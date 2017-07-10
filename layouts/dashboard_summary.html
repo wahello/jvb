@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Uniocde -->
+    <meta charset="utf-8">
+    <!-- IE Compatiblity -->
+    <meta http-equiv="X-UA Compatible" content="IE=edge">
+    <!-- First Mobile Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Title Of template -->
+    <title>Health And Wellness</title>
+    <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="plugins\bootstrap-datepicker-master\dist\css\bootstrap-datepicker.min.css">
+
+    <link rel="stylesheet" type="text/css" href="plugins\icheck\skins\all.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrapValidator.min.css">
+
+    <link rel="stylesheet" type="text/css" href="css/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="css/C3.min.css">
+
+    <!--[if IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![End if] -->
+   
+  </head>
+  <body>
+<!-- start navbar -->
+  <nav class="navbar  navbar-toggleable-md navbar-light bg-faded fixed-top">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Health And Wellness</a>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="user_inputs.html">User Inputs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="login.html">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="Registration.html">Registration</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="dashboard_summary.html">Dashoard<span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>  <!-- end navbar -->
+
+  <!-- start dashboard -->
+
+   <div class="container-fluid" id="dashboard">
+    <div class="row justify-content-center">
+       <h3 class="header"> Overall grades for july 16,2017 </h3>
+    </div>
+    <div class="row justify-content-center row1">
+       <div class="col-md-5  col-lg-3 col-sm-6 mt-4">
+         <div class="box">
+           <h3 class="title pt-5">A</h3>
+           <h4 class="title">4</h4>
+           <p class="title">Movement-Non Exercise Step Grade</p>
+         </div>
+       </div>
+       <div class="col-md-5 col-lg-3 col-sm-6 mt-4">
+         <div class="box_cd">
+           <h3 class="title pt-5">D</h3>
+           <h4 class="title">1.6</h4>
+           <p class="title">Movement consistency Grade</p>
+         </div>
+       </div><div class="col-md-5 col-lg-3 col-sm-6 mt-4">
+         <div class="box_cd">
+           <h3 class="title pt-5">C</h3>
+           <h4 class="title">2.7</h4>
+            <p class="title">Average Sleep Per Night Grade</p>
+         </div>
+       </div>
+       <div class="col-md-5 col-lg-3 col-sm-6 mt-4">
+         <div class="box">
+           <h3 class="title pt-5">A</h3>
+           <h4 class="title">4.00</h4>
+            <p class="title">Exercise Consistency Grade</p>
+         </div>
+       </div>
+        <div class="col-md-5 col-lg-3 col-sm-6 mt-4">
+         <div class="box">
+           <h3 class="title pt-5">A</h3>
+           <h4 class="title">4</h4>
+            <p class="title">Overall Exercise Grade</p>
+         </div>
+       </div><div class="col-md-5 col-lg-3 col-sm-6 mt-4">
+         <div class="box">
+           <h3 class="title pt-5">B</h3>
+           <h4 class="title">3</h4>
+            <p class="title">% Non Processed Food Consumed Grade</p>
+         </div>
+       </div>
+       <div class="col-md-5 col-lg-3 col-sm-6 mt-4">
+         <div class="box_cd">
+           <h3 class="title pt-5">C</h3>
+           <h4 class="title">2</h4>
+            <p class="title">Alcoholic Drinks Per Day Grade</p>
+         </div>
+       </div>
+     </div><!-- row end -->
+     <div class="weekly_grade">
+       <h2 class="weekly_grade_title">Weekly Report With Grades</h2>
+       <!-- <hr> -->
+     </div>
+      <div class="row justify-content-center  tbc">
+        <div class="col-lg-10 col-sm-12">
+         
+          <table class="table table-responsive table-bordered">
+            <thead>
+              <th></th>            
+              <th>10-06-2017</th>
+              <th>11-06-2017</th>
+              <th>12-06-2017</th>
+              <th>13-06-2017</th>
+              <th>14-06-2017</th>
+              <th>15-06-2017</th>
+              <th>16-06-2017</th>
+            </thead>
+            <tbody>
+            <tr>  
+              <th scope="row">Non Exercise Steps</th>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+            </tr>
+            <tr>  
+              <th scope="row">Movement Consistency</th>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+              </tr>
+            <tr>  
+              <th scope="row">Sleep</th>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="coloryellow">C</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">B</td>
+                <td class="colorgreen">B</td>
+            </tr>
+            <tr>  
+              <th scope="row">Exercise Consistency</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>  
+              <th scope="row">Overall Exercise</th>
+                <td class="coloryellow">D</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">B</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+            </tr>
+            <tr>  
+              <th scope="row">Workout Duration</th>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+            </tr>
+            <tr>  
+              <th scope="row">Exercise Effort Level</th>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+            </tr>
+            <tr>  
+              <th scope="row">Exercise Heart Rate</th>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+            </tr>
+            <tr>  
+              <th scope="row">Food</th>
+                <td class="colorgreen">B</td>
+                <td class="colorgreen">C</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+                <td class="colorgreen">A</td>
+            </tr>
+            <tr>  
+              <th scope="row">Alcohol</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+          </table>
+        
+        </div>
+      </div><!-- ending of weekly grade row -->
+      <div class="break_grade">
+        <h2 class="break_grade_title">Breakdown Of Grades</h2>
+      </div>
+      <div class="row justify-content-center btbc">
+        <div class="col-lg-8 col-md-10 col-sm-12">
+          <table class="table table-responsive table-bordered break_grade_table pt-5">
+            <thead>
+              <th></th>
+              <th>A</th>
+              <th>B</th>
+              <th>C</th>
+              <th>D</th>
+              <th>F</th>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Non Exercise Steps</th>
+                <td class="colorgreen">
+                  <!-- <p><b>A</b></p> -->
+                  <!-- <p>10000+</p> -->
+                  <p>14</p>
+                </td>
+                <td class="colorgreen">
+                  <!-- <p><b>B</b></p> -->
+                  <!-- <p>7500-9999</p> -->
+                  <p>0</p>
+                </td>
+                <td class="coloryellow">
+                  <!-- <p><b>C</b></p> -->
+                  <!-- <p>5000-7499</p> -->
+                  <p>0</p>
+                </td>
+                <td class="coloryellow">
+                  <!-- <p><b>D</b></p>                -->
+                  <!-- <p>3000-4999</p> -->
+                  <p>0</p>
+                </td>
+                <td class="colorred">
+                  <!-- <p><b>F</b></p> -->
+                  <!-- <p> < 3000</p> -->
+                  <p>0</p>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Movement Consistency</th>
+                <td class="colorgreen">
+                  <!-- <p><=4.5</p> -->
+                  <p>10</p>
+                </td>
+                <td class="colorgreen">
+                  <!-- <p>4.5 to 6</p> -->
+                  <p>10</p>
+                </td>
+                <td class="coloryellow">
+                  <!-- <p>6.01 to 7</p> -->
+                  <p>0</p>
+                </td>
+                <td class="coloryellow">
+                  <!-- <p>7.01 to 10</p> -->
+                  <p>0</p>
+                </td>
+                <td class="colorred">
+                  <!-- <p>>10</p> -->
+                  <p>0</p>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Sleep</th>
+                  <td class="colorgreen">8</td>
+                  <td class="colorgreen">5</td>
+                  <td class="coloryellow">1</td>
+                  <td class="coloryellow">0</td>
+                  <td class="colorred">0</td>
+              </tr>
+              <tr>  
+                <th scope="row">Exercise Consistency</th>
+                  <td class="colorgreen">2</td>
+                  <td class="colorgreen">0</td>
+                  <td class="coloryellow">0</td>
+                  <td class="coloryellow">0</td>
+                  <td class="colorred">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Overall Exercise</th>
+                  <td class="colorgreen">9</td>
+                  <td class="colorgreen">3</td>
+                  <td class="coloryellow">1</td>
+                  <td class="coloryellow">1</td>
+                  <td class="colorred">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Workout Duration</th>
+                  <td class="colorgreen">14</td>
+                  <td class="colorgreen">0</td>
+                  <td class="coloryellow">0</td>
+                  <td class="coloryellow">0</td>
+                  <td class="colorred">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Exercise Effort Level</th>
+                  <td class="colorgreen">11</td>
+                  <td class="colorgreen">1</td>
+                  <td class="coloryellow">0</td>
+                  <td class="coloryellow">1</td>
+                  <td class="colorred">1</td>
+            </tr>
+            <tr>
+              <th scope="row">Exercise Heart Rate</th>
+                  <td class="colorgreen">0</td>
+                  <td class="colorgreen">12</td>
+                  <td class="coloryellow">1</td>
+                  <td class="coloryellow">1</td>
+                  <td class="colorred">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Food</th>
+                  <td class="colorgreen">8</td>
+                  <td class="colorgreen">3</td>
+                  <td class="coloryellow">3</td>
+                  <td class="coloryellow">0</td>
+                  <td class="colorred">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Alcohol</th>
+                  <td class="colorgreen">3</td>
+                  <td class="colorgreen">2</td>
+                  <td class="coloryellow">6</td>
+                  <td class="coloryellow">2</td>
+                  <td class="colorred">1</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div><!-- ending of breakdown row -->
+      <div class="week_summary">
+        <h2 class="week_summary_title">Weekly Summary</h2>
+      </div>
+      <div class="row justify-content-center wstbc">
+        <div class="col-lg-7 col-md-9 col-sm-12">
+          <table class="table table-responsive table-bordered">
+            <thead>
+              <th></th>
+              <th>Average</th>
+              <th>Median</th>
+              <th>Best</th>
+              <th>Worst</th>
+            </thead>
+            <tbody>
+             <tr>
+               <th scope="row">Non Exercise Steps</th>
+                  <td class="colorgreen">21174</td>
+                  <td class="colorgreen">19775</td>
+                  <td class="colorgreen">32652</td>
+                  <td class="colorgreen">13987</td>
+            </tr>
+            <tr>
+               <th scope="row">Movement Consistency</th>
+                  <td class="colorgreen">3</td>
+                  <td class="colorgreen">4</td>
+                  <td class="colorgreen">0</td>
+                  <td class="coloryellow">6</td>
+            </tr>
+            <tr>
+               <th scope="row">Sleep(in hours)</th>
+                  <td class="colorgreen">7.6</td>
+                  <td class="colorgreen">7.7</td>
+                  <td class="colorgreen">8.2</td>
+                  <td class="coloryellow">6.8</td>
+            </tr> 
+            <tr>
+               <th scope="row">Exercise Consistency</th>
+                  <td class="colorgreen"></td>
+                  <td class="colorgreen"></td>
+                  <td class="colorgreen"></td>
+                  <td class="colorgreen"></td>
+            </tr>
+            <tr>
+               <th scope="row">Overall Exercise</th>
+                  <td class="colorgreen">3.5</td>
+                  <td class="colorgreen">3.7</td>
+                  <td class="colorgreen">4</td>
+                  <td class="colorgreen">2</td>
+            </tr>
+            <tr>
+               <th scope="row">Workout Duration</th>
+                  <td class="colorgreen">86</td>
+                  <td class="colorgreen">92</td>
+                  <td class="colorgreen">99</td>
+                  <td class="colorgreen">60</td>
+            </tr>
+            <tr>
+               <th scope="row">Workout Effort Level</th>
+                  <td class="colorgreen">3.9</td>
+                  <td class="colorgreen">3.0</td>
+                  <td class="colorgreen">2.0</td>
+                  <td class="colorgreen">9.0</td>
+            </tr>
+            <tr>
+               <th scope="row">Exercise Heart Rate</th>
+                  <td class="colorgreen">131</td>
+                  <td class="colorgreen">127</td>
+                  <td class="colorgreen">124</td>
+                  <td class="colorgreen">162</td>
+            </tr>
+            <tr>
+               <th scope="row">Food</th>
+                  <td class="colorgreen">78</td>
+                  <td class="colorgreen">80</td>
+                  <td class="colorgreen">95</td>
+                  <td class="colorgreen">65</td>
+            </tr>
+            <tr>
+               <th scope="row">Alcohol</th>
+                  <td class="colorgreen">1.8</td>
+                  <td class="colorgreen">2.0</td>
+                  <td class="colorgreen"></td>
+                  <td class="colorgreen">5</td>
+            </tr>     
+            </tbody>
+          </table>
+        </div>
+      </div><!-- ending of week summary row -->
+
+      <div class="content">
+        <div class="row">
+            <div class="col-lg-6 col-12">
+                <div class="card mt-5">
+                    <div class="card-block">
+                        <h5 class="heading">Line chart for sleep</h5>
+                        <div class="m-t-30" id="line_chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>      
+
+   </div><!-- closing of container -->
+
+
+
+  <!-- ending of dashboard -->
+
+
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="plugins/moment.min.js"></script>
+    <script type="text/javascript" src="plugins\bootstrap-datepicker-master\dist\js\bootstrap-datepicker.min.js"></script>
+    <script src="js/script.js"></script>
+      <script type="text/javascript" src="plugins\icheck\icheck.js"></script>
+      <script type="text/javascript" src="js/select2.min.js"></script>
+      <script type="text/javascript" src="js/bootstrapValidator.min.js"></script>
+      <script type="text/javascript" src="js/C3.min.js"></script>
+      <script type="text/javascript" src="js/d3.min.js"></script>
+      <script type="text/javascript" src="js/c3_line_chart.js"></script>
+    <script src="js/script.js"></script>
+  </body>
+</html>
