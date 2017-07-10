@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 674f0080698c72aafa67fd31a563ed937b23b634
 
 import os
 import sys
@@ -20,6 +23,7 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
+<<<<<<< HEAD
 =======
 import os
 import sys
@@ -42,4 +46,6 @@ if __name__ == "__main__":
             )
         raise
 >>>>>>> 'Firstcommit'
+=======
+>>>>>>> 674f0080698c72aafa67fd31a563ed937b23b634
     execute_from_command_line(sys.argv)
