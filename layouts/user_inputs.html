@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Uniocde -->
+    <meta charset="utf-8">
+    <!-- IE Compatiblity -->
+    <meta http-equiv="X-UA Compatible" content="IE=edge">
+    <!-- First Mobile Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Title Of template -->
+    <title>Health And Wellness</title>
+    <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="plugins\bootstrap-datepicker-master\dist\css\bootstrap-datepicker.min.css">
+
+    <link rel="stylesheet" type="text/css" href="plugins\icheck\skins\all.css">
+    <link rel="stylesheet" type="text/css" href="css\select2.min.css">
+    <link rel="stylesheet" type="text/css" href="css\bootstrapValidator.min.css">
+
+    <!--[if IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![End if] -->
+   
+  </head>
+  <body>
+
+    <nav class="navbar  navbar-toggleable-md navbar-light bg-faded fixed-top">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Health And Wellness</a>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">Home </a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="user_inputs.html">User Inputs <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="login.html">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="registration.html">Registration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard_summary.html">Dashoard</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>  <!-- end navbar -->
+
+<!-- start user inputs -->
+
+<section id="user-inputs">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8  col-sm-12">
+        <h2 class="head">Daily user inputs report</h2>
+        <form class="user-inputs-form bootstrap_validator" role="form" data-toggle="validator">
+         <label class="padding">Was your workout easy or hard</label>
+          <select class="custom-select form-control" name="one">
+            <option selected>select</option>
+            <option value="1">Easy</option>
+            <option value="2">Hard</option>
+          </select>
+          <label class="padding">Workout Effort Level</label>
+          <select class="custom-select form-control">
+            <option selected>select</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+          <label class="padding"> how much % unprocessed food consumed yesterday?</label>
+            <select class="custom-select form-control">
+             <option selected>select</option>
+             <option value="1">0%</option>
+              <option value="2">1%</option>
+               <option value="3">2%</option>
+                <option value="4">3%</option>
+                 <option value="5">5%</option>
+                  <option value="6">6%</option>
+                   <option value="7">7%</option>
+          </select>
+           <label class="padding">Number of Alchol Drinks consumed yesterday?</label>
+            <select class="custom-select form-control">
+             <option selected>select</option>
+             <option value="1">0.5</option>
+              <option value="2">1</option>
+               <option value="3">1.5</option>
+                <option value="4">2</option>
+                 <option value="5">2.5</option>
+                  <option value="6">3</option>
+                   <option value="7">3.5</option>
+            </select>
+            <label class="padding">Did you take any prescription or non prescription sleep aids last night?</label>
+            <select class="custom-select form-control" id="prescription_select" >
+              <option selected>Select</option>
+              <option value="1">Yes</option>
+              <option value="2">No</option>
+            </select>
+
+              <!-- Hidden fields -->
+              <div class="prescription_hidden_fields">
+
+                <label class="padding">Did you smoke any substances whatsover</label>
+                  <select class="custom-select form-control">
+                    <option selected="">select</option>
+                    <option value="1">Yes</option>
+                    <option value="2">No</option>
+                  </select>
+
+
+                <label class="padding">Did you ingest any prescription or non prescription medications</label>
+                  <select class="custom-select form-control">
+                    <option selected="">select</option>
+                    <option value="1">Yes</option>
+                    <option value="2">No</option>
+                  </select>
+                
+              </div>
+              <!-- end of hidden fields -->
+
+
+
+            <label class="padding">Yesterday Stress Level</label>
+            <select class="custom-select form-control">
+              <option selected="select">select</option>
+              <option value="1">Low</option>
+              <option value="2">Medium</option>
+              <option value="3">High</option>
+            </select>
+            <label class="padding">Did you have any pain or twinges during or after your workout</label>
+            <select class="custom-select form-control" id="pain_select">
+              <option selected="select">select</option>
+              <option value="1">Yes</option>
+              <option vlaue="2">No</option>
+            </select>
+
+            <!-- hidden fields -->
+           
+           <div class="pain_hidden_fields">
+             <label class="padding">Select the pain is from below dropdown</label>
+             <select class="custom-select form-control">
+               <option selected="select">select</option>
+               <option value="">neck</option>
+               <option value="">leg</option>
+             </select>
+           </div>
+
+            <!-- end of hidden fields -->
+
+            <label class="padding">Water Consumed During Workout</label>
+            <select class="custom-select form-control">
+              <option selected="select">select</option>
+              <option value="">0 ounces</option>
+              <option value="">1 ounces</option>
+              <option value="">2 ounces</option>
+              <option value="">3 ounces</option>
+              <option value="">4 ounces</option>
+              <option value="">5 ounces</option>
+              <option value="">6 ounces</option>
+              <option value="">7 ounces</option>
+            </select>
+            <label class="padding">How Much % Workout that User breathed in and out through nose</label>
+            <select class="custom-select form-control">
+              <option selected="select">select</option>
+              <option value="">1%</option>
+              <option value="">2%</option>
+              <option value="">3%</option>
+              <option value="">4%</option>
+              <option value="">5%</option>
+              <option value="">6%</option>
+              <option value="">7%</option>
+              <option value="">8%</option>
+              <option value="">9%</option>
+              <option value="">10%</option>
+            </select>
+            <label class="padding">Are you sick today?</label>
+            <select class="custom-select form-control" id="sick_select">
+              <option selected="">select</option>
+              <option value="1">Yes</option>
+              <option value="2">No</option>
+            </select>
+            <!-- hidden fields -->
+            <div class="sick_hidden_fields">
+              <input type="textarea" name="sick_comment" rows="5" columns="5" class="form-control" placeholder="type here your illness">
+            </div>
+            <!-- end of hidden files -->
+            <label class="padding">Did you stand for 3 hours yesterday when you worked </label>
+            <select class="custom-select form-control" id="sick_select">
+              <option selected="">select</option>
+              <option value="1">Yes</option>
+              <option value="2">No</option>
+            </select>
+
+            <label class="padding">List of processed food consumed yesterday</label>
+            <input type="textarea" class="form-control" placeholder="Enter processed items consumed" name="" />
+            <label class="padding">Tablespoons of chia seeds consumed during workout ?</label>
+            <select class="custom-select form-control">
+              <option selected="select">select</option>
+              <option value="">1</option>
+              <option value="">2</option>
+              <option value="">3</option>
+              <option value="">4</option>
+              <option value="">5</option>
+              <option value="">6</option>
+              <option value="">7</option>
+              <option value="">8</option>
+              <option value="">9</option>
+              <option value="">10</option>
+              <option value="">11</option>
+              <option value="">12</option>
+              <option value="">13</option>
+              <option value="">14</option>
+              <option value="">15</option>
+              <option value="">16</option>
+              <option value="">17</option>
+              <option value="">18</option>
+              <option value="">19</option>
+              <option value="">20</option>
+            </select>
+            <label class="padding">Were you fasted during workout </label>
+            <select class="custom-select form-control">
+              <option selected="select">select</option>
+              <option value="">Yes</option>
+              <option value="">No</option>
+            </select>
+            <label class="padding">General workout comments</label>
+            <input type="text" name="comment" placeholder="please leave a comment" class="form-control" />
+            <label class="padding">Weight</label>
+            <select class="custom-select form-control">
+              <option selected="select">select</option>
+              <option value="">30 pounds</option>
+              <option value="">40 pounds</option>
+              <option value="">50 pounds</option>
+              <option value="">60 pounds</option>
+              <option value="">70 pounds</option>
+              <option value="">80 pounds</option>
+              <option value="">90 pounds</option>
+              <option value="">100 pounds</option>
+              <option value="">110 pounds</option>
+              <option value="">120 pounds</option>
+              <option value="">130 pounds</option>
+              <option value="">140 pounds</option>
+              <option value="">150 pounds</option>
+              <option value="">160 pounds</option>
+              <option value="">170 pounds</option>
+           </select>
+           <label class="padding">Waist size (Male)</label>
+           <select class="custom-select form-control">
+             <option selected="select">select</option>
+             <option value="">20</option>
+             <option value="">22</option>
+             <option value="">24</option>
+             <option value="">26</option>
+             <option value="">28</option>
+             <option value="">30</option>
+             <option value="">32</option>
+             <option value="">34</option>
+             <option value="">36</option>
+             <option value="">38</option>
+             <option value="">40</option>
+             <option value="">42</option>
+             <option value="">44</option>
+             <option value="">46</option>
+             <option value="">48</option>
+             <option value="">50</option>
+             <option value="">52</option>
+             <option value="">54</option>
+             <option value="">56</option>
+             <option value="">58</option>
+             <option value="">60</option>
+           </select>
+           <label class="padding">Clothes Size (Womens)</label>
+           <select class="custom-select form-control">
+             <option selected="select">select</option>
+             <option value="">1</option>
+             <option value="">2</option>
+             <option value="">3</option>
+             <option value="">4</option>
+             <option value="">5</option>
+             <option value="">6</option>
+             <option value="">7</option>
+             <option value="">8</option>
+             <option value="">9</option>
+             <option value="">10</option>
+             <option value="">11</option>
+             <option value="">12</option>
+             <option value="">13</option>
+             <option value="">14</option>
+             <option value="">15</option>
+           </select>
+           <label class="padding">Heart rate variability</label>
+           <select class="custom-select form-control">
+             <option selected="select">select</option>
+             <option value="">1</option>
+             <option value="">2</option>
+             <option value="">3</option>
+             <option value="">4</option>
+             <option value="">5</option>
+             <option value="">6</option>
+             <option value="">7</option>
+             <option value="">8</option>
+             <option value="">9</option>
+             <option value="">10</option>
+             <option value="">11</option>
+             <option value="">12</option>
+             <option value="">13</option>
+             <option value="">14</option>
+             <option value="">15</option>
+             <option value="">16</option>
+             <option value="">17</option>
+             <option value="">18</option>
+             <option value="">19</option>
+             <option value="">20</option>
+           </select>  
+            <label class="padding">What % did you breath through your nose last night when you were a sleep?</label>
+           <select class="custom-select form-control">
+             <option selected="select">select</option>
+             <option value="">0%</option>
+             <option value="">1%</option>
+             <option value="">2%</option>
+             <option value="">3%</option>
+             <option value="">4%</option>
+             <option value="">5%</option>
+             <option value="">6%</option>
+           </select>
+           <label class="padding">What % did you breath through your nose throughtout the day when you were not exercising?</label>
+           <select class="custom-select form-control">
+             <option selected="select">select</option>
+             <option value="">0%</option>
+             <option value="">1%</option>
+             <option value="">2%</option>
+             <option value="">3%</option>
+             <option value="">4%</option>
+             <option value="">5%</option>
+             <option value="">6%</option>
+           </select>  
+           <button type="submit" class="btn btn-block btn-primary">Submit</button>
+       </form>
+      </div>
+    </div>
+  </div>
+</section> <!-- end user inputs -->
+
+
+
+
+    
+
+
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="plugins\moment.min.js"></script>
+    <script type="text/javascript" src="plugins\bootstrap-datepicker-master\dist\js\bootstrap-datepicker.min.js"></script>
+    <script src="js/script.js"></script>
+      <script type="text/javascript" src="plugins\icheck\icheck.js"></script>
+      <script type="text/javascript" src="js\select2.min.js"></script>
+      <script type="text/javascript" src="js\bootstrapValidator.min.js"></script>
+    <script src="js/script.js"></script>
+  </body>
+</html>
