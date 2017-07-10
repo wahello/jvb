@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Uniocde -->
+    <meta charset="utf-8">
+    <!-- IE Compatiblity -->
+    <meta http-equiv="X-UA Compatible" content="IE=edge">
+    <!-- First Mobile Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Title Of template -->
+    <title>Health And Wellness</title>
+    <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="plugins\bootstrap-datepicker-master\dist\css\bootstrap-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="css\bootstrapValidator.min.css">
+
+    <link rel="stylesheet" type="text/css" href="plugins\icheck\skins\all.css">
+    <link rel="stylesheet" type="text/css" href="css\select2.min.css">
+
+  
+    <!--[if IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![End if] -->
+
+  </head>
+  <body>
+  <!-- navbar start -->
+  <nav class="navbar  navbar-toggleable-md navbar-light bg-faded fixed-top">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Health And Wellness</a>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="user_inputs.html">User Inputs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="login.html">Login</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="registration.html">Registration <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard_summary.html">Dashoard</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>  <!-- end navbar -->
+
+   <!-- start registration -->
+
+    
+    <section id="registration">
+      <div class="container">
+            <h2 class="head">Registration</h4>
+        <div class="row justify-content-center">
+          
+          <form  class=" col-sm-12  col-md-6 registration-form bootstrap_validator" data-toggle="validator"  role="form" action="" method="">
+            <div class="form-group" class="col-md-12">
+              <label>First Name</label>
+              <input type="text"  name="first_name" class="form-control" placeholder="please enter first  name" required="">
+            </div>
+            <div class="form-group" class="col-md-12">
+            <label>Last Name</label>
+              <input type="text"  name="last_name" class="form-control" placeholder="please enter last name" required="">
+            </div>
+            <div class="form-group" class="col-md-12">
+              <label>Height</label>
+              <input type="text"  name="height" class="form-control" placeholder="please enter height" required="">
+            </div> 
+            <div class="form-group" class="col-md-12">
+               <label>Weight</label>
+              <input type="text"  name="weight" class="form-control" placeholder="please enter weight" required="">
+            </div> 
+   <fieldset class="form-group">
+    <legend>select your gender</legend>
+         <div class="form-check form-check-inline">
+            <label class="form-check-label">
+             <input class="form-check-input" type="radio" name="gender" id="" value="male" required=""> Male
+            </label>
+            <label class="form-check-label">
+             <input class="form-check-input" type="radio" name="gender" id="" value="female" required=""> Female
+             </label>
+             <label class="form-check-label">
+             <input class="form-check-input" type="radio" name="gender" id="" value="other" required=""> Other
+             </label>
+         </div>
+   </fieldset>
+       <div class="form-group" class="col-md-12">
+           <label>Birthday</label>
+              <input type="text"  name="dob" class="form-control datepicker" placeholder="please enter birthday" required="">
+       </div>
+       <div class="form-group" class="col-md-12">
+           <label>Garmin username</label>
+              <input type="text"  name="username" class="form-control" placeholder="please enter garmin username" required="">
+       </div>
+       <div class="form-group" class="col-md-12">
+          <label>Garmin password</label>
+              <input type="password"  name="password" class="form-control" placeholder="please enter garmin password" required="">
+       </div>
+       <div class="form-group" class="col-md-12">
+           <label>Email</label>
+              <input type="email" name="email" class="form-control" placeholder="please enter email" required="">
+       </div>
+       
+       <div class="form-group">
+         <label class="padding">Goals</label>
+           <select class=" form-control" multiple="multiple" name="goals">
+             <option value="">Maintain Overall Health</option>
+             <option value="">improve health</option>
+             <option value="">improve energy levels</option>
+             <option value="">improve blood work levels</option>
+           </select> 
+       
+       </div>
+       <div class="form-group" class="col-md-12">
+         <label class="padding">Daily Non Exercise Steps Goals</label>
+           <input type="text" name="non_steps_goals" class="form-control" placeholder="enter stpes in numbers">
+       </div>
+       <div class="form-group" class="col-md-12">
+         <label class="padding">Daily Sleep Goal</label>
+           <input type="text" name="sleep_goal" class="form-control" placeholder="enter sleep time">
+       </div>
+       <div class="form-group" class="col-md-12">
+         <label class="padding">Daily Movement Consistency Goal</label>
+           <input type="text" name="movement_goal" class="form-control" placeholder="enter consistency goal">
+       </div>
+           <button type="submit" class="btn btn-block btn-primary">Sign Up</button>
+                Already have an account? Please <a href="login.html"> Log In</a>
+             <!-- <a href="index.html" class="btn btn-primary btn-lg btn-block">Submit</a>   -->
+          </form>
+        </div>
+      </div> 
+      </section>   <!-- end registration -->
+
+
+  <!-- jQuery first, then Tether, then Bootstrap JS. -->
+   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="plugins/moment.min.js"></script>
+    <script type="text/javascript" src="plugins\bootstrap-datepicker-master\dist\js\bootstrap-datepicker.min.js"></script>
+    <script src="js/script.js"></script>
+      <script type="text/javascript" src="plugins\icheck\icheck.js"></script>
+      <script type="text/javascript" src="js/select2.min.js"></script>
+    <script src="js/script.js"></script>
+    <script type="text/javascript" src="js/bootstrapValidator.min.js"></script>
+  </body>
+</html>
