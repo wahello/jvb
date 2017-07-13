@@ -8,7 +8,7 @@ import HomePageReactTitle from '../components/HomePageReactTitle';
 // eslint-disable-next-line react/prefer-stateless-function
 export default class HomePageContainer extends React.Component {
   render() {
-    const title = 'It really does work! (rendered by React, change this message to test hot reloading)';
+    const title = ''
     return <HomePageReactTitle title={title} />;
   }
 }
