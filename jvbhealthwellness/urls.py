@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^djangojs/', include('djangojs.urls')),
 
-    url(r'^$', TemplateView.as_view(template_name='exampleapp/itworks.html'), name='home'),
+    url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
 ]
