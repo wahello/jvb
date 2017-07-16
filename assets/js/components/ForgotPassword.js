@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Container, Row, Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
 
@@ -26,7 +26,7 @@ const HomePageReactTitle = ({ title }) => {
      </Col></Row>
      <Row>
      	<Col  xs="6">
-       <Link to='/register'>Register</Link>
+     	 <a>Register</a>
      	</Col>
      </Row>
           <Row>
