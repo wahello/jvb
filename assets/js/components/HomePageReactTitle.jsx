@@ -26,7 +26,7 @@ const HomePageReactTitle = ({ title }) => {
      </Col></Row>
      <Row>
      	<Col  xs="6">
-       <Link to='/register'>Register</Link>
+       <Link to='register'>Register</Link>
      	</Col>
      </Row>
           <Row>
