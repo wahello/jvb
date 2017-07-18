@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+<<<<<<< HEAD
 import os
 import sys
 
@@ -19,4 +20,27 @@ if __name__ == "__main__":
                 "forget to activate a virtual environment?"
             )
         raise
+=======
+
+
+import os
+import sys
+
+from decouple import config
+
+
+if __name__ == "__main__":
+    settings_module = config('DJANGO_SETTINGS_MODULE', default=None)
+    print(settings_module)
+
+    if sys.argv[1] == 'test':
+        if settings_module:
+            print("Ignoring config('DJANGO_SETTINGS_MODULE') because it's test. "
+                  "Using 'jvbhealthwellness.settings.test'")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jvbhealthwellness.settings.test")
+    else:
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
+
+    from django.core.management import execute_from_command_line
+>>>>>>> d042e6150b53849199f4007ecdeaf8f5a6b49b9e
     execute_from_command_line(sys.argv)

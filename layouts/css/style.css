@@ -1,0 +1,259 @@
+html,
+body{
+	height: 100%;
+	/*background: url('../img/header.jpg') center center no-repeat;*/
+	background-size: cover;
+}
+.fixed-top{
+	z-index:99999;
+}
+/*user_inputs CSS*/
+.select2{
+	width: 100% !important;
+}
+#user-inputs {
+	padding-top: 80px;
+	display: flex;
+	align-items: center;
+	background: url('../img/header.jpg') center center no-repeat fixed;
+	background-size: cover;
+	color: white;
+
+}
+#user-inputs .head{
+	text-align: center;
+	padding: 50px;
+}
+#user-inputs .user-inputs-form{
+	background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+	padding: 10px;
+
+}
+#user-inputs .user-inputs-form input.form-control{
+	height: 28px;
+}
+#user-inputs .user-inputs-form button {
+margin-top: 46px;
+}
+#user-inputs .user-inputs-form .padding{
+	padding: 10px;
+}
+/*input[name='sick_comment']{*/
+	/*height: 28px;*/
+/*}*/
+
+/* login css */
+
+#loginform {
+	padding-top: 200px;
+	/*display: flex;*/
+	align-items: center;
+	background: url('../img/login_header.jpg') center center no-repeat fixed;
+	background-size: cover;
+	color: white;
+	height: 700px;
+}
+#loginform .head{
+	text-align: center;
+	/*padding:30px*/
+
+}
+#loginform .login-form-header{
+background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+	padding: 10px;
+}
+#loginform .login-form-header a{
+	color:white;
+}
+#loginform .login-form-header a.btn{
+	margin-top: 5px;
+}
+
+/*registration CSS*/
+.help-block{
+	color:#ff6666;
+}
+
+#registration {
+	padding-top: 80px;
+	display: flex;
+	background: url('../img/registration_header.jpg') center center no-repeat fixed;
+	background-size: cover;
+	align-items: center;	
+	color: white;
+
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice{
+	background: #636c72 !important;
+}
+#registration .head{
+	text-align: center;
+	padding: 50px;
+}
+ #registration .registration-form{
+	background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+	padding: 10px;
+}
+#registration .registration-form .btn{
+	margin-top: 40px;
+}
+#registration .registration-form a {
+	color: white;
+}
+#registration .registration-form a:hover {
+	color: lightblue;
+}
+.datepicker td, .datepicker th{
+	padding: 3px;
+}
+input[name='dob']{
+	height: 38px;
+}
+
+
+/*forgot CSS*/
+
+#forgot{
+	padding-top: 80px;
+	display: flex;
+	background: url('../img/login_header.jpg') center center no-repeat fixed;
+	background-size: cover;
+	align-items: center;	
+	color: white;
+	height: 700px;
+}
+#forgot .forgot-password{
+	background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+	padding: 10px;
+	margin-bottom: 10px
+}
+#forgot .head{
+	text-align: center;
+	margin-top: -120px;
+	padding: 10px;
+}
+
+/*reset css*/
+#reset{
+	padding-top: 60px;
+	display: flex;
+	background: url('../img/login_header.jpg') center center no-repeat fixed;
+	background-size: cover;
+	align-items: center;	
+	color: white;
+	height: 700px;
+}
+#reset .head{
+	text-align: center;
+	padding: 30px;
+}
+#reset .reset_password{
+	background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+	padding: 10px;
+}
+
+/*hidden fields*/
+.prescription_hidden_fields{
+	display: none;
+}
+.pain_hidden_fields{
+	display: none;
+}
+.sick_hidden_fields{
+	display: none;
+}
+
+/*dashboard styles*/
+#dashboard{
+	padding-top: 80px;
+	color: black;
+	text-align: center;
+	background-color: #eceeef
+}
+#dashboard h3.header{
+	margin-bottom: 20px;
+}
+#dashboard .box{
+	background-color: green;
+	color: black;
+	height: 200px;
+	width: 200px;
+	margin: auto;
+	text-align: center;
+	/*display: table-cell;*/
+	/*vertical-align: middle;*/
+}
+#dashboard .box_cd{
+	margin: auto;
+	background-color: yellow;
+	color: black;
+	height: 200px;
+	width: 200px;
+	text-align: center;
+	/*display: table-cell;*/
+	/*vertical-align: middle;*/
+}
+#dashboard .row1{
+	margin: 10px;
+	padding: 10px;
+}
+.tbc{
+	background-color: cadetblue;
+	margin-top: 50px;
+}
+.btbc{
+	background-color: darkgray;
+	margin-top: 50px;
+}
+.wstbc{
+	background-color: darkseagreen;
+	margin-top: 50px;
+}
+table th{
+	min-width: 100px;
+	text-align: center;
+}
+tbody td{
+	vertical-align: middle !important; 
+}
+tbody th{
+	vertical-align: middle !important;
+	text-align: center;
+}
+.colorgreen{
+	
+	background-color: green;
+}
+.coloryellow{
+	background-color:yellow;
+}
+.colorred{
+	background-color:red;
+}
+/*break_view grade css*/
+.break_grade_table tbody td p{
+	margin-bottom: 0px;
+}
+.break_grade h2.break_grade_title{
+	margin-top: 70px;
+}
+.weekly_grade h2.weekly_grade_title{
+	margin-top: 50px;
+}
+.week_summary h2.week_summary_title{
+	margin-top: 70px;
+}
+
+.content {
+  display: block;
+  width: auto;
+  overflow-x: hidden;
+  padding: 0 20px 25px 25px; }
+
+.content-header {
+  margin-bottom: 10px; }
