@@ -8,4 +8,6 @@ urlpatterns = [
     url(r'^djangojs/', include('djangojs.urls')),
 
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
+    url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
+
 ]
