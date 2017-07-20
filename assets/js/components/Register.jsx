@@ -32,7 +32,7 @@ class Register extends React.Component {
 <Row><Col>&nbsp;</Col></Row><Row><Col>&nbsp;</Col></Row>
     <Row><Col>&nbsp;</Col></Row>
     <Row><Col  xs="6">
-      <h1>Login</h1>
+      <h1>Registration</h1>
       <Form onSubmit={(e,d) => this.sendForm(e,d)}>
 
   <FormGroup>
