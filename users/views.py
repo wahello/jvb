@@ -14,8 +14,8 @@ def request_token(request):
     req_url = 'http://connectapitest.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connecttest.garmin.com/oauthConfirm'
     acc_url = 'http://connectapitest.garmin.com/oauth-service-1.0/oauth/access_token'
-    conskey = 'YOUR_KEY';
-    conssec = 'YOUR_SECRET';
+    conskey = '38226ca8-88be-4641-a788-353894e5dbc0';
+    conssec = 'k9KRDdmiMQtLMG43QTtl4LmDo0SohR9OtZi';
     session = request.session
     if not 'auth_token' in session and ('state' in session and session['state'])==1:
         session['state'] = 0; 
@@ -37,7 +37,8 @@ def request_token(request):
 
     session = request.session
     
-    if not 'oauth_token' in session and not ('state' in session or session['state']):
+
+    if not 'oauth_token' in session and not 'state' in session:
         # request_token, request_token_secret = service.get_request_token(params = 
   #                     {'oauth_callback': 'oob', 
   #                      'format': 'json'})
@@ -47,7 +48,7 @@ def request_token(request):
         session['request_token'] = request_token
         session['request_token_secret'] = request_token_secret
         session['state'] = 1
-        redirect(authurl + '?oauth_token={0}'.format(request_token))
+        return redirect(authurl + '?oauth_token={0}'.format(request_token))
     elif 'state' in session and session['state'] ==1:
         #oauth token already exists
         #determine access token temporaily for work  
@@ -59,6 +60,7 @@ def request_token(request):
         session['state'] = 2
         session['access_token'] = access_token
         session['access_secret'] = access_token_secret
+        return redirect('/')
     # except Exception, e:
     #     print(e)
     
