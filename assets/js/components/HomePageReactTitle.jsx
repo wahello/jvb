@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { Container, Row, Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
 
-
 const HomePageReactTitle = ({ title }) => {
   const homeURL = window.Django.url('home');
 
@@ -29,10 +28,20 @@ const HomePageReactTitle = ({ title }) => {
        <Link to='register'>Register</Link>
      	</Col>
      </Row>
-          <Row>
+     <Row>
      	<Col  xs="6">
      	<a>Forgot Password</a>
      	</Col>
+       </Row>
+       <Row>
+      <Col xs="6">
+       <Link to='dashboard'>Dashboard</Link>
+      </Col>
+     </Row>
+     <Row>
+      <Col xs="6">
+       <Link to='userinputs'>userinputs</Link>
+      </Col>
      </Row>
      </Container>
   )
