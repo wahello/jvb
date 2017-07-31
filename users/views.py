@@ -4,7 +4,9 @@ import webbrowser
 from django.shortcuts import redirect
 
 # Create your views here.
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import authentication, permissions
 
 # In state=1 the next request should include an oauth_token.
 #If it doesn't go back to 0
