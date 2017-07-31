@@ -10,6 +10,19 @@ from django.shortcuts import redirect
 #If it doesn't go back to 0
 
 
+
+class UserCreate(APIView):
+    """ 
+    Creates the user. 
+    """
+
+    def post(self, request, format='json'):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 def request_token(request):
     req_url = 'http://connectapitest.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connecttest.garmin.com/oauthConfirm'
