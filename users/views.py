@@ -11,6 +11,9 @@ from rest_framework import authentication, permissions
 # In state=1 the next request should include an oauth_token.
 #If it doesn't go back to 0
 
+from django.views.decorators.clickjacking import xframe_options_exempt
+
+
 
 
 class UserCreate(APIView):
@@ -25,6 +28,7 @@ class UserCreate(APIView):
             if user:
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+@xframe_options_exempt
 def request_token(request):
     req_url = 'http://connectapitest.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connecttest.garmin.com/oauthConfirm'

@@ -43,6 +43,11 @@ const HomePageReactTitle = ({ title }) => {
        <Link to='userinputs'>userinputs</Link>
       </Col>
      </Row>
+     <Row>
+      <Col xs="6">
+       <Link to='service_connect'>Service Connect</Link>
+      </Col>
+     </Row>
      </Container>
   )
 };
