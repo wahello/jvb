@@ -1,5 +1,6 @@
 import React from 'react';
 import HomePageReactTitle from '../components/HomePageReactTitle';
+import Navbar from '../components/navbar';
 
 /* You also get this warning in v1.x if you write your root component as
    stateless plain function instead of using React.Component. This problem
@@ -9,6 +10,11 @@ import HomePageReactTitle from '../components/HomePageReactTitle';
 export default class HomePageContainer extends React.Component {
   render() {
     const title = ''
-    return <HomePageReactTitle title={title} />;
+    return (
+    <div>
+    <Navbar />
+    <HomePageReactTitle title={title} />
+    </div>
+    )
   }
 }

@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router'
 import { Container, Select, Option, option, Row, Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import RegisterNetwork from '../network/register';
+import Navbar from '../components/navbar';
 
 
 class Register extends React.Component {
@@ -27,6 +28,8 @@ class Register extends React.Component {
 
     console.log('i am in the render for register');
   return (
+    <div>
+     <Navbar />
   	<Container>
      
 <Row><Col>&nbsp;</Col></Row><Row><Col>&nbsp;</Col></Row>
@@ -63,7 +66,7 @@ class Register extends React.Component {
    </FormGroup>
   <FormGroup>
            <Label>Birthday</Label>
-              <Input type="text"  name="dob" className="form-control datepicker" placeholder="please enter birthday" required="" />
+              <Input type="date"  name="dob" className="form-control datepicker" placeholder="please enter birthday" required="" />
   </FormGroup>
   
   <FormGroup>
@@ -72,7 +75,7 @@ class Register extends React.Component {
   </FormGroup>
  
   <FormGroup>
-           <Label>Email</Label>
+           <Label>Password</Label>
               <Input type="password" ref="password" className="form-control" placeholder="please enter password" required="" />
   </FormGroup>
 
@@ -112,6 +115,7 @@ class Register extends React.Component {
 
 
     </Container>
+    </div>
   );
 }
 
