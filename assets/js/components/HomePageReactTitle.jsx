@@ -30,17 +30,42 @@ const HomePageReactTitle = ({ title }) => {
      </Row>
      <Row>
      	<Col  xs="6">
-     	<a>Forgot Password</a>
+     	<Link to="forgotpassword">Forgot Password</Link>
      	</Col>
        </Row>
-       <Row>
+     <Row>
       <Col xs="6">
-       <Link to='dashboard'>Dashboard</Link>
+       <Link to='userinputs'>userinputs</Link>
+      </Col>
+     </Row>
+      <Row>
+      <Col xs="6">
+       <Link to='nes'>NES Graph</Link>
+      </Col>
+     </Row>
+      <Row>
+      <Col xs="6">
+       <Link to='sleep'>Sleeping Graph</Link>
       </Col>
      </Row>
      <Row>
       <Col xs="6">
-       <Link to='userinputs'>userinputs</Link>
+       <Link to='overallgrade'>Over All Grade</Link>
+      </Col>
+     </Row>
+     <Row>
+      <Col xs="6">
+       <Link to='weeklygrade'>Weekly Grade</Link>
+      </Col>
+     </Row>
+     <Row>
+      <Col xs="6">
+       <Link to='breakdown'>Break Down Grade</Link>
+      </Col>
+     </Row>
+     <Row>
+      <Col xs="6">
+       <Link to='weeklysummary'>Weekly Summary</Link>
       </Col>
      </Row>
      </Container>

@@ -2,14 +2,13 @@ import React from 'react';
 
 import { Container, Select, option, Option, Row, Col, Button, Form, FormGroup, Label, Input, FormText, className } from 'reactstrap';
 
-import Navbar from '../components/navbar';
 class UserInputs extends React.Component{
     render(){
          console.log('i am in the render for userinputs');
         return(
             <div>
-                <Navbar />
-                <Container>
+            
+                <Container id="user-inputs">
                     <div className="row justify-content-center">
                     <div className="col-md-8  col-sm-12">
                         <h2 className="head">Daily user inputs report</h2>
@@ -24,7 +23,7 @@ class UserInputs extends React.Component{
                           </FormGroup> 
                           <FormGroup>   
                         <Label className="padding">Workout Effort Level</Label>
-                          <Input type="select" className="custom-select form-control" name="" multiple>
+                          <Input type="select" className="custom-select form-control" name="workout_effort">
                                 <option value="">select</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>

@@ -1,3 +1,18 @@
 // Pages
 
 // @import "";
+html,
+body{
+    height: 100%;
+}
+#user-inputs{
+    padding-top:80px;
+    display: flex;
+    color:blue;
+    align-items: center;
+}
+ #user-inputs .head{
+    color:pink;
+    margin-top: 10px;
+    text-align: center;
+}

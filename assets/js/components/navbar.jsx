@@ -1,6 +1,5 @@
 import React from 'react';
 import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
-import Dashboard from '../components/dashboard';
 import PropTypes from 'prop-types';
 
 export default class Navbarmenu extends React.Component {
