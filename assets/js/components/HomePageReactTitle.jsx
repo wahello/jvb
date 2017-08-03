@@ -45,7 +45,7 @@ const HomePageReactTitle = ({ title }) => {
      </Row>
      <Row>
       <Col xs="6">
-       <Link to='service_connect'>Service Connect</Link>
+       <a href='users/request_token'>Garmin Connect</a>
       </Col>
      </Row>
      </Container>

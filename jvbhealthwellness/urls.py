@@ -12,5 +12,5 @@ urlpatterns = [
 
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
-
+    url(r'^service_connect$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
 ]

@@ -55,31 +55,37 @@ def request_token(request):
     # $oauth->enableDebug()
 
     session = request.session
+    request_token, request_token_secret = service.get_request_token()               
+    # $request_token_info = $oauth->getRequestToken($req_url)
+    session['request_token'] = request_token
+    session['request_token_secret'] = request_token_secret
+    session['state'] = 1
+    return redirect(authurl + '?oauth_token={0}'.format(request_token))
     
 
-    if not 'oauth_token' in session and not 'state' in session:
-        # request_token, request_token_secret = service.get_request_token(params = 
-  #                     {'oauth_callback': 'oob', 
-  #                      'format': 'json'})
+  #   if not 'oauth_token' in session and not 'state' in session:
+  #       # request_token, request_token_secret = service.get_request_token(params = 
+  # #                     {'oauth_callback': 'oob', 
+  # #                      'format': 'json'})
 
-        request_token, request_token_secret = service.get_request_token()               
-        # $request_token_info = $oauth->getRequestToken($req_url)
-        session['request_token'] = request_token
-        session['request_token_secret'] = request_token_secret
-        session['state'] = 1
-        return redirect(authurl + '?oauth_token={0}'.format(request_token))
-    elif 'state' in session and session['state'] ==1:
-        #oauth token already exists
-        #determine access token temporaily for work  
-        #continue
-        access_token, access_token_secret = service.get_access_token(session['request_token'],
-            session['request_token_secret'])
+        # request_token, request_token_secret = service.get_request_token()               
+        # # $request_token_info = $oauth->getRequestToken($req_url)
+        # session['request_token'] = request_token
+        # session['request_token_secret'] = request_token_secret
+        # session['state'] = 1
+        # return redirect(authurl + '?oauth_token={0}'.format(request_token))
+  #   elif 'state' in session and session['state'] ==1:
+  #       #oauth token already exists
+  #       #determine access token temporaily for work  
+  #       #continue
+  #       access_token, access_token_secret = service.get_access_token(session['request_token'],
+  #           session['request_token_secret'])
 
-        # need to validate that the token still works.... not done
-        session['state'] = 2
-        session['access_token'] = access_token
-        session['access_secret'] = access_token_secret
-        return redirect('/')
+  #       # need to validate that the token still works.... not done
+  #       session['state'] = 2
+  #       session['access_token'] = access_token
+  #       session['access_secret'] = access_token_secret
+  #       return redirect('/')
     # except Exception, e:
     #     print(e)
     

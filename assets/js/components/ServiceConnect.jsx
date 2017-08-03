@@ -16,15 +16,12 @@ class ServiceConnect extends React.Component {
     console.log('i am in the render for register');
   return (
     <div>
-     <Navbar />
   	<Container>
 
-    <Iframe url="/users/request_token"
-        width="450px"
-        height="450px"
-        display="initial"
-        position="relative"
-        allowFullScreen/>
+      <br/>
+      <br/>
+      <br/>
+      <p>You have succesfully registered your Garmin Connect</p>
 
     </Container>
     </div>
