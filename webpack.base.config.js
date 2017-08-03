@@ -44,11 +44,11 @@ module.exports = [{
     loaders: [
       {
         test: /\.css$/,
-        loaders: ['style','css','postcss'] 
+        loaders: ['style-loader','css-loader','postcss-loader'] 
       },
       {
         test: /\.scss$/,
-        loaders:['style','css','postcss','sass']
+        loaders:['style-loader','css-loader','postcss-loader','sass-loader']
       },
       {
         test: /\.(woff(2)?|eot|ttf|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -67,6 +67,6 @@ module.exports = [{
   ],
   resolve: {
     modules: ['node_modules', 'bower_components'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.css'],
   },
 }];
