@@ -4,27 +4,27 @@ import { Container, Row, Col, Button, Form, FormGroup, Label, Input, FormText } 
 
 
 
-const HomePageReactTitle = ({ title }) => {
-  const homeURL = window.Django.url('home');
-
-  return (
+class Forgotpassword extends React.Component{
+  render(){
+    console.log(' i am here rendering forgot password page')
+     return (
   	<Container><Row><Col>&nbsp;</Col></Row><Row><Col>&nbsp;</Col></Row>
   	<Row><Col>&nbsp;</Col></Row>
   	<Row><Col  xs="6">
-  	  <h1>Login</h1>
+  	  <h1>Forgot Password</h1>
       <Form>
         <FormGroup>
           <Label for="exampleEmail">Email</Label>
           <Input type="email" name="email" id="exampleEmail" placeholder="with a placeholder" />
         </FormGroup>
-        <FormGroup>
+        {/* <FormGroup>
           <Label for="examplePassword">Password</Label>
           <Input type="password" name="password" id="examplePassword" placeholder="password placeholder" />
-        </FormGroup>
+        </FormGroup> */}
         <Button>Submit</Button>
       </Form>
      </Col></Row>
-     <Row>
+     {/* <Row>
      	<Col  xs="6">
      	 <a>Register</a>
      	</Col>
@@ -33,13 +33,11 @@ const HomePageReactTitle = ({ title }) => {
      	<Col  xs="6">
      	<a>Forgot Password</a>
      	</Col>
-     </Row>
+     </Row> */}
      </Container>
-  )
-};
+   );
+  }
+}
 
-HomePageReactTitle.propTypes = {
-  title: PropTypes.string.isRequired,
-};
-
-export default HomePageReactTitle;
+export default Forgotpassword;
+ 

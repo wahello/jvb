@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router'
 import { Container, Select, Option, option, Row, Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import RegisterNetwork from '../network/register';
-import Navbar from '../components/navbar';
 
 
 class Register extends React.Component {
@@ -29,7 +28,6 @@ class Register extends React.Component {
     console.log('i am in the render for register');
   return (
     <div>
-     <Navbar />
   	<Container>
      
 <Row><Col>&nbsp;</Col></Row><Row><Col>&nbsp;</Col></Row>
