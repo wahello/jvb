@@ -10,7 +10,7 @@ class UserInputs extends React.Component{
             
                 <Container id="user-inputs">
                     <div className="row justify-content-center">
-                    <div className="col-md-8  col-sm-12">
+                    <div className="col-md-8 col-lg-10 col-sm-12">
                         <h2 className="head">Daily user inputs report</h2>
                         <Form className="user-inputs-form bootstrap_validator" role="form" data-toggle="validator">
                          <FormGroup>   

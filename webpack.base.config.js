@@ -44,20 +44,11 @@ module.exports = [{
     loaders: [
       {
         test: /\.css$/,
-        loaders: [
-          'style-loader',
-          'css-loader',
-          'postcss-loader',
-        ],
+        loaders: ['style','css','postcss'] 
       },
       {
         test: /\.scss$/,
-        loaders: [
-          'style-loader',
-          'css-loader',
-          'postcss-loader',
-          'sass-loader',
-        ],
+        loaders:['style','css','postcss','sass']
       },
       {
         test: /\.(woff(2)?|eot|ttf|svg)(\?v=\d+\.\d+\.\d+)?$/,

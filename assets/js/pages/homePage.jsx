@@ -11,6 +11,7 @@ import Breakdown from '../components/BreakDown';
 import Weeklysummary from '../components/WeeklySummary';
 import Sleepgraph from '../components/sleep';
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
+// require('../sass/style.scss');
 
 // const history = createBrowserHistory();
 

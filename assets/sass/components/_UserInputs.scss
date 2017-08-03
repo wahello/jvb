@@ -1,0 +1,54 @@
+html,
+body{
+	height: 100%;
+	background-size: cover;
+}
+#user-inputs{
+    padding-top: 80px;
+	display: flex;
+	align-items: center;
+	background: url('../images/header.jpg') center center no-repeat fixed;
+	background-size: cover;
+	color: white;
+}
+#user-inputs .head{
+	text-align: center;
+	padding: 50px;
+}
+#user-inputs .user-inputs-form{
+	background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+    padding: 10px;
+    align-content: center;
+
+}
+#user-inputs .user-inputs-form input.form-control{
+	height: 28px;
+}
+#user-inputs .user-inputs-form button {
+margin-top: 46px;
+}
+#user-inputs .user-inputs-form .padding{
+	padding: 10px;
+}
+// @media (min-width: 1024px) {
+// form.user-inputs-form.bootstrap_validator{
+//     margin-left: 180px;
+// }
+// }
+
+@media (min-width: 768px) and (max-width: 1023px) {
+   #user-inputs .user-inputs-form{
+	background-color:rgba(20,10,15,0.5);
+	border-radius: 20px;
+    padding: 10px;
+    align-content: center;
+
+}
+form.user-inputs-form.bootstrap_validator{
+    margin-left: 180px;
+  }
+#user-inputs h2.head{
+    margin-left: 180px;
+}
+}

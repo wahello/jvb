@@ -8,33 +8,20 @@ class Forgotpassword extends React.Component{
   render(){
     console.log(' i am here rendering forgot password page')
      return (
-  	<Container><Row><Col>&nbsp;</Col></Row><Row><Col>&nbsp;</Col></Row>
-  	<Row><Col>&nbsp;</Col></Row>
-  	<Row><Col  xs="6">
-  	  <h1>Forgot Password</h1>
-      <Form>
-        <FormGroup>
-          <Label for="exampleEmail">Email</Label>
-          <Input type="email" name="email" id="exampleEmail" placeholder="with a placeholder" />
-        </FormGroup>
-        {/* <FormGroup>
-          <Label for="examplePassword">Password</Label>
-          <Input type="password" name="password" id="examplePassword" placeholder="password placeholder" />
-        </FormGroup> */}
-        <Button>Submit</Button>
-      </Form>
-     </Col></Row>
-     {/* <Row>
-     	<Col  xs="6">
-     	 <a>Register</a>
-     	</Col>
-     </Row>
-          <Row>
-     	<Col  xs="6">
-     	<a>Forgot Password</a>
-     	</Col>
-     </Row> */}
-     </Container>
+           <div>
+              <Container id="forgot">
+                <div className="row justify-content-center">
+                  <h2 className="head">Forgot Password</h2>   
+                    <Form className="forgot-form bootstrap_validator col-sm-12 col-md-6 col-lg-5" role="form" data-toggle="validator">
+                        <FormGroup>
+                            <Label className="padding">Enter your email to reset your password</Label>
+                              <Input className="form-control" placeholder="Email" name="email" type="email" />
+                        </FormGroup>
+                        <Button type="submit" color="info" className="btn btn-block btn-primary">Rest Your Password</Button>
+                    </Form>  
+                </div>  
+              </Container>
+           </div>     
    );
   }
 }
