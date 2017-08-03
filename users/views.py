@@ -60,7 +60,7 @@ def request_token(request):
     session['request_token'] = request_token
     session['request_token_secret'] = request_token_secret
     session['state'] = 1
-    return redirect(authurl + '?oauth_token={0}'.format(request_token))
+    return redirect(authurl + '?oauth_token={0}&oauth_callback=app.jvbwellness.com/service_connect'.format(request_token))
     
 
   #   if not 'oauth_token' in session and not 'state' in session:
