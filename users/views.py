@@ -60,7 +60,7 @@ def request_token(request):
     session['request_token'] = request_token
     session['request_token_secret'] = request_token_secret
     session['state'] = 1
-    callback_string = urllib.urlencode('https://app.jvbwellness.com/service_connect')
+    callback_string = urllib.parse.urlencode('https://app.jvbwellness.com/service_connect')
     return redirect(authurl + '?oauth_token={0}&oauth_callback={1}'.format(request_token,callback_string))
     
 
