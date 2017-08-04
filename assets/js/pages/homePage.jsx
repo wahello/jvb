@@ -23,7 +23,7 @@ ReactDOM.render((
     <Switch>
         <Route exact path='/' component={HomePageContainer}/>
         <Route path='/register' component={Register} />
-        <Route path='/dashboard' component={Dashboard} />
+
         <Route path='/UserInputs' component={UserInputs} />
         <Route path='/service_connect' component={ServiceConnect} />
 			<Route path='/ForgotPassword' component={Forgotpassword} />
