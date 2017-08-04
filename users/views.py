@@ -30,11 +30,11 @@ class UserCreate(APIView):
 
 @xframe_options_exempt
 def request_token(request):
-    req_url = 'http://connectapitest.garmin.com/oauth-service-1.0/oauth/request_token'
-    authurl = 'http://connecttest.garmin.com/oauthConfirm'
-    acc_url = 'http://connectapitest.garmin.com/oauth-service-1.0/oauth/access_token'
-    conskey = '38226ca8-88be-4641-a788-353894e5dbc0';
-    conssec = 'k9KRDdmiMQtLMG43QTtl4LmDo0SohR9OtZi';
+    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'http://connect.garmin.com/oauthConfirm'
+    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
+    conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
     if not 'auth_token' in session and ('state' in session and session['state'])==1:
         session['state'] = 0; 
