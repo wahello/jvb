@@ -28,7 +28,6 @@ class UserCreate(APIView):
             if user:
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-@xframe_options_exempt
 def request_token(request):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connect.garmin.com/oauthConfirm'
@@ -91,7 +90,41 @@ def request_token(request):
     #     print(e)
     
 def receive_token(request):
-    print(request)
+    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'http://connect.garmin.com/oauthConfirm'
+    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
+    conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
+    session = request.session
+    
+    service = OAuth1Service(
+          # name = 'etrade',
+          consumer_key = conskey,
+          consumer_secret = conssec,
+          request_token_url = req_url,
+          access_token_url = acc_url,
+          authorize_url = authurl, 
+          # base_url = 'https://etws.etrade.com'
+          )
+
+    #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
+    oauth_token = request.GET['oauth_token'] 
+    oauth_token_secret = request.GET['oauth_verifier']
+
+    access_token, access_token_secret = service.get_access_token(oauth_token, oauth_verifier)
+
+    # need to validate that the token still works.... not done
+    session['state'] = 2
+    session['access_token'] = access_token
+    session['access_secret'] = access_token_secret
+    print('access token')
+    print(access_token)
+    print('access_token_secret')
+    print(access_token_secret)
+
+    return redirect('/service_connect')
+    
+    # print(request)
     # $json = json_decode($_POST['uploadMetaData']);
     # $tmp_name = $_FILES['file']['tmp_name'];
     # $file_name = $_FILES['file']['name']; 
