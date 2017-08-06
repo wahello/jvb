@@ -54,7 +54,8 @@ def request_token(request):
     # $oauth->enableDebug()
 
     session = request.session
-    request_token, request_token_secret = service.get_request_token()               
+    request_token, request_token_secret = service.get_request_token()  
+
     # $request_token_info = $oauth->getRequestToken($req_url)
     session['request_token'] = request_token
     session['request_token_secret'] = request_token_secret
@@ -96,7 +97,11 @@ def receive_token(request):
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
-    
+
+    oauth_token = request.GET['oauth_token'] 
+    oauth_verifier = request.GET['oauth_verifier']
+    acc_url = '{0}?oauth_verifier={1}'.format(acc_url,oauth_verifier)    
+
     service = OAuth1Service(
           # name = 'etrade',
           consumer_key = conskey,
@@ -108,10 +113,9 @@ def receive_token(request):
           )
 
     #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
-    oauth_token = request.GET['oauth_token'] 
-    oauth_token_secret = request.GET['oauth_verifier']
 
-    access_token, access_token_secret = service.get_access_token(oauth_token, oauth_token_secret)
+
+    access_token, access_token_secret = service.get_access_token(oauth_token, session['request_token_session'])
 
     # need to validate that the token still works.... not done
     session['state'] = 2
