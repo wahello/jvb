@@ -111,7 +111,7 @@ def receive_token(request):
     oauth_token = request.GET['oauth_token'] 
     oauth_token_secret = request.GET['oauth_verifier']
 
-    access_token, access_token_secret = service.get_access_token(oauth_token, oauth_verifier)
+    access_token, access_token_secret = service.get_access_token(oauth_token, oauth_token_secret)
 
     # need to validate that the token still works.... not done
     session['state'] = 2
