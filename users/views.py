@@ -43,9 +43,9 @@ class UserCreate(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def request_token(request):
-    req_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-    authurl = 'https://connect.garmin.com/oauthConfirm'
-    acc_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'http://connect.garmin.com/oauthConfirm'
+    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
@@ -60,7 +60,7 @@ def request_token(request):
           request_token_url = req_url,
           access_token_url = acc_url,
           authorize_url = authurl, 
-          # base_url = 'https://etws.etrade.com'
+          # base_url = 'http://etws.etrade.com'
           )
 
     # Get request token and secret    
@@ -74,7 +74,7 @@ def request_token(request):
     session['request_token'] = request_token
     session['request_token_secret'] = request_token_secret
     session['state'] = 1
-    callback_string = urllib.parse.quote('https://app.jvbwellness.com/callbacks/garmin')
+    callback_string = urllib.parse.quote('http://app.jvbwellness.com/callbacks/garmin')
     return redirect(authurl + '?oauth_token={0}&oauth_callback={1}'.format(request_token,callback_string))
     
 
@@ -105,9 +105,9 @@ def request_token(request):
     #     print(e)
     
 def receive_token(request):
-    req_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-    authurl = 'https://connect.garmin.com/oauthConfirm'
-    acc_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'http://connect.garmin.com/oauthConfirm'
+    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
@@ -125,13 +125,13 @@ def receive_token(request):
           request_token_url = req_url,
           access_token_url = acc_url,
           authorize_url = authurl, 
-          # base_url = 'https://etws.etrade.com'
+          # base_url = 'http://etws.etrade.com'
           )
 
     #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
 
     print('oauth_token_secret')
-    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'])
+    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST')
 
     # need to validate that the token still works.... not done
     session['state'] = 2
