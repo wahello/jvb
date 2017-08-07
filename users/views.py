@@ -43,9 +43,9 @@ class UserCreate(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def request_token(request):
-    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-    authurl = 'http://connect.garmin.com/oauthConfirm'
-    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    req_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'https://connect.garmin.com/oauthConfirm'
+    acc_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
@@ -105,9 +105,9 @@ def request_token(request):
     #     print(e)
     
 def receive_token(request):
-    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-    authurl = 'http://connect.garmin.com/oauthConfirm'
-    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    req_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'https://connect.garmin.com/oauthConfirm'
+    acc_url = 'https://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
