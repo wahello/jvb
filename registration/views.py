@@ -1,63 +1,58 @@
-from django.shortcuts import render
+from registration.models import User_Input
+from registration.serializers import UserInputSerializer,UserSerializer
 from rest_framework import generics
-from .models import Registration_Input
-from regitration.forms import Registration_InputForm,GoalsForm,Caluculated_FieldsForms
+from django.contrib.auth.models import User
+from rest_framework import permissions
+from registration.permissions import IsOwnerOrReadOnly
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from rest_framework import renderers
+from rest_framework.views import APIView
+from rest_framework import status
+
+
+class UserInputHighlight(generics.GenericAPIView):
+    queryset = User_Input.objects.all()
+    renderer_classes = (renderers.StaticHTMLRenderer,)
+
+    def get(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
 # Create your views here.
-from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
-from django.contrib.auth import authenticate,login,logout
-from django.contrib.auth.decorators import login_required
+class UserInputList(generics.ListCreateAPIView):
+    queryset = User_Input.objects.all()
+    serializer_class = UserInputSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class UserInputDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User_Input.objects.all()
+    serializer_class = UserInputSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-class CreateView(generics.ListCreateAPIView):
-    """This class defines the create behavior of our rest api."""
-    queryset = Registration_Input.objects.all()
-    forms_class = Registration_InputForm
+class UserCreate(APIView):
+    """
+    Creates the user.
+    """
 
-    def perform_create(self, forms):
-        """Save the post data when creating a new bucketlist."""
-        forms.save()
-def index(request):
-    return render(request,'user_input/index.html')
+    def post(self, request, format='json'):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-def special(request):
-    return HttpResponse("You are logged in ,Nice!")
-@login_required
-def user_logout(request):
-    logout(request)
-    return HttpResponseRedirect(reverse('index'))
-
-def register(request):
-
-    registered = False
-
-    if request.method == "POST":
-        Registration_Input_form = Registration_InputForm(data = request.POST)
-        Goals_form = GoalsForm(data = request.POST)
-        Caluculated_Fields_forms = Caluculated_FieldsForms(data = request.POST)
-
-        if Registration_Input_form.is_valid() and Goals_form.is_valid() and Caluculated_Fields_forms.is_valid():
-
-            registation = Registration_Input_form.save()
-            registration.set_password(registration.password)
-            registration.save()
-
-            goals = Goals_form.save(commit = False)
-            goals.registration = registration
-
-            caluculatedfields = Caluculated_Fields_forms(commit = False)
-            caluculatedfields.registration = registration
-
-
-        else:
-
-            print(Registration_Input_form.errors,Goals_form.errors,Caluculated_Fields_forms.errors)
-    else:
-        Registration_Input_form = Registration_InputForm()
-        Goals_form = GoalsForm()
-        Caluculated_Fields_forms =Caluculated_FieldsForms()
-
-    return render(request,{'Registration_Input_form':Registration_Input_form,
-                                                        'Goals_form':Goals_form,
-                                                        'Caluculated_Fields_forms':Caluculated_Fields_forms})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,24 +1,118 @@
-from rest_framework.test import APIClient
-from django.test import TestCase
-from rest_framework import status
 from django.core.urlresolvers import reverse
+from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
-from regitration.forms import Registration_InputForm
-class ModelTestCase(TestCase):
-    """This class defines the test suite for the Registration_Input model."""
+from registration.models import User_Input
+from registration.serializers import UserInputSerializer,UserSerializer
+from rest_framework import status
 
+class AccountsTest(APITestCase):
     def setUp(self):
-        """Define the test client and other test variables."""
-        self.user = User.objects.create_user(
-            email='test@test.com', password='secret', username='tester')
+        # We want to go ahead and originally create a user.
+        self.test_user = User.objects.create_user('testuser', 'test@example.com', 'testpassword')
+
+        # URL for creating an account.
+        self.create_url = reverse('registration-create')
+
+    def test_create_user(self):
+        """
+        Ensure we can create a new user and a valid token is created with it.
+        """
+        data = {
+            'username': 'foobar',
+            'email': 'foobar@example.com',
+            'password': 'somepassword'
+        }
+
+        response = self.client.post(self.create_url , data, format='json')
+
+        # We want to make sure we have two users in the database..
+        self.assertEqual(User.objects.count(), 2)
+        # And that we're returning a 201 created code.
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Additionally, we want to return the username and email upon successful creation.
+        self.assertEqual(response.data['username'], data['username'])
+        self.assertEqual(response.data['email'], data['email'])
+        self.assertFalse('password' in response.data)
+
+    def test_create_user_with_no_password(self):
+        data = {
+                'username': 'foobar',
+                'email': 'foobarbaz@example.com',
+                'password': ''
+        }
+
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['password']), 1)
+    def test_create_user_with_too_long_username(self):
+        data = {
+            'username': 'foo'*30,
+            'email': 'foobarbaz@example.com',
+            'password': 'foobar'
+        }
+
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['username']), 1)
+
+    def test_create_user_with_no_username(self):
+        data = {
+                'username': '',
+                'email': 'foobarbaz@example.com',
+                'password': 'foobar'
+                }
+
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['username']), 1)
+
+    def test_create_user_with_preexisting_username(self):
+        data = {
+                'username': 'testuser',
+                'email': 'user@example.com',
+                'password': 'testuser'
+                }
+
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['username']), 1)
+    def test_create_user_with_preexisting_email(self):
+        data = {
+            'username': 'testuser2',
+            'email': 'test@example.com',
+            'password': 'testuser'
+        }
+
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['email']), 1)
+
+    def test_create_user_with_invalid_email(self):
+        data = {
+            'username': 'foobarbaz',
+            'email':  'testing',
+            'passsword': 'foobarbaz'
+        }
 
 
-    def test_model_can_create_a_registration_Input(self):
-        self.registration_Input_data = {'Gender':'Male','Height':'160','Weight':'50','Date_of_Birth':'1992-10-02',
-                                        'First_name':'Jose','Last_name':'Jack','Garmin_User_Name':'admin',
-                                        'Garmin_Password':'june2017','Email':'admin@gmail.com'}
-        self.response = self.client.post(
-                            self.registration_Input_data,
-                            format="json")
-        """Test the Registration_Input model can create a Registration_Input."""
-        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['email']), 1)
+
+    def test_create_user_with_no_email(self):
+        data = {
+                'username' : 'foobar',
+                'email': '',
+                'password': 'foobarbaz'
+        }
+
+        response = self.client.post(self.create_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(len(response.data['email']), 1)
