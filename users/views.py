@@ -146,8 +146,8 @@ def receive_token(request):
     print(access_token)
     print('access_token_secret')
     print(access_token_secret)
-
-    r = service.get('https://healthapi.garmin.com/wellness-api/rest/dailies?uploadStartTimeInSeconds=1452470400&uploadEndTimeInSeconds=1502150488', params={'format': 'json'})
+    session = service.get_auth_session('jvbwellness')
+    r = session.get('https://healthapi.garmin.com/wellness-api/rest/dailies?uploadStartTimeInSeconds=1452470400&uploadEndTimeInSeconds=1502150488', params={'format': 'json'})
     print(r.text)
 
     return redirect('/service_connect')
