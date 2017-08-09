@@ -146,7 +146,7 @@ def receive_token(request):
     print(access_token)
     print('access_token_secret')
     print(access_token_secret)
-    session = service.get_auth_session(session['access_token'],session['access_token_secret'],method='POST',data=data)
+    session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
     
     data = {
       'uploadStartTimeInSeconds': 1452470400,
