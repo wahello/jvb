@@ -116,7 +116,7 @@ def receive_token(request):
     oauth_verifier = request.GET['oauth_verifier']
 
     encoded_verifier = urllib.parse.quote(oauth_verifier)
-    #acc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
+    acc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
     service = OAuth1Service(
           # name = 'etrade',
@@ -136,7 +136,7 @@ def receive_token(request):
         'oauth_verifier': oauth_verifier,
     }
 
-    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data=data, header_auth=True)
+    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='GET', header_auth=True)
 
     # need to validate that the token still works.... not done
     session['state'] = 2
