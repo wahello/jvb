@@ -136,7 +136,7 @@ def receive_token(request):
         'oauth_verifier': oauth_verifier,
     }
 
-    # access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data=data)
+    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data=data)
 
     # need to validate that the token still works.... not done
     session['state'] = 2
