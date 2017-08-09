@@ -138,21 +138,21 @@ def receive_token(request):
 
     # access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data=data)
 
-    # # need to validate that the token still works.... not done
-    # session['state'] = 2
-    # session['access_token'] = access_token
-    # session['access_secret'] = access_token_secret
-    # print('access token')
-    # print(access_token)
-    # print('access_token_secret')
-    # print(access_token_secret)
-    session = service.get_auth_session(session['request_token'],session['request_token_secret'],method='POST',data=data)
+    # need to validate that the token still works.... not done
+    session['state'] = 2
+    session['access_token'] = access_token
+    session['access_secret'] = access_token_secret
+    print('access token')
+    print(access_token)
+    print('access_token_secret')
+    print(access_token_secret)
+    session = service.get_auth_session(session['access_token'],session['access_token_secret'],method='POST',data=data)
     
     data = {
       'uploadStartTimeInSeconds': 1452470400,
       'uploadEndTimeInSeconds': 1502150488
     }
-
+    session.headers.update({'access-token': access_token})
     r = session.request('GET','https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, data=data)
     print(r.json())
 
