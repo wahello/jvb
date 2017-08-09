@@ -1,12 +1,15 @@
 from django.conf.urls import url
+from django.conf.urls import include
 from rest_framework.urlpatterns import format_suffix_patterns
-from .views import CreateView
-from . import views
-app_name = 'regitration'
+from registration import views
+
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^register/',views.register,name='register'),
-     url(r'^register_input/$', CreateView.as_view(), name="create"),
+    url(r'^registration/$', views.UserInputList.as_view()),
+    url(r'^registration/(?P<pk>[0-9]+)/$', views.UserInputDetail.as_view()),
+    url(r'^registration/(?P<pk>[0-9]+)/highlight/$', views.UserInputHighlight.as_view()),
+    url(r'^users/$', views.UserList.as_view()),
+    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
+    url(r'api/users/', views.UserCreate.as_view(), name='registration-create'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
