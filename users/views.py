@@ -30,6 +30,8 @@ requests_log.propagate = True
 
 
 
+
+
 class UserCreate(APIView):
     """ 
     Creates the user. 
@@ -52,6 +54,7 @@ def request_token(request):
     if not 'auth_token' in session and ('state' in session and session['state'])==1:
         session['state'] = 0; 
     # try:
+
 
     service = OAuth1Service(
           # name = 'etrade',
@@ -118,43 +121,51 @@ def receive_token(request):
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     acc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
-    service = OAuth1Service(
-          # name = 'etrade',
-          consumer_key = conskey,
-          consumer_secret = conssec,
-          request_token_url = req_url,
-          access_token_url = acc_url,
-          authorize_url = authurl, 
-          # base_url = 'http://etws.etrade.com'
-          )
 
-    #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
 
-    print('oauth_token_secret')
-    
-    data = {
-        'oauth_verifier': oauth_verifier,
-    }
-
-    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='GET', header_auth=True)
-
-    # need to validate that the token still works.... not done
-    session['state'] = 2
-    session['access_token'] = access_token
-    session['access_secret'] = access_token_secret
-    print('access token')
-    print(access_token)
-    print('access_token_secret')
-    print(access_token_secret)
-    session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
-    
-    data = {
-      'uploadStartTimeInSeconds': 1452470400,
-      'uploadEndTimeInSeconds': 1502150488
-    }
-    session.headers.update({'access-token': access_token})
-    r = session.request('GET','https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, data=data)
+    from requests_oauthlib import OAuth1
+    url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
+    auth = OAuth1(conskey, conssec, oauth_token, oauth_token_secret)
+    r = requests.post(acc_url, auth=auth)
     print(r.json())
+
+    # service = OAuth1Service(
+    #       # name = 'etrade',
+    #       consumer_key = conskey,
+    #       consumer_secret = conssec,
+    #       request_token_url = req_url,
+    #       access_token_url = acc_url,
+    #       authorize_url = authurl, 
+    #       # base_url = 'http://etws.etrade.com'
+    #       )
+
+    # #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
+
+    # print('oauth_token_secret')
+    
+    # data = {
+    #     'oauth_verifier': oauth_verifier,
+    # }
+
+    # access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='GET', header_auth=True)
+
+    # # need to validate that the token still works.... not done
+    # session['state'] = 2
+    # session['access_token'] = access_token
+    # session['access_secret'] = access_token_secret
+    # print('access token')
+    # print(access_token)
+    # print('access_token_secret')
+    # print(access_token_secret)
+    # session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
+    
+    # data = {
+    #   'uploadStartTimeInSeconds': 1452470400,
+    #   'uploadEndTimeInSeconds': 1502150488
+    # }
+    # session.headers.update({'access-token': access_token})
+    # r = session.request('GET','https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, data=data)
+    # print(r.json())
 
     return redirect('/service_connect')
     
