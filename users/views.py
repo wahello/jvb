@@ -128,10 +128,10 @@ def receive_token(request):
         'oauth_verifier': oauth_verifier,
     }
 
-    from requests_oauthlib import OAuth1
+    from requests_oauthlib import OAuth1, OAuth1Session
     s = requests.Session()
     url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
-    auth = OAuth1(conskey, conssec, oauth_token, session['request_token_secret'])
+    auth = OAuth1(conskey, conssec, verifier=oauth_verifier)
     s.auth = auth
     s.headers.update({'ouath_verifier': oauth_verifier})
     r = s.post(acc_url, data=data)
