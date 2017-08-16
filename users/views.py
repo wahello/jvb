@@ -124,9 +124,10 @@ def receive_token(request):
 
 
     
-    # data = {
-    #     'oauth_verifier': oauth_verifier,
-    # }
+    data = {
+        'oauth_verifier': oauth_verifier,
+        'oauth_token': oauth_token
+    }
 
     from requests_oauthlib import OAuth1, OAuth1Session
     s = requests.Session()
