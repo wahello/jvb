@@ -121,8 +121,6 @@ def receive_token(request):
 
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
-
-
     
     data = {
         'oauth_verifier': oauth_verifier,
@@ -136,7 +134,7 @@ def receive_token(request):
     s.headers.update({'oauth_verifier': oauth_verifier,
         'oauth_token': oauth_token,
         'oauth_token_secret': session['request_token_secret'] })
-    r = s.get(acc_url,data=data)
+    r = s.get(acc_url)
     print(r.text)
     print(r.json())
 
