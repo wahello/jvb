@@ -136,7 +136,7 @@ def receive_token(request):
     s.headers.update({'oauth_verifier': oauth_verifier,
         'oauth_token': oauth_token,
         'oauth_token_secret': session['request_token_secret'] })
-    r = s.post(acc_url)
+    r = s.post(acc_url,json=data)
     print(r.text)
     print(r.json())
 
