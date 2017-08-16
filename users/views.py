@@ -133,6 +133,8 @@ def receive_token(request):
         'oauth_token': oauth_token,
         'oauth_token_secret': session['request_token_secret'] })
 
+    print(s.headers)
+
     data = {'oauth_verifier': oauth_verifier,
         'oauth_token': oauth_token,
         'oauth_token_secret': session['request_token_secret'], 
@@ -142,7 +144,7 @@ def receive_token(request):
     }
 
 
-    r = s.get(acc_url, params=data)
+    r = s.get(acc_url, data=data)
     print(r.text)
     print(r.json())
 
