@@ -30,7 +30,7 @@ fixmydjango==0.2
 flake8==2.6.2
 flake8-putty==0.4.0
 future==0.16.0
-get==0.0.0
+#get==0.0.0
 gitdb2==2.0.2
 GitPython==2.1.5
 gunicorn==19.7.1
