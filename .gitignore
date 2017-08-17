@@ -3,4 +3,5 @@
 */*.pyc
 node_modules
 webpack_stats.json
+jquery-webpack-stats.json
 
