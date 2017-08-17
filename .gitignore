@@ -4,4 +4,4 @@
 node_modules
 webpack_stats.json
 jquery-webpack-stats.json
-
+db.sqlite3
