@@ -144,7 +144,7 @@ def receive_token(request):
     }
 
 
-    r = s.get(acc_url, data=data)
+    r = s.get(acc_url)
     print(r.text)
     print(r.json())
 
