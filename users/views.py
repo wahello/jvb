@@ -131,20 +131,22 @@ def receive_token(request):
     s.auth = auth
     s.headers.update({'oauth_verifier': oauth_verifier,
         'oauth_token': oauth_token,
-        'oauth_token_secret': session['request_token_secret'] })
+        'oauth_token_secret': session['request_token_secret'],
+        'Content-Length': 0
+         })
 
     print(s.headers)
 
-    data = {'oauth_verifier': oauth_verifier,
-        'oauth_token': oauth_token,
-        'oauth_token_secret': session['request_token_secret'], 
-        'oauth_timestamp': s.headers['oauth_timestamp'],
-        'oauth_nonce': s.headers['oauth_nonce'],
-        'oauth_signature_method': s.headers['oauth_signature_method']
-    }
+    # data = {'oauth_verifier': oauth_verifier,
+    #     'oauth_token': oauth_token,
+    #     'oauth_token_secret': session['request_token_secret'], 
+    #     'oauth_timestamp': s.headers['oauth_timestamp'],
+    #     'oauth_nonce': s.headers['oauth_nonce'],
+    #     'oauth_signature_method': s.headers['oauth_signature_method']
+    # }
 
 
-    r = s.get(acc_url)
+    r = s.post(acc_url)
     print(r.text)
     print(r.json())
 
