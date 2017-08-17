@@ -6,11 +6,11 @@ import hmac
 import random
 import re
 import time
-import urllib2
-import urlparse
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import string
 
-import OAuthSimpleException
+from . import OAuthSimpleException
 
 
 class OAuthSimple:
@@ -149,18 +149,18 @@ class OAuthSimple:
         return 'OAuth %s' % (', '.join(result))
 
     def _arrayMerge(self, target, source):
-        for skey in source.keys():
+        for skey in list(source.keys()):
             target[skey] = source.get(skey)
         return target
 
     def _parseParameterString(self, paramString):
-        return urlparse.parse_qs(paramString, True)
+        return urllib.parse.parse_qs(paramString, True)
 
     def _oauthEscape(self, string):
         if not string:
             return ''
 
-        string = urllib2.quote(string)
+        string = urllib.parse.quote(string)
         return string.replace('/', '%2F').replace('+', '%20')\
                 .replace('!', '%21').replace('*', '%2A')\
                 .replace('\\', '%27').replace('(', '%28').\
@@ -203,7 +203,7 @@ class OAuthSimple:
         elements = []
         if not self._parameters:
             return ''
-        pKeys = self._parameters.keys()
+        pKeys = list(self._parameters.keys())
         pKeys.sort()
         for paramName in pKeys:
             if paramName.find('_secret') > 0:
