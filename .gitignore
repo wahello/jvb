@@ -2,5 +2,5 @@
 *.pyc
 */*.pyc
 node_modules
-wepack_stats.json
+webpack_stats.json
 
