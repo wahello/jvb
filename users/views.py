@@ -132,7 +132,7 @@ def receive_token(request):
     s.headers.update({'oauth_verifier': oauth_verifier,
         'oauth_token': oauth_token,
         'oauth_token_secret': session['request_token_secret'],
-        'Content-Length': 0
+        'Content-Length': '0'
          })
 
     print(s.headers)
