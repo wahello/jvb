@@ -30,7 +30,6 @@ fixmydjango==0.2
 flake8==2.6.2
 flake8-putty==0.4.0
 future==0.16.0
-#get==0.0.0
 gitdb2==2.0.2
 GitPython==2.1.5
 gunicorn==19.7.1
@@ -48,12 +47,10 @@ pathlib2==2.3.0
 pbr==3.1.1
 pexpect==4.2.1
 pickleshare==0.7.4
-#post==0.0.0
 pre-commit==0.14.2
 prompt-toolkit==1.0.14
 psycopg2==2.7.1
 ptyprocess==0.5.2
-#public==0.0.0
 pycodestyle==2.0.0
 pycparser==2.17
 pyflakes==1.2.3
@@ -62,10 +59,8 @@ pyparsing==2.2.0
 python-decouple==3.0
 pytz==2017.2
 PyYAML==3.12
-query-string==0.0.0
 rauth==0.7.3
 redis==2.10.5
-request==0.0.0
 requests==2.18.1
 safety==1.4.0
 scandir==1.5

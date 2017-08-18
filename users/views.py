@@ -139,7 +139,8 @@ def receive_token(request):
     s = requests.Session()
     auth = OAuth1(conskey, conssec, verifier=oauth_verifier, resource_owner_key=oauth_token)
     s.auth = auth
-    s.headers.update({'oauth_verifier': oauth_verifier,
+    s.headers.update({
+        #'oauth_verifier': oauth_verifier,
         # 'oauth_token': oauth_token,
         'Content-Length': '0'
          })
