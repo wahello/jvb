@@ -16,7 +16,7 @@ import urllib
 import logging
 import requests
 import time 
-from utils.OAuthSimple import OAuthSimple
+# from utils.OAuthSimple import OAuthSimple
 
 
 try:
@@ -125,36 +125,27 @@ def receive_token(request):
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
-    oauth = OAuthSimple(oauth_token, session['request_token_secret'])
-    request = oauth.sign({
-      action: "POST",
-      path: acc_url,
-      parameters: {  'oauth_verifier': auth_verifier,
-        'oauth_version': '1.0',
-        'oauth_timestap': time.time(),
-      }
-    })
+    # oauth = OAuthSimple(oauth_token, session['request_token_secret'])
+    # request = oauth.sign({
+    #   action: "POST",
+    #   path: acc_url,
+    #   parameters: {  'oauth_verifier': auth_verifier,
+    #     'oauth_version': '1.0',
+    #     'oauth_timestap': time.time(),
+    #   }
+    # })
 
-    # from requests_oauthlib import OAuth1, OAuth1Session
-    # s = requests.Session()
-    # auth = OAuth1(conskey, conssec, verifier=oauth_verifier)
-    # s.auth = auth
-    # s.headers.update({'oauth_verifier': oauth_verifier,
-    #     'oauth_token': oauth_token,
-    #     'oauth_token_secret': session['request_token_secret'],
-    #     'Content-Length': '0'
-    #      })
+    from requests_oauthlib import OAuth1, OAuth1Session
+    s = requests.Session()
+    auth = OAuth1(conskey, conssec, verifier=oauth_verifier, oauth_token=oauth_token)
+    s.auth = auth
+    s.headers.update({'oauth_verifier': oauth_verifier,
+        # 'oauth_token': oauth_token,
+        'Content-Length': '0'
+         })
 
     print(s.headers)
-
-    # data = {'oauth_verifier': oauth_verifier,
-    #     'oauth_token': oauth_token,
-    #     'oauth_token_secret': session['request_token_secret'], 
-    #     'oauth_timestamp': s.headers['oauth_timestamp'],
-    #     'oauth_nonce': s.headers['oauth_nonce'],
-    #     'oauth_signature_method': s.headers['oauth_signature_method']
-    # }
-
+ 
 
     r = s.post(acc_url)
     print(r.text)
