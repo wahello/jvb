@@ -73,8 +73,6 @@ traitlets==4.3.2
 udemy-dl==0.2.1
 unicode-slugify==0.1.3
 Unidecode==0.4.21
-urllib2==1498656401.94
-urllib3==1.21.1
 vine==1.1.3
 virtualenv==15.1.0
 wcwidth==0.1.7
