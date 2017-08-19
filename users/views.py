@@ -126,16 +126,16 @@ def receive_token(request):
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
-    oauth = OAuthSimple(apiKey=conskey, sharedSecret=conssec)
-    request = oauth.sign({
-      'action': "POST",
-      'path': acc_url,
-      'parameters': {  'oauth_verifier': oauth_verifier,
-        'oauth_token': oauth_token,
-        'oauth_version': '1.0',
-        'oauth_timestamp': time.time(),
-      }
-    })
+    # oauth = OAuthSimple(apiKey=conskey, sharedSecret=conssec)
+    # request = oauth.sign({
+    #   'action': "POST",
+    #   'path': acc_url,
+    #   'parameters': {  'oauth_verifier': oauth_verifier,
+    #     'oauth_token': oauth_token,
+    #     'oauth_version': '1.0',
+    #     'oauth_timestamp': time.time(),
+    #   }
+    # })
 
     # from requests_oauthlib import OAuth1, OAuth1Session
     # s = requests.Session()
@@ -156,29 +156,29 @@ def receive_token(request):
     print(r.text)
     print(r.json())
 
-    # service = OAuth1Service(
-    #       # name = 'etrade',
-    #       consumer_key = conskey,
-    #       consumer_secret = conssec,
-    #       request_token_url = req_url,
-    #       access_token_url = acc_url,
-    #       authorize_url = authurl, 
-    #       # base_url = 'http://etws.etrade.com'
-    #       )
+    service = OAuth1Service(
+          # name = 'etrade',
+          consumer_key = conskey,
+          consumer_secret = conssec,
+          request_token_url = req_url,
+          access_token_url = acc_url,
+          authorize_url = authurl, 
+          # base_url = 'http://etws.etrade.com'
+          )
 
     # #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
 
     # print('oauth_token_secret')
-    # access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='GET', header_auth=True)
+    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
 
     # # need to validate that the token still works.... not done
     # session['state'] = 2
     # session['access_token'] = access_token
     # session['access_secret'] = access_token_secret
-    # print('access token')
-    # print(access_token)
-    # print('access_token_secret')
-    # print(access_token_secret)
+    print('access token')
+    print(access_token)
+    print('access_token_secret')
+    print(access_token_secret)
     # session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
     
     # data = {
