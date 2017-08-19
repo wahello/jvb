@@ -126,11 +126,12 @@ def receive_token(request):
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
-    oauth = OAuthSimple(oauth_token, byte_array(session['request_token_secret'])
+    oauth = OAuthSimple(apikey=conskey, sharedSecret=conssec)
     request = oauth.sign({
       'action': "POST",
       'path': acc_url,
       'parameters': {  'oauth_verifier': oauth_verifier,
+        'oauth_token': oauth_token,
         'oauth_version': '1.0',
         'oauth_timestamp': time.time(),
       }
