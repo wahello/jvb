@@ -184,8 +184,8 @@ def receive_token(request):
     # session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
     
     data = {
-      'uploadStartTimeInSeconds': 503148183-2*86400,
-      'uploadEndTimeInSeconds': 1503148183-86401,
+      'uploadStartTimeInSeconds': 503148183-86399,
+      'uploadEndTimeInSeconds': 1503148183,
     }
     # session.headers.update({'access-token': access_token})
     # print(r.json())
