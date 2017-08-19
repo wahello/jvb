@@ -197,7 +197,10 @@ def receive_token(request):
         # 'oauth_token': oauth_token,
         'Content-Length': '0'
          })
-    s.get('https://healthapi.garmin.com/wellness-api/rest/dailies', params=data)
+    r = s.get('https://healthapi.garmin.com/wellness-api/rest/dailies', params=data)
+    print(r.text)
+    print(r.json())
+
 
     # print(s.headers)
 
