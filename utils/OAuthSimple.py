@@ -23,7 +23,7 @@ class OAuthSimple:
     _parameters = {}
     _default_signature_method = "HMAC-SHA1"
     _action = "GET"
-    _nonce_characters = string.digits + string.letters
+    _nonce_characters = string.digits + 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     sbs = ""
     _path = ""
 
