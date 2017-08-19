@@ -126,7 +126,7 @@ def receive_token(request):
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
-    oauth = OAuthSimple(oauth_token, session['request_token_secret'])
+    oauth = OAuthSimple(oauth_token, byte_array(session['request_token_secret'])
     request = oauth.sign({
       'action': "POST",
       'path': acc_url,
@@ -136,17 +136,19 @@ def receive_token(request):
       }
     })
 
-    from requests_oauthlib import OAuth1, OAuth1Session
-    s = requests.Session()
-    auth = OAuth1(conskey, conssec, verifier=oauth_verifier, resource_owner_key=oauth_token)
-    s.auth = auth
-    s.headers.update({
-        #'oauth_verifier': oauth_verifier,
-        # 'oauth_token': oauth_token,
-        'Content-Length': '0'
-         })
+    # from requests_oauthlib import OAuth1, OAuth1Session
+    # s = requests.Session()
+    # auth = OAuth1(conskey, conssec, verifier=oauth_verifier, resource_owner_key=oauth_token)
+    # s.auth = auth
+    # s.headers.update({
+    #     #'oauth_verifier': oauth_verifier,
+    #     # 'oauth_token': oauth_token,
+    #     'Content-Length': '0'
+    #      })
 
-    print(s.headers)
+    # print(s.headers)
+
+    print request 
  
 
     r = s.post(acc_url)
