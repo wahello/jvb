@@ -149,7 +149,7 @@ def receive_token(request):
 
     # print(s.headers)
 
-    print request 
+    print(request)
  
 
     r = s.post(acc_url)
