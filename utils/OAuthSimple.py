@@ -1,22 +1,22 @@
 #!/usr/bin/env python -tt
 
 
+import base64
+import hashlib
+import hmac
+import random
+import re
+import time
+from six.moves import urllib
+# import urllib.request, urllib.error, urllib.parse
+# import urllib.parse
+import string
 
 from . import OAuthSimpleException
 
 
 class OAuthSimple:
 
-    import base64
-    import hashlib
-    import hmac
-    import random
-    import re
-    import time
-    from six.moves import urllib
-    # import urllib.request, urllib.error, urllib.parse
-    # import urllib.parse
-    import string
 
 
     _secrets = {}
