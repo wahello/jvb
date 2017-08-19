@@ -186,8 +186,25 @@ def receive_token(request):
     #   'uploadEndTimeInSeconds': 1502150488
     # }
     # session.headers.update({'access-token': access_token})
-    # r = session.request('GET','https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, data=data)
     # print(r.json())
+
+    from requests_oauthlib import OAuth1, OAuth1Session
+    s = requests.Session()
+    auth = OAuth1(conskey, conssec, resource_owner_key=access_token)
+    s.auth = auth
+    s.headers.update({
+        #'oauth_verifier': oauth_verifier,
+        # 'oauth_token': oauth_token,
+        'Content-Length': '0'
+         })
+    s.get('https://healthapi.garmin.com/wellness-api/rest/dailies', params=data)
+
+    # print(s.headers)
+
+    # print(request)
+
+
+
 
     return redirect('/service_connect')
     
