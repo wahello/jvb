@@ -15,7 +15,8 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 import urllib
 import logging
 import requests
-import time 
+import time
+import re
 from utils.OAuthSimple import OAuthSimple
 
 
