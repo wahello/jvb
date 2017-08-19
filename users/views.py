@@ -126,7 +126,7 @@ def receive_token(request):
     encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
-    oauth = OAuthSimple(apikey=conskey, sharedSecret=conssec)
+    oauth = OAuthSimple(apiKey=conskey, sharedSecret=conssec)
     request = oauth.sign({
       'action': "POST",
       'path': acc_url,
