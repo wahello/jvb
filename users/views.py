@@ -127,9 +127,9 @@ def receive_token(request):
 
     oauth = OAuthSimple(oauth_token, session['request_token_secret'])
     request = oauth.sign({
-      action: "POST",
-      path: acc_url,
-      parameters: {  'oauth_verifier': auth_verifier,
+      'action': "POST",
+      'path': acc_url,
+      'parameters': {  'oauth_verifier': auth_verifier,
         'oauth_version': '1.0',
         'oauth_timestap': time.time(),
       }
