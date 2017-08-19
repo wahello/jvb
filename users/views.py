@@ -185,7 +185,7 @@ def receive_token(request):
     
     data = {
       'uploadStartTimeInSeconds': 1452470400,
-      'uploadEndTimeInSeconds': 1502150488
+      'uploadEndTimeInSeconds': 1452470400+86399,
     }
     # session.headers.update({'access-token': access_token})
     # print(r.json())
