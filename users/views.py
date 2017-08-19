@@ -129,9 +129,9 @@ def receive_token(request):
     request = oauth.sign({
       'action': "POST",
       'path': acc_url,
-      'parameters': {  'oauth_verifier': auth_verifier,
+      'parameters': {  'oauth_verifier': oauth_verifier,
         'oauth_version': '1.0',
-        'oauth_timestap': time.time(),
+        'oauth_timestamp': time.time(),
       }
     })
 
