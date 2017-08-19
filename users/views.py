@@ -149,12 +149,12 @@ def receive_token(request):
 
     # print(s.headers)
 
-    print(request)
+    # print(request)
  
 
-    r = s.post(acc_url)
-    print(r.text)
-    print(r.json())
+    # r = s.post(acc_url)
+    # print(r.text)
+    # print(r.json())
 
     service = OAuth1Service(
           # name = 'etrade',
