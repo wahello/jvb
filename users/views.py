@@ -171,7 +171,7 @@ def receive_token(request):
     # print('oauth_token_secret')
     access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
     #sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
-    sess = service.get_session((access_token, access_token_secret), header_auth=True)
+    sess = service.get_session((access_token, access_token_secret))
 
     # # need to validate that the token still works.... not done
     # session['state'] = 2
