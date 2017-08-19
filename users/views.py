@@ -170,7 +170,7 @@ def receive_token(request):
 
     # print('oauth_token_secret')
     access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
-
+    sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
     # # need to validate that the token still works.... not done
     # session['state'] = 2
     # session['access_token'] = access_token
@@ -188,17 +188,17 @@ def receive_token(request):
     # session.headers.update({'access-token': access_token})
     # print(r.json())
 
-    from requests_oauthlib import OAuth1, OAuth1Session
-    s = requests.Session()
-    auth = OAuth1(conskey, conssec, resource_owner_key=access_token)
-    s.auth = auth
-    s.headers.update({
-        #'oauth_verifier': oauth_verifier,
-        # 'oauth_token': oauth_token,
-        'Content-Length': '0'
-         })
-    r = s.get('https://healthapi.garmin.com/wellness-api/rest/dailies', params=data)
-    print(r.text)
+    # from requests_oauthlib import OAuth1, OAuth1Session
+    # s = requests.Session()
+    # auth = OAuth1(conskey, conssec, resource_owner_key=access_token)
+    # s.auth = auth
+    # s.headers.update({
+    #     #'oauth_verifier': oauth_verifier,
+    #     # 'oauth_token': oauth_token,
+    #     'Content-Length': '0'
+    #      })
+    r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
+    print(r)
     print(r.json())
 
 
