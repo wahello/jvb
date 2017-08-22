@@ -183,10 +183,22 @@ def receive_token(request):
     # print(access_token_secret)
     # session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
     
+
+
     data = {
       'uploadStartTimeInSeconds': 1503148183-86300,
       'uploadEndTimeInSeconds': 1503148183,
     }
+    
+    count = 0 
+    while count < 20:
+        r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
+        print(r)
+        print(r.json())        
+        count += 1
+        data['uploadEndTimeInSeconds'] = data['uploadStartTimeInSeconds']
+        data['uploadStartTimeInSeconds'] = data['uploadStartTimeInSeconds'] - 86300
+
     # session.headers.update({'access-token': access_token})
     # print(r.json())
 
@@ -199,9 +211,6 @@ def receive_token(request):
     #     # 'oauth_token': oauth_token,
     #     'Content-Length': '0'
     #      })
-    r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
-    print(r)
-    print(r.json())
 
 
     # print(s.headers)
