@@ -192,7 +192,7 @@ def receive_token(request):
     
     count = 0 
     while count < 20:
-        r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
+        r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
         print(r)
         print(r.json())        
         count += 1
