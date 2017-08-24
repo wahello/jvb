@@ -1,0 +1,89 @@
+html,body {
+	height:100%;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+}
+
+.form-container{
+	min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+ 	min-height: 100vh; /* These two lines are counted as one :-)       */
+  	display: flex;
+  	align-items: center;
+  	font-weight: 300;
+}
+
+.form-card {
+	box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+#reg-form .card .card-header{
+	background-color: #fff;
+	padding:30px;
+	padding-bottom: 0px;
+	border-bottom: none
+}
+
+#reg-form .f-progress{
+	position: relative;
+	overflow: hidden;
+}
+
+#reg-form .card .card-header .f-progress-bar {
+	position: absolute;
+	top:24px;
+	width:100%;
+	height:1px;
+	background: #ddd;
+}
+
+#reg-form .card .card-header .f-cp {
+	float:left;
+	position: relative;
+	width:33.333%;
+	padding: 0 5px;
+}
+
+#reg-form .card .card-header .f-cp .f-cp-icon{
+	display: inline-block;
+	width:40px;
+	height: 40px;
+	font-size: 22px;
+    line-height: 40px;
+	color:#fff;
+	border-radius: 50%;
+	background-color: #ddd;
+	margin-top: 4px;
+}
+#reg-form .card .card-header .f-cp .active{
+	margin-top: 0px;
+	background-color: #0275d8;
+	line-height: 48px;
+	width:48px;
+	height: 48px;
+}
+#reg-form .card .card-block{
+	padding:0 10px;
+}
+
+#reg-form h3 {
+	font-weight: 300;
+	color: #555;
+	font-size: 22px;
+}
+
+#reg-form .form-item {
+	padding:30px;
+}
+
+#reg-form .form-item .f-footer {
+	padding-top:20px;
+}
+
+#reg-form .form-item input {
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	height:44px;
+	border: 1px solid #ddd;
+	color: #888;
+	margin-bottom: 20px;
+}

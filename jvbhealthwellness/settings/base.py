@@ -36,6 +36,8 @@ INSTALLED_APPS = [
 
     'djangojs',
     'webpack_loader',
+    # cors app
+    'corsheaders',
 
     'common',
     'users',
@@ -45,6 +47,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # cors middleware
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

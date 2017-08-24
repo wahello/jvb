@@ -1,70 +1,100 @@
 from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
-from pygments.formatters.html import HtmlFormatter
-from pygments import highlight
-# Create your models here.
-Maintain_overall_health='Maintain overall health'
-improve_health='improve health'
-improve_energy_levels='improve energy levels'
-improve_blood_work_levels='improve blood work levels'
-weight_loss_waist_size_reduction='weight loss/waist size reduction'
-reduce_stress_anxiety='reduce stress/anxiety'
-train_for_a_running_race='train for a running race'
-train_for_a_triathlon='train for a triathlon'
-get_faster_as_an_athlete='get faster as an athlete'
-qualify_for_the_Boston_marathon='qualify for the Boston marathon'
-qualify_for_a_world_level_triathlon_ironman_kona_half_ironman_world_championships ='qualify for a world level triathlon_ironman kona_half ironman world championships'
-completely_transform_my_life='completely transform my life'
-be_proud_to_look_in_the_mirror_again='be proud to look in the mirror again'
-other='other'
-CHOICE =   (
-( Maintain_overall_health,'Maintain overall health'),
-(improve_health,'improve health'),
-(improve_energy_levels,'improve energy levels'),
-(improve_blood_work_levels,'improve blood work levels'),
-(weight_loss_waist_size_reduction,'weight loss/waist size reduction'),
-(reduce_stress_anxiety,'reduce stress/anxiety'),
-(train_for_a_running_race,'train for a running race'),
-(train_for_a_triathlon,'train for a triathlon'),
-(get_faster_as_an_athlete,'get faster as an athlete'),
-(qualify_for_the_Boston_marathon,'qualify for the Boston marathon'),
-(qualify_for_a_world_level_triathlon_ironman_kona_half_ironman_world_championships,'qualify for a world level triathlon(ironman kona/half ironman world championships)'),
-(completely_transform_my_life,'completely transform my life'),
-(be_proud_to_look_in_the_mirror_again,'be proud to look in the mirror again'),
-(other,'other'),
-)
-class User_Input(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    gender = models.CharField(blank=True,null =True,default = None,max_length=264)
-    height = models.FloatField(max_length=264,blank=True,null =True,default = None)
-    weight = models.FloatField(max_length=264,blank=True,null =True,default = None)
-    date_of_birth = models.DateField(max_length = 8,blank=True,null =True,default = None)
-    first_name =  models.CharField(max_length =264,blank=True,null =True,default = None)
-    last_name = models.CharField(max_length=264,blank=True,null =True,default = None)
-    garmin_user_name = models.CharField(max_length=264,blank=True,null =True,default = None)
-    garmin_password = models.CharField(max_length = 50,blank=True,null =True,default = None)
-    email = models.EmailField(max_length=70,blank=True,null =True,default = None,unique=True)
-    goals = models.CharField(max_length=264,choices = CHOICE,null=True)
-    other = models.CharField(max_length=264,null=True,blank=True)
-    age = models.IntegerField(null=True,blank=True)
-    aerobic_heart_rate_zone_high_number = models.IntegerField(null=True,blank=True)
-    aerobic_heart_rate_zone_low_number = models.IntegerField(null=True,blank=True)
-    owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE ,default= None,null=True,blank=True)
-    highlighted = models.TextField(null=True,blank=True)
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-    class Caluculated_Fields(models.Model):
-        def age(date_of_Birth):
-            today = date.today()
-            return today.year - Date_of_Birth.year - ((today.month, today.day) < (Date_of_Birth.month, Date_of_Birth.day))
-        def Aerobic_Heart_Rate_Zone_High_Number(age):
-            value = age+5
-            return 180-value
-        def Aerobic_Heart_Rate_Zone_Low_Number(age):
-            value = age-25
-            return 180-value
+
+class Profile(models.Model):
+    MAINTAIN_OVERALL_HEALTH = 'maintain_overall_health'
+    # IMPROVE_HEALTH = 'improve_health'
+    # IMPROVE_ENERGY_LEVELS = 'improve_energy_levels'
+    # IMPROVE_BLOOD_WORK_LEVELS = 'improve_blood_work_levels'
+    # WEIGHT_LOSS_WAIST_SIZE_REDUCTION = 'weight_loss/waist_size_reduction'
+    # REDUCE_STRESS_ANXIETY = 'reduce_stress/anxiety'
+    # TRAIN_FOR_A_RUNNING_RACE = 'train_for a running race'
+    # TRAIN_FOR_A_TRIATHLON = 'Train for a triathlon'
+    # GET_FASTER_AS_AN_ATHLETE = 'Get faster as an athlete'
+    # QUALIFY_FOR_THE_BOSTON_MARATHON = 'Qualify for the Boston marathon'
+    # QUALIFY_IRONMAN_WORLD_CHAMPIONSHIPS = 'Qualify for a world level triathlon_ironman kona_half ironman world championships'
+    # COMPLETELY_TRANSFORM_MY_LIFE = 'Completely transform my life'
+    # BE_PROUD_TO_LOOK_IN_THE_MIRROR_AGAIN = 'Be proud to look in the mirror again'
+    # OTHER = 'other'
+
+    GOALS_CHOICE = (
+        (MAINTAIN_OVERALL_HEALTH, 'Maintain_overall_health'),
+        # (IMPROVE_HEALTH, 'improve health'),
+        # (IMPROVE_ENERGY_LEVELS, 'improve energy levels'),
+        # (IMPROVE_BLOOD_WORK_LEVELS, 'improve blood work levels'),
+        # (WEIGHT_LOSS_WAIST_SIZE_REDUCTION, 'weight loss/waist size reduction'),
+        # (REDUCE_STRESS_ANXIETY, 'reduce stress/anxiety'),
+        # (TRAIN_FOR_A_RUNNING_RACE, 'train for a running race'),
+        # (TRAIN_FOR_A_TRIATHLON, 'train for a triathlon'),
+        # (GET_FASTER_AS_AN_ATHLETE, 'get faster as an athlete'),
+        # (QUALIFY_FOR_THE_BOSTON_MARATHON, 'qualify for the Boston marathon'),
+        # (QUALIFY_IRONMAN_WORLD_CHAMPIONSHIPS,
+        #  'qualify for a world level triathlon(ironman kona/half ironman world championships)'),
+        # (COMPLETELY_TRANSFORM_MY_LIFE, 'completely transform my life'),
+        # (BE_PROUD_TO_LOOK_IN_THE_MIRROR_AGAIN,
+        #  'be proud to look in the mirror again'),
+        # (OTHER, 'other'),
+    )
+
+    MALE = 'M'
+    FEMALE = 'F'
+
+    GENDER_CHOICE = (
+        (MALE, 'Male'),
+        (FEMALE, 'Female')
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    gender = models.CharField(default=MALE, max_length=1, choices=GENDER_CHOICE)
+
+    height = models.CharField(max_length=6)
+
+    weight = models.CharField(max_length=3)
+
+    date_of_birth = models.DateField()
+
+    goals = models.CharField(max_length=264, choices=GOALS_CHOICE,
+                             null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def age(self):
+        today = date.today()
+        dob = self.date_of_birth
+        return (today.year - self.dob.year
+                - ((today.month, today.day) < (dob.month, dob.day)))
+
+    def Aerobic_Heart_Rate_Zone_High_Number(self):
+        age = self.age()
+        value = age + 5
+        return 180 - value
+
+    def Aerobic_Heart_Rate_Zone_Low_Number(self):
+        age = self.age()
+        value = age - 25
+        return 180 - value
 
     class Meta:
-        ordering = ('created',)
+        ordering = ('created_at',)
 
-    
+
+# whenever a save method is called on User model, a signal is fired
+# and following function will create or update the Profile model
+# instance based on either a new user is created or existing is modified
+
+# @receiver(post_save, sender=User)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
+
+
+# @receiver(post_save, sender=User)
+# def save_user_profile(sender, instance, **kwargs):
+#     instance.profile.save()
