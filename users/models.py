@@ -1,5 +1,6 @@
 # from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-# from django.db import models
+from django.db import models
+from django.contrib.auth.models import User
 # from django.utils.translation import ugettext_lazy as _
 
 # from common.models import IndexedTimeStampedModel
@@ -30,3 +31,12 @@
 
 #     def __str__(self):
 #         return self.email
+
+class GarminToken(models.Model):
+
+	user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='garmin_token')
+	token = models.CharField(max_length=250)
+	token_secret = models.CharField(max_length=250)
+
+	def __str__(self):
+		return "%s"%(self.user.username)

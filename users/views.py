@@ -1,13 +1,18 @@
 from django.shortcuts import render  # noqa
+from django.http import Http404
 from rauth import OAuth1Service
 import webbrowser 
 from django.shortcuts import redirect
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
+from rest_framework import status
 
+from .serializers import GarminTokenSerializer
+from .models import GarminToken
 # In state=1 the next request should include an oauth_token.
 #If it doesn't go back to 0
 
@@ -32,22 +37,6 @@ logging.getLogger().setLevel(logging.DEBUG)
 requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
-
-
-
-
-
-class UserCreate(APIView):
-    """ 
-    Creates the user. 
-    """
-
-    def post(self, request, format='json'):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            if user:
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def request_token(request):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
@@ -120,10 +109,10 @@ def receive_token(request):
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
 
-    oauth_token = request.GET['oauth_token'] 
+    # oauth_token = request.GET['oauth_token'] 
     oauth_verifier = request.GET['oauth_verifier']
 
-    encoded_verifier = urllib.parse.quote(oauth_verifier)
+    # encoded_verifier = urllib.parse.quote(oauth_verifier)
     # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)    
 
     # oauth = OAuthSimple(apiKey=conskey, sharedSecret=conssec)
@@ -169,7 +158,10 @@ def receive_token(request):
     # #oauth_token=d37f1145-59b1-4f85-bc18-9a25e5697445&oauth_verifier=d9lZlU521B
 
     # print('oauth_token_secret')
-    access_token, access_token_secret = service.get_access_token(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
+    access_token, access_token_secret = service.get_access_token(session['request_token'],
+    session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
+    header_auth=True)
+
     #sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
     sess = service.get_session((access_token, access_token_secret))
 
@@ -185,19 +177,19 @@ def receive_token(request):
     
 
 
-    data = {
-      'uploadStartTimeInSeconds': 1503148183-86300,
-      'uploadEndTimeInSeconds': 1503148183,
-    }
+    # data = {
+    #   'uploadStartTimeInSeconds': 1503148183-86300,
+    #   'uploadEndTimeInSeconds': 1503148183,
+    # }
     
-    count = 0 
-    while count < 20:
-        r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
-        print(r)
-        print(r.json())        
-        count += 1
-        data['uploadEndTimeInSeconds'] = data['uploadStartTimeInSeconds']
-        data['uploadStartTimeInSeconds'] = data['uploadStartTimeInSeconds'] - 86300
+    # count = 0 
+    # while count < 20:
+    #     r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
+    #     print(r)
+    #     print(r.json())        
+    #     count += 1
+    #     data['uploadEndTimeInSeconds'] = data['uploadStartTimeInSeconds']
+    #     data['uploadStartTimeInSeconds'] = data['uploadStartTimeInSeconds'] - 86300
 
     # session.headers.update({'access-token': access_token})
     # print(r.json())
@@ -216,11 +208,13 @@ def receive_token(request):
     # print(s.headers)
 
     # print(request)
-
-
-
+    
+    data = {'token':access_token, 'secret':access_token_secret}
+    url = "/garmin_token/"
+    requests.post(url,data=data)
 
     return redirect('/service_connect')
+
     
     # print(request)
     # $json = json_decode($_POST['uploadMetaData']);
@@ -228,3 +222,32 @@ def receive_token(request):
     # $file_name = $_FILES['file']['name']; 
     # move_uploaded_file($tmp_name, YOUR_FILE_PATH); 
     # header('Location: YOUR_URL_FOR_THE_SAVED_FILE', true, 201);
+
+
+class GetGarminToken(APIView):
+  permission_classes = (permissions.IsAuthenticated,)
+
+  def dispatch(self, *args, **kwargs):
+    try:
+      if GarminToken.objects.get(user=self.request.user):
+        return super(GetGarminToken,self).dispatch(*args,**kwargs)
+    except GarminToken.DoesNotExist:
+      return redirect('/users/request_token')
+
+  def get_object(self,user):
+    return GarminToken.objects.get(user=user)
+    # # request_token(self.request)
+    # redirect('/users/request_token')
+    # return GarminToken.objects.get(user=user)
+
+  def get(self, request, format="json"):
+      token = self.get_object(user=request.user)
+      serializers = GarminTokenSerializer(token)
+      return Response(serializers.data)
+
+  def post(self, request, format="json"):
+    serializer = GarminTokenSerializer(data=request.data,context={'request': request})
+    if serializer.is_valid():
+      serializer.save()
+      return Response(serializer.data,status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

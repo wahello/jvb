@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from "react-redux";
+import thunk from "redux-thunk"
 import { createStore, applyMiddleware } from "redux";
 import reducers from "../reducers";
 import promise from 'redux-promise';
@@ -9,7 +10,7 @@ import HomePageContainer from '../containers/HomePageContainer';
 import Register from '../components/registration/Register';
 import Forgotpassword from '../components/ForgotPassword';
 import UserInputs from '../components/UserInputs';
-
+import Dashboard from '../components/dashboard/Dashboard';
 import ServiceConnect from '../components/ServiceConnect';
 import Nes from '../components/nes';
 import Overallgrade from '../components/OverAllGrade';
@@ -20,7 +21,7 @@ import Sleepgraph from '../components/sleep';
 
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
 
-const createStoreWithMiddleware = applyMiddleware(promise)(createStore);
+const createStoreWithMiddleware = applyMiddleware(promise,thunk)(createStore);
 // require('../sass/style.scss');
 
 // const history = createBrowserHistory();
@@ -30,6 +31,7 @@ ReactDOM.render((
 	  <BrowserRouter>
 	    <Switch>
 	        <Route exact path='/' component={HomePageContainer}/>
+	        <Route path='/users/dashboard' component={Dashboard} />
 	        <Route path='/register' component={Register} />
 	        <Route path='/UserInputs' component={UserInputs} />
 	        <Route path='/service_connect' component={ServiceConnect} />

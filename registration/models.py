@@ -1,43 +1,40 @@
 from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
 
 class Profile(models.Model):
     MAINTAIN_OVERALL_HEALTH = 'maintain_overall_health'
-    # IMPROVE_HEALTH = 'improve_health'
-    # IMPROVE_ENERGY_LEVELS = 'improve_energy_levels'
-    # IMPROVE_BLOOD_WORK_LEVELS = 'improve_blood_work_levels'
-    # WEIGHT_LOSS_WAIST_SIZE_REDUCTION = 'weight_loss/waist_size_reduction'
-    # REDUCE_STRESS_ANXIETY = 'reduce_stress/anxiety'
-    # TRAIN_FOR_A_RUNNING_RACE = 'train_for a running race'
-    # TRAIN_FOR_A_TRIATHLON = 'Train for a triathlon'
-    # GET_FASTER_AS_AN_ATHLETE = 'Get faster as an athlete'
-    # QUALIFY_FOR_THE_BOSTON_MARATHON = 'Qualify for the Boston marathon'
-    # QUALIFY_IRONMAN_WORLD_CHAMPIONSHIPS = 'Qualify for a world level triathlon_ironman kona_half ironman world championships'
-    # COMPLETELY_TRANSFORM_MY_LIFE = 'Completely transform my life'
-    # BE_PROUD_TO_LOOK_IN_THE_MIRROR_AGAIN = 'Be proud to look in the mirror again'
-    # OTHER = 'other'
+    IMPROVE_HEALTH = 'improve_health'
+    IMPROVE_ENERGY_LEVELS = 'improve_energy_levels'
+    IMPROVE_BLOOD_WORK_LEVELS = 'improve_blood_work_levels'
+    WEIGHT_LOSS_WAIST_SIZE_REDUCTION = 'weight_loss/waist_size_reduction'
+    REDUCE_STRESS_ANXIETY = 'reduce_stress/anxiety'
+    TRAIN_FOR_A_RUNNING_RACE = 'train_for a running race'
+    TRAIN_FOR_A_TRIATHLON = 'Train for a triathlon'
+    GET_FASTER_AS_AN_ATHLETE = 'Get faster as an athlete'
+    QUALIFY_FOR_THE_BOSTON_MARATHON = 'Qualify for the Boston marathon'
+    QUALIFY_IRONMAN_WORLD_CHAMPIONSHIPS = 'Qualify for a world level triathlon_ironman kona_half ironman world championships'
+    COMPLETELY_TRANSFORM_MY_LIFE = 'Completely transform my life'
+    BE_PROUD_TO_LOOK_IN_THE_MIRROR_AGAIN = 'Be proud to look in the mirror again'
+    OTHER = 'other'
 
     GOALS_CHOICE = (
         (MAINTAIN_OVERALL_HEALTH, 'Maintain_overall_health'),
-        # (IMPROVE_HEALTH, 'improve health'),
-        # (IMPROVE_ENERGY_LEVELS, 'improve energy levels'),
-        # (IMPROVE_BLOOD_WORK_LEVELS, 'improve blood work levels'),
-        # (WEIGHT_LOSS_WAIST_SIZE_REDUCTION, 'weight loss/waist size reduction'),
-        # (REDUCE_STRESS_ANXIETY, 'reduce stress/anxiety'),
-        # (TRAIN_FOR_A_RUNNING_RACE, 'train for a running race'),
-        # (TRAIN_FOR_A_TRIATHLON, 'train for a triathlon'),
-        # (GET_FASTER_AS_AN_ATHLETE, 'get faster as an athlete'),
-        # (QUALIFY_FOR_THE_BOSTON_MARATHON, 'qualify for the Boston marathon'),
-        # (QUALIFY_IRONMAN_WORLD_CHAMPIONSHIPS,
-        #  'qualify for a world level triathlon(ironman kona/half ironman world championships)'),
-        # (COMPLETELY_TRANSFORM_MY_LIFE, 'completely transform my life'),
-        # (BE_PROUD_TO_LOOK_IN_THE_MIRROR_AGAIN,
-        #  'be proud to look in the mirror again'),
-        # (OTHER, 'other'),
+        (IMPROVE_HEALTH, 'improve health'),
+        (IMPROVE_ENERGY_LEVELS, 'improve energy levels'),
+        (IMPROVE_BLOOD_WORK_LEVELS, 'improve blood work levels'),
+        (WEIGHT_LOSS_WAIST_SIZE_REDUCTION, 'weight loss/waist size reduction'),
+        (REDUCE_STRESS_ANXIETY, 'reduce stress/anxiety'),
+        (TRAIN_FOR_A_RUNNING_RACE, 'train for a running race'),
+        (TRAIN_FOR_A_TRIATHLON, 'train for a triathlon'),
+        (GET_FASTER_AS_AN_ATHLETE, 'get faster as an athlete'),
+        (QUALIFY_FOR_THE_BOSTON_MARATHON, 'qualify for the Boston marathon'),
+        (QUALIFY_IRONMAN_WORLD_CHAMPIONSHIPS,
+         'qualify for a world level triathlon(ironman kona/half ironman world championships)'),
+        (COMPLETELY_TRANSFORM_MY_LIFE, 'completely transform my life'),
+        (BE_PROUD_TO_LOOK_IN_THE_MIRROR_AGAIN,
+         'be proud to look in the mirror again'),
+        (OTHER, 'other'),
     )
 
     MALE = 'M'
@@ -58,8 +55,7 @@ class Profile(models.Model):
 
     date_of_birth = models.DateField()
 
-    goals = models.CharField(max_length=264, choices=GOALS_CHOICE,
-                             null=True)
+    goals = models.CharField(max_length=250, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -83,18 +79,3 @@ class Profile(models.Model):
 
     class Meta:
         ordering = ('created_at',)
-
-
-# whenever a save method is called on User model, a signal is fired
-# and following function will create or update the Profile model
-# instance based on either a new user is created or existing is modified
-
-# @receiver(post_save, sender=User)
-# def create_user_profile(sender, instance, created, **kwargs):
-#     if created:
-#         Profile.objects.create(user=instance)
-
-
-# @receiver(post_save, sender=User)
-# def save_user_profile(sender, instance, **kwargs):
-#     instance.profile.save()

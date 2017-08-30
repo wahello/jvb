@@ -5,6 +5,11 @@ from rest_framework import serializers
 from .models import Profile
 
 class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','username','email','first_name','last_name')
+
+class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     email = serializers.EmailField(source='user.email')
     password = serializers.CharField(source='user.password',read_only=True)
@@ -35,23 +40,3 @@ class UserSerializer(serializers.ModelSerializer):
         instance.weight = validated_data.get('weight', instance.weight)
         instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
         instance.goals = validated_data.get('goals',instance.goals)
-
-# class UserSerializer(serializers.ModelSerializer):
-#     email = serializers.EmailField(
-#             required=True,
-#             validators=[UniqueValidator(queryset=User.objects.all())]
-#             )
-#     username = serializers.CharField(
-#             max_length=32,
-#             validators=[UniqueValidator(queryset=User.objects.all())]
-#             )
-#     password = serializers.CharField(min_length=8, write_only=True)
-
-#     def create(self, validated_data):
-#         user = User.objects.create_user(validated_data['username'], validated_data['email'],
-#              validated_data['password'])
-#         return user
-
-#     class Meta:
-#         model = User
-#         fields = ('id', 'username', 'email', 'password')

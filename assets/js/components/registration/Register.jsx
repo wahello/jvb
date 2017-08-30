@@ -8,7 +8,7 @@ import RegisterNetwork from '../../network/register';
 import WizardAccountPage from './WizardAccountPage';
 import WizardPersonalPage from './WizardPersonalPage';
 import WizardGoalsPage from './WizardGoalsPage';
-console.log("test");
+
 class Register extends Component {
 
 	constructor(props){
@@ -37,7 +37,7 @@ class Register extends Component {
 	}
 
 	onSubmit(values){
-		console.log(values);
+		
 		var reg = new RegisterNetwork();
 		reg.register(values,this.onRegisterSuccess,this.onRegisterFailure);
 	}

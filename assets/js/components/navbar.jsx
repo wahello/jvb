@@ -1,19 +1,26 @@
 import React from 'react';
-import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
+import {connect} from 'react-redux';
+import { Collapse, Navbar, NavbarToggler, 
+         NavbarBrand, Nav, NavItem, NavLink,
+         Dropdown, DropdownToggle, DropdownMenu,
+         DropdownItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 
-export default class Navbarmenu extends React.Component {
+import { getGarminToken } from '../network/auth';
+
+class NavbarMenu extends React.Component {
   constructor(props) {
     super(props);
-
     this.toggle = this.toggle.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      dropdownOpen: false
     };
   }
   toggle() {
     this.setState({
-      isOpen: !this.state.isOpen
+      isOpen: !this.state.isOpen,
+      dropdownOpen: !this.state.dropdownOpen
     });
   }
   render() {
@@ -39,6 +46,18 @@ export default class Navbarmenu extends React.Component {
               <NavItem>
                 <NavLink href="">Dashboard</NavLink>
               </NavItem>
+              <NavItem>
+                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                  <DropdownToggle caret>
+                    Device Connect
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem onClick={this.props.getGarminToken}>
+                      Connect Device
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavItem>
             </Nav>
           </Collapse>
         </Navbar>
@@ -46,6 +65,15 @@ export default class Navbarmenu extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+
+export default connect(mapStateToProps,{getGarminToken})(NavbarMenu);
 
 Navbar.propTypes={
     fixed: PropTypes.string,

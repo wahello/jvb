@@ -36,11 +36,12 @@ INSTALLED_APPS = [
 
     'djangojs',
     'webpack_loader',
-    # cors app
     'corsheaders',
+    'rest_framework.authtoken',
 
     'common',
     'users',
+    'user_input',
     'registration'
 ]
 
@@ -126,3 +127,12 @@ WEBPACK_LOADER = {
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+#Restframework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',   
+    )
+}

@@ -1,10 +1,29 @@
 from django.contrib import admin
-from user_input.models import Daily_User_Input_Encouraged,Daily_User_Input_Strong,Daily_User_Input_Optional,Inputs_Changes_from_Third_Sources,Goals
+from user_input.models import DailyUserInputEncouraged,\
+							  DailyUserInputStrong,\
+							  DailyUserInputOptional,\
+							  InputsChangesFromThirdSources,\
+							  UserDailyInput,\
+							  Goals
 
+class DailyUserInputStrongAdmin(admin.ModelAdmin):
+	pass
+class DailyUserInputEncouragedAdmin(admin.ModelAdmin):
+	pass
+class DailyUserInputOptionalAdmin(admin.ModelAdmin):
+	pass
+class InputsChangesFromThirdSourcesAdmin(admin.ModelAdmin):
+	pass
+class UserInputAdmin(admin.ModelAdmin):
+	pass
+class GoalsAdmin(admin.ModelAdmin):
+	pass
 
 # Register your models here.
-admin.site.register(Daily_User_Input_Strong)
-admin.site.register(Daily_User_Input_Encouraged)
-admin.site.register(Daily_User_Input_Optional)
-admin.site.register(Inputs_Changes_from_Third_Sources)
-admin.site.register(Goals)
+admin.site.register(DailyUserInputStrong,DailyUserInputStrongAdmin)
+admin.site.register(DailyUserInputEncouraged,DailyUserInputEncouragedAdmin)
+admin.site.register(DailyUserInputOptional,DailyUserInputOptionalAdmin)
+admin.site.register(InputsChangesFromThirdSources,
+					InputsChangesFromThirdSourcesAdmin)
+admin.site.register(UserDailyInput,UserInputAdmin)
+admin.site.register(Goals,GoalsAdmin)

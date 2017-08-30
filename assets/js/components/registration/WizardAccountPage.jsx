@@ -7,9 +7,6 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 import renderField from './fieldRenderer';
 import { account_validate } from './validation';
 
-import RegisterNetwork from '../../network/register';
-
-
 const WizardAccountPage = (props) => {
 	const { handleSubmit, onSubmit } = props;
 	

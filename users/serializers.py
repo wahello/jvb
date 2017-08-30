@@ -1,6 +1,13 @@
+from django.contrib.auth.models import User
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.models import User
+
+from rauth import OAuth1Service
+
+from .models import GarminToken
+
+
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -20,3 +27,21 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'password')
+
+class GarminTokenSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only = True)
+
+    def create(self,validated_data):
+        user = self.context['request'].user
+        token = GarminToken.objects.create(user=user,**validated_data)
+        return token
+
+    def update(self,instance,validated_data):
+        instance.token = validated_data.get('token',instance.token)
+        instance.token_secret = validated_data.get('token_secret', instance.token_secret)
+        instance.save()
+
+    class Meta:
+        model = GarminToken
+        fields = ('__all__')
+
