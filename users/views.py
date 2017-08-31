@@ -292,6 +292,6 @@ class fetchGarminData(APIView):
       }
       
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
-      return Response(r.json)
+      return Response(r.json())
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
