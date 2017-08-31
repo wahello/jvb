@@ -225,8 +225,7 @@ def receive_token(request):
 
 
 class GetGarminToken(APIView):
-  permission_classes = (permissions.IsAuthenticated,)
-
+  # permission_classes = (permissions.IsAuthenticated,)
   def dispatch(self, *args, **kwargs):
     try:
       if GarminToken.objects.get(user=self.request.user):
