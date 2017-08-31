@@ -34,7 +34,7 @@ from django.contrib.auth.models import User
 
 class GarminToken(models.Model):
 
-	user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='garmin_token')
+	user = models.OneToOneField('auth.User')
 	token = models.CharField(max_length=250)
 	token_secret = models.CharField(max_length=250)
 

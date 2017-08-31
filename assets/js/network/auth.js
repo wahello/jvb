@@ -75,7 +75,6 @@ export function logoutUser(){
 export function getGarminToken(){
 	return function(dispatch){
 		const URL = '/users/garmin_token/';
-		console.log("Just testing pal!");
 		const cookie = new Cookies();
 		const config = {
 			method: 'get',
