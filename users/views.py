@@ -164,8 +164,8 @@ def receive_token(request):
     session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
     header_auth=True)
 
-    sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
-    
+    # sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
+    sess = service.get_session((access_token, access_token_secret))
 
     # # need to validate that the token still works.... not done
     # session['state'] = 2
@@ -273,6 +273,8 @@ class fetchGarminData(APIView):
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
+    access_token = session['token']
+    access_token_secret = session['token_secret']
 
     service = OAuth1Service(
           consumer_key = conskey,
@@ -281,11 +283,7 @@ class fetchGarminData(APIView):
           access_token_url = acc_url,
           authorize_url = authurl, 
           )
-    sess = service.get_auth_session(session['request_token'],
-                                     session['request_token_secret'],
-                                     method='POST',
-                                     data={'oauth_verifier': session['oauth_verifier']},
-                                     header_auth=True)
+    sess = service.get_session((access_token, access_token_secret))
     data = {
       'uploadStartTimeInSeconds': 1503187200-86300,
       'uploadEndTimeInSeconds': 1503187200,
