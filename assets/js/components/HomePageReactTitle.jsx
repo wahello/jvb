@@ -81,6 +81,11 @@ class HomePageReactTitle extends Component {
         </Form>
        </Col></Row>
        <Row>
+        <Col  xs="6">
+         <Link to='/users/dashboard'>Dashboard</Link>
+        </Col>
+       </Row>
+       <Row>
        	<Col  xs="6">
          <Link to='register'>Register</Link>
        	</Col>

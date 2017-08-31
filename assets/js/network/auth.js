@@ -67,7 +67,7 @@ export function logoutUser(){
 		dispatch({
 			type: UNAUTH_USER
 		});
-		cookie.remove('auth_token', {path: '/'});
+		// cookie.remove('auth_token', {path: '/'});
 		window.location.href = '/';
 	}
 } 
