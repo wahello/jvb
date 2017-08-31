@@ -57,7 +57,8 @@ export function loginUser(data, callback){
 			});
 			callback();
 		}).catch((error) => {
-			errorHandler(dispatch, error, AUTH_ERROR);
+			// errorHandler(dispatch, error, AUTH_ERROR);
+			console.log("Opps! some error occured!");
 		});
 	}
 }

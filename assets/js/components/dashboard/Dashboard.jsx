@@ -19,13 +19,10 @@ class Dashboard extends Component {
 	}
 
 	fetchGarminData(){
-		// if (this.props.have_token){
-		// 	data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
-		// 	console.log(data);
-		// }
-		data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
-		console.log()
-	
+		if (this.props.have_token){
+			data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
+			console.log(data);
+		}
 	}
 
 	render(){
