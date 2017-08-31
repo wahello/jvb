@@ -52,8 +52,8 @@ class NavbarMenu extends React.Component {
                     Device Connect
                   </DropdownToggle>
                   <DropdownMenu>
-                    <DropdownItem onClick={this.props.getGarminToken}>
-                      Connect Device
+                    <DropdownItem>
+                      <a href="/users/request_token">Connect Device</a>
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

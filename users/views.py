@@ -1,5 +1,6 @@
 from django.shortcuts import render  # noqa
 from django.http import Http404
+from django.http import HttpResponse
 from rauth import OAuth1Service
 import webbrowser 
 from django.shortcuts import redirect
@@ -209,9 +210,14 @@ def receive_token(request):
 
     # print(request)
     
-    data = {'token':access_token, 'secret':access_token_secret}
-    url = "/garmin_token/"
-    requests.post(url,data=data)
+    request.session['token'] = access_token
+    request.session['token_secret'] = access_token_secret
+    print("\n\nACCESS TOKEN:", access_token)
+    print("\n\nACCES TOKEN SECRET:", access_token_secret)
+
+    # data = {'token':access_token, 'secret':access_token_secret}
+    # url = "/garmin_token/"
+    # requests.post(url,data=data)
 
     return redirect('/service_connect')
 
@@ -224,29 +230,33 @@ def receive_token(request):
     # header('Location: YOUR_URL_FOR_THE_SAVED_FILE', true, 201);
 
 
-class GetGarminToken(APIView):
-  # permission_classes = (permissions.IsAuthenticated,)
-  def dispatch(self, *args, **kwargs):
-    try:
-      if GarminToken.objects.get(user=self.request.user):
-        return super(GetGarminToken,self).dispatch(*args,**kwargs)
-    except GarminToken.DoesNotExist:
-      return redirect('/users/request_token')
+# class GetGarminToken(APIView):
+#   permission_classes = (permissions.IsAuthenticated,)
+#   def dispatch(self, *args, **kwargs):
+#     try:
+#       if GarminToken.objects.get(user=self.request.user):
+#         return super(GetGarminToken,self).dispatch(*args,**kwargs)
+#     except GarminToken.DoesNotExist:
+#       return redirect('/users/request_token')
+#     return redirect('/users/request_token')
 
-  def get_object(self,user):
-    return GarminToken.objects.get(user=user)
-    # # request_token(self.request)
-    # redirect('/users/request_token')
-    # return GarminToken.objects.get(user=user)
+#   def get_object(self,user):
+#     return GarminToken.objects.get(user=user)
+#     # request_token(self.request)
+#     redirect('/users/request_token')
+#     return GarminToken.objects.get(user=user)
+#     pass
 
-  def get(self, request, format="json"):
-      token = self.get_object(user=request.user)
-      serializers = GarminTokenSerializer(token)
-      return Response(serializers.data)
+#   def get(self, request, format="json"):
+#       token = self.get_object(user=request.user)
+#       token = self.request.session['token']
+#       serializers = GarminTokenSerializer(token)
+#       return Response(serializers.data)
+#       return Response({'token':token})
 
-  def post(self, request, format="json"):
-    serializer = GarminTokenSerializer(data=request.data,context={'request': request})
-    if serializer.is_valid():
-      serializer.save()
-      return Response(serializer.data,status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#   def post(self, request, format="json"):
+#     serializer = GarminTokenSerializer(data=request.data,context={'request': request})
+#     if serializer.is_valid():
+#       serializer.save()
+#       return Response(serializer.data,status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
