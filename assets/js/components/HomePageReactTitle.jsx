@@ -136,7 +136,7 @@ class HomePageReactTitle extends Component {
        </Row>
        <Row>
         <Col xs="6">
-         <a href='raw/garmin'>Garmin Pull Down</a>
+         <Link to='/raw/garmin'>Garmin Pull Down</Link>
         </Col>
        </Row>
        </Container>
