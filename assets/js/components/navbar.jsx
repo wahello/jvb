@@ -1,4 +1,6 @@
 import React from 'react';
+import { withRouter, Link } from 'react-router-dom';
+
 import {connect} from 'react-redux';
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
@@ -32,7 +34,9 @@ class NavbarMenu extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <NavLink href="/components/" >Home</NavLink>
+                <NavLink>
+                    <Link to="/">Home</Link>
+                </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="">User Inputs</NavLink>

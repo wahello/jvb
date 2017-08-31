@@ -57,7 +57,8 @@ export function loginUser(data, callback){
 			});
 			callback();
 		}).catch((error) => {
-			errorHandler(dispatch, error, AUTH_ERROR);
+			// errorHandler(dispatch, error, AUTH_ERROR);
+			console.log("Opps! some error occured!");
 		});
 	}
 }
@@ -67,7 +68,7 @@ export function logoutUser(){
 		dispatch({
 			type: UNAUTH_USER
 		});
-		cookie.remove('auth_token', {path: '/'});
+		// cookie.remove('auth_token', {path: '/'});
 		window.location.href = '/';
 	}
 } 
