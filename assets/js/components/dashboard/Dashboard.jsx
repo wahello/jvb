@@ -15,15 +15,17 @@ class Dashboard extends Component {
 	}
 
 	onFetchError(error){
-		alert(error.message);
+		console.log("Cannot fetch data now!");
 	}
 
 	fetchGarminData(){
-		console.log(this.props);
-		if (this.props.have_token){
-			data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
-			console.log(data);
-		}
+		// if (this.props.have_token){
+		// 	data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
+		// 	console.log(data);
+		// }
+		data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
+		console.log()
+	
 	}
 
 	render(){
