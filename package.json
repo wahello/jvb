@@ -42,6 +42,7 @@
     "react-addons-css-transition-group": "^15.6.0",
     "react-addons-transition-group": "^15.6.0",
     "react-bootstrap-table": "^3.5.1",
+    "react-calendar-widget": "^0.0.3",
     "react-cookie": "^2.0.8",
     "react-dom": "^15.6.1",
     "react-hot-loader": "^3.0.0-beta.2",
