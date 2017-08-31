@@ -273,21 +273,25 @@ class fetchGarminData(APIView):
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
-    access_token = session['token']
-    access_token_secret = session['token_secret']
 
-    service = OAuth1Service(
-          consumer_key = conskey,
-          consumer_secret = conssec,
-          request_token_url = req_url,
-          access_token_url = acc_url,
-          authorize_url = authurl, 
-          )
-    sess = service.get_session((access_token, access_token_secret))
-    data = {
-      'uploadStartTimeInSeconds': 1503187200-86300,
-      'uploadEndTimeInSeconds': 1503187200,
-    }
-    
-    r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
-    return Response(r.json)
+    access_token = session.get('token',None)
+    access_token_secret = session.get('token_secret',None)
+
+    if access_token and access_token_secret:
+      service = OAuth1Service(
+            consumer_key = conskey,
+            consumer_secret = conssec,
+            request_token_url = req_url,
+            access_token_url = acc_url,
+            authorize_url = authurl, 
+            )
+      sess = service.get_session((access_token, access_token_secret))
+      data = {
+        'uploadStartTimeInSeconds': 1503187200-86300,
+        'uploadEndTimeInSeconds': 1503187200,
+      }
+      
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
+      return Response(r.json)
+    else:
+      return Response(status.HTTP_401_UNAUTHORIZED)
