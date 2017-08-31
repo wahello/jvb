@@ -1,1 +1,1 @@
-{"status":"error","publicPath":"http://localhost:3000/assets/bundles/","error":"ModuleNotFoundError","message":"Module not found: Error: Empty dependency (no request)"}
+{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","error":"ModuleNotFoundError","message":"Module not found: Error: Empty dependency (no request)","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/Users/saumyagarg/wkspace/jvbhw/proj/assets/bundles/main.js"}]}}

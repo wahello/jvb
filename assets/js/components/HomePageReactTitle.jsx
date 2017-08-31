@@ -4,7 +4,6 @@ import { Field, reduxForm} from 'redux-form';
 import { withRouter, Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText } from 'reactstrap';
-import {} from '';
 import { loginUser } from '../network/auth';
 
 class HomePageReactTitle extends Component {
