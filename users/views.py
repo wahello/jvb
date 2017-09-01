@@ -297,7 +297,8 @@ class fetchGarminData(APIView):
       }
       
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/bodyComps', header_auth=True, params=data)
-      
+      output_dict['bodyComps'] = r.json()
+
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/sleeps', header_auth=True, params=data)
       output_dict['sleeps'] = r.json()
 
@@ -311,7 +312,9 @@ class fetchGarminData(APIView):
       output_dict['dailies'] = r.json()
       
       
-      
+      output_dict['garmin_health_api'] = {
+        'average_ground_contact_time': ''
+      }
 
       return Response(output_dict)
     else:
