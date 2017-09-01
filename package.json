@@ -81,7 +81,5 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.4.1",
-    "react-hot-loader": "3.0.0-beta.2",
-    "webpack-bundle-tracker": "^0.2.0"
   }
 }
