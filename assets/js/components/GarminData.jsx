@@ -24,6 +24,11 @@ class GarminDataPage extends Component {
   }
 
 
+  getInitialState() {
+    return {
+    }
+  }
+
   componentDidMount(){
 
     //    fetchGarminData(this.updateState).bind(this);
@@ -48,6 +53,7 @@ class GarminDataPage extends Component {
 	// const { handleSubmit, onSubmit } = this.props;
 
 	return(
+    <div>
 		<form onSubmit={handleSubmit} className = "container">
 			<div>
       &nbsp;
@@ -816,7 +822,12 @@ class GarminDataPage extends Component {
 
       </div>
     </form>
+    <p><pre>{JSON.stringify(this.state, null, 2) }</pre></p>
+    <div>
   )
+
+
+
  }
 
 }
