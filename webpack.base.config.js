@@ -66,7 +66,7 @@ module.exports = [{
     // defined in local or prod
   ],
   resolve: {
-    modules: ['node_modules', 'bower_components'],
+    modules: ['node_modules'],
     extensions: ['.js', '.jsx', '.css'],
   },
 }];
