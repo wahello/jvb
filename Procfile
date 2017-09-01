@@ -1,3 +1,3 @@
-web: gunicorn jvbhealthwellness.wsgi --limit-request-line 8188 --log-file -
+web: waitress-serve --port=$PORT jvbhealthwellness.wsgi:application
 worker: celery worker --app=jvbhealthwellness --loglevel=info
 
