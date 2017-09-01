@@ -1,13 +1,51 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
+import fetchGarminData  from '../network/garminOperations';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
+
+axiosRetry(axios, { retries: 3}); 
+
+
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 var setText = function (date) {
     // code for processing the JavaScript Date object
 };
-const GarminDataPage = (props) => {
-	const { handleSubmit, onSubmit } = props;
+
+
+class GarminDataPage extends Component {
+
+
+  updateState(data){
+
+    this.setState(data);
+  }
+
+
+  componentDidMount(){
+
+    //    fetchGarminData(this.updateState).bind(this);
+
+  const URL = 'users/garmin/fetch/';
+  const config = {
+    method: "get",
+    url: URL
+  };
+  axios(config).then( function(response){
+    this.updateState(response);
+  }.bind(this)).catch((error) => {
+    errorCallback(error);
+  });
+
+
+  }
+
+
+  render(){
+    let handleSubmit = this.props.handleSubmit;
+	// const { handleSubmit, onSubmit } = this.props;
 
 	return(
 		<form onSubmit={handleSubmit} className = "container">
@@ -778,8 +816,13 @@ const GarminDataPage = (props) => {
 
       </div>
     </form>
-  );
+  )
+ }
+
 }
+
 export default reduxForm({
-  form: 'data to pull from garmin' // a unique identifier for this form
-})(GarminDataPage)
+  form: 'data to pull from garmin'
+})(
+  connect(undefined, {fetchGarminData})(GarminDataPage)
+);
