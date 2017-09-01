@@ -17,6 +17,14 @@ var setText = function (date) {
 
 class GarminDataPage extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      raw_output: '',
+      garmin_health_api: {
+       average_ground_contact_time: 'nothing' 
+      };
+  }
 
   updateState(data){
 
@@ -24,16 +32,6 @@ class GarminDataPage extends Component {
   }
 
 
-  getInitialState() {
-    return {
-      raw_output: '',
-      garmin_health_api: {
-       average_ground_contact_time: 'nothing' 
-      },
-
-
-    }
-  }
 
   componentDidMount(){
 
