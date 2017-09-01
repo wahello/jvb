@@ -20,12 +20,18 @@ class GarminDataPage extends Component {
 
   updateState(data){
 
-    this.setState(data);
+    this.setState({raw_output: data});
   }
 
 
   getInitialState() {
     return {
+      raw_output: '',
+      garmin_health_api: {
+       average_ground_contact_time: 'nothing' 
+      },
+
+
     }
   }
 
@@ -532,14 +538,8 @@ class GarminDataPage extends Component {
             />
           </div>
           <div className="row">
-          <label>Average Ground Contact Time :</label>
-          <Field
-              className ="form-control"
-              name = "avggroundcontacttime"
-              type = "text"
-              placeholder = "avggroundcontacttime"
-              component="input"
-            />
+          <label>Average Ground Contact Time:</label>
+             {this.state.garmin_health_api.average_ground_contact_time}
           </div>
           &nbsp;
           &nbsp;
@@ -547,7 +547,8 @@ class GarminDataPage extends Component {
           &nbsp;
           &nbsp;
           <div className="row">
-          <label>Average Ground Contact Time :</label>
+          <label>Average Ground Contact Time :
+          </label>
           <Field
               className ="form-control"
               name = "avggroundcontacttime"
