@@ -233,36 +233,29 @@ def receive_token(request):
     # header('Location: YOUR_URL_FOR_THE_SAVED_FILE', true, 201);
 
 
-# class GetGarminToken(APIView):
-#   permission_classes = (permissions.IsAuthenticated,)
-#   def dispatch(self, *args, **kwargs):
-#     try:
-#       if GarminToken.objects.get(user=self.request.user):
-#         return super(GetGarminToken,self).dispatch(*args,**kwargs)
-#     except GarminToken.DoesNotExist:
-#       return redirect('/users/request_token')
-#     return redirect('/users/request_token')
+class GetGarminToken(APIView):
+  permission_classes = (permissions.IsAuthenticated,)
+  def dispatch(self, *args, **kwargs):
+    try:
+      if GarminToken.objects.get(user=self.request.user):
+        return super(GetGarminToken,self).dispatch(*args,**kwargs)
+    except GarminToken.DoesNotExist:
+      return redirect('/users/request_token')
 
-#   def get_object(self,user):
-#     return GarminToken.objects.get(user=user)
-#     # request_token(self.request)
-#     redirect('/users/request_token')
-#     return GarminToken.objects.get(user=user)
-#     pass
+  def get_object(self,user):
+    return GarminToken.objects.get(user=user)
 
-#   def get(self, request, format="json"):
-#       token = self.get_object(user=request.user)
-#       token = self.request.session['token']
-#       serializers = GarminTokenSerializer(token)
-#       return Response(serializers.data)
-#       return Response({'token':token})
+  def get(self, request, format="json"):
+      token = self.get_object(user=request.user)
+      serializers = GarminTokenSerializer(token)
+      return Response(serializers.data)
 
-#   def post(self, request, format="json"):
-#     serializer = GarminTokenSerializer(data=request.data,context={'request': request})
-#     if serializer.is_valid():
-#       serializer.save()
-#       return Response(serializer.data,status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  def post(self, request, format="json"):
+    serializer = GarminTokenSerializer(data=request.data,context={'request': request})
+    if serializer.is_valid():
+      serializer.save()
+      return Response(serializer.data,status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class fetchGarminData(APIView):
 
@@ -276,6 +269,8 @@ class fetchGarminData(APIView):
 
     access_token = session.get('token',None)
     access_token_secret = session.get('token_secret',None)
+
+    print(request.user)
 
     if access_token and access_token_secret:
       service = OAuth1Service(

@@ -50,7 +50,8 @@ class GarminDataPage extends Component {
   axios(config).then( function(response){
     this.updateState(response);
   }.bind(this)).catch((error) => {
-    errorCallback(error);
+    // errorCallback(error);
+    console.log(error.message);
   });
 
 
