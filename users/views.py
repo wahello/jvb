@@ -313,6 +313,6 @@ class fetchGarminData(APIView):
       
       
 
-      return Response(r.json())
+      return Response(output_dict)
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
