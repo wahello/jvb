@@ -822,8 +822,8 @@ class GarminDataPage extends Component {
 
       </div>
     </form>
-    <p><pre>{JSON.stringify(this.state, null, 2) }</pre></p>
-    <div>
+    <p><pre>{JSON.stringify(this.state, null, 2)}</pre></p>
+    </div>
   )
 
 
@@ -831,6 +831,7 @@ class GarminDataPage extends Component {
  }
 
 }
+
 
 export default reduxForm({
   form: 'data to pull from garmin'
