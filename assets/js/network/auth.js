@@ -50,14 +50,15 @@ export function loginUser(data, callback){
 		};
 
 		axios(config).then((response) => {
-			const cookie = new Cookies();
-			cookie.set('auth_token', response.data.token, {path:'/'});
+			// const cookie = new Cookies();
+			// cookie.set('auth_token', response.data.token, {path:'/'});
 			dispatch({
 				type: AUTH_USER,
 			});
 			callback();
 		}).catch((error) => {
-			errorHandler(dispatch, error, AUTH_ERROR);
+			// errorHandler(dispatch, error, AUTH_ERROR);
+			console.log("Opps! some error occured!");
 		});
 	}
 }
@@ -67,7 +68,7 @@ export function logoutUser(){
 		dispatch({
 			type: UNAUTH_USER
 		});
-		cookie.remove('auth_token', {path: '/'});
+		// cookie.remove('auth_token', {path: '/'});
 		window.location.href = '/';
 	}
 } 
@@ -75,13 +76,13 @@ export function logoutUser(){
 export function getGarminToken(){
 	return function(dispatch){
 		const URL = '/users/garmin_token/';
-		const cookie = new Cookies();
+		// const cookie = new Cookies();
 		const config = {
 			method: 'get',
 			url: URL,
-			headers: {
-				'Authorization': 'Token '+cookie.get('auth_token')
-			}
+			// headers: {
+			// 	'Authorization': 'Token '+cookie.get('auth_token')
+			// }
 		};
 
 		axios(config).then((response) => {

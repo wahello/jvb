@@ -1,5 +1,6 @@
 from django.shortcuts import render  # noqa
 from django.http import Http404
+from django.http import HttpResponse
 from rauth import OAuth1Service
 import webbrowser 
 from django.shortcuts import redirect
@@ -10,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer
 
 from .serializers import GarminTokenSerializer
 from .models import GarminToken
@@ -162,7 +164,7 @@ def receive_token(request):
     session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
     header_auth=True)
 
-    #sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
+    # sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
     sess = service.get_session((access_token, access_token_secret))
 
     # # need to validate that the token still works.... not done
@@ -209,9 +211,16 @@ def receive_token(request):
 
     # print(request)
     
-    data = {'token':access_token, 'secret':access_token_secret}
-    url = "/garmin_token/"
-    requests.post(url,data=data)
+    request.session['token'] = access_token
+    request.session['token_secret'] = access_token_secret
+    request.session['oauth_verifier'] = oauth_verifier
+
+    # print("\n\nACCESS TOKEN:", access_token)
+    # print("\n\nACCES TOKEN SECRET:", access_token_secret)
+
+    # data = {'token':access_token, 'secret':access_token_secret}
+    # url = "/garmin_token/"
+    # requests.post(url,data=data)
 
     return redirect('/service_connect')
 
@@ -224,29 +233,86 @@ def receive_token(request):
     # header('Location: YOUR_URL_FOR_THE_SAVED_FILE', true, 201);
 
 
-class GetGarminToken(APIView):
-  # permission_classes = (permissions.IsAuthenticated,)
-  def dispatch(self, *args, **kwargs):
-    try:
-      if GarminToken.objects.get(user=self.request.user):
-        return super(GetGarminToken,self).dispatch(*args,**kwargs)
-    except GarminToken.DoesNotExist:
-      return redirect('/users/request_token')
+# class GetGarminToken(APIView):
+#   permission_classes = (permissions.IsAuthenticated,)
+#   def dispatch(self, *args, **kwargs):
+#     try:
+#       if GarminToken.objects.get(user=self.request.user):
+#         return super(GetGarminToken,self).dispatch(*args,**kwargs)
+#     except GarminToken.DoesNotExist:
+#       return redirect('/users/request_token')
+#     return redirect('/users/request_token')
 
-  def get_object(self,user):
-    return GarminToken.objects.get(user=user)
-    # # request_token(self.request)
-    # redirect('/users/request_token')
-    # return GarminToken.objects.get(user=user)
+#   def get_object(self,user):
+#     return GarminToken.objects.get(user=user)
+#     # request_token(self.request)
+#     redirect('/users/request_token')
+#     return GarminToken.objects.get(user=user)
+#     pass
+
+#   def get(self, request, format="json"):
+#       token = self.get_object(user=request.user)
+#       token = self.request.session['token']
+#       serializers = GarminTokenSerializer(token)
+#       return Response(serializers.data)
+#       return Response({'token':token})
+
+#   def post(self, request, format="json"):
+#     serializer = GarminTokenSerializer(data=request.data,context={'request': request})
+#     if serializer.is_valid():
+#       serializer.save()
+#       return Response(serializer.data,status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class fetchGarminData(APIView):
 
   def get(self, request, format="json"):
-      token = self.get_object(user=request.user)
-      serializers = GarminTokenSerializer(token)
-      return Response(serializers.data)
+    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'http://connect.garmin.com/oauthConfirm'
+    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
+    conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
+    session = request.session
 
-  def post(self, request, format="json"):
-    serializer = GarminTokenSerializer(data=request.data,context={'request': request})
-    if serializer.is_valid():
-      serializer.save()
-      return Response(serializer.data,status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    access_token = session.get('token',None)
+    access_token_secret = session.get('token_secret',None)
+
+    if access_token and access_token_secret:
+      service = OAuth1Service(
+            consumer_key = conskey,
+            consumer_secret = conssec,
+            request_token_url = req_url,
+            access_token_url = acc_url,
+            authorize_url = authurl, 
+            )
+      sess = service.get_session((access_token, access_token_secret))
+      data = {
+        'uploadStartTimeInSeconds': 1503187200-86300,
+        'uploadEndTimeInSeconds': 1503187200,
+      }
+      
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
+      output_dict = {
+        'epochs': r.json()
+      }
+      
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/bodyComps', header_auth=True, params=data)
+      
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/sleeps', header_auth=True, params=data)
+      output_dict['sleeps'] = r.json()
+
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/manuallyUpdatedActivities', header_auth=True, params=data)
+      output_dict['manuallyUpdatedActivities'] = r.json()
+
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/activities', header_auth=True, params=data)
+      output_dict['activities'] = r.json()
+
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
+      output_dict['dailies'] = r.json()
+      
+      
+      
+
+      return Response(output_dict)
+    else:
+      return Response(status.HTTP_401_UNAUTHORIZED)

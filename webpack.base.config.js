@@ -66,7 +66,10 @@ module.exports = [{
     // defined in local or prod
   ],
   resolve: {
-    modules: ['node_modules', 'bower_components'],
+    modules: ['node_modules'],
     extensions: ['.js', '.jsx', '.css'],
+    alias: {
+            'React$': path.resolve(__dirname, './node_modules/react/dist/react.min.js')
+        }
   },
 }];

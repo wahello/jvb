@@ -4,7 +4,6 @@ import { Field, reduxForm} from 'redux-form';
 import { withRouter, Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText } from 'reactstrap';
-
 import { loginUser } from '../network/auth';
 
 class HomePageReactTitle extends Component {
@@ -81,6 +80,11 @@ class HomePageReactTitle extends Component {
         </Form>
        </Col></Row>
        <Row>
+        <Col  xs="6">
+         <Link to='/users/dashboard'>Dashboard</Link>
+        </Col>
+       </Row>
+       <Row>
        	<Col  xs="6">
          <Link to='register'>Register</Link>
        	</Col>
@@ -128,6 +132,11 @@ class HomePageReactTitle extends Component {
        <Row>
         <Col xs="6">
          <a href='users/request_token'>Garmin Connect</a>
+        </Col>
+       </Row>
+       <Row>
+        <Col xs="6">
+         <Link to='/raw/garmin'>Garmin Pull Down</Link>
         </Col>
        </Row>
        </Container>
