@@ -292,6 +292,27 @@ class fetchGarminData(APIView):
       }
       
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
+      output_dict = {
+        'epochs': r.json()
+      }
+      
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/bodyComps', header_auth=True, params=data)
+      
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/sleeps', header_auth=True, params=data)
+      output_dict['sleeps'] = r.json()
+
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/manuallyUpdatedActivities', header_auth=True, params=data)
+      output_dict['manuallyUpdatedActivities'] = r.json()
+
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/activities', header_auth=True, params=data)
+      output_dict['activities'] = r.json()
+
+      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
+      output_dict['dailies'] = r.json()
+      
+      
+      
+
       return Response(r.json())
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
