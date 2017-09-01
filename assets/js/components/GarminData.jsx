@@ -23,7 +23,9 @@ class GarminDataPage extends Component {
       raw_output: '',
       garmin_health_api: {
        average_ground_contact_time: 'nothing' 
-      };
+      }
+   }
+
   }
 
   updateState(data){
