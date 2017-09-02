@@ -5,8 +5,8 @@ from .base import *  # noqa
 
 
 DEBUG = False
-SECRET_KEY = 'secret'
-#SECRET_KEY = config('SECRET_KEY')
+# SECRET_KEY = 'secret'
+SECRET_KEY = config('SECRET_KEY')
 
 DATABASES = {
     'default': config('DATABASE_URL', cast=db_url),
