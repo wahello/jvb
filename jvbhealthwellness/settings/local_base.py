@@ -1,11 +1,12 @@
 from .base import *  # noqa
+from decouple import config
 
 
 DEBUG = True
 
 HOST = 'http://localhost:8000'
 
-SECRET_KEY = 'secret'
+SECRET_KEY = config('SECRET_KEY')
 
 DATABASES = {
     'default': {
