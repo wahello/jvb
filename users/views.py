@@ -215,12 +215,9 @@ def receive_token(request):
     request.session['token_secret'] = access_token_secret
     request.session['oauth_verifier'] = oauth_verifier
 
-    # print("\n\nACCESS TOKEN:", access_token)
-    # print("\n\nACCES TOKEN SECRET:", access_token_secret)
-
-    # data = {'token':access_token, 'secret':access_token_secret}
-    # url = "/garmin_token/"
-    # requests.post(url,data=data)
+    data = {'token':access_token, 'secret':access_token_secret}
+    url = "/garmin_token/"
+    requests.post(url,data=data)
 
     return redirect('/service_connect')
 
