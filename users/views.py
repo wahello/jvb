@@ -216,7 +216,7 @@ def receive_token(request):
     request.session['oauth_verifier'] = oauth_verifier
 
     data = {'token':access_token, 'secret':access_token_secret}
-    url = "/garmin_token/"
+    url = "https://app.jvbwellness.com/users/garmin/token/"
     requests.post(url,data=data)
 
     return redirect('/service_connect')
