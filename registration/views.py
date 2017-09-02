@@ -22,10 +22,12 @@ class Login(APIView):
 		username = request.data.get('username')
 		password = request.data.get('password')
 		user = authenticate(username=username, password=password)
+		print(user)
 		if user:
 			login(request,user)
 			return Response(status=status.HTTP_200_OK)
 		else:
+			print('in the unauthorized area')
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 class UserCreate(APIView):
