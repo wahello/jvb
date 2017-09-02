@@ -47,6 +47,7 @@ export function loginUser(data, callback){
 			method: 'post',
 			url: URL,
 			data: data,
+			withCredentials: true
 		};
 
 		axios(config).then((response) => {
