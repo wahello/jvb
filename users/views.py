@@ -215,10 +215,10 @@ def receive_token(request):
     request.session['token_secret'] = access_token_secret
     request.session['oauth_verifier'] = oauth_verifier
 
-    data = {'token':access_token, 'secret':access_token_secret}
-    url = "https://app.jvbwellness.com/users/garmin/token/"
-    requests.post(url,data=data)
-
+    # store the token in the db
+    GarminToken.objects.create(user=request.user,token=access_token,
+                               token_secret=access_token_secret)
+    
     return redirect('/service_connect')
 
     
