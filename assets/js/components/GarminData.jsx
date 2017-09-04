@@ -5,7 +5,7 @@ import fetchGarminData  from '../network/garminOperations';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-axiosRetry(axios, { retries: 3}); 
+axiosRetry(axios, { retries: 3});
 
 
 var CalendarWidget = require('react-calendar-widget');
@@ -22,7 +22,80 @@ class GarminDataPage extends Component {
     this.state = {
       raw_output: '',
       garmin_health_api: {
-       average_ground_contact_time: 'nothing' 
+       activity_name:'Running',
+       activity_type:'Running',
+       event_type:'course',
+       course:'nothing',
+       location:'nothing',
+       start:'nothing',
+       time:'sample',
+       distance:'sample',
+       lap_information:'sample',
+       elevation_gain:'sample',
+       elevation_loss:'sample',
+       average_speed:'nothing',
+       max_speed:'nothing',
+       average_power:'sample',
+       max_power:'sample',
+       avg_run_cadence:'nothing',
+       max_run_cadence:'nothing',
+       avg_bike_cadence:'nothing',
+       max_bike_cadence:'nothing',
+       steps_from_activity:'nothing',
+       calories:'000',
+       sum_strokes:'000',
+       avg_strokes:'00',
+       min_strokes:'000',
+       avg_swolf:'000',
+       best_swolf:'0',
+       training_effect:'nothing',
+       normalized_power:'nothing',
+       balance_left:'0',
+       balance_right:'0',
+       tss:'nothing',
+       max_avg_power:'0',
+       avg_temperature:'0',
+       min_temperature:'0',
+       max_temperature:'0',
+       min_elev:'0' ,
+       max_elev:'0',
+       moving_time:'nothing',
+       elapsed_time:'0',
+       avg_moving_pace:'0', 
+       avg_stride_length:'0',
+       avg_vertical_ratio:'0', 
+       avg_vertical_oscillation:'0', 
+       avg_gct_balance:'0' ,
+       average_ground_contact_time: 'nothing',
+       total_steps:'230',
+       excersice_steps:'200',
+       floors_climbed:'2',
+       floors_descended:'23',
+       calories_in_out:'0',
+       golf_starts:'nothing',
+       weight:'0',
+       body_mass:'0',
+       bmi:'0',
+       body_composition_summary:'0',
+       resting_heart_rate:'0',
+       average_resting_heart_rate:'0',
+       max_heart_rate:'0',
+       resting_heart_rate_over_time:'0',
+       VO2_max_grab_data_and_populate_database:'0',
+       intensity_minutes:'0',
+       heart_rate_variability_stress:'0',
+       training_status: 'nothing',
+       data_from_my_fitness_pal:'nothing',
+       data_from_withings:'nothing',
+       data_from_other_third_party_source:'0',
+       total_sleep:'0',
+       light_sleep:'0',
+       deep_sleep:'0',
+       bed_time:'0',
+       sleep_awake_aime:'0',
+       stress_field:'0',
+
+
       }
    }
 
@@ -32,7 +105,80 @@ class GarminDataPage extends Component {
 
     this.setState({raw_output: data,
       garmin_health_api: {
-        average_ground_contact_time: data.data.garmin_health_api.average_ground_contact_time
+        activity_name:data.data.garmin_health_api.activity_name,
+        activity_type:data.data.garmin_health_api.activity_type,
+        event_type:data.data.garmin_health_api.event_type,
+        course:data.data.garmin_health_api.course,
+        location:data.data.garmin_health_api.location,
+        start:data.data.garmin_health_api.start,
+        time:data.data.garmin_health_api.time,
+        distance:data.data.garmin_health_api.distance,
+        lap_information:data.data.garmin_health_api.lap_information,
+        elevation_gain:data.data.garmin_health_api.elevation_gain,
+        elevation_loss:data.data.garmin_health_api.elevation_loss,
+        average_speed:data.data.garmin_health_api.average_speed,
+        max_speed:data.data.garmin_health_api.max_speed,
+        average_power:data.data.garmin_health_api.average_power,
+        max_power:data.data.garmin_health_api.max_power,
+        avg_run_cadence:data.data.garmin_health_api.avg_run_cadence,
+        max_run_cadence:data.data.garmin_health_api.max_run_cadence,
+        avg_bike_cadence:data.data.garmin_health_api.avg_bike_cadence,
+        max_bike_cadence:data.data.garmin_health_api.max_bike_cadence,
+        steps_from_activity:data.data.garmin_health_api.steps_from_activity,
+        calories:data.data.garmin_health_api.calories,
+        sum_strokes:data.data.garmin_health_api.sum_strokes,
+        avg_strokes:data.data.garmin_health_api.avg_strokes,
+        min_strokes:data.data.garmin_health_api.min_strokes,
+        avg_swolf:data.data.garmin_health_api.avg_swolf,
+        best_swolf:data.data.garmin_health_api.best_swolf,
+        training_effect:data.data.garmin_health_api.training_effect,
+        normalized_power:data.data.garmin_health_api.normalized_power,
+        balance_left:data.data.garmin_health_api.balance_left,
+        balance_right:data.data.garmin_health_api.balance_right,
+        tss:data.data.garmin_health_api.tss,
+        max_avg_power:data.data.garmin_health_api.max_avg_power,
+        avg_temperature:data.data.garmin_health_api.avg_temperature,
+        min_temperature:data.data.garmin_health_api.min_temperature,
+        max_temperature:data.data.garmin_health_api.max_temperature,
+        min_elev:data.data.garmin_health_api.min_elev,
+        max_elev:data.data.garmin_health_api.max_elev,
+        moving_time:data.data.garmin_health_api.moving_time,
+        elapsed_time:data.data.garmin_health_api.elapsed_time,
+        avg_moving_pace:data.data.garmin_health_api.avg_moving_pace,
+        avg_stride_length:data.data.garmin_health_api.avg_stride_length,
+        avg_vertical_ratio:data.data.garmin_health_api.avg_vertical_ratio,
+        avg_vertical_oscillation:data.data.garmin_health_api.avg_vertical_oscillation,
+        avg_gct_balance:data.data.garmin_health_api.avg_gct_balance,
+        average_ground_contact_time: data.data.garmin_health_api.average_ground_contact_time,
+        total_steps:data.data.garmin_health_api.total_steps,
+        excersice_steps:data.data.garmin_health_api.excersice_steps,
+        floors_climbed:data.data.garmin_health_api.floors_climbed,
+        floors_descended:data.data.garmin_health_api.floors_descended,
+        calories_in_out:data.data.garmin_health_api.calories_in_out,
+        golf_starts:data.data.garmin_health_api.golf_starts,
+        weight:data.data.garmin_health_api.weight,
+        body_mass:data.data.garmin_health_api.body_mass,
+        bmi:data.data.garmin_health_api.bmi,
+        body_composition_summary:data.data.garmin_health_api.body_composition_summary,
+        resting_heart_rate:data.data.garmin_health_api.resting_heart_rate,
+        average_resting_heart_rate:data.data.garmin_health_api.average_resting_heart_rate,
+        max_heart_rate:data.data.garmin_health_api.max_heart_rate,
+        resting_heart_rate_over_time:data.data.garmin_health_api.resting_heart_rate_over_time,
+        VO2_max_grab_data_and_populate_database:data.data.garmin_health_api.VO2_max_grab_data_and_populate_database,
+        intensity_minutes:data.data.garmin_health_api.intensity_minutes,
+        heart_rate_variability_stress:data.data.garmin_health_api.heart_rate_variability_stress,
+        training_status:data.data.garmin_health_api.training_status,
+        data_from_my_fitness_pal:data.data.garmin_health_api.data_from_my_fitness_pal,
+        data_from_withings:data.data.garmin_health_api.data_from_withings,
+        data_from_other_third_party_source:data.data.garmin_health_api.data_from_other_third_party_source,
+        total_sleep:data.data.garmin_health_api.total_sleep,
+        light_sleep:data.data.garmin_health_api.light_sleep,
+        deep_sleep:data.data.garmin_health_api.deep_sleep,
+        bed_time:data.data.garmin_health_api.bed_time,
+        sleep_awake_aime:data.data.garmin_health_api.sleep_awake_aime,
+        stress_field:data.data.garmin_health_api.stress_field,
+
+
       }});
   }
 
@@ -63,782 +209,324 @@ class GarminDataPage extends Component {
 
 	return(
     <div>
-		<form onSubmit={handleSubmit} className = "container">
-			<div>
-      &nbsp;
-      &nbsp;
+		<form onSubmit={handleSubmit} className = "container" >
+    <div>
 				<div className="row">
           <div className="col-sm-3">
             <div className="row">
               <CalendarWidget onDaySelect={setText}/>,
-
             </div>
-
           </div>
           <div className="col-sm-6">
           <h3>From Garmin Connect API</h3>
           <div className="row">
-
           </div>
           <div className="row">
           <label>Activity Name :</label>
-          <Field
-              className ="form-control"
-              name = "activityname"
-              type = "text"
-              placeholder = "activityname"
-              component="input"
-            />
+            {this.state.garmin_health_api.activity_name}
           </div>
           <div className="row">
           <label >Activity Type :</label>
-          <Field
-              className ="form-control"
-              name = "activitytype"
-              type = "text"
-              placeholder = "activity type"
-              component="input"
-            />
+            {this.state.garmin_health_api.activity_type}
           </div>
           <div className="row">
           <label>Event Type :</label>
-          <Field
-              className ="form-control"
-              name = "eventtype"
-              type = "text"
-              placeholder = "event type"
-              component="input"
-            />
+            {this.state.garmin_health_api.event_type}
           </div>
           <div className="row">
           <label>Course :</label>
-          <Field
-              className ="form-control"
-              name = "course"
-              type = "text"
-              placeholder = "course"
-              component="input"
-            />
+            {this.state.garmin_health_api.course}
           </div>
           <div className="row">
           <label>Location :</label>
-          <Field
-              className ="form-control"
-              name = "location"
-              type = "text"
-              placeholder = "Location"
-              component="input"
-            />
+            {this.state.garmin_health_api.location}
           </div>
           <div className="row">
           <label>Start :</label>
-          <Field
-              className ="form-control"
-              name = "start"
-              type = "text"
-              placeholder = "start"
-              component="input"
-            />
+            {this.state.garmin_health_api.start}
           </div>
           <div className="row">
           <label>Time :</label>
-          <Field
-              className ="form-control"
-              name = "time"
-              type = "text"
-              placeholder = "time"
-              component="input"
-            />
+            {this.state.garmin_health_api.time}
           </div>
           <div className="row">
           <label>Distance :</label>
-          <Field
-              className ="form-control"
-              name = "distancet"
-              type = "text"
-              placeholder = "distance"
-              component="input"
-            />
+            {this.state.garmin_health_api.distance}
           </div>
           <div className="row">
           <label>Lap Information :</label>
-          <Field
-              className ="form-control"
-              name = "lapinformation"
-              type = "text"
-              placeholder = "lapinformation"
-              component="input"
-            />
+            {this.state.garmin_health_api.lap_information}
           </div>
           <div className="row">
           <label>Elevation Gain :</label>
-          <Field
-              className ="form-control"
-              name = "elevationgain"
-              type = "text"
-              placeholder = "elevationgain"
-              component="input"
-            />
+            {this.state.garmin_health_api.elevation_gain}
           </div>
           <div className="row">
           <label>Elevation Loss :</label>
-          <Field
-              className ="form-control"
-              name = "elevationloss"
-              type = "text"
-              placeholder = "elevationloss"
-              component="input"
-            />
+            {this.state.garmin_health_api.elevation_loss}
           </div>
           <div className="row">
           <label>Average Speed :</label>
-          <Field
-              className ="form-control"
-              name = "averagespeed"
-              type = "text"
-              placeholder = "averagespeed"
-              component="input"
-            />
+            {this.state.garmin_health_api.average_speed}
           </div>
           <div className="row">
           <label>Max Speed :</label>
-          <Field
-              className ="form-control"
-              name = "maxspeed"
-              type = "text"
-              placeholder = "maxspeed"
-              component="input"
-            />
-          </div>
-          <div className="row">
-          <label>Max Speed :</label>
-          <Field
-              className ="form-control"
-              name = "maxspeed"
-              type = "text"
-              placeholder = "maxspeed"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_speed}
           </div>
           <div className="row">
           <label>Average Hr :</label>
-          <Field
-              className ="form-control"
-              name = "avghr"
-              type = "text"
-              placeholder = "averagehr"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_hr}
           </div>
           <div className="row">
           <label>Maximum Hr :</label>
-          <Field
-              className ="form-control"
-              name = "maxhr"
-              type = "text"
-              placeholder = "maximumhr"
-              component="input"
-            />
+              {this.state.garmin_health_api.max_hr}
           </div>
           <div className="row">
           <label>Average Power :</label>
-          <Field
-              className ="form-control"
-              name = "avgpower"
-              type = "text"
-              placeholder = "averagepower"
-              component="input"
-            />
+              {this.state.garmin_health_api.average_power}
           </div>
           <div className="row">
           <label>Maximum Power :</label>
-          <Field
-              className ="form-control"
-              name = "maxpower"
-              type = "text"
-              placeholder = "maximumpower"
-              component="input"
-            />
+            {this.state.garmin_health_api.maximum_power}
           </div>
           <div className="row">
           <label>Average Run Cadence :</label>
-          <Field
-              className ="form-control"
-              name = "avgruncadence"
-              type = "text"
-              placeholder = "averageruncadence"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_run_cadence}
           </div>
           <div className="row">
           <label>Maximum Run Cadence :</label>
-          <Field
-              className ="form-control"
-              name = "maxruncadence"
-              type = "text"
-              placeholder = "maximumruncadence"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_run_cadence}
           </div>
           <div className="row">
           <label>Average Bike Cadence :</label>
-          <Field
-              className ="form-control"
-              name = "avgbikecadence"
-              type = "text"
-              placeholder = "averagebikecadence"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_bike_cadence}
           </div>
           <div className="row">
           <label>Maximum Bike Cadence :</label>
-          <Field
-              className ="form-control"
-              name = "maxbikecadence"
-              type = "text"
-              placeholder = "maximumbikecadence"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_bike_cadence}
           </div>
           <div className="row">
           <label>Steps from Activity :</label>
-          <Field
-              className ="form-control"
-              name = "stepsfromactivity"
-              type = "text"
-              placeholder = "stepsfromactivity"
-              component="input"
-            />
+            {this.state.garmin_health_api.steps_from_activity}
           </div>
           <div className="row">
           <label>Calories :</label>
-          <Field
-              className ="form-control"
-              name = "calories"
-              type = "text"
-              placeholder = "calories"
-              component="input"
-            />
+            {this.state.garmin_health_api.calories}
           </div>
           <div className="row">
           <label>Sum Strokes :</label>
-          <Field
-              className ="form-control"
-              name = "sumstrokes"
-              type = "text"
-              placeholder = "sumstrokes"
-              component="input"
-            />
+            {this.state.garmin_health_api.sum_strokes}
           </div>
           <div className="row">
           <label>Average Strokes :</label>
-          <Field
-              className ="form-control"
-              name = "avgstrokes"
-              type = "text"
-              placeholder = "averagestrokes"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_strokes}
           </div>
           <div className="row">
           <label>Average Swolf :</label>
-          <Field
-              className ="form-control"
-              name = "avgswolf"
-              type = "text"
-              placeholder = "averageswolf"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_swolf}
           </div>
           <div className="row">
           <label>Best Swolf :</label>
-          <Field
-              className ="form-control"
-              name = "bestswolf"
-              type = "text"
-              placeholder = "bestswolf"
-              component="input"
-            />
+            {this.state.garmin_health_api.best_swolf}
           </div>
           <div className="row">
           <label>Training Effect :</label>
-          <Field
-              className ="form-control"
-              name = "trainingeffect"
-              type = "text"
-              placeholder = "trainingeffect"
-              component="input"
-            />
+            {this.state.garmin_health_api.training_effect}
           </div>
           <div className="row">
           <label>Normalized Power :</label>
-          <Field
-              className ="form-control"
-              name = "normalizedpower"
-              type = "text"
-              placeholder = "normalizedpower"
-              component="input"
-            />
+            {this.state.garmin_health_api.normalized_power}
           </div>
           <div className="row">
           <label>Balance Left(%) :</label>
-          <Field
-              className ="form-control"
-              name = "balanceleft"
-              type = "text"
-              placeholder = "balanceleft"
-              component="input"
-            />
+            {this.state.garmin_health_api.balance_left}
           </div>
           <div className="row">
           <label>Balance Right(%) :</label>
-          <Field
-              className ="form-control"
-              name = "balanceright"
-              type = "text"
-              placeholder = "balanceright"
-              component="input"
-            />
+            {this.state.garmin_health_api.balance_right}
           </div>
           <div className="row">
           <label>TSS :</label>
-          <Field
-              className ="form-control"
-              name = "tss"
-              type = "text"
-              placeholder = "tss"
-              component="input"
-            />
+            {this.state.garmin_health_api.tss}
           </div>
           <div className="row">
           <label>Max Average Power(20min) :</label>
-          <Field
-              className ="form-control"
-              name = "maxavgpower"
-              type = "text"
-              placeholder = "maxavgpower"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_avg_power}
           </div>
           <div className="row">
           <label>Average Temparature :</label>
-          <Field
-              className ="form-control"
-              name = "avgtemp"
-              type = "text"
-              placeholder = "avgtemperature"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_temperature}
           </div>
           <div className="row">
           <label>Minimum Temparature :</label>
-          <Field
-              className ="form-control"
-              name = "mintemp"
-              type = "text"
-              placeholder = "mintemperature"
-              component="input"
-            />
+            {this.state.garmin_health_api.min_temperature}
           </div>
           <div className="row">
           <label>Maximum Temparature :</label>
-          <Field
-              className ="form-control"
-              name = "maxtemp"
-              type = "text"
-              placeholder = "maxtemperature"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_temperature}
           </div>
           <div className="row">
           <label>Minimum Elev :</label>
-          <Field
-              className ="form-control"
-              name = "minelev"
-              type = "text"
-              placeholder = "minelev"
-              component="input"
-            />
+            {this.state.garmin_health_api.min_elev}
           </div>
           <div className="row">
           <label>Maximum Elev :</label>
-          <Field
-              className ="form-control"
-              name = "maxelev"
-              type = "text"
-              placeholder = "maxelev"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_elev}
           </div>
           <div className="row">
           <label>Moving Time :</label>
-          <Field
-              className ="form-control"
-              name = "movingtime"
-              type = "text"
-              placeholder = "movingtime"
-              component="input"
-            />
+            {this.state.garmin_health_api.moving_time}
           </div>
           <div className="row">
           <label>Elapsed Time :</label>
-          <Field
-              className ="form-control"
-              name = "elapsedtime"
-              type = "text"
-              placeholder = "maxtemperature"
-              component="input"
-            />
+            {this.state.garmin_health_api.elapsed_time}
           </div>
           <div className="row">
           <label>Average Moving Pace :</label>
-          <Field
-              className ="form-control"
-              name = "avgmovingpace"
-              type = "text"
-              placeholder = "avgmovingpace"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_moving_pace}
           </div>
           <div className="row">
           <label>Average Stride Length :</label>
-          <Field
-              className ="form-control"
-              name = "avgstridelength"
-              type = "text"
-              placeholder = "avgstridelength"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_stride_length}
           </div>
           <div className="row">
           <label>Average Vertical Ratio :</label>
-          <Field
-              className ="form-control"
-              name = "avgverticalratio"
-              type = "text"
-              placeholder = "avgverticalratio"
-              component="input"
-            />
-          </div>
+            {this.state.garmin_health_api.avg_vertical_ratio}
+		      </div>
           <div className="row">
           <label>Average Vertical Oscillation :</label>
-          <Field
-              className ="form-control"
-              name = "avgverticaloscillation"
-              type = "text"
-              placeholder = "avgverticaloscillation"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_vertical_oscillation}
           </div>
           <div className="row">
           <label>Average gct Balance :</label>
-          <Field
-              className ="form-control"
-              name = "avggctbalance"
-              type = "text"
-              placeholder = "avggctbalance"
-              component="input"
-            />
+            {this.state.garmin_health_api.avg_gct_balance}
           </div>
           <div className="row">
           <label>Average Ground Contact Time:</label>
              {this.state.garmin_health_api.average_ground_contact_time}
           </div>
-          &nbsp;
-          &nbsp;
-          <h3>Garmin Health API</h3>
-          &nbsp;
-          &nbsp;
           <div className="row">
-          <label>Average Ground Contact Time :
-          </label>
-          <Field
-              className ="form-control"
-              name = "avggroundcontacttime"
-              type = "text"
-              placeholder = "avggroundcontacttime"
-              component="input"
-            />
+          <label>Average Ground Contact Time:</label>
+               <h3>Garmin Health API</h3>
           </div>
           <div className="row">
           <label>Total Steps :</label>
-          <Field
-              className ="form-control"
-              name = "totalsteps"
-              type = "text"
-              placeholder = "provided every 15mins"
-              component="input"
-            />
+            {this.state.garmin_health_api.total_steps}
           </div>
           <div className="row">
           <label>Floor Climbed :</label>
-          <Field
-              className ="form-control"
-              name = "floorclimbed"
-              type = "text"
-              placeholder = "floorclimbed"
-              component="input"
-            />
+            {this.state.garmin_health_api.floor_climbed}
           </div>
           <div className="row">
-          <label>Foors Descended :</label>
-          <Field
-              className ="form-control"
-              name = "foorsdescended"
-              type = "text"
-              placeholder = "foorsdescended"
-              component="input"
-            />
+          <label>Floors Descended :</label>
+            {this.state.garmin_health_api.floors_descended}
           </div>
           <div className="row">
           <label>Calories In/Out :</label>
-          <Field
-              className ="form-control"
-              name = "caloriesin/out"
-              type = "text"
-              placeholder = "calories in/out"
-              component="input"
-            />
+            {this.state.garmin_health_api.calories_in_out}
           </div>
           <div className="row">
           <label>Golf Stats :</label>
-          <Field
-              className ="form-control"
-              name = "golfstats"
-              type = "text"
-              placeholder = "golfstats"
-              component="input"
-            />
+            {this.state.garmin_health_api.golf_starts}
           </div>
           <div className="row">
           <label>Weight :</label>
-          <Field
-              className ="form-control"
-              name = "weight"
-              type = "text"
-              placeholder = "weight"
-              component="input"
-            />
+            {this.state.garmin_health_api.weight}
           </div>
           <div className="row">
           <label>Body Mass :</label>
-          <Field
-              className ="form-control"
-              name = "bodymass"
-              type = "text"
-              placeholder = "bodymass"
-              component="input"
-            />
+            {this.state.garmin_health_api.body_mass}
           </div>
           <div className="row">
           <label>BMI :</label>
-          <Field
-              className ="form-control"
-              name = "bmi"
-              type = "text"
-              placeholder = "bmi"
-              component="input"
-            />
+            {this.state.garmin_health_api.bmi}
           </div>
           <div className="row">
           <label>Body Composition Summary :</label>
-          <Field
-              className ="form-control"
-              name = "bodycompositionsummary"
-              type = "text"
-              placeholder = "bodycompositionsummary"
-              component="input"
-            />
+            {this.state.garmin_health_api.body_composition_summary}
           </div>
           <div className="row">
           <label>Resting Heart Rate:</label>
-          <Field
-              className ="form-control"
-              name = "restingheartrate"
-              type = "text"
-              placeholder = "restingheartrate"
-              component="input"
-            />
+            {this.state.garmin_health_api.resting_heart_rate}
           </div>
           <div className="row">
           <label>Average Resting Heart Rate:</label>
-          <Field
-              className ="form-control"
-              name = "avgrestingheartrate"
-              type = "text"
-              placeholder = "avgrestingheartrate"
-              component="input"
-            />
+            {this.state.garmin_health_api.average_resting_heart_rate}
           </div>
           <div className="row">
           <label>Max Heart Rate :</label>
-          <Field
-              className ="form-control"
-              name = "maxheartrate"
-              type = "text"
-              placeholder = "maxheartrate"
-              component="input"
-            />
+            {this.state.garmin_health_api.max_heart_rate}
           </div>
           <div className="row">
           <label>Resting Heart Rate Trends Over Time:</label>
-          <Field
-              className ="form-control"
-              name = "restingheartratetrendsovertime"
-              type = "text"
-              placeholder = "restingheartratetrendsovertime"
-              component="input"
-            />
+            {this.state.garmin_health_api.resting_heart_rate_over_time}
           </div>
           <div className="row">
           <label>VO2 Max Grab Data and Populate Database:</label>
-          <Field
-              className ="form-control"
-              name = "vo2maxgrab"
-              type = "text"
-              placeholder = "vo2maxgrab"
-              component="input"
-            />
-          </div>
+            {this.state.garmin_health_api.VO2_max_grab_data_and_populate_database}
+		      </div>
           <div className="row">
           <label>Intensity Minutes:</label>
-          <Field
-              className ="form-control"
-              name = "intensityminutes"
-              type = "text"
-              placeholder = "intensity minutes"
-              component="input"
-            />
+            {this.state.garmin_health_api.intensity_minutes}
           </div>
           <div className="row">
           <label>Heart Rate Variability Stress:</label>
-          <Field
-              className ="form-control"
-              name = "heartratevariability"
-              type = "text"
-              placeholder = "heartratevariability"
-              component="input"
-            />
+            {this.state.garmin_health_api.heart_rate_variability_stress}
           </div>
           <div className="row">
           <label>Training Status:</label>
-          <Field
-              className ="form-control"
-              name = "trainingstatus"
-              type = "text"
-              placeholder = "trainingstatus"
-              component="input"
-            />
+            {this.state.garmin_health_api.training_status}
           </div>
           <div className="row">
           <label>Data From My Fitness Pal:</label>
-          <Field
-              className ="form-control"
-              name = "datafrommyfitnesspal"
-              type = "text"
-              placeholder = "datafrommyfitnesspal"
-              component="input"
-            />
+            {this.state.garmin_health_api.data_from_my_fitness_pal}
           </div>
           <div className="row">
           <label>Data From Withings:</label>
-          <Field
-              className ="form-control"
-              name = "datafromwithings"
-              type = "text"
-              placeholder = "datafromwithings"
-              component="input"
-            />
+            {this.state.garmin_health_api.data_from_withings}
           </div>
           <div className="row">
           <label>Data From Other Third Party Source:</label>
-          <Field
-              className ="form-control"
-              name = "datafromthirdparty"
-              type = "text"
-              placeholder = "datafromthirdparty"
-              component="input"
-            />
+            {this.state.garmin_health_api.data_from_other_third_party_source}
           </div>
           <div className="row">
           <label>Total Sleep:</label>
-          <Field
-              className ="form-control"
-              name = "totalsleep"
-              type = "text"
-              placeholder = "totalsleep"
-              component="input"
-            />
+            {this.state.garmin_health_api.total_sleep}
           </div>
           <div className="row">
           <label>Light Sleep:</label>
-          <Field
-              className ="form-control"
-              name = "lightsleep"
-              type = "text"
-              placeholder = "lightsleep"
-              component="input"
-            />
+            {this.state.garmin_health_api.light_sleep}
           </div>
           <div className="row">
           <label>Deep Sleep:</label>
-          <Field
-              className ="form-control"
-              name = "deepsleep"
-              type = "text"
-              placeholder = "deepsleep"
-              component="input"
-            />
+              {this.state.garmin_health_api.deep_sleep}
           </div>
           <div className="row">
           <label>Bed Time:</label>
-          <Field
-              className ="form-control"
-              name = "bedtime"
-              type = "text"
-              placeholder = "bedtime"
-              component="input"
-            />
+            {this.state.garmin_health_api.bed_time}
           </div>
           <div className="row">
           <label>Sleep Awake Time:</label>
-          <Field
-              className ="form-control"
-              name = "sleepawaketime"
-              type = "text"
-              placeholder = "sleepawaketime"
-              component="input"
-            />
+            {this.state.garmin_health_api.sleep_awake_time}
           </div>
           <div className="row">
           <label>Stress Field:</label>
-          <Field
-              className ="form-control"
-              name = "stressfield"
-              type = "text"
-              placeholder = "stressfield"
-              component="input"
-            />
+              {this.state.garmin_health_api.stress_field}
+
+          </div>
+          </div>
+          <div className="col-sm-3">
           </div>
         </div>
-        <div className="col-sm-3"></div>
-        </div>
-
       </div>
     </form>
     <p><pre>{JSON.stringify(this.state, null, 2)}</pre></p>
     </div>
-  )
-
-
-
- }
-
+    );
+  }
 }
-
-
 export default reduxForm({
-  form: 'data to pull from garmin'
-})(
-  connect(undefined, {fetchGarminData})(GarminDataPage)
-);
+    form: 'data to pull from garmin'
+  })(
+    connect(undefined, {fetchGarminData})(GarminDataPage)
+  );
