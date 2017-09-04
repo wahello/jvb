@@ -5,7 +5,6 @@ from .base import *  # noqa
 
 
 DEBUG = False
-
 SECRET_KEY = config('SECRET_KEY')
 
 DATABASES = {

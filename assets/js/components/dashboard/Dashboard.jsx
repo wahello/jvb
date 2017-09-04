@@ -10,8 +10,11 @@ class Dashboard extends Component {
 		super(props)
 		this.fetchGarminData = this.fetchGarminData.bind(this);
 	}
-	onFetchSuccess(){
-		alert("Data fetched successfully");
+	onFetchSuccess(response){
+		if(response.data === 401)
+			console.log("Cannot connect to Garmin, app is not authorized!");
+		else 
+			console.log(response.data);
 	}
 
 	onFetchError(error){
@@ -19,7 +22,7 @@ class Dashboard extends Component {
 	}
 
 	fetchGarminData(){
-		data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
+		var data = this.props.fetchGarminData(this.onFetchSuccess,this.onFetchError);
 		console.log(data);
 	}
 

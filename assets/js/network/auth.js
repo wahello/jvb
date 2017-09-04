@@ -42,11 +42,12 @@ export function errorHandler(dispatch, error, type){
 
 export function loginUser(data, callback){
 	return function (dispatch){
-		const URL = '/api/users/obtain-auth-token/';
+		const URL = '/api/users/login/';
 		const config = {
 			method: 'post',
 			url: URL,
 			data: data,
+			withCredentials: true
 		};
 
 		axios(config).then((response) => {
@@ -58,7 +59,7 @@ export function loginUser(data, callback){
 			callback();
 		}).catch((error) => {
 			// errorHandler(dispatch, error, AUTH_ERROR);
-			console.log("Opps! some error occured!");
+			console.log(error);
 		});
 	}
 }
