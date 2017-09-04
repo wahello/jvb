@@ -18,7 +18,7 @@ import Weeklygrade from '../components/WeeklyGrade';
 import Breakdown from '../components/BreakDown';
 import Weeklysummary from '../components/WeeklySummary';
 import Sleepgraph from '../components/sleep';
-
+import GarminDataPage from '../components/GarminData';
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
 
 const createStoreWithMiddleware = applyMiddleware(promise,thunk)(createStore);
@@ -32,6 +32,7 @@ ReactDOM.render((
 	    <Switch>
 	        <Route exact path='/' component={HomePageContainer}/>
 	        <Route path='/users/dashboard' component={Dashboard} />
+	        <Route path='/raw/garmin' component={GarminDataPage} />
 	        <Route path='/register' component={Register} />
 	        <Route path='/UserInputs' component={UserInputs} />
 	        <Route path='/service_connect' component={ServiceConnect} />
