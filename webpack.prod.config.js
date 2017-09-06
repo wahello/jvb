@@ -24,6 +24,12 @@ baseConfig[1].module.loaders.push({
 });
 
 baseConfig[1].plugins = [
+
+  new webpack.ProvidePlugin({
+             $: "jquery",
+             jQuery: "jQuery"
+         }),
+         
   new webpack.DefinePlugin({  // removes React warnings
     'process.env':{
       'NODE_ENV': JSON.stringify('production')

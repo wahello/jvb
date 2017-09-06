@@ -26,6 +26,10 @@ baseConfig[1].module.loaders.push({
 });
 
 baseConfig[1].plugins = [
+  new webpack.ProvidePlugin({
+             $: "jquery",
+             jQuery: "jQuery"
+         }),
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoEmitOnErrorsPlugin(),  // don't reload if there is an error
   new SpritesmithPlugin({
