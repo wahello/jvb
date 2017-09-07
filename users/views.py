@@ -1,8 +1,5 @@
 from rauth import OAuth1Service
-<<<<<<< HEAD
-=======
-import webbrowser
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
+
 from django.shortcuts import redirect
 
 from rest_framework.views import APIView
@@ -50,13 +47,7 @@ def request_token(request):
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
     if not 'auth_token' in session and ('state' in session and session['state'])==1:
-<<<<<<< HEAD
-        session['state'] = 0; 
-=======
-        session['state'] = 0;
-    # try:
-
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
+      session['state'] = 0; 
 
     service = OAuth1Service(
           # name = 'etrade',
@@ -68,13 +59,10 @@ def request_token(request):
           # base_url = 'http://etws.etrade.com'
           )
 
-<<<<<<< HEAD
-=======
     # Get request token and secret
     # $oauth = new OAuth($conskey,$conssec,OAUTH_SIG_METHOD_HMACSHA1,OAUTH_AUTH_TYPE_URI)
     # $oauth->enableDebug()
 
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
     session = request.session
     request_token, request_token_secret = service.get_request_token()
 
@@ -83,11 +71,6 @@ def request_token(request):
     session['state'] = 1
     callback_string = urllib.parse.quote('http://app.jvbwellness.com/callbacks/garmin')
     return redirect(authurl + '?oauth_token={0}&oauth_callback={1}'.format(request_token,callback_string))
-<<<<<<< HEAD
-    
-    
-=======
-
 
   #   if not 'oauth_token' in session and not 'state' in session:
   #       # request_token, request_token_secret = service.get_request_token(params =
@@ -115,7 +98,6 @@ def request_token(request):
     # except Exception, e:
     #     print(e)
 
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
 def receive_token(request):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connect.garmin.com/oauthConfirm'
@@ -124,9 +106,6 @@ def receive_token(request):
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
 
-<<<<<<< HEAD
-    oauth_verifier = request.GET['oauth_verifier']
-=======
     # oauth_token = request.GET['oauth_token']
     oauth_verifier = request.GET['oauth_verifier']
 
@@ -163,7 +142,6 @@ def receive_token(request):
     # print(r.text)
     # print(r.json())
 
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
     service = OAuth1Service(
           # name = 'etrade',
           consumer_key = conskey,
@@ -178,9 +156,6 @@ def receive_token(request):
     session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
     header_auth=True)
 
-<<<<<<< HEAD
-    # sess = service.get_session((access_token, access_token_secret))
-=======
     # sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
     sess = service.get_session((access_token, access_token_secret))
 
@@ -195,8 +170,6 @@ def receive_token(request):
     # session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
 
 
-
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
     # data = {
     #   'uploadStartTimeInSeconds': 1503148183-86300,
     #   'uploadEndTimeInSeconds': 1503148183,
@@ -214,8 +187,7 @@ def receive_token(request):
     # session.headers.update({'access-token': access_token})
     # print(r.json())
 
-<<<<<<< HEAD
-=======
+
     # from requests_oauthlib import OAuth1, OAuth1Session
     # s = requests.Session()
     # auth = OAuth1(conskey, conssec, resource_owner_key=access_token)
@@ -231,7 +203,6 @@ def receive_token(request):
 
     # print(request)
 
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
     request.session['token'] = access_token
     request.session['token_secret'] = access_token_secret
     request.session['oauth_verifier'] = oauth_verifier
@@ -311,14 +282,11 @@ class fetchGarminData(APIView):
         'uploadEndTimeInSeconds':startDateTimeInSeconds+86300
       }
 
-<<<<<<< HEAD
       # data = {
       #   'uploadStartTimeInSeconds': 1503187200-86300,
       #   'uploadEndTimeInSeconds': 1503187200,
       # }
-      
-=======
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
+
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
       output_dict = {
         'epochs': r.json()
@@ -347,7 +315,6 @@ class fetchGarminData(APIView):
       return Response(output_dict)
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
-<<<<<<< HEAD
 '''
 class fetchGarminData(APIView):
 
@@ -471,5 +438,3 @@ class fetchGarminData(APIView):
       return Response(output_dict)
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
-=======
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
