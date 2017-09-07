@@ -72,6 +72,7 @@
     "universal-cookie": "^2.0.8",
     "url-loader": "^0.5.9",
     "webpack": "^2.7.0",
+    "webpack-bundle-tracker": "^0.2.0",
     "webpack-dev-server": "^2.7.1",
     "webpack-spritesmith": "^0.3.3",
     "yarn": "^0.27.5"
