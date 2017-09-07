@@ -13,13 +13,28 @@ var ReactDOM = require('react-dom');
 
 class GarminDataPage extends Component {
 
+  getEpoch(dateObj=null){
+
+    if(!dateObj)
+      var dateObj = new Date()
+    
+    const d = dateObj.getDate();
+    const m = dateObj.getMonth();
+    const y = dateObj.getFullYear();
+
+    dateObj = new Date(y,m,d,0,0,0);
+    // dividing by 1000 to convert into seconds
+    return dateObj.getTime()/1000;
+  }
+
   constructor(props) {
     super(props);
     this.processDate = this.processDate.bind(this);
     this.state = {
         raw_output: '',
         garmin_health_api: {
-          average_ground_contact_time: 'nothing' 
+          average_ground_contact_time: 'nothing',
+          selectedDateEpoch: this.getEpoch() 
         },
       garmin_health_api: {
        activity_name:'Running',
@@ -94,25 +109,9 @@ class GarminDataPage extends Component {
        bed_time:'0',
        sleep_awake_aime:'0',
        stress_field:'0',
-       selectedDateEpoch: this.getEpoch()
       }
    }
  }
-  getEpoch(dateObj=null){
-
-    if(!dateObj)
-      var dateObj = new Date()
-    
-    const d = dateObj.getDate();
-    const m = dateObj.getMonth();
-    const y = dateObj.getFullYear();
-
-    dateObj = new Date(y,m,d,0,0,0);
-    // dividing by 1000 to convert into seconds
-    return dateObj.getTime()/1000;
-  }
-
-
   processDate(date){
 
     //processing date logic
