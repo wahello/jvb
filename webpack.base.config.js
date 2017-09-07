@@ -24,7 +24,7 @@ module.exports = [{
       },
       {
         test: /jquery\/dist\/jquery\.js$/,
-        loader: 'expose-loasder?jQuery=jquery',
+        loader: 'expose-loader?jQuery=jquery',
       }],
   },
   plugins: [

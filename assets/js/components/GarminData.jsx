@@ -21,7 +21,6 @@ class GarminDataPage extends Component {
         garmin_health_api: {
           average_ground_contact_time: 'nothing' 
         },
-      raw_output: '',
       garmin_health_api: {
        activity_name:'Running',
        activity_type:'Running',
@@ -98,6 +97,7 @@ class GarminDataPage extends Component {
        selectedDateEpoch: this.getEpoch()
       }
    }
+ }
   getEpoch(dateObj=null){
 
     if(!dateObj)

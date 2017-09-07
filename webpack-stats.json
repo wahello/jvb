@@ -1,5 +1,1 @@
-<<<<<<< HEAD
 {"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/media/overide/Part-A/Mydata/project/S7/client_project/Health-Tracker/healthtracker/assets/bundles/main.js"}]}}
-=======
-{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"C:\\Users\\Administrator\\jvb\\healthtracker\\assets\\bundles\\main.js"}]}}
->>>>>>> 8b98c381cf563a5001ea74c6fbacaaf65a9d4fcd
