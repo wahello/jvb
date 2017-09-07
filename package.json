@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "autoprefixer": "^6.7.7",
+    "autoprefixer-core": "^6.0.1",
     "axios": "^0.16.2",
     "axios-retry": "^2.0.1",
     "babel-cli": "^6.26.0",
@@ -47,7 +48,7 @@
     "react-calendar-widget": "^0.0.3",
     "react-cookie": "^2.0.8",
     "react-dom": "^15.6.1",
-    "react-hot-loader": "next",
+    "react-hot-loader": "^3.0.0-beta.7",
     "react-iframe": "^1.0.7",
     "react-redux": "^5.0.6",
     "react-router": "^4.1.2",
@@ -71,15 +72,17 @@
     "universal-cookie": "^2.0.8",
     "url-loader": "^0.5.9",
     "webpack": "^2.7.0",
-    "webpack-bundle-tracker": "^0.2.0",
     "webpack-dev-server": "^2.7.1",
-    "webpack-spritesmith": "^0.3.3"
+    "webpack-spritesmith": "^0.3.3",
+    "yarn": "^0.27.5"
   },
   "devDependencies": {
+    "babel-preset-stage-1": "^6.24.1",
     "eslint": "^3.8.1",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^6.4.1"
+    "eslint-plugin-react": "^6.4.1",
+    "webpack-bundle-tracker": "^0.2.0"
   }
 }

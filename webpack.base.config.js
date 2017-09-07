@@ -24,7 +24,7 @@ module.exports = [{
       },
       {
         test: /jquery\/dist\/jquery\.js$/,
-        loader: 'expose-loader?jQuery',
+        loader: 'expose-loasder?jQuery=jquery',
       }],
   },
   plugins: [
@@ -69,7 +69,8 @@ module.exports = [{
     modules: ['node_modules'],
     extensions: ['.js', '.jsx', '.css'],
     alias: {
-            'React$': path.resolve(__dirname, './node_modules/react/dist/react.min.js')
+            'React$': path.resolve(__dirname, './node_modules/react/dist/react.min.js'),
+            'jQuery': path.resolve(__dirname, './node_modules/jquery/dist/jquery.min.js'),
         }
   },
 }];
