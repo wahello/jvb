@@ -32,11 +32,8 @@ class GarminDataPage extends Component {
     this.processDate = this.processDate.bind(this);
     this.state = {
         raw_output: '',
-        garmin_health_api: {
-          average_ground_contact_time: 'nothing',
-          selectedDateEpoch: this.getEpoch() 
-        },
-      garmin_health_api: {
+        selectedDateEpoch: this.getEpoch(),
+       garmin_health_api: {
        activity_name:'Running',
        activity_type:'Running',
        event_type:'course',
