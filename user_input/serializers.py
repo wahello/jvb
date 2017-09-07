@@ -39,17 +39,20 @@ class GoalsSerializer(serializers.ModelSerializer):
 
 class UserDailyInputSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
-	strong_input = DailyUserInputStrongSerializer(many=True)
-	# encouraged_input = DailyUserInputEncouragedSerializer(many=True)
-	# optional_input = DailyUserInputOptionalSerializer(many=True)
-	# third_source_input = InputsChangesFromThirdSourcesSerializer(many=True)
-	# goals_input = GoalsSerializer()
+	strong_input = DailyUserInputStrongSerializer()
+	encouraged_input = DailyUserInputEncouragedSerializer()
+	optional_input = DailyUserInputOptionalSerializer()
+	# third_source_input = InputsChangesFromThirdSourcesSerializer()
+	# goals = GoalsSerializer()
 
 	class Meta:
 		model = UserDailyInput
-		fields = ('user','created_at','updated_at','strong_input',)
+		fields = ('user','created_at','updated_at','strong_input','encouraged_input',
+				  'optional_input')
+		
 		# fields = ('user','created_at','updated_at','strong_input','encouraged_input',
-		# 		  'optional_input','third_source_input','goals_input')
+		# 		  'optional_input','third_source_input','goals')
+	
 		read_only_fields = ('created_at','updated_at',)
 
 	def _update_helper(instance, validated_data):
@@ -66,41 +69,48 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		instance.save()
 	
 	def create(self, validated_data):
-		strong_data = validated_data.pop('strong_input')
-		print(strong_data)
-		# encouraged_data = validated_data.pop('encouraged_input')
-		# optional_data = validated_data.pop('optional_input')
-		# third_source_data = validated_data.pop('third_source_input')
-		# goals_data = validated_data.pop('goals_input')
 
-		user_input_obj = UserDailyInput.objects.create(user=self.context['request'].user,
+		user = self.context['request'].user
+		strong_data = validated_data.pop('strong_input')
+		encouraged_data = validated_data.pop('encouraged_input')
+		optional_data = validated_data.pop('optional_input')
+		# third_source_data = validated_data.pop('third_source_input')
+		# goals_data = validated_data.pop('goals')
+
+		user_input_obj = UserDailyInput.objects.create(user=user,
 												  **validated_data)
+
 		DailyUserInputStrong.objects.create(user_input=user_input_obj,
 														   **strong_data)
-		# DailyUserInputEncouraged.objects.create(user_input=user_input_obj,
-		# 												   **encouraged_data)
-		# DailyUserInputOptional.objects.create(user_input=user_input_obj,
-		# 												   **optional_data)
+
+		DailyUserInputEncouraged.objects.create(user_input=user_input_obj,
+														   **encouraged_data)
+
+		DailyUserInputOptional.objects.create(user_input=user_input_obj,
+														   **optional_data)
+		
 		# InputsChangesFromThirdSources.objects.create(user_input=user_input_obj,
 		# 												   **third_source_data)
 		# Goals.objects.create(user_input=user_input_obj,
 		# 								 **goals_data)
 
+		return user_input_obj
+
 	def update(self,instance,validated_data):
-		strong_data = validated_data.pop('strong_input')
-		# encouraged_data = validated_data.pop('encouraged_input')
-		# optional_data = validated_data.pop('optional_input')
+		strong_data = validated_data.pop('strong')
+		encouraged_data = validated_data.pop('encouraged_input')
+		optional_data = validated_data.pop('optional_input')
 		# third_source_data = validated_data.pop('third_source_input')
-		# goals_data = validated_data.pop('goals_input')
+		# goals_data = validated_data.pop('goals')
 
 		strong_obj = instance.strong_input
 		self._update_helper(strong_obj, strong_data)
 
-		# encouraged_obj = instance.encouraged_input
-		# self._update_helper(encouraged_obj, encouraged_data)
+		encouraged_obj = instance.encouraged_input
+		self._update_helper(encouraged_obj, encouraged_data)
 
-		# optional_obj = instance.optional_input
-		# self._update_helper(optional_obj, optional_data)
+		optional_obj = instance.optional_input
+		self._update_helper(optional_obj, optional_data)
 
 		# third_source_obj = instance.third_source_input
 		# self._update_helper(third_source_obj, third_source_data)

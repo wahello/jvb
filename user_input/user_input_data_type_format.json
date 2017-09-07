@@ -1,0 +1,47 @@
+{
+	"strong_input":
+	{
+		"work_out_easy_or_hard":"Hard",
+		"work_out_effort_level":8,
+		"unprocessed_food_consumed_yesterday":50,
+		"number_of_alcohol_consumed_yesterday":6.5,
+		"sleep_aids_last_night":"Yes",
+		"prescription_or_non_prescription_sleep_aids_last_night":"No",
+		"smoke_any_substances_whatsoever":"Yes",
+		"medications_or_controlled_substances_yesterday":"No"
+	},
+
+	"encouraged_input":
+	{
+		"stress_level_yesterday":"Medium",
+		"pains_twings_during_or_after_your_workout":"Yes",
+		"water_consumed_during_workout":100,
+		"workout_that_user_breathed_through_nose":"50"
+	},
+
+	"optional_input":
+	{
+		"list_of_processed_food_consumed_yesterday":"apple",
+		"chia_seeds_consumed_during_workout":15,
+		"fasted_during_workout":"Yes",
+		"general_Workout_Comments":"I'm lovin' it!",
+		"weight":60,
+		"waist_size":30,
+		"clothes_size":10,
+		"heart_rate_variability":30
+	},
+
+	"third_source_input":
+	{
+		"resting_heart_rate":50,
+		"sleep_time_excluding_awake_time":"sleep time",
+		"other":"some char value",
+		"tbd":"some char value"
+	},
+
+	"goals":
+	{
+		"goals":"improve health",
+		"other":"Becoming Hokage!"
+	}
+}

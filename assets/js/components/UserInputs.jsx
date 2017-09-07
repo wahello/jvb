@@ -1,10 +1,29 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
-import { Container, Select, option, Option, Row, Col, Button, Form, FormGroup, Label, Input, FormText, className } from 'reactstrap';
+import { Container, Select, option, Option, Row, Col, Button, Form,
+         FormGroup, Label, Input, FormText, className } from 'reactstrap';
 
+import {userDailyInputSend} from '../network/userInput';
 class UserInputs extends React.Component{
+
+    constructor(props){
+      super(props);
+      this.onSubmit = this.onSubmit.bind(this);
+    }
+
+    onSubmit(event){
+      event.preventDefault();
+      var form = this.input_form;
+      var elmnts = form.elements.length;
+      var form_values = {};
+      for(var i=0; i<elmnts; i++){
+        form_values[form.elements[i].name] = form.elements[i].value;
+      }
+      userDailyInputSend(form_values);
+    }
+
     render(){
-         console.log('i am in the render for userinputs');
         return(
             <div>
             
@@ -12,18 +31,23 @@ class UserInputs extends React.Component{
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
                         <h2 className="head">Daily user inputs report</h2>
-                        <Form className="user-inputs-form bootstrap_validator" role="form" data-toggle="validator">
+                        <Form 
+                          getRef = {(input) => this.input_form = input}
+                          onSubmit = {this.onSubmit}
+                          className="user-inputs-form bootstrap_validator" 
+                          role="form" 
+                          data-toggle="validator">
                          <FormGroup>   
                         <Label className="padding">Was your workout easy or hard</Label>
-                          <Input type="select" className="custom-select form-control" name="work_out_easy" multiple>
-                                <option value="">select</option>
-                                <option value="1">Easy</option>
-                                <option value="2">Hard</option>
+                          <Input type="select" className="custom-select form-control" name="work_out_easy">
+                                <option value="select">select</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Hard">Hard</option>
                           </Input>  
                           </FormGroup> 
                           <FormGroup>   
                         <Label className="padding">Workout Effort Level</Label>
-                          <Input type="select" className="custom-select form-control" name="workout_effort">
+                          <Input type="select" className="custom-select form-control" name="workout_effort" >
                                 <option value="">select</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -39,54 +63,65 @@ class UserInputs extends React.Component{
                           </FormGroup>
                           <FormGroup>
                         <Label className="padding"> how much % unprocessed food consumed yesterday?</Label>
-                            <Input type="select" className="custom-select form-control" name="unprocessed_food" multiple>
-                                <option value="">select</option>
-                                <option value="1">0%</option>
-                                <option value="2">1%</option>
-                                <option value="3">2%</option>
-                                <option value="4">3%</option>
-                                <option value="5">5%</option>
-                                <option value="6">6%</option>
-                                <option value="7">7%</option>
-                            </Input>
+                            <Input type="text" className="form-control" name="unprocessed_food" />
                           </FormGroup>  
                           <FormGroup>
                                <Label className="padding">Number of Alchol Drinks consumed yesterday?</Label>
-                                 <Input type="select" className="form-control" name="alchol_consmumed" multiple>
+                                 <Input type="select" className="custom-select form-control" name="alchol_consumed">
                                     <option value="">select</option>
-                                    <option value="1">0.5</option>
-                                    <option value="2">1</option>
-                                    <option value="3">1.5</option>
-                                    <option value="4">2</option>
-                                    <option value="5">2.5</option>
-                                    <option value="6">3</option>
-                                    <option value="7">3.5</option>
+                                    <option value="0.5">0.5</option>
+                                    <option value="1">1</option>
+                                    <option value="1.5">1.5</option>
+                                    <option value="2">2</option>
+                                    <option value="2.5">2.5</option>
+                                    <option value="3">3</option>
+                                    <option value="3.5">3.5</option>
+                                    <option value="4">4</option>
+                                    <option value="4.5">4.5</option>
+                                    <option value="5">5</option>
+                                    <option value="5.5">5.5</option>
+                                    <option value="6">6</option>
+                                    <option value="6.5">6.5</option>
+                                    <option value="7">7</option>
+                                    <option value="7.5">7.5</option>
+                                    <option value="8">8</option>
+                                    <option value="8.5">8.5</option>
+                                    <option value="9">9</option>
+                                    <option value="9.5">9.5</option>
+                                    <option value="10">3</option>
                             </Input>
                           </FormGroup>
                           <FormGroup>
-                               <Label className="padding">Did you take any prescription or non prescription sleep aids last night?</Label>
-                                <Input type="select" className="custom-select form-control" id="prescription_select" name="sllep_aids" multiple >
+                              <Label className="padding">Sleep aids last night?</Label>
+                                <Input type="select" className="custom-select form-control" id="sleep_aids_select" name="sleep_aids">
                                     <option value="">Select</option>
-                                    <option value="1">Yes</option>
-                                    <option value="2">No</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </Input>
+
+                               <Label className="padding">Did you take any prescription or non prescription sleep aids last night?</Label>
+                                <Input type="select" className="custom-select form-control" id="prescription_select" name="prescription_sleep_aids">
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
                                 </Input>
 
                             {/* <!-- Hidden fields --> */}
                             <div className="prescription_hidden_fields">
 
                              <Label className="padding">Did you smoke any substances whatsover</Label>
-                                <Input type="select" className="custom-select form-control" name="substances" multiple>
+                                <Input type="select" className="custom-select form-control" name="substances">
                                         <option value="">select</option>
-                                        <option value="1">Yes</option>
-                                        <option value="2">No</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
                                 </Input>
 
 
                            <Label className="padding">Did you ingest any prescription or non prescription medications</Label>
-                                <Input type="select" className="custom-select form-control" name="medications" multiple>
+                                <Input type="select" className="custom-select form-control" name="medications">
                                         <option value="">select</option>
-                                        <option value="1">Yes</option>
-                                        <option value="2">No</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
                                 </Input>
                                 
                            </div>
@@ -94,67 +129,49 @@ class UserInputs extends React.Component{
 
                           <FormGroup>
                              <Label className="padding">Yesterday Stress Level</Label>
-                                <Input type="select" className="custom-select form-control" name="stress" multiple>
+                                <Input type="select" className="custom-select form-control" name="stress">
                                     <option value="select">select</option>
-                                    <option value="1">Low</option>
-                                    <option value="2">Medium</option>
-                                    <option value="3">High</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
                                 </Input>
                             <Label className="padding">Did you have any pain or twinges during or after your workout</Label>
-                                <Input type="select" className="custom-select form-control" id="pain_select" name="pain_select" multiple>
+                                <Input type="select" className="custom-select form-control" id="pain_select" name="pain_select">
                                     <option value="select">select</option>
-                                    <option value="1">Yes</option>
-                                    <option vlaue="2">No</option>
+                                    <option value="Yes">Yes</option>
+                                    <option vlaue="No">No</option>
                                 </Input>
 
                             {/* <!-- hidden fields --> */}
                         
                           <div className="pain_hidden_fields">
                              <Label className="padding">Select the pain is from below dropdown</Label>
-                                <Input type="select" className="custom-select form-control" name="pain" multiple>
+                                <Input type="select" className="custom-select form-control" name="pain" >
                                     <option value="select">select</option>
-                                    <option value="">neck</option>
-                                    <option value="">leg</option>
+                                    <option value="neck">neck</option>
+                                    <option value="leg">leg</option>
                                 </Input>
                           </div>
                           </FormGroup>
                           <FormGroup>
                               
-                        <Label className="padding">Water Consumed During Workout</Label>
-                            <Input type="select" className="custom-select form-control" name="water_consumed" multiple>
-                                <option value="select">select</option>
-                                <option value="">0 ounces</option>
-                                <option value="">1 ounces</option>
-                                <option value="">2 ounces</option>
-                                <option value="">3 ounces</option>
-                                <option value="">4 ounces</option>
-                                <option value="">5 ounces</option>
-                                <option value="">6 ounces</option>
-                                <option value="">7 ounces</option>
-                            </Input>
+                        <Label className="padding">Water Consumed During Workout(ounce)</Label>
+                            <Input type="number" 
+                                   className="custom-select form-control" 
+                                   name="water_consumed"
+                                   min="1" max="250"
+                            />
                           </FormGroup>
                           <FormGroup>
                             <Label className="padding">How Much % Workout that User breathed in and out through nose</Label>
-                                <Input type="select" className="custom-select form-control" name="nose" multiple>
-                                    <option value="select">select</option>
-                                    <option value="">1%</option>
-                                    <option value="">2%</option>
-                                    <option value="">3%</option>
-                                    <option value="">4%</option>
-                                    <option value="">5%</option>
-                                    <option value="">6%</option>
-                                    <option value="">7%</option>
-                                    <option value="">8%</option>
-                                    <option value="">9%</option>
-                                    <option value="">10%</option>
-                                </Input>
+                                <Input type="text" className="form-control" name="nose"/>
                           </FormGroup>
                           <FormGroup>
                              <Label className="padding">Are you sick today?</Label>
-                                <Input type="select" className="custom-select form-control" id="sick_select"name="sick" multiple>
+                                <Input type="select" className="custom-select form-control" id="sick_select"name="sick">
                                     <option value="">select</option>
-                                    <option value="1">Yes</option>
-                                    <option value="2">No</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
                                 </Input>
                             {/* <!-- hidden fields --> */}
                             <div className="sick_hidden_fields">
@@ -165,10 +182,10 @@ class UserInputs extends React.Component{
                           <FormGroup>
                                  
                         <Label className="padding">Did you stand for 3 hours yesterday when you worked </Label>
-                            <Input type="select" className="custom-select form-control" id="sick_select" name="stand" multiple>
+                            <Input type="select" className="custom-select form-control" id="sick_select" name="stand">
                                 <option value="">select</option>
-                                <option value="1">Yes</option>
-                                <option value="2">No</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
                             </Input>
                           </FormGroup>
                           <FormGroup>
@@ -180,36 +197,37 @@ class UserInputs extends React.Component{
                           <FormGroup>
                               
                         <Label className="padding">Tablespoons of chia seeds consumed during workout ?</Label>
-                            <Input type="select" className="custom-select form-control" name="chia_seeds" multiple>
+                            <Input type="select" className="custom-select form-control" name="chia_seeds">
                                 <option value="select">select</option>
-                                <option value="">1</option>
-                                <option value="">2</option>
-                                <option value="">3</option>
-                                <option value="">4</option>
-                                <option value="">5</option>
-                                <option value="">6</option>
-                                <option value="">7</option>
-                                <option value="">8</option>
-                                <option value="">9</option>
-                                <option value="">10</option>
-                                <option value="">11</option>
-                                <option value="">12</option>
-                                <option value="">13</option>
-                                <option value="">14</option>
-                                <option value="">15</option>
-                                <option value="">16</option>
-                                <option value="">17</option>
-                                <option value="">18</option>
-                                <option value="">19</option>
-                                <option value="">20</option>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
                             </Input>
                           </FormGroup>
                           <FormGroup>
                             <Label className="padding">Were you fasted during workout </Label>
-                                <Input type="select" className="custom-select form-control" name="fasted" multiple>
+                                <Input type="select" className="custom-select form-control" name="fasted">
                                     <option value="select">select</option>
-                                    <option value="">Yes</option>
-                                    <option value="">No</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
                                 </Input>
                           </FormGroup>
                           <FormGroup>      
@@ -217,128 +235,103 @@ class UserInputs extends React.Component{
                                <Input type="text" name="comment" placeholder="please leave a comment" className="form-control" />
                           </FormGroup>
                           <FormGroup>
-                            <Label className="padding">Weight</Label>
-                                <Input type="select" className="custom-select form-control" name="weight" multiple>
-                                    <option value="select">select</option>
-                                    <option value="">30 pounds</option>
-                                    <option value="">40 pounds</option>
-                                    <option value="">50 pounds</option>
-                                    <option value="">60 pounds</option>
-                                    <option value="">70 pounds</option>
-                                    <option value="">80 pounds</option>
-                                    <option value="">90 pounds</option>
-                                    <option value="">100 pounds</option>
-                                    <option value="">110 pounds</option>
-                                    <option value="">120 pounds</option>
-                                    <option value="">130 pounds</option>
-                                    <option value="">140 pounds</option>
-                                    <option value="">150 pounds</option>
-                                    <option value="">160 pounds</option>
-                                    <option value="">170 pounds</option>
-                                </Input>
+                            <Label className="padding">Weight (pounds)</Label>
+                                <Input type="number" 
+                                       className="custom-select form-control"
+                                       name="weight"
+                                       min="30"
+                                       max="500" 
+                                />
                           </FormGroup>
                           <FormGroup>
                                
                         <Label className="padding">Waist size (Male)</Label>
-                            <Input type="select" className="custom-select form-control" name="waist" multiple>
+                            <Input type="select" className="custom-select form-control" name="waist">
                                 <option value="select">select</option>
-                                <option value="">20</option>
-                                <option value="">22</option>
-                                <option value="">24</option>
-                                <option value="">26</option>
-                                <option value="">28</option>
-                                <option value="">30</option>
-                                <option value="">32</option>
-                                <option value="">34</option>
-                                <option value="">36</option>
-                                <option value="">38</option>
-                                <option value="">40</option>
-                                <option value="">42</option>
-                                <option value="">44</option>
-                                <option value="">46</option>
-                                <option value="">48</option>
-                                <option value="">50</option>
-                                <option value="">52</option>
-                                <option value="">54</option>
-                                <option value="">56</option>
-                                <option value="">58</option>
-                                <option value="">60</option>
+                                <option value="20">20</option>
+                                <option value="22">22</option>
+                                <option value="24">24</option>
+                                <option value="26">26</option>
+                                <option value="28">28</option>
+                                <option value="30">30</option>
+                                <option value="32">32</option>
+                                <option value="34">34</option>
+                                <option value="36">36</option>
+                                <option value="38">38</option>
+                                <option value="40">40</option>
+                                <option value="42">42</option>
+                                <option value="44">44</option>
+                                <option value="46">46</option>
+                                <option value="48">48</option>
+                                <option value="50">50</option>
+                                <option value="52">52</option>
+                                <option value="54">54</option>
+                                <option value="56">56</option>
+                                <option value="58">58</option>
+                                <option value="60">60</option>
                             </Input>
                           </FormGroup>
                           <FormGroup>
                               <Label className="padding">Clothes Size (Womens)</Label>
-                                <Input type="select" className="custom-select form-control" name="clothes" multiple>
+                                <Input type="select" className="custom-select form-control" name="clothes">
                                     <option value="select">select</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
-                                    <option value="">4</option>
-                                    <option value="">5</option>
-                                    <option value="">6</option>
-                                    <option value="">7</option>
-                                    <option value="">8</option>
-                                    <option value="">9</option>
-                                    <option value="">10</option>
-                                    <option value="">11</option>
-                                    <option value="">12</option>
-                                    <option value="">13</option>
-                                    <option value="">14</option>
-                                    <option value="">15</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
                                 </Input>
                           </FormGroup>
                           <FormGroup>
                              <Label className="padding">Heart rate variability</Label>
-                                <Input type="select" className="custom-select form-control" name="heart" multiple>
+                                <Input type="select" className="custom-select form-control" name="heart">
                                     <option value="select">select</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
-                                    <option value="">4</option>
-                                    <option value="">5</option>
-                                    <option value="">6</option>
-                                    <option value="">7</option>
-                                    <option value="">8</option>
-                                    <option value="">9</option>
-                                    <option value="">10</option>
-                                    <option value="">11</option>
-                                    <option value="">12</option>
-                                    <option value="">13</option>
-                                    <option value="">14</option>
-                                    <option value="">15</option>
-                                    <option value="">16</option>
-                                    <option value="">17</option>
-                                    <option value="">18</option>
-                                    <option value="">19</option>
-                                    <option value="">20</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
                                 </Input>  
                           </FormGroup>
                           <FormGroup>         
-                            <Label className="padding">What % did you breath through your nose last night when you were a sleep?</Label>
-                                <Input type="select" className="custom-select form-control" name="breath_sleep" multiple>
-                                    <option value="select">select</option>
-                                    <option value="">0%</option>
-                                    <option value="">1%</option>
-                                    <option value="">2%</option>
-                                    <option value="">3%</option>
-                                    <option value="">4%</option>
-                                    <option value="">5%</option>
-                                    <option value="">6%</option>
-                                </Input>
+                            <Label className="padding">What % did you breath through your nose last night when you were asleep?</Label>
+                                <Input type="text" className="form-control" name="breath_sleep"/>
                           </FormGroup>
                           <FormGroup>
                               <Label className="padding">What % did you breath through your nose throughtout the day when you were not exercising?</Label>
-                                <Input type="select" className="custom-select form-control" name="breath_day" multiple>
-                                    <option value="select">select</option>
-                                    <option value="">0%</option>
-                                    <option value="">1%</option>
-                                    <option value="">2%</option>
-                                    <option value="">3%</option>
-                                    <option value="">4%</option>
-                                    <option value="">5%</option>
-                                    <option value="">6%</option>
-                                </Input>  
+                                <Input type="text" className="form-control" name="breath_day"/>
                           </FormGroup>
-                        <Button type="submit" color="info" className="btn btn-block btn-primary">Submit</Button>
+                        <Button 
+                          type="submit"
+                          color="info" 
+                          className="btn btn-block btn-primary">
+                            Submit
+                        </Button>
                     </Form>
                     </div>
                  </div>

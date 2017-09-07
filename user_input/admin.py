@@ -6,24 +6,31 @@ from user_input.models import DailyUserInputEncouraged,\
 							  UserDailyInput,\
 							  Goals
 
-class DailyUserInputStrongAdmin(admin.ModelAdmin):
-	pass
-class DailyUserInputEncouragedAdmin(admin.ModelAdmin):
-	pass
-class DailyUserInputOptionalAdmin(admin.ModelAdmin):
-	pass
-class InputsChangesFromThirdSourcesAdmin(admin.ModelAdmin):
-	pass
+class DailyUserInputStrongInline(admin.TabularInline):
+	model = DailyUserInputStrong
+
+class DailyUserInputEncouragedInline(admin.TabularInline):
+	model = DailyUserInputEncouraged
+
+class DailyUserInputOptionalInline(admin.TabularInline):
+	model = DailyUserInputOptional
+
+class InputsChangesFromThirdSourcesInline(admin.TabularInline):
+	model = InputsChangesFromThirdSources
+
+class GoalsInline(admin.TabularInline):
+	model = Goals
+
 class UserInputAdmin(admin.ModelAdmin):
-	pass
-class GoalsAdmin(admin.ModelAdmin):
-	pass
+	list_display=('user','created_at', 'updated_at')
+	inlines = [
+		DailyUserInputStrongInline,
+		DailyUserInputEncouragedInline,
+		DailyUserInputOptionalInline,
+		InputsChangesFromThirdSourcesInline,
+		GoalsInline
+	]
 
 # Register your models here.
-admin.site.register(DailyUserInputStrong,DailyUserInputStrongAdmin)
-admin.site.register(DailyUserInputEncouraged,DailyUserInputEncouragedAdmin)
-admin.site.register(DailyUserInputOptional,DailyUserInputOptionalAdmin)
-admin.site.register(InputsChangesFromThirdSources,
-					InputsChangesFromThirdSourcesAdmin)
+
 admin.site.register(UserDailyInput,UserInputAdmin)
-admin.site.register(Goals,GoalsAdmin)

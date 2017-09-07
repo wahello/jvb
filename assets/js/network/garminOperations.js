@@ -5,7 +5,7 @@ axiosRetry(axios, { retries: 3});
 
 export function fetchGarminData(successCallback, errorCallback){
 	return function(dispatch){
-		const URL = 'users/garmin/fetch/';
+		const URL = '/users/garmin/fetch';
 		const config = {
 			method: "get",
 			url: URL

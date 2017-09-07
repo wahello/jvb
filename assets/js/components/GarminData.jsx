@@ -10,22 +10,57 @@ axiosRetry(axios, { retries: 3});
 
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
-var setText = function (date) {
-    // code for processing the JavaScript Date object
-};
-
 
 class GarminDataPage extends Component {
 
   constructor(props) {
     super(props);
+    this.processDate = this.processDate.bind(this);
     this.state = {
-      raw_output: '',
-      garmin_health_api: {
-       average_ground_contact_time: 'nothing' 
-      }
-   }
+        raw_output: '',
+        garmin_health_api: {
+          average_ground_contact_time: 'nothing' 
+        },
+        selectedDateEpoch: this.getEpoch()
+    }
+  }
 
+  getEpoch(dateObj=null){
+
+    if(!dateObj)
+      var dateObj = new Date()
+    
+    const d = dateObj.getDate();
+    const m = dateObj.getMonth();
+    const y = dateObj.getFullYear();
+
+    dateObj = new Date(y,m,d,0,0,0);
+    // dividing by 1000 to convert into seconds
+    return dateObj.getTime()/1000;
+  }
+
+  processDate(date){
+
+    //processing date logic
+    this.setState({
+      selectedDateEpoch: this.getEpoch(date)
+    })
+
+    const URL = '/users/garmin/fetch';
+    const config = {
+      method: "get",
+      url: URL,
+      params: {
+          start_date: this.state.selectedDateEpoch
+        },
+      
+    };
+    axios(config).then( function(response){
+      this.updateState(response);
+    }.bind(this)).catch((error) => {
+      // errorCallback(error);
+      console.log(error.message);
+    });
   }
 
   updateState(data){
@@ -39,22 +74,20 @@ class GarminDataPage extends Component {
 
 
   componentDidMount(){
-
-    //    fetchGarminData(this.updateState).bind(this);
-
-  const URL = 'users/garmin/fetch/';
-  const config = {
-    method: "get",
-    url: URL
-  };
-  axios(config).then( function(response){
-    this.updateState(response);
-  }.bind(this)).catch((error) => {
-    // errorCallback(error);
-    console.log(error.message);
-  });
-
-
+    const URL = '/users/garmin/fetch';
+    const config = {
+      method: "get",
+      url: URL,
+      params: {
+          start_date: this.state.selectedDateEpoch
+      },
+    };
+    axios(config).then( function(response){
+      this.updateState(response);
+    }.bind(this)).catch((error) => {
+      // errorCallback(error);
+      console.log(error.message);
+    });
   }
 
 
@@ -71,8 +104,7 @@ class GarminDataPage extends Component {
 				<div className="row">
           <div className="col-sm-3">
             <div className="row">
-              <CalendarWidget onDaySelect={setText}/>,
-
+              <CalendarWidget onDaySelect={this.processDate}/>,
             </div>
 
           </div>
