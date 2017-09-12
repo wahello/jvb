@@ -434,11 +434,9 @@ class fetchGarminData(APIView):
 
       return Response(output_dict)
 
-     
+
       output_dict['garmin_health_api'] = {
-        'light_sleep': my_sum(sleeps,'lightSleepDurationInSeconds '),
-        'deep_sleep': my_sum(sleeps,'deepSleepDurationInSeconds '),
-        'sleep_awake_time': my_sum(sleeps,'awakeDurationInSeconds '),
+        'light_sleep': ''
       }
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
