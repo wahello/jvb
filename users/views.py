@@ -307,6 +307,7 @@ class fetchGarminData(APIView):
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
       output_dict['dailies'] = r.json()
 
+
       output_dict['garmin_health_api'] = {
         'average_ground_contact_time': ''
       }
@@ -434,9 +435,33 @@ class fetchGarminData(APIView):
 
       return Response(output_dict)
 
+      """
+        #decoding the data
+      """
+
+      decode_dailies_raw = output_dict[dailies]
+      dailies_json = json.loads(decode_dailies_raw)
+
+      decode_activities_raw = output_dict[activities]
+      activities_json = json.loads(decode_activities_raw)
+
+      decode_epochs_raw = output_dict[epochs]
+      epochs_json = json.loads(decode_epochs_raw)
+
+      decode_sleeps_raw = output_dict[sleeps]
+      sleeps_json = json.loads(decode_sleeps_raw)
+
+      decode_bodyComps_raw = output_dict[bodyComps]
+      bodyComps_json = json.loads(decode_bodyComps_raw)
+
+      #caluculates the sum of all the values related to the key and returns the result to dict
+      def my_sum(d, key):
+          return sum([i.get(key, 0) for i in d ])
 
       output_dict['garmin_health_api'] = {
-        'light_sleep': ''
+        'light_sleep': my_sum(sleeps_json,'lightSleepDurationInSeconds '),
+        'deep_sleep': my_sum(sleeps_json,'deepSleepDurationInSeconds '),
+        'sleep_awake_time': my_sum(sleeps_json,'awakeDurationInSeconds '),
       }
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
