@@ -17,7 +17,7 @@ class GarminDataPage extends Component {
 
     if(!dateObj)
       var dateObj = new Date()
-    
+
     const d = dateObj.getDate();
     const m = dateObj.getMonth();
     const y = dateObj.getFullYear();
@@ -104,7 +104,7 @@ class GarminDataPage extends Component {
        light_sleep:'0',
        deep_sleep:'0',
        bed_time:'0',
-       sleep_awake_aime:'0',
+       sleep_awake_time:'0',
        stress_field:'0',
       }
    }
@@ -123,7 +123,7 @@ class GarminDataPage extends Component {
       params: {
           start_date: this.state.selectedDateEpoch
         },
-      
+
     };
     axios(config).then( function(response){
       this.updateState(response);
@@ -138,7 +138,7 @@ class GarminDataPage extends Component {
     this.setState({raw_output: data,
       garmin_health_api: {
         activity_name:data.data.garmin_health_api.activity_name,
-        activity_type:data.data.garmin_health_api.activity_type,
+        activity_type:data.dailies.garmin_health_api.activity_type,
         event_type:data.data.garmin_health_api.event_type,
         course:data.data.garmin_health_api.course,
         location:data.data.garmin_health_api.location,
@@ -207,7 +207,7 @@ class GarminDataPage extends Component {
         light_sleep:data.data.garmin_health_api.light_sleep,
         deep_sleep:data.data.garmin_health_api.deep_sleep,
         bed_time:data.data.garmin_health_api.bed_time,
-        sleep_awake_aime:data.data.garmin_health_api.sleep_awake_aime,
+        sleep_awake_time:data.data.garmin_health_api.sleep_awake_time,
         stress_field:data.data.garmin_health_api.stress_field,
 
 
@@ -436,10 +436,9 @@ class GarminDataPage extends Component {
           <label>Average Ground Contact Time:</label>
              {this.state.garmin_health_api.average_ground_contact_time}
           </div>
-          <div className="row">
-          <label>Average Ground Contact Time:</label>
-               <h3>Garmin Health API</h3>
-          </div>
+
+          <h3>Garmin Health API</h3>
+
           <div className="row">
           <label>Total Steps :</label>
             {this.state.garmin_health_api.total_steps}
