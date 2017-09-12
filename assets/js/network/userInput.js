@@ -99,7 +99,8 @@ export function userDailyInputSend(data){
 	const config = {
 		url : URL,
 		data : formatJSON(data),
-		method : 'post'
+		method : 'post',
+		withCredentials: true
 	};
 	axios(config).then((response) => {
 		alert("User Input submitted successfully!");

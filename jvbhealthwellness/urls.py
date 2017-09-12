@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 from users import views as userViews
 from user_input import urls as userInputUrls
 from garmin import urls as garminUrls
+from quicklook import urls as quicklookUrls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -14,6 +15,7 @@ urlpatterns = [
     url(r'^users/garmin/token/$',userViews.GetGarminToken.as_view(), name='garmin_token'),
     url(r'^users/garmin/fetch$',userViews.fetchGarminData.as_view(),name='garmin_data'),
     url(r'^garmin/',include(garminUrls)),
+    url(r'^quicklook/',include(quicklookUrls)),
     url(r'^users/',include(userInputUrls)),
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),

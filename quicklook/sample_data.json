@@ -1,0 +1,118 @@
+// API Endpoint : http://127.0.0.1:8000/quicklook/users/data
+
+{
+
+	"grades_ql":
+	{
+		"overall_truth_grade":"A",
+		"overall_truth_health_gpa":3.2,
+		"movement_non_exercise_grade":"A",
+		"movement_consistency_grade":"A",
+		"avg_sleep_per_night_grade":"A",
+		"exercise_consistency_grade":"A",
+		"overall_workout_grade":"A",
+		"prcnt_non_processed_food_consumed_grade":"A",
+		"alcoholic_drink_per_week_grade":"A",
+		"penalty":"D"
+	},
+
+	"exercise_reporting_ql":
+	{
+		"workout_easy_hard":"easy",
+		"workout_type":"trademil run",
+		"workout_time":"19:11:14",
+		"workout_location":"New York",
+		"workout_duration":"01:30:20",
+		"maximum_elevation_workout":118,
+		"minutes_walked_before_workout":"00:30:00",
+		"distance":10.2,
+		"pace":"00:31:46",
+		"avg_heartrate":145,
+		"elevation_gain":587,
+		"elevation_loss":272,
+		"effort_level":6,
+		"dew_point":58,
+		"temperature":72,
+		"humidity":65,
+		"temperature_feels_like":72,
+		"wind":6,
+		"hrr":"00:3:29",
+		"hrr_start_point":161,
+		"hrr_beats_lowered":47,
+		"sleep_resting_hr_last_night":56,
+		"vo2_max":53,
+		"running_cadence":186,
+		"nose_breath_prcnt_workout":100,
+		"water_consumed_workout":40,
+		"chia_seeds_consumed_workout":6,
+		"fast_before_workout":"no",
+		"pain":"yes",
+		"pain_area":"neck",
+		"stress_level":"medium",
+		"sick":"yes",
+		"drug_consumed":"yes",
+		"drug":"illicit drugs",
+		"medication":"dexilant",
+		"smoke_substance":"no",
+		"exercise_fifteen_more":"yes",
+		"workout_elapsed_time":"01:39:52",
+		"timewatch_paused_workout":"00:02:07",
+		"exercise_consistency":7.0,
+		"workout_duration_grade":"A",
+		"workout_effortlvl_grade":"A",
+		"avg_heartrate_grade":"A",
+		"overall_workout_grade":"A",
+		"heartrate_variability_grade":"A",
+		"workout_comment":"It's awesome!"	
+	},
+
+	"swim_stats_ql":
+	{
+		"pace_per_100_yard":68.3,
+		"total_strokes":100
+	},
+
+	"bike_stats_ql":
+	{
+		"avg_speed":35.2,
+		"avg_power":34.2,
+		"avg_speed_per_mile":50.2,
+		"avg_cadence":40.5
+	},
+
+	"steps_ql":
+	{
+		"non_exercise_steps":1000,
+		"exercise_steps":1000,
+		"total_steps":2000,
+		"floor_climed":66,
+		"floor_decended":65,
+		"movement_consistency":3.0
+	},
+
+	"sleep_ql":
+	{
+		"sleep_per_wearable":"20:01:00",
+		"sleep_per_user_input":"20:20:20",
+		"sleep_aid":"yes",
+		"sleep_bed_time":"22:30:26",
+		"sleep_awake_time":"18:44:00",
+		"deep_sleep":"14:30:56",
+		"light_sleep":"16:02:20",
+		"awake_time":"15:33:30"
+	},
+
+	"food_ql":
+	{
+		"prcnt_non_processed_food":60,
+		"prcnt_non_processed_food_grade":"A",
+		"non_processed_food":"Pizza",
+		"diet_type":"vegan"	
+	},
+
+	"alcohol_ql":
+	{
+		"alcohol_day":0,
+		"alcohol_week":0
+	}	
+}

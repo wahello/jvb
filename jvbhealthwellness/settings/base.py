@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'users',
     'user_input',
     'registration',
-    'garmin'
+    'garmin',
+    'quicklook',
 ]
 
 MIDDLEWARE = [
