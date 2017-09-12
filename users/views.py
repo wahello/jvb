@@ -437,6 +437,8 @@ class fetchGarminData(APIView):
       decode_output_dict = data['output_dict']
       decode_output_dict_json = json.loads(decode_output_dict)
 
+      def my_sum(d, key):
+          return sum([i.get(key, 0) for i in d ])
 
       output_dict['garmin_health_api'] = {
         'light_sleep': my_sum(sleeps,'lightSleepDurationInSeconds '),
