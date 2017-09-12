@@ -47,7 +47,7 @@ def request_token(request):
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
     session = request.session
     if not 'auth_token' in session and ('state' in session and session['state'])==1:
-      session['state'] = 0; 
+      session['state'] = 0;
 
     service = OAuth1Service(
           # name = 'etrade',
@@ -224,7 +224,7 @@ def receive_token(request):
 
 class GetGarminToken(APIView):
   permission_classes = (permissions.IsAuthenticated,)
-  
+
   def dispatch(self, *args, **kwargs):
     try:
       if GarminToken.objects.get(user=self.request.user):
@@ -307,19 +307,20 @@ class fetchGarminData(APIView):
       r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
       output_dict['dailies'] = r.json()
 
-
       output_dict['garmin_health_api'] = {
         'average_ground_contact_time': ''
       }
 
       return Response(output_dict)
+
+
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
 '''
 class fetchGarminData(APIView):
 
   '''
-  fetch data from db for specified date, otherwise 
+  fetch data from db for specified date, otherwise
   pull directly from api and display raw data
   '''
 
@@ -343,7 +344,7 @@ class fetchGarminData(APIView):
     "bodyComps":UserGarminDataBodyComposition
   }
 
-  # just for demo storing data in db. Pulling data from api and storing 
+  # just for demo storing data in db. Pulling data from api and storing
   # in db is functionality of other view
   def _createObjectList(self, json_data, dtype):
     '''
@@ -385,7 +386,7 @@ class fetchGarminData(APIView):
             consumer_secret = conssec,
             request_token_url = req_url,
             access_token_url = acc_url,
-            authorize_url = authurl, 
+            authorize_url = authurl,
             )
       sess = service.get_session((access_token, access_token_secret))
 
@@ -399,7 +400,7 @@ class fetchGarminData(APIView):
       today_epoch = calendar.timegm(midnight.timetuple())
 
       output_dict = {}
-      
+
       ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/{}'
 
       for dtype in self.DATA_TYPES.values():
@@ -423,18 +424,24 @@ class fetchGarminData(APIView):
 
           output_dict[dtype] = r.json()
 
-          model.objects.bulk_create(  
+          model.objects.bulk_create(
             self._createObjectList(r.json(),dtype)
           )
 
         else:
           # fetch from db
           output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
-      
-      output_dict['garmin_health_api'] = {
-        'average_ground_contact_time': ''
-      }
 
       return Response(output_dict)
+
+      decode_output_dict = data['output_dict']
+      decode_output_dict_json = json.loads(decode_output_dict)
+
+
+      output_dict['garmin_health_api'] = {
+        'light_sleep': my_sum(sleeps,'lightSleepDurationInSeconds '),
+        'deep_sleep': my_sum(sleeps,'deepSleepDurationInSeconds '),
+        'sleep_awake_time': my_sum(sleeps,'awakeDurationInSeconds '),
+      }
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
