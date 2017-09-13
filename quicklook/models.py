@@ -1,3 +1,6 @@
+# Changed all TimeField() with CharField() to resolve
+# timezone issue in Postgres on server (have to resolve this)
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator ,MaxValueValidator
@@ -95,13 +98,23 @@ class ExerciseAndReporting(models.Model):
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "exercise_reporting_ql")
 	workout_easy_hard = models.CharField(choices=EH_CHOICES, max_length=4)
 	workout_type = models.CharField(choices=WORKOUT_TYPE, max_length=20)
-	workout_time = models.TimeField()
+
+	workout_time = models.CharField(max_length=10)
+	# workout_time = models.TimeField()
+
 	workout_location = models.CharField(max_length=100)
-	workout_duration = models.TimeField()
+
+	workout_duration = models.CharField(max_length=10)
+	# workout_duration = models.TimeField()
 	maximum_elevation_workout = models.IntegerField()
-	minutes_walked_before_workout = models.TimeField()
+
+	minutes_walked_before_workout = models.CharField(max_length=10)
+	# minutes_walked_before_workout = models.TimeField()
 	distance = models.FloatField()
-	pace = models.TimeField()
+
+	pace = models.CharField(max_length=10)
+	# pace = models.TimeField()
+
 	avg_heartrate = models.PositiveIntegerField()
 	elevation_gain = models.IntegerField()
 	elevation_loss = models.IntegerField()
@@ -111,7 +124,10 @@ class ExerciseAndReporting(models.Model):
 	humidity = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(100)])
 	temperature_feels_like = models.FloatField()
 	wind = models.FloatField()
-	hrr  = models.TimeField()
+
+	hrr  = models.CharField(max_length=10)
+	# hrr  = models.TimeField()
+
 	hrr_start_point = models.IntegerField()
 	hrr_beats_lowered = models.IntegerField()
 	sleep_resting_hr_last_night = models.IntegerField()
@@ -132,8 +148,13 @@ class ExerciseAndReporting(models.Model):
 	medication = models.TextField()
 	smoke_substance = models.CharField(choices=YN_CHOICES, max_length=3)
 	exercise_fifteen_more = models.CharField(choices=YN_CHOICES, max_length=3)
-	workout_elapsed_time = models.TimeField()
-	timewatch_paused_workout = models.TimeField()
+
+	workout_elapsed_time = models.CharField(max_length=10)
+	# workout_elapsed_time = models.TimeField()
+
+	timewatch_paused_workout = models.CharField(max_length=10)	
+	# timewatch_paused_workout = models.TimeField()
+
 	exercise_consistency = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(7)])
 	workout_duration_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	workout_effortlvl_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
@@ -173,16 +194,27 @@ class Sleep(models.Model):
 	)
 
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "sleep_ql")
-	sleep_per_wearable = models.TimeField()
-	sleep_per_user_input = models.TimeField(blank=True,null=True)
+
+	sleep_per_wearable = models.CharField(max_length=10)
+	# sleep_per_wearable = models.TimeField()
+
+	sleep_per_user_input = models.CharField(blank=True,max_length=10)
+	# sleep_per_user_input = models.TimeField(blank=True,null=True)
+
 	sleep_aid = models.CharField(choices=YN_CHOICES, max_length=3)
 	
 	# TODO : AM or PM should be taken care
-	sleep_bed_time = models.TimeField()
-	sleep_awake_time = models.TimeField()
-	deep_sleep = models.TimeField()
-	light_sleep = models.TimeField()
-	awake_time = models.TimeField()
+	sleep_bed_time = models.CharField(max_length=10)
+	sleep_awake_time = models.CharField(max_length=10)
+	deep_sleep = models.CharField(max_length=10)
+	light_sleep = models.CharField(max_length=10)
+	awake_time = models.CharField(max_length=10)
+
+	# sleep_bed_time = models.TimeField()
+	# sleep_awake_time = models.TimeField()
+	# deep_sleep = models.TimeField()
+	# light_sleep = models.TimeField()
+	# awake_time = models.TimeField()
 
 class Food(models.Model):
 	GRADE_CHOICES = (

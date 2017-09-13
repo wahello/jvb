@@ -33,6 +33,7 @@ class GarminDataPage extends Component {
     this.state = {
         raw_output: '',
         selectedDateEpoch: this.getEpoch(),
+        weatherData: '',
        garmin_health_api: {
        activity_name:'Running',
        activity_type:'Running',
@@ -128,7 +129,6 @@ class GarminDataPage extends Component {
     axios(config).then( function(response){
       this.updateState(response);
     }.bind(this)).catch((error) => {
-      // errorCallback(error);
       console.log(error.message);
     });
   }
@@ -213,25 +213,45 @@ class GarminDataPage extends Component {
     });
   }
 
+  fetchWeatherData(city){
+    // for darksky.net (CORS error not working)
+    // const KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
+    // const URL = `https://api.darksky.net/forecast/${KEY}/${lat},${lon}`;
+
+    // for open weather maps
+    const KEY = '4fe4e4340ad2f79c6dee60de32575281';
+    const URL = `http://api.openweathermap.org/data/2.5/weather?appid=${KEY}`;
+    const url = `${URL}&q=${city},us`;
+    const config = {
+      method:"get",
+      url:url
+    };
+    axios(config).then(function(response){
+      this.setState({
+        weatherData : response
+      });
+    }.bind(this)).catch((error) => {
+      console.log(error.message);
+    });
+  }
 
 
   componentDidMount(){
     const URL = '/users/garmin/fetch';
     const config = {
-      method: "get",
+      method:"get",
       url: URL,
       params: {
           start_date: this.state.selectedDateEpoch
       },
     };
     axios(config).then( function(response){
-      console.log(response);
       this.updateState(response);
     }.bind(this)).catch((error) => {
-      // errorCallback(error);
-      console.log("Some unxepected error!");
       console.log(error.message);
     });
+    // this.fetchWeatherData(42.3601,-71.0589);
+    this.fetchWeatherData('london');
   }
 
 

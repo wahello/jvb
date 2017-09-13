@@ -438,19 +438,19 @@ class fetchGarminData(APIView):
         #decoding the data
       """
 
-      decode_dailies_raw = output_dict[dailies]
+      decode_dailies_raw = output_dict['dailies']
       dailies_json = json.loads(decode_dailies_raw)
 
-      decode_activities_raw = output_dict[activities]
+      decode_activities_raw = output_dict['activities']
       activities_json = json.loads(decode_activities_raw)
 
-      decode_epochs_raw = output_dict[epochs]
+      decode_epochs_raw = output_dict['epochs']
       epochs_json = json.loads(decode_epochs_raw)
 
-      decode_sleeps_raw = output_dict[sleeps]
+      decode_sleeps_raw = output_dict['sleeps']
       sleeps_json = json.loads(decode_sleeps_raw)
 
-      decode_bodyComps_raw = output_dict[bodyComps]
+      decode_bodyComps_raw = output_dict['bodyComps']
       bodyComps_json = json.loads(decode_bodyComps_raw)
 
       #caluculates the sum of all the values related to the key and returns the result to dict
