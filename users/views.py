@@ -462,11 +462,17 @@ class fetchGarminData(APIView):
            #caluculates the sum of all the values related to the key and returns the result to dict
 
       def my_sum(d, key):
-          return sum([i.get(key,0) for i in d ])
+          if(d!=[]):
+              return sum([i.get(key,0) for i in d ])
+          else:
+              return(0)
 
       def max_values(d,key):
-          seq = [x[key] for x in d]
-          return(max(seq))
+          if(d!=[]):
+              seq = [x[key] for x in d]
+              return(max(seq))
+          else:
+              return(0)
 
       output_dict['garmin_health_api'] = {
         "Activity Name": "",
