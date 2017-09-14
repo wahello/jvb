@@ -428,7 +428,7 @@ class fetchGarminData(APIView):
             self._createObjectList(r.json(),dtype)
           )
 
-                else:
+        else:
           # fetch from db
             output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
 
