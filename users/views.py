@@ -438,11 +438,11 @@ class fetchGarminData(APIView):
       dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
 
       decode_activities_raw = output_dict['activities']
-      activities_json = json.loads(decode_activities_raw)
+      #activities_json = json.loads(decode_activities_raw)
       activities_json = [ast.literal_eval(dic) for dic in decode_activities_raw]
 
       decode_manuallyUpdatedActivities_raw = output_dict['manuallyUpdatedActivities']
-      manuallyUpdatedActivities_json = json.loads(decode_manuallyUpdatedActivities_raw)
+      #manuallyUpdatedActivities_json = json.loads(decode_manuallyUpdatedActivities_raw)
       manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in decode_manuallyUpdatedActivities_raw]
 
       decode_epochs_raw = output_dict['epochs']
@@ -450,7 +450,7 @@ class fetchGarminData(APIView):
       epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
 
       decode_sleeps_raw = output_dict['sleeps']
-      sleeps_json = json.loads(decode_sleeps_raw)
+      #sleeps_json = json.loads(decode_sleeps_raw)
       sleeps_json = [ast.literal_eval(dic) for dic in decode_sleeps_raw]
 
       decode_bodyComps_raw = output_dict['bodyComps']
