@@ -428,39 +428,109 @@ class fetchGarminData(APIView):
             self._createObjectList(r.json(),dtype)
           )
 
-        else:
+                else:
           # fetch from db
-          output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
-
-      return Response(output_dict)
-
-      """
-        #decoding the data
-      """
+            output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
 
       decode_dailies_raw = output_dict['dailies']
       dailies_json = json.loads(decode_dailies_raw)
+      dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
+            #print(i[0]['activityType'])
 
-      decode_activities_raw = output_dict['activities']
-      activities_json = json.loads(decode_activities_raw)
-
-      decode_epochs_raw = output_dict['epochs']
-      epochs_json = json.loads(decode_epochs_raw)
 
       decode_sleeps_raw = output_dict['sleeps']
       sleeps_json = json.loads(decode_sleeps_raw)
+      sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
+
+
+      decode_activities_raw = output_dict['activities']
+      activities_json = json.loads(decode_activities_raw)
+      activities_json = [ast.literal_eval(dic) for dic in activities_json]
+
+
+      decode_epochs_raw = output_dict['epochs']
+      epochs_json = json.loads(decode_epochs_raw)
+      epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
+
 
       decode_bodyComps_raw = output_dict['bodyComps']
       bodyComps_json = json.loads(decode_bodyComps_raw)
+      bodyComps_json = [ast.literal_eval(dic) for dic in bodyComps_json]
 
-      #caluculates the sum of all the values related to the key and returns the result to dict
+      #sleeps_decoded = sleeps_json.strip('"')
+
+           #caluculates the sum of all the values related to the key and returns the result to dict
+
       def my_sum(d, key):
-          return sum([i.get(key, 0) for i in d ])
+          return sum([i.get(key,0) for i in d ])
+
+      def max_values(d,key):
+          seq = [x['key'] for x in d]
+          return(max(seq))
 
       output_dict['garmin_health_api'] = {
-        'light_sleep': my_sum(sleeps_json,'lightSleepDurationInSeconds '),
-        'deep_sleep': my_sum(sleeps_json,'deepSleepDurationInSeconds '),
-        'sleep_awake_time': my_sum(sleeps_json,'awakeDurationInSeconds '),
-      }
+        "Activity Name": "",
+        "Activity Type": dailies_json[0]['activityType'],
+        "Event Type":"",
+        "Course":"",
+        "Location":"",
+        "start": dailies_json[0]['startTimeInSeconds'],
+        "Time":my_sum(dailies_json,'activeTimeInSeconds'),
+        "Distance":my_sum(dailies_json,'distanceInMeters'),
+        "Lap Information":"",
+        "Elevation Gain":my_sum(activities_json,'totalElevationGainInMeters'),
+        "Elevation Loss":my_sum(activities_json,'totalElevationLossInMeters'),
+        "Average Speed":my_sum(activities_json,'averageSpeedInMetersPerSecond'),
+        "Maximum Speed":my_sum(activities_json,'maxSpeedInMetersPerSecond'),
+        "Average Hr":my_sum(activities_json,'averageHeartRateInBeatsPerMinute'),
+        "Maximum Hr":my_sum(activities_json,'maxHeartRateInBeatsPerMinute'),
+        "Average Run Cadence":my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
+        "Maximu Run Cadence":my_sum(activities_json,'maxRunCadenceInStepsPerMinute'),
+        "Steps from Activity":my_sum(dailies_json,'steps'),
+        "Calories":my_sum(dailies_json,'activeKilocalories'),
+        "Training Effect":"",
+        "Minimum Elevation":"",
+        "Maximum Elevation":"",
+        "Moving Time":"",
+        "Elapsed Time":"",
+        "Average Moving Pace":"",
+        "Average Stride Length":"",
+        "Average Vertical Ratio":"",
+        "Average Vertical Oscillation":"",
+        "Average Gct Balance":"",
+        "Avergae Ground Contact Time":"",
+        "Total Steps":my_sum(activities_json,'totalSteps'),
+        "Activity Steps":my_sum(activities_json,'activitySteps'),
+        "Floors Climbed":my_sum(dailies_json,'floorsClimbed'),
+        "Floors Descended":"",
+        "Calories In/Out":my_sum(dailies_json,'activeKilocalories'),
+        "Golf Stats":"",
+        "Weight In grams":bodyComps_json[0]['weightInGrams'],
+        "Body Mass":"",
+        "BMI":"",
+        "Body Composition Summary (from Garmin Index scale)":"",
+        "Resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute'),
+        "Average resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute')/len(dailies_json),
+        "Maximum Resting Heart Rate":max_values(dailies_json,'restingHeartRateInBeatsPerMinute'),
+        "Resting Heart Rate Trends Over Time ":"",
+        "VO2 Max grab data and populate database":"",
+        "VO2 max category":"",
+        "Intensity minutes":my_sum(dailies_json,'moderateIntensityDurationInSeconds')+my_sum(dailies_json,'vigorousIntensityDurationInSeconds'),
+        "Heart rate variability stress":"",
+        "Training status":"",
+        "Data from my fitness pal":"",
+        "Data from withings":"",
+        "Data from other third party sources":"",
+        "Total Sleep":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds'),
+        "light sleep":my_sum(sleeps_json,'lightSleepDurationInSeconds'),
+        "deep sleep":my_sum(sleeps_json,'deepSleepDurationInSeconds'),
+        "Bed Time":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds')+my_sum(sleeps_json,'awakeDurationInSeconds'),
+        "Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
+        "Stress Field (HRV throughout the day)":""
+                }
+
+
+      return Response(output_dict)
+
     else:
       return Response(status.HTTP_401_UNAUTHORIZED)
