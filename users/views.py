@@ -12,7 +12,7 @@ from .serializers import GarminTokenSerializer
 from .models import GarminToken
 # In state=1 the next request should include an oauth_token.
 #If it doesn't go back to 0
-
+import ast
 import json
 import urllib
 import logging
@@ -427,10 +427,14 @@ class fetchGarminData(APIView):
           model.objects.bulk_create(
             self._createObjectList(r.json(),dtype)
           )
-
         else:
           # fetch from db
-            output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
+          output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
+
+
+      """
+        #decoding the data
+      """
 
       decode_dailies_raw = output_dict['dailies']
       dailies_json = json.loads(decode_dailies_raw)
@@ -512,7 +516,7 @@ class fetchGarminData(APIView):
         "Resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute'),
         "Average resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute')/len(dailies_json),
         "Maximum Resting Heart Rate":max_values(dailies_json,'restingHeartRateInBeatsPerMinute'),
-        "Resting Heart Rate Trends Over Time ":"",
+        "Resting Heart Rate Trends Over Time ":"",
         "VO2 Max grab data and populate database":"",
         "VO2 max category":"",
         "Intensity minutes":my_sum(dailies_json,'moderateIntensityDurationInSeconds')+my_sum(dailies_json,'vigorousIntensityDurationInSeconds'),
