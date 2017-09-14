@@ -432,25 +432,18 @@ class fetchGarminData(APIView):
           output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
 
 
-      """
-        #decoding the data
-      """
 
       decode_dailies_raw = output_dict['dailies']
       dailies_json = json.loads(decode_dailies_raw)
       dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
-            #print(i[0]['activityType'])
 
+      #decode_sleeps_raw = output_dict['sleeps']
+      #sleeps_json = json.loads(decode_sleeps_raw)
+      #sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
 
-      decode_sleeps_raw = output_dict['sleeps']
-      sleeps_json = json.loads(decode_sleeps_raw)
-      sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
-
-
-      decode_activities_raw = output_dict['activities']
-      activities_json = json.loads(decode_activities_raw)
-      activities_json = [ast.literal_eval(dic) for dic in activities_json]
-
+      #decode_activities_raw = output_dict['activities']
+      #activities_json = json.loads(decode_activities_raw)
+      #activities_json = [ast.literal_eval(dic) for dic in activities_json]
 
       decode_epochs_raw = output_dict['epochs']
       epochs_json = json.loads(decode_epochs_raw)
@@ -469,7 +462,7 @@ class fetchGarminData(APIView):
           return sum([i.get(key,0) for i in d ])
 
       def max_values(d,key):
-          seq = [x['key'] for x in d]
+          seq = [x[key] for x in d]
           return(max(seq))
 
       output_dict['garmin_health_api'] = {
@@ -482,14 +475,14 @@ class fetchGarminData(APIView):
         "Time":my_sum(dailies_json,'activeTimeInSeconds'),
         "Distance":my_sum(dailies_json,'distanceInMeters'),
         "Lap Information":"",
-        "Elevation Gain":my_sum(activities_json,'totalElevationGainInMeters'),
-        "Elevation Loss":my_sum(activities_json,'totalElevationLossInMeters'),
-        "Average Speed":my_sum(activities_json,'averageSpeedInMetersPerSecond'),
-        "Maximum Speed":my_sum(activities_json,'maxSpeedInMetersPerSecond'),
-        "Average Hr":my_sum(activities_json,'averageHeartRateInBeatsPerMinute'),
-        "Maximum Hr":my_sum(activities_json,'maxHeartRateInBeatsPerMinute'),
-        "Average Run Cadence":my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
-        "Maximu Run Cadence":my_sum(activities_json,'maxRunCadenceInStepsPerMinute'),
+        #"Elevation Gain":my_sum(activities_json,'totalElevationGainInMeters'),
+        #"Elevation Loss":my_sum(activities_json,'totalElevationLossInMeters'),
+        #"Average Speed":my_sum(activities_json,'averageSpeedInMetersPerSecond'),
+        #"Maximum Speed":my_sum(activities_json,'maxSpeedInMetersPerSecond'),
+        #"Average Hr":my_sum(activities_json,'averageHeartRateInBeatsPerMinute'),
+        #"Maximum Hr":my_sum(activities_json,'maxHeartRateInBeatsPerMinute'),
+        #"Average Run Cadence":my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
+        #"Maximu Run Cadence":my_sum(activities_json,'maxRunCadenceInStepsPerMinute'),
         "Steps from Activity":my_sum(dailies_json,'steps'),
         "Calories":my_sum(dailies_json,'activeKilocalories'),
         "Training Effect":"",
@@ -503,8 +496,8 @@ class fetchGarminData(APIView):
         "Average Vertical Oscillation":"",
         "Average Gct Balance":"",
         "Avergae Ground Contact Time":"",
-        "Total Steps":my_sum(activities_json,'totalSteps'),
-        "Activity Steps":my_sum(activities_json,'activitySteps'),
+        #"Total Steps":my_sum(activities_json,'totalSteps'),
+        #"Activity Steps":my_sum(activities_json,'activitySteps'),
         "Floors Climbed":my_sum(dailies_json,'floorsClimbed'),
         "Floors Descended":"",
         "Calories In/Out":my_sum(dailies_json,'activeKilocalories'),
@@ -525,11 +518,11 @@ class fetchGarminData(APIView):
         "Data from my fitness pal":"",
         "Data from withings":"",
         "Data from other third party sources":"",
-        "Total Sleep":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds'),
-        "light sleep":my_sum(sleeps_json,'lightSleepDurationInSeconds'),
-        "deep sleep":my_sum(sleeps_json,'deepSleepDurationInSeconds'),
-        "Bed Time":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds')+my_sum(sleeps_json,'awakeDurationInSeconds'),
-        "Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
+        #"Total Sleep":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds'),
+        #"light sleep":my_sum(sleeps_json,'lightSleepDurationInSeconds'),
+        #"deep sleep":my_sum(sleeps_json,'deepSleepDurationInSeconds'),
+        #"Bed Time":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds')+my_sum(sleeps_json,'awakeDurationInSeconds'),
+        #"Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
         "Stress Field (HRV throughout the day)":""
                 }
 

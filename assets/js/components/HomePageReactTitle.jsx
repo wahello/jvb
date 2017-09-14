@@ -24,7 +24,7 @@ class HomePageReactTitle extends Component {
       return(
         <div style={{color:'red'}}><strong>Error!</strong> {this.props.errorMessage}</div>
       );
-    } 
+    }
   }
 
   onSubmit(values){
@@ -37,10 +37,10 @@ class HomePageReactTitle extends Component {
     return(
       <FormGroup className={className}>
         <Label className="sr-only">{field.label}</Label>
-        <Input 
-          type={field.type} 
-          name={field.name} 
-          placeholder={field.placeholder} 
+        <Input
+          type={field.type}
+          name={field.name}
+          placeholder={field.placeholder}
           value={field.value}
           {...field.input}
         />
@@ -53,7 +53,6 @@ class HomePageReactTitle extends Component {
 
   render(){
     const { handleSubmit} = this.props;
-    const homeURL = window.Django.url('home');
 
     return (
     	<Container><Row><Col>&nbsp;</Col></Row><Row><Col>&nbsp;</Col></Row>
