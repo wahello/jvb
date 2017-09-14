@@ -4,8 +4,7 @@ import { withRouter, Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-         Dropdown, DropdownToggle, DropdownMenu,
-         DropdownItem } from 'reactstrap';
+          } from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import { getGarminToken } from '../network/auth';
@@ -14,54 +13,48 @@ class NavbarMenu extends React.Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
+     //this.dropdownToggle = this.dropdownToggle.bind(this);
     this.state = {
-      isOpen: false,
-      dropdownOpen: false
+      isOpen: false
+      
+
+
     };
   }
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen,
-      dropdownOpen: !this.state.dropdownOpen
+     
     });
   }
   render() {
     return (
       <div>
-        <Navbar color="faded" light toggleable fixed="top">
-          <NavbarToggler right onClick={this.toggle} />
-          <NavbarBrand href="/">HEALTH AND WELLNESS</NavbarBrand>
-          <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="ml-auto" navbar>
-              <NavItem>
-                <NavLink>
-                    <Link to="/">Home</Link>
-                </NavLink>
+        <Navbar light toggleable fixed="top" className="navbar navbar-expand-sm  navbar-fixed-top">
+          <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />
+          <NavbarBrand className="navbar-brand float-xs-right float-sm-left" id="navbarTogglerDemo" href="/">HEALTH AND WELLNESS</NavbarBrand>
+          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+              <NavItem className="float-sm-right">
+                
+                 <NavLink href="/">Home</NavLink>
+                   {/* <Link to="/">Home</Link>*/}
+                
               </NavItem>
-              <NavItem>
+              <NavItem className="float-sm-right">
                 <NavLink href="">User Inputs</NavLink>
               </NavItem>
-              <NavItem>
+              <NavItem className="float-sm-right">
                 <NavLink href="">Registration</NavLink>
               </NavItem>
-              <NavItem>
+              <NavItem className="float-sm-right">
                 <NavLink href="">Login</NavLink>
               </NavItem>
-              <NavItem>
-                <NavLink href="">Dashboard</NavLink>
+              <NavItem className="float-sm-right">
+                <NavLink href="/users/request_token">Connect Device</NavLink>
               </NavItem>
-              <NavItem>
-                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                  <DropdownToggle caret>
-                    Device Connect
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    <DropdownItem>
-                      <a href="/users/request_token">Connect Device</a>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </NavItem>
+            
+              
             </Nav>
           </Collapse>
         </Navbar>
