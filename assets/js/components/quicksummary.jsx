@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
+import {Table} from "reactstrap";
 import {fetchQuickLook}  from '../network/quick';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import NavbarMenu from './navbar';
 
 class Quicklook extends Component{	
 	constructor(props){
 		super(props);
 		this.successquick = this.successquick.bind(this);
 		this.state = {
-			quicklook_raw:"fetching",
 			grades_ql: {
 		        id: '',
 		        user_ql: '',
@@ -134,9 +135,8 @@ class Quicklook extends Component{
 	}
 
 	successquick(data){
-		console.log("data");
+		console.log(data);
 		this.setState({
-			quicklook_raw : data,
 			grades_ql: {
 		        id: data.data[0].grades_ql.id,
 		        user_ql: data.data[0].grades_ql.user_ql,
@@ -266,210 +266,277 @@ class Quicklook extends Component{
 
 	render(){
 	return(
-		<div class="container-fluid">
+		<div className="container-fluid">
+		<NavbarMenu/>
 			<div className="col-sm-12">
-						 <div className="row">
-			                 <h3>Quick Summary</h3>
+			<div className="quick">
+			
+						 <div id="quick1" className="row">
+			                 <h2>Quick Summary</h2>			                
 			             </div>
-			    <div className="row">
 
+			   <div id="quick2" className="row">
 			        <div className="col-sm-6">
-							<div className="row">
-							  <h4>Grades</h4>
-							</div>
-							  <div className="row">
-					        <label>Overall Truth Grade : </label>
-				            {this.state.grades_ql.overall_truth_grade}
-				         </div>
-				         <div className="row">
-					        <label>Overall Truth Health Gpa : </label>
-				            {this.state.grades_ql.overall_truth_health_gpa}
-				         </div>
-				         <div className="row">
-					        <label>Movement Non Exercise Grade : </label>
-				            {this.state.grades_ql.movement_non_exercise_grade}
-				         </div>
+			        <div className="quick3">
+			        <Table className="quick4">
+			       
+			           
+			                <th>  
+							 <h4> Grades</h4>
+							</th>
+							<th><h4>value</h4></th>
+							
+							
+							
+							<tbody>
+							<tr>
+					        <td>Overall Truth Grade : </td>
+				            <td>{this.state.grades_ql.overall_truth_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>Overall Truth Health Gpa : </td>
+				            <td>{this.state.grades_ql.overall_truth_health_gpa}</td>
+				         </tr>
+				         <tr>
+					        <td>Movement Non Exercise Grade : </td>
+				            <td>{this.state.grades_ql.movement_non_exercise_grade}</td>
+				         </tr>
 
-				         <div className="row">
-					        <label>Avg Sleep Per Night Grade : </label>
-				            {this.state.grades_ql.avg_sleep_per_night_grade}
-				         </div>
-				         <div className="row">
-					        <label>Exercise Consistency Grade : </label>
-				            {this.state.grades_ql.exercise_consistency_grade}
-				         </div>
-				         <div className="row">
-					        <label>Overall Workout Grade : </label>
-				            {this.state.grades_ql.overall_workout_grade}
-				         </div>
-				         <div className="row">
-					        <label>percent NonProcessed Food Consumed Grade : </label>
-				            {this.state.grades_ql.prcnt_non_processed_food_consumed_grade}
-				         </div>
-				          <div className="row">
-					        <label>Alcoholic Drink Per Week Grade : </label>
-				            {this.state.grades_ql.alcoholic_drink_per_week_grade}
-				         </div>
-				         <div className="row">
-					        <label>Penalty : </label>
-				            {this.state.grades_ql.penalty}
-				         </div>
+				         <tr>
+					        <td>Avg Sleep Per Night Grade : </td>
+				           <td>{this.state.grades_ql.avg_sleep_per_night_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>Exercise Consistency Grade : </td>
+				            <td>{this.state.grades_ql.exercise_consistency_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>Overall Workout Grade : </td>
+				           <td> {this.state.grades_ql.overall_workout_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>percent NonProcessed Food Consumed Grade : </td>
+				            <td>{this.state.grades_ql.prcnt_non_processed_food_consumed_grade}</td>
+				         </tr>
+				          <tr>
+					        <td>Alcoholic Drink Per Week Grade : </td>
+				            <td>{this.state.grades_ql.alcoholic_drink_per_week_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>Penalty : </td>
+				            <td>{this.state.grades_ql.penalty}</td>
+				         </tr>
+				         </tbody>
+                          </Table>
+                         </div>
 
 
 				         {/*---swimming--------*/}
 
-
-				         <div className="row">
+                           <div className="quick3">
+                           <Table className="quick4">
+                           
+				         <th>
 						  <h4>Swim Stats</h4>
-						</div>
-						  <div className="row">
-					        <label>Overall Truth Grade : </label>
-				            {this.state.swim_stats_ql.pace_per_100_yard}
-				         </div>
-				        <div className="row">
-					        <label>Total Strokes : </label>
-				            {this.state.swim_stats_ql.total_strokes}
-				         </div>
-
+						</th>
+						 <th>
+						  <h4>value</h4>
+						</th>
+						
+						  <tr>
+					        <td>Overall Truth Grade : </td>
+				            <td>{this.state.swim_stats_ql.pace_per_100_yard}</td>
+				         </tr>
+				        <tr>
+					        <td>Total Strokes : </td>
+				            <td>{this.state.swim_stats_ql.total_strokes}</td>
+				            </tr>
+				         </Table>
+                          </div>
 
 				           {/*---bike_stats--------*/}
 
-
-				         <div className="row">
+                           <div className="quick3">
+                           <Table className="quick4">
+                           
+				         <tr>
+				         <th>
 						  <h4>Bike Stats</h4>
-						</div>
-						 <div className="row">
-					        <label>Avg Speed : </label>
-				            {this.state.bike_stats_ql.avg_speed}
-				         </div>
+						  </th>
+						   <th>
+						  <h4>value</h4>
+						</th>
+						</tr>
+					
+						 <tr>
+					        <td>Avg Speed : </td>
+				            <td>{this.state.bike_stats_ql.avg_speed}</td>
+				         </tr>
 
-				         <div className="row">
-					        <label>Avg Power : </label>
-				            {this.state.bike_stats_ql.avg_power}
-				         </div>
-				         <div className="row">
-					        <label>Asvg Speed Per Mile : </label>
-				            {this.state.bike_stats_ql.avg_speed_per_mile}
-				         </div>
-				         <div className="row">
-					        <label>Avg Cadence : </label>
-				            {this.state.bike_stats_ql.avg_cadence}
-				         </div>
-
+				         <tr>
+					        <td>Avg Power : </td>
+				            <td>{this.state.bike_stats_ql.avg_power}</td>
+				         </tr>
+				         <tr>
+					        <td>Asvg Speed Per Mile : </td>
+				            <td>{this.state.bike_stats_ql.avg_speed_per_mile}</td>
+				         </tr>
+				         <tr>
+					        <td>Avg Cadence : </td>
+				            <td>{this.state.bike_stats_ql.avg_cadence}</td>
+				         </tr>
+				         </Table>
+                         </div>
 
 				          {/*---steps_ql--------*/}
 
-
-				         <div className="row">
+                         <div className="quick3">
+				         <Table className="quick4">
+				       
+				         <tr>
+				         <th>
 						  <h4>Steps</h4>
-						</div>
-						 <div className="row">
-					        <label>Non Exercise Steps : </label>
-				            {this.state.steps_ql.non_exercise_steps}
-				         </div>
-				         <div className="row">
-					        <label>Exercise Steps : </label>
-				            {this.state.steps_ql.exercise_steps}
-				         </div>
-				         <div className="row">
-					        <label>Total Steps :</label>
-				            {this.state.steps_ql.total_steps}
-				         </div>
-				         <div className="row">
-					        <label>Floor Climed : </label>
-				            {this.state.steps_ql.floor_climed}
-				         </div>
-				         <div className="row">
-					        <label>Floor Decended : </label>
-				            {this.state.steps_ql.floor_decended}
-				         </div>
+						  </th>
+						   <th>
+						  <h4>value</h4>
+						</th>
+						  </tr>
+						 
+						 <tr>
+					        <td>Non Exercise Steps : </td>
+				            <td>{this.state.steps_ql.non_exercise_steps}</td>
+				         </tr>
+				         <tr>
+					        <td>Exercise Steps : </td>
+				            <td>{this.state.steps_ql.exercise_steps}</td>
+				         </tr>
+				         <tr>
+					        <td>Total Steps :</td>
+				            <td>{this.state.steps_ql.total_steps}</td>
+				         </tr>
+				         <tr>
+					        <td>Floor Climed : </td>
+				            <td>{this.state.steps_ql.floor_climed}</td>
+				         </tr>
+				         <tr>
+					        <td>Floor Decended : </td>
+				            <td>{this.state.steps_ql.floor_decended}</td>
+				         </tr>
 				         
-				         <div className="row">
-					        <label>Movement Consistency : </label>
-				            {this.state.steps_ql.movement_consistency}
-				         </div>
-
-
+				         <tr>
+					        <td>Movement Consistency : </td>
+				            <td>{this.state.steps_ql.movement_consistency}</td>
+				         </tr>
+                          </Table>
+                         </div>
 				           {/*---sleep_ql--------*/}
 
-
-				         <div className="row">
+                          <div className="quick3">
+                          <Table className="quick4">
+                         
+				         <tr>
+				         <th>
 						  <h4>Sleep</h4>
-						</div>
-						 <div className="row">
-					        <label>Sleep Per Wearable : </label>
-				            {this.state.sleep_ql.sleep_per_wearable}
-				         </div>
-				         <div className="row">
-					        <label>Sleep Per User Input : </label>
-				            {this.state.sleep_ql.sleep_per_user_input}
-				         </div>
-				         <div className="row">
-					        <label>Sleep Aid : </label>
-				            {this.state.sleep_ql.sleep_aid}
-				         </div>
-				         <div className="row">
-					        <label>Sleep Bed Time : </label>
-				            {this.state.sleep_ql.sleep_bed_time}
-				         </div>
-				         <div className="row">
-					        <label>Sleep Awake Time : </label>
-				            {this.state.sleep_ql.sleep_awake_time}
-				         </div>
+						  </th>
+						   <th>
+						  <h4>value</h4>
+						</th>
+						</tr>
+					
+						 <tr>
+					        <td>Sleep Per Wearable : </td>
+				           <td> {this.state.sleep_ql.sleep_per_wearable}</td>
+				         </tr>
+				         <tr>
+					        <td>Sleep Per User Input : </td>
+				           <td> {this.state.sleep_ql.sleep_per_user_input} </td>
+				         </tr>
+				         <tr>
+					        <td>Sleep Aid : </td>
+				           <td> {this.state.sleep_ql.sleep_aid}</td>
+				         </tr>
+				         <tr>
+					        <td>Sleep Bed Time : </td>
+				            <td>{this.state.sleep_ql.sleep_bed_time}</td>
+				         </tr>
+				         <tr>
+					        <td>Sleep Awake Time : </td>
+				            <td>{this.state.sleep_ql.sleep_awake_time}</td>
+				         </tr>
 				         
-				         <div className="row">
-					        <label>Deep Sleep : </label>
-				            {this.state.sleep_ql.deep_sleep}
-				         </div>
-				          <div className="row">
-					        <label>Light Sleep : </label>
-				            {this.state.sleep_ql.light_sleep}
-				         </div>
-				          <div className="row">
-					        <label>Awake Time : </label>
-				            {this.state.sleep_ql.awake_time}
-				         </div>
-
-
+				         <tr>
+					        <td>Deep Sleep : </td>
+				            <td>{this.state.sleep_ql.deep_sleep}</td>
+				         </tr>
+				          <tr>
+					        <td>Light Sleep : </td>
+				            <td>{this.state.sleep_ql.light_sleep}</td>
+				         </tr>
+				          <tr>
+					        <td>Awake Time : </td>
+				            <td>{this.state.sleep_ql.awake_time}</td>
+				         </tr>
+                          </Table>
+                        </div>
 				         {/*---food_ql--------*/}
 
-
-				         <div className="row">
+                           <div className="quick3">
+				         <Table className="quick4">
+				      
+				         <tr>
+				         <th>
 						  <h4>Food</h4>
-						</div>
-						 <div className="row">
-					        <label>percentage Non Processed Food : </label>
-				            {this.state.food_ql.prcnt_non_processed_food}
-				         </div>
-				         <div className="row">
-					        <label>Percentage Non Processed Food Grade : </label>
-				            {this.state.food_ql.prcnt_non_processed_food_grade}
-				         </div>
-				          <div className="row">
-					        <label>Non Processed Food : </label>
-				            {this.state.food_ql.non_processed_food}
-				         </div>
-				         <div className="row">
-					        <label>Diet Type : </label>
-				            {this.state.food_ql.diet_type}
-				         </div>
-
+						  </th>
+						   <th>
+						  <h4>value</h4>
+						</th>
+						  </tr>
+						 
+						 <tr>
+					        <td>percentage Non Processed Food : </td>
+				            <td>{this.state.food_ql.prcnt_non_processed_food}</td>
+				         </tr>
+				         <tr>
+					        <td>Percentage Non Processed Food Grade : </td>
+				            <td>{this.state.food_ql.prcnt_non_processed_food_grade}</td>
+				         </tr>
+				          <tr>
+					        <td>Non Processed Food : </td>
+				            <td>{this.state.food_ql.non_processed_food}</td>
+				         </tr>
+				         <tr>
+					        <td>Diet Type : </td>
+				            <td>{this.state.food_ql.diet_type}</td>
+				         </tr>
+				         </Table>
+                          </div>
 				          {/*---alcohol_ql--------*/}
 
-
-				         <div className="row">
+                          <div className="quick3">
+				         <Table className="quick4">
+				         
+				         <tr>
+				         <th>
 						  <h4>Alcohol</h4>
-						</div>
-						 <div className="row">
-					        <label>Alcohol Per Day : </label>
-				            {this.state.alcohol_ql.alcohol_day}
-				         </div>
-				         <div className="row">
-					        <label>Alcohol Per Week : </label>
-				            {this.state.alcohol_ql.alcohol_week}
-				         </div>
-				    </div>
-
+						  </th>
+						   <th>
+						  <h4>value</h4>
+						</th>
+						  </tr>
+						 
+					<tbody>
+						 <tr>
+					        <td>Alcohol Per Day : </td>
+				           <td> {this.state.alcohol_ql.alcohol_day}</td>
+				         </tr>
+				         <tr>
+					        <td>Alcohol Per Week : </td>
+				            <td>{this.state.alcohol_ql.alcohol_week}</td>
+				         </tr>
+				         </tbody>
+				    </Table>
+                         </div>
+                         </div>
 					         
 				 
 
@@ -477,206 +544,213 @@ class Quicklook extends Component{
 
 
 				 <div className="col-sm-6">
-						<div className="row">
+				  <div className="quick3">
+						<Table className="quick4" striped>
+						
+						<tr>
+						<th >
 						  <h4>Exercise Reporting</h4>
-						</div>
-						<div className="row">
-					        <label>WorkOut Easy Hard : </label>
-				            {this.state.exercise_reporting_ql.workout_easy_hard}
-				         </div>
-				         <div className="row">
-					        <label>Workout Type : </label>
-				            {this.state.exercise_reporting_ql.workout_type}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Time : </label>
-				            {this.state.exercise_reporting_ql.workout_time}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Location : </label>
-				            {this.state.exercise_reporting_ql.workout_location}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Duration : </label>
-				            {this.state.exercise_reporting_ql.workout_duration}
-				         </div>
-				         <div className="row">
-					        <label>Maximum Elevation Workout : </label>
-				            {this.state.exercise_reporting_ql.maximum_elevation_workout}
-				         </div>
-				         <div className="row">
-					        <label>Minutes Walked Before Workout : </label>
-				            {this.state.exercise_reporting_ql.minutes_walked_before_workout}
-				         </div>
-				         <div className="row">
-					        <label>Distance : </label>
-				            {this.state.exercise_reporting_ql.distance}
-				         </div>
-				         <div className="row">
-					        <label>Pace : </label>
-				            {this.state.exercise_reporting_ql.pace}
-				         </div>
-				         <div className="row">
-					        <label>Asvg Heartrate : </label>
-				            {this.state.exercise_reporting_ql.avg_heartrate}
-				         </div>
-				         <div className="row">
-					        <label>Elevation Gain : </label>
-				            {this.state.exercise_reporting_ql.elevation_gain}
-				         </div>
-				         <div className="row">
-					        <label>Elevation Loss : </label>
-				            {this.state.exercise_reporting_ql.elevation_loss}
-				         </div>
-				         <div className="row">
-					        <label>Effort Level : </label>
-				            {this.state.exercise_reporting_ql.effort_level}
-				         </div>
-				         <div className="row">
-					        <label>Dsew Point : </label>
-				            {this.state.exercise_reporting_ql.dew_point}
-				         </div>
-				         <div className="row">
-					        <label>Temperature : </label>
-				            {this.state.exercise_reporting_ql.temperature}
-				         </div>
-				         <div className="row">
-					        <label>Humidity : </label>
-				            {this.state.exercise_reporting_ql.humidity}
-				         </div>
-				         <div className="row">
-					        <label>Tsemperature Feels Like : </label>
-				            {this.state.exercise_reporting_ql.temperature_feels_like}
-				         </div>
-				         <div className="row">
-					        <label>wind : </label>
-				            {this.state.exercise_reporting_ql.wind}
-				         </div>
-				         <div className="row">
-					        <label>HRR : </label>
-				            {this.state.exercise_reporting_ql.hrr}
-				         </div>
-				         <div className="row">
-					        <label>HRR Start Point : </label>
-				            {this.state.exercise_reporting_ql.hrr_start_point}
-				         </div>
+						</th>
+						 <th>
+						  <h4>value</h4>
+						</th>
+						</tr>
+						
+						<tr>
+					        <td>WorkOut Easy Hard : </td>
+				            <td>{this.state.exercise_reporting_ql.workout_easy_hard}</td>
+				         </tr>
+				         <tr>
+					        <td>Workout Type : </td>
+				            <td>{this.state.exercise_reporting_ql.workout_type}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Time : </td>
+				            <td>{this.state.exercise_reporting_ql.workout_time}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Location : </td>
+				           <td> {this.state.exercise_reporting_ql.workout_location}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Duration : </td>
+				            <td>{this.state.exercise_reporting_ql.workout_duration}</td>
+				         </tr>
+				         <tr>
+					        <td>Maximum Elevation Workout : </td>
+				            <td>{this.state.exercise_reporting_ql.maximum_elevation_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Minutes Walked Before Workout : </td>
+				            <td>{this.state.exercise_reporting_ql.minutes_walked_before_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Distance : </td>
+				            <td>{this.state.exercise_reporting_ql.distance}</td>
+				         </tr>
+				         <tr>
+					        <td>Pace : </td>
+				            <td>{this.state.exercise_reporting_ql.pace}</td>
+				         </tr>
+				         <tr>
+					        <td>Asvg Heartrate : </td>
+				            <td>{this.state.exercise_reporting_ql.avg_heartrate}</td>
+				         </tr>
+				         <tr>
+					        <td>Elevation Gain : </td>
+				            <td>{this.state.exercise_reporting_ql.elevation_gain}</td>
+				         </tr>
+				         <tr>
+					        <td>Elevation Loss : </td>
+				            <td>{this.state.exercise_reporting_ql.elevation_loss}</td>
+				         </tr>
+				         <tr>
+					        <td>Effort Level : </td>
+				            <td>{this.state.exercise_reporting_ql.effort_level}</td>
+				         </tr>
+				         <tr>
+					        <td>Dsew Point : </td>
+				            <td>{this.state.exercise_reporting_ql.dew_point}</td>
+				         </tr>
+				         <tr>
+					        <td>Temperature : </td>
+				           <td> {this.state.exercise_reporting_ql.temperature}</td>
+				         </tr>
+				         <tr>
+					        <td>Humidity : </td>
+				           <td>{this.state.exercise_reporting_ql.humidity}</td>
+				         </tr>
+				         <tr>
+					        <td>Tsemperature Feels Like : </td>
+				            <td>{this.state.exercise_reporting_ql.temperature_feels_like}</td>
+				         </tr>
+				         <tr>
+					        <td>wind : </td>
+				            <td>{this.state.exercise_reporting_ql.wind}</td>
+				         </tr>
+				         <tr>
+					        <td>HRR : </td>
+				           <td> {this.state.exercise_reporting_ql.hrr}</td>
+				         </tr>
+				         <tr>
+					        <td>HRR Start Point : </td>
+				            <td>{this.state.exercise_reporting_ql.hrr_start_point}</td>
+				         </tr>
 
-				         <div className="row">
-					        <label>HRR Beats Lowered : </label>
-				            {this.state.exercise_reporting_ql.hrr_beats_lowered}
-				         </div>
-				         <div className="row">
-					        <label>Sleep Resting Hr Last Nigh : </label>
-				            {this.state.exercise_reporting_ql.sleep_resting_hr_last_nigh}
-				         </div>
-				         <div className="row">
-					        <label>Vo2 Max : </label>
-				            {this.state.exercise_reporting_ql.vo2_max}
-				         </div>
-				         <div className="row">
-					        <label>Rsunning Cadence : </label>
-				            {this.state.exercise_reporting_ql.running_cadence}
-				         </div>
-				         <div className="row">
-					        <label>Nose Breath Prcnt Workout : </label>
-				            {this.state.exercise_reporting_ql.nose_breath_prcnt_workout}
-				         </div>
-				         <div className="row">
-					        <label>Water Consumed WorkOut : </label>
-				            {this.state.exercise_reporting_ql.water_consumed_workout}
-				         </div>
-				         <div className="row">
-					        <label>Chia Seeds consumed WorkOut : </label>
-				            {this.state.exercise_reporting_ql.chia_seeds_consumed_workout}
-				         </div>
-				         <div className="row">
-					        <label>Fast Before WorkOut : </label>
-				            {this.state.exercise_reporting_ql.fast_before_workout}
-				         </div>
-				         <div className="row">
-					        <label>Pain : </label>
-				            {this.state.exercise_reporting_ql.pain}
-				         </div>
-				         <div className="row">
-					        <label>Pain Area : </label>
-				            {this.state.exercise_reporting_ql.pain_area}
-				         </div>
-				         <div className="row">
-					        <label>Stress Level : </label>
-				            {this.state.exercise_reporting_ql.stress_level}
-				         </div>
-				         <div className="row">
-					        <label>Sicks : </label>
-				            {this.state.exercise_reporting_ql.sick}
-				         </div>
-				         <div className="row">
-					        <label>Drug Consumed : </label>
-				            {this.state.exercise_reporting_ql.drug_consumed}
-				         </div>
-				         <div className="row">
-					        <label>Drug : </label>
-				            {this.state.exercise_reporting_ql.drug}
-				         </div>
-				         <div className="row">
-					        <label>Medication : </label>
-				            {this.state.exercise_reporting_ql.medication}
-				         </div>
-				         <div className="row">
-					        <label>Smoke Substance : </label>
-				            {this.state.exercise_reporting_ql.smoke_substance}
-				         </div>
-				         <div className="row">
-					        <label>Exercise Fifteen More : </label>
-				            {this.state.exercise_reporting_ql.exercise_fifteen_more}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Elapsed Time : </label>
-				            {this.state.exercise_reporting_ql.workout_elapsed_time}
-				         </div>
-				         <div className="row">
-					        <label>TimeWatch Paused WorkOut : </label>
-				            {this.state.exercise_reporting_ql.timewatch_paused_workout}
-				         </div>
-				         <div className="row">
-					        <label>Exercise Consistency : </label>
-				            {this.state.exercise_reporting_ql.exercise_consistency}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Duration Grade : </label>
-				            {this.state.exercise_reporting_ql.workout_duration_grade}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Effort Level Grade : </label>
-				            {this.state.exercise_reporting_ql.workout_effortlvl_grade}
-				         </div>
-				         <div className="row">
-					        <label>Avg Heart Rate Grade : </label>
-				            {this.state.exercise_reporting_ql.avg_heartrate_grade}
-				         </div>
+				         <tr>
+					        <td>HRR Beats Lowered : </td>
+				            <td>{this.state.exercise_reporting_ql.hrr_beats_lowered}</td>
+				         </tr>
+				         <tr>
+					        <td>Sleep Resting Hr Last Nigh : </td>
+				            <td>{this.state.exercise_reporting_ql.sleep_resting_hr_last_nigh}</td>
+				         </tr>
+				         <tr>
+					        <td>Vo2 Max : </td>
+				            <td>{this.state.exercise_reporting_ql.vo2_max}</td>
+				         </tr>
+				         <tr>
+					        <td>Rsunning Cadence : </td>
+				            <td>{this.state.exercise_reporting_ql.running_cadence}</td>
+				         </tr>
+				         <tr>
+					        <td>Nose Breath Prcnt Workout : </td>
+				            <td>{this.state.exercise_reporting_ql.nose_breath_prcnt_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Water Consumed WorkOut : </td>
+				            <td>{this.state.exercise_reporting_ql.water_consumed_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Chia Seeds consumed WorkOut : </td>
+				            <td>{this.state.exercise_reporting_ql.chia_seeds_consumed_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Fast Before WorkOut : </td>
+				            <td>{this.state.exercise_reporting_ql.fast_before_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Pain : </td>
+				            <td>{this.state.exercise_reporting_ql.pain}</td>
+				         </tr>
+				         <tr>
+					        <td>Pain Area : </td>
+				            <td>{this.state.exercise_reporting_ql.pain_area}</td>
+				         </tr>
+				         <tr>
+					        <td>Stress Level : </td>
+				            <td>{this.state.exercise_reporting_ql.stress_level}</td>
+				         </tr>
+				         <tr>
+					        <td>Sicks : </td>
+				            <td>{this.state.exercise_reporting_ql.sick}</td>
+				         </tr>
+				         <tr>
+					        <td>Drug Consumed : </td>
+				            <td>{this.state.exercise_reporting_ql.drug_consumed}</td>
+				         </tr>
+				         <tr>
+					        <td>Drug : </td>
+				            <td>{this.state.exercise_reporting_ql.drug}</td>
+				         </tr>
+				         <tr>
+					        <td>Medication : </td>
+				            <td>{this.state.exercise_reporting_ql.medication}</td>
+				         </tr>
+				         <tr>
+					        <td>Smoke Substance : </td>
+				            <td>{this.state.exercise_reporting_ql.smoke_substance}</td>
+				         </tr>
+				         <tr>
+					        <td>Exercise Fifteen More : </td>
+				            <td>{this.state.exercise_reporting_ql.exercise_fifteen_more}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Elapsed Time : </td>
+				            <td>{this.state.exercise_reporting_ql.workout_elapsed_time}</td>
+				         </tr>
+				         <tr>
+					        <td>TimeWatch Paused WorkOut : </td>
+				            <td>{this.state.exercise_reporting_ql.timewatch_paused_workout}</td>
+				         </tr>
+				         <tr>
+					        <td>Exercise Consistency : </td>
+				            <td>{this.state.exercise_reporting_ql.exercise_consistency}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Duration Grade : </td>
+				             <td>{this.state.exercise_reporting_ql.workout_duration_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Effort Level Grade : </td>
+				             <td>{this.state.exercise_reporting_ql.workout_effortlvl_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>Avg Heart Rate Grade : </td>
+				             <td>{this.state.exercise_reporting_ql.avg_heartrate_grade}</td>
+				         </tr>
 
-				          <div className="row">
-					        <label>OverAll WorkOut Grade : </label>
-				            {this.state.exercise_reporting_ql.overall_workout_grade}
-				         </div>
-				         <div className="row">
-					        <label>Heart Rate Variability Grade : </label>
-				            {this.state.exercise_reporting_ql.heartrate_variability_grade}
-				         </div>
-				         <div className="row">
-					        <label>WorkOut Comment : </label>
-				            {this.state.exercise_reporting_ql.workout_comment}
-				         </div>
-
+				          <tr>
+					        <td>OverAll WorkOut Grade : </td>
+				             <td>{this.state.exercise_reporting_ql.overall_workout_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>Heart Rate Variability Grade : </td>
+				             <td>{this.state.exercise_reporting_ql.heartrate_variability_grade}</td>
+				         </tr>
+				         <tr>
+					        <td>WorkOut Comment : </td>
+				             <td>{this.state.exercise_reporting_ql.workout_comment}</td>
+				         </tr>
+				         </Table>
 					</div>
-
 					</div>
-					
-
-
-
+					</div>
+                 
+					</div>
+				</div>
 			</div>			
-			<p><pre>{JSON.stringify(this.state, null, 2)}</pre></p>
-		</div>
+		
 	);
 	}
 }
