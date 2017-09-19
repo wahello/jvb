@@ -1,21 +1,35 @@
 import React from 'react';
+import NavbarMenu from './navbar';
 
-import { Table, Row, Container, className, Col } from 'reactstrap';
+
+import { Table} from 'reactstrap';
+
+var CalendarWidget = require('react-calendar-widget');
 
 class Weeklygrade extends React.Component{
+
+ 
     render(){
         console.log('i am here for rendering weekly grade')
         return(
-            <Container>
-             <div className="weekly_grade row justify-content-center">
-               <h2 className="weekly_grade_title">Weekly Report With Grades</h2>
+            <div className="container">
+            <NavbarMenu/>
+
+             <div className="col-md-12">
+             <div className="tbc">
+               <h2>Weekly Report With Grades</h2>
              </div>
-          <div className="row justify-content-center  tbc">
-           <div className="col-lg-10 col-sm-12">
-            <Table bordered>
-            <thead>
+          
+          <div className="row justify-content-center">
+         
+          <div className="col-sm-2">
+            <CalendarWidget onDaySelect={this.processDate}/>,
+             </div>
+              <div>
+            <Table id="tbc2" className="table table-success">
+            
              <tr>
-              <th></th>
+              <th scope="row"></th>
               <th>10-06-2017</th>
               <th>11-06-2017</th>
               <th>12-06-2017</th>
@@ -23,9 +37,9 @@ class Weeklygrade extends React.Component{
               <th>14-06-2017</th>
               <th>15-06-2017</th>
               <th>16-06-2017</th>
-             </tr>
-            </thead>
-            <tbody>
+             
+          </tr>
+        <tbody>
             <tr>  
               <th scope="row">Non Exercise Steps</th>
                 <td className="colorgreen">A</td>
@@ -126,11 +140,12 @@ class Weeklygrade extends React.Component{
                 <td></td>
                 <td></td>
             </tr>
-            </tbody>
+          </tbody>
            </Table>
           </div>
-         </div> 
-         </Container>
+          </div>
+        </div>
+         </div>
 
         );
     }

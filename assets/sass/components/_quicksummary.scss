@@ -2,7 +2,7 @@
 	padding: 70px;
 }
 	#quick1{
-		padding: 15px 0px 5px 38px;
+		padding: 15px 0px 5px 90px;
 	font-family: 'Roboto', sans-serif;
 	font-weight: bold;
 	font-size: 40px;
@@ -21,7 +21,24 @@
 	color: #6600B2;
 
 }
-.quick4 th,tbody,tr,td{
+.quick4 th{
 	border: 1px solid #356AA0;
 	text-align: left;
+}
+
+.quick4 tbody{
+	border: 1px solid #356AA0;
+	text-align: left;
+}
+.quick4 tr{
+	border: 1px solid #356AA0;
+	text-align: left;
+}
+
+.quick4 td{
+	border: 1px solid #356AA0;
+	text-align: left;
+}
+.quick5{
+	padding: 14px 0px 0px 85px;
 }

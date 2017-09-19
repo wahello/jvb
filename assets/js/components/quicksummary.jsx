@@ -3,11 +3,19 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table} from "reactstrap";
 import {fetchQuickLook}  from '../network/quick';
+import {quicksummaryDate}  from '../network/quick';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import NavbarMenu from './navbar';
+   
 
-class Quicklook extends Component{	
+axiosRetry(axios, { retries: 3});
+
+var CalendarWidget = require('react-calendar-widget');
+var ReactDOM = require('react-dom');
+
+
+class Quicklook extends Component{
 	constructor(props){
 		super(props);
 		this.successquick = this.successquick.bind(this);
@@ -260,7 +268,13 @@ class Quicklook extends Component{
 		console.log(error.message);
 	}
 
+	processDate(date){
+		quicksummaryDate(date,this.successquick,this.errorquick);
+	}
+
 	componentDidMount(){
+		var today = new Date();
+		quicksummaryDate(today,this.successquick,this.errorquick);
 		this.props.fetchQuickLook(this.successquick, this.errorquick);
 	}
 
@@ -268,7 +282,7 @@ class Quicklook extends Component{
 	return(
 		<div className="container-fluid">
 		<NavbarMenu/>
-			<div className="col-sm-12">
+			<div className="col-lg-12 col-md-6 col-sm-3">
 			<div className="quick">
 			
 						 <div id="quick1" className="row">
@@ -276,7 +290,10 @@ class Quicklook extends Component{
 			             </div>
 
 			   <div id="quick2" className="row">
-			        <div className="col-sm-6">
+			    <div className="col-sm-2 quick5">
+		            <CalendarWidget onDaySelect={this.processDate} id="quick6"/>,
+                    </div>
+			        <div className="col-sm-5">
 			        <div className="quick3">
 			        <Table className="quick4">
 			       
@@ -543,7 +560,7 @@ class Quicklook extends Component{
 				 {/*---Exercise Reporting--------*/}
 
 
-				 <div className="col-sm-6">
+				 <div className="col-sm-5">
 				  <div className="quick3">
 						<Table className="quick4" striped>
 						

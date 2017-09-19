@@ -1,4 +1,6 @@
 import React from 'react';
+import NavbarMenu from './navbar';
+
 
 import { Table, Row, Container, className, Col } from 'reactstrap';
 
@@ -6,20 +8,24 @@ class Weeklysummary extends React.Component{
     render(){
         console.log('i am here for rendering summary')
         return(
-            <Container>
-                 <div className="week_summary row justify-content-center">
-        <h2 className="week_summary_title">Weekly Summary</h2>
-      </div>
-      <div className="row justify-content-center wstbc">
-        <div className="col-lg-7 col-md-9 col-sm-12">
-          <Table bordered>
-            <thead>
+            <div className="container">
+             <NavbarMenu/>
+              <div className="col-lg-12 col-md-6 col-sm-3">
+                 <div className="tbcw">
+                 
+                <h2>Weekly Summary</h2>
+               
+              </div>
+      <div className="row justify-content-center">
+       <div>
+          <Table id="tbcw1" className="table table-info">
+            
               <th></th>
               <th>Average</th>
               <th>Median</th>
               <th>Best</th>
               <th>Worst</th>
-            </thead>
+            
             <tbody>
              <tr>
                <th scope="row">Non Exercise Steps</th>
@@ -95,7 +101,8 @@ class Weeklysummary extends React.Component{
           </Table>
         </div>
       </div>
-            </Container>
+            </div>
+            </div>
         );
     }
 }
