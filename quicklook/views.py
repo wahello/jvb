@@ -25,6 +25,33 @@ class UserQuickLookView(generics.ListCreateAPIView):
     serializer_class = UserQuickLookSerializer
 
 
+class UserQuickLookItemView(generics.RetrieveUpdateDestroyAPIView):
+	'''
+		GET for getting particular model instance
+		PUT for updating particular model instance
+		DELETE for deleting particular model instance
+		
+		-displays only current user data not others (for now)
+		-search item based on provided date
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = UserQuickLookSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+		qs = UserQuickLook.objects.filter(user=user)
+		return qs
+
+	def get_object(self):
+		qs = self.get_queryset()
+		d = int(self.kwargs.get('day'))
+		m = int(self.kwargs.get('month'))
+		y = int(self.kwargs.get('year'))
+		dt = datetime.date(y,m,d)
+		obj = get_object_or_404(qs,created_at=dt)
+		return obj
+
+
 class GradeItemView(generics.RetrieveUpdateDestroyAPIView):
 	'''
 		GET for getting particular model instance
