@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"C:\\Users\\HOME\\Desktop\\Garmin\\sample\\assets\\bundles\\main.js"}]}}
+=======
+{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"C:\\Users\\NS-HYD-05\\jvbh\\healthtracker\\assets\\bundles\\main.js"},{"name":"0.6d7c279bfdf7831c40b8.hot-update.js","publicPath":"http://localhost:3000/assets/bundles/0.6d7c279bfdf7831c40b8.hot-update.js","path":"C:\\Users\\NS-HYD-05\\jvbh\\healthtracker\\assets\\bundles\\0.6d7c279bfdf7831c40b8.hot-update.js"}]}}
+>>>>>>> 2689299731d3a67e77ca3f52edb19f9f47e61fa9
