@@ -24,7 +24,7 @@ class HomePageReactTitle extends Component {
       return(
         <div style={{color:'red'}}><strong>Error!</strong> {this.props.errorMessage}</div>
       );
-    } 
+    }
   }
 
   onSubmit(values){
@@ -37,10 +37,10 @@ class HomePageReactTitle extends Component {
     return(
       <FormGroup className={className}>
         <Label className="sr-only">{field.label}</Label>
-        <Input 
-          type={field.type} 
-          name={field.name} 
-          placeholder={field.placeholder} 
+        <Input
+          type={field.type}
+          name={field.name}
+          placeholder={field.placeholder}
           value={field.value}
           {...field.input}
         />
@@ -53,33 +53,32 @@ class HomePageReactTitle extends Component {
 
   render(){
     const { handleSubmit} = this.props;
-    const homeURL = window.Django.url('home');
 
     return (
 
 
 
  <div className="top-content">
-          
+
             <div className="inner-bg">
     	<Container>
-        
-        
+
+
 
 
         <div>
 
       <section id="why">
             <div className="container">
-             
+
 
                <div className="row">
                         <div className="col-sm-6 col-sm-offset-3 form-box">
                           <div className="d-flex justify-content-center">
-                          
+
                               <img className="img-fluid"
                                src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>
-                            
+
                             </div>
 
                             <div className="form-bo">
@@ -110,7 +109,7 @@ class HomePageReactTitle extends Component {
                           <h3>Link's</h3>
                           <div className="social-login-buttons">
                           <Link to='/users/dashboard'>Dashboard</Link><br/>
-                           
+
                           <Link to='register'>Register</Link><br/>
                             <Link to="forgotpassword">Forgot Password</Link><br/>
                              <Link to='userinputs'>userinputs</Link><br/>
@@ -129,8 +128,8 @@ class HomePageReactTitle extends Component {
                     </div>
 
               </div>
-             
-            
+
+
 
 
           </section>
@@ -138,12 +137,12 @@ class HomePageReactTitle extends Component {
 
 
 
-               
-
-      
 
 
-    	
+
+
+
+
 
 {/*
 
@@ -168,8 +167,8 @@ class HomePageReactTitle extends Component {
           <Button>Submit</Button>
           {this.renderAlert()}
         </Form>
-        
-        
+
+
        </Col></Row>
 
        <Row>
@@ -235,8 +234,8 @@ class HomePageReactTitle extends Component {
        </Container>
        </div>
        </div>
-       
-       
+
+
     )
   }
 };

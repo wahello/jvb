@@ -34,6 +34,7 @@ class GarminDataPage extends Component {
         raw_output: '',
         selectedDateEpoch: this.getEpoch(),
         weatherData: '',
+        activities_data:'',
        garmin_health_api: {
        activity_name:'Running',
        activity_type:'Running',
@@ -135,9 +136,10 @@ class GarminDataPage extends Component {
 
   updateState(data){
 
-    this.setState({raw_output: data
-      // garmin_health_api: {
-      //   activity_name:data.data.garmin_health_api.activity_name,
+    this.setState({raw_output: data,
+    activities_data:data.data.activities[0].split(','),
+      garmin_health_api: {
+      //   activity_name:data.data.garmin_health_api.activity name,
       //   activity_type:data.dailies.garmin_health_api.activity_type,
       //   event_type:data.data.garmin_health_api.event_type,
       //   course:data.data.garmin_health_api.course,
@@ -209,8 +211,8 @@ class GarminDataPage extends Component {
       //   bed_time:data.data.garmin_health_api.bed_time,
       //   sleep_awake_time:data.data.garmin_health_api.sleep_awake_time,
       //   stress_field:data.data.garmin_health_api.stress_field,
-      // }
-    });
+        }
+    })
   }
 
   fetchWeatherData(city){
