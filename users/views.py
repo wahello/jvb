@@ -404,6 +404,17 @@ class fetchGarminData(APIView):
 
       ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/{}'
 
+      # True if data is pulled fro garmin api
+      # False if pulled from our database
+      PULL_HISTORY = {
+        "dailies":False,
+        "activities":False,
+        "manuallyUpdatedActivities":False,
+        "epochs":False,
+        "sleeps":False,
+        "bodyComps":False
+      }
+
       for dtype in self.DATA_TYPES.values():
 
         URL = ROOT_URL.format(dtype)
@@ -419,6 +430,8 @@ class fetchGarminData(APIView):
           # no record in db
           pull=True
 
+        PULL_HISTORY[dtype]=pull
+
         if pull:
           # pull from api and store in db
           r = sess.get(URL, header_auth=True, params=data)
@@ -429,33 +442,32 @@ class fetchGarminData(APIView):
           )
         else:
           # fetch from db
-          output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
+          output_dict[dtype] = [q.data for q in model.objects.filter(user=user)]
 
 
+      dailies_json = output_dict['dailies']
+      if not PULL_HISTORY['dailies']:
+        dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
 
-      decode_dailies_raw = output_dict['dailies']
-      dailies_json = json.loads(decode_dailies_raw)
-      dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
-
-      decode_activities_raw = output_dict['activities']
-      activities_json = json.loads(decode_activities_raw)
-      activities_json = [ast.literal_eval(dic) for dic in activities_json]
+      activities_json = output_dict['activities']
+      if not PULL_HISTORY['activities']:
+        activities_json = [ast.literal_eval(dic) for dic in activities_json]
 
       #decode_manuallyUpdatedActivities_raw = output_dict['manuallyUpdatedActivities']
       #manuallyUpdatedActivities_json = json.loads(decode_manuallyUpdatedActivities_raw)
       #manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in decode_manuallyUpdatedActivities_raw]
 
-      decode_epochs_raw = output_dict['epochs']
-      epochs_json = json.loads(decode_epochs_raw)
-      epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
+      epochs_json = output_dict['epochs']
+      if not PULL_HISTORY['epochs']:
+        epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
 
-      decode_sleeps_raw = output_dict['sleeps']
-      sleeps_json = json.loads(decode_sleeps_raw)
-      sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
+      sleeps_json = output_dict['sleeps']
+      if not PULL_HISTORY['sleeps']:
+        sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
 
-      decode_bodyComps_raw = output_dict['bodyComps']
-      bodyComps_json = json.loads(decode_bodyComps_raw)
-      bodyComps_json = [ast.literal_eval(dic) for dic in bodyComps_json]
+      bodyComps_json = output_dict['bodyComps']
+      if not PULL_HISTORY['bodyComps']:
+        bodyComps_json = [ast.literal_eval(dic) for dic in bodyComps_json]
 
       #sleeps_decoded = sleeps_json.strip('"')
 
