@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"C:\\Users\\HOME\\Desktop\\Garmin\\sample\\assets\\bundles\\main.js"}]},"error":"ModuleBuildError","message":"Module build failed: SyntaxError: C:/Users/HOME/Desktop/Garmin/sample/assets/js/components/GarminData.jsx: Unexpected token, expected , (215:5)\n\n  213 |       //   stress_field:data.data.garmin_health_api.stress_field,\n  214 |       // }\n> 215 |     });\n      |      ^\n  216 |   }\n  217 | \n  218 |   fetchWeatherData(city){\n"}
-=======
-{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/Disk-A/projects/S7/health-tracker/healthtracker/assets/bundles/main.js"}]}}
->>>>>>> ddd0b34650c0c0391b879bd7dd933adb2c905777
+{"status":"compiling","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"C:\\Users\\HOME\\Desktop\\Garmin\\sample\\assets\\bundles\\main.js"}]}}
