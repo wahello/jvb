@@ -3,15 +3,30 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table} from "reactstrap";
 import {fetchQuickLook}  from '../network/quick';
+import {quicksummaryDate}  from '../network/quick';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import NavbarMenu from './navbar';
+import { Alert } from 'reactstrap';
 
-class Quicklook extends Component{	
+   
+
+axiosRetry(axios, { retries: 3});
+
+var CalendarWidget = require('react-calendar-widget');  
+var ReactDOM = require('react-dom');
+
+
+class Quicklook extends Component{
 	constructor(props){
 		super(props);
 		this.successquick = this.successquick.bind(this);
+		this.errorquick = this.errorquick.bind(this);
+		this.processDate = this.processDate.bind(this);
+		this.onDismiss = this.onDismiss.bind(this);
 		this.state = {
+			visible: true,
+			error:false,
 			grades_ql: {
 		        id: '',
 		        user_ql: '',
@@ -134,149 +149,191 @@ class Quicklook extends Component{
 		};
 	}
 
+
 	successquick(data){
 		console.log(data);
 		this.setState({
+		visible:true,
+		error:false,
 			grades_ql: {
-		        id: data.data[0].grades_ql.id,
-		        user_ql: data.data[0].grades_ql.user_ql,
-		        overall_truth_grade: data.data[0].grades_ql.overall_truth_grade,
-		        overall_truth_health_gpa: data.data[0].grades_ql.overall_truth_health_gpa,
-		        movement_non_exercise_grade: data.data[0].grades_ql.movement_non_exercise_grade,
-		        movement_consistency_grade: data.data[0].grades_ql.movement_consistency_grade,
-		        avg_sleep_per_night_grade: data.data[0].grades_ql.avg_sleep_per_night_grade,
-		        exercise_consistency_grade: data.data[0].grades_ql.exercise_consistency_grade,
-		        overall_workout_grade: data.data[0].grades_ql.overall_workout_grade,
-		        prcnt_non_processed_food_consumed_grade: data.data[0].grades_ql.prcnt_non_processed_food_consumed_grade,
-		        alcoholic_drink_per_week_grade: data.data[0].grades_ql.alcoholic_drink_per_week_grade,
-		        penalty: data.data[0].grades_ql.penalty
+		        id: data.data.grades_ql.id,
+		        user_ql: data.data.grades_ql.user_ql,
+		        overall_truth_grade: data.data.grades_ql.overall_truth_grade,
+		        overall_truth_health_gpa: data.data.grades_ql.overall_truth_health_gpa,
+		        movement_non_exercise_grade: data.data.grades_ql.movement_non_exercise_grade,
+		        movement_consistency_grade: data.data.grades_ql.movement_consistency_grade,
+		        avg_sleep_per_night_grade: data.data.grades_ql.avg_sleep_per_night_grade,
+		        exercise_consistency_grade: data.data.grades_ql.exercise_consistency_grade,
+		        overall_workout_grade: data.data.grades_ql.overall_workout_grade,
+		        prcnt_non_processed_food_consumed_grade: data.data.grades_ql.prcnt_non_processed_food_consumed_grade,
+		        alcoholic_drink_per_week_grade: data.data.grades_ql.alcoholic_drink_per_week_grade,
+		        penalty: data.data.grades_ql.penalty
     		},
 
 		    exercise_reporting_ql: {
-		        id: data.data[0].exercise_reporting_ql.id,
-		        user_ql: data.data[0].exercise_reporting_ql.user_ql,
-		        workout_easy_hard: data.data[0].exercise_reporting_ql.workout_easy_hard,
-		        workout_type: data.data[0].exercise_reporting_ql.workout_type,
-		        workout_time: data.data[0].exercise_reporting_ql.workout_time,
-		        workout_location: data.data[0].exercise_reporting_ql.workout_location,
-		        workout_duration: data.data[0].exercise_reporting_ql.workout_duration,
-		        maximum_elevation_workout: data.data[0].exercise_reporting_ql.maximum_elevation_workout,
-		        minutes_walked_before_workout: data.data[0].exercise_reporting_ql.minutes_walked_before_workout,
-		        distance: data.data[0].exercise_reporting_ql.distance,
-		        pace: data.data[0].exercise_reporting_ql.pace,
-		        avg_heartrate: data.data[0].exercise_reporting_ql.avg_heartrate,
-		        elevation_gain: data.data[0].exercise_reporting_ql.elevation_gain,
-		        elevation_loss: data.data[0].exercise_reporting_ql.elevation_loss,
-		        effort_level: data.data[0].exercise_reporting_ql.effort_level,
-		        dew_point: data.data[0].exercise_reporting_ql.dew_point,
-		        temperature: data.data[0].exercise_reporting_ql.temperature,
-		        humidity: data.data[0].exercise_reporting_ql.humidity,
-		        temperature_feels_like: data.data[0].exercise_reporting_ql.temperature_feels_like,
-		        wind: data.data[0].exercise_reporting_ql.wind,
-		        hrr: data.data[0].exercise_reporting_ql.hrr,
-		        hrr_start_point: data.data[0].exercise_reporting_ql.hrr_start_point,
-		        hrr_beats_lowered: data.data[0].exercise_reporting_ql.hrr_beats_lowered,
-		        sleep_resting_hr_last_night: data.data[0].exercise_reporting_ql.sleep_resting_hr_last_night,
-		        vo2_max: data.data[0].exercise_reporting_ql.vo2_max,
-		        running_cadence: data.data[0].exercise_reporting_ql.running_cadence,
-		        nose_breath_prcnt_workout: data.data[0].exercise_reporting_ql.nose_breath_prcnt_workout,
-		        water_consumed_workout: data.data[0].exercise_reporting_ql.water_consumed_workout,
-		        chia_seeds_consumed_workout: data.data[0].exercise_reporting_ql. chia_seeds_consumed_workout,
-		        fast_before_workout: data.data[0].exercise_reporting_ql.fast_before_workout,
-		        pain: data.data[0].exercise_reporting_ql.pain,
-		        pain_area: data.data[0].exercise_reporting_ql.pain_area,
-		        stress_level: data.data[0].exercise_reporting_ql.stress_level,
-		        sick: data.data[0].exercise_reporting_ql.sick,
-		        drug_consumed: data.data[0].exercise_reporting_ql.drug_consumed,
-		        drug: data.data[0].exercise_reporting_ql.drug,
-		        medication: data.data[0].exercise_reporting_ql.medication,
-		        smoke_substance: data.data[0].exercise_reporting_ql.smoke_substance,
-		        exercise_fifteen_more: data.data[0].exercise_reporting_ql.exercise_fifteen_more,
-		        workout_elapsed_time: data.data[0].exercise_reporting_ql.workout_elapsed_time,
-		        timewatch_paused_workout: data.data[0].exercise_reporting_ql.timewatch_paused_workout,
-		        exercise_consistency:data.data[0].exercise_reporting_ql.exercise_consistency,
-		        workout_duration_grade: data.data[0].exercise_reporting_ql.workout_duration_grade,
-		        workout_effortlvl_grade: data.data[0].exercise_reporting_ql.workout_effortlvl_grade,
-		        avg_heartrate_grade: data.data[0].exercise_reporting_ql.avg_heartrate_grade,
-		        overall_workout_grade: data.data[0].exercise_reporting_ql.overall_workout_grade,
-		        heartrate_variability_grade: data.data[0].exercise_reporting_ql.heartrate_variability_grade,
-		        workout_comment: data.data[0].exercise_reporting_ql.workout_comment
+		        id: data.data.exercise_reporting_ql.id,
+		        user_ql: data.data.exercise_reporting_ql.user_ql,
+		        workout_easy_hard: data.data.exercise_reporting_ql.workout_easy_hard,
+		        workout_type: data.data.exercise_reporting_ql.workout_type,
+		        workout_time: data.data.exercise_reporting_ql.workout_time,
+		        workout_location: data.data.exercise_reporting_ql.workout_location,
+		        workout_duration: data.data.exercise_reporting_ql.workout_duration,
+		        maximum_elevation_workout: data.data.exercise_reporting_ql.maximum_elevation_workout,
+		        minutes_walked_before_workout: data.data.exercise_reporting_ql.minutes_walked_before_workout,
+		        distance: data.data.exercise_reporting_ql.distance,
+		        pace: data.data.exercise_reporting_ql.pace,
+		        avg_heartrate: data.data.exercise_reporting_ql.avg_heartrate,
+		        elevation_gain: data.data.exercise_reporting_ql.elevation_gain,
+		        elevation_loss: data.data.exercise_reporting_ql.elevation_loss,
+		        effort_level: data.data.exercise_reporting_ql.effort_level,
+		        dew_point: data.data.exercise_reporting_ql.dew_point,
+		        temperature: data.data.exercise_reporting_ql.temperature,
+		        humidity: data.data.exercise_reporting_ql.humidity,
+		        temperature_feels_like: data.data.exercise_reporting_ql.temperature_feels_like,
+		        wind: data.data.exercise_reporting_ql.wind,
+		        hrr: data.data.exercise_reporting_ql.hrr,
+		        hrr_start_point: data.data.exercise_reporting_ql.hrr_start_point,
+		        hrr_beats_lowered: data.data.exercise_reporting_ql.hrr_beats_lowered,
+		        sleep_resting_hr_last_night: data.data.exercise_reporting_ql.sleep_resting_hr_last_night,
+		        vo2_max: data.data.exercise_reporting_ql.vo2_max,
+		        running_cadence: data.data.exercise_reporting_ql.running_cadence,
+		        nose_breath_prcnt_workout: data.data.exercise_reporting_ql.nose_breath_prcnt_workout,
+		        water_consumed_workout: data.data.exercise_reporting_ql.water_consumed_workout,
+		        chia_seeds_consumed_workout: data.data.exercise_reporting_ql. chia_seeds_consumed_workout,
+		        fast_before_workout: data.data.exercise_reporting_ql.fast_before_workout,
+		        pain: data.data.exercise_reporting_ql.pain,
+		        pain_area: data.data.exercise_reporting_ql.pain_area,
+		        stress_level: data.data.exercise_reporting_ql.stress_level,
+		        sick: data.data.exercise_reporting_ql.sick,
+		        drug_consumed: data.data.exercise_reporting_ql.drug_consumed,
+		        drug: data.data.exercise_reporting_ql.drug,
+		        medication: data.data.exercise_reporting_ql.medication,
+		        smoke_substance: data.data.exercise_reporting_ql.smoke_substance,
+		        exercise_fifteen_more: data.data.exercise_reporting_ql.exercise_fifteen_more,
+		        workout_elapsed_time: data.data.exercise_reporting_ql.workout_elapsed_time,
+		        timewatch_paused_workout: data.data.exercise_reporting_ql.timewatch_paused_workout,
+		        exercise_consistency:data.data.exercise_reporting_ql.exercise_consistency,
+		        workout_duration_grade: data.data.exercise_reporting_ql.workout_duration_grade,
+		        workout_effortlvl_grade: data.data.exercise_reporting_ql.workout_effortlvl_grade,
+		        avg_heartrate_grade: data.data.exercise_reporting_ql.avg_heartrate_grade,
+		        overall_workout_grade: data.data.exercise_reporting_ql.overall_workout_grade,
+		        heartrate_variability_grade: data.data.exercise_reporting_ql.heartrate_variability_grade,
+		        workout_comment: data.data.exercise_reporting_ql.workout_comment
 		    },
 		    swim_stats_ql: {
-		        id: data.data[0].swim_stats_ql.id,
-		        user_ql: data.data[0].swim_stats_ql.user_ql,
-		        pace_per_100_yard: data.data[0].swim_stats_ql.pace_per_100_yard,
-		        total_strokes: data.data[0].swim_stats_ql.total_strokes
+		        id: data.data.swim_stats_ql.id,
+		        user_ql: data.data.swim_stats_ql.user_ql,
+		        pace_per_100_yard: data.data.swim_stats_ql.pace_per_100_yard,
+		        total_strokes: data.data.swim_stats_ql.total_strokes
 		    },
 		     "bike_stats_ql": {
-		        id: data.data[0].bike_stats_ql.id,
-		        user_ql: data.data[0].bike_stats_ql.user_ql,
-		        avg_speed: data.data[0].bike_stats_ql.avg_speed,
-		        avg_power: data.data[0].bike_stats_ql.avg_power,
-		        avg_speed_per_mile: data.data[0].bike_stats_ql.avg_speed_per_mile,
-		        avg_cadence: data.data[0].bike_stats_ql.avg_cadence
+		        id: data.data.bike_stats_ql.id,
+		        user_ql: data.data.bike_stats_ql.user_ql,
+		        avg_speed: data.data.bike_stats_ql.avg_speed,
+		        avg_power: data.data.bike_stats_ql.avg_power,
+		        avg_speed_per_mile: data.data.bike_stats_ql.avg_speed_per_mile,
+		        avg_cadence: data.data.bike_stats_ql.avg_cadence
 		    },
 		    "steps_ql": {
-		        "id": data.data[0].steps_ql.id,
-		        "user_ql": data.data[0].steps_ql.user_ql,
-		        "non_exercise_steps": data.data[0].steps_ql.non_exercise_steps,
-		        "exercise_steps": data.data[0].steps_ql.exercise_steps,
-		        "total_steps": data.data[0].steps_ql.total_steps,
-		        "floor_climed": data.data[0].steps_ql.floor_climed,
-		        "floor_decended": data.data[0].steps_ql.floor_decended,
-		        "movement_consistency": data.data[0].steps_ql.movement_consistency
+		        "id": data.data.steps_ql.id,
+		        "user_ql": data.data.steps_ql.user_ql,
+		        "non_exercise_steps": data.data.steps_ql.non_exercise_steps,
+		        "exercise_steps": data.data.steps_ql.exercise_steps,
+		        "total_steps": data.data.steps_ql.total_steps,
+		        "floor_climed": data.data.steps_ql.floor_climed,
+		        "floor_decended": data.data.steps_ql.floor_decended,
+		        "movement_consistency": data.data.steps_ql.movement_consistency
 		    },
 
 		    sleep_ql: {
-		        id: data.data[0].sleep_ql.id,
-		        user_ql: data.data[0].sleep_ql.user_ql,
-		        sleep_per_wearable: data.data[0].sleep_ql.sleep_per_wearable,
-		        sleep_per_user_input: data.data[0].sleep_ql.sleep_per_user_input,
-		        sleep_aid: data.data[0].sleep_ql.sleep_aid,
-		        sleep_bed_time: data.data[0].sleep_ql.sleep_bed_time,
-		        sleep_awake_time: data.data[0].sleep_ql.sleep_awake_time,
-		        deep_sleep: data.data[0].sleep_ql.deep_sleep,
-		        light_sleep: data.data[0].sleep_ql.light_sleep,
-		        awake_time: data.data[0].sleep_ql.awake_time
+		        id: data.data.sleep_ql.id,
+		        user_ql: data.data.sleep_ql.user_ql,
+		        sleep_per_wearable: data.data.sleep_ql.sleep_per_wearable,
+		        sleep_per_user_input: data.data.sleep_ql.sleep_per_user_input,
+		        sleep_aid: data.data.sleep_ql.sleep_aid,
+		        sleep_bed_time: data.data.sleep_ql.sleep_bed_time,
+		        sleep_awake_time: data.data.sleep_ql.sleep_awake_time,
+		        deep_sleep: data.data.sleep_ql.deep_sleep,
+		        light_sleep: data.data.sleep_ql.light_sleep,
+		        awake_time: data.data.sleep_ql.awake_time
 		    },
 		    food_ql: {
-		        id: data.data[0].food_ql.id,
-		        user_ql: data.data[0].food_ql.user_ql,
-		        prcnt_non_processed_food: data.data[0].food_ql.prcnt_non_processed_food,
-		        prcnt_non_processed_food_grade: data.data[0].food_ql.prcnt_non_processed_food_grade,
-		        non_processed_food: data.data[0].food_ql.non_processed_food,
-		        diet_type: data.data[0].food_ql.diet_type
+		        id: data.data.food_ql.id,
+		        user_ql: data.data.food_ql.user_ql,
+		        prcnt_non_processed_food: data.data.food_ql.prcnt_non_processed_food,
+		        prcnt_non_processed_food_grade: data.data.food_ql.prcnt_non_processed_food_grade,
+		        non_processed_food: data.data.food_ql.non_processed_food,
+		        diet_type: data.data.food_ql.diet_type
 		    },
 		    alcohol_ql: {
-		        id: data.data[0].alcohol_ql.id,
-		        user_ql: data.data[0].alcohol_ql.user_ql,
-		        alcohol_day: data.data[0].alcohol_ql.alcohol_day,
-		        alcohol_week: data.data[0].alcohol_ql.alcohol_week
+		        id: data.data.alcohol_ql.id,
+		        user_ql: data.data.alcohol_ql.user_ql,
+		        alcohol_day: data.data.alcohol_ql.alcohol_day,
+		        alcohol_week: data.data.alcohol_ql.alcohol_week
 		    }
 		});
 	}
 
 	errorquick(error){
 		console.log(error.message);
+		this.setState({
+			error:true
+		});
+	}
+
+	renderAlert(){
+		if (this.state.error){
+			console.log("some error");
+			return(
+				 <Alert color="danger" isOpen={this.state.error} toggle={this.onDismiss}>
+					No Quicklook data is found!		       
+				</Alert>
+			);
+		}
+	}
+
+	processDate(date){
+		quicksummaryDate(date,this.successquick,this.errorquick);
 	}
 
 	componentDidMount(){
-		this.props.fetchQuickLook(this.successquick, this.errorquick);
+		var today = new Date();
+		quicksummaryDate(today,this.successquick,this.errorquick);
+		// this.props.fetchQuickLook(this.successquick, this.errorquick);
+	}
+	onDismiss(){
+		this.setState(
+			{
+				visible:false,
+				error:false
+		});
 	}
 
 	render(){
 	return(
 		<div className="container-fluid">
 		<NavbarMenu/>
-			<div className="col-sm-12">
+	
+		           	
+					
+			<div className="col-lg-12 col-md-6 col-sm-3">
 			<div className="quick">
-			
+			        <div className="col-md-12 col-md-offset-2">
+                         <div className="row justify-content-center">
+						<div className="alert">
+							{this.renderAlert()}
+						</div>
+					 </div>
+</div>
 						 <div id="quick1" className="row">
 			                 <h2>Quick Summary</h2>			                
 			             </div>
-
+                        
 			   <div id="quick2" className="row">
-			        <div className="col-sm-6">
+			    <div className="col-sm-2 quick5">
+		            <CalendarWidget onDaySelect={this.processDate} id="quick6"/>,
+                    </div>
+			        <div className="col-sm-5">
 			        <div className="quick3">
 			        <Table className="quick4">
 			       
@@ -543,7 +600,7 @@ class Quicklook extends Component{
 				 {/*---Exercise Reporting--------*/}
 
 
-				 <div className="col-sm-6">
+				 <div className="col-sm-5">
 				  <div className="quick3">
 						<Table className="quick4" striped>
 						
