@@ -3,7 +3,7 @@ from . import views
 from . import views_calculated
 
 urlpatterns = [
-	url(r'users/calculations',views_calculated.GetGarminData.as_view(),
+	url(r'^users/calculations',views_calculated.GetGarminData.as_view(),
 		name="quicklookcalculations"),
 	url(r'^users/data$',views.UserQuickLookView.as_view(),
 								  name="quick_look"),
