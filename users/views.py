@@ -392,8 +392,8 @@ class fetchGarminData(APIView):
       sess = service.get_session((access_token, access_token_secret))
 
       data = {
-        'uploadStartTimeInSeconds': startDateTimeInSeconds,
-        'uploadEndTimeInSeconds':startDateTimeInSeconds+86300
+        'uploadStartTimeInSeconds': startDateTimeInSeconds+19800,
+        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400+19800
       }
 
       midnight = datetime.combine(date.today(), time.min)
@@ -403,6 +403,17 @@ class fetchGarminData(APIView):
       output_dict = {}
 
       ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/{}'
+
+      # True if data is pulled fro garmin api
+      # False if pulled from our database
+      PULL_HISTORY = {
+        "dailies":False,
+        "activities":False,
+        "manuallyUpdatedActivities":False,
+        "epochs":False,
+        "sleeps":False,
+        "bodyComps":False
+      }
 
       for dtype in self.DATA_TYPES.values():
 
@@ -419,6 +430,8 @@ class fetchGarminData(APIView):
           # no record in db
           pull=True
 
+        PULL_HISTORY[dtype]=pull
+
         if pull:
           # pull from api and store in db
           r = sess.get(URL, header_auth=True, params=data)
@@ -429,33 +442,42 @@ class fetchGarminData(APIView):
           )
         else:
           # fetch from db
-          output_dict[dtype] = json.dumps([q.data for q in model.objects.filter(user=user)])
+          output_dict[dtype] = ([q.data for q in model.objects.filter(user=user)])
 
 
 
       decode_dailies_raw = output_dict['dailies']
-      dailies_json = json.loads(decode_dailies_raw)
-      dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
+      dailies_json = [ast.literal_eval(dic) for dic in decode_dailies_raw]
 
       decode_activities_raw = output_dict['activities']
-      activities_json = json.loads(decode_activities_raw)
-      activities_json = [ast.literal_eval(dic) for dic in activities_json]
+      activities_json = [ast.literal_eval(dic) for dic in decode_activities_raw]
 
-      #decode_manuallyUpdatedActivities_raw = output_dict['manuallyUpdatedActivities']
+
+
+      decode_manuallyUpdatedActivities_raw = output_dict['manuallyUpdatedActivities']
       #manuallyUpdatedActivities_json = json.loads(decode_manuallyUpdatedActivities_raw)
-      #manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in decode_manuallyUpdatedActivities_raw]
+      manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in decode_manuallyUpdatedActivities_raw]
 
       decode_epochs_raw = output_dict['epochs']
-      epochs_json = json.loads(decode_epochs_raw)
-      epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
+      epochs_json = [ast.literal_eval(dic) for dic in decode_epochs_raw]
 
       decode_sleeps_raw = output_dict['sleeps']
-      sleeps_json = json.loads(decode_sleeps_raw)
-      sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
+      sleeps_json = [ast.literal_eval(dic) for dic in decode_sleeps_raw]
 
       decode_bodyComps_raw = output_dict['bodyComps']
-      bodyComps_json = json.loads(decode_bodyComps_raw)
-      bodyComps_json = [ast.literal_eval(dic) for dic in bodyComps_json]
+      bodyComps_json = [ast.literal_eval(dic) for dic in decode_bodyComps_raw]
+
+      epochs_json = output_dict['epochs']
+      if not PULL_HISTORY['epochs']:
+        epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
+
+      sleeps_json = output_dict['sleeps']
+      if not PULL_HISTORY['sleeps']:
+        sleeps_json = [ast.literal_eval(dic) for dic in sleeps_json]
+
+      bodyComps_json = output_dict['bodyComps']
+      if not PULL_HISTORY['bodyComps']:
+        bodyComps_json = [ast.literal_eval(dic) for dic in bodyComps_json]
 
       #sleeps_decoded = sleeps_json.strip('"')
 
@@ -475,6 +497,7 @@ class fetchGarminData(APIView):
               return(0)
 
       output_dict['garmin_health_api'] = {
+
         "Activity Name": "",
         "Activity Type": dailies_json[0]['activityType'],
         "Event Type":"",
@@ -492,20 +515,20 @@ class fetchGarminData(APIView):
         "Maximum Hr":my_sum(activities_json,'maxHeartRateInBeatsPerMinute'),
         "Average Run Cadence":my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
         "Maximu Run Cadence":my_sum(activities_json,'maxRunCadenceInStepsPerMinute'),
-        "Steps from Activity":my_sum(dailies_json,'steps'),
-        "Calories":my_sum(dailies_json,'activeKilocalories'),
+        "Steps from Activity":my_sum(activities_json,'steps')+my_sum(dailies_json,'steps'),
+        "Calories":my_sum(epochs_json,'activeKilocalories'),
         "Training Effect":"",
         "Minimum Elevation":"",
         "Maximum Elevation":"",
         "Moving Time":"",
         "Elapsed Time":"",
-        "Average Moving Pace":"",
+        "Average Moving Pace":my_sum(activities_json,'averagePaceInMinutesPerKilometer'),
         "Average Stride Length":"",
         "Average Vertical Ratio":"",
         "Average Vertical Oscillation":"",
         "Average Gct Balance":"",
         "Avergae Ground Contact Time":"",
-        "Total Steps":my_sum(activities_json,'totalSteps'),
+        "Total Steps":my_sum(dailies_json,'totalSteps'),
         "Activity Steps":my_sum(activities_json,'activitySteps'),
         "Floors Climbed":my_sum(dailies_json,'floorsClimbed'),
         "Floors Descended":"",
