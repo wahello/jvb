@@ -20,3 +20,22 @@ export function fetchQuickLook(successquick, errorquick){
 		});
 	}
 }
+
+export function quicksummaryDate(date,successquick, errorquick){
+	const d = date.getDate();
+    const m = date.getMonth()+1;
+    const y = date.getFullYear();
+    const URL = `quicklook/users/data/${y}/${m}/${d}`;
+    const config = {
+      method: "get",
+      url: URL,
+      withCredentials: true
+    };
+     axios(config).then((response) => {
+       successquick(response);
+     }).catch(function (error){
+       errorquick(error);
+    });
+  }
+
+	
