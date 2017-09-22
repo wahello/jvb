@@ -152,7 +152,7 @@ class Weeklysummary extends React.Component{
 componentDidMount(){
   var today= new Date();
   weeklysummaryDate(today,this.successweeklysummary,this.errorweeklysummary);
-  //fetchWeeklySummary(this.successweeklysummary,this.errorweeklysummary)
+  fetchWeeklySummary(this.successweeklysummary,this.errorweeklysummary)
 }
     render(){
         console.log('i am here for rendering summary')
