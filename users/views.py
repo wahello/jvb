@@ -392,8 +392,8 @@ class fetchGarminData(APIView):
       sess = service.get_session((access_token, access_token_secret))
 
       data = {
-        'uploadStartTimeInSeconds': startDateTimeInSeconds+19800,
-        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400+19800
+        'uploadStartTimeInSeconds': startDateTimeInSeconds+5400, #GMT to EST timezone epoch is of 14400 
+        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400+5400
       }
 
       midnight = datetime.combine(date.today(), time.min)
