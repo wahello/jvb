@@ -170,3 +170,11 @@ class PullGarminData(APIView):
 			return Response(status=status.HTTP_201_CREATED)
 		else:
 			return Response(status.HTTP_401_UNAUTHORIZED)	
+
+class GarminPing(APIView):
+	'''
+		This view will receive PING API data and print it in Logs
+	'''
+	def post(self, request, format=None):
+		print("\n\n ***********PING DATA***********\n\n",request.data)
+		return Response(status = status.HTTP_200_OK)
