@@ -24,6 +24,38 @@ class UserQuickLookView(generics.ListCreateAPIView):
     queryset = UserQuickLook.objects.all()
     serializer_class = UserQuickLookSerializer
 
+class UserQuickLookWeeklyView(generics.ListAPIView):
+	'''
+		 - Return list of quicklook from last sunday to upcoming saturday
+		   for provided date
+		 - Week start at Sunday and ends at Saturday
+		 - Monday is 0 and Sunday is 6
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = UserQuickLookSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+		d = int(self.kwargs.get('day'))
+		m = int(self.kwargs.get('month'))
+		y = int(self.kwargs.get('year'))
+		current_dt = datetime.date(y,m,d)
+		
+		# upcoming saturday date
+		week_end_dt = current_dt + datetime.timedelta(5 - current_dt.weekday())
+
+		if not current_dt.weekday() == 6:
+			# If weekday is not sunday find the date of last sunday
+			week_start_dt = current_dt - datetime.timedelta(current_dt.weekday()+1)
+		else:
+			# A new week started, it's sunday yay!
+			week_start_dt = current_dt
+		
+		qs = UserQuickLook.objects.filter(Q(created_at__gte=week_start_dt)&
+								   		  Q(created_at__lte=week_end_dt),
+								   		  user=user)
+		return qs
+
 
 class UserQuickLookItemView(generics.RetrieveUpdateDestroyAPIView):
 	'''

@@ -445,6 +445,11 @@ class fetchGarminData(APIView):
           output_dict[dtype] = ([q.data for q in model.objects.filter(user=user)])
 
 
+      # users input raw
+      from user_input.views import UserDailyInputView
+      user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
+      output_dict['user_input_raw'] = user_input_raw
+
 
       decode_dailies_raw = output_dict['dailies']
       dailies_json = [ast.literal_eval(dic) for dic in decode_dailies_raw]

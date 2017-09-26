@@ -137,7 +137,7 @@ class GarminDataPage extends Component {
   updateState(data){
 
     this.setState({raw_output: data,
-    activities_data:data.data.activities[0].split(','),
+    // activities_data:data.data.activities[0].split(','),
       garmin_health_api: {
       //   activity_name:data.data.garmin_health_api.activity name,
       //   activity_type:data.dailies.garmin_health_api.activity_type,

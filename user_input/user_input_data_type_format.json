@@ -16,7 +16,8 @@
 		"stress_level_yesterday":"Medium",
 		"pains_twings_during_or_after_your_workout":"Yes",
 		"water_consumed_during_workout":100,
-		"workout_that_user_breathed_through_nose":"50"
+		"workout_that_user_breathed_through_nose":50,
+		"pain_area":"leg"
 	},
 
 	"optional_input":
@@ -28,20 +29,12 @@
 		"weight":60,
 		"waist_size":30,
 		"clothes_size":10,
-		"heart_rate_variability":30
-	},
-
-	"third_source_input":
-	{
-		"resting_heart_rate":50,
-		"sleep_time_excluding_awake_time":"sleep time",
-		"other":"some char value",
-		"tbd":"some char value"
-	},
-
-	"goals":
-	{
-		"goals":"improve health",
-		"other":"Becoming Hokage!"
+		"heart_rate_variability":30,
+		"sick":"Yes",
+		"sick_comment":"I'm verrrrry sick!!",
+		"stand_for_three_hours":"Yes",
+		"percent_breath_nose_last_night":90,
+		"percent_breath_nose_all_day_not_exercising":85
 	}
+
 }
