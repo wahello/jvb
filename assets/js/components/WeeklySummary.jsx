@@ -1,7 +1,7 @@
 import React from 'react';
 import NavbarMenu from './navbar';
 import fetchWeeklySummary from '../network/weeklysummary';
-import weeklysummaryDate from '../network/weeklysummary'
+import {weeklysummaryDate} from '../network/weeklysummary'
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
@@ -160,20 +160,23 @@ componentDidMount(){
             <div className="container">
              <NavbarMenu/>
               <div className="col-lg-12 col-md-6 col-sm-3">
+              <div className="row">
                  <div className="tbcw">
-                 
                 <h2>Weekly Summary</h2>
-               
+               </div>
               </div>
+               
+     
               
-               <div className="row justify-content-center">
-               <div className="col-sm-2">
+               <div className="row">
+              
+
+      <div>
+       <div id="tbcw2" className="col-sm-5">
             <CalendarWidget onDaySelect={this.processDate}/>,
              </div>
-     
+             <div className="col-sm-7">
 
-       <div>
-      
           <Table id="tbcw1" className="table table-info">
             
               <th></th>
@@ -255,6 +258,7 @@ componentDidMount(){
             </tr>     
             </tbody>
           </Table>
+</div>
         </div>
       </div>
       </div>

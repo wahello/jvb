@@ -3,8 +3,8 @@ import axiosRetry from 'axios-retry';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function fetchWeeklySummary(successweeklysummary,errorweeklysummary){
-	console.log('suresh');
+export default function fetchWeeklySummary(successweeklysummary,errorweeklysummary){ 
+	console.log('suresh'); 
 	// return function(dispatch){
  //      const URL='';
  //      const config={

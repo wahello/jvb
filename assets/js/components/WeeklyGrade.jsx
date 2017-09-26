@@ -8,7 +8,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
 axiosRetry(axios, { retries: 4}); 
-var CalendarWidget = require('react-calendar-widget');
+var CalendarWidget = require('react-calendar-widget');   
 
 var ReactDOM = require('react-dom');
 
@@ -71,22 +71,24 @@ processDate(date){
     fetchWeeklyGrade(this.successweekly, this.errorweekly)
   }
     render(){
-        console.log('i am here for rendering weekly grade')
+        console.log('i am here for rendering weekly grade') 
         return(
             <div className="container">
             <NavbarMenu/>
 
-             <div className="col-md-12">
+             <div className="col-lg-12 col-md-6 col-sm-3">
+             <div className="row">
              <div className="tbc">
                <h2>Weekly Report With Grades</h2>
              </div>
-          
-          <div className="row justify-content-center">
-         
-          <div className="col-sm-2">
-            <CalendarWidget onDaySelect={this.processDate}/>,
              </div>
-              <div>
+          
+          <div className="row">
+         <div>
+          <div className="col-sm-3" >
+            <CalendarWidget  onDaySelect={this.processDate}/>,
+             </div>
+             <div className="col-sm-9">
             <Table id="tbc2" className="table table-success">
             
              <tr>
@@ -203,6 +205,7 @@ processDate(date){
             </tr>
           </tbody>
            </Table>
+           </div>
           </div>
           </div>
         </div>
