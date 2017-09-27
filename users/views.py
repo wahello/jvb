@@ -405,8 +405,6 @@ class fetchGarminData(APIView):
         'uploadEndTimeInSeconds':startDateTimeInSeconds+86400-14400
       }
 
-      print("\n\nstart time and end time\n\n",data)
-
       midnight = datetime.combine(date.today(), time.min)
       # today's epoch at midnight
       today_epoch = calendar.timegm(midnight.timetuple())
@@ -434,7 +432,7 @@ class fetchGarminData(APIView):
                             .order_by('-record_date_in_seconds')
         pull = False
 
-        if latest_record and latest_record[0].record_date_in_seconds - today_epoch > 604800:
+        if latest_record and today_epoch - latest_record[0].record_date_in_seconds > 604800:
           pull = True
 
         elif not latest_record:
@@ -458,13 +456,6 @@ class fetchGarminData(APIView):
                                 record_date_in_seconds__gte=data['uploadStartTimeInSeconds'],
                                 record_date_in_seconds__lte=data['uploadEndTimeInSeconds'])]
 
-
-      # users input raw
-      from user_input.views import UserDailyInputView
-      user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
-      output_dict['user_input_raw'] = user_input_raw
-
-
       dailies_json = output_dict['dailies']
       if not PULL_HISTORY['dailies']:
         dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
@@ -474,7 +465,7 @@ class fetchGarminData(APIView):
         activities_json = [ast.literal_eval(dic) for dic in activities_json]
 
       manuallyUpdatedActivities_json = output_dict['manuallyUpdatedActivities']
-      if PULL_HISTORY['activities']:
+      if PULL_HISTORY['manuallyUpdatedActivities']:
         manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in manuallyUpdatedActivities_json]
 
       epochs_json = output_dict['epochs']
@@ -509,11 +500,11 @@ class fetchGarminData(APIView):
       output_dict['garmin_health_api'] = {
 
         "Activity Name": "",
-        "Activity Type": dailies_json[0]['activityType'],
+        "Activity Type": dailies_json[0]['activityType'] if dailies_json else '',
         "Event Type":"",
         "Course":"",
         "Location":"",
-        "start": dailies_json[0]['startTimeInSeconds'],
+        "start": dailies_json[0]['startTimeInSeconds'] if dailies_json else '',
         "Time":my_sum(dailies_json,'activeTimeInSeconds'),
         "Distance":my_sum(dailies_json,'distanceInMeters'),
         "Lap Information":"",
@@ -544,12 +535,13 @@ class fetchGarminData(APIView):
         "Floors Descended":"",
         "Calories In/Out":my_sum(dailies_json,'activeKilocalories'),
         "Golf Stats":"",
-        "Weight In grams":bodyComps_json[0]['weightInGrams'],
+        "Weight In grams":bodyComps_json[0]['weightInGrams'] if bodyComps_json else '',
         "Body Mass":"",
         "BMI":"",
         "Body Composition Summary (from Garmin Index scale)":"",
         "Resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute'),
-        "Average resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute')/len(dailies_json),
+        "Average resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute')/len(dailies_json)\
+                                     if dailies_json else '',
         "Maximum Resting Heart Rate":max_values(dailies_json,'restingHeartRateInBeatsPerMinute'),
         "Resting Heart Rate Trends Over Time ":"",
         "VO2 Max grab data and populate database":"",
@@ -567,6 +559,10 @@ class fetchGarminData(APIView):
         "Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
         "Stress Field (HRV throughout the day)":""
                 }
+      # users input raw
+      from user_input.views import UserDailyInputView
+      user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
+      output_dict['user_input_raw'] = user_input_raw
 
       return Response(output_dict)
 
