@@ -79,7 +79,7 @@ class DailyUserInputEncouraged(models.Model):
         (LEG, 'Leg')
     )
     user_input = models.OneToOneField(UserDailyInput, related_name='encouraged_input')
-    stress_level_yesterday = models.CharField(max_length=4,choices = stress_level_choices)
+    stress_level_yesterday = models.CharField(max_length=6,choices = stress_level_choices)
     pains_twings_during_or_after_your_workout =models.CharField(max_length=4,choices = choice)
     water_consumed_during_workout = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(250)])
     workout_that_user_breathed_through_nose = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(100)])
