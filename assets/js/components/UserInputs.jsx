@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+// var ReactDOM = require('react-dom');
+// var CalendarWidget = require('react-calendar-widget');
+import CalendarWidget from 'react-calendar-widget';
 
 import { Container, Select, option, Option, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText, className } from 'reactstrap';
@@ -9,14 +12,25 @@ class UserInputs extends React.Component{
 
     constructor(props){
       super(props);
+      // default dis current date
+      this.state = {
+        selected_date:new Date()
+      }
       this.onSubmit = this.onSubmit.bind(this);
+      this.processDate = this.processDate.bind(this);
+    }
+
+    processDate(date){
+      this.setState({
+        selected_date:date
+      });
     }
 
     onSubmit(event){
       event.preventDefault();
       var form = this.input_form;
       var elmnts = form.elements.length;
-      var form_values = {};
+      var form_values = {'created_at':this.state.selected_date};
       for(var i=0; i<elmnts; i++){
         form_values[form.elements[i].name] = form.elements[i].value;
       }
@@ -30,6 +44,9 @@ class UserInputs extends React.Component{
                 <Container id="user-inputs">
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
+                        <div className="col-sm-2">
+                         <CalendarWidget onDaySelect={this.processDate}/>,
+                        </div>
                         <h2 className="head">Daily user inputs report</h2>
                         <Form 
                           getRef = {(input) => this.input_form = input}

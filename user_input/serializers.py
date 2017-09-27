@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 
 from .models import UserDailyInput,\
@@ -53,7 +55,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# fields = ('user','created_at','updated_at','strong_input','encouraged_input',
 		# 		  'optional_input','third_source_input','goals')
 	
-		read_only_fields = ('created_at','updated_at',)
+		read_only_fields = ('updated_at',)
+
 
 	def _update_helper(instance, validated_data):
 		'''
@@ -69,7 +72,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		instance.save()
 	
 	def create(self, validated_data):
-
+		
 		user = self.context['request'].user
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')

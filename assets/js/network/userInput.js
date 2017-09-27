@@ -30,7 +30,7 @@ function formatJSON(data){
 				"stress_level_yesterday":"Medium",
 				"pains_twings_during_or_after_your_workout":"Yes",
 				"water_consumed_during_workout":100,
-				"workout_that_user_breathed_through_nose":50
+				"workout_that_user_breathed_through_nose":50,
 				"pain_area":"leg"
 			},
 
@@ -54,13 +54,18 @@ function formatJSON(data){
 		}
 
 	*/
+	const d = data.created_at.getDate();
+    const m = data.created_at.getMonth()+1;
+    const y = data.created_at.getFullYear();
+    const created_at = y+"-"+m+"-"+d;
 
 	let json_data = {
+		"created_at":data.created_at,
 		"strong_input":{},
 		"encouraged_input":{},
 		"optional_input":{}
 	};
-
+	
 	json_data.strong_input['work_out_easy_or_hard'] = data.work_out_easy; 
 	json_data.strong_input['work_out_effort_level'] = data.workout_effort; 
 	json_data.strong_input['unprocessed_food_consumed_yesterday'] = data.unprocessed_food; 
@@ -100,11 +105,15 @@ export function userDailyInputSend(data){
 		url : URL,
 		data : formatJSON(data),
 		method : 'post',
-		withCredentials: true
+		withCredentials: true,
+		headers:{
+			'Content-Type': 'application/json'				
+		}
 	};
 	axios(config).then((response) => {
 		alert("User Input submitted successfully!");
 	}).catch((error) => {
+		console.log(error);
 		console.log(error.message);
 	});
 }

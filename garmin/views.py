@@ -169,12 +169,42 @@ class PullGarminData(APIView):
 				# )
 			return Response(status=status.HTTP_201_CREATED)
 		else:
-			return Response(status.HTTP_401_UNAUTHORIZED)	
+			return Response(status.HTTP_401_UNAUTHORIZED)
+
+
+from mailjet_rest import Client
+
+# Ya ya! I know this it's not good practice 
+# to expose key but knock it off for a while
+
+MAILJET_KEY = '2f205406afff360b2a60954a8c213223'
+MAILJET_SECRET = 'ab6866adc74542922ad06f982331bb67'
+mailjet = Client(auth=(MAILJET_KEY, MAILJET_SECRET), version='v3.1')
 
 class GarminPing(APIView):
 	'''
-		This view will receive PING API data and print it in Logs
+		This view will receive PING API data and 
+		send that data to email address : atulk@s7inc.co
 	'''
 	def post(self, request, format=None):
+		data = {
+		  'Messages': [
+		                {
+	                        "From": {
+	                                "Email": "atulk@s7inc.co",
+	                                "Name": "Atul Kumar"
+	                        },
+	                        "To": [
+	                                {
+	                                        "Email": "atulk@s7inc.co",
+	                                        "Name": "Atul Kumar"
+	                                }
+	                        ],
+	                        "Subject": "Garmin PING data",
+	                        "TextPart": str(request.data)
+		                }
+		        ]
+		}
 		print("\n\n ***********PING DATA***********\n\n",request.data)
+		request = mailjet.send.create(data=data)
 		return Response(status = status.HTTP_200_OK)

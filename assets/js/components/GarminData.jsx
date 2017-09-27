@@ -12,7 +12,7 @@ var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
 class GarminDataPage extends Component {
-
+/*
   getEpoch(dateObj=null){
 
     if(!dateObj)
@@ -26,13 +26,22 @@ class GarminDataPage extends Component {
     // dividing by 1000 to convert into seconds
     return dateObj.getTime()/1000;
   }
+*/
+  convertDateToString(dt){
+    const d = dt.getDate();
+    const m = dt.getMonth()+1;
+    const y = dt.getFullYear();
+    dt = y+"-"+m+"-"+d;
+    // dt = '2017-9-13';
+    return dt;
+  }
 
   constructor(props) {
     super(props);
     this.processDate = this.processDate.bind(this);
     this.state = {
         raw_output: '',
-        selectedDateEpoch: this.getEpoch(),
+        selectedDate:this.convertDateToString(new Date()),
         weatherData: '',
         activities_data:'',
        garmin_health_api: {
@@ -114,24 +123,26 @@ class GarminDataPage extends Component {
   processDate(date){
 
     //processing date logic
+    date = this.convertDateToString(date);
     this.setState({
-      selectedDateEpoch: this.getEpoch(date)
-    })
+      selectedDate:date
+    },function(){
+      console.log(this.state.selectedDate);
+      const URL = '/users/garmin/fetch';
+      const config = {
+        method: "get",
+        url: URL,
+        params: {
+            start_date: this.state.selectedDate
+          },
 
-    const URL = '/users/garmin/fetch';
-    const config = {
-      method: "get",
-      url: URL,
-      params: {
-          start_date: this.state.selectedDateEpoch
-        },
-
-    };
-    axios(config).then( function(response){
-      this.updateState(response);
-    }.bind(this)).catch((error) => {
-      console.log(error.message);
-    });
+      };
+      axios(config).then( function(response){
+        this.updateState(response);
+      }.bind(this)).catch((error) => {
+        console.log(error.message);
+      });
+    }.bind(this));
   }
 
   updateState(data){
@@ -244,7 +255,7 @@ class GarminDataPage extends Component {
       method:"get",
       url: URL,
       params: {
-          start_date: this.state.selectedDateEpoch
+          start_date: this.state.selectedDate
       },
     };
     axios(config).then( function(response){
