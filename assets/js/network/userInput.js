@@ -13,6 +13,7 @@ function formatJSON(data){
 		 example - 
 		 
 		 {
+		 	"creatd_at":"2017-9-13",
 			"strong_input":
 			{
 				"work_out_easy_or_hard":"Hard",
@@ -49,7 +50,7 @@ function formatJSON(data){
 				"stand_for_three_hours":"Yes",
 				"percent_breath_nose_last_night":90,
 				"percent_breath_nose_all_day_not_exercising":85
-			},
+			}
 
 		}
 
@@ -60,7 +61,7 @@ function formatJSON(data){
     const created_at = y+"-"+m+"-"+d;
 
 	let json_data = {
-		"created_at":data.created_at,
+		"created_at":created_at,
 		"strong_input":{},
 		"encouraged_input":{},
 		"optional_input":{}

@@ -37,7 +37,6 @@ class Register extends Component {
 	}
 
 	onSubmit(values){
-		
 		var reg = new RegisterNetwork();
 		reg.register(values,this.onRegisterSuccess,this.onRegisterFailure);
 	}

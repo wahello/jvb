@@ -44,9 +44,9 @@ class UserInputs extends React.Component{
                 <Container id="user-inputs">
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
-                        <div className="col-sm-2">
-                         <CalendarWidget onDaySelect={this.processDate}/>,
-                        </div>
+                      <div className="col-sm-2">
+                           <CalendarWidget onDaySelect={this.processDate}/>,
+                      </div>
                         <h2 className="head">Daily user inputs report</h2>
                         <Form 
                           getRef = {(input) => this.input_form = input}

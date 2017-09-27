@@ -31,7 +31,6 @@ class Dashboard extends Component {
 			<div>
 				<NavbarMenu />
 				<div>
-					{this.fetchGarminData()}
 				</div>
 			</div>
 		);
