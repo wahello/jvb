@@ -15,7 +15,8 @@ import Steps from './quicksummary_steps';
 import Sleep from './quicksummary_sleep';
 import Food from './quicksummary_food';  
 import Alcohol from './quicksummary_alocohol';
-import Exercise from './quicksummary_exercise';  
+import Exercise from './quicksummary_exercise';
+import Movement from './movement_summary';  
 
 
 axiosRetry(axios, { retries: 3});
@@ -25,6 +26,126 @@ var ReactDOM = require('react-dom');
 
 
 class Quicklook extends Component{
+
+	getInitialState(){
+		 let initial_state={
+				"sunday":{},
+				"monday":{},
+				"tuesday":{},
+				"wednesday":{},
+				"thursday":{},
+				"friday":{},
+				"saturday":{}
+			};
+
+		let blank_properties={
+			"created_at":'',
+			"grades_ql":{
+				    "overall_truth_grade": '-',
+			        "overall_truth_health_gpa": '-',
+			        "movement_non_exercise_grade": '-',
+			        "movement_consistency_grade": '-',
+			        "avg_sleep_per_night_grade": '-',
+			        "exercise_consistency_grade": '-',
+			        "overall_workout_grade": '-',
+			        "prcnt_non_processed_food_consumed_grade": '-',
+			        "alcoholic_drink_per_week_grade": '-',
+			        "penalty": '-'
+
+			},
+			"exercise_reporting_ql": {
+		        "workout_easy_hard": '-',
+		        "workout_type": '-',
+		        "workout_time": '-',
+		        "workout_location": '-',
+		        "workout_duration": '-',
+		        "maximum_elevation_workout": '-',
+		        "minutes_walked_before_workout": '-',
+		        "distance": '-',
+		        "pace": '-',
+		        "avg_heartrate": '-',
+		        "elevation_gain": '-',
+		        "elevation_loss": '-',
+		        "effort_level": '-',
+		        "dew_point": '-',
+		        "temperature": '-',
+		        "humidity": '-',
+		        "temperature_feels_like": '-',
+		        "wind": '-',
+		        "hrr": '-',
+		        "hrr_start_point": '-',
+		        "hrr_beats_lowered": '-',
+		        "sleep_resting_hr_last_night": '-',
+		        "vo2_max": '-',
+		        "running_cadence": '-',
+		        "nose_breath_prcnt_workout": '-',
+		        "water_consumed_workout": '-',
+		        "chia_seeds_consumed_workout": '-',
+		        "fast_before_workout": '-',
+		        "pain": '-',
+		        "pain_area": '-',
+		        "stress_level":'-',
+		        "sick": '-',
+		        "drug_consumed": '-',
+		        "drug": '-',
+		        "medication": '-',
+		        "smoke_substance": '-',
+		        "exercise_fifteen_more": '-',
+		        "workout_elapsed_time": '-',
+		        "timewatch_paused_workout": '-',
+		        "exercise_consistency":'-',
+		        "workout_duration_grade": '-',
+		        "workout_effortlvl_grade": '-',
+		        "avg_heartrate_grade": '-',
+		        "overall_workout_grade": '-',
+		        "heartrate_variability_grade": '-',
+		        "workout_comment": '-'
+		    },
+		    "swim_stats_ql": {    
+		        "pace_per_100_yard": '-',
+		        "total_strokes": '-'
+		    },
+		     "bike_stats_ql": {
+		        "avg_speed": '-',
+		        "avg_power": '-',
+		        "avg_speed_per_mile": '-',
+		        "avg_cadence": '-',
+		    },
+		    "steps_ql": {
+		        "non_exercise_steps": '-',
+		        "exercise_steps": '-',
+		        "total_steps": '-',
+		        "floor_climed": '-',
+		        "floor_decended": '-',
+		        "movement_consistency": '-',
+		    },
+
+		    "sleep_ql": {
+		        "sleep_per_wearable": '-',
+		        "sleep_per_user_input": '-',
+		        "sleep_aid": '-',
+		        "sleep_bed_time": '-',
+		        "sleep_awake_time": '-',
+		        "deep_sleep": '-',
+		        "light_sleep": '-',
+		        "awake_time": '-'
+		    },
+		    "food_ql": {
+		        "prcnt_non_processed_food": '-',
+		        "prcnt_non_processed_food_grade": '-',
+		        "non_processed_food": '-',
+		        "diet_type": '-'
+		    },
+		    "alcohol_ql": {
+		        "alcohol_day": '-',
+		        "alcohol_week": '-'
+		    }
+		};
+		for(const day of Object.keys(initial_state)){
+				initial_state[day] = blank_properties
+       		}
+       	return initial_state;
+	}
 	constructor(props){
 		super(props);
 		this.successquick = this.successquick.bind(this);
@@ -32,245 +153,14 @@ class Quicklook extends Component{
 		this.processDate = this.processDate.bind(this);
 		this.onDismiss = this.onDismiss.bind(this);
 		this.updateDayState=this.updateDayState.bind(this);
-
-		var initial_state={
-			"sunday":{},
-			"monday":{},
-			"tuesday":{},
-			"wednesday":{},
-			"thursday":{},
-			"friday":{},
-			"saturday":{}
-		};
-
-		var blank_properties={
-			"created_at":'',
-			"grades_ql":{
-				    "overall_truth_grade": '',
-			        "overall_truth_health_gpa": '',
-			        "movement_non_exercise_grade": '',
-			        "movement_consistency_grade": '',
-			        "avg_sleep_per_night_grade": '',
-			        "exercise_consistency_grade": '',
-			        "overall_workout_grade": '',
-			        "prcnt_non_processed_food_consumed_grade": '',
-			        "alcoholic_drink_per_week_grade": '',
-			        "penalty": ''
-
-			},
-			"exercise_reporting_ql": {
-		        "workout_easy_hard": '',
-		        "workout_type": '',
-		        "workout_time": '',
-		        "workout_location": '',
-		        "workout_duration": '',
-		        "maximum_elevation_workout": '',
-		        "minutes_walked_before_workout": '',
-		        "distance": '',
-		        "pace": '',
-		        "avg_heartrate": '',
-		        "elevation_gain": '',
-		        "elevation_loss": '',
-		        "effort_level": '',
-		        "dew_point": '',
-		        "temperature": '',
-		        "humidity": '',
-		        "temperature_feels_like": '',
-		        "wind": '',
-		        "hrr": '',
-		        "hrr_start_point": '',
-		        "hrr_beats_lowered": '',
-		        "sleep_resting_hr_last_night": '',
-		        "vo2_max": '',
-		        "running_cadence": '',
-		        "nose_breath_prcnt_workout": '',
-		        "water_consumed_workout": '',
-		        "chia_seeds_consumed_workout": '',
-		        "fast_before_workout": '',
-		        "pain": '',
-		        "pain_area": '',
-		        "stress_level":'',
-		        "sick": '',
-		        "drug_consumed": '',
-		        "drug": '',
-		        "medication": '',
-		        "smoke_substance": '',
-		        "exercise_fifteen_more": '',
-		        "workout_elapsed_time": '',
-		        "timewatch_paused_workout": '',
-		        "exercise_consistency":'',
-		        "workout_duration_grade": '',
-		        "workout_effortlvl_grade": '',
-		        "avg_heartrate_grade": '',
-		        "overall_workout_grade": '',
-		        "heartrate_variability_grade": '',
-		        "workout_comment": ''
-		    },
-		    "swim_stats_ql": {    
-		        "pace_per_100_yard": '',
-		        "total_strokes": ''
-		    },
-		     "bike_stats_ql": {
-		        "avg_speed": '',
-		        "avg_power": '',
-		        "avg_speed_per_mile": '',
-		        "avg_cadence": '',
-		    },
-		    "steps_ql": {
-		        "non_exercise_steps": '',
-		        "exercise_steps": '',
-		        "total_steps": '',
-		        "floor_climed": '',
-		        "floor_decended": '',
-		        "movement_consistency": '',
-		    },
-
-		    "sleep_ql": {
-		        "sleep_per_wearable": '',
-		        "sleep_per_user_input": '',
-		        "sleep_aid": '',
-		        "sleep_bed_time": '',
-		        "sleep_awake_time": '',
-		        "deep_sleep": '',
-		        "light_sleep": '',
-		        "awake_time": ''
-		    },
-		    "food_ql": {
-		        "prcnt_non_processed_food": '',
-		        "prcnt_non_processed_food_grade": '',
-		        "non_processed_food": '',
-		        "diet_type": ''
-		    },
-		    "alcohol_ql": {
-		        "alcohol_day": '',
-		        "alcohol_week": ''
-		    }
-		}
-		for(const day of Object.keys(initial_state)){
-				initial_state[day] = blank_properties
-       		}
-   
+		// this.activateTab=this.activateTab.bind(this);
+		let initial_state = this.getInitialState()
 		this.state = {
 			visible: true,
 			error:false,
 			data:initial_state,
-			grades_ql: {
-		        id: '',
-		        user_ql: '',
-		        overall_truth_grade: '',
-		        overall_truth_health_gpa: '',
-		        movement_non_exercise_grade: '',
-		        movement_consistency_grade: '',
-		        avg_sleep_per_night_grade: '',
-		        exercise_consistency_grade: '',
-		        overall_workout_grade: '',
-		        prcnt_non_processed_food_consumed_grade: '',
-		        alcoholic_drink_per_week_grade: '',
-		        penalty: ''
-    		},
-
-
-    		exercise_reporting_ql: {
-		        id: '',
-		        user_ql: '',
-		        workout_easy_hard: '',
-		        workout_type: '',
-		        workout_time: '',
-		        workout_location: '',
-		        workout_duration: '',
-		        maximum_elevation_workout: '',
-		        minutes_walked_before_workout: '',
-		        distance: '',
-		        pace: '',
-		        avg_heartrate: '',
-		        elevation_gain: '',
-		        elevation_loss: '',
-		        effort_level: '',
-		        dew_point: '',
-		        temperature: '',
-		        humidity: '',
-		        temperature_feels_like: '',
-		        wind: '',
-		        hrr: '',
-		        hrr_start_point: '',
-		        hrr_beats_lowered: '',
-		        sleep_resting_hr_last_night: '',
-		        vo2_max: '',
-		        running_cadence: '',
-		        nose_breath_prcnt_workout: '',
-		        water_consumed_workout: '',
-		        chia_seeds_consumed_workout: '',
-		        fast_before_workout: '',
-		        pain: '',
-		        pain_area: '',
-		        stress_level:'',
-		        sick: '',
-		        drug_consumed: '',
-		        drug: '',
-		        medication: '',
-		        smoke_substance: '',
-		        exercise_fifteen_more: '',
-		        workout_elapsed_time: '',
-		        timewatch_paused_workout: '',
-		        exercise_consistency:'',
-		        workout_duration_grade: '',
-		        workout_effortlvl_grade: '',
-		        avg_heartrate_grade: '',
-		        overall_workout_grade: '',
-		        heartrate_variability_grade: '',
-		        workout_comment: ''
-		    },
-		    swim_stats_ql: {
-		        id: '',
-		        user_ql: '',
-		        pace_per_100_yard: '',
-		        total_strokes: ''
-		    },
-		     "bike_stats_ql": {
-		        id: '',
-		        user_ql: '',
-		        avg_speed: '',
-		        avg_power: '',
-		        avg_speed_per_mile: '',
-		        avg_cadence: '',
-		    },
-		    "steps_ql": {
-		        "id": '',
-		        "user_ql": '',
-		        "non_exercise_steps": '',
-		        "exercise_steps": '',
-		        "total_steps": '',
-		        "floor_climed": '',
-		        "floor_decended": '',
-		        "movement_consistency": '',
-		    },
-
-		    sleep_ql: {
-		        id: '',
-		        user_ql: '',
-		        sleep_per_wearable: '',
-		        sleep_per_user_input: '',
-		        sleep_aid: '',
-		        sleep_bed_time: '',
-		        sleep_awake_time: '',
-		        deep_sleep: '',
-		        light_sleep: '',
-		        awake_time: ''
-		    },
-		    food_ql: {
-		        id: '',
-		        user_ql: '',
-		        prcnt_non_processed_food: '',
-		        prcnt_non_processed_food_grade: '',
-		        non_processed_food: '',
-		        diet_type: ''
-		    },
-		    alcohol_ql: {
-		        id: '',
-		        user_ql: '',
-		        alcohol_day: '',
-		        alcohol_week: ''
-		    }
+			activeTab : 'grade'
+			
 		};
 	}
 
@@ -393,36 +283,34 @@ class Quicklook extends Component{
 			        alcohol_day: data.alcohol_ql.alcohol_day,
 			        alcohol_week: data.alcohol_ql.alcohol_week
 			    }
-             }
+             };
              return properties;
        		}
 
 	successquick(data){
 		console.log(data);
-		let days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-		let updated_state ={
-			"sunday":{},
-			"monday":{},
-			"tuesday":{},
-			"wednesday":{},
-			"thursday":{},
-			"friday":{},
-			"saturday":{}
-	
-            }
-	 	 for(const dataitem of data){
-	      	let date=dataitem.created_at;
-	      	let day=days[date.getDay()];
-	      	let obj = updateDayState(day,dataitem);
-	      	updated_state[day] = obj;
-	      }
-
-
-		this.setState({
-		data:updated_state,
-		visible:true,
-		error:false
-		});
+		const days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+		let initial_state = this.getInitialState();
+         if (data.data.length > 0){
+		 	 for(var dataitem of data.data){
+		      	const date=new Date(dataitem.created_at);
+		      	const day=days[date.getDay()];
+		      	let obj = this.updateDayState(day,dataitem);
+		      	initial_state[day] = obj;
+		      }
+		      this.setState({
+				data:initial_state,
+				visible:true,
+				error:false
+			});
+	     }
+	     else{
+	     		this.setState({
+				data:initial_state,
+				visible:true,
+				error:false
+			});
+	     }
 	}
 
 	errorquick(error){
@@ -433,19 +321,15 @@ class Quicklook extends Component{
 	}
 
 	renderAlert(){
+
 		if (this.state.error){
-			console.log("some error");
+			
 			return(
 				 <Alert color="danger" isOpen={this.state.error} toggle={this.onDismiss}>
 					No Quicklook data is found!		       
 				</Alert>
 			);
 		}
-	}
-
-	Color(color){
-		console.log('suresh');
-
 	}
 
 	processDate(date){
@@ -465,7 +349,23 @@ class Quicklook extends Component{
 		});
 	}
 
+	activateTab(tab,event){
+		this.setState({
+           activeTab:tab,
+       });
+	}
+
 	render(){
+		const {activeTab}=this.state;
+		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
+		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
+		const class_bike=`nav-link ${activeTab === "bike" ? 'active':''}`;
+		const class_steps=`nav-link ${activeTab === "steps" ? 'active':''}`;
+		const class_sleep=`nav-link ${activeTab === "sleep" ? 'active':''}`;
+		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
+        const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
+        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;
+        const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;
 	return(
 		<div className="container-fluid">
 		<NavbarMenu/>
@@ -486,53 +386,121 @@ class Quicklook extends Component{
 			             </div>
 
 			             <div className="row">
-			             <div className="col-sm-8 col-sm-offset-2">
-			             <ul className="nav nav-tabs">
-						    <li><a href="#">Grades</a></li>
-						    <li><a href="#">Swim Stats</a></li>
-						    <li><a href="#">Bike Stats</a></li>
-						    <li><a href="#">Steps</a></li>
-						    <li><a href="#">Sleep</a></li>
-						    <li><a href="#">Food</a></li>
-						    <li><a href="#">Alcohol</a></li>
-						    <li><a href="#">Exercise Reporting</a></li>
+			             <div className="col-sm-10 col-sm-offset-1">
+			             <div className="quick7">
+			             <ul className="nav nav-tabs" id="quick6">
+                              
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_grade} value="grade"
+						    		 onClick={this.activateTab.bind(this,"grade")}>
+						    		Grade
+						    		</a>
+						    		</div>
+						    </li>
+						   
+						    <li className="nav-item">
+						    		<div >
+						    		<a href="#" className={class_swim}  value="swim"
+						    		 onClick={this.activateTab.bind(this,"swim")}>
+						    		 Swim Stats
+						    		 </a>
+						    		 </div>
+						     </li>
+						    <li className="nav-item">
+						    		<div >
+						    		<a href="#" className={class_bike} value="bike"
+						    		 onClick={this.activateTab.bind(this,"bike")}>
+						    		 Bike Stats
+						    		</a>
+						    		</div>
+						    </li>
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_steps}  value="steps"
+						    		 onClick={this.activateTab.bind(this,"steps")}>
+						    		 Steps
+						    		</a>
+						    		</div>
+						    </li>
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_sleep}  value="sleep"
+						    		 onClick={this.activateTab.bind(this,"sleep")}>
+						    		 Sleep
+						    		</a>
+						    		</div>
+						    </li>
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_food}  value="food"
+						    		 onClick={this.activateTab.bind(this,"food")}>
+						    		 Food
+						    		</a>
+						    		</div>
+						    </li>
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_alcohol} value="alcohol"
+						    		 onClick={this.activateTab.bind(this,"alcohol")}>
+						    		 Alcohol
+						    		 </a>
+						    		 </div>
+						    </li>
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_exercise} value="exercise"
+						    		 onClick={this.activateTab.bind(this,"exercise")}>
+						    		 Exercise Reporting
+						    		 </a>
+						    		 </div>
+						    </li>
+						      <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_movement} value="exercise"
+						    		 onClick={this.activateTab.bind(this,"movement")}>
+						    		 Movement summary
+						    		 </a>
+						    		 </div>
+						    </li>
 						 </ul>
 			      		</div>
+			             </div>
 			             </div>
                         
 			   <div id="quick2" className="row">
 			    <div className="col-sm-2 quick5">
 		            <CalendarWidget onDaySelect={this.processDate}/>,
                     </div>
-			       <Grades data={this.state.data}/>
+                    <div className="col-sm-10">
+                   
+			      		{this.state.activeTab === "grade" && <Grades data={this.state.data}/> }
+			       
 
-				         {/*---swimming--------*/}
+				         
 
-                          <Swim data={this.state.data}/>
-				           {/*---bike_stats--------*/}
-                          <Bike data={this.state.data}/>
+                         {this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
+				         
+                          {this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
 
-				          {/*---steps_ql--------*/}
+				         
 
-                       <Steps data={this.state.data}/>
-				           {/*---sleep_ql--------*/}
+                       {this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
+				          
 
-                         <Sleep data={this.state.data}/>
-				         {/*---food_ql--------*/}
+                        {this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
+				        
 
-                          <Food data={this.state.data}/>
-				          {/*---alcohol_ql--------*/}
+                         {this.state.activeTab === "food" && <Food data={this.state.data}/>}
+				         
 
-                         <Alcohol data={this.state.data}/>
-                       
-					         
-				 
+                        {this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
+                      
 
-				 {/*---Exercise Reporting--------*/}
+				         {this.state.activeTab === "exercise" && <Exercise data={this.state.data}/>}
 
-
-				 
-				 <Exercise data={this.state.data}/>
+				         {this.state.activeTab === "movement" && <Movement/>}
+                    </div>
 					</div>
 					</div>
                  

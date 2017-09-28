@@ -10,16 +10,16 @@ const Steps = (props) =>{
 				         <Table className="quick4">
 				       
 				         <tr>
-				         <th>
+				         <th className="quick8">
 						  <h4>Steps</h4>
 						  </th>
-						    <th><h4>19-09-2017</h4></th>
-							<th><h4>20-09-2017</h4></th>
-							<th><h4>21-09-2017</h4></th>
-							<th><h4>22-09-2017</h4></th>
-							<th><h4>23-09-2017</h4></th>
-							<th><h4>24-09-2017</h4></th>
-							<th><h4>25-09-2017</h4></th>
+						    <th className="quick8"><h4>{props.data.sunday.created_at}</h4></th>
+							<th className="quick8"><h4>{props.data.monday.created_at}</h4></th>
+							<th className="quick8"><h4>{props.data.tuesday.created_at}</h4></th>
+							<th className="quick8"><h4>{props.data.wednesday.created_at}</h4></th>
+							<th className="quick8"><h4>{props.data.thursday.created_at}</h4></th>
+							<th className="quick8"><h4>{props.data.friday.created_at}</h4></th>
+							<th className="quick8"><h4>{props.data.saturday.created_at}</h4></th>
 						  </tr>
 						 
 						 <tr>
