@@ -30,8 +30,8 @@ const Alcohol=(props)=>{
 				           <td> {props.data.friday.alcohol_ql.alcohol_day}</td>
 				           <td> {props.data.saturday.alcohol_ql.alcohol_day}</td>
 				         </tr>
-				         <tr>
-					        <td className="quick9">Alcohol Per Week</td>
+				         <tr className="quick9">
+					        <td >Alcohol Per Week</td>
 					        <td>{props.data.sunday.alcohol_ql.alcohol_week}</td>
 				            <td>{props.data.monday.alcohol_ql.alcohol_week}</td>
 				            <td>{props.data.tuesday.alcohol_ql.alcohol_week}</td>        

@@ -32,8 +32,8 @@ const Bike = (props) => {
 				            <td>{props.data.saturday.bike_stats_ql.avg_speed}</td>
 				         </tr>
 
-				         <tr>
-					        <td className="quick9">Avg Power</td>
+				         <tr className="quick9">
+					        <td >Avg Power</td>
 				            <td>{props.data.sunday.bike_stats_ql.avg_power}</td>
 				            <td>{props.data.monday.bike_stats_ql.avg_power}</td>
 				            <td>{props.data.tuesday.bike_stats_ql.avg_power}</td>
@@ -52,8 +52,8 @@ const Bike = (props) => {
 				            <td>{props.data.friday.bike_stats_ql.avg_speed_per_mile}</td>
 				            <td>{props.data.saturday.bike_stats_ql.avg_speed_per_mile}</td>
 				         </tr>
-				         <tr>
-					        <td className="quick9">Avg Cadence</td>
+				         <tr className="quick9">
+					        <td >Avg Cadence</td>
 				            <td>{props.data.sunday.bike_stats_ql.avg_cadence}</td>
 				            <td>{props.data.monday.bike_stats_ql.avg_cadence}</td>
 				            <td>{props.data.tuesday.bike_stats_ql.avg_cadence}</td>

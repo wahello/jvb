@@ -32,8 +32,8 @@ const Steps = (props) =>{
 				            <td>{props.data.friday.steps_ql.non_exercise_steps}</td>
 				            <td>{props.data.saturday.steps_ql.non_exercise_steps}</td>
 				         </tr>
-				         <tr>
-					        <td className="quick9">Exercise Steps</td>
+				         <tr className="quick9">
+					        <td >Exercise Steps</td>
 				            <td>{props.data.sunday.steps_ql.exercise_steps}</td>
 				            <td>{props.data.monday.steps_ql.exercise_steps}</td>
 				            <td>{props.data.tuesday.steps_ql.exercise_steps}</td>

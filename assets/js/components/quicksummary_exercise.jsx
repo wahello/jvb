@@ -33,8 +33,8 @@ const Exercise=(props)=> {
 				            <td>{props.data.friday.exercise_reporting_ql.workout_easy_hard}</td>
 				            <td>{props.data.saturday.exercise_reporting_ql.workout_easy_hard}</td>
 				         </tr>
-				         <tr>
-					        <td className="quick9">Workout Type</td>
+				         <tr className="quick9">
+					        <td >Workout Type</td>
 				            <td>{props.data.sunday.exercise_reporting_ql.workout_type}</td>
 				            <td>{props.data.monday.exercise_reporting_ql.workout_type}</td>
 				            <td>{props.data.tuesday.exercise_reporting_ql.workout_type}</td>
@@ -53,8 +53,8 @@ const Exercise=(props)=> {
 				            <td>{props.data.friday.exercise_reporting_ql.workout_time}</td>
 				            <td>{props.data.saturday.exercise_reporting_ql.workout_time}</td>
 				         </tr>
-				         <tr>
-					        <td className="quick9">WorkOut Location</td>
+				         <tr className="quick9">
+					        <td>WorkOut Location</td>
 				           <td> {props.data.sunday.exercise_reporting_ql.workout_location}</td>
 				           <td> {props.data.monday.exercise_reporting_ql.workout_location}</td>
 				           <td> {props.data.tuesday.exercise_reporting_ql.workout_location}</td>
