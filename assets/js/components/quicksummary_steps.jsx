@@ -11,19 +11,19 @@ const Steps = (props) =>{
 				       
 				         <tr>
 				         <th className="quick8">
-						  <h4>Steps</h4>
+						  <h5>Steps</h5>
 						  </th>
-						    <th className="quick8"><h4>{props.data.sunday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.monday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.tuesday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.wednesday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.thursday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.friday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.saturday.created_at}</h4></th>
+						    <th className="quick8"><h5>{props.data.sunday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.monday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.tuesday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.wednesday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.thursday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.friday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.saturday.created_at}</h5></th>
 						  </tr>
 						 
 						 <tr>
-					        <td>Non Exercise Steps : </td>
+					        <td>Non Exercise Steps</td>
 				            <td>{props.data.sunday.steps_ql.non_exercise_steps}</td>
 				            <td>{props.data.monday.steps_ql.non_exercise_steps}</td>
 				            <td>{props.data.tuesday.steps_ql.non_exercise_steps}</td>
@@ -33,7 +33,7 @@ const Steps = (props) =>{
 				            <td>{props.data.saturday.steps_ql.non_exercise_steps}</td>
 				         </tr>
 				         <tr>
-					        <td>Exercise Steps : </td>
+					        <td className="quick9">Exercise Steps</td>
 				            <td>{props.data.sunday.steps_ql.exercise_steps}</td>
 				            <td>{props.data.monday.steps_ql.exercise_steps}</td>
 				            <td>{props.data.tuesday.steps_ql.exercise_steps}</td>
@@ -43,7 +43,7 @@ const Steps = (props) =>{
 				            <td>{props.data.saturday.steps_ql.exercise_steps}</td>
 				         </tr>
 				         <tr>
-					        <td>Total Steps :</td>
+					        <td>Total Steps</td>
 				            <td>{props.data.sunday.steps_ql.total_steps}</td>
 				            <td>{props.data.monday.steps_ql.total_steps}</td>
 				            <td>{props.data.tuesday.steps_ql.total_steps}</td>
@@ -52,8 +52,8 @@ const Steps = (props) =>{
 				            <td>{props.data.friday.steps_ql.total_steps}</td>
 				            <td>{props.data.saturday.steps_ql.total_steps}</td>
 				         </tr>
-				         <tr>
-					        <td>Floor Climed : </td>
+				         <tr className="quick9">
+					        <td>Floor Climed</td>
 				            <td>{props.data.sunday.steps_ql.floor_climed}</td>
 				            <td>{props.data.monday.steps_ql.floor_climed}</td>
 				            <td>{props.data.tuesday.steps_ql.floor_climed}</td>
@@ -63,7 +63,7 @@ const Steps = (props) =>{
 				            <td>{props.data.saturday.steps_ql.floor_climed}</td>
 				         </tr>
 				         <tr>
-					        <td>Floor Decended : </td>
+					        <td>Floor Decended</td>
 				            <td>{props.data.sunday.steps_ql.floor_decended}</td>
 				            <td>{props.data.monday.steps_ql.floor_decended}</td>
 				            <td>{props.data.tuesday.steps_ql.floor_decended}</td>
@@ -73,8 +73,8 @@ const Steps = (props) =>{
 				            <td>{props.data.saturday.steps_ql.floor_decended}</td>
 				         </tr>
 				         
-				         <tr>
-					        <td>Movement Consistency : </td>
+				         <tr className="quick9">
+					        <td>Movement Consistency</td>
 				            <td>{props.data.sunday.steps_ql.movement_consistency}</td>
 				            <td>{props.data.monday.steps_ql.movement_consistency}</td>
 				            <td>{props.data.tuesday.steps_ql.movement_consistency}</td>

@@ -8,18 +8,18 @@ const Movement=(props)=>{
 
 						<div className="quick3">
 						<Table className="quick4">
-						<tr>
+						
 						<th className="quick8">
-						  <h4 >Movement Summary</h4>
+						  <h5 >Movement Summary</h5>
 						</th>
-						 	<th className="quick8"><h4>17-09-2017</h4></th>
-							 <th className="quick8"><h4>18-09-2017</h4></th>
-							 <th className="quick8"><h4>19-09-2017</h4></th>
-							 <th className="quick8"><h4>20-09-2017</h4></th>
-							 <th className="quick8"><h4>21-09-2017</h4></th>
-							 <th className="quick8"><h4>22-09-2017</h4></th>
-							 <th className="quick8"><h4>23-09-2017</h4></th>
-						</tr>
+						 	<th className="quick8"><h5>17-09-2017</h5></th>
+							 <th className="quick8"><h5>18-09-2017</h5></th>
+							 <th className="quick8"><h5>19-09-2017</h5></th>
+							 <th className="quick8"><h5>20-09-2017</h5></th>
+							 <th className="quick8"><h5>21-09-2017</h5></th>
+							 <th className="quick8"><h5>22-09-2017</h5></th>
+							 <th className="quick8"><h5>23-09-2017</h5></th>
+						
 						<tbody>
 								<tr>
 								<td>movement summary</td>

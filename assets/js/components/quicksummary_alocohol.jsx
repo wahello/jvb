@@ -8,22 +8,20 @@ const Alcohol=(props)=>{
                         <div className="quick3">
 				         <Table className="quick4">
 				         
-				         <tr>
+				         
 				         <th className="quick8">
-						  <h4>Alcohol</h4>
+						  <h5>Alcohol</h5>
 						  </th>
-						      <th className="quick8"><h4>{props.data.sunday.created_at}</h4></th>
-							  <th className="quick8"><h4>{props.data.monday.created_at}</h4></th>
-							  <th className="quick8"><h4>{props.data.tuesday.created_at}</h4></th>
-							  <th className="quick8"><h4>{props.data.wednesday.created_at}</h4></th>
-							  <th className="quick8"><h4>{props.data.thursday.created_at}</h4></th>
-							  <th className="quick8"><h4>{props.data.friday.created_at}</h4></th>
-							  <th className="quick8"><h4>{props.data.saturday.created_at}</h4></th>
-						  </tr>
-						 
+						      <th className="quick8"><h5>{props.data.sunday.created_at}</h5></th>
+							  <th className="quick8"><h5>{props.data.monday.created_at}</h5></th>
+							  <th className="quick8"><h5>{props.data.tuesday.created_at}</h5></th>
+							  <th className="quick8"><h5>{props.data.wednesday.created_at}</h5></th>
+							  <th className="quick8"><h5>{props.data.thursday.created_at}</h5></th>
+							  <th className="quick8"><h5>{props.data.friday.created_at}</h5></th>
+							  <th className="quick8"><h5>{props.data.saturday.created_at}</h5></th>
 					<tbody>
 						 <tr>
-					        <td>Alcohol Per Day : </td>
+					        <td>Alcohol Per Day</td>
 				           <td> {props.data.sunday.alcohol_ql.alcohol_day}</td>
 				           <td> {props.data.monday.alcohol_ql.alcohol_day}</td>
 				           <td> {props.data.tuesday.alcohol_ql.alcohol_day}</td>
@@ -33,7 +31,7 @@ const Alcohol=(props)=>{
 				           <td> {props.data.saturday.alcohol_ql.alcohol_day}</td>
 				         </tr>
 				         <tr>
-					        <td>Alcohol Per Week : </td>
+					        <td className="quick9">Alcohol Per Week</td>
 					        <td>{props.data.sunday.alcohol_ql.alcohol_week}</td>
 				            <td>{props.data.monday.alcohol_ql.alcohol_week}</td>
 				            <td>{props.data.tuesday.alcohol_ql.alcohol_week}</td>        

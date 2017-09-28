@@ -8,21 +8,21 @@ const Bike = (props) => {
                           <div className="quick3">
                           <Table className="quick4">
                            
-				         <tr>
+				        
 				         <th className="quick8">
-						  <h4>Bike Stats</h4>
+						  <h5>Bike Stats</h5>
 						  </th>
-						    <th className="quick8"><h4>{props.data.sunday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.monday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.tuesday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.wednesday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.thursday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.friday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.saturday.created_at}</h4></th>
-						</tr>
+						    <th className="quick8"><h5>{props.data.sunday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.monday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.tuesday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.wednesday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.thursday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.friday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.saturday.created_at}</h5></th>
+						
 					
 						 <tr>
-					        <td>Avg Speed : </td>
+					        <td>Avg Speed</td>
 				            <td>{props.data.sunday.bike_stats_ql.avg_speed}</td>
 				            <td>{props.data.monday.bike_stats_ql.avg_speed}</td>
 				            <td>{props.data.tuesday.bike_stats_ql.avg_speed}</td>
@@ -33,7 +33,7 @@ const Bike = (props) => {
 				         </tr>
 
 				         <tr>
-					        <td>Avg Power : </td>
+					        <td className="quick9">Avg Power</td>
 				            <td>{props.data.sunday.bike_stats_ql.avg_power}</td>
 				            <td>{props.data.monday.bike_stats_ql.avg_power}</td>
 				            <td>{props.data.tuesday.bike_stats_ql.avg_power}</td>
@@ -43,7 +43,7 @@ const Bike = (props) => {
 				            <td>{props.data.saturday.bike_stats_ql.avg_power}</td>
 				         </tr>
 				         <tr>
-					        <td>Asvg Speed Per Mile : </td>
+					        <td>Asvg Speed Per Mile</td>
 				            <td>{props.data.sunday.bike_stats_ql.avg_speed_per_mile}</td>
 				            <td>{props.data.monday.bike_stats_ql.avg_speed_per_mile}</td>
 				            <td>{props.data.tuesday.bike_stats_ql.avg_speed_per_mile}</td>
@@ -53,7 +53,7 @@ const Bike = (props) => {
 				            <td>{props.data.saturday.bike_stats_ql.avg_speed_per_mile}</td>
 				         </tr>
 				         <tr>
-					        <td>Avg Cadence : </td>
+					        <td className="quick9">Avg Cadence</td>
 				            <td>{props.data.sunday.bike_stats_ql.avg_cadence}</td>
 				            <td>{props.data.monday.bike_stats_ql.avg_cadence}</td>
 				            <td>{props.data.tuesday.bike_stats_ql.avg_cadence}</td>

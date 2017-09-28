@@ -7,20 +7,20 @@ const Swim = (props) =>{
 	return(
 					 <div className="quick3">
 			         <Table className="quick4">
-                           
+                          <tr > 
 				         <th className="quick8">
-						  <h4>Swim Stats</h4>
+						  <h5>Swim Stats</h5>
 						</th>
-						    <th className="quick8"><h4>{props.data.sunday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.monday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.tuesday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.wednesday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.thursday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.friday.created_at}</h4></th>
-							<th className="quick8"><h4>{props.data.saturday.created_at}</h4></th>
-						
+						    <th className="quick8"><h5>{props.data.sunday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.monday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.tuesday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.wednesday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.thursday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.friday.created_at}</h5></th>
+							<th className="quick8"><h5>{props.data.saturday.created_at}</h5></th>
+						</tr>
 						  <tr>
-					        <td>Overall Truth Grade : </td>
+					        <td>Overall Truth Grade</td>
 				            <td>{props.data.sunday.swim_stats_ql.pace_per_100_yard}</td>
 				            <td>{props.data.monday.swim_stats_ql.pace_per_100_yard}</td>
 				            <td>{props.data.tuesday.swim_stats_ql.pace_per_100_yard}</td>
@@ -29,8 +29,8 @@ const Swim = (props) =>{
 				            <td>{props.data.friday.swim_stats_ql.pace_per_100_yard}</td>
 				            <td>{props.data.saturday.swim_stats_ql.pace_per_100_yard}</td>
 				         </tr>
-				        <tr>
-					        <td>Total Strokes : </td>
+				        <tr className="quick9">
+					        <td>Total Strokes</td>
 				            <td>{props.data.sunday.swim_stats_ql.total_strokes}</td>
 				            <td>{props.data.monday.swim_stats_ql.total_strokes}</td>
 				            <td>{props.data.tuesday.swim_stats_ql.total_strokes}</td>
