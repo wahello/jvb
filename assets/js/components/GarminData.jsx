@@ -250,20 +250,6 @@ class GarminDataPage extends Component {
 
 
   componentDidMount(){
-    const URL = '/users/garmin/fetch';
-    const config = {
-      method:"get",
-      url: URL,
-      params: {
-          start_date: this.state.selectedDate
-      },
-    };
-    axios(config).then( function(response){
-      this.updateState(response);
-    }.bind(this)).catch((error) => {
-      console.log(error.message);
-    });
-    // this.fetchWeatherData(42.3601,-71.0589);
     this.fetchWeatherData('london');
   }
 
