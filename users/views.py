@@ -1,3 +1,11 @@
+import dateutil.parser
+import ast
+import json
+import urllib
+import logging
+from datetime import datetime, date, time,timezone
+import calendar
+
 from rauth import OAuth1Service
 
 from django.shortcuts import redirect
@@ -12,12 +20,7 @@ from .serializers import GarminTokenSerializer
 from .models import GarminToken
 # In state=1 the next request should include an oauth_token.
 #If it doesn't go back to 0
-import ast
-import json
-import urllib
-import logging
-from datetime import datetime, date, time
-import calendar
+
 
 from garmin.models import UserGarminDataEpoch,\
           UserGarminDataSleep,\
@@ -347,14 +350,13 @@ class fetchGarminData(APIView):
 
   # just for demo storing data in db. Pulling data from api and storing
   # in db is functionality of other view
-  def _createObjectList(self, json_data, dtype):
+  def _createObjectList(self, json_data, dtype,record_date):
     '''
       Helper method of bulk_create method to create model
       objects for each data dictionary in json data received
     '''
     if len(json_data):
       model = self.MODEL_TYPES[dtype]
-      record_date = int(self.request.GET.get('start_date'))
       objects = [
         model(user=self.request.user,
             summary_id=obj.get("summaryId"),
@@ -375,7 +377,12 @@ class fetchGarminData(APIView):
     conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
 
-    startDateTimeInSeconds = int(request.GET.get('start_date'))
+    # start_date = '2017-09-13'
+    y,m,d = map(int,request.GET.get('start_date').split('-'))
+
+    start_date_dt = datetime(y,m,d,0,0,0)
+
+    startDateTimeInSeconds = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
     user = request.user
 
     access_token = request.user.garmin_token.token
@@ -391,9 +398,11 @@ class fetchGarminData(APIView):
             )
       sess = service.get_session((access_token, access_token_secret))
 
+      # UTC time is 4 hour ahead of EST so we have to minus 14400
+      # seconds to get actual EST starting time
       data = {
-        'uploadStartTimeInSeconds': startDateTimeInSeconds+5400, #GMT to EST timezone epoch is of 14400 (19800-14400)
-        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400+5400
+        'uploadStartTimeInSeconds': startDateTimeInSeconds-14400,
+        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400-14400
       }
 
       midnight = datetime.combine(date.today(), time.min)
@@ -417,13 +426,24 @@ class fetchGarminData(APIView):
 
       for dtype in self.DATA_TYPES.values():
 
+#         with open("audit_log.txt", "a+") as fh:
+#           fh.write(
+#             """
+# uploadStartTimeInSeconds: {} ({})\n
+# uploadEndTimeInSeconds: {} ({})\n
+# Endpoint called: {}\n""".format(
+#               data['uploadStartTimeInSeconds'],str(datetime.utcfromtimestamp(data['uploadStartTimeInSeconds'])),
+#               data['uploadEndTimeInSeconds'], str(datetime.utcfromtimestamp(data['uploadEndTimeInSeconds'])),
+#               ROOT_URL.format(dtype))
+#           )
+
         URL = ROOT_URL.format(dtype)
         model = self.MODEL_TYPES[dtype]
         latest_record = model.objects.filter(user=user)\
                             .order_by('-record_date_in_seconds')
         pull = False
 
-        if latest_record and latest_record[0].record_date_in_seconds - today_epoch > 604800:
+        if latest_record and today_epoch - latest_record[0].record_date_in_seconds > 604800:
           pull = True
 
         elif not latest_record:
@@ -438,39 +458,26 @@ class fetchGarminData(APIView):
           output_dict[dtype] = r.json()
 
           model.objects.bulk_create(
-            self._createObjectList(r.json(),dtype)
+            self._createObjectList(r.json(),dtype,startDateTimeInSeconds)
           )
         else:
           # fetch from db
-          output_dict[dtype] = ([q.data for q in model.objects.filter(user=user)])
+          output_dict[dtype] = [q.data for q in model.objects.filter(
+                                user=user,
+                                record_date_in_seconds__gte=data['uploadStartTimeInSeconds'],
+                                record_date_in_seconds__lte=data['uploadEndTimeInSeconds'])]
 
+      dailies_json = output_dict['dailies']
+      if not PULL_HISTORY['dailies']:
+        dailies_json = [ast.literal_eval(dic) for dic in dailies_json]
 
-      # users input raw
-      from user_input.views import UserDailyInputView
-      user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
-      output_dict['user_input_raw'] = user_input_raw
+      activities_json = output_dict['activities']
+      if not PULL_HISTORY['activities']:
+        activities_json = [ast.literal_eval(dic) for dic in activities_json]
 
-
-      decode_dailies_raw = output_dict['dailies']
-      dailies_json = [ast.literal_eval(dic) for dic in decode_dailies_raw]
-
-      decode_activities_raw = output_dict['activities']
-      activities_json = [ast.literal_eval(dic) for dic in decode_activities_raw]
-
-
-
-      decode_manuallyUpdatedActivities_raw = output_dict['manuallyUpdatedActivities']
-      #manuallyUpdatedActivities_json = json.loads(decode_manuallyUpdatedActivities_raw)
-      manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in decode_manuallyUpdatedActivities_raw]
-
-      decode_epochs_raw = output_dict['epochs']
-      epochs_json = [ast.literal_eval(dic) for dic in decode_epochs_raw]
-
-      decode_sleeps_raw = output_dict['sleeps']
-      sleeps_json = [ast.literal_eval(dic) for dic in decode_sleeps_raw]
-
-      decode_bodyComps_raw = output_dict['bodyComps']
-      bodyComps_json = [ast.literal_eval(dic) for dic in decode_bodyComps_raw]
+      manuallyUpdatedActivities_json = output_dict['manuallyUpdatedActivities']
+      if PULL_HISTORY['manuallyUpdatedActivities']:
+        manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in manuallyUpdatedActivities_json]
 
       epochs_json = output_dict['epochs']
       if not PULL_HISTORY['epochs']:
@@ -504,11 +511,11 @@ class fetchGarminData(APIView):
       output_dict['garmin_health_api'] = {
 
         "Activity Name": "",
-        "Activity Type": dailies_json[0]['activityType'],
+        "Activity Type": dailies_json[0]['activityType'] if dailies_json else '',
         "Event Type":"",
         "Course":"",
         "Location":"",
-        "start": dailies_json[0]['startTimeInSeconds'],
+        "start": dailies_json[0]['startTimeInSeconds'] if dailies_json else '',
         "Time":my_sum(dailies_json,'activeTimeInSeconds'),
         "Distance":my_sum(dailies_json,'distanceInMeters'),
         "Lap Information":"",
@@ -533,18 +540,19 @@ class fetchGarminData(APIView):
         "Average Vertical Oscillation":"",
         "Average Gct Balance":"",
         "Avergae Ground Contact Time":"",
-        "Total Steps":my_sum(dailies_json,'totalSteps'),
+        "Total Steps":my_sum(dailies_json,'steps'),
         "Activity Steps":my_sum(activities_json,'activitySteps'),
         "Floors Climbed":my_sum(dailies_json,'floorsClimbed'),
         "Floors Descended":"",
         "Calories In/Out":my_sum(dailies_json,'activeKilocalories'),
         "Golf Stats":"",
-        "Weight In grams":bodyComps_json[0]['weightInGrams'],
+        "Weight In grams":bodyComps_json[0]['weightInGrams'] if bodyComps_json else '',
         "Body Mass":"",
         "BMI":"",
         "Body Composition Summary (from Garmin Index scale)":"",
         "Resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute'),
-        "Average resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute')/len(dailies_json),
+        "Average resting heart rate":my_sum(dailies_json,'restingHeartRateInBeatsPerMinute')/len(dailies_json)\
+                                     if dailies_json else '',
         "Maximum Resting Heart Rate":max_values(dailies_json,'restingHeartRateInBeatsPerMinute'),
         "Resting Heart Rate Trends Over Time ":"",
         "VO2 Max grab data and populate database":"",
@@ -562,7 +570,10 @@ class fetchGarminData(APIView):
         "Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
         "Stress Field (HRV throughout the day)":""
                 }
-
+      # users input raw
+      from user_input.views import UserDailyInputView
+      user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
+      output_dict['user_input_raw'] = user_input_raw
 
       return Response(output_dict)
 

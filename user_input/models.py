@@ -1,8 +1,9 @@
-from datetime import datetime
+# from datetime import datetime
 
 from django.db import models
 from django.core.validators import MinValueValidator ,MaxValueValidator
 from django.contrib.auth.models import User
+# from django.core.exceptions import ValidationError 
 # Create your models here.
 
 Yes = 'Yes'
@@ -13,8 +14,18 @@ Medium = 'Medium'
 
 class UserDailyInput(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateField(auto_now_add=True,unique=True)
+    created_at = models.DateField(unique=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # def validate_unique(self, exclude=None):
+    #     qs = UserDailyInput.objects.filter(user=self.user,
+    #         created_at__contains=self.created_at.date())
+    #     if qs:
+    #         raise ValidationError('User input for date {} already exist'.format(self.created_at))
+
+    # def save(self, *args, **kwargs):
+    #     self.validate_unique()
+    #     super(UserDailyInput, self).save(*args, **kwargs)
 
     def __str__(self):
         dtime = str(self.created_at)
@@ -68,7 +79,7 @@ class DailyUserInputEncouraged(models.Model):
         (LEG, 'Leg')
     )
     user_input = models.OneToOneField(UserDailyInput, related_name='encouraged_input')
-    stress_level_yesterday = models.CharField(max_length=4,choices = stress_level_choices)
+    stress_level_yesterday = models.CharField(max_length=6,choices = stress_level_choices)
     pains_twings_during_or_after_your_workout =models.CharField(max_length=4,choices = choice)
     water_consumed_during_workout = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(250)])
     workout_that_user_breathed_through_nose = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(100)])

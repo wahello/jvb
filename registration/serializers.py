@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     email = serializers.EmailField(source='user.email')
-    password = serializers.CharField(source='user.password',read_only=True)
+    password = serializers.CharField(source='user.password')
     first_name = serializers.CharField(source='user.first_name')
     last_name  = serializers.CharField(source='user.last_name')
 
@@ -21,9 +21,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ('id','username','email','password','first_name','last_name',
                   'gender','height','weight','date_of_birth','goals','created_at',
                   'updated_at')
-
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
     def create(self,validated_data):
+        print(validated_data)
         user_data = validated_data.pop('user')
+        print(user_data)
         user = User.objects.create_user(**user_data)
         validated_data['goals'] = Profile.GOALS_CHOICE[0][1]
         

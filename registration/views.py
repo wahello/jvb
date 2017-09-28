@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
+from rest_framework.authentication import SessionAuthentication
 
 
 from .serializers import UserSerializer, UserProfileSerializer
@@ -21,17 +22,14 @@ class Login(APIView):
 	def post(self, request, format="json"):
 		username = request.data.get('username')
 		password = request.data.get('password')
-		user = authenticate(username=username, password=password)
-		print(user)
+		user = authenticate(request,username=username, password=password)
 		if user:
 			login(request,user)
 			return Response(status=status.HTTP_200_OK)
 		else:
-			print('in the unauthorized area')
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 class UserCreate(APIView):
-
     def post(self, request, format="json"):
         serializer = UserProfileSerializer(data=request.data)
         if serializer.is_valid():
