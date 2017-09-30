@@ -141,6 +141,6 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        CsrfExemptSessionAuthentication,  
+        'CsrfExemptSessionAuthentication',  
     )
 }
