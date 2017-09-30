@@ -132,15 +132,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 #Restframework
 
-from rest_framework.authentication import SessionAuthentication 
-
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-
-    def enforce_csrf(self, request):
-        return  # To not perform the csrf check previously happening
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'CsrfExemptSessionAuthentication',  
+        'utils.exempt.CsrfExemptSessionAuthentication',  
     )
 }
