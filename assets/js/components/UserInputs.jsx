@@ -38,7 +38,8 @@ class UserInputs extends React.Component{
       for(var i=0; i<elmnts; i++){
         form_values[form.elements[i].name] = form.elements[i].value;
       }
-      userDailyInputSend(form_values,reset_form).bind(this);
+      userDailyInputSend(form_values,this.reset_form).bind(this);
+      this.input_form.reset();
     }
 
 
