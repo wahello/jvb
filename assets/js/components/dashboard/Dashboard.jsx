@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchGarminData } from '../../network/garminOperations';
-
+import { Link } from 'react-router-dom';
 import NavbarMenu from '../navbar';
 
 class Dashboard extends Component {
