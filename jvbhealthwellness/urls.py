@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^',include('registration.urls')),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
+    url(r'^(.*)$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
+
 ]
