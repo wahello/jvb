@@ -106,7 +106,6 @@ class HomePageReactTitle extends Component {
                     </div>
                     <div className="row">
                         <div className="col-sm-6 col-sm-offset-3 social-login">
-                          <h3>Link's</h3>
                           <div className="social-login-buttons">
                           <Link to='/users/dashboard'>Dashboard</Link><br/>
 
