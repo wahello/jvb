@@ -99,7 +99,7 @@ function formatJSON(data){
 	return json_data;
 }
 
-export function userDailyInputSend(data){
+export function userDailyInputSend(data, callback=undefined){
 	// this function will send the data to the api 
 	const URL = 'users/daily_input/';
 	const config = {
@@ -113,7 +113,10 @@ export function userDailyInputSend(data){
 	};
 	axios(config).then((response) => {
 		alert("User Input submitted successfully!");
-	}).catch((error) => {
+		if(callback != undefined){
+			callback();
+		}
+	}.bind(this)).catch((error) => {
 		console.log(error);
 		console.log(error.message);
 	});

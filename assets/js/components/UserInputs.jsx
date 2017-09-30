@@ -26,6 +26,10 @@ class UserInputs extends React.Component{
       });
     }
 
+    reset_form(){
+      this.input_form.reset();
+    }
+
     onSubmit(event){
       event.preventDefault();
       var form = this.input_form;
@@ -34,8 +38,10 @@ class UserInputs extends React.Component{
       for(var i=0; i<elmnts; i++){
         form_values[form.elements[i].name] = form.elements[i].value;
       }
-      userDailyInputSend(form_values);
+      userDailyInputSend(form_values,reset_form).bind(this);
     }
+
+
 
     render(){
         return(
