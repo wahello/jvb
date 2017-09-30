@@ -35,6 +35,7 @@ class HomePageReactTitle extends Component {
     const { meta: {touched, error} } = field;
     const className = `${ touched && error ? 'has-danger' : '' }`;
     return(
+      <Form method="post">
       <FormGroup className={className}>
         <Label className="sr-only">{field.label}</Label>
         <Input
@@ -48,6 +49,7 @@ class HomePageReactTitle extends Component {
           {touched ? error : ''}
         </div>
       </FormGroup>
+      </Form>
     );
   }
 
