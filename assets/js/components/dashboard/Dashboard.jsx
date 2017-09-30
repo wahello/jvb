@@ -35,10 +35,7 @@ class Dashboard extends Component {
                         <div className="col-sm-6 col-sm-offset-3 social-login">
                           <h3>Link's</h3>
                           <div className="social-login-buttons">
-                          <Link to='/users/dashboard'>Dashboard</Link><br/>
-
-                          <Link to='register'>Register</Link><br/>
-                            <Link to="forgotpassword">Forgot Password</Link><br/>
+      
                              <Link to='userinputs'>userinputs</Link><br/>
                              <Link to='nes'>NES Graph</Link><br/>
                               <Link to='sleep'>Sleeping Graph</Link><br/>
