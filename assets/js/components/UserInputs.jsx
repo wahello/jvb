@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// var ReactDOM = require('react-dom');
-// var CalendarWidget = require('react-calendar-widget');
+
 import CalendarWidget from 'react-calendar-widget';
 
 import { Container, Select, option, Option, Row, Col, Button, Form,
@@ -80,7 +79,11 @@ class UserInputs extends React.Component{
                           </FormGroup>
                           <FormGroup>
                         <Label className="padding"> how much % unprocessed food consumed yesterday?</Label>
-                            <Input type="text" className="form-control" name="unprocessed_food" />
+                            <Input
+                            type="number" 
+                            className="form-control" 
+                            name="unprocessed_food"
+                            step="5" min="0" max="100" />
                           </FormGroup>  
                           <FormGroup>
                                <Label className="padding">Number of Alchol Drinks consumed yesterday?</Label>
@@ -181,7 +184,11 @@ class UserInputs extends React.Component{
                           </FormGroup>
                           <FormGroup>
                             <Label className="padding">How Much % Workout that User breathed in and out through nose</Label>
-                                <Input type="text" className="form-control" name="nose"/>
+                                <Input type="number" step="10"
+                                 className="form-control" 
+                                 name="nose"
+                                 min="0"
+                                 max="100"/>
                           </FormGroup>
                           <FormGroup>
                              <Label className="padding">Are you sick today?</Label>
@@ -227,16 +234,6 @@ class UserInputs extends React.Component{
                                 <option value="8">8</option>
                                 <option value="9">9</option>
                                 <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
                             </Input>
                           </FormGroup>
                           <FormGroup>
@@ -249,7 +246,10 @@ class UserInputs extends React.Component{
                           </FormGroup>
                           <FormGroup>      
                             <Label className="padding">General workout comments</Label>
-                               <Input type="text" name="comment" placeholder="please leave a comment" className="form-control" />
+                               <Input type="textarea" name="comment" 
+                               placeholder="please leave a comment" 
+                               className="form-control"
+                               rows="5" columns="5" />
                           </FormGroup>
                           <FormGroup>
                             <Label className="padding">Weight (pounds)</Label>
@@ -311,37 +311,31 @@ class UserInputs extends React.Component{
                           </FormGroup>
                           <FormGroup>
                              <Label className="padding">Heart rate variability</Label>
-                                <Input type="select" className="custom-select form-control" name="heart">
-                                    <option value="select">select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    <option value="13">13</option>
-                                    <option value="14">14</option>
-                                    <option value="15">15</option>
-                                    <option value="16">16</option>
-                                    <option value="17">17</option>
-                                    <option value="18">18</option>
-                                    <option value="19">19</option>
-                                    <option value="20">20</option>
-                                </Input>  
+                                <Input
+                                  type="number"
+                                  className"form-control"
+                                  name="heart"
+                                  min="0" max="100" step="10"
+
+                                />
                           </FormGroup>
                           <FormGroup>         
                             <Label className="padding">What % did you breath through your nose last night when you were asleep?</Label>
-                                <Input type="text" className="form-control" name="breath_sleep"/>
-                          </FormGroup>
+                                <Input 
+                                  type="number" 
+                                  className="form-control" 
+                                  name="breath_sleep"
+                                  min="0" max="100" step="10"
+                                />
+                         </FormGroup>
                           <FormGroup>
                               <Label className="padding">What % did you breath through your nose throughtout the day when you were not exercising?</Label>
-                                <Input type="text" className="form-control" name="breath_day"/>
+                                <Input 
+                                  type="text" 
+                                  className="form-control" 
+                                  name="breath_day"
+                                  min="0" max="0" step="10" 
+                                />
                           </FormGroup>
                         <Button 
                           type="submit"
