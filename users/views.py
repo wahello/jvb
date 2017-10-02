@@ -42,6 +42,21 @@ requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
+
+
+class Login(APIView):
+  def post(self, request, format="json"):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request,username=username, password=password)
+    if user:
+      login(request,user)
+      return Response(status=status.HTTP_200_OK)
+    else:
+      return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+
 def request_token(request):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connect.garmin.com/oauthConfirm'
