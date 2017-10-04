@@ -9,7 +9,7 @@ import promise from 'redux-promise';
 import HomePageContainer from '../containers/HomePageContainer';
 import Register from '../components/registration/Register';
 import Forgotpassword from '../components/ForgotPassword';
-import UserInputs from '../components/UserInputs';
+import UserInputs from '../components/user_input/UserInputs';
 import Dashboard from '../components/dashboard/Dashboard';
 import ServiceConnect from '../components/ServiceConnect';
 import Nes from '../components/nes';
