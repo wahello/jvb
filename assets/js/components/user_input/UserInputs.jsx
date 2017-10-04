@@ -12,6 +12,8 @@ import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
 import UnprocesedFoodModal from './unprocessedFoodModal';
 import SickModal from './sickModal';
+import PrescriptionSleepAids from './prescriptionsleepaids';
+import PrescriptionMedication from './pres-nonprescriptionmedication';
 import FastedModal from './fastedModal';
 
 class UserInputs extends React.Component{
@@ -43,7 +45,7 @@ class UserInputs extends React.Component{
         calories_item:'',
         sleep_last_night:'',
         prescription_sleep_aids:'',
-        sleep_aid_taken:[],
+        sleep_aid_taken:'',
         smoke_substances:'',
         smoked_substance_list:'',
         medications:'',
@@ -65,12 +67,16 @@ class UserInputs extends React.Component{
       this.handleChangeUnprocessedFood = this.handleChangeUnprocessedFood.bind(this);
       this.handleOnBlurUnprocessedFood = this.handleOnBlurUnprocessedFood.bind(this);
       this.handleChangeSick = this.handleChangeSick.bind(this);
+      this.handleChangeSleepAids=this.handleChangeSleepAids.bind(this);
+      this.handleChangePrescription=this.handleChangePrescription.bind(this);
       this.handleChangeFasted = this.handleChangeFasted.bind(this);
 
       this.renderWorkoutEffortModal = this.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = this.renderPainModal.bind(this);
       this.renderUnprocessedFoodModal = this.renderUnprocessedFoodModal.bind(this);
       this.renderPainSick = this.renderPainSick.bind(this);
+      this.renderPrescriptionSleepAids=this.renderPrescriptionSleepAids.bind(this);
+      this.renderPrescriptionMedication=this.renderPrescriptionMedication.bind(this);
       this.renderFasted = this.renderFasted.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
@@ -113,6 +119,23 @@ class UserInputs extends React.Component{
           updateState={callback}
         />
       );
+    }
+
+    renderPrescriptionSleepAids(callback){
+      return(
+        <PrescriptionSleepAids
+        sleep_aid_taken={this.state.sleep_aid_taken}
+        updateState={callback}
+        />
+        );
+    }
+     renderPrescriptionMedication(callback){
+      return(
+        <PrescriptionSleepAids
+        sleep_aid_taken={this.state.medications_taken_list}
+        updateState={callback}
+        />
+        );
     }
 
     renderFasted(callback){
@@ -178,6 +201,8 @@ class UserInputs extends React.Component{
         }
       }.bind(this));
     }
+
+
 
     handleChangePain(event){
       const target = event.target;
@@ -249,6 +274,50 @@ class UserInputs extends React.Component{
       }.bind(this));
     }
 
+    handleChangeSleepAids(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+
+      this.setState({
+        prescription_sleep_aids:value
+      },function(){
+        if(value === 'yes'){
+          const updateState = function(val){
+            this.setState({
+              sleep_aid_taken: val
+            });
+          }.bind(this);
+          ReactDOM.render(
+            this.renderPrescriptionSleepAids(updateState),
+            document.getElementById('sleepAidModal')
+          );
+        }
+      }.bind(this));
+    }
+
+    handleChangePrescription(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+
+      this.setState({
+        medications:value
+      },function(){
+        if(value === 'yes'){
+          const updateState = function(val){
+            this.setState({
+             medications_taken_list: val
+            });
+          }.bind(this);
+          ReactDOM.render(
+            this.renderPrescriptionMedication(updateState),
+            document.getElementById('medicationModel')
+          );
+        }
+      }.bind(this));
+    }
+
     handleChangeFasted(event){
       const target = event.target;
       const value = target.value;
@@ -260,7 +329,7 @@ class UserInputs extends React.Component{
         if(value === 'yes'){
           const updateState = function(val){
             this.setState({
-              food_ate_before_workout : val
+             food_ate_before_workout: val
             });
           }.bind(this);
           ReactDOM.render(
@@ -294,8 +363,6 @@ class UserInputs extends React.Component{
       this.input_form.reset();
       console.log(this.state);
     }
-
-
 
     render(){
         return(
@@ -353,7 +420,7 @@ class UserInputs extends React.Component{
                             name="workout_effort"
                             value={this.state.workout_effort}
                             onChange={this.handleChangeWorkoutEffort} >
-                                  <option value="select">select</option>
+                                  <option value="select">select</option>  
                                   <option value="1">1</option>
                                   <option value="2">2</option>
                                   <option value="3">3</option>
@@ -567,12 +634,14 @@ class UserInputs extends React.Component{
                               className="custom-select form-control" 
                               id="prescription_select" 
                               name="prescription_sleep_aids"
-                              value={this.state.prescription_sleep_aids}>
+                              value={this.state.prescription_sleep_aids}
+                              onChange={this.handleChangeSleepAids}>
                                   <option value="select">Select</option>
                                   <option value="yes">Yes</option>
                                   <option value="no">No</option>
                               </Input>
                           </FormGroup>
+                          <div id="sleepAidModal"></div>
 
                           <FormGroup>
                             <Label className="padding">Did you smoke any substances whatsover?</Label>
@@ -593,12 +662,14 @@ class UserInputs extends React.Component{
                               type="select" 
                               className="custom-select form-control" 
                               name="medications"
-                              value={this.state.medications}>
+                              value={this.state.medications}
+                              onChange={this.handleChangePrescription}>
                                       <option value="select">select</option>
                                       <option value="yes">Yes</option>
                                       <option value="no">No</option>
                               </Input>
                           </FormGroup>
+                          <div id="medicationModel"></div>
 
                           <FormGroup>     
                             <Label className="padding">Did you stand for 3 hours yesterday when you worked </Label>
