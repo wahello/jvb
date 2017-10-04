@@ -5,7 +5,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataBodyComposition,\
 					UserGarminDataDaily,\
 					UserGarminDataActivity,\
-					UserGarminDataManuallyUpdated
+					UserGarminDataManuallyUpdated,\
+					UserGarminDataStressDetails
 
 class UserGarminDataEpochSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -41,4 +42,10 @@ class UserGarminDataManuallyUpdatedSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
 	class Meta:
 		model = UserGarminDataManuallyUpdated
+		fields = ('__all__')
+
+class UserGarminDataStressDetailSerializer(serializers.ModelSerializer):
+	user = serializers.PrimaryKeyRelatedField(read_only=True)
+	class Meta:
+		model = UserGarminDataStressDetails
 		fields = ('__all__')

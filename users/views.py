@@ -441,17 +441,6 @@ class fetchGarminData(APIView):
 
       for dtype in self.DATA_TYPES.values():
 
-#         with open("audit_log.txt", "a+") as fh:
-#           fh.write(
-#             """
-# uploadStartTimeInSeconds: {} ({})\n
-# uploadEndTimeInSeconds: {} ({})\n
-# Endpoint called: {}\n""".format(
-#               data['uploadStartTimeInSeconds'],str(datetime.utcfromtimestamp(data['uploadStartTimeInSeconds'])),
-#               data['uploadEndTimeInSeconds'], str(datetime.utcfromtimestamp(data['uploadEndTimeInSeconds'])),
-#               ROOT_URL.format(dtype))
-#           )
-
         URL = ROOT_URL.format(dtype)
         model = self.MODEL_TYPES[dtype]
         latest_record = model.objects.filter(user=user)\
