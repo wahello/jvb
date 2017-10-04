@@ -12,6 +12,7 @@ import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
 import UnprocesedFoodModal from './unprocessedFoodModal';
 import SickModal from './sickModal';
+import FastedModal from './fastedModal';
 
 class UserInputs extends React.Component{
 
@@ -64,11 +65,13 @@ class UserInputs extends React.Component{
       this.handleChangeUnprocessedFood = this.handleChangeUnprocessedFood.bind(this);
       this.handleOnBlurUnprocessedFood = this.handleOnBlurUnprocessedFood.bind(this);
       this.handleChangeSick = this.handleChangeSick.bind(this);
+      this.handleChangeFasted = this.handleChangeFasted.bind(this);
 
       this.renderWorkoutEffortModal = this.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = this.renderPainModal.bind(this);
       this.renderUnprocessedFoodModal = this.renderUnprocessedFoodModal.bind(this);
       this.renderPainSick = this.renderPainSick.bind(this);
+      this.renderFasted = this.renderFasted.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.processDate = this.processDate.bind(this);
@@ -112,6 +115,14 @@ class UserInputs extends React.Component{
       );
     }
 
+    renderFasted(callback){
+      return(
+        <FastedModal
+          food_ate_before_workout={this.state.food_ate_before_workout}
+          updateState={callback}
+        />
+      );
+    }
 
     // Change handlers
     handleChange(event){
@@ -233,6 +244,28 @@ class UserInputs extends React.Component{
           ReactDOM.render(
             this.renderPainSick(updateState),
             document.getElementById('sickModal')
+          );
+        }
+      }.bind(this));
+    }
+
+    handleChangeFasted(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+
+      this.setState({
+        fasted:value
+      },function(){
+        if(value === 'yes'){
+          const updateState = function(val){
+            this.setState({
+              food_ate_before_workout : val
+            });
+          }.bind(this);
+          ReactDOM.render(
+            this.renderFasted(updateState),
+            document.getElementById('fastedModal')
           );
         }
       }.bind(this));
@@ -483,12 +516,15 @@ class UserInputs extends React.Component{
                                 type="select" 
                                 className="custom-select form-control" 
                                 name="fasted"
-                                value={this.state.fasted}>
+                                value={this.state.fasted}
+                                onChange={this.handleChangeFasted}>
                                     <option value="select">select</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                                 </Input>
                           </FormGroup>
+
+                          <div id="fastedModal"></div>
 
                           <FormGroup>      
                             <Label className="padding">General workout comments</Label>
@@ -496,13 +532,15 @@ class UserInputs extends React.Component{
                                placeholder="please leave a comment" 
                                className="form-control"
                                rows="5" columns="5" 
-                               value={this.state.workout_comment}/>
+                               value={this.state.workout_comment}
+                               onChange={this.handleChange}/>
                           </FormGroup>
 
                           <FormGroup>      
                             <Label className="padding">Approximately how many calories did you consume during your workout?</Label>
                                <Input type="number" name="calories" 
-                               value={this.state.calories}/>
+                               value={this.state.calories}
+                               onChange={this.handleChange}/>
                           </FormGroup>
 
                           <FormGroup>      
@@ -510,14 +548,16 @@ class UserInputs extends React.Component{
                             <Input type="textarea" name="calories_item" 
                             className="form-control"
                             rows="5" columns="5" 
-                            value={this.state.calories_item}/>
+                            value={this.state.calories_item}
+                            onChange={this.handleChange}/>
                           </FormGroup>
 
                           <FormGroup>
                             <Label className="padding">How much time did you Sleep last night (excluding awake time)?</Label>
                             <Input type="text" name="sleep_last_night"
                             className="form-control" placeholder="5:10" 
-                            value={this.state.sleep_last_night}/>
+                            value={this.state.sleep_last_night}
+                            onChange={this.handleChange}/>
                           </FormGroup>
 
                           <FormGroup>
@@ -566,7 +606,8 @@ class UserInputs extends React.Component{
                             type="select" 
                             className="custom-select form-control"  
                             name="stand"
-                            value={this.state.stand}>
+                            value={this.state.stand}
+                            onChange={this.handleChange}>
                                 <option value="select">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
@@ -580,7 +621,8 @@ class UserInputs extends React.Component{
                             className="form-control" 
                             placeholder="Enter processed items consumed" 
                             name="food_consumed"
-                            value={this.state.food_consumed} />
+                            value={this.state.food_consumed}
+                            onChange={this.handleChange} />
                           </FormGroup>
                           
                           <FormGroup>
@@ -591,6 +633,7 @@ class UserInputs extends React.Component{
                                    min="30"
                                    max="500" 
                                    value={this.state.weight}
+                                   onChange={this.handleChange}
                                 />
                           </FormGroup>
 
@@ -602,7 +645,8 @@ class UserInputs extends React.Component{
                               placeholder="Between 20 - 60"
                               name="waist"
                               min="20" max="60" step="1"
-                              value={this.state.waist}>
+                              value={this.state.waist}
+                              onChange={this.handleChange}>
                             </Input>
                           </FormGroup>
 
@@ -614,7 +658,8 @@ class UserInputs extends React.Component{
                               placeholder="Between 0 - 16" 
                               name="clothes_size"
                               min="0" max="16" step="1"
-                              value={this.state.clothes_size}>
+                              value={this.state.clothes_size}
+                              onChange={this.handleChange}>
                             </Input>
                           </FormGroup>
 
@@ -626,7 +671,25 @@ class UserInputs extends React.Component{
                                 name="heart_variability"
                                 min="0" max="100" step="10"
                                 value={this.state.heart_variability}
+                                onChange={this.handleChange}
                               />
+                          </FormGroup>
+
+                          <FormGroup>
+                              <Label className="padding">What type of diet do you eat?</Label>
+                              <Input 
+                              type="select" 
+                              className="custom-select form-control" 
+                              name="diet_type"
+                              value={this.state.diet_type}>
+                                      <option value="select">select</option>
+                                      <option value="vegan">Vegan</option>
+                                      <option value="vegetarian">Vegetarian</option>
+                                      <option value="paleo">Paleo</option>
+                                      <option value="low carb/high fat">Low carb/High fat</option>
+                                      <option value="">None</option>
+                                      <option value="other">Other</option>
+                              </Input>
                           </FormGroup>
 
                           <FormGroup>         
@@ -637,6 +700,7 @@ class UserInputs extends React.Component{
                               name="breath_sleep"
                               min="0" max="100" step="10"
                               value={this.state.breath_sleep}
+                              onChange={this.handleChange}
                             />
                          </FormGroup>
 
@@ -648,6 +712,7 @@ class UserInputs extends React.Component{
                                 name="breath_day"
                                 min="0" max="0" step="10" 
                                 value={this.state.breath_day}
+                                onChange={this.handleChange}
                               />
                           </FormGroup>
 

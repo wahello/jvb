@@ -77,7 +77,7 @@ class UserGarminDataManuallyUpdatedView(generics.ListCreateAPIView):
 	def perform_create(self, serializer):
 		serializer.save(user=self.request.user)
 
-class UserGarminDataStressDetails(generics.ListCreateAPIView):
+class UserGarminDataStressDetailsView(generics.ListCreateAPIView):
 	permission_classes = (IsAuthenticated,)
 	queryset = UserGarminDataStressDetails.objects.all()
 	serializer_class = UserGarminDataStressDetailSerializer
@@ -248,8 +248,11 @@ class GarminPing(APIView):
 				user = User.objects.get(garmin_token__token = user_key)
 			except User.DoesNotExist:
 				user = None
+				return Response(status = status.HTTP_404_NOT_FOUND)
+
 			if user:
 				callback_url = obj.get('callbackURL')
+
 				access_token = user.garmin_token.token
 				access_token_secret = user.garmin_token.token_secret
 
@@ -261,11 +264,23 @@ class GarminPing(APIView):
 				    authorize_url = authurl, 
 			    )
 				
-				sess = service.get_session((access_token, access_token_secret))
-
-				r = sess.get(callback_url, header_auth=True)
 				upload_start_time = int(re.search('uploadStartTimeInSeconds=(\d+)*',
 									callback_url).group(1))
+
+				upload_end_time = int(re.search('uploadEndTimeInSeconds=(\d+)*',
+									callback_url).group(1))
+
+				callback_url = callback_url.split('?')[0]+"/"
+
+				data = {
+					'uploadStartTimeInSeconds': upload_start_time,
+        			'uploadEndTimeInSeconds':upload_end_time
+				}
+
+				sess = service.get_session((access_token, access_token_secret))
+				
+				r = sess.get(callback_url, header_auth=True, params=data)
+				
 				obj_list = self._createObjectList(user, r.json(), dtype,upload_start_time)
 
 				self.MODEL_TYPES[dtype].objects.bulk_create(obj_list)
