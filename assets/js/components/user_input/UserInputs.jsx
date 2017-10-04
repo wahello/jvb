@@ -15,6 +15,7 @@ import SickModal from './sickModal';
 import PrescriptionSleepAids from './prescriptionsleepaids';
 import PrescriptionMedication from './pres-nonprescriptionmedication';
 import FastedModal from './fastedModal';
+import SmokedSubstance from './smokedSubstance';
 
 class UserInputs extends React.Component{
 
@@ -70,6 +71,7 @@ class UserInputs extends React.Component{
       this.handleChangeSleepAids=this.handleChangeSleepAids.bind(this);
       this.handleChangePrescription=this.handleChangePrescription.bind(this);
       this.handleChangeFasted = this.handleChangeFasted.bind(this);
+      this.handleChangeSmokeSubstance = this.handleChangeSmokeSubstance.bind(this);
 
       this.renderWorkoutEffortModal = this.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = this.renderPainModal.bind(this);
@@ -78,6 +80,7 @@ class UserInputs extends React.Component{
       this.renderPrescriptionSleepAids=this.renderPrescriptionSleepAids.bind(this);
       this.renderPrescriptionMedication=this.renderPrescriptionMedication.bind(this);
       this.renderFasted = this.renderFasted.bind(this);
+      this.renderSmokeSubstance = this.renderSmokeSubstance.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.processDate = this.processDate.bind(this);
@@ -123,18 +126,18 @@ class UserInputs extends React.Component{
 
     renderPrescriptionSleepAids(callback){
       return(
-        <PrescriptionSleepAids
-        sleep_aid_taken={this.state.sleep_aid_taken}
-        updateState={callback}
-        />
+          <PrescriptionSleepAids
+          sleep_aid_taken={this.state.sleep_aid_taken}
+          updateState={callback}
+          />
         );
     }
      renderPrescriptionMedication(callback){
       return(
-        <PrescriptionSleepAids
-        sleep_aid_taken={this.state.medications_taken_list}
-        updateState={callback}
-        />
+          <PrescriptionSleepAids
+          sleep_aid_taken={this.state.medications_taken_list}
+          updateState={callback}
+          />
         );
     }
 
@@ -142,6 +145,15 @@ class UserInputs extends React.Component{
       return(
         <FastedModal
           food_ate_before_workout={this.state.food_ate_before_workout}
+          updateState={callback}
+        />
+      );
+    }
+
+    renderSmokeSubstance(callback){
+      return(
+        <SmokedSubstance
+          smoked_substance_list={this.state.smoked_substance_list}
           updateState={callback}
         />
       );
@@ -340,6 +352,28 @@ class UserInputs extends React.Component{
       }.bind(this));
     }
 
+   handleChangeSmokeSubstance(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+
+      this.setState({
+        smoke_substances:value
+      },function(){
+        if(value === 'yes'){
+          const updateState = function(val){
+            this.setState({
+             smoked_substance_list: val
+            });
+          }.bind(this);
+          ReactDOM.render(
+            this.renderSmokeSubstance(updateState),
+            document.getElementById('smokeSubstanceModal')
+          );
+        }
+      }.bind(this));
+    }
+
     processDate(date){
       this.setState({
         selected_date:date
@@ -459,7 +493,7 @@ class UserInputs extends React.Component{
                             <Input type="number" 
                                    className="custom-select form-control" 
                                    name="water_consumed"
-                                   min="1" max="250"
+                                   min="0" max="250"
                                    value={this.state.water_consumed}
                                    onChange={this.handleChange}/>
                           </FormGroup>
@@ -649,12 +683,15 @@ class UserInputs extends React.Component{
                             type="select" 
                             className="custom-select form-control" 
                             name="smoke_substances"
-                            value={this.state.smoke_substances}>
+                            value={this.state.smoke_substances}
+                            onChange = {this.handleChangeSmokeSubstance}>
                                     <option value="select">select</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                             </Input>       
                           </FormGroup>
+
+                          <div id="smokeSubstanceModal"></div>
 
                            <FormGroup>
                               <Label className="padding">Did you ingest any prescription or non prescription medications/controlled yesterday?</Label>
@@ -781,7 +818,7 @@ class UserInputs extends React.Component{
                                 type="number" 
                                 className="form-control" 
                                 name="breath_day"
-                                min="0" max="0" step="10" 
+                                min="0" max="100" step="10" 
                                 value={this.state.breath_day}
                                 onChange={this.handleChange}
                               />
