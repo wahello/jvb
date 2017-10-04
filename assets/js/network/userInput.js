@@ -62,7 +62,7 @@ function formatJSON(data){
 
 	let json_data = {
 		"created_at":created_at,
-		"strong_input":{},
+		"strong_input":{},   
 		"encouraged_input":{},
 		"optional_input":{}
 	};
