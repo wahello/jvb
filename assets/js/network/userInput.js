@@ -111,7 +111,7 @@ export function userDailyInputSend(data, callback=undefined){
 			'Content-Type': 'application/json'				
 		}
 	};
-	axios(config).then((response) => {
+	axios(config).then(function(response){
 		alert("User Input submitted successfully!");
 		if(callback != undefined){
 			callback();
