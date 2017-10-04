@@ -67,34 +67,41 @@ function formatJSON(data){
 		"optional_input":{}
 	};
 	
-	json_data.strong_input['work_out_easy_or_hard'] = data.work_out_easy; 
-	json_data.strong_input['work_out_effort_level'] = data.workout_effort; 
-	json_data.strong_input['unprocessed_food_consumed_yesterday'] = data.unprocessed_food; 
+	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
+	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
+	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;
+	json_data.strong_input['prcnt_unprocessed_food_consumed_yesterday'] = data.prnct_unprocessed_food;
+	json_data.strong_input['list_of_unprocessed_food_consumed_yesterdayy'] = data.unprocessed_food_list; 
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
-	json_data.strong_input['sleep_aids_last_night'] = data.sleep_aids;
+	json_data.strong_input[' sleep_aid_takent'] = data.sleep_aid_taken;
 	json_data.strong_input['prescription_or_non_prescription_sleep_aids_last_night'] = data.prescription_sleep_aids; 
-	json_data.strong_input['smoke_any_substances_whatsoever'] = data.substances; 
+	json_data.strong_input['smoke_any_substances_whatsoever '] = data.smoke_substances;
+	json_data.strong_input['smoked_substance '] = data.smoked_substance_list;
 	json_data.strong_input['medications_or_controlled_substances_yesterday'] = data.medications; 
+	json_data.strong_input['medications_or_controlled_substances_taken'] = data.medications_taken_list; 
+
 
 	json_data.encouraged_input['stress_level_yesterday'] = data.stress; 
-	json_data.encouraged_input['pains_twings_during_or_after_your_workout'] = data.pain_select; 
+	json_data.encouraged_input['pains_twings_during_or_after_your_workout'] = data.pain; 
 	json_data.encouraged_input['water_consumed_during_workout'] = data.water_consumed; 
-	json_data.encouraged_input['workout_that_user_breathed_through_nose'] = data.nose; 
-	json_data.encouraged_input['pain_area'] = data.pain; 
+	json_data.encouraged_input['workout_that_user_breathed_through_nose'] = data.breath_nose; 
+	json_data.encouraged_input['pain_area'] = data.pain_area; 
 
 	json_data.optional_input['list_of_processed_food_consumed_yesterday'] = data.food_consumed; 
 	json_data.optional_input['chia_seeds_consumed_during_workout'] = data.chia_seeds; 
 	json_data.optional_input['fasted_during_workout'] = data.fasted; 
-	json_data.optional_input['general_Workout_Comments'] = data.comment; 
+	json_data.optional_input['foot_ate_during_workout'] = data.calories_item;
+	json_data.optional_input['general_Workout_Comments'] = data.workout_comment; 
 	json_data.optional_input['weight'] = data.weight; 
 	json_data.optional_input['waist_size'] = data.waist; 
-	json_data.optional_input['clothes_size'] = data.clothes; 
-	json_data.optional_input['heart_rate_variability'] = data.heart; 
+	json_data.optional_input['clothes_size'] = data.clothes_size; 
+	json_data.optional_input['heart_rate_variability'] = data.heart_variabilit; 
 	json_data.optional_input['sick'] = data.sick;
-	json_data.optional_input['sick_comment'] = data.sick_comment; 
+	json_data.optional_input['sickness'] = data.sickness; 
 	json_data.optional_input['stand_for_three_hours'] = data.stand;
 	json_data.optional_input['percent_breath_nose_last_night'] = data.breath_sleep; 
 	json_data.optional_input['percent_breath_nose_all_day_not_exercising'] = data.breath_day;
+	json_data.optional_input[' workout_enjoyable'] = data.workout_enjoyable;
 
 	return json_data;
 }

@@ -15,6 +15,7 @@ import SickModal from './sickModal';
 import PrescriptionSleepAids from './prescriptionsleepaids';
 import PrescriptionMedication from './pres-nonprescriptionmedication';
 import FastedModal from './fastedModal';
+import DietType from './diettype';
 
 class UserInputs extends React.Component{
 
@@ -67,9 +68,10 @@ class UserInputs extends React.Component{
       this.handleChangeUnprocessedFood = this.handleChangeUnprocessedFood.bind(this);
       this.handleOnBlurUnprocessedFood = this.handleOnBlurUnprocessedFood.bind(this);
       this.handleChangeSick = this.handleChangeSick.bind(this);
-      this.handleChangeSleepAids=this.handleChangeSleepAids.bind(this);
+      this.handleChangeSleepAids = this.handleChangeSleepAids.bind(this);
       this.handleChangePrescription=this.handleChangePrescription.bind(this);
       this.handleChangeFasted = this.handleChangeFasted.bind(this);
+      this.handleChangeDietModel = this.handleChangeDietModel.bind(this);
 
       this.renderWorkoutEffortModal = this.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = this.renderPainModal.bind(this);
@@ -78,6 +80,7 @@ class UserInputs extends React.Component{
       this.renderPrescriptionSleepAids=this.renderPrescriptionSleepAids.bind(this);
       this.renderPrescriptionMedication=this.renderPrescriptionMedication.bind(this);
       this.renderFasted = this.renderFasted.bind(this);
+      this.renderDietType = this.renderDietType.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.processDate = this.processDate.bind(this);
@@ -146,8 +149,15 @@ class UserInputs extends React.Component{
         />
       );
     }
-
-    // Change handlers
+     renderDietType(callback){
+      return(
+        <DietType
+          food_ate_before_workout={this.state.diet_type}
+          updateState={callback}
+        />
+      );
+    }
+  
     handleChange(event){
       const target = event.target;
       const value = target.value;
@@ -335,6 +345,28 @@ class UserInputs extends React.Component{
           ReactDOM.render(
             this.renderFasted(updateState),
             document.getElementById('fastedModal')
+          );
+        }
+      }.bind(this));
+    }
+
+     handleChangeDietModel(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+
+      this.setState({
+        diet_type:value
+      },function(){
+        if(value === 'other'){
+          const updateState = function(val){
+            this.setState({
+             diet_type: val
+            });
+          }.bind(this);
+          ReactDOM.render(
+            this.renderDietType(updateState),
+            document.getElementById('dietMo')
           );
         }
       }.bind(this));
@@ -752,7 +784,8 @@ class UserInputs extends React.Component{
                               type="select" 
                               className="custom-select form-control" 
                               name="diet_type"
-                              value={this.state.diet_type}>
+                              value={this.state.diet_type}
+                              onChange={this.handleChangeDietModel}>
                                       <option value="select">select</option>
                                       <option value="vegan">Vegan</option>
                                       <option value="vegetarian">Vegetarian</option>
@@ -762,6 +795,7 @@ class UserInputs extends React.Component{
                                       <option value="other">Other</option>
                               </Input>
                           </FormGroup>
+                          <div id="dietMo"></div>
 
                           <FormGroup>         
                             <Label className="padding">What % did you breath through your nose last night when you were asleep?</Label>
