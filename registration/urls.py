@@ -16,6 +16,7 @@ urlpatterns = [
     # url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
     url(r'api/users/$', views.UserCreate.as_view(), name='registration-create'),
     url(r'api/users/login/$',views.Login.as_view(), name='login'),
+    url(r'api/users/profile/$',views.UserItemView.as_view(), name="user_profile"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

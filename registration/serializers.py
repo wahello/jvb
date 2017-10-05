@@ -25,9 +25,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
     def create(self,validated_data):
-        print(validated_data)
         user_data = validated_data.pop('user')
-        print(user_data)
         user = User.objects.create_user(**user_data)
         validated_data['goals'] = Profile.GOALS_CHOICE[0][1]
         
@@ -37,6 +35,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user = instance.user
         user.email = validated_data.get('email',user.email)
+        user.save()
         instance.first_name = validated_data.get('first_name', user.first_name)
         instance.last_name = validated_data.get('last_name', user.first_name)
         instance.gender = validated_data.get('gender',instance.gender)
@@ -44,3 +43,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.weight = validated_data.get('weight', instance.weight)
         instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
         instance.goals = validated_data.get('goals',instance.goals)
+        instance.save()
+        return instance
