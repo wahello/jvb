@@ -58,14 +58,14 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		read_only_fields = ('updated_at',)
 
 
-	def _update_helper(instance, validated_data):
+	def _update_helper(self,instance, validated_data):
 		'''
 		This function will iterate all fields of given instance
 		and update them with new data (if present) otherwise 
 		with old data
 		'''
 
-		fields = [f.name for f in instance._meta_get_fields()]
+		fields = [f.name for f in instance._meta._get_fields()]
 		for f in fields:
 			setattr(instance,f,
 					validated_data.get(f,getattr(instance,f)))
@@ -100,7 +100,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		return user_input_obj
 
 	def update(self,instance,validated_data):
-		strong_data = validated_data.pop('strong')
+		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
 		optional_data = validated_data.pop('optional_input')
 		# third_source_data = validated_data.pop('third_source_input')
@@ -120,3 +120,4 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		# goals_obj = instance.goals
 		# self._update_helper(goals_obj, goals_data)
+		return instance

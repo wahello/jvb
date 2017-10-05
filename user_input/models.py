@@ -66,7 +66,7 @@ class DailyUserInputStrong(models.Model):
     hard_portion_workout_effort_level = models.IntegerField(
         validators=[MinValueValidator(0),MaxValueValidator(10)], blank=True, null=True)
 
-    prcnt_unprocessed_food_consumed_yesterday = models.FloatField(
+    prcnt_unprocessed_food_consumed_yesterday = models.IntegerField(
         validators=[MinValueValidator(0),MaxValueValidator(100)])
 
     list_of_unprocessed_food_consumed_yesterday = models.TextField(blank=True)
@@ -122,7 +122,7 @@ class DailyUserInputEncouraged(models.Model):
         validators=[MinValueValidator(0),MaxValueValidator(250)])
 
     # for workout_that_user_breathed_through_nose, value 0 means "no workout today"
-    workout_that_user_breathed_through_nose = models.FloatField(
+    workout_that_user_breathed_through_nose = models.IntegerField(
         validators=[MinValueValidator(0),MaxValueValidator(100)])
     
     # expect comma separated one or more body areas 
@@ -133,16 +133,22 @@ class DailyUserInputEncouraged(models.Model):
 
 class DailyUserInputOptional(models.Model):
 
+    NO_WORKOUT = 'no workout today'
     VEGAN = 'vegan'
     VEGETARIAN = 'vegetarian'
     PALEO = 'paleo'
     LOW_CARB_HIGH_FAT = 'low carb/high fat'
     OTHER = 'other'
 
-
     YN_CHOICE = (
         (YES,'Yes'),
+        (NO,'No')
+    )
+
+    WORKOUT_ENJOYABLE_CHOICE = (
+        (YES,'Yes'),
         (NO,'No'),
+        (NO_WORKOUT, 'No Workout Today')
     )
 
     DIET_TYPE = (
@@ -153,7 +159,7 @@ class DailyUserInputOptional(models.Model):
         (OTHER, 'Other')
     )
     user_input = models.OneToOneField(UserDailyInput, related_name='optional_input')
-    list_of_processed_food_consumed_yesterday = models.TextField()
+    list_of_processed_food_consumed_yesterday = models.TextField(blank=True)
 
     # for chia_seeds_consumed_during_workout, value 0 means "no workout today"
     chia_seeds_consumed_during_workout = models.IntegerField(
@@ -164,18 +170,18 @@ class DailyUserInputOptional(models.Model):
 
     # for calories_consumed_during_workout, value -1 means "no workout today"
     calories_consumed_during_workout = models.IntegerField()
-    foot_ate_during_workout = models.TextField(max_length=300, blank=True)
+    food_ate_during_workout = models.TextField(max_length=300, blank=True)
 
-    workout_enjoyable = models.CharField(max_length=3, choices=YN_CHOICE)
+    workout_enjoyable = models.CharField(max_length=3, choices = WORKOUT_ENJOYABLE_CHOICE)
     general_Workout_Comments = models.TextField( max_length = 300, blank=True )
     weight = models.FloatField(validators = [MinValueValidator(30),MaxValueValidator(500)],
                                 blank=True, null=True)
-    waist_size =models.FloatField(validators = [MinValueValidator(20),MaxValueValidator(60)],
+    waist_size =models.IntegerField(validators = [MinValueValidator(20),MaxValueValidator(60)],
         blank=True, null=True)
-    clothes_size = models.FloatField( validators = [MinValueValidator(0),MaxValueValidator(16)],
+    clothes_size = models.IntegerField( validators = [MinValueValidator(0),MaxValueValidator(16)],
         blank=True, null=True)
 
-    heart_rate_variability = models.FloatField(
+    heart_rate_variability = models.IntegerField(
         validators = [MinValueValidator(1),MaxValueValidator(100)],
         blank=True, null=True)
 
@@ -184,10 +190,10 @@ class DailyUserInputOptional(models.Model):
     stand_for_three_hours = models.CharField(max_length=3, choices=YN_CHOICE,
         blank=True)
 
-    percent_breath_nose_last_night = models.FloatField(
+    percent_breath_nose_last_night = models.IntegerField(
         validators = [MinValueValidator(1),MaxValueValidator(100)])
 
-    percent_breath_nose_all_day_not_exercising = models.FloatField(
+    percent_breath_nose_all_day_not_exercising = models.IntegerField(
         validators = [MinValueValidator(1),MaxValueValidator(100)])
 
     type_of_diet_eaten = models.CharField(max_length=100, blank=True)

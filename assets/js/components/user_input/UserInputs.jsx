@@ -7,7 +7,8 @@ import { Container, Select, option, Option, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText, className, Modal,
           ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
 
-import {userDailyInputSend} from '../..//network/userInput';
+import {userDailyInputSend,userDailyInputFetch,
+        userDailyInputUpdate} from '../../network/userInput';
 import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
 import UnprocesedFoodModal from './unprocessedFoodModal';
@@ -20,10 +21,11 @@ import SmokedSubstance from './smokedSubstance';
 
 class UserInputs extends React.Component{
 
-    constructor(props){
-      super(props);
-      this.state = {
+    getInitialState(){
+      const initialState = {
         selected_date:new Date(),
+        fetched_user_input_created_at:'',
+        update_form:false,
 
         workout_easy:'',
         workout_enjoyable:'',
@@ -34,7 +36,7 @@ class UserInputs extends React.Component{
         water_consumed:'',
         chia_seeds:'',
         breath_nose:'',
-        prnct_unprocessed_food:'',
+        prcnt_unprocessed_food:'',
         unprocessed_food_list:'',
         alchol_consumed:'',
         stress:'',
@@ -62,6 +64,12 @@ class UserInputs extends React.Component{
         breath_day:'',
         diet_type:''
       };
+      return initialState;
+    }
+
+    constructor(props){
+      super(props);
+      this.state = this.getInitialState();
       this.handleChange = this.handleChange.bind(this);
       this.handleChangeWorkout=this.handleChangeWorkout.bind(this);
       this.handleChangeWorkoutEffort = this.handleChangeWorkoutEffort.bind(this);
@@ -85,9 +93,14 @@ class UserInputs extends React.Component{
       this.renderFasted = this.renderFasted.bind(this);
       this.renderDietType = this.renderDietType.bind(this);
       this.renderSmokeSubstance = this.renderSmokeSubstance.bind(this);
+      this.renderUpdateButton = this.renderUpdateButton.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
+      this.onUpdate = this.onUpdate.bind(this);
+      this.reset_form = this.reset_form.bind(this);
       this.processDate = this.processDate.bind(this);
+      this.onFetchSuccess = this.onFetchSuccess.bind(this);
+      this.onFetchFailure = this.onFetchFailure.bind(this);
     }
     
     // modal renderers
@@ -170,6 +183,19 @@ class UserInputs extends React.Component{
           updateState={callback}
         />
       );
+    }
+
+    renderUpdateButton(){
+      if(this.state.update_form){
+        return(
+          <Button 
+            color="info" 
+            className="btn btn-block btn-primary"
+            onClick={this.onUpdate}>
+              Update
+          </Button>
+        );
+      }
     }
   
     handleChange(event){
@@ -256,7 +282,7 @@ class UserInputs extends React.Component{
       const name = target.name;
 
       this.setState({
-        prnct_unprocessed_food:value
+        prcnt_unprocessed_food:value
       });
     }
 
@@ -408,28 +434,78 @@ class UserInputs extends React.Component{
       }.bind(this));
     }
 
+    onFetchSuccess(data){
+      this.setState({
+        fetched_user_input_created_at:data.data.created_at,
+        update_form:true,
+        workout_easy:data.data.strong_input.work_out_easy_or_hard,
+        workout_enjoyable:data.data.optional_input.workout_enjoyable,
+        workout_effort:data.data.strong_input.workout_effort_level,
+        workout_effort_hard_portion:data.data.strong_input.hard_portion_workout_effort_level,
+        pain:data.data.encouraged_input.pains_twings_during_or_after_your_workout,
+        pain_area:data.data.encouraged_input.pain_area,
+        water_consumed:data.data.encouraged_input.water_consumed_during_workout,
+        chia_seeds:data.data.optional_input.chia_seeds_consumed_during_workout,
+        breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
+        prcnt_unprocessed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
+        unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
+        alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
+        stress:data.data.encouraged_input.stress_level_yesterday,
+        sick:data.data.optional_input.sick,
+        sickness:data.data.optional_input.sickness,
+        fasted:data.data.optional_input.fasted_during_workout,
+        food_ate_before_workout:data.data.optional_input.food_ate_before_workout,
+        workout_comment:data.data.optional_input.general_Workout_Comments,
+        calories:data.data.optional_input.calories_consumed_during_workout,
+        calories_item:data.data.optional_input.food_ate_during_workout,
+        sleep_last_night:data.data.strong_input.sleep_time_excluding_awake_time,
+        prescription_sleep_aids:data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
+        sleep_aid_taken:data.data.strong_input.sleep_aid_taken,
+        smoke_substances:data.data.strong_input.smoke_any_substances_whatsoever,
+        smoked_substance_list:data.data.strong_input.smoked_substance,
+        medications:data.data.strong_input.medications_or_controlled_substances_yesterday,
+        medications_taken_list:data.data.strong_input.medications_or_controlled_substances_taken,
+        stand:data.data.optional_input.stand_for_three_hours,
+        food_consumed:data.data.optional_input.list_of_processed_food_consumed_yesterday,
+        weight:data.data.optional_input.weight,
+        waist:data.data.optional_input.waist_size,
+        clothes_size:data.data.optional_input.clothes_size,
+        heart_variability:data.data.optional_input.heart_rate_variability,
+        breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
+        breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
+        diet_type:data.data.optional_input.type_of_diet_eaten
+      });
+    }
+
+    onFetchFailure(error){
+      // alert('User input not found');
+      this.setState(this.getInitialState());
+    }
+
     processDate(date){
       this.setState({
         selected_date:date
-      });
+      },function(){
+        userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure);
+      }.bind(this));
     }
 
     reset_form(){
       this.input_form.reset();
     }
 
+    onUpdateSuccess(response){
+      alert("Successfully updated form");
+    }
+
+    onUpdate(){
+      userDailyInputUpdate(this.state,this.onUpdateSuccess);
+    }
+
     onSubmit(event){
       event.preventDefault();
-      var form = this.input_form;
-      var elmnts = form.elements.length;
-      var form_values = {'created_at':this.state.selected_date};
-      for(var i=0; i<elmnts; i++){
-        form_values[form.elements[i].name] = form.elements[i].value;
-      }
-      // userDailyInputSend(form_values,this.reset_form).bind(this);
-      // console.log(form_values);
+      userDailyInputSend(this.state,this.reset_form);
       this.input_form.reset();
-      console.log(this.state);
     }
 
     render(){
@@ -458,7 +534,7 @@ class UserInputs extends React.Component{
                             name="workout_easy"
                             value={this.state.workout_easy}
                             onChange={this.handleChangeWorkout}>
-                                <option value="select">select</option>
+                                <option value="">select</option>
                                 <option value="easy">Easy</option>
                                 <option value="hard">Hard</option>
                                 <option value="no workout today">No workout today</option>
@@ -473,7 +549,7 @@ class UserInputs extends React.Component{
                             name="workout_enjoyable"
                             value={this.state.workout_enjoyable}
                             onChange={this.handleChange}>
-                                  <option value="select">select</option>
+                                  <option value="">select</option>
                                   <option value="yes">Yes</option>
                                   <option value="no">No</option>
                                   <option value="no workout today">No workout today</option>
@@ -488,7 +564,7 @@ class UserInputs extends React.Component{
                             name="workout_effort"
                             value={this.state.workout_effort}
                             onChange={this.handleChangeWorkoutEffort} >
-                                  <option value="select">select</option>  
+                                  <option value="">select</option>  
                                   <option value="1">1</option>
                                   <option value="2">2</option>
                                   <option value="3">3</option>
@@ -514,7 +590,7 @@ class UserInputs extends React.Component{
                             name="pain"
                             value={this.state.pain}
                             onChange={this.handleChangePain}>
-                                <option value="select">select</option>
+                                <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option vlaue="no">No</option>
                             </Input>
@@ -540,7 +616,7 @@ class UserInputs extends React.Component{
                             name="chia_seeds"
                             value={this.state.chia_seeds}
                             onChange={this.handleChange}>
-                                <option value="select">select</option>
+                                <option value="">select</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -573,7 +649,7 @@ class UserInputs extends React.Component{
                             className="form-control" 
                             name="prcnt_unprocessed_food"
                             step="5" min="0" max="100" 
-                            value={this.state.unprocessed_food}
+                            value={this.state.prcnt_unprocessed_food}
                             onChange={this.handleChangeUnprocessedFood}
                             onBlur={this.handleOnBlurUnprocessedFood}/>
                           </FormGroup>
@@ -588,7 +664,7 @@ class UserInputs extends React.Component{
                                  name="alchol_consumed"
                                  value={this.state.alchol_consumed}
                                  onChange={this.handleChange}>
-                                    <option value="select">select</option>
+                                    <option value="">select</option>
                                     <option value="0">0</option>
                                     <option value="0.5">0.5</option>
                                     <option value="1">1</option>
@@ -621,10 +697,10 @@ class UserInputs extends React.Component{
                             name="stress"
                             value={this.state.stress}
                             onChange={this.handleChange}>
-                                <option value="select">select</option>
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
+                                <option value="">select</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
                             </Input>
                           </FormGroup>
 
@@ -637,7 +713,7 @@ class UserInputs extends React.Component{
                             name="sick"
                             value={this.state.sick}
                             onChange={this.handleChangeSick}>
-                                <option value="select">select</option>
+                                <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </Input>
@@ -653,7 +729,7 @@ class UserInputs extends React.Component{
                                 name="fasted"
                                 value={this.state.fasted}
                                 onChange={this.handleChangeFasted}>
-                                    <option value="select">select</option>
+                                    <option value="">select</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                                 </Input>
@@ -704,7 +780,7 @@ class UserInputs extends React.Component{
                               name="prescription_sleep_aids"
                               value={this.state.prescription_sleep_aids}
                               onChange={this.handleChangeSleepAids}>
-                                  <option value="select">Select</option>
+                                  <option value="">select</option>
                                   <option value="yes">Yes</option>
                                   <option value="no">No</option>
                               </Input>
@@ -719,7 +795,7 @@ class UserInputs extends React.Component{
                             name="smoke_substances"
                             value={this.state.smoke_substances}
                             onChange = {this.handleChangeSmokeSubstance}>
-                                    <option value="select">select</option>
+                                    <option value="">select</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                             </Input>       
@@ -735,7 +811,7 @@ class UserInputs extends React.Component{
                               name="medications"
                               value={this.state.medications}
                               onChange={this.handleChangePrescription}>
-                                      <option value="select">select</option>
+                                      <option value="">select</option>
                                       <option value="yes">Yes</option>
                                       <option value="no">No</option>
                               </Input>
@@ -750,7 +826,7 @@ class UserInputs extends React.Component{
                             name="stand"
                             value={this.state.stand}
                             onChange={this.handleChange}>
-                                <option value="select">select</option>
+                                <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </Input>
@@ -825,7 +901,7 @@ class UserInputs extends React.Component{
                               name="diet_type"
                               value={this.state.diet_type}
                               onChange={this.handleChangeDietModel}>
-                                      <option value="select">select</option>
+                                      <option value="">select</option>
                                       <option value="vegan">Vegan</option>
                                       <option value="vegetarian">Vegetarian</option>
                                       <option value="paleo">Paleo</option>
@@ -860,13 +936,13 @@ class UserInputs extends React.Component{
                               />
                           </FormGroup>
 
-                        <Button 
-                          type="submit"
-                          color="info" 
-                          className="btn btn-block btn-primary">
-                            Submit
-                        </Button>
-
+                            <Button 
+                              type="submit"
+                              color="info" 
+                              className="btn btn-block btn-primary">
+                                Submit
+                            </Button>
+                            {this.renderUpdateButton()}
                     </Form>
                     </div>
                  </div>
