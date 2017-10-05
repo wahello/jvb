@@ -5,6 +5,7 @@ import urllib
 import logging
 from datetime import datetime, date, time,timezone
 import calendar
+from collections import OrderedDict
 
 from rauth import OAuth1Service
 
@@ -443,14 +444,13 @@ class fetchGarminData(APIView):
 
         URL = ROOT_URL.format(dtype)
         model = self.MODEL_TYPES[dtype]
-        latest_record = model.objects.filter(user=user)\
-                            .order_by('-record_date_in_seconds')
         pull = False
+        output_dict[dtype] = [q.data for q in model.objects.filter(
+                      user=user,
+                      record_date_in_seconds__gte=data['uploadStartTimeInSeconds'],
+                      record_date_in_seconds__lte=data['uploadEndTimeInSeconds'])]
 
-        if latest_record and today_epoch - latest_record[0].record_date_in_seconds > 604800:
-          pull = True
-
-        elif not latest_record:
+        if not output_dict[dtype]:
           # no record in db
           pull=True
 
@@ -464,12 +464,6 @@ class fetchGarminData(APIView):
           model.objects.bulk_create(
             self._createObjectList(r.json(),dtype,startDateTimeInSeconds)
           )
-        else:
-          # fetch from db
-          output_dict[dtype] = [q.data for q in model.objects.filter(
-                                user=user,
-                                record_date_in_seconds__gte=data['uploadStartTimeInSeconds'],
-                                record_date_in_seconds__lte=data['uploadEndTimeInSeconds'])]
 
       dailies_json = output_dict['dailies']
       if not PULL_HISTORY['dailies']:
@@ -480,7 +474,7 @@ class fetchGarminData(APIView):
         activities_json = [ast.literal_eval(dic) for dic in activities_json]
 
       manuallyUpdatedActivities_json = output_dict['manuallyUpdatedActivities']
-      if PULL_HISTORY['manuallyUpdatedActivities']:
+      if not PULL_HISTORY['manuallyUpdatedActivities']:
         manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in manuallyUpdatedActivities_json]
 
       epochs_json = output_dict['epochs']
@@ -575,9 +569,36 @@ class fetchGarminData(APIView):
         "Stress Field (HRV throughout the day)":""
                 }
       # users input raw
-      from user_input.views import UserDailyInputView
-      user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
-      output_dict['user_input_raw'] = user_input_raw
+      # from user_input.views import UserDailyInputView
+      # user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
+      # output_dict['user_input_raw'] = user_input_raw
+
+      # movement consistency calculation
+      movement_consistency = OrderedDict()
+
+      if epochs_json:
+        active_hours = 0 
+        inactive_hours = 0
+        epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
+
+        for data in epochs_json:
+          if data.get('activityType') == 'WALKING': 
+            duration = data.get('durationInSeconds')
+            start_time = data.get('startTimeInSeconds')-14400
+            end_time = start_time + duration
+            time_interval = str(datetime.utcfromtimestamp(start_time))+" to "+\
+                            str(datetime.utcfromtimestamp(end_time))
+            is_active = True if data.get('steps') > 300 else False
+            if is_active:
+                active_hours += duration
+            else:
+                inactive_hours += duration
+            movement_consistency[time_interval] = 'active' if is_active else 'inactive'
+
+        movement_consistency['active_hours'] = active_hours / 3600
+        movement_consistency['inactive_hours'] = inactive_hours / 3600
+
+      output_dict['movement_consistency'] = movement_consistency
 
       return Response(output_dict)
 

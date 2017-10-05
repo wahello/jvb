@@ -5,7 +5,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 axiosRetry(axios, { retries: 4}); 
 
-export function fetchForgetPassword(sucesssendmail, errorsendmail){
+export function fetchForgetPassword(){
 	//return function(dispatch){
 		//const URL = '';
 	// 	const config = {
