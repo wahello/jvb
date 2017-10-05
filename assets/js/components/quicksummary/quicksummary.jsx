@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
-import {fetchQuickLook}  from '../network/quick';
-import {quicksummaryDate}  from '../network/quick';
+import {Table,Button,Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import {fetchQuickLook}  from '../../network/quick';
+import {quicksummaryDate}  from '../../network/quick';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import NavbarMenu from './navbar';
+import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
 import Grades from './quicksummary_grades';
 import Swim from './quicksummary_swim';
@@ -16,7 +16,8 @@ import Sleep from './quicksummary_sleep';
 import Food from './quicksummary_food';  
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
-import Movement from './movement_summary';  
+import Movement from './movement_summary'; 
+import AllStats from './quicksummary_allstats'; 
 
 
 axiosRetry(axios, { retries: 3});
@@ -159,7 +160,7 @@ class Quicklook extends Component{
 			visible: true,
 			error:false,
 			data:initial_state,
-			activeTab : 'grade'
+			activeTab : 'allstats'
 			
 		};
 	}
@@ -267,7 +268,7 @@ class Quicklook extends Component{
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 			        deep_sleep: data.sleep_ql.deep_sleep,
 			        light_sleep: data.sleep_ql.light_sleep,
-			        awake_time: data.sleep_ql.awake_time
+			        awake_time: data.sleep_ql.awake_time   
 			    },
 			    food_ql: {
 			        id: data.food_ql.id,
@@ -357,6 +358,7 @@ class Quicklook extends Component{
 
 	render(){
 		const {activeTab}=this.state;
+		const class_allstats=`nav-link ${activeTab === "allstats" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
 		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
 		const class_bike=`nav-link ${activeTab === "bike" ? 'active':''}`;
@@ -389,6 +391,15 @@ class Quicklook extends Component{
 			             <div className="col-sm-10 col-sm-offset-1">
 			             <div className="quick7">
 			             <ul className="nav nav-tabs" id="quick6">
+
+			             <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_allstats} value="allstats"
+						    		 onClick={this.activateTab.bind(this,"allstats")}>
+						    		All Stats
+						    		</a>
+						    		</div>
+						    </li>
                               
 						    <li className="nav-item">
 						    		<div>
@@ -471,12 +482,27 @@ class Quicklook extends Component{
 			   <div id="quick2" className="row">
 			    <div className="col-sm-2 quick5">
 		            <CalendarWidget onDaySelect={this.processDate}/>,
+		            <div className="quick10">
+				           <Form>
+						        <FormGroup>
+						          <Label for="exampleEmail">Start Date</Label>
+						          <Input type="date" name="startdate" id="examplestartdate" />
+						        </FormGroup>
+						        <FormGroup>
+						          <Label for="examplePassword">End date</Label>
+						          <Input type="date" name="enddate" id="exampleenddate"/>
+						        </FormGroup>
+						   </Form>
+					</div>
                     </div>
                     <div className="col-sm-10">
-                   
-			      		{this.state.activeTab === "grade" && <Grades data={this.state.data}/> }
+
+     
+
+			      		{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/> }
 			       
 
+			      		{this.state.activeTab === "grade" && <Grades data={this.state.data}/> }
 				         
 
                          {this.state.activeTab === "swim" && <Swim data={this.state.data}/>}

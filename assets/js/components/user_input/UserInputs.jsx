@@ -135,7 +135,7 @@ class UserInputs extends React.Component{
      renderPrescriptionMedication(callback){
       return(
         <PrescriptionSleepAids
-        sleep_aid_taken={this.state.medications_taken_list}
+        medications_taken_listcations={this.state.medications_taken_list}
         updateState={callback}
         />
         );
@@ -152,7 +152,7 @@ class UserInputs extends React.Component{
      renderDietType(callback){
       return(
         <DietType
-          food_ate_before_workout={this.state.diet_type}
+          diet_type={this.state.diet_type}
           updateState={callback}
         />
       );
