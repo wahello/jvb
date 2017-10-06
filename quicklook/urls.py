@@ -9,10 +9,6 @@ urlpatterns = [
 	url(r'^users/data$',views.UserQuickLookView.as_view(),
 								  name="quick_look"),
 
-	url(r'^users/data/weekly/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})$',
-								  views.UserQuickLookWeeklyView.as_view(),
-								  name="quick_look_weekly"),
-
 	url(r'^users/data/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})$',
 						views.UserQuickLookItemView.as_view(),name="quicklook_item"),
 
