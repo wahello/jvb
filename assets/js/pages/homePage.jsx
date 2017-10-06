@@ -20,7 +20,7 @@ import Weeklysummary from '../components/WeeklySummary';
 import Sleepgraph from '../components/sleep';
 import GarminDataPage from '../components/GarminData';
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
-import Quicklook from '../components/quicksummary';
+import Quicklook from '../components/quicksummary/quicksummary';
 
 const createStoreWithMiddleware = applyMiddleware(promise,thunk)(createStore);
 // require('../sass/style.scss');

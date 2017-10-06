@@ -39,8 +39,15 @@ class NavbarMenu extends React.Component {
                 
                  <NavLink href="/">Home</NavLink>
                    {/* <Link to="/">Home</Link>*/}
+                   
+              </NavItem>
+               <NavItem className="float-sm-right">
+                
+                
+                   <NavLink href="/">LogOut</NavLink>
                 
               </NavItem>
+
 
             
               
