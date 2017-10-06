@@ -5,18 +5,21 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 axiosRetry(axios, { retries: 4}); 
 
-export function fetchForgetPassword(){
-	//return function(dispatch){
-		//const URL = '';
-	// 	const config = {
-	// 		method: "get",
-	// 		url: URL,
-	// 		withCredentials: true
-	// 	};
-	// 	axios(config).then ((response) => {
-	// 		sucesssendmail(response);
-	// 	}).catch((error) => {
-	// 		errorsendmail(error);
-	// 	});
-	// }
+export function userForgetPassword(data, callback=undefined){
+	// this function will send the data to the api 
+	const URL = '';
+	const config = {
+		url : URL,
+		data : data,
+		method : 'post',
+		withCredentials: true,
+	};
+	axios(config).then(function(response){
+		alert("User setpassword link send successfully!");
+		if(callback != undefined){
+			callback();
+		}
+	}.bind(this)).catch((error) => {
+		console.log(error.message);
+	});
 }
