@@ -96,3 +96,19 @@ export function getGarminToken(){
 
 	}
 }
+
+export function getUserProfile(succesCallback=undefined){
+	const URL = '/api/users/profile/';
+	const config = {
+		url:URL,
+		method:'get',
+		withCredentials:true
+	};
+	axios(config).then(function(response){
+		if(succesCallback != undefined){
+			succesCallback(response);
+		}
+	}).catch((error) => {
+		console.log(error.message);
+	})
+}

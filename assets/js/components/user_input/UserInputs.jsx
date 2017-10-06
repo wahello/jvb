@@ -9,6 +9,8 @@ import { Container, Select, option, Option, Row, Col, Button, Form,
 
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate} from '../../network/userInput';
+
+import {getUserProfile} from '../../network/auth';
 import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
 import UnprocesedFoodModal from './unprocessedFoodModal';
@@ -26,26 +28,27 @@ class UserInputs extends React.Component{
         selected_date:new Date(),
         fetched_user_input_created_at:'',
         update_form:false,
+        gender:'M',
 
         workout_easy:'',
         workout_enjoyable:'',
-        workout_effort:'',
-        workout_effort_hard_portion:'',
+        workout_effort:null,
+        workout_effort_hard_portion:null,
         pain:'',
         pain_area:'',
-        water_consumed:'',
-        chia_seeds:'',
-        breath_nose:'',
-        prcnt_unprocessed_food:'',
-        unprocessed_food_list:'',
-        alchol_consumed:'',
+        water_consumed:null,
+        chia_seeds:null,
+        breath_nose:null,
+        prcnt_unprocessed_food:null,
+        unprocessed_food_list:null,
+        alchol_consumed:null,
         stress:'',
         sick:'',
         sickness:'',
         fasted:'',
         food_ate_before_workout:'',
         workout_comment:'',
-        calories:'',
+        calories:null,
         calories_item:'',
         sleep_last_night:'',
         prescription_sleep_aids:'',
@@ -56,12 +59,12 @@ class UserInputs extends React.Component{
         medications_taken_list:'',
         stand:'',
         food_consumed:'',
-        weight:'',
-        waist:'',
-        clothes_size:'',
-        heart_variability:'',
-        breath_sleep:'',
-        breath_day:'',
+        weight:null,
+        waist:null,
+        clothes_size:null,
+        heart_variability:null,
+        breath_sleep:null,
+        breath_day:null,
         diet_type:''
       };
       return initialState;
@@ -83,7 +86,6 @@ class UserInputs extends React.Component{
       this.handleChangeDietModel = this.handleChangeDietModel.bind(this);
       this.handleChangeSmokeSubstance = this.handleChangeSmokeSubstance.bind(this);
 
-
       this.renderWorkoutEffortModal = this.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = this.renderPainModal.bind(this);
       this.renderUnprocessedFoodModal = this.renderUnprocessedFoodModal.bind(this);
@@ -101,6 +103,7 @@ class UserInputs extends React.Component{
       this.processDate = this.processDate.bind(this);
       this.onFetchSuccess = this.onFetchSuccess.bind(this);
       this.onFetchFailure = this.onFetchFailure.bind(this);
+      this.onProfileSuccessFetch = this.onProfileSuccessFetch.bind(this);
     }
     
     // modal renderers
@@ -508,6 +511,16 @@ class UserInputs extends React.Component{
       this.input_form.reset();
     }
 
+    onProfileSuccessFetch(data){
+      this.setState({
+        gender:data.data.gender
+      });
+    }
+
+    componentDidMount(){
+      getUserProfile(this.onProfileSuccessFetch);
+    }
+
     render(){
         return(
             <div>
@@ -592,7 +605,7 @@ class UserInputs extends React.Component{
                             onChange={this.handleChangePain}>
                                 <option value="">select</option>
                                 <option value="yes">Yes</option>
-                                <option vlaue="no">No</option>
+                                <option value="no">No</option>
                             </Input>
                           </FormGroup>
 
@@ -855,31 +868,35 @@ class UserInputs extends React.Component{
                                 />
                           </FormGroup>
 
-                          <FormGroup>       
-                            <Label className="padding">Waist size (Male)</Label>
-                            <Input 
-                              type="number" 
-                              className="form-control" 
-                              placeholder="Between 20 - 60"
-                              name="waist"
-                              min="20" max="60" step="1"
-                              value={this.state.waist}
-                              onChange={this.handleChange}>
-                            </Input>
-                          </FormGroup>
+                          { this.state.gender === 'M' &&
+                            <FormGroup>       
+                              <Label className="padding">Waist size (Male)</Label>
+                              <Input 
+                                type="number" 
+                                className="form-control" 
+                                placeholder="Between 20 - 60"
+                                name="waist"
+                                min="20" max="60" step="1"
+                                value={this.state.waist}
+                                onChange={this.handleChange}>
+                              </Input>
+                            </FormGroup>
+                          }
 
-                          <FormGroup>
-                            <Label className="padding">Clothes Size (Womens)</Label>
-                            <Input 
-                              type="number" 
-                              className="form-control"
-                              placeholder="Between 0 - 16" 
-                              name="clothes_size"
-                              min="0" max="16" step="1"
-                              value={this.state.clothes_size}
-                              onChange={this.handleChange}>
-                            </Input>
-                          </FormGroup>
+                          { this.state.gender === 'F' &&
+                            <FormGroup>
+                              <Label className="padding">Clothes Size (Womens)</Label>
+                              <Input 
+                                type="number" 
+                                className="form-control"
+                                placeholder="Between 0 - 16" 
+                                name="clothes_size"
+                                min="0" max="16" step="1"
+                                value={this.state.clothes_size}
+                                onChange={this.handleChange}>
+                              </Input>
+                            </FormGroup>
+                          }
 
                           <FormGroup>
                               <Label className="padding">Heart rate variability</Label>
