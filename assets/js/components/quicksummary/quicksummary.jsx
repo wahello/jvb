@@ -2,10 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText } from "reactstrap";
-import {fetchQuickLook}  from '../../network/quick';
-import {quicksummaryDate}  from '../../network/quick';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import moment from 'moment';
+
+import {getInitialState} from './initialState';
+import {fetchQuickLook}  from '../../network/quick';
+import {quicksummaryDate}  from '../../network/quick';
+
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
 import Grades from './quicksummary_grades';
@@ -28,135 +32,20 @@ var ReactDOM = require('react-dom');
 
 class Quicklook extends Component{
 
-	getInitialState(){
-		 let initial_state={
-				"sunday":{},
-				"monday":{},
-				"tuesday":{},
-				"wednesday":{},
-				"thursday":{},
-				"friday":{},
-				"saturday":{}
-			};
-
-		let blank_properties={
-			"created_at":'',
-			"grades_ql":{
-				    "overall_truth_grade": '-',
-			        "overall_truth_health_gpa": '-',
-			        "movement_non_exercise_grade": '-',
-			        "movement_consistency_grade": '-',
-			        "avg_sleep_per_night_grade": '-',
-			        "exercise_consistency_grade": '-',
-			        "overall_workout_grade": '-',
-			        "prcnt_non_processed_food_consumed_grade": '-',
-			        "alcoholic_drink_per_week_grade": '-',
-			        "penalty": '-'
-
-			},
-			"exercise_reporting_ql": {
-		        "workout_easy_hard": '-',
-		        "workout_type": '-',
-		        "workout_time": '-',
-		        "workout_location": '-',
-		        "workout_duration": '-',
-		        "maximum_elevation_workout": '-',
-		        "minutes_walked_before_workout": '-',
-		        "distance": '-',
-		        "pace": '-',
-		        "avg_heartrate": '-',
-		        "elevation_gain": '-',
-		        "elevation_loss": '-',
-		        "effort_level": '-',
-		        "dew_point": '-',
-		        "temperature": '-',
-		        "humidity": '-',
-		        "temperature_feels_like": '-',
-		        "wind": '-',
-		        "hrr": '-',
-		        "hrr_start_point": '-',
-		        "hrr_beats_lowered": '-',
-		        "sleep_resting_hr_last_night": '-',
-		        "vo2_max": '-',
-		        "running_cadence": '-',
-		        "nose_breath_prcnt_workout": '-',
-		        "water_consumed_workout": '-',
-		        "chia_seeds_consumed_workout": '-',
-		        "fast_before_workout": '-',
-		        "pain": '-',
-		        "pain_area": '-',
-		        "stress_level":'-',
-		        "sick": '-',
-		        "drug_consumed": '-',
-		        "drug": '-',
-		        "medication": '-',
-		        "smoke_substance": '-',
-		        "exercise_fifteen_more": '-',
-		        "workout_elapsed_time": '-',
-		        "timewatch_paused_workout": '-',
-		        "exercise_consistency":'-',
-		        "workout_duration_grade": '-',
-		        "workout_effortlvl_grade": '-',
-		        "avg_heartrate_grade": '-',
-		        "overall_workout_grade": '-',
-		        "heartrate_variability_grade": '-',
-		        "workout_comment": '-'
-		    },
-		    "swim_stats_ql": {    
-		        "pace_per_100_yard": '-',
-		        "total_strokes": '-'
-		    },
-		     "bike_stats_ql": {
-		        "avg_speed": '-',
-		        "avg_power": '-',
-		        "avg_speed_per_mile": '-',
-		        "avg_cadence": '-',
-		    },
-		    "steps_ql": {
-		        "non_exercise_steps": '-',
-		        "exercise_steps": '-',
-		        "total_steps": '-',
-		        "floor_climed": '-',
-		        "floor_decended": '-',
-		        "movement_consistency": '-',
-		    },
-
-		    "sleep_ql": {
-		        "sleep_per_wearable": '-',
-		        "sleep_per_user_input": '-',
-		        "sleep_aid": '-',
-		        "sleep_bed_time": '-',
-		        "sleep_awake_time": '-',
-		        "deep_sleep": '-',
-		        "light_sleep": '-',
-		        "awake_time": '-'
-		    },
-		    "food_ql": {
-		        "prcnt_non_processed_food": '-',
-		        "prcnt_non_processed_food_grade": '-',
-		        "non_processed_food": '-',
-		        "diet_type": '-'
-		    },
-		    "alcohol_ql": {
-		        "alcohol_day": '-',
-		        "alcohol_week": '-'
-		    }
-		};
-		for(const day of Object.keys(initial_state)){
-				initial_state[day] = blank_properties
-       		}
-       	return initial_state;
-	}
 	constructor(props){
 		super(props);
+
 		this.successquick = this.successquick.bind(this);
 		this.errorquick = this.errorquick.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.onDismiss = this.onDismiss.bind(this);
-		this.updateDayState=this.updateDayState.bind(this);
-		// this.activateTab=this.activateTab.bind(this);
-		let initial_state = this.getInitialState()
+		this.updateDateState=this.updateDateState.bind(this);
+		
+		let initial_state = getInitialState(moment(new Date()));
+
 		this.state = {
+			start_date:moment(new Date()),
+			end_date:null,
 			visible: true,
 			error:false,
 			data:initial_state,
@@ -165,9 +54,9 @@ class Quicklook extends Component{
 		};
 	}
 
-	updateDayState(day,data){
+	updateDateState(data){
        			var properties={
-       			"created_at":data.created_at,
+       			created_at:data.created_at,
 				grades_ql: {
 			        id: data.grades_ql.id,
 			        user_ql: data.grades_ql.user_ql,
@@ -288,16 +177,18 @@ class Quicklook extends Component{
              return properties;
        		}
 
-	successquick(data){
-		console.log(data);
-		const days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-		let initial_state = this.getInitialState();
+	successquick(data,start_dt,end_dt){
+		const dates = [];
+		let initial_state = getInitialState(start_dt,end_dt);
+		for(let date of Object.keys(initial_state)){
+			dates.push(date);
+		} 
+
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
-		      	const date=new Date(dataitem.created_at);
-		      	const day=days[date.getDay()];
-		      	let obj = this.updateDayState(day,dataitem);
-		      	initial_state[day] = obj;
+		      	const date = dataitem.created_at;
+		      	let obj = this.updateDateState(dataitem);
+		      	initial_state[date] = obj;
 		      }
 		      this.setState({
 				data:initial_state,
@@ -334,13 +225,15 @@ class Quicklook extends Component{
 	}
 
 	processDate(date){
-		quicksummaryDate(date,this.successquick,this.errorquick);
+		let start_dt = moment(date);
+		let end_dt = moment(date).add(6,'days');
+		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
 	}
 
 	componentDidMount(){
-		var today = new Date();
-		quicksummaryDate(today,this.successquick,this.errorquick);
-		// this.props.fetchQuickLook(this.successquick, this.errorquick);
+		let start_dt = moment();
+		let end_dt = moment().add(6,'days');
+		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
 	}
 	onDismiss(){
 		this.setState(
@@ -496,36 +389,7 @@ class Quicklook extends Component{
 					</div>
                     </div>
                     <div className="col-sm-10">
-
-     
-
-			      		{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/> }
-			       
-
-			      		{this.state.activeTab === "grade" && <Grades data={this.state.data}/> }
-				         
-
-                         {this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
-				         
-                          {this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
-
-				         
-
-                       {this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
-				          
-
-                        {this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
-				        
-
-                         {this.state.activeTab === "food" && <Food data={this.state.data}/>}
-				         
-
-                        {this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
-                      
-
-				         {this.state.activeTab === "exercise" && <Exercise data={this.state.data}/>}
-
-				         {this.state.activeTab === "movement" && <Movement/>}
+                    	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     </div>
 					</div>
 					</div>

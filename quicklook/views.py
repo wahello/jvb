@@ -33,8 +33,8 @@ class UserQuickLookView(generics.ListCreateAPIView):
 	def get_queryset(self):
 		user = self.request.user
 
-		start_dt = self.request.query_params.get('to',None)
-		end_dt = self.request.query_params.get('from', None)
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
 
 		if start_dt and end_dt:
 			queryset = UserQuickLook.objects.filter(Q(created_at__gte=start_dt)&
