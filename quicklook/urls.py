@@ -3,9 +3,6 @@ from . import views
 from . import views_calculated
 
 urlpatterns = [
-	url(r'^users/calculations',views_calculated.GetGarminData.as_view(),
-		name="quicklookcalculations"),
-
 	url(r'^users/data$',views.UserQuickLookView.as_view(),
 								  name="quick_look"),
 
@@ -31,4 +28,11 @@ urlpatterns = [
 
 	url(r'^users/sleep/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})$',
 						views.SleepItemView.as_view(),name="sleep_item"),
+
+	url(r'^users/movement_consistency$', 
+		views_calculated.movementConsistencySummary.as_view(),
+		name = "movement_consistency"),
+
+	url(r'^users/calculations',views_calculated.GetGarminData.as_view(),
+		name="quicklookcalculations"),
 ]
