@@ -3,85 +3,59 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button} from "reactstrap";
 
+function renderTableRows(dateWiseData,category,field,classes=""){
+	let elements = [];
+	for(let [date,data] of Object.entries(dateWiseData)){
+		if(field === "created_at"){
+			elements.push(
+				<th key={date} className={classes}><h5>{date}</h5></th>
+			);	
+		}else{
+			elements.push(
+				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
+			);
+		}
+	}
+	return elements;
+}
+
 const Steps = (props) =>{
 	return(
            
             			  <div className="quick3">
-				         <Table className="quick4">
+				         <Table className="table table-responsive quick4">
 				       
-				         <tr>
-				         <th className="quick8">
+				         <tr className="quick8">
+				         <th >
 						  <h5>Steps</h5>
 						  </th>
-						    <th className="quick8"><h5>{props.data.sunday.created_at}</h5></th>
-							<th className="quick8"><h5>{props.data.monday.created_at}</h5></th>
-							<th className="quick8"><h5>{props.data.tuesday.created_at}</h5></th>
-							<th className="quick8"><h5>{props.data.wednesday.created_at}</h5></th>
-							<th className="quick8"><h5>{props.data.thursday.created_at}</h5></th>
-							<th className="quick8"><h5>{props.data.friday.created_at}</h5></th>
-							<th className="quick8"><h5>{props.data.saturday.created_at}</h5></th>
+						    {renderTableRows(props.data,"steps_ql","created_at")}							
 						  </tr>
 						 
 						 <tr>
 					        <td>Non Exercise Steps</td>
-				            <td>{props.data.sunday.steps_ql.non_exercise_steps}</td>
-				            <td>{props.data.monday.steps_ql.non_exercise_steps}</td>
-				            <td>{props.data.tuesday.steps_ql.non_exercise_steps}</td>
-				            <td>{props.data.wednesday.steps_ql.non_exercise_steps}</td>
-				            <td>{props.data.thursday.steps_ql.non_exercise_steps}</td>
-				            <td>{props.data.friday.steps_ql.non_exercise_steps}</td>
-				            <td>{props.data.saturday.steps_ql.non_exercise_steps}</td>
+					         {renderTableRows(props.data,"steps_ql","non_exercise_steps")}					           
 				         </tr>
 				         <tr className="quick9">
 					        <td >Exercise Steps</td>
-				            <td>{props.data.sunday.steps_ql.exercise_steps}</td>
-				            <td>{props.data.monday.steps_ql.exercise_steps}</td>
-				            <td>{props.data.tuesday.steps_ql.exercise_steps}</td>
-				            <td>{props.data.wednesday.steps_ql.exercise_steps}</td>
-				            <td>{props.data.thursday.steps_ql.exercise_steps}</td>
-				            <td>{props.data.friday.steps_ql.exercise_steps}</td>
-				            <td>{props.data.saturday.steps_ql.exercise_steps}</td>
+					         {renderTableRows(props.data,"steps_ql","exercise_steps")}					           
 				         </tr>
 				         <tr>
 					        <td>Total Steps</td>
-				            <td>{props.data.sunday.steps_ql.total_steps}</td>
-				            <td>{props.data.monday.steps_ql.total_steps}</td>
-				            <td>{props.data.tuesday.steps_ql.total_steps}</td>
-				            <td>{props.data.wednesday.steps_ql.total_steps}</td>
-				            <td>{props.data.thursday.steps_ql.total_steps}</td>
-				            <td>{props.data.friday.steps_ql.total_steps}</td>
-				            <td>{props.data.saturday.steps_ql.total_steps}</td>
+					         {renderTableRows(props.data,"steps_ql","total_steps")}					           
 				         </tr>
 				         <tr className="quick9">
 					        <td>Floor Climed</td>
-				            <td>{props.data.sunday.steps_ql.floor_climed}</td>
-				            <td>{props.data.monday.steps_ql.floor_climed}</td>
-				            <td>{props.data.tuesday.steps_ql.floor_climed}</td>
-				            <td>{props.data.wednesday.steps_ql.floor_climed}</td>
-				            <td>{props.data.thursday.steps_ql.floor_climed}</td>
-				            <td>{props.data.friday.steps_ql.floor_climed}</td>
-				            <td>{props.data.saturday.steps_ql.floor_climed}</td>
+					         {renderTableRows(props.data,"steps_ql","floor_climed")}					            
 				         </tr>
 				         <tr>
 					        <td>Floor Decended</td>
-				            <td>{props.data.sunday.steps_ql.floor_decended}</td>
-				            <td>{props.data.monday.steps_ql.floor_decended}</td>
-				            <td>{props.data.tuesday.steps_ql.floor_decended}</td>
-				            <td>{props.data.wednesday.steps_ql.floor_decended}</td>
-				            <td>{props.data.thursday.steps_ql.floor_decended}</td>
-				            <td>{props.data.friday.steps_ql.floor_decended}</td>
-				            <td>{props.data.saturday.steps_ql.floor_decended}</td>
+					         {renderTableRows(props.data,"steps_ql","floor_decended")}					           
 				         </tr>
 				         
 				         <tr className="quick9">
 					        <td>Movement Consistency</td>
-				            <td>{props.data.sunday.steps_ql.movement_consistency}</td>
-				            <td>{props.data.monday.steps_ql.movement_consistency}</td>
-				            <td>{props.data.tuesday.steps_ql.movement_consistency}</td>
-				            <td>{props.data.wednesday.steps_ql.movement_consistency}</td>
-				            <td>{props.data.thursday.steps_ql.movement_consistency}</td>
-				            <td>{props.data.friday.steps_ql.movement_consistency}</td>
-				            <td>{props.data.saturday.steps_ql.movement_consistency}</td>
+					         {renderTableRows(props.data,"steps_ql","movement_consistency")}					           
 				         </tr>
                           </Table>
                          </div>

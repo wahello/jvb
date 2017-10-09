@@ -3,63 +3,50 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button} from "reactstrap";
 
+function renderTableRows(dateWiseData,category,field,classes=""){
+	let elements = [];
+	for(let [date,data] of Object.entries(dateWiseData)){
+		if(field === "created_at"){
+			elements.push(
+				<th key={date} className={classes}><h5>{date}</h5></th>
+			);	
+		}else{
+			elements.push(
+				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
+			);
+		}
+	}
+	return elements;
+}
+
+
 const Food =(props)=>{
 	return(
  						 <div className="quick3">
-				         <Table className="quick4">
+				         <Table className="table table-responsive quick4">
 				      
-				         <tr >
-				         <th className="quick8">
+				         <tr className="quick8">
+				         <th >
 						  <h5>Food</h5>
 						  </th>
-						  <th className="quick8"><h5>{props.data.sunday.created_at}</h5></th>
-						  <th className="quick8"><h5>{props.data.monday.created_at}</h5></th>
-						  <th className="quick8"><h5>{props.data.tuesday.created_at}</h5></th>
-						  <th className="quick8"><h5>{props.data.wednesday.created_at}</h5></th>
-						  <th className="quick8"><h5>{props.data.thursday.created_at}</h5></th>
-						  <th className="quick8"><h5>{props.data.friday.created_at}</h5></th>
-						  <th className="quick8"><h5>{props.data.saturday.created_at}</h5></th>
+			           	  {renderTableRows(props.data,"food_ql","created_at")}
 						  </tr>
 						 
 						 <tr >
 					        <td>percentage Non Processed Food</td>
-				            <td>{props.data.sunday.food_ql.prcnt_non_processed_food}</td>
-				            <td>{props.data.monday.food_ql.prcnt_non_processed_food}</td>
-				            <td>{props.data.tuesday.food_ql.prcnt_non_processed_food}</td>
-				            <td>{props.data.wednesday.food_ql.prcnt_non_processed_food}</td>
-				            <td>{props.data.thursday.food_ql.prcnt_non_processed_food}</td>
-				            <td>{props.data.friday.food_ql.prcnt_non_processed_food}</td>
-				            <td>{props.data.saturday.food_ql.prcnt_non_processed_food}</td>
+					         {renderTableRows(props.data,"food_ql","prcnt_non_processed_food")}				            
 				         </tr>
 				         <tr className="quick9">
 					        <td>Percentage Non Processed Food Grade</td>
-				            <td>{props.data.sunday.food_ql.prcnt_non_processed_food_grade}</td>
-				            <td>{props.data.monday.food_ql.prcnt_non_processed_food_grade}</td>
-				            <td>{props.data.tuesday.food_ql.prcnt_non_processed_food_grade}</td>
-				            <td>{props.data.wednesday.food_ql.prcnt_non_processed_food_grade}</td>
-				            <td>{props.data.thursday.food_ql.prcnt_non_processed_food_grade}</td>
-				            <td>{props.data.friday.food_ql.prcnt_non_processed_food_grade}</td>
-				            <td>{props.data.saturday.food_ql.prcnt_non_processed_food_grade}</td>
+					         {renderTableRows(props.data,"food_ql","prcnt_non_processed_food_grade")}				            
 				         </tr>
 				          <tr >
 					        <td>Non Processed Food</td>
-				            <td>{props.data.sunday.food_ql.non_processed_food}</td>
-				            <td>{props.data.monday.food_ql.non_processed_food}</td>
-				            <td>{props.data.tuesday.food_ql.non_processed_food}</td>
-				            <td>{props.data.wednesday.food_ql.non_processed_food}</td>
-				            <td>{props.data.thursday.food_ql.non_processed_food}</td>
-				            <td>{props.data.friday.food_ql.non_processed_food}</td>
-				            <td>{props.data.saturday.food_ql.non_processed_food}</td>
+					         {renderTableRows(props.data,"food_ql","non_processed_food")}				            
 				         </tr>
 				         <tr className="quick9">
 					        <td>Diet Type</td>
-				            <td>{props.data.sunday.food_ql.diet_type}</td>
-				            <td>{props.data.monday.food_ql.diet_type}</td>
-				            <td>{props.data.tuesday.food_ql.diet_type}</td>
-				            <td>{props.data.wednesday.food_ql.diet_type}</td>
-				            <td>{props.data.thursday.food_ql.diet_type}</td>
-				            <td>{props.data.friday.food_ql.diet_type}</td>
-				            <td>{props.data.saturday.food_ql.diet_type}</td>
+					         {renderTableRows(props.data,"food_ql","diet_type")}				           
 				         </tr>
 				         </Table>
                           </div>

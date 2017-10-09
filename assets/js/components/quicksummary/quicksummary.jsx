@@ -40,11 +40,14 @@ class Quicklook extends Component{
 		this.processDate = this.processDate.bind(this);
 		this.onDismiss = this.onDismiss.bind(this);
 		this.updateDateState=this.updateDateState.bind(this);
+		this.onSubmitDate=this.onSubmitDate.bind(this);
+		this.handleChange=this.handleChange.bind(this);
 		
-		let initial_state = getInitialState(moment(new Date()));
+		let initial_state = getInitialState(moment(new Date()));   
 
 		this.state = {
-			start_date:moment(new Date()),
+			today_date:moment(new Date()),
+			start_date:null,
 			end_date:null,
 			visible: true,
 			error:false,
@@ -230,6 +233,22 @@ class Quicklook extends Component{
 		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
 	}
 
+	 handleChange(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      this.setState({
+        [name]: value
+      });
+    }	
+  
+  onSubmitDate(event){
+  	event.preventDefault();
+  	let start_dt=moment(this.state.start_date);
+  	let end_dt=moment(this.state.end_date);
+  	quicksummaryDate(start_dt,end_dt,this.successquick,this.errorquick);
+  }
+
 	componentDidMount(){
 		let start_dt = moment();
 		let end_dt = moment().add(6,'days');
@@ -259,15 +278,14 @@ class Quicklook extends Component{
 		const class_sleep=`nav-link ${activeTab === "sleep" ? 'active':''}`;
 		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
         const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
-        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;
-        const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;
+        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;            
 	return(
 		<div className="container-fluid">
 		<NavbarMenu/>
 	
 		           	
 					
-			<div className="col-lg-12 col-md-6 col-sm-3">  
+			<div className="col-lg-12 col-md-12 col-sm-12">  
 			<div className="quick">
 			        <div className="col-md-12 col-md-offset-2">
                          <div className="row justify-content-center">
@@ -281,7 +299,7 @@ class Quicklook extends Component{
 			             </div>
 
 			             <div className="row">
-			             <div className="col-sm-10 col-sm-offset-1">
+			             <div className="col-sm-8 col-sm-offset-2">
 			             <div className="quick7">
 			             <ul className="nav nav-tabs" id="quick6">
 
@@ -359,14 +377,7 @@ class Quicklook extends Component{
 						    		 </a>
 						    		 </div>
 						    </li>
-						      <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_movement} value="exercise"
-						    		 onClick={this.activateTab.bind(this,"movement")}>
-						    		 Movement summary
-						    		 </a>
-						    		 </div>
-						    </li>
+						     
 						 </ul>
 			      		</div>
 			             </div>
@@ -378,18 +389,36 @@ class Quicklook extends Component{
 		            <div className="quick10">
 				           <Form>
 						        <FormGroup>
-						          <Label for="exampleEmail">Start Date</Label>
-						          <Input type="date" name="startdate" id="examplestartdate" />
+						          <Label>Start Date</Label>
+						          <Input type="date"
+						           name="start_date"
+						           value={this.state.start_date}
+						           onChange={this.handleChange}/>
 						        </FormGroup>
 						        <FormGroup>
 						          <Label for="examplePassword">End date</Label>
-						          <Input type="date" name="enddate" id="exampleenddate"/>
+						          <Input type="date"
+						           name="end_date"
+						           value={this.state.end_date}
+						           onChange={this.handleChange}/>
 						        </FormGroup>
+						        <Button
+						         type="submit"
+						         className="btn btn-block btn-info"
+						         onClick={this.onSubmitDate}>Submit</Button>
 						   </Form>
 					</div>
                     </div>
                     <div className="col-sm-10">
+                    	{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
+                    	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
+                    	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
+                    	{this.state.activeTab === "exercise" && <Exercise data={this.state.data}/>}
+                    	{this.state.activeTab === "grade" && <Grades data={this.state.data}/>}
+                    	{this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
+                    	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
+                    	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
                     </div>
 					</div>
 					</div>

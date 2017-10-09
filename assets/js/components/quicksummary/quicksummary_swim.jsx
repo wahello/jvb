@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button} from "reactstrap";
 
-function renderTableRows(dateWiseData,category,field,classes=""){
+ function renderTableRows(dateWiseData,category,field,classes=""){
 	let elements = [];
 	for(let [date,data] of Object.entries(dateWiseData)){
 		if(field === "created_at"){
@@ -22,10 +22,11 @@ function renderTableRows(dateWiseData,category,field,classes=""){
 const Swim = (props) =>{
 	return(
 	 <div className="quick3">
-	     <Table className="quick4">
-	          <tr > 
-	         	<th className="quick8"><h5>Swim Stats</h5></th>
-			    {renderTableRows(props.data,"swim_stats_ql","created_at","quick8")}
+	
+	     <Table className="table table-responsive quick4">
+	          <tr className="quick8"> 
+	         	<th><h5>Swim Stats</h5></th>
+			    {renderTableRows(props.data,"swim_stats_ql","created_at")}
 			  </tr>
 
 			  <tr>
@@ -38,8 +39,7 @@ const Swim = (props) =>{
 		        {renderTableRows(props.data,"swim_stats_ql","total_strokes")}
 	          </tr>
          </Table>
-      </div>
-
+         </div>
 	);
 }
 export default Swim;
