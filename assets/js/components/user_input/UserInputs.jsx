@@ -105,7 +105,7 @@ class UserInputs extends React.Component{
       this.onFetchFailure = this.onFetchFailure.bind(this);
       this.onProfileSuccessFetch = this.onProfileSuccessFetch.bind(this);
       this.onNoWorkoutToday=this.onNoWorkoutToday.bind(this);
-      this.fetchYesterdaydata=this.fetchYesterdaydata.bind(this);
+      this.fetchYesterdayData=this.fetchYesterdayData.bind(this);
 
     }
     
@@ -262,17 +262,18 @@ class UserInputs extends React.Component{
       const name = target.name;
 
       this.setState({
-        workout_effort:value
+        workout_effort:value,
       },function(){
         if(value > 0){
           const updateState = function(val){
               this.setState({
-                workout_effort_hard_portion: val
+                workout_effort_hard_portion: val,
+                workout_modal:true
               });
           }.bind(this);
           ReactDOM.render(
             this.renderWorkoutEffortModal(updateState),
-            document.getElementById('workoutEffortModal')
+            document.getElementById('workoutEffortModal'),
           );
         }
       }.bind(this));
@@ -460,10 +461,10 @@ class UserInputs extends React.Component{
       }.bind(this));
     }
 
-    onFetchSuccess(data){
+    onFetchSuccess(data,clone=false){
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
-        update_form:true,
+        update_form:!clone,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
         workout_enjoyable:data.data.optional_input.workout_enjoyable,
         workout_effort:data.data.strong_input.workout_effort_level,
@@ -505,24 +506,26 @@ class UserInputs extends React.Component{
 
     onFetchFailure(error){
       // alert('User input not found');
-      this.setState(this.getInitialState());
+      const initial_state = this.getInitialState();
+      this.setState({...initial_state,selected_date:this.state.selected_date});
     }
 
     processDate(date){
       this.setState({
         selected_date:date
       },function(){
-        userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure);
+        const clone = false;
+        userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
       }.bind(this));
     }
 
-    fetchYesterdaydata(){
+    fetchYesterdayData(){
       const today = new Date();
       const yesterday = new Date(today.getFullYear(),
                                 today.getMonth(),
                                 today.getDate()-1);
-
-      userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure);
+      const clone = true;
+      userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
     }
 
     resetForm(){
@@ -540,9 +543,7 @@ class UserInputs extends React.Component{
 
     onSubmit(event){
       event.preventDefault();
-      // userDailyInputSend(this.state,this.resetForm());
-      this.resetForm();
-      
+      userDailyInputSend(this.state,this.resetForm());    
     }
 
     onProfileSuccessFetch(data){
@@ -567,17 +568,21 @@ class UserInputs extends React.Component{
                       </div>
                         <h2 className="head">Daily user inputs report</h2>
                         <div className="row justify-content-center">
-                        <Button 
-                        type="submit" 
-                        size="lg" 
-                        onClick={this.onNoWorkoutToday}
-                        className="btn btn-info">I didn't Workout Today</Button>
-                        <Button 
-                        type="submit" 
-                        size="lg" 
-                         onClick={this.fetchYesterdaydata}
-                        className="btn btn-info">Previous Day Data</Button>
+                          <Button  
+                            size="lg" 
+                            onClick={this.onNoWorkoutToday}
+                            className="btn btn-info">
+                            I didn't Workout Today
+                          </Button>
+                          &nbsp;
+                          <Button  
+                            size="lg" 
+                            onClick={this.fetchYesterdayData}
+                            className="btn btn-info">
+                            Copy Yesterday’s Inputs
+                          </Button>
                         </div>
+
                         <Form 
                           getRef = {(input) => this.input_form = input}
                           onSubmit = {this.onSubmit}
@@ -594,9 +599,9 @@ class UserInputs extends React.Component{
                             value={this.state.workout_easy}
                             onChange={this.handleChangeWorkout}>
                                 <option value="">select</option>
+                                <option value="no workout today">No workout today</option>
                                 <option value="easy">Easy</option>
                                 <option value="hard">Hard</option>
-                                <option value="no workout today">No workout today</option>
                             </Input>  
                           </FormGroup> 
 
@@ -609,9 +614,9 @@ class UserInputs extends React.Component{
                             value={this.state.workout_enjoyable}
                             onChange={this.handleChange}>
                                   <option value="">select</option>
+                                  <option value="no workout today">No workout today</option>
                                   <option value="yes">Yes</option>
                                   <option value="no">No</option>
-                                  <option value="no workout today">No workout today</option>
                             </Input>  
                           </FormGroup>
 
@@ -624,6 +629,7 @@ class UserInputs extends React.Component{
                             value={this.state.workout_effort}
                             onChange={this.handleChangeWorkoutEffort} >
                                   <option value="">select</option>  
+                                  <option value="no workout today">No workout today</option>
                                   <option value="1">1</option>
                                   <option value="2">2</option>
                                   <option value="3">3</option>
@@ -634,7 +640,6 @@ class UserInputs extends React.Component{
                                   <option value="8">8</option>
                                   <option value="9">9</option>
                                   <option value="10">10</option>
-                                  <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -649,10 +654,10 @@ class UserInputs extends React.Component{
                             name="pain"
                             value={this.state.pain}
                             onChange={this.handleChangePain}>
+                                <option value="no workout today">No workout today</option>
                                 <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
-                                <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -676,6 +681,7 @@ class UserInputs extends React.Component{
                             value={this.state.chia_seeds}
                             onChange={this.handleChange}>
                                 <option value="">select</option>
+                                <option value="no workout today">No workout today</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -686,7 +692,6 @@ class UserInputs extends React.Component{
                                 <option value="8">8</option>
                                 <option value="9">9</option>
                                 <option value="10">10</option>
-                               <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -742,7 +747,6 @@ class UserInputs extends React.Component{
                                     <option value="9">9</option>
                                     <option value="9.5">9.5</option>
                                     <option value="10">10</option>
-                                    <option value="no workout today">No workout today</option>
                                   </Input>
                           </FormGroup>
 
@@ -755,10 +759,10 @@ class UserInputs extends React.Component{
                             value={this.state.stress}
                             onChange={this.handleChange}>
                                 <option value="">select</option>
+                                <option value="no workout today">No workout today</option>
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>
-                                <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -774,7 +778,6 @@ class UserInputs extends React.Component{
                                 <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
-                                <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -789,9 +792,9 @@ class UserInputs extends React.Component{
                                 value={this.state.fasted}
                                 onChange={this.handleChangeFasted}>
                                     <option value="">select</option>
+                                    <option value="no workout today">No workout today</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
-                                    <option value="no workout today">No workout today</option>
                                 </Input>
                           </FormGroup>
 
@@ -961,11 +964,11 @@ class UserInputs extends React.Component{
                               value={this.state.diet_type}
                               onChange={this.handleChangeDietModel}>
                                       <option value="">select</option>
+                                      <option value="">None</option>
                                       <option value="vegan">Vegan</option>
                                       <option value="vegetarian">Vegetarian</option>
                                       <option value="paleo">Paleo</option>
                                       <option value="low carb/high fat">Low carb/High fat</option>
-                                      <option value="">None</option>
                                       <option value="other">Other</option>
                               </Input>
                           </FormGroup>
@@ -993,13 +996,15 @@ class UserInputs extends React.Component{
                               />
                           </FormGroup>
 
+                          { !this.state.update_form &&
                             <Button 
                               type="submit"
                               color="info" 
                               className="btn btn-block btn-primary">
                                 Submit
                             </Button>
-                            {this.renderUpdateButton()}
+                          }
+                          {this.renderUpdateButton()}
                     </Form>
                     </div>
                  </div>
