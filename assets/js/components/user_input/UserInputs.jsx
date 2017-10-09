@@ -759,7 +759,6 @@ class UserInputs extends React.Component{
                             value={this.state.stress}
                             onChange={this.handleChange}>
                                 <option value="">select</option>
-                                <option value="no workout today">No workout today</option>
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>

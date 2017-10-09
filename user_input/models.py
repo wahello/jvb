@@ -83,7 +83,7 @@ class DailyUserInputStrong(models.Model):
 
     user_input = models.OneToOneField(UserDailyInput,related_name='strong_input')
     work_out_easy_or_hard = models.CharField(
-        max_length=4,
+        max_length=20,
         choices=WORK_OUT_EASY_OR_HARD_CHOICES,
         blank=True)
 
@@ -105,7 +105,7 @@ class DailyUserInputStrong(models.Model):
     list_of_unprocessed_food_consumed_yesterday = models.TextField(blank=True)
 
     number_of_alcohol_consumed_yesterday = models.CharField(
-        max_length=2,choices=NUMBER_ALCOHOL_CHOICE,
+        max_length=3,choices=NUMBER_ALCOHOL_CHOICE,
         blank = True,null = True)
 
     sleep_time_excluding_awake_time = models.CharField(max_length=10, blank = True)
