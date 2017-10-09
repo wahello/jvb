@@ -32,23 +32,23 @@ class UserInputs extends React.Component{
 
         workout_easy:'',
         workout_enjoyable:'',
-        workout_effort:null,
-        workout_effort_hard_portion:null,
+        workout_effort:'',
+        workout_effort_hard_portion:'',
         pain:'',
         pain_area:'',
-        water_consumed:null,
-        chia_seeds:null,
-        breath_nose:null,
-        prcnt_unprocessed_food:null,
-        unprocessed_food_list:null,
-        alchol_consumed:null,
+        water_consumed:'',
+        chia_seeds:'',
+        breath_nose:'',
+        prcnt_unprocessed_food:'',
+        unprocessed_food_list:'',
+        alchol_consumed:'',
         stress:'',
         sick:'',
         sickness:'',
         fasted:'',
         food_ate_before_workout:'',
         workout_comment:'',
-        calories:null,
+        calories:'',
         calories_item:'',
         sleep_last_night:'',
         prescription_sleep_aids:'',
@@ -59,12 +59,12 @@ class UserInputs extends React.Component{
         medications_taken_list:'',
         stand:'',
         food_consumed:'',
-        weight:null,
-        waist:null,
-        clothes_size:null,
-        heart_variability:null,
-        breath_sleep:null,
-        breath_day:null,
+        weight:'',
+        waist:'',
+        clothes_size:'',
+        heart_variability:'',
+        breath_sleep:'',
+        breath_day:'',
         diet_type:''
       };
       return initialState;
@@ -99,11 +99,14 @@ class UserInputs extends React.Component{
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
-      this.reset_form = this.reset_form.bind(this);
+      this.resetForm = this.resetForm.bind(this);
       this.processDate = this.processDate.bind(this);
       this.onFetchSuccess = this.onFetchSuccess.bind(this);
       this.onFetchFailure = this.onFetchFailure.bind(this);
       this.onProfileSuccessFetch = this.onProfileSuccessFetch.bind(this);
+      this.onNoWorkoutToday=this.onNoWorkoutToday.bind(this);
+      this.fetchYesterdaydata=this.fetchYesterdaydata.bind(this);
+
     }
     
     // modal renderers
@@ -161,7 +164,7 @@ class UserInputs extends React.Component{
         );
     }
 
-    renderFasted(callback){
+    renderFasted(callback){   
       return(
         <FastedModal
           food_ate_before_workout={this.state.food_ate_before_workout}
@@ -209,7 +212,24 @@ class UserInputs extends React.Component{
         [name]: value
       });
     }
+    onNoWorkoutToday(){
+      const value = "no workout today";
+       this.setState({
+          workout_easy:value,
+          workout_effort:value,
+          workout_effort_hard_portion:value,
+          workout_enjoyable:value,
+          pain:value,
+          water_consumed:value ,
+          breath_nose:value,
+          chia_seeds:value,
+          calories:value,
+          fasted:value,          
+          calories_item:value,
+          workout_comment:value
+        });
 
+    }
     handleChangeWorkout(event){
       const target = event.target;
       const value = target.value;
@@ -217,14 +237,17 @@ class UserInputs extends React.Component{
       if (value === "no workout today"){
         this.setState({
           workout_easy:value,
-          workout_effort:0,
-          workout_effort_hard_portion:0,
+          workout_effort:value,
+          workout_effort_hard_portion:value,
           workout_enjoyable:value,
           pain:value,
-          water_consumed:0,
-          breath_nose:0,
-          chia_seeds:0,
-          calories:0
+          water_consumed:value ,
+          breath_nose:value,
+          chia_seeds:value,
+          calories:value,
+          fasted:value,          
+          calories_item:value,
+          workout_comment:value
         });
       }else{
           this.setState({
@@ -493,8 +516,18 @@ class UserInputs extends React.Component{
       }.bind(this));
     }
 
-    reset_form(){
-      this.input_form.reset();
+    fetchYesterdaydata(){
+      const today = new Date();
+      const yesterday = new Date(today.getFullYear(),
+                                today.getMonth(),
+                                today.getDate()-1);
+
+      userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure);
+    }
+
+    resetForm(){
+      const initial_state = this.getInitialState();
+      this.setState({...initial_state,gender:this.state.gender});
     }
 
     onUpdateSuccess(response){
@@ -507,8 +540,9 @@ class UserInputs extends React.Component{
 
     onSubmit(event){
       event.preventDefault();
-      userDailyInputSend(this.state,this.reset_form);
-      this.input_form.reset();
+      // userDailyInputSend(this.state,this.resetForm());
+      this.resetForm();
+      
     }
 
     onProfileSuccessFetch(data){
@@ -532,6 +566,18 @@ class UserInputs extends React.Component{
                            <CalendarWidget onDaySelect={this.processDate}/>,
                       </div>
                         <h2 className="head">Daily user inputs report</h2>
+                        <div className="row justify-content-center">
+                        <Button 
+                        type="submit" 
+                        size="lg" 
+                        onClick={this.onNoWorkoutToday}
+                        className="btn btn-info">I didn't Workout Today</Button>
+                        <Button 
+                        type="submit" 
+                        size="lg" 
+                         onClick={this.fetchYesterdaydata}
+                        className="btn btn-info">Previous Day Data</Button>
+                        </div>
                         <Form 
                           getRef = {(input) => this.input_form = input}
                           onSubmit = {this.onSubmit}
@@ -588,7 +634,7 @@ class UserInputs extends React.Component{
                                   <option value="8">8</option>
                                   <option value="9">9</option>
                                   <option value="10">10</option>
-                                  <option value="0">No workout today</option>
+                                  <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -606,6 +652,7 @@ class UserInputs extends React.Component{
                                 <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
+                                <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -613,10 +660,9 @@ class UserInputs extends React.Component{
 
                           <FormGroup>    
                             <Label className="padding">Water Consumed During Workout(ounce)</Label>
-                            <Input type="number" 
+                            <Input type="text" 
                                    className="custom-select form-control" 
-                                   name="water_consumed"
-                                   min="0" max="250"
+                                   name="water_consumed"                                 
                                    value={this.state.water_consumed}
                                    onChange={this.handleChange}/>
                           </FormGroup>
@@ -640,17 +686,15 @@ class UserInputs extends React.Component{
                                 <option value="8">8</option>
                                 <option value="9">9</option>
                                 <option value="10">10</option>
-                                <option value="0">No workout today</option>
+                               <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
                           <FormGroup>
                             <Label className="padding">How much % of Workout that you breathed in and out through the nose</Label>
-                            <Input type="number" step="10"
+                            <Input type="text"
                              className="form-control" 
-                             name="breath_nose"
-                             min="0"
-                             max="100"
+                             name="breath_nose"                         
                              value={this.state.breath_nose}
                              onChange={this.handleChange}/>
                           </FormGroup>
@@ -658,10 +702,9 @@ class UserInputs extends React.Component{
                           <FormGroup>
                             <Label className="padding"> how much % unprocessed food consumed yesterday?</Label>
                             <Input
-                            type="number" 
+                            type="text" 
                             className="form-control" 
-                            name="prcnt_unprocessed_food"
-                            step="5" min="0" max="100" 
+                            name="prcnt_unprocessed_food"                            
                             value={this.state.prcnt_unprocessed_food}
                             onChange={this.handleChangeUnprocessedFood}
                             onBlur={this.handleOnBlurUnprocessedFood}/>
@@ -699,6 +742,7 @@ class UserInputs extends React.Component{
                                     <option value="9">9</option>
                                     <option value="9.5">9.5</option>
                                     <option value="10">10</option>
+                                    <option value="no workout today">No workout today</option>
                                   </Input>
                           </FormGroup>
 
@@ -714,6 +758,7 @@ class UserInputs extends React.Component{
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>
+                                <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -729,6 +774,7 @@ class UserInputs extends React.Component{
                                 <option value="">select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
+                                <option value="no workout today">No workout today</option>
                             </Input>
                           </FormGroup>
 
@@ -745,6 +791,7 @@ class UserInputs extends React.Component{
                                     <option value="">select</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
+                                    <option value="no workout today">No workout today</option>
                                 </Input>
                           </FormGroup>
 
@@ -762,7 +809,7 @@ class UserInputs extends React.Component{
 
                           <FormGroup>      
                             <Label className="padding">Approximately how many calories did you consume during your workout?</Label>
-                               <Input type="number" name="calories" 
+                               <Input type="text" name="calories" 
                                value={this.state.calories}
                                onChange={this.handleChange}/>
                           </FormGroup>
@@ -858,11 +905,9 @@ class UserInputs extends React.Component{
                           
                           <FormGroup>
                             <Label className="padding">Weight (pounds)</Label>
-                                <Input type="number" 
+                                <Input type="text" 
                                    className="custom-select form-control"
-                                   name="weight"
-                                   min="30"
-                                   max="500" 
+                                   name="weight"                                  
                                    value={this.state.weight}
                                    onChange={this.handleChange}
                                 />
@@ -872,11 +917,10 @@ class UserInputs extends React.Component{
                             <FormGroup>       
                               <Label className="padding">Waist size (Male)</Label>
                               <Input 
-                                type="number" 
+                                type="text" 
                                 className="form-control" 
                                 placeholder="Between 20 - 60"
-                                name="waist"
-                                min="20" max="60" step="1"
+                                name="waist"                               
                                 value={this.state.waist}
                                 onChange={this.handleChange}>
                               </Input>
@@ -887,11 +931,10 @@ class UserInputs extends React.Component{
                             <FormGroup>
                               <Label className="padding">Clothes Size (Womens)</Label>
                               <Input 
-                                type="number" 
+                                type="text" 
                                 className="form-control"
                                 placeholder="Between 0 - 16" 
-                                name="clothes_size"
-                                min="0" max="16" step="1"
+                                name="clothes_size"                                
                                 value={this.state.clothes_size}
                                 onChange={this.handleChange}>
                               </Input>
@@ -901,10 +944,9 @@ class UserInputs extends React.Component{
                           <FormGroup>
                               <Label className="padding">Heart rate variability</Label>
                               <Input
-                                type="number"
+                                type="text"
                                 className="form-control"
-                                name="heart_variability"
-                                min="0" max="100" step="10"
+                                name="heart_variability"                     
                                 value={this.state.heart_variability}
                                 onChange={this.handleChange}
                               />
@@ -932,10 +974,9 @@ class UserInputs extends React.Component{
                           <FormGroup>         
                             <Label className="padding">What % did you breath through your nose last night when you were asleep?</Label>
                             <Input 
-                              type="number" 
+                              type="text" 
                               className="form-control" 
-                              name="breath_sleep"
-                              min="0" max="100" step="10"
+                              name="breath_sleep"                            
                               value={this.state.breath_sleep}
                               onChange={this.handleChange}
                             />
@@ -944,10 +985,9 @@ class UserInputs extends React.Component{
                           <FormGroup>
                               <Label className="padding">What % did you breath through your nose throughtout the day when you were not exercising?</Label>
                               <Input 
-                                type="number" 
+                                type="text" 
                                 className="form-control" 
-                                name="breath_day"
-                                min="0" max="100" step="10" 
+                                name="breath_day"                               
                                 value={this.state.breath_day}
                                 onChange={this.handleChange}
                               />
