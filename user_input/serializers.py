@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from rest_framework import serializers
 
@@ -12,18 +13,67 @@ from .models import UserDailyInput,\
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
+
+	def validate(self, data):
+		prnct_food = data['prcnt_unprocessed_food_consumed_yesterday']
+		pattern = re.compile("(^\d{1,3}).*")
+		if not pattern.match(prnct_food):
+			raise serializers.ValidationError("not a valid percentage value")
+
+		prnct_food = pattern.match(prnct_food).group(1)
+		data['prcnt_unprocessed_food_consumed_yesterday'] = prnct_food
+		return data
+
 	class Meta:
 		model = DailyUserInputStrong
 		fields = ('__all__')
 
 class DailyUserInputEncouragedSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
+
+	def validate(self, data):
+		prnct_breath = data['workout_that_user_breathed_through_nose']
+		pattern = re.compile("(^\d{1,3}).*")
+		if not pattern.match(prnct_breath):
+			raise serializers.ValidationError("not a valid percentage value")
+
+		prnct_breath = pattern.match(prnct_breath).group(1)
+		data['workout_that_user_breathed_through_nose'] = prnct_breath
+		return data
+
 	class Meta:
 		model = DailyUserInputEncouraged
 		fields = ('__all__')
 
 class DailyUserInputOptionalSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
+
+	def validate(self, data):
+		heart_variability = data['workout_that_user_breathed_through_nose']
+		breath_nose = data['percent_breath_nose_last_night']
+		breath_nose_day = data['percent_breath_nose_all_day_not_exercising']
+
+		pattern = re.compile("(^\d{1,3}).*")
+		if not pattern.match(heart_variability):
+			raise serializers.ValidationError("not a valid percentage value")
+
+		if not pattern.match(breath_nose):
+			raise serializers.ValidationError("not a valid percentage value")
+
+		if not pattern.match(breath_nose_day):
+			raise serializers.ValidationError("not a valid percentage value")
+
+		heart_variability = pattern.match(heart_variability).group(1)
+		data['workout_that_user_breathed_through_nose'] = heart_variability
+
+		breath_nose = pattern.match(breath_nose).group(1)
+		data['percent_breath_nose_last_night'] = breath_nose
+
+		breath_nose_day = pattern.match(breath_nose_day).group(1)
+		data['percent_breath_nose_all_day_not_exercising'] = breath_nose_day
+
+		return data
+
 	class Meta:
 		model = DailyUserInputOptional
 		fields = ('__all__')

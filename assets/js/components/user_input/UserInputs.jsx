@@ -654,8 +654,8 @@ class UserInputs extends React.Component{
                             name="pain"
                             value={this.state.pain}
                             onChange={this.handleChangePain}>
-                                <option value="no workout today">No workout today</option>
                                 <option value="">select</option>
+                                <option value="no workout today">No workout today</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </Input>
