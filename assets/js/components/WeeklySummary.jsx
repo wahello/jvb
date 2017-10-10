@@ -9,7 +9,7 @@ import { Table, Row, Container, className, Col } from 'reactstrap';
 
 
 axiosRetry(axios, { retries: 4}); 
-var CalendarWidget = require('react-calendar-widget');
+var CalendarWidget = require('react-calendar-widget');  
 
 var ReactDOM = require('react-dom');
 
