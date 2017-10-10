@@ -67,7 +67,7 @@ processDate(date){
 }
   componentDidMount(){
     var today=new Date();
-     weeklygradeDate(today,this.successweekly,this.errorweekly);
+     weeklygradeDate(today,this.successweekly,this.errorweekly);   
     fetchWeeklyGrade(this.successweekly, this.errorweekly)
   }
     render(){

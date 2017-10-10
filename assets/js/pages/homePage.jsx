@@ -21,6 +21,7 @@ import Sleepgraph from '../components/sleep';
 import GarminDataPage from '../components/GarminData';
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
 import Quicklook from '../components/quicksummary/quicksummary';
+import Movement from '../components/movement_consistency';
 
 const createStoreWithMiddleware = applyMiddleware(promise,thunk)(createStore);
 // require('../sass/style.scss');
@@ -46,6 +47,7 @@ ReactDOM.render((
 			<Route path='/WeeklySummary' component={Weeklysummary} />
 			<Route path='/sleep' component={Sleepgraph} />
 			<Route path='/quicksummary' component={Quicklook} />
+			<Route path='/movement_consistency' component={Movement}/>
 
 	    </Switch>
 	  </BrowserRouter>
