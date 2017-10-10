@@ -4,7 +4,6 @@ import { Table, Row, Container, className, Col } from 'reactstrap';
 
 class Breakdown extends React.Component{
     render(){
-        console.log('i am here for rendering grade')
         return(
             <Container id="breakdown">
                       <div className="break_grade row justify-content-center">

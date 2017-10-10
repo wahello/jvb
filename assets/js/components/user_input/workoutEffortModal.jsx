@@ -7,7 +7,7 @@ export default class WorkoutEffortModal extends Component{
 	constructor(props){
 		super(props);
 		const effort = this.props.workout_effort_hard_portion;
-		const is_workout_hard = effort !== null ? 'yes' : 'no';
+		const is_workout_hard = effort !== '' ? 'yes' : 'no';
 		this.state = {
 			modal:true,
 			is_workout_hard:is_workout_hard,
@@ -88,7 +88,7 @@ export default class WorkoutEffortModal extends Component{
 	                                  <option value="8">8</option>
 	                                  <option value="9">9</option>
 	                                  <option value="10">10</option>
-	                                  <option value="0">No workout today</option>
+	                                  <option value="no workout today">No workout today</option>
 	                            </Input>
 							</FormGroup>
 						</Collapse>

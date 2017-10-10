@@ -6,19 +6,22 @@ export default class SmokedSubstance extends Component{
 
 	constructor(props){
 		super(props);
-		const smoked_substance_list = this.props.smoked_substance_list;
+		let smoked_substance_list = this.props.smoked_substance_list;
 		let pat = /^cigarettes/i;
 		let isCigarettes = pat.test(smoked_substance_list);
 		let cigarettes_count = '';
+
 		if (isCigarettes){
 			let pattern = /^cigarettes\((\d+)\)$/i;
 			cigarettes_count = pattern.exec(smoked_substance_list)[1];
+			smoked_substance_list = 'cigarettes';
 		}
+
 		this.state = {
 			modal:true,
 			smoked_substance_list:smoked_substance_list,
 			cigarettes_count:cigarettes_count,
-			collapseOther: smoked_substance_list !== '' ? true : false,
+			collapseOther: (smoked_substance_list !== '' && smoked_substance_list !== 'cigarettes')? true : false,
 			collapseCigarettesCount: isCigarettes ? true : false
 		};
 		this.modalToggle = this.modalToggle.bind(this);
@@ -32,12 +35,14 @@ export default class SmokedSubstance extends Component{
 		const value = event.target.value;
 		if (value === 'other'){
 		    this.setState({
-		    	collapseOther:true
+		    	collapseOther:true,
+		    	collapseCigarettesCount:false
 		    });
 		}else if (value === 'cigarettes'){
 			this.setState({
 		    	smoked_substance_list: value,
-		    	collapseCigarettesCount: true
+		    	collapseCigarettesCount: true,
+		    	collapseOther:false
 		    });
 		}else {
 			this.setState({
@@ -89,9 +94,8 @@ export default class SmokedSubstance extends Component{
                             className="custom-select form-control" 
                             value={this.state.smoked_substance_list}
                             onChange={this.handleChange}>
-                                <option value="select">select</option>
-                                <option value="cigarettes">Cigarettes</option>
                                 <option value="other">Other</option>
+                                <option value="cigarettes">Cigarettes</option>
                             </Input>  
                           </FormGroup> 
 
@@ -114,7 +118,7 @@ export default class SmokedSubstance extends Component{
 	                            type="textarea" 
 	                            className="form-control" 
 	                            rows="5" columns="5"
-	                            placeholder="Please write what you have smoked"
+	                            placeholder="Please type in..."
 	                            value={this.state.smoked_substance_list}
 	                            onChange={this.handleChange} />
 							</FormGroup>

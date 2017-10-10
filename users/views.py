@@ -3,7 +3,7 @@ import ast
 import json
 import urllib
 import logging
-from datetime import datetime, date, time,timezone
+from datetime import datetime,timedelta,date, time,timezone
 import calendar
 from collections import OrderedDict
 
@@ -445,6 +445,7 @@ class fetchGarminData(APIView):
         URL = ROOT_URL.format(dtype)
         model = self.MODEL_TYPES[dtype]
         pull = False
+        # start_time_in_seconds
         output_dict[dtype] = [q.data for q in model.objects.filter(
                       user=user,
                       record_date_in_seconds__gte=data['uploadStartTimeInSeconds'],
@@ -568,35 +569,56 @@ class fetchGarminData(APIView):
         "Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
         "Stress Field (HRV throughout the day)":""
                 }
-      # users input raw
-      # from user_input.views import UserDailyInputView
-      # user_input_raw = [dict(d) for d in UserDailyInputView.as_view()(request).data]
-      # output_dict['user_input_raw'] = user_input_raw
 
       # movement consistency calculation
+
       movement_consistency = OrderedDict()
 
       if epochs_json:
-        active_hours = 0 
-        inactive_hours = 0
-        epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 
+        epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
         for data in epochs_json:
           if data.get('activityType') == 'WALKING': 
-            duration = data.get('durationInSeconds')
             start_time = data.get('startTimeInSeconds')-14400
-            end_time = start_time + duration
-            time_interval = str(datetime.utcfromtimestamp(start_time))+" to "+\
-                            str(datetime.utcfromtimestamp(end_time))
-            is_active = True if data.get('steps') > 300 else False
-            if is_active:
-                active_hours += duration
-            else:
-                inactive_hours += duration
-            movement_consistency[time_interval] = 'active' if is_active else 'inactive'
 
-        movement_consistency['active_hours'] = active_hours / 3600
-        movement_consistency['inactive_hours'] = inactive_hours / 3600
+            date_of_data = datetime.utcfromtimestamp(start_time).strftime("%Y-%m-%d")
+            td = timedelta(hours=1)
+            hour_start = datetime.utcfromtimestamp(start_time).strftime("%I %p")
+            hour_end = (datetime.utcfromtimestamp(start_time)+td).strftime("%I %p")
+            time_interval = hour_start+" to "+hour_end
+
+            if not movement_consistency.get(date_of_data,None):
+              movement_consistency[date_of_data] = OrderedDict()
+
+            if not movement_consistency[date_of_data].get(time_interval,None):
+              movement_consistency[date_of_data][time_interval] = {
+                "steps":0,
+                "status":"inactive"
+              }
+
+            steps_in_interval = movement_consistency[date_of_data][time_interval].get('steps')
+            status = movement_consistency[date_of_data][time_interval].get('status')
+            is_active = True if data.get('steps') + steps_in_interval > 300 else False
+
+            movement_consistency[date_of_data][time_interval]['steps']\
+                = steps_in_interval + data.get('steps')
+
+            movement_consistency[date_of_data][time_interval]['status']\
+                = 'active' if is_active else 'inactive'
+
+        # converting Ordered dict "movement_consistency" to list
+        # to avoid the bug "RuntimeError: OrderedDict mutated during iteration"
+        # in DRF (is guess so!) 
+        for dt,data in list(movement_consistency.items()):
+          active_hours = 0
+          inactive_hours = 0
+          for interval,values in list(data.items()):
+            if values['status'] == 'active': 
+              active_hours += 1 
+            else:
+              inactive_hours += 1
+          movement_consistency[dt]['active_hours'] = active_hours
+          movement_consistency[dt]['inactive_hours'] = inactive_hours
 
       output_dict['movement_consistency'] = movement_consistency
 

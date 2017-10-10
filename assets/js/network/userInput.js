@@ -142,7 +142,7 @@ export function userDailyInputSend(data, callback=undefined){
 	});
 }
 
-export function userDailyInputFetch(date, successCallback=undefined, errorCallback=undefined){
+export function userDailyInputFetch(date, successCallback=undefined, errorCallback=undefined,clone){
 	const URL = 'users/daily_input/item/';
 	const d = date.getDate();
     const m = date.getMonth()+1;
@@ -158,7 +158,7 @@ export function userDailyInputFetch(date, successCallback=undefined, errorCallba
 	};
 	axios(config).then(function(response){
 		if(successCallback != undefined){
-			successCallback(response);
+			successCallback(response,clone);
 		}
 	}).catch((error) => {
 		if(errorCallback != undefined){

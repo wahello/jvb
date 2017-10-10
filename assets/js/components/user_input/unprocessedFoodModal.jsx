@@ -6,7 +6,6 @@ export default class UnprocesedFoodModal extends Component{
 
 	constructor(props){
 		super(props);
-		console.log("Inside component");
 		const unprocessed_food_list = this.props.unprocessed_food_list;
 		this.state = {
 			modal:true,

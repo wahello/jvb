@@ -9,6 +9,7 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals
 
+
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
 	class Meta:
