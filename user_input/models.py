@@ -1,5 +1,5 @@
 # from datetime import datetime
-
+import re
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator,BaseValidator
 from django.utils.translation import gettext_lazy as _
@@ -26,6 +26,11 @@ class CharMinValueValidator(BaseValidator):
     def clean(self, x):
         if x == 'no workout today':
             return x
+
+        pattern = re.compile("(^\d{1,3}).*")
+        if x and pattern.match(x):
+            return int(pattern.match(x).group(1))
+
         return int(x);
 
 
@@ -42,6 +47,11 @@ class CharMaxValueValidator(BaseValidator):
     def clean(self, x):
         if x == 'no workout today':
             return x
+
+        pattern = re.compile("(^\d{1,3}).*")
+        if x and pattern.match(x):
+            return int(pattern.match(x).group(1))
+
         return int(x);
 
 class UserDailyInput(models.Model):
@@ -118,12 +128,12 @@ class DailyUserInputStrong(models.Model):
     smoke_any_substances_whatsoever = models.CharField(
         max_length=4, choices=YN_CHOICE, blank = True)
 
-    smoked_substance = models.TextField(max_length=300, blank=True)
+    smoked_substance = models.TextField(blank=True)
 
     medications_or_controlled_substances_yesterday= models.CharField(
         max_length=4, choices=YN_CHOICE, blank = True)
 
-    medications_or_controlled_substances_taken = models.TextField(max_length=300, blank=True)
+    medications_or_controlled_substances_taken = models.TextField(blank=True)
 
 class DailyUserInputEncouraged(models.Model):
 
@@ -173,7 +183,7 @@ class DailyUserInputEncouraged(models.Model):
     
     # expect comma separated one or more body areas 
     # (right foot, left foot, right shins, left shins,no workout today) 
-    pain_area = models.TextField(max_length=300, blank=True)
+    pain_area = models.TextField(blank=True)
 
 
 
@@ -220,11 +230,11 @@ class DailyUserInputOptional(models.Model):
         choices = YN_NO_WRKOUT_CHOICE,
         blank = True)
 
-    food_ate_before_workout = models.TextField(max_length=300, blank=True)
+    food_ate_before_workout = models.TextField(blank=True)
 
     calories_consumed_during_workout = models.CharField(max_length=20, blank = True)
 
-    food_ate_during_workout = models.TextField(max_length=300, blank=True)
+    food_ate_during_workout = models.TextField(blank=True)
 
     workout_enjoyable = models.CharField(
         max_length=20, 
@@ -235,7 +245,7 @@ class DailyUserInputOptional(models.Model):
 
     weight = models.CharField(
         max_length=20,
-        validators = [CharMinValueValidator(30),CharMaxValueValidator(500)],
+        validators = [CharMinValueValidator(30),CharMaxValueValidator(300)],
         blank=True, null=True)
 
     waist_size =models.CharField(
