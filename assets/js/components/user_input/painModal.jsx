@@ -49,7 +49,7 @@ export default class PainModal extends Component{
 				<Modal isOpen={this.state.modal} toggle={this.modalToggle}>
 					<ModalBody>
 						<FormGroup>   
-                            <Label>Where do you have pain/twinges?</Label>
+                            <Label>Where Did You Have Pain/Twinges?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 

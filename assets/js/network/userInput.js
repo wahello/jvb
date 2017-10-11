@@ -133,7 +133,7 @@ export function userDailyInputSend(data, callback=undefined){
 		}
 	};
 	axios(config).then(function(response){
-		alert("User Input submitted successfully!");
+		//alert("User Input submitted successfully!");
 		if(callback != undefined){
 			callback();
 		}
