@@ -47,7 +47,7 @@ export default class UnprocesedFoodModal extends Component{
 	                            className="custom-select form-control" 
 	                            value={this.state.unprocessed_food_list}
 	                            onChange={this.handleChange}
-	                            placeholder="Apple,Carrot..." /> 
+	                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." /> 
                           </FormGroup> 
 					</ModalBody>
 					<ModalFooter>
