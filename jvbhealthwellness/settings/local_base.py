@@ -66,3 +66,5 @@ LOGGING = {
 
 #cors 
 CORS_ORIGIN_ALLOW_ALL = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

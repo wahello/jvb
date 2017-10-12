@@ -1,4 +1,4 @@
-
+from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
@@ -10,6 +10,18 @@ from quicklook import urls as quicklookUrls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^password_reset/$', auth_views.PasswordResetView.as_view(),
+                              name='password_reset'),
+
+    url(r'^password_reset/done/$', auth_views. PasswordResetDoneView.as_view(),
+                                   name='password_reset_done'),
+
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
+    url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), 
+                          name='password_reset_complete'),
+
     url(r'^djangojs/', include('djangojs.urls')),
     url(r'^callbacks/garmin$', userViews.receive_token, name='receive_token'),
     url(r'^callbacks/garmin/push$',garmin_views.GarminPing.as_view(), name="garmin_ping"),
