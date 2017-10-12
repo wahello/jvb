@@ -54,6 +54,9 @@ MIDDLEWARE = [
     # cors middleware
     'corsheaders.middleware.CorsMiddleware',
 
+    #request logging middleware
+    'request_logging.middleware.LoggingMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,9 +134,27 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 #Restframework
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'utils.exempt.CsrfExemptSessionAuthentication',  
     )
 }
+
+#Request Logging 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # change debug level as appropiate
+            'propagate': False,
+        },
+    },
+}
+REQUEST_LOGGING_DISABLE_COLORIZE = True

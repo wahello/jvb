@@ -194,6 +194,7 @@ class DailyUserInputOptional(models.Model):
     VEGETARIAN = 'vegetarian'
     PALEO = 'paleo'
     LOW_CARB_HIGH_FAT = 'low carb/high fat'
+    HIGH_CARB = 'high carb'
     OTHER = 'other'
 
     YN_CHOICE = (
@@ -215,6 +216,7 @@ class DailyUserInputOptional(models.Model):
         (VEGETARIAN,'Vegetarian'),
         (PALEO,'paleo'),
         (LOW_CARB_HIGH_FAT,'Low carb/high fat'),
+        (HIGH_CARB, 'High Carb'),
         (OTHER, 'Other')
     )
     user_input = models.OneToOneField(UserDailyInput, related_name='optional_input')
@@ -286,7 +288,6 @@ class DailyUserInputOptional(models.Model):
         blank = True,null = True)
 
     type_of_diet_eaten = models.CharField(
-        choices=DIET_CHOICE,
         max_length=100,
         blank=True)
 

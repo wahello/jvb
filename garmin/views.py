@@ -17,7 +17,9 @@ from .serializers import UserGarminDataEpochSerializer,\
 					UserGarminDataDailySerializer,\
 					UserGarminDataActivitySerializer,\
 					UserGarminDataManuallyUpdatedSerializer,\
-					UserGarminDataStressDetailSerializer
+					UserGarminDataStressDetailSerializer,\
+					UserGarminDataMetricsSerializer,\
+					UserGarminDataMoveIQSerializer
 
 from .models import UserGarminDataEpoch,\
 					UserGarminDataSleep,\
@@ -25,7 +27,9 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataDaily,\
 					UserGarminDataActivity,\
 					UserGarminDataManuallyUpdated,\
-					UserGarminDataStressDetails
+					UserGarminDataStressDetails,\
+					UserGarminDataMetrics,\
+					UserGarminDataMoveIQ
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -85,6 +89,22 @@ class UserGarminDataStressDetailsView(generics.ListCreateAPIView):
 	def perform_create(self, serializer):
 		serializer.save(user=self.request.user)
 
+class UserGarminDataMetricsView(generics.ListCreateAPIView):
+	permission_classes = (IsAuthenticated,)
+	queryset = UserGarminDataMetrics.objects.all()
+	serializer_class = UserGarminDataMetricsSerializer
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+
+class UserGarminDataMoveIQView(generics.ListCreateAPIView):
+	permission_classes = (IsAuthenticated,)
+	queryset = UserGarminDataMoveIQ.objects.all()
+	serializer_class = UserGarminDataMoveIQSerializer
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+
 class PullGarminData(APIView):
 	'''
 		this view will pull data from API and store
@@ -101,7 +121,7 @@ class PullGarminData(APIView):
 				"MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
 				"EPOCH_SUMMARIES":"epochs",
 				"SLEEP_SUMMARIES":"sleeps",
-				"BODY_COMPOSITION":"bodyComps",
+				"BODY_COMPOSITION":"bodyComps"
 			}
 
 	MODEL_TYPES = {
@@ -197,7 +217,9 @@ class GarminPing(APIView):
 				"EPOCH_SUMMARIES":"epochs",
 				"SLEEP_SUMMARIES":"sleeps",
 				"BODY_COMPOSITION":"bodyComps",
-				"STRESS_DETAILS":"stressDetails"
+				"STRESS_DETAILS":"stressDetails",
+				"MOVEMENT_IQ":"moveiq",
+				"USER_METRICS":"userMetrics"
 			}
 
 	MODEL_TYPES = {
@@ -207,7 +229,9 @@ class GarminPing(APIView):
 		"epochs":UserGarminDataEpoch,
 		"sleeps":UserGarminDataSleep,
 		"bodyComps":UserGarminDataBodyComposition,
-		"stressDetails":UserGarminDataStressDetails
+		"stressDetails":UserGarminDataStressDetails,
+		"moveiq":UserGarminDataMoveIQ,
+		"userMetrics":UserGarminDataMetrics
 	}
 
 	def _createObjectList(self,user,json_data,dtype,record_dt):
@@ -217,15 +241,37 @@ class GarminPing(APIView):
 		if len(json_data):
 			model = self.MODEL_TYPES[dtype]
 			record_date = record_dt
-			objects = [
-				model(user=user,
-					  summary_id=obj.get("summaryId"),
-					  record_date_in_seconds=record_date,
-					  start_time_in_seconds=obj.get("startTimeInSeconds"),
-					  start_time_duration_in_seconds=obj.get("durationInSeconds"),
-					  data = obj)
-				for obj in json_data
-			]
+			if not dtype in ["bodyComps","userMetrics"]:
+				objects = [
+					model(user=user,
+						  summary_id=obj.get("summaryId"),
+						  record_date_in_seconds=record_date,
+						  start_time_in_seconds=obj.get("startTimeInSeconds")+\
+						  						obj.get("startTimeOffsetInSeconds"),
+						  start_time_duration_in_seconds=obj.get("durationInSeconds"),
+						  data = obj)
+					for obj in json_data
+				]
+			if dtype == "bodyComps":
+				objects = [
+					model(	user=user,
+							summary_id=obj.get("summaryId"),
+							record_date_in_seconds=record_date,
+							start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
+							                   	  obj.get("measurementTimeOffsetInSeconds"),
+							start_time_duration_in_seconds=obj.get("durationInSeconds"),
+							data = obj)
+					for obj in json_data
+        		]
+			if dtype == "userMetrics":
+				objects = [
+					model(	user=user,
+						 	summary_id=obj.get("summaryId"),
+						 	record_date_in_seconds=record_date,
+						 	calendar_date=obj.get("calendar_date"),
+						 	data=obj)
+					for obj in json_data
+				]
 
 			return objects
 

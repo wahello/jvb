@@ -373,15 +373,28 @@ class fetchGarminData(APIView):
     '''
     if len(json_data):
       model = self.MODEL_TYPES[dtype]
-      objects = [
-        model(user=self.request.user,
-            summary_id=obj.get("summaryId"),
-            record_date_in_seconds=record_date,
-            start_time_in_seconds=obj.get("startTimeInSeconds"),
-            start_time_duration_in_seconds=obj.get("durationInSeconds"),
-            data = obj)
-        for obj in json_data
-      ]
+      if not dtype == 'bodyComps':
+        objects = [
+          model(user=self.request.user,
+              summary_id=obj.get("summaryId"),
+              record_date_in_seconds=record_date,
+              start_time_in_seconds=obj.get("startTimeInSeconds")+\
+                                    obj.get("startTimeOffsetInSeconds"),
+              start_time_duration_in_seconds=obj.get("durationInSeconds"),
+              data = obj)
+          for obj in json_data
+        ]
+      else:
+        objects = [
+          model(user=self.request.user,
+              summary_id=obj.get("summaryId"),
+              record_date_in_seconds=record_date,
+              start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
+                                    obj.get("measurementTimeOffsetInSeconds"),
+              start_time_duration_in_seconds=obj.get("durationInSeconds"),
+              data = obj)
+          for obj in json_data
+        ]
 
       return objects
 
@@ -417,13 +430,9 @@ class fetchGarminData(APIView):
       # UTC time is 4 hour ahead of EST so we have to minus 14400
       # seconds to get actual EST starting time
       data = {
-        'uploadStartTimeInSeconds': startDateTimeInSeconds-14400,
-        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400-14400
+        'uploadStartTimeInSeconds': startDateTimeInSeconds,
+        'uploadEndTimeInSeconds':startDateTimeInSeconds+86400
       }
-
-      midnight = datetime.combine(date.today(), time.min)
-      # today's epoch at midnight
-      today_epoch = calendar.timegm(midnight.timetuple())
 
       output_dict = {}
 
@@ -448,8 +457,8 @@ class fetchGarminData(APIView):
         # start_time_in_seconds
         output_dict[dtype] = [q.data for q in model.objects.filter(
                       user=user,
-                      record_date_in_seconds__gte=data['uploadStartTimeInSeconds'],
-                      record_date_in_seconds__lte=data['uploadEndTimeInSeconds'])]
+                      start_time_in_seconds__gte=data['uploadStartTimeInSeconds'],
+                      start_time_in_seconds__lte=data['uploadEndTimeInSeconds'])]
 
         if not output_dict[dtype]:
           # no record in db
@@ -539,7 +548,7 @@ class fetchGarminData(APIView):
         "Average Vertical Oscillation":"",
         "Average Gct Balance":"",
         "Avergae Ground Contact Time":"",
-        "Total Steps":my_sum(dailies_json,'steps'),
+        "Total Steps":my_sum(epochs_json,'steps'),
         "Activity Steps":my_sum(activities_json,'activitySteps'),
         "Floors Climbed":my_sum(dailies_json,'floorsClimbed'),
         "Floors Descended":"",

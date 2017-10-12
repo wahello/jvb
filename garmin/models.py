@@ -86,3 +86,26 @@ class UserGarminDataStressDetails(models.Model):
 	#data = JSONField()
 	# data = models.CharField(max_length=2000)
 	data = models.TextField()
+
+class UserGarminDataMetrics(models.Model):
+	user = models.ForeignKey('auth.user', on_delete=models.CASCADE, related_name="metrics_data")
+	summary_id = models.CharField(max_length=100,db_index=True)
+	record_date_in_seconds = models.IntegerField()
+	calendar_date = models.DateField()
+
+	# only in case of postgres db
+	#data = JSONField()
+	# data = models.CharField(max_length=2000)
+	data = models.TextField()
+
+class UserGarminDataMoveIQ(models.Model):
+	user = models.ForeignKey('auth.user', on_delete=models.CASCADE, related_name="moveiq_data")
+	summary_id = models.CharField(max_length=100,db_index=True)
+	record_date_in_seconds = models.IntegerField()
+	start_time_in_seconds = models.IntegerField(blank=True,null=True)
+	start_time_duration_in_seconds = models.IntegerField(blank=True,null=True)
+
+	# only in case of postgres db
+	#data = JSONField()
+	# data = models.CharField(max_length=2000)
+	data = models.TextField()

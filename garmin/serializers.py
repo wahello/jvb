@@ -6,7 +6,9 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataDaily,\
 					UserGarminDataActivity,\
 					UserGarminDataManuallyUpdated,\
-					UserGarminDataStressDetails
+					UserGarminDataStressDetails,\
+					UserGarminDataMetrics,\
+					UserGarminDataMoveIQ
 
 class UserGarminDataEpochSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -48,4 +50,16 @@ class UserGarminDataStressDetailSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
 	class Meta:
 		model = UserGarminDataStressDetails
+		fields = ('__all__')
+
+class UserGarminDataMetricsSerializer(serializers.ModelSerializer):
+	user = serializers.PrimaryKeyRelatedField(read_only=True)
+	class Meta:
+		model = UserGarminDataMetrics
+		fields = ('__all__')
+
+class UserGarminDataMoveIQSerializer(serializers.ModelSerializer):
+	user = serializers.PrimaryKeyRelatedField(read_only=True)
+	class Meta:
+		model = UserGarminDataMoveIQ
 		fields = ('__all__')
