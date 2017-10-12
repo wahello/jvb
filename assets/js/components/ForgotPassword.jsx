@@ -17,7 +17,7 @@ class Forgotpassword extends React.Component{
     };
     this.toggle=this.toggle.bind(this);
     this.handlechange=this.handlechange.bind(this);  
-    this.onSuccess = this.onSuccess.bind(this);
+    this.onSuccess = this.onSuccess.bind(this); 
   }
 handlechange(event){
       const target = event.target;

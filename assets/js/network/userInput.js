@@ -76,14 +76,15 @@ function formatJSON(data){
 		"encouraged_input":{},
 		"optional_input":{}
 	};
-	
+		
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
 	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;
 	json_data.strong_input['prcnt_unprocessed_food_consumed_yesterday'] = data.prcnt_unprocessed_food;
 	json_data.strong_input['list_of_unprocessed_food_consumed_yesterday'] = data.unprocessed_food_list; 
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
-	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_last_night; 
+	//json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_last_night; 
+	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;
 	json_data.strong_input['prescription_or_non_prescription_sleep_aids_last_night'] = data.prescription_sleep_aids; 
 	json_data.strong_input['smoke_any_substances_whatsoever'] = data.smoke_substances;

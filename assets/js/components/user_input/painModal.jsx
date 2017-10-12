@@ -1,6 +1,9 @@
-import React, {Component} from 'react'
-import {Button,FormGroup, Label, Input, FormText, className, Modal,
-		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
+import React, {Component} from 'react';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
+
+import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
+	
 
 export default class PainModal extends Component{
 
@@ -8,18 +11,24 @@ export default class PainModal extends Component{
 		super(props);
 		const area = this.props.pain_area;
 		this.state = {
-			modal:true,
-			pain_area:area,
-			collapse:false
+			collapse:false,	
+			disabled: false,
+			stayOpen: true,
+			pain_area: area !== '' ? area.split(',') : []
 		};
-		this.modalToggle = this.modalToggle.bind(this);
+		this.onSubmit = this.onSubmit.bind(this);
+		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
-		this.onModalSubmit = this.onModalSubmit.bind(this);
-
 	}
-
 	handleChange(event){
 		const value = event.target.value;
+		this.setState({
+			pain_area:value
+		},() => {
+		    	this.props.updateState(this.state.pain_area);
+		 });
+	}
+	handleSelectChange(value) {
 		if (value === 'other'){
 		    this.setState({
 		    	pain_area: value,
@@ -27,77 +36,68 @@ export default class PainModal extends Component{
 		    });
 		}else{
 			this.setState({
-		    	pain_area: value,
+		    	pain_area:value
+		    },()=>{
+		    	this.props.updateState(this.state.pain_area)
 		    });
 		}
 	}
 
-	modalToggle(){
-		this.setState({
-			modal:!this.state.modal
-		});
-	}
-
-	onModalSubmit(){
+	onSubmit(){
 		this.props.updateState(this.state.pain_area);
-		this.modalToggle();
+		console.log(this.state);
 	}
 
 	render(){
+		const option=[
+                { value:"right knee",label:'Right knee'},
+                { value:'left knee',label:'Light knee'},
+                { value:"right ankle",label:'Right ankle'},
+                { value:"left ankle",label:'Left ankle'},
+                { value:"right foot",label:'Right foot'},
+                { value:"left foot",label:'Left foot'},
+                { value:"right shins",label:'Right shins'},
+                { value:"left shins",label:'Left shins'},
+                { value:"right hip",label:'Right hip'},
+                { value:"left hip",label:'Left hip'},
+                { value:"right achilles",label:'Right achilles'},
+                { value:"left achilles",label:'Left achilles'},
+                { value:"right calf",label:'Right calf'},
+                { value:"left calf",label:'Left calf'},
+                { value:"right toes",label:'Right toes'},
+                { value:"left toes",label:'Left toes'},
+                { value:"neck",label:'Neck'},
+                { value:"upper back",label:'Upper back'},
+                { value:"mid back",label:'Mid back'},
+                { value:"lower back",label:'Lower back'},
+                { value:"other",label:'Other'}
+
+		];
 		return(
 			<div>
-				<Modal isOpen={this.state.modal} toggle={this.modalToggle}>
-					<ModalBody>
-						<FormGroup>   
-                            <Label>Where Did You Have Pain/Twinges?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            value={this.state.pain_area}
-                            onChange={this.handleChange}>
-                                <option value="select">select</option>
-                                <option value="right knee">Right knee</option>
-                                <option value="left knee">Light knee</option>
-                                <option value="right ankle">Right ankle</option>
-                                <option value="left ankle">Left ankle</option>
-                                <option value="right foot">Right foot</option>
-                                <option value="left foot">Left foot</option>
-                                <option value="right shins">Right shins</option>
-                                <option value="left shins">Left shins</option>
-                                <option value="right hip">Right hip</option>
-                                <option value="left hip">Left hip</option>
-                                <option value="right achilles">Right achilles</option>
-                                <option value="left achilles">Left achilles</option>
-                                <option value="right calf">Right calf</option>
-                                <option value="left calf">Left calf</option>
-                                <option value="right toes">Right toes</option>
-                                <option value="left toes">Left toes</option>
-                                <option value="neck">Neck</option>
-                                <option value="upper back">Upper back</option>
-                                <option value="mid back">Mid back</option>
-                                <option value="lower back">Lower back</option>
-                                <option value="other">Other</option>
-                            </Input>  
-                          </FormGroup> 
+				<FormGroup>   
+                    <Label>Where Did You Have Pain/Twinges?</Label>
+                    <Select
+							closeOnSelect={!this.state.stayOpen}
+							disabled={this.state.disabled}
+							multi
+							onChange={this.handleSelectChange}
+							options={option}
+							simpleValue
+							value={this.state.pain_area}
+					/> 
+                  </FormGroup> 
 
-						<Collapse isOpen={this.state.collapse}>
-							<FormGroup>
-								<Label>Please write where you have pain/twinges</Label>
-								<Input 
-	                            type="textarea" 
-	                            className="form-control" 
-	                            rows="5" columns="5"
-	                            value={this.state.pain_area}
-	                            onChange={this.handleChange} />
-							</FormGroup>
-						</Collapse>
-
-					</ModalBody>
-					<ModalFooter>
-						<Button color="primary" onClick={this.onModalSubmit}>Save</Button>{' '}
-						<Button color="danger" onClick={this.modalToggle}>Cancel</Button>
-					</ModalFooter>
-				</Modal>
+				<Collapse isOpen={this.state.collapse}>
+					<FormGroup>
+						<Label>Please write where you have pain/twinges</Label>
+						<Input
+						type="text"
+						className="form-control"
+						placeholder="Write where you have pain here.."
+						onChange={this.handleChange} />
+					</FormGroup>
+				</Collapse>
 			</div>
 		);
 	}
