@@ -796,9 +796,7 @@ class UserInputs extends React.Component{
                              <option value="">Hours</option>
                             {this.createDropdown(0,24)}                        
                             </Input>
-                            </div>
-                            &nbsp;
-                            &nbsp;
+                            </div>                          
                             <div className="col-xs-6 justify-content-right">
                             <div className="Minutes">
                             <Input type="select" name="sleep_mins_last_night"
