@@ -38,7 +38,9 @@ export default class PainModal extends Component{
 		const area = this.props.pain_area;
 		const area_list = area.split(',');
 
-		if(area !== ""){
+		if(area === ""){
+			other = false;
+		}else{
 			for(let item of option){
 				for(let a of area_list){
 					if(item.value === a){
@@ -48,7 +50,7 @@ export default class PainModal extends Component{
 				}
 			}
 		}
-		
+
 		this.state = {
 			collapse:other ? true : false,	
 			disabled: false,
