@@ -789,7 +789,6 @@ class UserInputs extends React.Component{
                            
                              <div className="col-xs-6">
                             <Input type="select" name="sleep_hours_last_night"
-                            placeholder="Hours"
                             id="hours"
                             className="form-control custom-select"
                             value={this.state.sleep_hours_last_night}
@@ -797,10 +796,11 @@ class UserInputs extends React.Component{
                              <option value="">Hours</option>
                             {this.createDropdown(0,24)}                        
                             </Input>
-                         </div>
-
-                              <div className="col-xs-6">
-                             <span><Input type="select" name="sleep_mins_last_night"
+                            </div>
+                            &nbsp
+                            &nbsp
+                            <div className="col-xs-6 justify-content-right">
+                            <Input type="select" name="sleep_mins_last_night"
                              placeholder="Minutes"
                              id="minutes"
                             className="form-control custom-select "
@@ -808,7 +808,7 @@ class UserInputs extends React.Component{
                             onChange={this.handleChange}>
                              <option value="">Minutes</option>
                             {this.createDropdown(0,59)}                        
-                            </Input></span>
+                            </Input>
                        
                           </div>
                           
@@ -817,7 +817,7 @@ class UserInputs extends React.Component{
 
                         
                           <FormGroup className="food">
-                            <h2><strong>Food/Drink/Other Inputs</strong></h2>
+                            
                             <Label className="padding"> What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
                             <Input
                             type="select" 
@@ -998,7 +998,7 @@ class UserInputs extends React.Component{
                               name="diet_type"
                               value={this.state.diet_type}
                               onChange={this.handleChangeDietModel}>
-                                      <option value="">select</option>
+                                      <option value="select">select</option>
                                       <option value="other">Other</option> 
                                       <option value="vegan">Vegan</option>
                                       <option value="vegetarian">Vegetarian</option>
