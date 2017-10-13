@@ -582,15 +582,7 @@ class UserInputs extends React.Component{
                       </div>
                         <h2 className="head">Daily user inputs report</h2>
                         <div className="row justify-content-center">
-                        <div className="btn1">
-                          <Button  
-                           size="sm"
-                            onClick={this.onNoWorkoutToday}
-
-                            className="btn btn-info">
-                            I Did Not Workout Today
-                          </Button>
-                          </div>
+                       
                         <div className="btn2">
                           <Button  
                         size="sm"
@@ -618,7 +610,6 @@ class UserInputs extends React.Component{
                             value={this.state.workout_easy}
                             onChange={this.handleChangeWorkout}>
                                 <option value="">select</option>
-                                <option value="no workout today">No Workout Today</option>
                                 <option value="easy">Easy</option>
                                 <option value="hard">Hard</option>
                             </Input>  
@@ -634,8 +625,7 @@ class UserInputs extends React.Component{
                             name="workout_enjoyable"
                             value={this.state.workout_enjoyable}
                             onChange={this.handleChange}>
-                                  <option value="">select</option>
-                                  <option value="no workout today">No Workout Today</option>
+                                  <option value="">select</option>                               
                                   <option value="yes">Yes</option>
                                   <option value="no">No</option>
                             </Input>  
@@ -651,8 +641,7 @@ class UserInputs extends React.Component{
                             name="workout_effort"
                             value={this.state.workout_effort}
                             onChange={this.handleChangeWorkoutEffort} >
-                                  <option value="">select</option>  
-                                  <option value="no workout today">No Workout Today</option>
+                                  <option value="">select</option>                                 
                                   <option value="1">1</option>
                                   <option value="2">2</option>
                                   <option value="3">3</option>
@@ -680,8 +669,7 @@ class UserInputs extends React.Component{
                             name="pain"
                             value={this.state.pain}
                             onChange={this.handleChangePain}>
-                                <option value="">select</option>
-                                <option value="no workout today">No Workout Today</option>
+                                <option value="">select</option>                              
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </Input>
@@ -697,8 +685,7 @@ class UserInputs extends React.Component{
                                    name="water_consumed"                                 
                                    value={this.state.water_consumed}
                                    onChange={this.handleChange}>
-                                   <option value="">select</option>
-                                   <option value="no workout today">No Workout Today</option>
+                                   <option value="">select</option>                                   
                                    {this.createDropdown(0,250)}
                                    </Input>
                           </FormGroup>
@@ -713,8 +700,7 @@ class UserInputs extends React.Component{
                             name="chia_seeds"
                             value={this.state.chia_seeds}
                             onChange={this.handleChange}>
-                                <option value="">select</option>
-                                <option value="no workout today">No Workout Today</option>
+                                <option value="">select</option>                              
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -737,8 +723,7 @@ class UserInputs extends React.Component{
                              name="breath_nose"                         
                              value={this.state.breath_nose}
                              onChange={this.handleChange}>
-                             <option value="">select</option>
-                             <option value="no workout today">No Workout Today</option>
+                             <option value="">select</option>                            
                               {this.createDropdown(1,100)}
                             </Input>
                           </FormGroup>
@@ -753,8 +738,7 @@ class UserInputs extends React.Component{
                                 name="fasted"
                                 value={this.state.fasted}
                                 onChange={this.handleChangeFasted}>
-                                    <option value="">select</option>
-                                    <option value="no workout today">No Workout Today</option>
+                                    <option value="">select</option>                                   
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                                 </Input>
@@ -799,7 +783,7 @@ class UserInputs extends React.Component{
                           <h2><strong>Sleep Input</strong></h2>
                            <FormGroup>
                             <Label className="padding">How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
-                            <div className="col-md-5 col-lg-6 col-sm-6">
+                     
                             <Input type="select" name="sleep_hours_last_night"
                             placeholder="Hours"
                             className="form-control custom-select"
@@ -808,8 +792,8 @@ class UserInputs extends React.Component{
                              <option value="">Hours</option>
                             {this.createDropdown(0,24)}                        
                             </Input>
-                            </div>
-                            <div className="col-md-5 col-lg-6 col-sm-6">
+    
+                        
                              <span><Input type="select" name="sleep_mins_last_night"
                              placeholder="Minutes"
                             className="form-control custom-select"
@@ -818,7 +802,7 @@ class UserInputs extends React.Component{
                              <option value="">Minutes</option>
                             {this.createDropdown(0,59)}                        
                             </Input></span>
-                            </div>
+                       
                           </FormGroup>
 
                         
