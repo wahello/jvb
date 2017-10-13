@@ -797,8 +797,8 @@ class UserInputs extends React.Component{
                             {this.createDropdown(0,24)}                        
                             </Input>
                             </div>
-                            &nbsp
-                            &nbsp
+                            &nbsp;
+                            &nbsp;
                             <div className="col-xs-6 justify-content-right">
                             <Input type="select" name="sleep_mins_last_night"
                              placeholder="Minutes"
@@ -814,7 +814,7 @@ class UserInputs extends React.Component{
                           
                           </FormGroup>
                         
-
+                        <h2><strong>Food/Drink/Other Inputs</strong></h2>
                         
                           <FormGroup className="food">
                             
