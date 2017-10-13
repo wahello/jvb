@@ -38,15 +38,17 @@ export default class PainModal extends Component{
 		const area = this.props.pain_area;
 		const area_list = area.split(',');
 
-		for(let item of option){
-			for(let a of area_list){
-				if(item.value === a){
-					other = false;
-					break;
+		if(area !== ""){
+			for(let item of option){
+				for(let a of area_list){
+					if(item.value === a){
+						other = false;
+						break;
+					}
 				}
 			}
 		}
-
+		
 		this.state = {
 			collapse:other ? true : false,	
 			disabled: false,
