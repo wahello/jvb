@@ -545,7 +545,7 @@ class UserInputs extends React.Component{
     onSubmit(event){
       console.log(this.state);
       event.preventDefault();
-      userDailyInputSend(this.state,this.resetForm());    
+      userDailyInputSend(this.state,this.resetForm);    
     }
 
     onProfileSuccessFetch(data){
@@ -781,29 +781,39 @@ class UserInputs extends React.Component{
                             }
 
                           <h2><strong>Sleep Input</strong></h2>
+                         
+                          
                            <FormGroup>
+                          
                             <Label className="padding">How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
-                     
+                           
+                             <div className="col-xs-6">
                             <Input type="select" name="sleep_hours_last_night"
                             placeholder="Hours"
+                            id="hours"
                             className="form-control custom-select"
                             value={this.state.sleep_hours_last_night}
                             onChange={this.handleChange}>
                              <option value="">Hours</option>
                             {this.createDropdown(0,24)}                        
                             </Input>
-    
-                        
+                         </div>
+
+                              <div className="col-xs-6">
                              <span><Input type="select" name="sleep_mins_last_night"
                              placeholder="Minutes"
-                            className="form-control custom-select"
+                             id="minutes"
+                            className="form-control custom-select "
                             value={this.state.sleep_mins_last_night}
                             onChange={this.handleChange}>
                              <option value="">Minutes</option>
                             {this.createDropdown(0,59)}                        
                             </Input></span>
                        
+                          </div>
+                          
                           </FormGroup>
+                        
 
                         
                           <FormGroup className="food">
