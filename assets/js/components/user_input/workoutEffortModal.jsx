@@ -73,8 +73,7 @@ export default class WorkoutEffortModal extends Component{
                               <option value="7">7</option>
                               <option value="8">8</option>
                               <option value="9">9</option>
-                              <option value="10">10</option>
-                              <option value="no workout today">No Workout Today</option>
+                              <option value="10">10</option>                            
                         </Input>
 					</FormGroup>
 				</Collapse>

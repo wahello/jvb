@@ -94,7 +94,7 @@ class Quicklook extends Component{
 			        dew_point: data.exercise_reporting_ql.dew_point,
 			        temperature: data.exercise_reporting_ql.temperature,
 			        humidity: data.exercise_reporting_ql.humidity,
-			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,
+			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,  
 			        wind:data.exercise_reporting_ql.wind,
 			        hrr: data.exercise_reporting_ql.hrr,
 			        hrr_start_point: data.exercise_reporting_ql.hrr_start_point,
