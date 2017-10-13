@@ -15,14 +15,14 @@ class DailyUserInputStrongSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
 
 	def validate(self, data):
-		prnct_food = data['prcnt_unprocessed_food_consumed_yesterday']
+		prcnt_food = data['prcnt_unprocessed_food_consumed_yesterday']
 		pattern = re.compile("(^\d{1,3}).*")
-		if prnct_food and not pattern.match(prnct_food):
+		if prcnt_food and not pattern.match(prcnt_food):
 			raise serializers.ValidationError("not a valid percentage value")
 
-		if prnct_food:
-			prnct_food = pattern.match(prnct_food).group(1)
-			data['prcnt_unprocessed_food_consumed_yesterday'] = prnct_food
+		if prcnt_food:
+			prcnt_food = pattern.match(prcnt_food).group(1)
+			data['prcnt_unprocessed_food_consumed_yesterday'] = prcnt_food
 		return data
 
 	class Meta:
@@ -33,14 +33,15 @@ class DailyUserInputEncouragedSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
 
 	def validate(self, data):
-		prnct_breath = data['workout_that_user_breathed_through_nose']
+		prcnt_breath = data['workout_that_user_breathed_through_nose']
 		pattern = re.compile("(^\d{1,3}).*")
-		if prnct_breath and not pattern.match(prnct_breath):
+		if (prcnt_breath and prcnt_breath != "no workout today") \
+						 and not pattern.match(prcnt_breath):
 			raise serializers.ValidationError("not a valid percentage value")
 
-		if prnct_breath:
-			prnct_breath = pattern.match(prnct_breath).group(1)
-			data['workout_that_user_breathed_through_nose'] = prnct_breath
+		if prcnt_breath and prcnt_breath != 'no workout today':
+			prcnt_breath = pattern.match(prcnt_breath).group(1)
+			data['workout_that_user_breathed_through_nose'] = prcnt_breath
 		return data
 
 	class Meta:

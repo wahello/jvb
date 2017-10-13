@@ -74,7 +74,7 @@ export default class SmokedSubstance extends Component{
 
 	createCigarettesDropdown(num){
 		let elements = [];
-		elements.push(<option value=''>Select</option>);
+		elements.push(<option value=''>select</option>);
 		for(let i=1;i<=num;i++){
 			elements.push(<option value={i}>{i}</option>);
 		}
@@ -94,6 +94,7 @@ export default class SmokedSubstance extends Component{
                             className="custom-select form-control" 
                             value={this.state.smoked_substance_list}
                             onChange={this.handleChange}>
+                            	<option value="">select</option>
                                 <option value="other">Other</option>
                                 <option value="cigarettes">Cigarettes</option>
                             </Input>  

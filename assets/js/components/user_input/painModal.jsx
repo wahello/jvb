@@ -5,13 +5,50 @@ import 'react-select/dist/react-select.css';
 import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
 	
 
+const option=[
+                { value:"right knee",label:'Right knee'},
+                { value:'left knee',label:'Light knee'},
+                { value:"right ankle",label:'Right ankle'},
+                { value:"left ankle",label:'Left ankle'},
+                { value:"right foot",label:'Right foot'},
+                { value:"left foot",label:'Left foot'},
+                { value:"right shins",label:'Right shins'},
+                { value:"left shins",label:'Left shins'},
+                { value:"right hip",label:'Right hip'},
+                { value:"left hip",label:'Left hip'},
+                { value:"right achilles",label:'Right achilles'},
+                { value:"left achilles",label:'Left achilles'},
+                { value:"right calf",label:'Right calf'},
+                { value:"left calf",label:'Left calf'},
+                { value:"right toes",label:'Right toes'},
+                { value:"left toes",label:'Left toes'},
+                { value:"neck",label:'Neck'},
+                { value:"upper back",label:'Upper back'},
+                { value:"mid back",label:'Mid back'},
+                { value:"lower back",label:'Lower back'},
+                { value:"other",label:'Other'}
+
+		];
+
 export default class PainModal extends Component{
 
 	constructor(props){
 		super(props);
+		let other = true;
 		const area = this.props.pain_area;
+		const area_list = area.split(',');
+
+		for(let item of option){
+			for(let a of area_list){
+				if(item.value === a){
+					other = false;
+					break;
+				}
+			}
+		}
+
 		this.state = {
-			collapse:false,	
+			collapse:other ? true : false,	
 			disabled: false,
 			stayOpen: true,
 			pain_area: area !== '' ? area.split(',') : []
@@ -49,30 +86,6 @@ export default class PainModal extends Component{
 	}
 
 	render(){
-		const option=[
-                { value:"right knee",label:'Right knee'},
-                { value:'left knee',label:'Light knee'},
-                { value:"right ankle",label:'Right ankle'},
-                { value:"left ankle",label:'Left ankle'},
-                { value:"right foot",label:'Right foot'},
-                { value:"left foot",label:'Left foot'},
-                { value:"right shins",label:'Right shins'},
-                { value:"left shins",label:'Left shins'},
-                { value:"right hip",label:'Right hip'},
-                { value:"left hip",label:'Left hip'},
-                { value:"right achilles",label:'Right achilles'},
-                { value:"left achilles",label:'Left achilles'},
-                { value:"right calf",label:'Right calf'},
-                { value:"left calf",label:'Left calf'},
-                { value:"right toes",label:'Right toes'},
-                { value:"left toes",label:'Left toes'},
-                { value:"neck",label:'Neck'},
-                { value:"upper back",label:'Upper back'},
-                { value:"mid back",label:'Mid back'},
-                { value:"lower back",label:'Lower back'},
-                { value:"other",label:'Other'}
-
-		];
 		return(
 			<div>
 				<FormGroup>   
@@ -95,6 +108,7 @@ export default class PainModal extends Component{
 						type="text"
 						className="form-control"
 						placeholder="Write where you have pain here.."
+						value={this.state.pain_area}
 						onChange={this.handleChange} />
 					</FormGroup>
 				</Collapse>

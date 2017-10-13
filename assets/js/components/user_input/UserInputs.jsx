@@ -826,12 +826,15 @@ class UserInputs extends React.Component{
                             <h2><strong>Food/Drink/Other Inputs</strong></h2>
                             <Label className="padding"> What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
                             <Input
-                            type="text" 
-                            className="form-control" 
+                            type="select" 
+                            className="form-control custom-select" 
                             name="prcnt_unprocessed_food"                            
                             value={this.state.prcnt_unprocessed_food}
                             onChange={this.handleChangeUnprocessedFood}
-                            onBlur={this.handleOnBlurUnprocessedFood}/>
+                            onBlur={this.handleOnBlurUnprocessedFood}>
+                            <option value="">select</option>
+                            {this.createDropdown(0,100)}
+                            </Input>
                           </FormGroup>
 
                           <div id="unprocessedFoodModal"></div>
