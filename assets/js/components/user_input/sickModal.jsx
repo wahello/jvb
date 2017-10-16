@@ -8,40 +8,31 @@ export default class SickModal extends Component{
 		super(props);
 		const sickness = this.props.sickness;
 		this.state = {
-			modal:true,
-			sickness:sickness,
+			collapse:true,
+			sickness:sickness
 		};
-		this.modalToggle = this.modalToggle.bind(this);
+		
 		this.handleChange = this.handleChange.bind(this);
-		this.onModalSubmit = this.onModalSubmit.bind(this);
-
+		
 	}
 
 	handleChange(event){
 		const value = event.target.value;
 	    this.setState({
 	    	sickness: value,
+	    },()=>{
+	    	this.props.updateState(this.state.sickness);
 	    });
 	}
 
-	modalToggle(){
-		this.setState({
-			modal:!this.state.modal
-		});
-	}
-
-	onModalSubmit(){
-		this.props.updateState(this.state.sickness);
-		this.modalToggle();
-	}
-
+	
 	render(){
 		return(
 			<div>
-				<Modal isOpen={this.state.modal} toggle={this.modalToggle}>
-					<ModalBody>
+				
+					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>Please tell us your illness</Label>
+                            <Label>20.1) Please Tell Us Your Illness</Label>
                             <Input 
 	                            type="textarea" 
 	                            className="custom-select form-control" 
@@ -49,12 +40,7 @@ export default class SickModal extends Component{
 	                            onChange={this.handleChange}
 	                            placeholder="cold, since 1 week..." /> 
                           </FormGroup> 
-					</ModalBody>
-					<ModalFooter>
-						<Button color="primary" onClick={this.onModalSubmit}>Save</Button>{' '}
-						<Button color="danger" onClick={this.modalToggle}>Cancel</Button>
-					</ModalFooter>
-				</Modal>
+					</Collapse>
 			</div>
 		);
 	}

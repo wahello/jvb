@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import {Button,FormGroup, Label, Input, FormText, className, Modal,
-		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
+import {Button,FormGroup, Label, Input, FormText, className,Collapse} from 'reactstrap';
 
 export default class FastedModal extends Component{
 
@@ -8,12 +7,12 @@ export default class FastedModal extends Component{
 		super(props);
 		const food_ate_before_workout = this.props.food_ate_before_workout;
 		this.state = {
-			modal:true,
 			food_ate_before_workout:food_ate_before_workout,
+			collapse: true,	
 		};
-		this.modalToggle = this.modalToggle.bind(this);
+		
 		this.handleChange = this.handleChange.bind(this);
-		this.onModalSubmit = this.onModalSubmit.bind(this);
+		
 
 	}
 
@@ -21,27 +20,19 @@ export default class FastedModal extends Component{
 		const value = event.target.value;
 	    this.setState({
 	    	food_ate_before_workout: value,
+	    },()=>{
+	    	this.props.updateState(this.state.food_ate_before_workout);
 	    });
 	}
 
-	modalToggle(){
-		this.setState({
-			modal:!this.state.modal
-		});
-	}
-
-	onModalSubmit(){
-		this.props.updateState(this.state.food_ate_before_workout);
-		this.modalToggle();
-	}
 
 	render(){
 		return(
 			<div>
-				<Modal isOpen={this.state.modal} toggle={this.modalToggle}>
-					<ModalBody>
+			
+					<Collapse isOpen={this.state.collapse}>			
 						<FormGroup>   
-                            <Label>What food eaten before workout?</Label>
+                            <Label>9.1) What Food Eaten Before Workout?</Label>
                             <Input 
 	                            type="textarea" 
 	                            className="custom-select form-control" 
@@ -49,12 +40,8 @@ export default class FastedModal extends Component{
 	                            onChange={this.handleChange}
 	                            placeholder="Apple, riceballs..." /> 
                           </FormGroup> 
-					</ModalBody>
-					<ModalFooter>
-						<Button color="primary" onClick={this.onModalSubmit}>Save</Button>{' '}
-						<Button color="danger" onClick={this.modalToggle}>Cancel</Button>
-					</ModalFooter>
-				</Modal>
+					</Collapse>		
+				
 			</div>
 		);
 	}
