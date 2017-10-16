@@ -18,16 +18,15 @@ export default class SmokedSubstance extends Component{
 		}
 
 		this.state = {
-			modal:true,
+		collapse:true,
 			smoked_substance_list:smoked_substance_list,
 			cigarettes_count:cigarettes_count,
 			collapseOther: (smoked_substance_list !== '' && smoked_substance_list !== 'cigarettes')? true : false,
 			collapseCigarettesCount: isCigarettes ? true : false
 		};
-		this.modalToggle = this.modalToggle.bind(this);
+		
 		this.handleChange = this.handleChange.bind(this);
-		this.handleChangeCigarettes = this.handleChangeCigarettes.bind(this);
-		this.onModalSubmit = this.onModalSubmit.bind(this);
+		this.handleChangeCigarettes = this.handleChangeCigarettes.bind(this);		
 
 	}
 
@@ -60,17 +59,7 @@ export default class SmokedSubstance extends Component{
 			smoked_substance_list:smoked_substance_list
 		});
 	}
-
-	modalToggle(){
-		this.setState({
-			modal:!this.state.modal
-		});
-	}
-
-	onModalSubmit(){
-		this.props.updateState(this.state.smoked_substance_list);
-		this.modalToggle();
-	}
+	
 
 	createCigarettesDropdown(num){
 		let elements = [];
@@ -85,10 +74,10 @@ export default class SmokedSubstance extends Component{
 	render(){
 		return(
 			<div>
-				<Modal isOpen={this.state.modal} toggle={this.modalToggle}>
-					<ModalBody>
+				
+					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>What did you smoke yesterday?</Label>
+                            <Label>17.1) What Did You Smoke Yesterday?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -102,7 +91,7 @@ export default class SmokedSubstance extends Component{
 
                         <Collapse isOpen={this.state.collapseCigarettesCount}>
 							<FormGroup>
-								<Label>How many cigarettes you have smoked?</Label>
+								<Label>17.2) How Many Cigarettes You Have Smoked?</Label>
 								<Input 
 		                            type="select" 
 		                            className="custom-select form-control" 
@@ -125,12 +114,9 @@ export default class SmokedSubstance extends Component{
 							</FormGroup>
 						</Collapse>
 
-					</ModalBody>
-					<ModalFooter>
-						<Button color="primary" onClick={this.onModalSubmit}>Save</Button>{' '}
-						<Button color="danger" onClick={this.modalToggle}>Cancel</Button>
-					</ModalFooter>
-				</Modal>
+					
+					</Collapse>
+				
 			</div>
 		);
 	}

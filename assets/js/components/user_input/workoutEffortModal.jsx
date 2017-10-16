@@ -36,7 +36,7 @@ export default class WorkoutEffortModal extends Component{
 		return(
 			<div>
 					
-				<Label>Was any portion of your workout hard?</Label>
+				<Label>4.1) Was Any Portion Of Your Workout Hard?</Label>
 				<FormGroup check>
 					<Label check>
 						<Input type="radio" name="is_workout_hard"
@@ -57,7 +57,7 @@ export default class WorkoutEffortModal extends Component{
 
 				<Collapse isOpen={this.state.is_workout_hard === 'yes'}>
 					<FormGroup>
-						<Label className="padding">What was Your Average Effort Level for the hard part of your Workout?</Label>
+						<Label className="padding">4.2) What Was Your Average Effort Level For The Hard Part Of Your Workout?</Label>
 						<Input 
                         type="select" 
                         className="form-control custom-select" 

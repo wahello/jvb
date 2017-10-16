@@ -7,7 +7,7 @@ import CalendarWidget from 'react-calendar-widget';
 
 import { Container, Select, option, Option, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText, className, Modal,
-          ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
+          ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink } from 'reactstrap';
 
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate} from '../../network/userInput';
@@ -83,7 +83,6 @@ class UserInputs extends React.Component{
       this.handleChangeWorkoutEffort = this.handleChangeWorkoutEffort.bind(this);
       this.handleChangePain = this.handleChangePain.bind(this);
       this.handleChangeUnprocessedFood = this.handleChangeUnprocessedFood.bind(this);
-      this.handleOnBlurUnprocessedFood = this.handleOnBlurUnprocessedFood.bind(this);
       this.handleChangeSick = this.handleChangeSick.bind(this);
       this.handleChangeSleepAids = this.handleChangeSleepAids.bind(this);
       this.handleChangePrescription=this.handleChangePrescription.bind(this);
@@ -149,57 +148,99 @@ class UserInputs extends React.Component{
       }
     }
 
-    renderUnprocessedFoodModal(callback){
-      return(
+     renderDietType(){
+        if(this.state.diet_type === 'other'){
+           const updateState = function(val){
+                              this.setState({
+                                diet_type: val
+                              })}.bind(this);
+           return(           
+            <DietType
+              diet_type={this.state.diet_type}
+              updateState={updateState}
+            />
+            );
+        }
+    }
+
+    renderUnprocessedFoodModal(){
+      
+        if(this.state. prcnt_unprocessed_food > 0 ){
+          const updateState = function(val){
+                              this.setState({
+                              unprocessed_food_list: val
+                              })}.bind(this);
+
+              return(
             <UnprocesedFoodModal
             unprocessed_food_list={this.state.unprocessed_food_list}
-            updateState={callback}
+            updateState={updateState}
           />
-      );
+          );
+        }
     }
 
-    renderPainSick(callback){
-      return(
-        <SickModal
-          sickness={this.state.sickness}
-          updateState={callback}
-        />
+     renderFasted(){ 
+     if(this.state. fasted === 'no'){
+       const updateState = function(val){
+                              this.setState({
+                           food_ate_before_workout: val
+                              })}.bind(this);
+           return(
+                <FastedModal
+                  food_ate_before_workout={this.state.food_ate_before_workout}
+                  updateState={updateState}
+                />
       );
+     }  
     }
 
-    renderPrescriptionSleepAids(callback){
+
+ renderPrescriptionMedication(){
+  if(this.state. medications === 'yes'){
+     const updateState = function(val){
+                              this.setState({
+                           medications_taken_list: val
+                              })}.bind(this);         
       return(
-          <PrescriptionSleepAids
-          sleep_aid_taken={this.state.sleep_aid_taken}
-          updateState={callback}
-          />
-        );
-    }
-     renderPrescriptionMedication(callback){
-      return(
-          <PrescriptionSleepAids
+          <PrescriptionMedication
           sleep_aid_taken={this.state.medications_taken_list}
-          updateState={callback}
+          updateState={updateState}
           />
         );
+      }
     }
 
-    renderFasted(callback){   
-      return(
-        <FastedModal
-          food_ate_before_workout={this.state.food_ate_before_workout}
-          updateState={callback}
-        />
-      );
+ renderPrescriptionSleepAids(){
+  if(this.state.prescription_sleep_aids === 'yes'){
+     const updateState = function(val){
+                              this.setState({
+                          sleep_aid_taken: val
+                              })}.bind(this); 
+         return(
+            <PrescriptionSleepAids
+            sleep_aid_taken={this.state.sleep_aid_taken}
+            updateState={updateState}
+            />
+        );
+      }
+     
     }
+    
+    renderPainSick(){
+      if(this.state.sick === 'yes'){
+         const updateState = function(val){
+                              this.setState({
+                              sickness: val
+                              })}.bind(this); 
 
-    renderDietType(callback){
-      return(
-        <DietType
-          food_ate_before_workout={this.state.diet_type}
-          updateState={callback}
-        />
-      );
+         return(
+                  <SickModal
+                    sickness={this.state.sickness}
+                    updateState={updateState}
+                  />
+             );
+      }
     }
 
     renderSmokeSubstance(callback){
@@ -308,21 +349,6 @@ class UserInputs extends React.Component{
       });
     }
 
-    handleOnBlurUnprocessedFood(event){
-      const value = event.target.value; 
-      if(value > 0){
-        const updateState = function(val){
-          this.setState({
-            unprocessed_food_list: val
-          });
-        }.bind(this);
-
-        ReactDOM.render(
-          this.renderUnprocessedFoodModal(updateState),
-          document.getElementById('unprocessedFoodModal')
-        );
-      }
-    }
 
     handleChangeSick(event){
       const target = event.target;
@@ -331,19 +357,7 @@ class UserInputs extends React.Component{
 
       this.setState({
         sick:value
-      },function(){
-        if(value === 'yes'){
-          const updateState = function(val){
-            this.setState({
-              sickness : val
-            });
-          }.bind(this);
-          ReactDOM.render(
-            this.renderPainSick(updateState),
-            document.getElementById('sickModal')
-          );
-        }
-      }.bind(this));
+      });
     }
 
     handleChangeSleepAids(event){
@@ -353,19 +367,7 @@ class UserInputs extends React.Component{
 
       this.setState({
         prescription_sleep_aids:value
-      },function(){
-        if(value === 'yes'){
-          const updateState = function(val){
-            this.setState({
-              sleep_aid_taken: val
-            });
-          }.bind(this);
-          ReactDOM.render(
-            this.renderPrescriptionSleepAids(updateState),
-            document.getElementById('sleepAidModal')
-          );
-        }
-      }.bind(this));
+      });
     }
 
     handleChangePrescription(event){
@@ -375,19 +377,7 @@ class UserInputs extends React.Component{
 
       this.setState({
         medications:value
-      },function(){
-        if(value === 'yes'){
-          const updateState = function(val){
-            this.setState({
-             medications_taken_list: val
-            });
-          }.bind(this);
-          ReactDOM.render(
-            this.renderPrescriptionMedication(updateState),
-            document.getElementById('medicationModel')
-          );
-        }
-      }.bind(this));
+      });
     }
 
     handleChangeFasted(event){
@@ -397,19 +387,7 @@ class UserInputs extends React.Component{
 
       this.setState({
         fasted:value
-      },function(){
-        if(value === 'no'){
-          const updateState = function(val){
-            this.setState({
-             food_ate_before_workout: val
-            });
-          }.bind(this);
-          ReactDOM.render(
-            this.renderFasted(updateState),
-            document.getElementById('fastedModal')
-          );
-        }
-      }.bind(this));
+      });
     }
 
     handleChangeDietModel(event){
@@ -419,19 +397,7 @@ class UserInputs extends React.Component{
 
       this.setState({
         diet_type:value
-      },function(){
-        if(value === 'other'){
-          const updateState = function(val){
-            this.setState({
-             diet_type: val
-            });
-          }.bind(this);
-          ReactDOM.render(
-            this.renderDietType(updateState),
-            document.getElementById('dietMo')
-          );
-        }
-      }.bind(this));
+      });
     }
 
    handleChangeSmokeSubstance(event){
@@ -517,7 +483,7 @@ class UserInputs extends React.Component{
     }
 
     fetchYesterdayData(){
-      const today = new Date();
+      const today = this.state.selected_date;
       const yesterday = new Date(today.getFullYear(),
                                 today.getMonth(),
                                 today.getDate()-1);
@@ -581,6 +547,27 @@ class UserInputs extends React.Component{
                            <CalendarWidget onDaySelect={this.processDate}/>,
                       </div>
                         <h2 className="head">Daily user inputs report</h2>
+
+                         <Nav>
+                              <NavItem>
+                                <NavLink href="#workout">Workout</NavLink>
+                              </NavItem>
+                              <NavItem>
+                                <NavLink href="#sleep">Sleep</NavLink>
+                              </NavItem>
+                              <NavItem>
+                                <NavLink href="#food">Food/Drink/Other</NavLink>
+                              </NavItem>
+                              <NavItem>
+                                <NavLink href="#smoking">Sleep Aids/Smoking/Medications/Supplements Inputs</NavLink>
+                              </NavItem>
+                              <NavItem>
+                                <NavLink href="#stress">Stress/Illness Inputs</NavLink>
+                              </NavItem>
+                              <NavItem>
+                                <NavLink href="#daily">Daily User Inputs (optional)</NavLink>
+                              </NavItem>
+                         </Nav>
                         <div className="row justify-content-center">
                        
                         <div className="btn2">
@@ -599,10 +586,27 @@ class UserInputs extends React.Component{
                           className="user-inputs-form bootstrap_validator" 
                           role="form" 
                           data-toggle="validator">
+                          <div id="workout">
+                          <h2><strong>Workout Inputs</strong></h2>
+
+                           <FormGroup>   
+                            <Label className="padding">1) Did You Workout Today?</Label>
+                            <Input 
+                            type="select" 
+                            className="custom-select form-control" 
+                            name="workout"
+                            value={this.state.workout_easy}
+                            onChange={this.handleChangeWorkout}>
+                                <option value="">select</option>
+                                <option value="easy">Yes</option>
+                                <option value="hard">No</option>
+                                <option value="hard">Not Yet</option>
+                            </Input>  
+                          </FormGroup> 
 
                           { this.state.workout_easy != "no workout today" &&
                           <FormGroup>   
-                            <Label className="padding">Was Your Workout Easy or Hard?</Label>
+                            <Label className="padding">2) Was Your Workout Easy or Hard?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -618,7 +622,7 @@ class UserInputs extends React.Component{
 
                         { this.state.workout_enjoyable !="no workout today" &&
                         <FormGroup>   
-                            <Label className="padding">Was Your Workout Today Enjoyable?</Label>
+                            <Label className="padding">3) Was Your Workout Today Enjoyable?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -634,7 +638,7 @@ class UserInputs extends React.Component{
 
                           { this.state.workout_effort !="no workout today" &&
                           <FormGroup>   
-                            <Label className="padding">Your Workout Effort Level?</Label>
+                            <Label className="padding">4) Your Workout Effort Level?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -661,7 +665,7 @@ class UserInputs extends React.Component{
 
                           { this.state.pain !="no workout today" &&
                           <FormGroup>
-                            <Label className="padding">Did You Have Any Pain or Twinges During or After Your Workout?</Label>
+                            <Label className="padding">5) Did You Have Any Pain or Twinges During or After Your Workout?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -679,7 +683,7 @@ class UserInputs extends React.Component{
 
                           { this.state.water_consumed !="no workout today" &&
                           <FormGroup>    
-                            <Label className="padding">Water Consumed During Workout (Ounces)</Label>
+                            <Label className="padding">6) Water Consumed During Workout (Ounces)</Label>
                             <Input type="select" 
                                    className="custom-select form-control" 
                                    name="water_consumed"                                 
@@ -693,7 +697,7 @@ class UserInputs extends React.Component{
 
                           { this.state.chia_seeds !="no workout today" &&     
                           <FormGroup>      
-                            <Label className="padding">Tablespoons of Chia Seeds Consumed During Workout?</Label>
+                            <Label className="padding">7) Tablespoons of Chia Seeds Consumed During Workout?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -717,7 +721,7 @@ class UserInputs extends React.Component{
 
                          { this.state.breath_nose !="no workout today" &&     
                           <FormGroup>
-                            <Label className="padding">What % of Your Workout Did you breathe in and out through Your nose?</Label>
+                            <Label className="padding">8) What % of Your Workout Did you breathe in and out through Your nose?</Label>
                             <Input type="select"
                              className="form-control custom-select" 
                              name="breath_nose"                         
@@ -731,7 +735,7 @@ class UserInputs extends React.Component{
                         }
                            { this.state.fasted !="no workout today" &&
                            <FormGroup>
-                            <Label className="padding">Were You Fasted During Your Workout? </Label>
+                            <Label className="padding">9) Were You Fasted During Your Workout? </Label>
                                 <Input 
                                 type="select" 
                                 className="custom-select form-control" 
@@ -742,15 +746,16 @@ class UserInputs extends React.Component{
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                                 </Input>
+                                {this.renderFasted()}
                           </FormGroup>
                         }
 
-                          <div id="fastedModal"></div>
+                         
 
 
                            { this.state.workout_comment !="No Workout Today" &&     
                           <FormGroup>      
-                            <Label className="padding">General Workout Comments</Label>
+                            <Label className="padding">10) General Workout Comments</Label>
                                <Input type="textarea" name="workout_comment" 
                                placeholder="please leave a comment" 
                                className="form-control"
@@ -762,7 +767,7 @@ class UserInputs extends React.Component{
 
                          { this.state.calories !="No Workout Today" &&
                           <FormGroup>      
-                            <Label className="padding">Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">11) Approximately How Many Calories Did You Consume During Your Workout?</Label>
                                <Input type="text" name="calories" 
                                value={this.state.calories}
                                onChange={this.handleChange}/>
@@ -771,7 +776,7 @@ class UserInputs extends React.Component{
 
                         { this.state.calories_item !="No Workout Today" &&
                           <FormGroup>      
-                            <Label className="padding">What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">12) What Specifically Did You Consume During Your Workout?</Label>
                                <Input type="textarea" name="calories_item"
                                 rows="5" columns="5" 
                                 className="form-control" 
@@ -779,13 +784,15 @@ class UserInputs extends React.Component{
                                onChange={this.handleChange}/>
                           </FormGroup>
                             }
+                            </div>
 
+                            <div id="sleep">
                           <h2><strong>Sleep Input</strong></h2>
                          
                           
                            <FormGroup>
                           
-                            <Label className="padding">How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
+                            <Label className="padding">13) How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
                            
                              <div className="col-xs-6">
                             <Input type="select" name="sleep_hours_last_night"
@@ -813,28 +820,28 @@ class UserInputs extends React.Component{
                           </div>
                           
                           </FormGroup>
+                          </div>
                         
+                        <div id="food">
                         <h2><strong>Food/Drink/Other Inputs</strong></h2>
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding"> What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
+                            <Label className="padding">14) What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
                             <Input
                             type="select" 
                             className="form-control custom-select" 
                             name="prcnt_unprocessed_food"                            
                             value={this.state.prcnt_unprocessed_food}
-                            onChange={this.handleChangeUnprocessedFood}
-                            onBlur={this.handleOnBlurUnprocessedFood}>
+                            onChange={this.handleChangeUnprocessedFood}>
                             <option value="">select</option>
                             {this.createDropdown(0,100)}
                             </Input>
+                            {this.renderUnprocessedFoodModal()}
                           </FormGroup>
 
-                          <div id="unprocessedFoodModal"></div>
-
                           <FormGroup>
-                               <Label className="padding">Number of Alcohol Drinks Consumed Yesterday?</Label>
+                               <Label className="padding">15) Number of Alcohol Drinks Consumed Yesterday?</Label>
                                  <Input 
                                  type="select" 
                                  className="custom-select form-control" 
@@ -866,10 +873,12 @@ class UserInputs extends React.Component{
                                     <option value="10+">More Than 10</option>
                                   </Input>
                           </FormGroup>
+                          </div>
                           
+                          <div id="smoking">
                            <h2><strong>Sleep Aids/Smoking/Medications/Supplements Inputs</strong></h2>
                            <FormGroup>
-                             <Label className="padding">Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
+                             <Label className="padding">16) Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
                               <Input 
                               type="select" 
                               className="custom-select form-control" 
@@ -881,11 +890,11 @@ class UserInputs extends React.Component{
                                   <option value="yes">Yes</option>
                                   <option value="no">No</option>
                               </Input>
+                              {this.renderPrescriptionSleepAids()}
                           </FormGroup>
-                          <div id="sleepAidModal"></div>
-
+                         
                           <FormGroup>
-                            <Label className="padding">Did You Smoke Any Substances Yesterday?</Label>
+                            <Label className="padding">17) Did You Smoke Any Substances Yesterday?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -901,7 +910,7 @@ class UserInputs extends React.Component{
                           <div id="smokeSubstanceModal"></div>
 
                            <FormGroup>
-                              <Label className="padding">Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
+                              <Label className="padding">18) Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
                               <Input 
                               type="select" 
                               className="custom-select form-control" 
@@ -912,12 +921,16 @@ class UserInputs extends React.Component{
                                       <option value="yes">Yes</option>
                                       <option value="no">No</option>
                               </Input>
+                              {this.renderPrescriptionMedication()}
                           </FormGroup>
-                          <div id="medicationModel"></div>
+                         
 
+                          </div>
+
+                          <div id="stress">
                            <h2><strong>Stress/Illness Inputs</strong></h2>
                           <FormGroup>
-                            <Label className="padding">Yesterday's Stress Level</Label>
+                            <Label className="padding">19) Yesterday's Stress Level</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -932,7 +945,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
 
                           <FormGroup>
-                            <Label className="padding">Are You Sick Today?</Label>
+                            <Label className="padding">20) Are You Sick Today?</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -944,14 +957,17 @@ class UserInputs extends React.Component{
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </Input>
+                            {this.renderPainSick()}
                           </FormGroup>
 
-                          <div id="sickModal"></div>
+                          
+
+                          </div>
                          
-                         
+                         <div id="daily">
                           <h2><strong>Daily User Inputs (optional)</strong></h2>
                           <FormGroup>
-                            <Label className="padding">Weight (Pounds)</Label>
+                            <Label className="padding">21) Weight (Pounds)</Label>
                                 <Input type="select" 
                                    className="custom-select form-control"
                                    name="weight"                                  
@@ -964,7 +980,7 @@ class UserInputs extends React.Component{
 
                           { this.state.gender === 'M' &&
                             <FormGroup>       
-                              <Label className="padding">Waist Size (Male)</Label>
+                              <Label className="padding">22) Waist Size (Male)</Label>
                               <Input 
                                 type="text" 
                                 className="form-control" 
@@ -978,7 +994,7 @@ class UserInputs extends React.Component{
 
                           { this.state.gender === 'F' &&
                             <FormGroup>
-                              <Label className="padding">Clothes Size (Womens)</Label>
+                              <Label className="padding">22) Clothes Size (Womens)</Label>
                               <Input 
                                 type="text" 
                                 className="form-control"
@@ -991,7 +1007,7 @@ class UserInputs extends React.Component{
                           }
 
                           <FormGroup>
-                              <Label className="padding">What Type Of Diet Do You Eat?</Label>
+                              <Label className="padding">23) What Type Of Diet Do You Eat?</Label>
                               <Input 
                               type="select" 
                               className="custom-select form-control" 
@@ -1008,11 +1024,12 @@ class UserInputs extends React.Component{
                                       <option value="">None</option>
                                       
                               </Input>
+                               {this.renderDietType()}
                           </FormGroup>
-                          <div id="dietMo"></div>
+                        
 
                            <FormGroup>     
-                            <Label className="padding">Did You Stand For 3 Hours or More Yesterday? </Label>
+                            <Label className="padding">24) Did You Stand For 3 Hours or More Yesterday? </Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control"  
@@ -1024,6 +1041,7 @@ class UserInputs extends React.Component{
                                 <option value="no">No</option>
                             </Input>
                           </FormGroup>
+                          </div>
 
                           { !this.state.update_form &&
                             <Button 

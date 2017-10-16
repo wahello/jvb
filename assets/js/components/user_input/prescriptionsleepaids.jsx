@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import {Button,FormGroup, Label, Input, FormText, className, Modal,
-		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
+import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
 
 export default class PrescriptionSleepAids extends Component{
 
@@ -8,41 +7,32 @@ export default class PrescriptionSleepAids extends Component{
 		super(props);
 		const sleep_aid_taken = this.props.sleep_aid_taken;
 		this.state = {
-			modal:true,
 			sleep_aid_taken:sleep_aid_taken,
+			collapse:true
 		}
 
-		this.modalToggle = this.modalToggle.bind(this);
+		
 		this.handleChangePrescriptionSleep = this.handleChangePrescriptionSleep.bind(this);
-		this.onModalSubmit = this.onModalSubmit.bind(this);
-
+	
 	}
 
 	handleChangePrescriptionSleep(event){
 		const value = event.target.value;
 		this.setState({
 			sleep_aid_taken:value
+		},()=>{
+			this.props.updateState(this.state.sleep_aid_taken);
 		});
 	}
-
-	modalToggle(){
-		this.setState({
-			modal:!this.state.modal
-		});
-	}
-
-	onModalSubmit(){
-		this.props.updateState(this.state.sleep_aid_taken);
-		this.modalToggle();
-	}
+	
 
 	render(){
 		return(
 			<div>
-				<Modal isOpen={this.state.modal} toggle={this.modalToggle}>
-					<ModalBody>
+				
+					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-								<h5>Hi, What did you take?</h5>
+							<Label>16.1) Hi, What Did You Take?</Label>
 								<Input 
 	                            type="FormText" 
 	                            className="form-control" 
@@ -51,12 +41,8 @@ export default class PrescriptionSleepAids extends Component{
 	                           
 	                            </Input>
 							</FormGroup>
-					</ModalBody>
-					<ModalFooter>
-						<Button color="primary" onClick={this.onModalSubmit}>Save</Button>{' '}
-						<Button color="danger" onClick={this.modalToggle}>Cancel</Button>
-					</ModalFooter>
-				</Modal>
+					</Collapse>
+					
 			</div>
 		);
 	}

@@ -57,7 +57,6 @@ export default class PainModal extends Component{
 			stayOpen: true,
 			pain_area: area !== '' ? area.split(',') : []
 		};
-		this.onSubmit = this.onSubmit.bind(this);
 		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
@@ -84,16 +83,11 @@ export default class PainModal extends Component{
 		}
 	}
 
-	onSubmit(){
-		this.props.updateState(this.state.pain_area);
-		console.log(this.state);
-	}
-
 	render(){
 		return(
 			<div>
 				<FormGroup>   
-                    <Label>Where Did You Have Pain/Twinges?</Label>
+                    <Label>5.1) Where Did You Have Pain/Twinges?</Label>
                     <Select
 							closeOnSelect={!this.state.stayOpen}
 							disabled={this.state.disabled}
@@ -107,7 +101,7 @@ export default class PainModal extends Component{
 
 				<Collapse isOpen={this.state.collapse}>
 					<FormGroup>
-						<Label>Please write where you have pain/twinges</Label>
+						<Label>5.2) Please Write Where You Have Pain/Twinges</Label>
 						<Input
 						type="text"
 						className="form-control"
