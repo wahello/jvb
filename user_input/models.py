@@ -70,6 +70,7 @@ class DailyUserInputStrong(models.Model):
     EASY = 'easy'
     HARD = 'hard'
     NO_WORKOUT = 'no workout today'
+    NOT_YET = 'not yet'
 
     WORK_OUT_EASY_OR_HARD_CHOICES = (
     ('','-'),
@@ -91,7 +92,18 @@ class DailyUserInputStrong(models.Model):
         (NO,'No'),
     )
 
+    WORKOUT_DONE_CHOICES = (
+        (YES,'Yes'),
+        (NO,'No'),
+        (NOT_YET,'Not Yet')
+    )
+
     user_input = models.OneToOneField(UserDailyInput,related_name='strong_input')
+    workout = models.CharField(
+        max_length=3,
+        choices=WORKOUT_DONE_CHOICES
+    )
+
     work_out_easy_or_hard = models.CharField(
         max_length=20,
         choices=WORK_OUT_EASY_OR_HARD_CHOICES,
