@@ -459,7 +459,7 @@ class UserInputs extends React.Component{
     onFetchSuccess(data,clone=false){
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
-        update_form:!clone,
+        update_form:clone,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
         workout_enjoyable:data.data.optional_input.workout_enjoyable,
         workout_effort:data.data.strong_input.workout_effort_level,
