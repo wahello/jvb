@@ -229,10 +229,12 @@ class UserInputs extends React.Component{
       getUserProfile(this.onProfileSuccessFetch);
     }
 
-    createDropdown(start_num , end_num){
+    createDropdown(start_num , end_num, step=1){
     let elements = [];
-    for(let i=start_num;i<=end_num;i++){
+    let i = start_num;
+    while(i<=end_num){
       elements.push(<option key={i} value={i}>{i}</option>);
+      i=i+step;
     }
     return elements;
   }
@@ -409,17 +411,8 @@ class UserInputs extends React.Component{
                             name="chia_seeds"
                             value={this.state.chia_seeds}
                             onChange={this.handleChange}>
-                                <option value="">select</option>                              
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
+                                <option value="">select</option>
+                                {this.createDropdown(0,10)}
                             </Input>
                           </FormGroup>
                         }
@@ -540,7 +533,7 @@ class UserInputs extends React.Component{
                             value={this.state.prcnt_unprocessed_food}
                             onChange={this.handleChangeUnprocessedFood}>
                             <option key="select" value="">select</option>
-                            {this.createDropdown(0,100)}
+                            {this.createDropdown(0,100,5)}
                             </Input>
                             {this.renderUnprocessedFoodModal()}
                           </FormGroup>
