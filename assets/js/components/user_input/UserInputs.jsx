@@ -11,18 +11,10 @@ import { Container, Select, option, Option, Row, Col, Button, Form,
 
 import * as handlers from './handlers';
 import * as renderers from './renderers';
+
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
-import WorkoutEffortModal from './workoutEffortModal';
-import PainModal from './painModal';
-import UnprocesedFoodModal from './unprocessedFoodModal';
-import SickModal from './sickModal';
-import PrescriptionSleepAids from './prescriptionsleepaids';
-import PrescriptionMedication from './pres-nonprescriptionmedication';
-import FastedModal from './fastedModal';
-import DietType from './diettype';
-import SmokedSubstance from './smokedSubstance';
 
 class UserInputs extends React.Component{
 
@@ -31,7 +23,6 @@ class UserInputs extends React.Component{
         selected_date:new Date(),
         fetched_user_input_created_at:'',
         update_form:false,
-        showResults:false,
         gender:'M',
 
         workout:'yes',
@@ -101,7 +92,6 @@ class UserInputs extends React.Component{
       this.renderFasted = renderers.renderFasted.bind(this);
       this.renderDietType = renderers.renderDietType.bind(this);
       this.renderSmokeSubstance = renderers.renderSmokeSubstance.bind(this);
-      this.renderUpdateButton = renderers.renderUpdateButton.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -110,15 +100,16 @@ class UserInputs extends React.Component{
       this.onFetchSuccess = this.onFetchSuccess.bind(this);
       this.onFetchFailure = this.onFetchFailure.bind(this);
       this.onProfileSuccessFetch = this.onProfileSuccessFetch.bind(this);
-      this.onNoWorkoutToday=this.onNoWorkoutToday.bind(this);
-      this.fetchYesterdayData=this.fetchYesterdayData.bind(this);
-
+      this.onNoWorkoutToday = this.onNoWorkoutToday.bind(this);
+      this.fetchYesterdayData = this.fetchYesterdayData.bind(this); 
     }
     
-    onFetchSuccess(data,clone=false){
+    onFetchSuccess(data,clone_form=undefined){
+      console.log("Called Fetch Success");
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
-        update_form:clone,
+        update_form:clone_form,
+        workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
         workout_enjoyable:data.data.optional_input.workout_enjoyable,
         workout_effort:data.data.strong_input.workout_effort_level,
@@ -139,7 +130,6 @@ class UserInputs extends React.Component{
         workout_comment:data.data.optional_input.general_Workout_Comments,
         calories:data.data.optional_input.calories_consumed_during_workout,
         calories_item:data.data.optional_input.food_ate_during_workout,
-       // sleep_last_night:data.data.strong_input.sleep_time_excluding_awake_time,
         sleep_hours_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0],
         sleep_mins_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1],
         prescription_sleep_aids:data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
@@ -180,16 +170,17 @@ class UserInputs extends React.Component{
     }
     
     onFetchFailure(error){
-      // alert('User input not found');
       const initial_state = this.getInitialState();
-      this.setState({...initial_state,selected_date:this.state.selected_date});
+      this.setState(
+        {...initial_state,
+        selected_date:this.state.selected_date})
     }
 
     processDate(date){
       this.setState({
         selected_date:date
       },function(){
-        const clone = false;
+        const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
       }.bind(this));
     }
@@ -233,15 +224,15 @@ class UserInputs extends React.Component{
     }
 
     componentDidMount(){
-      getUserProfile(this.onProfileSuccessFetch);
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
+      getUserProfile(this.onProfileSuccessFetch);
     }
 
     createDropdown(start_num , end_num){
     let elements = [];
     for(let i=start_num;i<=end_num;i++){
-      elements.push(<option value={i}>{i}</option>);
+      elements.push(<option key={i} value={i}>{i}</option>);
     }
     return elements;
   }
@@ -352,7 +343,7 @@ class UserInputs extends React.Component{
 
                           { this.state.workout == "yes" &&
                           <FormGroup>   
-                            <Label className="padding">4) Your Workout Effort Level?</Label>
+                            <Label className="padding">4) Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -403,7 +394,7 @@ class UserInputs extends React.Component{
                                    name="water_consumed"                                 
                                    value={this.state.water_consumed}
                                    onChange={this.handleChange}>
-                                   <option value="">select</option>                                   
+                                   <option key="select"value="">select</option>                                   
                                    {this.createDropdown(0,250)}
                                    </Input>
                           </FormGroup>
@@ -441,7 +432,7 @@ class UserInputs extends React.Component{
                              name="breath_nose"                         
                              value={this.state.breath_nose}
                              onChange={this.handleChange}>
-                             <option value="">select</option>                            
+                             <option key="select" value="">select</option>                            
                               {this.createDropdown(1,100)}
                             </Input>
                           </FormGroup>
@@ -473,7 +464,7 @@ class UserInputs extends React.Component{
                                <Input type="textarea" name="workout_comment" 
                                placeholder="please leave a comment" 
                                className="form-control"
-                               rows="5" columns="5" 
+                               rows="5" cols="5" 
                                value={this.state.workout_comment}
                                onChange={this.handleChange}/>
                           </FormGroup>
@@ -492,7 +483,7 @@ class UserInputs extends React.Component{
                           <FormGroup>      
                             <Label className="padding">12) What Specifically Did You Consume During Your Workout?</Label>
                                <Input type="textarea" name="calories_item"
-                                rows="5" columns="5" 
+                                rows="5" cols="5" 
                                 className="form-control" 
                                value={this.state.calories_item}
                                onChange={this.handleChange}/>
@@ -514,7 +505,7 @@ class UserInputs extends React.Component{
                             className="form-control custom-select"
                             value={this.state.sleep_hours_last_night}
                             onChange={this.handleChange}>
-                             <option value="">Hours</option>
+                             <option key="hours" value="">Hours</option>
                             {this.createDropdown(0,24)}                        
                             </Input>
                             </div>                          
@@ -526,7 +517,7 @@ class UserInputs extends React.Component{
                             className="form-control custom-select "
                             value={this.state.sleep_mins_last_night}
                             onChange={this.handleChange}>
-                             <option value="">Minutes</option>
+                             <option key="mins" value="">Minutes</option>
                             {this.createDropdown(0,59)}                        
                             </Input>
                             </div>
@@ -548,7 +539,7 @@ class UserInputs extends React.Component{
                             name="prcnt_unprocessed_food"                            
                             value={this.state.prcnt_unprocessed_food}
                             onChange={this.handleChangeUnprocessedFood}>
-                            <option value="">select</option>
+                            <option key="select" value="">select</option>
                             {this.createDropdown(0,100)}
                             </Input>
                             {this.renderUnprocessedFoodModal()}
@@ -686,7 +677,7 @@ class UserInputs extends React.Component{
                                    name="weight"                                  
                                    value={this.state.weight}
                                    onChange={this.handleChange} >
-                                    <option value="">select</option>
+                                    <option key="select" value="">select</option>
                                    {this.createDropdown(30,300)}
                                    </Input>
                           </FormGroup>
@@ -765,7 +756,18 @@ class UserInputs extends React.Component{
                             </Button>
 
                           }
-                          {this.renderUpdateButton()}
+
+                          {this.state.update_form &&
+                            <Button 
+                              color="info" 
+                              className="btn btn-block btn-primary"
+                              onClick={this.onUpdate}>
+                                Update
+                            </Button>
+                          }
+
+                          <div id="btn-update"></div>
+
                            <ToastContainer 
                                 position="top-center"
                                 type="success"
