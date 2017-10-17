@@ -76,7 +76,7 @@ function formatJSON(data){
 		"encouraged_input":{},
 		"optional_input":{}
 	};
-		
+	json_data.strong_input['workout'] = data.workout;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
 	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;

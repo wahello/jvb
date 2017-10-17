@@ -18,7 +18,7 @@ export default class SmokedSubstance extends Component{
 		}
 
 		this.state = {
-		collapse:true,
+			collapse:true,
 			smoked_substance_list:smoked_substance_list,
 			cigarettes_count:cigarettes_count,
 			collapseOther: (smoked_substance_list !== '' && smoked_substance_list !== 'cigarettes')? true : false,
@@ -46,7 +46,9 @@ export default class SmokedSubstance extends Component{
 		}else {
 			this.setState({
 				smoked_substance_list: value
-			});
+			},()=>{
+					this.props.updateState(smoked_substance_list)
+				});
 		}
 	}
 
@@ -57,6 +59,8 @@ export default class SmokedSubstance extends Component{
 		this.setState({
 			cigarettes_count: value,
 			smoked_substance_list:smoked_substance_list
+		},()=>{
+			this.props.updateState(smoked_substance_list);
 		});
 	}
 	

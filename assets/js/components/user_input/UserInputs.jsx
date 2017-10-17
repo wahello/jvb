@@ -9,9 +9,10 @@ import { Container, Select, option, Option, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText, className, Modal,
           ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink } from 'reactstrap';
 
+import * as handlers from './handlers';
+import * as renderers from './renderers';
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate} from '../../network/userInput';
-
 import {getUserProfile} from '../../network/auth';
 import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
@@ -33,6 +34,7 @@ class UserInputs extends React.Component{
         showResults:false,
         gender:'M',
 
+        workout:'yes',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -78,28 +80,28 @@ class UserInputs extends React.Component{
     constructor(props){
       super(props);
       this.state = this.getInitialState();
-      this.handleChange = this.handleChange.bind(this);
-      this.handleChangeWorkout=this.handleChangeWorkout.bind(this);
-      this.handleChangeWorkoutEffort = this.handleChangeWorkoutEffort.bind(this);
-      this.handleChangePain = this.handleChangePain.bind(this);
-      this.handleChangeUnprocessedFood = this.handleChangeUnprocessedFood.bind(this);
-      this.handleChangeSick = this.handleChangeSick.bind(this);
-      this.handleChangeSleepAids = this.handleChangeSleepAids.bind(this);
-      this.handleChangePrescription=this.handleChangePrescription.bind(this);
-      this.handleChangeFasted = this.handleChangeFasted.bind(this);
-      this.handleChangeDietModel = this.handleChangeDietModel.bind(this);
-      this.handleChangeSmokeSubstance = this.handleChangeSmokeSubstance.bind(this);
+      this.handleChange = handlers.handleChange.bind(this);
+      this.handleChangeWorkout = handlers.handleChangeWorkout.bind(this);
+      this.handleChangeWorkoutEffort = handlers.handleChangeWorkoutEffort.bind(this);
+      this.handleChangePain = handlers.handleChangePain.bind(this);
+      this.handleChangeUnprocessedFood = handlers.handleChangeUnprocessedFood.bind(this);
+      this.handleChangeSick = handlers.handleChangeSick.bind(this);
+      this.handleChangeSleepAids = handlers.handleChangeSleepAids.bind(this);
+      this.handleChangePrescription = handlers.handleChangePrescription.bind(this);
+      this.handleChangeFasted = handlers.handleChangeFasted.bind(this);
+      this.handleChangeDietModel = handlers.handleChangeDietModel.bind(this);
+      this.handleChangeSmokeSubstance = handlers.handleChangeSmokeSubstance.bind(this);
 
-      this.renderWorkoutEffortModal = this.renderWorkoutEffortModal.bind(this);
-      this.renderPainModal = this.renderPainModal.bind(this);
-      this.renderUnprocessedFoodModal = this.renderUnprocessedFoodModal.bind(this);
-      this.renderPainSick = this.renderPainSick.bind(this);
-      this.renderPrescriptionSleepAids=this.renderPrescriptionSleepAids.bind(this);
-      this.renderPrescriptionMedication=this.renderPrescriptionMedication.bind(this);
-      this.renderFasted = this.renderFasted.bind(this);
-      this.renderDietType = this.renderDietType.bind(this);
-      this.renderSmokeSubstance = this.renderSmokeSubstance.bind(this);
-      this.renderUpdateButton = this.renderUpdateButton.bind(this);
+      this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
+      this.renderPainModal = renderers.renderPainModal.bind(this);
+      this.renderUnprocessedFoodModal = renderers.renderUnprocessedFoodModal.bind(this);
+      this.renderPainSick = renderers.renderPainSick.bind(this);
+      this.renderPrescriptionSleepAids = renderers.renderPrescriptionSleepAids.bind(this);
+      this.renderPrescriptionMedication = renderers.renderPrescriptionMedication.bind(this);
+      this.renderFasted = renderers.renderFasted.bind(this);
+      this.renderDietType = renderers.renderDietType.bind(this);
+      this.renderSmokeSubstance = renderers.renderSmokeSubstance.bind(this);
+      this.renderUpdateButton = renderers.renderUpdateButton.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -113,315 +115,6 @@ class UserInputs extends React.Component{
 
     }
     
-    // modal renderers
-  
-
-    renderWorkoutEffortModal(){
-      if(this.state.workout_effort !== "no workout today" && 
-         this.state.workout_effort !== ""){
-        const updateState = function(val){
-                              this.setState({
-                                workout_effort_hard_portion:val
-                              })}.bind(this);
-    
-        return(
-          <WorkoutEffortModal
-            workout_effort_hard_portion={this.state.workout_effort_hard_portion}
-            updateState={updateState}
-          />
-        );
-    }
-      }
-
-    renderPainModal(){
-      if(this.state.pain === 'yes'){
-        const updateState = function(val){
-                              this.setState({
-                                pain_area: val
-                              })}.bind(this);
-        return(
-          <PainModal
-            pain_area={this.state.pain_area}
-            updateState={updateState}
-          />
-        );
-      }
-    }
-
-     renderDietType(){
-        if(this.state.diet_type === 'other'){
-           const updateState = function(val){
-                              this.setState({
-                                diet_type: val
-                              })}.bind(this);
-           return(           
-            <DietType
-              diet_type={this.state.diet_type}
-              updateState={updateState}
-            />
-            );
-        }
-    }
-
-    renderUnprocessedFoodModal(){
-      
-        if(this.state. prcnt_unprocessed_food > 0 ){
-          const updateState = function(val){
-                              this.setState({
-                              unprocessed_food_list: val
-                              })}.bind(this);
-
-              return(
-            <UnprocesedFoodModal
-            unprocessed_food_list={this.state.unprocessed_food_list}
-            updateState={updateState}
-          />
-          );
-        }
-    }
-
-     renderFasted(){ 
-     if(this.state. fasted === 'no'){
-       const updateState = function(val){
-                              this.setState({
-                           food_ate_before_workout: val
-                              })}.bind(this);
-           return(
-                <FastedModal
-                  food_ate_before_workout={this.state.food_ate_before_workout}
-                  updateState={updateState}
-                />
-      );
-     }  
-    }
-
-
- renderPrescriptionMedication(){
-  if(this.state. medications === 'yes'){
-     const updateState = function(val){
-                              this.setState({
-                           medications_taken_list: val
-                              })}.bind(this);         
-      return(
-          <PrescriptionMedication
-          sleep_aid_taken={this.state.medications_taken_list}
-          updateState={updateState}
-          />
-        );
-      }
-    }
-
- renderPrescriptionSleepAids(){
-  if(this.state.prescription_sleep_aids === 'yes'){
-     const updateState = function(val){
-                              this.setState({
-                          sleep_aid_taken: val
-                              })}.bind(this); 
-         return(
-            <PrescriptionSleepAids
-            sleep_aid_taken={this.state.sleep_aid_taken}
-            updateState={updateState}
-            />
-        );
-      }
-     
-    }
-    
-    renderPainSick(){
-      if(this.state.sick === 'yes'){
-         const updateState = function(val){
-                              this.setState({
-                              sickness: val
-                              })}.bind(this); 
-
-         return(
-                  <SickModal
-                    sickness={this.state.sickness}
-                    updateState={updateState}
-                  />
-             );
-      }
-    }
-
-    renderSmokeSubstance(callback){
-      return(
-        <SmokedSubstance
-          smoked_substance_list={this.state.smoked_substance_list}
-          updateState={callback}
-        />
-      );
-    }
-
-    renderUpdateButton(){
-      if(this.state.update_form){
-        return(
-          <Button 
-            color="info" 
-            className="btn btn-block btn-primary"
-            onClick={this.onUpdate}>
-              Update
-          </Button>
-        );
-      }
-    }
-  
-    handleChange(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-      this.setState({
-        [name]: value
-      });
-    }
-    onNoWorkoutToday(){
-      const value = "no workout today";
-       this.setState({  
-          workout_easy:value,
-          workout_effort:value,
-          workout_effort_hard_portion:value,
-          workout_enjoyable:value,
-          pain:value,
-          water_consumed:value,
-          breath_nose:value,
-          chia_seeds:value,
-          calories:'No Workout Today',
-          fasted:value,          
-          calories_item:'No Workout Today',
-          workout_comment:'No Workout Today'
-        });
-
-    }
-    handleChangeWorkout(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-      if (value === "no workout today"){
-        this.setState({
-          workout_easy:value,
-          workout_effort:value,
-          workout_effort_hard_portion:value,
-          workout_enjoyable:value,
-          pain:value,
-          water_consumed:value,
-          breath_nose:value,
-          chia_seeds:value,
-          calories:'No Workout Today',
-          fasted:value,          
-          calories_item:'No Workout Today',
-          workout_comment:'No Workout Today'
-        });
-      }else{
-          this.setState({
-          workout_easy:value
-        });
-      }
-    }
-
-    handleChangeWorkoutEffort(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        workout_effort:value,
-      });
-    }
-
-
-
-    handleChangePain(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        pain:value
-      });
-    }
-
-    handleChangeUnprocessedFood(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        prcnt_unprocessed_food:value
-      });
-    }
-
-
-    handleChangeSick(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        sick:value
-      });
-    }
-
-    handleChangeSleepAids(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        prescription_sleep_aids:value
-      });
-    }
-
-    handleChangePrescription(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        medications:value
-      });
-    }
-
-    handleChangeFasted(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        fasted:value
-      });
-    }
-
-    handleChangeDietModel(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        diet_type:value
-      });
-    }
-
-   handleChangeSmokeSubstance(event){
-      const target = event.target;
-      const value = target.value;
-      const name = target.name;
-
-      this.setState({
-        smoke_substances:value
-      },function(){
-        if(value === 'yes'){
-          const updateState = function(val){
-            this.setState({
-             smoked_substance_list: val
-            });
-          }.bind(this);
-          ReactDOM.render(
-            this.renderSmokeSubstance(updateState),
-            document.getElementById('smokeSubstanceModal')
-          );
-        }
-      }.bind(this));
-    }
-
     onFetchSuccess(data,clone=false){
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
@@ -467,6 +160,25 @@ class UserInputs extends React.Component{
       });
     }
 
+    onNoWorkoutToday(){
+      const value = "no workout today";
+       this.setState({  
+        workout_easy:value,
+        workout_effort:value,
+        workout_effort_hard_portion:value,
+        workout_enjoyable:value,
+        pain:value,
+        water_consumed:value,
+        breath_nose:value,
+        chia_seeds:value,
+        calories:'No Workout Today',
+        fasted:value,          
+        calories_item:'No Workout Today',
+        workout_comment:'No Workout Today'
+      });
+
+    }
+    
     onFetchFailure(error){
       // alert('User input not found');
       const initial_state = this.getInitialState();
@@ -522,6 +234,8 @@ class UserInputs extends React.Component{
 
     componentDidMount(){
       getUserProfile(this.onProfileSuccessFetch);
+      userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
+                          this.onFetchFailure,true);
     }
 
     createDropdown(start_num , end_num){
@@ -595,16 +309,16 @@ class UserInputs extends React.Component{
                             type="select" 
                             className="custom-select form-control" 
                             name="workout"
-                            value={this.state.workout_easy}
-                            onChange={this.handleChangeWorkout}>
+                            value={this.state.workout}
+                            onChange={this.handleChange}>
                                 <option value="">select</option>
-                                <option value="easy">Yes</option>
-                                <option value="hard">No</option>
-                                <option value="hard">Not Yet</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                                <option value="not yet">Not Yet</option>
                             </Input>  
                           </FormGroup> 
 
-                          { this.state.workout_easy != "no workout today" &&
+                          { this.state.workout == "yes" &&
                           <FormGroup>   
                             <Label className="padding">2) Was Your Workout Easy or Hard?</Label>
                             <Input 
@@ -620,7 +334,7 @@ class UserInputs extends React.Component{
                           </FormGroup> 
                         }
 
-                        { this.state.workout_enjoyable !="no workout today" &&
+                        { this.state.workout == "yes" &&
                         <FormGroup>   
                             <Label className="padding">3) Was Your Workout Today Enjoyable?</Label>
                             <Input 
@@ -636,7 +350,7 @@ class UserInputs extends React.Component{
                         </FormGroup>
                       }
 
-                          { this.state.workout_effort !="no workout today" &&
+                          { this.state.workout == "yes" &&
                           <FormGroup>   
                             <Label className="padding">4) Your Workout Effort Level?</Label>
                             <Input 
@@ -663,7 +377,7 @@ class UserInputs extends React.Component{
               
                   
 
-                          { this.state.pain !="no workout today" &&
+                          { this.state.workout == "yes" &&
                           <FormGroup>
                             <Label className="padding">5) Did You Have Any Pain or Twinges During or After Your Workout?</Label>
                             <Input 
@@ -681,7 +395,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
                           }
 
-                          { this.state.water_consumed !="no workout today" &&
+                          { this.state.workout == "yes" &&
                           <FormGroup>    
                             <Label className="padding">6) Water Consumed During Workout (Ounces)</Label>
                             <Input type="select" 
@@ -695,7 +409,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
                         }
 
-                          { this.state.chia_seeds !="no workout today" &&     
+                          { this.state.workout == "yes" &&     
                           <FormGroup>      
                             <Label className="padding">7) Tablespoons of Chia Seeds Consumed During Workout?</Label>
                             <Input 
@@ -719,7 +433,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
                         }
 
-                         { this.state.breath_nose !="no workout today" &&     
+                         { this.state.workout == "yes" &&     
                           <FormGroup>
                             <Label className="padding">8) What % of Your Workout Did you breathe in and out through Your nose?</Label>
                             <Input type="select"
@@ -733,7 +447,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
 
                         }
-                           { this.state.fasted !="no workout today" &&
+                           { this.state.workout == "yes" &&
                            <FormGroup>
                             <Label className="padding">9) Were You Fasted During Your Workout? </Label>
                                 <Input 
@@ -753,7 +467,7 @@ class UserInputs extends React.Component{
                          
 
 
-                           { this.state.workout_comment !="No Workout Today" &&     
+                           { this.state.workout == "yes" &&     
                           <FormGroup>      
                             <Label className="padding">10) General Workout Comments</Label>
                                <Input type="textarea" name="workout_comment" 
@@ -765,7 +479,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
                         }
 
-                         { this.state.calories !="No Workout Today" &&
+                         { this.state.workout == "yes" &&
                           <FormGroup>      
                             <Label className="padding">11) Approximately How Many Calories Did You Consume During Your Workout?</Label>
                                <Input type="text" name="calories" 
@@ -774,7 +488,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
                         }
 
-                        { this.state.calories_item !="No Workout Today" &&
+                        { this.state.workout == "yes" &&
                           <FormGroup>      
                             <Label className="padding">12) What Specifically Did You Consume During Your Workout?</Label>
                                <Input type="textarea" name="calories_item"
@@ -904,10 +618,9 @@ class UserInputs extends React.Component{
                                     <option value="">select</option>
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
-                            </Input>       
+                            </Input>
+                            {this.renderSmokeSubstance()}       
                           </FormGroup>
-
-                          <div id="smokeSubstanceModal"></div>
 
                            <FormGroup>
                               <Label className="padding">18) Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
