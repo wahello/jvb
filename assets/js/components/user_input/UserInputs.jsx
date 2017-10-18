@@ -199,7 +199,7 @@ class UserInputs extends React.Component{
       const yesterday = new Date(today.getFullYear(),
                                 today.getMonth(),
                                 today.getDate()-1);
-      const clone = true;
+      const clone = false;
       userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
     }
 
