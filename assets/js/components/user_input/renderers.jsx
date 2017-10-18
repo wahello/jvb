@@ -1,3 +1,16 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import WorkoutEffortModal from './workoutEffortModal';
+import PainModal from './painModal';
+import UnprocesedFoodModal from './unprocessedFoodModal';
+import SickModal from './sickModal';
+import PrescriptionSleepAids from './prescriptionsleepaids';
+import PrescriptionMedication from './pres-nonprescriptionmedication';
+import FastedModal from './fastedModal';
+import DietType from './diettype';
+import SmokedSubstance from './smokedSubstance';
+
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" && 
 	 this.state.workout_effort !== ""){
@@ -86,7 +99,7 @@ export function renderPrescriptionMedication(){
 							  })}.bind(this);         
 	  return(
 		  <PrescriptionMedication
-		  sleep_aid_taken={this.state.medications_taken_list}
+		  medications_taken_list={this.state.medications_taken_list}
 		  updateState={updateState}
 		  />
 		);
@@ -139,19 +152,6 @@ export function renderSmokeSubstance(callback){
 		smoked_substance_list={this.state.smoked_substance_list}
 		updateState={updateState}
 	  />
-	);
-  }
-}
-
-export function renderUpdateButton(){
-  if(this.state.update_form){
-	return(
-	  <Button 
-		color="info" 
-		className="btn btn-block btn-primary"
-		onClick={this.onUpdate}>
-		  Update
-	  </Button>
 	);
   }
 }

@@ -47,7 +47,7 @@ export default class SmokedSubstance extends Component{
 			this.setState({
 				smoked_substance_list: value
 			},()=>{
-					this.props.updateState(smoked_substance_list)
+					this.props.updateState(this.state.smoked_substance_list)
 				});
 		}
 	}
@@ -67,11 +67,11 @@ export default class SmokedSubstance extends Component{
 
 	createCigarettesDropdown(num){
 		let elements = [];
-		elements.push(<option value=''>select</option>);
+		elements.push(<option key="select" value=''>select</option>);
 		for(let i=1;i<=num;i++){
-			elements.push(<option value={i}>{i}</option>);
+			elements.push(<option key={i} value={i}>{i}</option>);
 		}
-		elements.push(<option value={num+"+"}>{num+"+"}</option>);
+		elements.push(<option key={num+"+"} value={num+"+"}>{num+"+"}</option>);
 		return elements;
 	}
 
@@ -111,7 +111,7 @@ export default class SmokedSubstance extends Component{
 								<Input 
 	                            type="textarea" 
 	                            className="form-control" 
-	                            rows="5" columns="5"
+	                            rows="5" cols="5"
 	                            placeholder="Please type in..."
 	                            value={this.state.smoked_substance_list}
 	                            onChange={this.handleChange} />

@@ -18,6 +18,7 @@ function formatJSON(data){
 		    "strong_input": {
 		        "id": 1,
 		        "user_input": 18,
+		        "workout":"yes",
 		        "work_out_easy_or_hard": "easy",
 		        "workout_effort_level": 5,
 		        "hard_portion_workout_effort_level": 8,

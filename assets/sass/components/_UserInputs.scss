@@ -32,6 +32,7 @@ margin-top: 46px;
 }
 #user-inputs .user-inputs-form .padding{
 	padding: 10px;
+	margin-left: -10px;
 }
 // @media (min-width: 1024px) {
 // form.user-inputs-form.bootstrap_validator{
@@ -59,7 +60,7 @@ form.user-inputs-form.bootstrap_validator{
 	padding:0px 10px;
 }
 .btn2{
-	padding:0px 10px;
+	padding:0px 10px;  
 }
 strong{
 	color:#212F3D;
@@ -91,4 +92,7 @@ h2{
 	align-items: center;
 	text-align: center;
 
+}
+#padd{
+	padding-top:17px;
 }
