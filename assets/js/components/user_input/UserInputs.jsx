@@ -534,6 +534,7 @@ class UserInputs extends React.Component{
                             <Label className="padding">13. How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
                            
                              <div className="col-xs-6">
+                             <div className="input1">
                             <Input type="select" name="sleep_hours_last_night"
                             id="hours"
                             className="form-control custom-select"
@@ -554,6 +555,7 @@ class UserInputs extends React.Component{
                              <option key="mins" value="">Minutes</option>
                             {this.createDropdown(0,59)}                        
                             </Input>
+                            </div>
                             </div>
                        
                           </div>
