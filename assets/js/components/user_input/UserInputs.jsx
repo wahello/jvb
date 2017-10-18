@@ -24,6 +24,7 @@ class UserInputs extends React.Component{
         fetched_user_input_created_at:'',
         update_form:false,
         gender:'M',
+        diet_to_show:'',
 
         workout:'yes',
         workout_easy:'',
@@ -46,7 +47,6 @@ class UserInputs extends React.Component{
         workout_comment:'',
         calories:'',
         calories_item:'',
-        //sleep_last_night:'',
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
         prescription_sleep_aids:'',
@@ -105,10 +105,19 @@ class UserInputs extends React.Component{
     }
     
     onFetchSuccess(data,clone_form=undefined){
-      console.log("Called Fetch Success");
+      const DIET_TYPE = ['vegan','vegetarian','paleo',
+                         'low carb/high fat','high carb',''];
+      let other_diet = true;
+      for(let diet of DIET_TYPE){
+        if(data.data.optional_input.type_of_diet_eaten === diet)
+          other_diet = false;
+      }
+
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
+        diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+
         workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
         workout_enjoyable:data.data.optional_input.workout_enjoyable,
@@ -709,7 +718,7 @@ class UserInputs extends React.Component{
                               type="select" 
                               className="custom-select form-control" 
                               name="diet_type"
-                              value={this.state.diet_type}
+                              value={this.state.diet_to_show}
                               onChange={this.handleChangeDietModel}>
                                       <option value="select">select</option>
                                       <option value="other">Other</option> 

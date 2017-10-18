@@ -44,7 +44,7 @@ export function renderPainModal(){
 }
 
 export function renderDietType(){
-	if(this.state.diet_type === 'other'){
+	if(this.state.diet_to_show === 'other'){
 	   const updateState = function(val){
 						  this.setState({
 							diet_type: val
