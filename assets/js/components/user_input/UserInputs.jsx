@@ -112,7 +112,7 @@ class UserInputs extends React.Component{
         if(data.data.optional_input.type_of_diet_eaten === diet)
           other_diet = false;
       }
-
+      console.log("i'm here with diet:",other_diet)
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
@@ -156,6 +156,8 @@ class UserInputs extends React.Component{
         breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
         breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
         diet_type:data.data.optional_input.type_of_diet_eaten
+      },()=>{
+        console.log(this.state);
       });
     }
 
