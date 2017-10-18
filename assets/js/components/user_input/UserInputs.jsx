@@ -24,6 +24,7 @@ class UserInputs extends React.Component{
         fetched_user_input_created_at:'',
         update_form:false,
         gender:'M',
+        diet_to_show:'',
 
         workout:'yes',
         workout_easy:'',
@@ -46,7 +47,6 @@ class UserInputs extends React.Component{
         workout_comment:'',
         calories:'',
         calories_item:'',
-        //sleep_last_night:'',
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
         prescription_sleep_aids:'',
@@ -105,10 +105,19 @@ class UserInputs extends React.Component{
     }
     
     onFetchSuccess(data,clone_form=undefined){
-      console.log("Called Fetch Success");
+      const DIET_TYPE = ['vegan','vegetarian','paleo',
+                         'low carb/high fat','high carb',''];
+      let other_diet = true;
+      for(let diet of DIET_TYPE){
+        if(data.data.optional_input.type_of_diet_eaten === diet)
+          other_diet = false;
+      }
+
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
+        diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+
         workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
         workout_enjoyable:data.data.optional_input.workout_enjoyable,
@@ -229,10 +238,12 @@ class UserInputs extends React.Component{
       getUserProfile(this.onProfileSuccessFetch);
     }
 
-    createDropdown(start_num , end_num){
+    createDropdown(start_num , end_num, step=1){
     let elements = [];
-    for(let i=start_num;i<=end_num;i++){
+    let i = start_num;
+    while(i<=end_num){
       elements.push(<option key={i} value={i}>{i}</option>);
+      i=i+step;
     }
     return elements;
   }
@@ -413,17 +424,8 @@ class UserInputs extends React.Component{
                             name="chia_seeds"
                             value={this.state.chia_seeds}
                             onChange={this.handleChange}>
-                                <option value="">select</option>                              
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
+                                <option value="">select</option>
+                                {this.createDropdown(0,10)}
                             </Input>
                           </FormGroup>
                         }
@@ -546,7 +548,7 @@ class UserInputs extends React.Component{
                             value={this.state.prcnt_unprocessed_food}
                             onChange={this.handleChangeUnprocessedFood}>
                             <option key="select" value="">select</option>
-                            {this.createDropdown(0,100)}
+                            {this.createDropdown(0,100,5)}
                             </Input>
                             <FormGroup id="padd"> 
                             {this.renderUnprocessedFoodModal()}
@@ -732,7 +734,7 @@ class UserInputs extends React.Component{
                               type="select" 
                               className="custom-select form-control" 
                               name="diet_type"
-                              value={this.state.diet_type}
+                              value={this.state.diet_to_show}
                               onChange={this.handleChangeDietModel}>
                                       <option value="select">select</option>
                                       <option value="other">Other</option> 

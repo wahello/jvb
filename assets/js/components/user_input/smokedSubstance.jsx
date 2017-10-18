@@ -19,6 +19,7 @@ export default class SmokedSubstance extends Component{
 
 		this.state = {
 			collapse:true,
+			smoked_substance_to_show:isCigarettes ? 'cigarettes' : 'other',
 			smoked_substance_list:smoked_substance_list,
 			cigarettes_count:cigarettes_count,
 			collapseOther: (smoked_substance_list !== '' && smoked_substance_list !== 'cigarettes')? true : false,
@@ -35,17 +36,20 @@ export default class SmokedSubstance extends Component{
 		if (value === 'other'){
 		    this.setState({
 		    	collapseOther:true,
+		    	smoked_substance_to_show:value,
 		    	collapseCigarettesCount:false
 		    });
 		}else if (value === 'cigarettes'){
 			this.setState({
 		    	smoked_substance_list: value,
+		    	smoked_substance_to_show:value,
 		    	collapseCigarettesCount: true,
 		    	collapseOther:false
 		    });
 		}else {
 			this.setState({
-				smoked_substance_list: value
+				smoked_substance_list: value,
+				smoked_substance_to_show:'other'
 			},()=>{
 					this.props.updateState(this.state.smoked_substance_list)
 				});
@@ -85,7 +89,7 @@ export default class SmokedSubstance extends Component{
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
-                            value={this.state.smoked_substance_list}
+                            value={this.state.smoked_substance_to_show}
                             onChange={this.handleChange}>
                             	<option value="">select</option>
                                 <option value="other">Other</option>

@@ -110,8 +110,16 @@ export function handleChangeDietModel(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
+  const DIET_TYPE = ['vegan','vegetarian','paleo',
+                         'low carb/high fat','high carb',''];
+  let other_diet = true;
+  for(let diet of DIET_TYPE){
+    if(value === diet)
+      other_diet = false;
+  }
 
   this.setState({
+  diet_to_show:other_diet ? 'other' : value,
 	diet_type:value
   });
 }
