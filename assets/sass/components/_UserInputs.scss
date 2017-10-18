@@ -2,6 +2,7 @@ html,
 body{
 	height: 100%;
 	background-size: cover;
+	font-size:16px;
 }
 #user-inputs{
     padding-top: 80px;
@@ -55,16 +56,21 @@ form.user-inputs-form.bootstrap_validator{
     margin-left: 180px;
 }
 }
-
-.btn1{
-	padding:0px 10px;
+.input{
+	padding:0px 17px;
+}
+.input1{
+	padding:0px 17px 0px 23px;
+}
+#navlink{
+	color:black;
 }
 .btn2{
-	padding:0px 10px;  
+	padding:15px 0px 0px 0px;  
 }
 strong{
 	color:#212F3D;
-	font-size:15px;
+	font-size:16px;
 }
 h2{
 	text-align:center;

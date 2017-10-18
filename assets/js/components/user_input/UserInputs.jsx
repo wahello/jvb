@@ -262,26 +262,26 @@ class UserInputs extends React.Component{
                       <div className="col-sm-2">
                            <CalendarWidget onDaySelect={this.processDate}/>,
                       </div>
-                        <h2 className="head">Daily user inputs report</h2>
+                        <h2 className="head">Daily User Inputs Report</h2>
 
-                         <Nav>
+                         <Nav className="nav1">
                               <NavItem>
-                                <NavLink href="#workout">Workout</NavLink>
+                                <NavLink id="navlink" href="#workout">Workout</NavLink>
                               </NavItem>
                               <NavItem>
-                                <NavLink href="#sleep">Sleep</NavLink>
+                                <NavLink id="navlink" href="#sleep">Sleep</NavLink>
                               </NavItem>
                               <NavItem>
-                                <NavLink href="#food">Food/Drink/Other</NavLink>
+                                <NavLink id="navlink" href="#food">Food/Drink/Other</NavLink>
                               </NavItem>
                               <NavItem>
-                                <NavLink href="#smoking">Sleep Aids/Smoking/Medications/Supplements Inputs</NavLink>
+                                <NavLink id="navlink" href="#smoking">Sleep Aids/Smoking/Medications/Supplements Inputs</NavLink>
                               </NavItem>
                               <NavItem>
-                                <NavLink href="#stress">Stress/Illness Inputs</NavLink>
+                                <NavLink id="navlink" href="#stress">Stress/Illness Inputs</NavLink>
                               </NavItem>
                               <NavItem>
-                                <NavLink href="#daily">Daily User Inputs (optional)</NavLink>
+                                <NavLink id="navlink" href="#daily">Daily User Inputs (optional)</NavLink>
                               </NavItem>
                          </Nav>
                         <div className="row justify-content-center">
@@ -306,7 +306,8 @@ class UserInputs extends React.Component{
                           <h2><strong>Workout Inputs</strong></h2>
 
                            <FormGroup>   
-                            <Label className="padding">1) Did You Workout Today?</Label>
+                            <Label className="padding">1. Did You Workout Today?</Label>
+                            <div className="input">
                             <Input 
                             type="select" 
                             className="custom-select form-control" 
@@ -317,62 +318,69 @@ class UserInputs extends React.Component{
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                                 <option value="not yet">Not Yet</option>
-                            </Input>  
+                            </Input> 
+                            </div> 
                           </FormGroup> 
 
                           { this.state.workout == "yes" &&
                           <FormGroup>   
-                            <Label className="padding">2) Was Your Workout Easy or Hard?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="workout_easy"
-                            value={this.state.workout_easy}
-                            onChange={this.handleChangeWorkout}>
-                                <option value="">select</option>
-                                <option value="easy">Easy</option>
-                                <option value="hard">Hard</option>
-                            </Input>  
+                            <Label className="padding">2. Was Your Workout Easy or Hard?</Label>
+                             <div className="input">
+                                <Input 
+                                type="select" 
+                                className="custom-select form-control" 
+                                name="workout_easy"
+                                value={this.state.workout_easy}
+                                onChange={this.handleChangeWorkout}>
+                                    <option value="">select</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="hard">Hard</option>
+                                </Input> 
+                              </div> 
                           </FormGroup> 
                         }
 
                         { this.state.workout == "yes" &&
                         <FormGroup>   
-                            <Label className="padding">3) Was Your Workout Today Enjoyable?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="workout_enjoyable"
-                            value={this.state.workout_enjoyable}
-                            onChange={this.handleChange}>
-                                  <option value="">select</option>                               
-                                  <option value="yes">Yes</option>
-                                  <option value="no">No</option>
-                            </Input>  
+                            <Label className="padding">3. Was Your Workout Today Enjoyable?</Label>
+                            <div className="input">
+                                <Input 
+                                type="select" 
+                                className="custom-select form-control" 
+                                name="workout_enjoyable"
+                                value={this.state.workout_enjoyable}
+                                onChange={this.handleChange}>
+                                      <option value="">select</option>                               
+                                      <option value="yes">Yes</option>
+                                      <option value="no">No</option>
+                                </Input>
+                            </div>  
                         </FormGroup>
                       }
 
                           { this.state.workout == "yes" &&
                           <FormGroup>   
-                            <Label className="padding">4) Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="workout_effort"
-                            value={this.state.workout_effort}
-                            onChange={this.handleChangeWorkoutEffort} >
-                                  <option value="">select</option>                                 
-                                  <option value="1">1</option>
-                                  <option value="2">2</option>
-                                  <option value="3">3</option>
-                                  <option value="4">4</option>
-                                  <option value="5">5</option>
-                                  <option value="6">6</option>
-                                  <option value="7">7</option>
-                                  <option value="8">8</option>
-                                  <option value="9">9</option>
-                                  <option value="10">10</option>
-                            </Input>
+                            <Label className="padding">4. Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
+                              <div className="input">
+                                  <Input 
+                                  type="select" 
+                                  className="custom-select form-control" 
+                                  name="workout_effort"
+                                  value={this.state.workout_effort}
+                                  onChange={this.handleChangeWorkoutEffort} >
+                                        <option value="">select</option>                                 
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                  </Input>
+                              </div>
                             <FormGroup id="padd">  
                             {this.renderWorkoutEffortModal()}
                              </FormGroup>
@@ -383,18 +391,20 @@ class UserInputs extends React.Component{
 
                           { this.state.workout == "yes" &&
                           <FormGroup>
-                            <Label className="padding">5) Did You Have Any Pain or Twinges During or After Your Workout?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            id="pain_select" 
-                            name="pain"
-                            value={this.state.pain}
-                            onChange={this.handleChangePain}>
-                                <option value="">select</option>                              
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </Input>
+                            <Label className="padding">5. Did You Have Any Pain or Twinges During or After Your Workout?</Label>
+                                <div className="input">
+                                    <Input 
+                                    type="select" 
+                                    className="custom-select form-control" 
+                                    id="pain_select" 
+                                    name="pain"
+                                    value={this.state.pain}
+                                    onChange={this.handleChangePain}>
+                                        <option value="">select</option>                              
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </Input>
+                                </div>
                             <FormGroup id="padd"> 
                             {this.renderPainModal()}
                             </FormGroup>
@@ -403,50 +413,57 @@ class UserInputs extends React.Component{
 
                           { this.state.workout == "yes" &&
                           <FormGroup>    
-                            <Label className="padding">6) Water Consumed During Workout (Ounces)</Label>
-                            <Input type="select" 
-                                   className="custom-select form-control" 
-                                   name="water_consumed"                                 
-                                   value={this.state.water_consumed}
-                                   onChange={this.handleChange}>
-                                   <option key="select"value="">select</option>                                   
-                                   {this.createDropdown(0,250)}
-                                   </Input>
+                            <Label className="padding">6. Water Consumed During Workout (Ounces)</Label>
+                            <div className="input">
+                                <Input type="select" 
+                                       className="custom-select form-control" 
+                                       name="water_consumed"                                 
+                                       value={this.state.water_consumed}
+                                       onChange={this.handleChange}>
+                                       <option key="select"value="">select</option>                                   
+                                       {this.createDropdown(0,250)}
+                                </Input>
+                            </div>
                           </FormGroup>
                         }
 
                           { this.state.workout == "yes" &&     
                           <FormGroup>      
-                            <Label className="padding">7) Tablespoons of Chia Seeds Consumed During Workout?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="chia_seeds"
-                            value={this.state.chia_seeds}
-                            onChange={this.handleChange}>
-                                <option value="">select</option>
-                                {this.createDropdown(0,10)}
-                            </Input>
+                            <Label className="padding">7. Tablespoons of Chia Seeds Consumed During Workout?</Label>
+                                <div className="input">
+                                    <Input 
+                                    type="select" 
+                                    className="custom-select form-control" 
+                                    name="chia_seeds"
+                                    value={this.state.chia_seeds}
+                                    onChange={this.handleChange}>
+                                        <option value="">select</option>
+                                        {this.createDropdown(0,10)}
+                                    </Input>
+                                </div>    
                           </FormGroup>
                         }
 
                          { this.state.workout == "yes" &&     
                           <FormGroup>
-                            <Label className="padding">8) What % of Your Workout Did you breathe in and out through Your nose?</Label>
-                            <Input type="select"
-                             className="form-control custom-select" 
-                             name="breath_nose"                         
-                             value={this.state.breath_nose}
-                             onChange={this.handleChange}>
-                             <option key="select" value="">select</option>                            
-                              {this.createDropdown(1,100)}
-                            </Input>
+                            <Label className="padding">8. What % of Your Workout Did you breathe in and out through Your nose?</Label>
+                                <div className="input">
+                                    <Input type="select"
+                                     className="form-control custom-select" 
+                                     name="breath_nose"                         
+                                     value={this.state.breath_nose}
+                                     onChange={this.handleChange}>
+                                     <option key="select" value="">select</option>                            
+                                      {this.createDropdown(1,100)}
+                                    </Input>
+                                </div>
                           </FormGroup>
 
                         }
                            { this.state.workout == "yes" &&
                            <FormGroup>
-                            <Label className="padding">9) Were You Fasted During Your Workout? </Label>
+                            <Label className="padding">9. Were You Fasted During Your Workout? </Label>
+                              <div className="input">
                                 <Input 
                                 type="select" 
                                 className="custom-select form-control" 
@@ -457,6 +474,7 @@ class UserInputs extends React.Component{
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                                 </Input>
+                              </div>
                                  <FormGroup id="padd">
                                    {this.renderFasted()}
                                  </FormGroup>
@@ -468,33 +486,39 @@ class UserInputs extends React.Component{
 
                            { this.state.workout == "yes" &&     
                           <FormGroup>      
-                            <Label className="padding">10) General Workout Comments</Label>
-                               <Input type="textarea" name="workout_comment" 
-                               placeholder="please leave a comment" 
-                               className="form-control"
-                               rows="5" cols="5" 
-                               value={this.state.workout_comment}
-                               onChange={this.handleChange}/>
+                            <Label className="padding">10. General Workout Comments</Label>
+                              <div className="input1">
+                                   <Input type="textarea" name="workout_comment" 
+                                   placeholder="please leave a comment" 
+                                   className="form-control"
+                                   rows="5" cols="5" 
+                                   value={this.state.workout_comment}
+                                   onChange={this.handleChange}/>
+                              </div>
                           </FormGroup>
                         }
 
                          { this.state.workout == "yes" &&
                           <FormGroup>      
-                            <Label className="padding">11) Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">11. Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <div className="input1">
                                <Input type="text" name="calories" 
                                value={this.state.calories}
                                onChange={this.handleChange}/>
+                            </div>
                           </FormGroup>
                         }
 
                         { this.state.workout == "yes" &&
                           <FormGroup>      
-                            <Label className="padding">12) What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">12. What Specifically Did You Consume During Your Workout?</Label>
+                            <div className="input1">
                                <Input type="textarea" name="calories_item"
                                 rows="5" cols="5" 
                                 className="form-control" 
                                value={this.state.calories_item}
                                onChange={this.handleChange}/>
+                            </div>
                           </FormGroup>
                             }
                             </div>
@@ -505,7 +529,7 @@ class UserInputs extends React.Component{
                           
                            <FormGroup>
                           
-                            <Label className="padding">13) How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
+                            <Label className="padding">13. How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
                            
                              <div className="col-xs-6">
                             <Input type="select" name="sleep_hours_last_night"
@@ -540,105 +564,115 @@ class UserInputs extends React.Component{
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding">14) What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
-                            <Input
-                            type="select" 
-                            className="form-control custom-select" 
-                            name="prcnt_unprocessed_food"                            
-                            value={this.state.prcnt_unprocessed_food}
-                            onChange={this.handleChangeUnprocessedFood}>
-                            <option key="select" value="">select</option>
-                            {this.createDropdown(0,100,5)}
-                            </Input>
+                            <Label className="padding">14. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
+                              <div className="input1">
+                                <Input
+                                type="select" 
+                                className="form-control custom-select" 
+                                name="prcnt_unprocessed_food"                            
+                                value={this.state.prcnt_unprocessed_food}
+                                onChange={this.handleChangeUnprocessedFood}>
+                                <option key="select" value="">select</option>
+                                {this.createDropdown(0,100,5)}
+                                </Input>
+                              </div>
                             <FormGroup id="padd"> 
                             {this.renderUnprocessedFoodModal()}
                             </FormGroup>
                           </FormGroup>
 
                           <FormGroup>
-                               <Label className="padding">15) Number of Alcohol Drinks Consumed Yesterday?</Label>
-                                 <Input 
-                                 type="select" 
-                                 className="custom-select form-control" 
-                                 name="alchol_consumed"
-                                 value={this.state.alchol_consumed}
-                                 onChange={this.handleChange}>
-                                    <option value="">select</option>
-                                    <option value="0">0</option>
-                                    <option value="0.5">0.5</option>
-                                    <option value="1">1</option>
-                                    <option value="1.5">1.5</option>
-                                    <option value="2">2</option>
-                                    <option value="2.5">2.5</option>
-                                    <option value="3">3</option>
-                                    <option value="3.5">3.5</option>
-                                    <option value="4">4</option>
-                                    <option value="4.5">4.5</option>
-                                    <option value="5">5</option>
-                                    <option value="5.5">5.5</option>
-                                    <option value="6">6</option>
-                                    <option value="6.5">6.5</option>
-                                    <option value="7">7</option>
-                                    <option value="7.5">7.5</option>
-                                    <option value="8">8</option>
-                                    <option value="8.5">8.5</option>
-                                    <option value="9">9</option>
-                                    <option value="9.5">9.5</option>
-                                    <option value="10">10</option>
-                                    <option value="10+">More Than 10</option>
-                                  </Input>
+                               <Label className="padding">15. Number of Alcohol Drinks Consumed Yesterday?</Label>
+                                <div className="input1">
+                                     <Input 
+                                     type="select" 
+                                     className="custom-select form-control" 
+                                     name="alchol_consumed"
+                                     value={this.state.alchol_consumed}
+                                     onChange={this.handleChange}>
+                                        <option value="">select</option>
+                                        <option value="0">0</option>
+                                        <option value="0.5">0.5</option>
+                                        <option value="1">1</option>
+                                        <option value="1.5">1.5</option>
+                                        <option value="2">2</option>
+                                        <option value="2.5">2.5</option>
+                                        <option value="3">3</option>
+                                        <option value="3.5">3.5</option>
+                                        <option value="4">4</option>
+                                        <option value="4.5">4.5</option>
+                                        <option value="5">5</option>
+                                        <option value="5.5">5.5</option>
+                                        <option value="6">6</option>
+                                        <option value="6.5">6.5</option>
+                                        <option value="7">7</option>
+                                        <option value="7.5">7.5</option>
+                                        <option value="8">8</option>
+                                        <option value="8.5">8.5</option>
+                                        <option value="9">9</option>
+                                        <option value="9.5">9.5</option>
+                                        <option value="10">10</option>
+                                        <option value="10+">More Than 10</option>
+                                      </Input>
+                                  </div>
                           </FormGroup>
                           </div>
                           
                           <div id="smoking">
                            <h2><strong>Sleep Aids/Smoking/Medications/Supplements Inputs</strong></h2>
                            <FormGroup>
-                             <Label className="padding">16) Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
-                              <Input 
-                              type="select" 
-                              className="custom-select form-control" 
-                              id="prescription_select" 
-                              name="prescription_sleep_aids"
-                              value={this.state.prescription_sleep_aids}
-                              onChange={this.handleChangeSleepAids}>
-                                  <option value="">select</option>
-                                  <option value="yes">Yes</option>
-                                  <option value="no">No</option>
-                              </Input>
+                             <Label className="padding">16. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
+                              <div className="input1">
+                                  <Input 
+                                  type="select" 
+                                  className="custom-select form-control" 
+                                  id="prescription_select" 
+                                  name="prescription_sleep_aids"
+                                  value={this.state.prescription_sleep_aids}
+                                  onChange={this.handleChangeSleepAids}>
+                                      <option value="">select</option>
+                                      <option value="yes">Yes</option>
+                                      <option value="no">No</option>
+                                  </Input>
+                              </div>
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionSleepAids()}
                               </FormGroup>
                           </FormGroup>
                          
                           <FormGroup>
-                            <Label className="padding">17) Did You Smoke Any Substances Yesterday?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="smoke_substances"
-                            value={this.state.smoke_substances}
-                            onChange = {this.handleChangeSmokeSubstance}>
-                                    <option value="">select</option>
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                            </Input>
+                            <Label className="padding">17. Did You Smoke Any Substances Yesterday?</Label>
+                            <div className="input1">
+                                <Input 
+                                type="select" 
+                                className="custom-select form-control" 
+                                name="smoke_substances"
+                                value={this.state.smoke_substances}
+                                onChange = {this.handleChangeSmokeSubstance}>
+                                        <option value="">select</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                </Input>
+                            </div>
                             <FormGroup id="padd"> 
                             {this.renderSmokeSubstance()}   
                             </FormGroup>    
                           </FormGroup>
 
                            <FormGroup>
-                              <Label className="padding">18) Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
-                              <Input 
-                              type="select" 
-                              className="custom-select form-control" 
-                              name="medications"
-                              value={this.state.medications}
-                              onChange={this.handleChangePrescription}>
-                                      <option value="">select</option>
-                                      <option value="yes">Yes</option>
-                                      <option value="no">No</option>
-                              </Input>
+                              <Label className="padding">18. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
+                                <div className="input1">
+                                  <Input 
+                                  type="select" 
+                                  className="custom-select form-control" 
+                                  name="medications"
+                                  value={this.state.medications}
+                                  onChange={this.handleChangePrescription}>
+                                          <option value="">select</option>
+                                          <option value="yes">Yes</option>
+                                          <option value="no">No</option>
+                                  </Input>
+                                </div>
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
@@ -650,33 +684,37 @@ class UserInputs extends React.Component{
                           <div id="stress">
                            <h2><strong>Stress/Illness Inputs</strong></h2>
                           <FormGroup>
-                            <Label className="padding">19) Yesterday's Stress Level</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="stress"
-                            value={this.state.stress}
-                            onChange={this.handleChange}>
-                                <option value="">select</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                            </Input>
+                            <Label className="padding">19. Yesterday's Stress Level</Label>
+                              <div className="input1">
+                                <Input 
+                                type="select" 
+                                className="custom-select form-control" 
+                                name="stress"
+                                value={this.state.stress}
+                                onChange={this.handleChange}>
+                                    <option value="">select</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </Input>
+                              </div>
                           </FormGroup>
 
                           <FormGroup>
-                            <Label className="padding">20) Are You Sick Today?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            id="sick_select"
-                            name="sick"
-                            value={this.state.sick}
-                            onChange={this.handleChangeSick}>
-                                <option value="">select</option>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </Input>
+                            <Label className="padding">20. Are You Sick Today?</Label>
+                              <div className="input1">
+                                <Input 
+                                type="select" 
+                                className="custom-select form-control" 
+                                id="sick_select"
+                                name="sick"
+                                value={this.state.sick}
+                                onChange={this.handleChangeSick}>
+                                    <option value="">select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </Input>
+                              </div>
                             <FormGroup id="padd"> 
                             {this.renderPainSick()}
                             </FormGroup>
@@ -689,7 +727,8 @@ class UserInputs extends React.Component{
                          <div id="daily">
                           <h2><strong>Daily User Inputs (optional)</strong></h2>
                           <FormGroup>
-                            <Label className="padding">21) Weight (Pounds)</Label>
+                            <Label className="padding">21. Weight (Pounds)</Label>
+                            <div className="input1">
                                 <Input type="select" 
                                    className="custom-select form-control"
                                    name="weight"                                  
@@ -698,11 +737,13 @@ class UserInputs extends React.Component{
                                     <option key="select" value="">select</option>
                                    {this.createDropdown(30,300)}
                                    </Input>
+                            </div>
                           </FormGroup>
 
                           { this.state.gender === 'M' &&
                             <FormGroup>       
-                              <Label className="padding">22) Waist Size (Male)</Label>
+                              <Label className="padding">22. Waist Size (Male)</Label>
+                            <div className="input1">
                               <Input 
                                 type="text" 
                                 className="form-control" 
@@ -711,12 +752,14 @@ class UserInputs extends React.Component{
                                 value={this.state.waist}
                                 onChange={this.handleChange}>
                               </Input>
+                            </div>
                             </FormGroup>
                           }
 
                           { this.state.gender === 'F' &&
                             <FormGroup>
-                              <Label className="padding">22) Clothes Size (Womens)</Label>
+                              <Label className="padding">22. Clothes Size (Womens)</Label>
+                            <div className="input1">
                               <Input 
                                 type="text" 
                                 className="form-control"
@@ -725,27 +768,30 @@ class UserInputs extends React.Component{
                                 value={this.state.clothes_size}
                                 onChange={this.handleChange}>
                               </Input>
+                            </div>
                             </FormGroup>
                           }
 
                           <FormGroup>
-                              <Label className="padding">23) What Type Of Diet Do You Eat?</Label>
-                              <Input 
-                              type="select" 
-                              className="custom-select form-control" 
-                              name="diet_type"
-                              value={this.state.diet_to_show}
-                              onChange={this.handleChangeDietModel}>
-                                      <option value="select">select</option>
-                                      <option value="other">Other</option> 
-                                      <option value="vegan">Vegan</option>
-                                      <option value="vegetarian">Vegetarian</option>
-                                      <option value="paleo">Paleo</option>
-                                      <option value="low carb/high fat">Low carb/High fat</option>
-                                      <option value="high carb">High Carb</option>
-                                      <option value="">None</option>
-                                      
-                              </Input>
+                              <Label className="padding">23. What Type Of Diet Do You Eat?</Label>
+                                  <div className="input1">
+                                      <Input 
+                                      type="select" 
+                                      className="custom-select form-control" 
+                                      name="diet_type"
+                                      value={this.state.diet_to_show}
+                                      onChange={this.handleChangeDietModel}>
+                                              <option value="select">select</option>
+                                              <option value="other">Other</option> 
+                                              <option value="vegan">Vegan</option>
+                                              <option value="vegetarian">Vegetarian</option>
+                                              <option value="paleo">Paleo</option>
+                                              <option value="low carb/high fat">Low carb/High fat</option>
+                                              <option value="high carb">High Carb</option>
+                                              <option value="">None</option>
+                                              
+                                      </Input>
+                                  </div>
                               <FormGroup id="padd"> 
                                {this.renderDietType()}
                                </FormGroup>
@@ -753,17 +799,19 @@ class UserInputs extends React.Component{
                         
 
                            <FormGroup>     
-                            <Label className="padding">24) Did You Stand For 3 Hours or More Yesterday? </Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control"  
-                            name="stand"
-                            value={this.state.stand}
-                            onChange={this.handleChange}>
-                                <option value="">select</option>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </Input>
+                            <Label className="padding">24. Did You Stand For 3 Hours or More Yesterday? </Label>
+                              <div className="input1">
+                                <Input 
+                                type="select" 
+                                className="custom-select form-control"  
+                                name="stand"
+                                value={this.state.stand}
+                                onChange={this.handleChange}>
+                                    <option value="">select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                 </Input>
+                                </div>
                           </FormGroup>
                           </div>
 

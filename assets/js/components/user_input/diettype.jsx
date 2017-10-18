@@ -33,14 +33,16 @@ export default class DietType extends Component{
 				<Collapse isOpen={this.state.collapse}>
 				
 							<FormGroup>
-							    <Label>23.1) Hi, What Did You Take?</Label>
-								<Input 
-	                            type="FormText" 
-	                            className="form-control" 
-	                            value={this.state.diet_type}
-		                          onChange={this.handleChangeDiet}
-		                          onBlur = {this.handleOnBlurDiet} >	                      
-	                            </Input>	                        
+							    <Label>23.1 Hi, What Did You Take?</Label>
+							    	<div className="input1">
+										<Input 
+			                            type="FormText" 
+			                            className="form-control" 
+			                            value={this.state.diet_type}
+				                          onChange={this.handleChangeDiet}
+				                          onBlur = {this.handleOnBlurDiet} >	                      
+			                            </Input>
+			                        </div>
 							</FormGroup>	
 
 				</Collapse>

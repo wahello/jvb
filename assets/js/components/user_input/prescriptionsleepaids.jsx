@@ -32,14 +32,15 @@ export default class PrescriptionSleepAids extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-							<Label>16.1) Hi, What Did You Take?</Label>
+							<Label>16.1 Hi, What Did You Take?</Label>
+							  <div className="input1">
 								<Input 
 	                            type="FormText" 
 	                            className="form-control" 
 	                            value={this.state.sleep_aid_taken}
-	                          onChange={this.handleChangePrescriptionSleep} >
-	                           
+	                          onChange={this.handleChangePrescriptionSleep} >	                           
 	                            </Input>
+	                          </div>
 							</FormGroup>
 					</Collapse>
 					

@@ -85,33 +85,38 @@ export default class SmokedSubstance extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>17.1) What Did You Smoke Yesterday?</Label>
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            value={this.state.smoked_substance_to_show}
-                            onChange={this.handleChange}>
-                            	<option value="">select</option>
-                                <option value="other">Other</option>
-                                <option value="cigarettes">Cigarettes</option>
-                            </Input>  
+                            <Label>17.1 What Did You Smoke Yesterday?</Label>
+                            <div className="input1">
+	                            <Input 
+	                            type="select" 
+	                            className="custom-select form-control" 
+	                            value={this.state.smoked_substance_to_show}
+	                            onChange={this.handleChange}>
+	                            	<option value="">select</option>
+	                                <option value="other">Other</option>
+	                                <option value="cigarettes">Cigarettes</option>
+	                            </Input> 
+                            </div> 
                           </FormGroup> 
 
                         <Collapse isOpen={this.state.collapseCigarettesCount}>
 							<FormGroup>
-								<Label>17.2) How Many Cigarettes You Have Smoked?</Label>
-								<Input 
-		                            type="select" 
-		                            className="custom-select form-control" 
-		                            value={this.state.cigarettes_count}
-		                            onChange={this.handleChangeCigarettes}>
-	                            {this.createCigarettesDropdown(60)}
-                            </Input> 
+								<Label>17.2 How Many Cigarettes You Have Smoked?</Label>
+								<div className="input1">
+									<Input 
+			                            type="select" 
+			                            className="custom-select form-control" 
+			                            value={this.state.cigarettes_count}
+			                            onChange={this.handleChangeCigarettes}>
+		                            {this.createCigarettesDropdown(60)}
+	                            </Input>
+                            </div> 
 							</FormGroup>
 						</Collapse>
 
 						<Collapse isOpen={this.state.collapseOther}>
 							<FormGroup>
+							<div className="input1">
 								<Input 
 	                            type="textarea" 
 	                            className="form-control" 
@@ -119,6 +124,7 @@ export default class SmokedSubstance extends Component{
 	                            placeholder="Please type in..."
 	                            value={this.state.smoked_substance_list}
 	                            onChange={this.handleChange} />
+	                            </div>
 							</FormGroup>
 						</Collapse>
 

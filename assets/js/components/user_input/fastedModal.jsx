@@ -32,13 +32,15 @@ export default class FastedModal extends Component{
 			
 					<Collapse isOpen={this.state.collapse}>			
 						<FormGroup>   
-                            <Label>9.1) What Food Eaten Before Workout?</Label>
-                            <Input 
-	                            type="textarea" 
-	                            className="custom-select form-control" 
-	                            value={this.state.food_ate_before_workout}
-	                            onChange={this.handleChange}
-	                            placeholder="Apple, riceballs..." /> 
+                            <Label>9.1 What Food Eaten Before Workout?</Label>
+                            	<div className="input1">
+		                            <Input 
+			                            type="textarea" 
+			                            className="custom-select form-control" 
+			                            value={this.state.food_ate_before_workout}
+			                            onChange={this.handleChange}
+			                            placeholder="Apple, riceballs..." /> 
+			                    </div>        	
                           </FormGroup> 
 					</Collapse>		
 				

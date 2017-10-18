@@ -36,7 +36,7 @@ export default class WorkoutEffortModal extends Component{
 		return(
 			<div>
 					
-				<Label>4.1) Was Any Portion Of Your Workout Hard?</Label>
+				<Label>4.1 Was Any Portion Of Your Workout Hard?</Label>
 				<FormGroup check>
 					<Label check>
 						<Input type="radio" name="is_workout_hard"
@@ -57,24 +57,26 @@ export default class WorkoutEffortModal extends Component{
 
 				<Collapse isOpen={this.state.is_workout_hard === 'yes'}>
 					<FormGroup>
-						<Label className="padding">4.2) What Was Your Average Effort Level For The Hard Part Of Your Workout?</Label>
-						<Input 
-                        type="select" 
-                        className="form-control custom-select" 
-                        value={this.state.workout_effort_hard_portion}
-                        onChange={this.handleChangeHardWorkoutEffort} >
-                              <option value="select">select</option>
-                              <option value="1">1</option>
-                              <option value="2">2</option>
-                              <option value="3">3</option>
-                              <option value="4">4</option>
-                              <option value="5">5</option>
-                              <option value="6">6</option>
-                              <option value="7">7</option>
-                              <option value="8">8</option>
-                              <option value="9">9</option>
-                              <option value="10">10</option>                            
-                        </Input>
+						<Label className="padding">4.2 What Was Your Average Effort Level For The Hard Part Of Your Workout?</Label>
+						<div className="input1">
+							<Input 
+	                        type="select" 
+	                        className="form-control custom-select" 
+	                        value={this.state.workout_effort_hard_portion}
+	                        onChange={this.handleChangeHardWorkoutEffort} >
+	                              <option value="select">select</option>
+	                              <option value="1">1</option>
+	                              <option value="2">2</option>
+	                              <option value="3">3</option>
+	                              <option value="4">4</option>
+	                              <option value="5">5</option>
+	                              <option value="6">6</option>
+	                              <option value="7">7</option>
+	                              <option value="8">8</option>
+	                              <option value="9">9</option>
+	                              <option value="10">10</option>                            
+	                        </Input>
+                        </div>
 					</FormGroup>
 				</Collapse>
 			</div>

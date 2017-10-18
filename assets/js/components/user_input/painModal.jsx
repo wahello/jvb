@@ -87,27 +87,31 @@ export default class PainModal extends Component{
 		return(
 			<div>
 				<FormGroup>   
-                    <Label>5.1) Where Did You Have Pain/Twinges?</Label>
-                    <Select
-							closeOnSelect={!this.state.stayOpen}
-							disabled={this.state.disabled}
-							multi
-							onChange={this.handleSelectChange}
-							options={option}
-							simpleValue
-							value={this.state.pain_area}
-					/> 
+                    <Label>5.1 Where Did You Have Pain/Twinges?</Label>
+						<div className="input1">
+		                    <Select
+									closeOnSelect={!this.state.stayOpen}
+									disabled={this.state.disabled}
+									multi
+									onChange={this.handleSelectChange}
+									options={option}
+									simpleValue
+									value={this.state.pain_area}
+							/> 
+						</div>
                   </FormGroup> 
 
 				<Collapse isOpen={this.state.collapse}>
 					<FormGroup>
-						<Label>5.2) Please Write Where You Have Pain/Twinges</Label>
-						<Input
-						type="text"
-						className="form-control"
-						placeholder="Write where you have pain here.."
-						value={this.state.pain_area}
-						onChange={this.handleChange} />
+						<Label>5.2 Please Write Where You Have Pain/Twinges</Label>
+							<div className="input1">
+								<Input
+								type="text"
+								className="form-control"
+								placeholder="Write where you have pain here.."
+								value={this.state.pain_area}
+								onChange={this.handleChange} />
+							</div>
 					</FormGroup>
 				</Collapse>
 			</div>
