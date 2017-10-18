@@ -31,13 +31,15 @@ export default class UnprocesedFoodModal extends Component{
 			<div>
 				<Collapse isOpen={this.state.collapse}>				
 						<FormGroup>   
-                            <Label>14.1) What Unprocessed Food Were Consumed?</Label>
-                            <Input 
-	                            type="textarea" 
-	                            className="custom-select form-control" 
-	                            value={this.state.unprocessed_food_list}
-	                            onChange={this.handleChange}
-	                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." /> 
+                            <Label>14.1 What Unprocessed Food Were Consumed?</Label>
+								<div className="input1">
+		                            <Input 
+			                            type="textarea" 
+			                            className="custom-select form-control" 
+			                            value={this.state.unprocessed_food_list}
+			                            onChange={this.handleChange}
+			                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
+		                        </div> 
                           </FormGroup> 			
 				</Collapse>
 			</div>

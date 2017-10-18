@@ -32,14 +32,15 @@ export default class PrescriptionMedication extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-								<Label>18.1) Hi, What Did You Take?</Label>
-								<Input 
-	                            type="FormText" 
-	                            className="form-control" 
-	                            value={this.state.medications_taken_list}
-	                          onChange={this.handleChangeMedications} >
-	                           
-	                            </Input>
+								<Label>18.1 Hi, What Did You Take?</Label>
+									<div className="input1">
+										<Input 
+			                            type="FormText" 
+			                            className="form-control" 
+			                            value={this.state.medications_taken_list}
+			                          onChange={this.handleChangeMedications} >			                           
+			                            </Input>
+			                        </div>    
 							</FormGroup>
 					</Collapse>
 					

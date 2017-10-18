@@ -32,13 +32,15 @@ export default class SickModal extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>20.1) Please Tell Us Your Illness</Label>
-                            <Input 
-	                            type="textarea" 
-	                            className="custom-select form-control" 
-	                            value={this.state.sickness}
-	                            onChange={this.handleChange}
-	                            placeholder="cold, since 1 week..." /> 
+                            <Label>20.1 Please Tell Us Your Illness</Label>
+                           	  <div className="input1">
+	                            <Input 
+		                            type="textarea" 
+		                            className="custom-select form-control" 
+		                            value={this.state.sickness}
+		                            onChange={this.handleChange}
+		                            placeholder="cold, since 1 week..." /> 
+		                      </div>
                           </FormGroup> 
 					</Collapse>
 			</div>
