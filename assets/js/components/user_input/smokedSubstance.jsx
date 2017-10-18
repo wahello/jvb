@@ -10,16 +10,29 @@ export default class SmokedSubstance extends Component{
 		let pat = /^cigarettes/i;
 		let isCigarettes = pat.test(smoked_substance_list);
 		let cigarettes_count = '';
+		let smoked_substance_to_show = '';
 
 		if (isCigarettes){
-			let pattern = /^cigarettes\((\d+)\)$/i;
-			cigarettes_count = pattern.exec(smoked_substance_list)[1];
+			if(smoked_substance_list === 'cigarettes(60+)')
+				cigarettes_count = "60+";
+			else{
+				let pattern = /^cigarettes\((\d+)\)$/i;
+				cigarettes_count = pattern.exec(smoked_substance_list)[1];
+			}
 			smoked_substance_list = 'cigarettes';
 		}
 
+		if(isCigarettes)
+			smoked_substance_to_show = 'cigarettes';
+		else if(smoked_substance_list === '')
+			smoked_substance_to_show = '';
+		else
+			smoked_substance_to_show = 'other';
+
+
 		this.state = {
 			collapse:true,
-			smoked_substance_to_show:isCigarettes ? 'cigarettes' : 'other',
+			smoked_substance_to_show:smoked_substance_to_show,
 			smoked_substance_list:smoked_substance_list,
 			cigarettes_count:cigarettes_count,
 			collapseOther: (smoked_substance_list !== '' && smoked_substance_list !== 'cigarettes')? true : false,
