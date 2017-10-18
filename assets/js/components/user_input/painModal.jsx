@@ -51,11 +51,17 @@ export default class PainModal extends Component{
 			}
 		}
 
+		let pain_area_to_show = area;
+		if(other)
+			pain_area_to_show = 'other'
+
+
 		this.state = {
 			collapse:other ? true : false,	
 			disabled: false,
 			stayOpen: true,
-			pain_area: area !== '' ? area.split(',') : []
+			pain_area: area,
+			pain_area_to_show: pain_area_to_show
 		};
 		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -69,14 +75,23 @@ export default class PainModal extends Component{
 		 });
 	}
 	handleSelectChange(value) {
+
 		if (value === 'other'){
 		    this.setState({
-		    	pain_area: value,
+		    	pain_area_to_show: value,
 		    	collapse:true
 		    });
-		}else{
+		}else if(value === ''){
 			this.setState({
-		    	pain_area:value
+				pain_area:'',
+				pain_area_to_show:'',
+				collapse:false				
+			});
+		}
+		else{
+			this.setState({
+		    	pain_area:value,
+		    	pain_area_to_show:value
 		    },()=>{
 		    	this.props.updateState(this.state.pain_area)
 		    });
@@ -95,7 +110,7 @@ export default class PainModal extends Component{
 							onChange={this.handleSelectChange}
 							options={option}
 							simpleValue
-							value={this.state.pain_area}
+							value={this.state.pain_area_to_show}
 					/> 
                   </FormGroup> 
 
