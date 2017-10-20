@@ -16,6 +16,14 @@ export default class SickModal extends Component{
 		
 	}
 
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.sickness !== this.props.sickness) {
+    	  	this.setState({
+    	  		sickness:nextProps.sickness
+    	  	});
+    	}
+  	}
+
 	handleChange(event){
 		const value = event.target.value;
 	    this.setState({

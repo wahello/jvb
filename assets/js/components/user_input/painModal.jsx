@@ -32,10 +32,8 @@ const option=[
 
 export default class PainModal extends Component{
 
-	constructor(props){
-		super(props);
+	isOtherPainArea(area){
 		let other = true;
-		const area = this.props.pain_area;
 		const area_list = area.split(',');
 
 		if(area === ""){
@@ -50,7 +48,13 @@ export default class PainModal extends Component{
 				}
 			}
 		}
+		return other;
+	}
 
+	constructor(props){
+		super(props);
+		let area = this.props.pain_area;
+		let other = this.isOtherPainArea(area);
 		let pain_area_to_show = area;
 		if(other)
 			pain_area_to_show = 'other'
@@ -66,6 +70,22 @@ export default class PainModal extends Component{
 		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
+
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.pain_area !== this.props.pain_area) {
+
+	  	  	let other = this.isOtherPainArea(nextProps.pain_area);
+			let pain_area_to_show = nextProps.pain_area;
+			if(other)
+				pain_area_to_show = 'other'
+    	  	this.setState({
+    	  		pain_area: nextProps.pain_area,
+    	  		collapse:other ? true : false,
+    	  		pain_area_to_show:pain_area_to_show
+    	  	});
+    	}
+  	}
+
 	handleChange(event){
 		const value = event.target.value;
 		this.setState({

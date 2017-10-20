@@ -16,6 +16,15 @@ export default class PrescriptionMedication extends Component{
 
 	}
 
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.medications_taken_list !== this.props.medications_taken_list) {
+    	  	this.setState({
+    	  		medications_taken_list:nextProps.medications_taken_list
+    	  	});
+    	}
+  	}
+
+
 	handleChangeMedications(event){
 		const value = event.target.value;
 		this.setState({

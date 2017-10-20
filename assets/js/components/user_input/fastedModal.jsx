@@ -12,9 +12,16 @@ export default class FastedModal extends Component{
 		};
 		
 		this.handleChange = this.handleChange.bind(this);
-		
-
 	}
+
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.food_ate_before_workout !== this.props.food_ate_before_workout) {
+
+    	  	this.setState({
+    	  		food_ate_before_workout:nextProps.food_ate_before_workout
+    	  	});
+    	}
+  	}
 
 	handleChange(event){
 		const value = event.target.value;

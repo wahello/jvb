@@ -16,6 +16,17 @@ export default class WorkoutEffortModal extends Component{
 
 	}
 
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.workout_effort_hard_portion !== this.props.workout_effort_hard_portion) {
+  	  		const effort = nextProps.workout_effort_hard_portion;
+			const is_workout_hard = effort !== '' ? 'yes' : 'no';
+    	  	this.setState({
+    	  		is_workout_hard:is_workout_hard,
+				workout_effort_hard_portion:effort
+    	  	});
+    	}
+  	}
+
 	handleChangeHardWorkoutEffort(event){
 		const value = event.target.value;
 		this.setState({
@@ -27,9 +38,18 @@ export default class WorkoutEffortModal extends Component{
 
 	handleRadioChange(event){
 		const value=event.target.value;
-	    this.setState({
-	    	is_workout_hard: value
-	    });
+		if(value === 'no'){
+		    this.setState({
+		    	is_workout_hard: value,
+		    	workout_effort_hard_portion:''
+		    },()=>{
+			this.props.updateState(this.state.workout_effort_hard_portion);
+		});
+		}else{
+			this.setState({
+				is_workout_hard: value
+			});
+		}
 	}
 
 	render(){

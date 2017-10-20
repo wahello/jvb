@@ -15,6 +15,14 @@ export default class UnprocesedFoodModal extends Component{
 		
 	}
 
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) {
+    	  	this.setState({
+    	  		unprocessed_food_list:nextProps.unprocessed_food_list
+    	  	});
+    	}
+  	}
+
 	handleChange(event){
 		const value = event.target.value;
 	    this.setState({

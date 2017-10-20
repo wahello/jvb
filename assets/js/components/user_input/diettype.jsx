@@ -16,6 +16,16 @@ export default class DietType extends Component{
 		
 	}
 
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.diet_type !== this.props.diet_type) {
+
+    	  	this.setState({
+    	  		diet_type:nextProps.diet_type,
+				collapse:nextProps.diet_type !== '' ? true : false,	
+    	  	});
+    	}
+  	}
+
 	handleChangeDiet(event){
 		const value = event.target.value;  
 		this.setState({

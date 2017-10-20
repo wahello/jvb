@@ -4,45 +4,60 @@ import {Button,FormGroup, Label, Input, FormText, className, Modal,
 
 export default class SmokedSubstance extends Component{
 
-	constructor(props){
-		super(props);
-		let smoked_substance_list = this.props.smoked_substance_list;
+	getStateObj(item){
 		let pat = /^cigarettes/i;
-		let isCigarettes = pat.test(smoked_substance_list);
+		let isCigarettes = pat.test(item);
 		let cigarettes_count = '';
 		let smoked_substance_to_show = '';
 
 		if (isCigarettes){
-			if(smoked_substance_list === 'cigarettes(60+)')
+			if(item === 'cigarettes(60+)')
 				cigarettes_count = "60+";
 			else{
 				let pattern = /^cigarettes\((\d+)\)$/i;
-				cigarettes_count = pattern.exec(smoked_substance_list)[1];
+				cigarettes_count = pattern.exec(item)[1];
 			}
-			smoked_substance_list = 'cigarettes';
+			item = 'cigarettes';
 		}
 
 		if(isCigarettes)
 			smoked_substance_to_show = 'cigarettes';
-		else if(smoked_substance_list === '')
+		else if(item === '')
 			smoked_substance_to_show = '';
 		else
 			smoked_substance_to_show = 'other';
 
-
-		this.state = {
+		let stateObj = {
 			collapse:true,
 			smoked_substance_to_show:smoked_substance_to_show,
-			smoked_substance_list:smoked_substance_list,
+			smoked_substance_list:item,
 			cigarettes_count:cigarettes_count,
-			collapseOther: (smoked_substance_list !== '' && smoked_substance_list !== 'cigarettes')? true : false,
+			collapseOther: (item !== '' && item !== 'cigarettes')? true : false,
 			collapseCigarettesCount: isCigarettes ? true : false
-		};
-		
+		}
+
+		return stateObj;
+	}
+
+	constructor(props){
+		super(props);
+		let smoked_substance_list = this.props.smoked_substance_list;
+		let stateObj = this.getStateObj(smoked_substance_list);
+		this.state = stateObj;
 		this.handleChange = this.handleChange.bind(this);
 		this.handleChangeCigarettes = this.handleChangeCigarettes.bind(this);		
 
 	}
+
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.smoked_substance_list !== this.props.smoked_substance_list) {
+  	  		let smoked_substance_list = nextProps.smoked_substance_list;
+			let stateObj = this.getStateObj(smoked_substance_list);
+    	  	this.setState({
+    	  		...stateObj
+    	  	});
+    	}
+  	}
 
 	handleChange(event){
 		const value = event.target.value;
