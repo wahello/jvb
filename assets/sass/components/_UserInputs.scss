@@ -4,17 +4,19 @@ body{
 	background-size: cover;
 	font-size:16px;
 }
+
 #user-inputs{
-    padding-top: 80px;
 	display: flex;
 	align-items: center;
 	background-size: cover;
-	color: white;
+	color: rgba(0,0,0,0.5);
+	padding: 30px;
 }
 
 #user-inputs .head{
 	text-align: center;
 	padding: 50px;
+	color: gray;
 }
 #user-inputs .user-inputs-form{
 	background-color:rgba(20,10,15,0.5);
@@ -44,16 +46,9 @@ margin-top: 46px;
    #user-inputs .user-inputs-form{
 	background-color:rgba(20,10,15,0.5);
 	border-radius: 20px;
-    padding: 10px;
     align-content: center;
+    padding:10px;
 
-}
-form.user-inputs-form.bootstrap_validator{
-    margin-left: 180px;
-  }
-#user-inputs h2.head{
-    margin-left: 180px;
-}
 }
 .input{
 	padding:0px 17px;
@@ -81,15 +76,60 @@ h2{
 	padding-top:20px;
 }
 #hours{
-	width:420px;
+	
 	float:left;
 	margin-left: 10px;
 }
 #minutes{
-	width:420px;
+	
 	float:left;
 	margin-left: 10px;
 
+}
+
+.dark{
+	font-size:12px;
+	align-items: center;
+	text-align: center;
+
+}
+#padd{
+	padding-top:17px;
+}
+
+}
+.input{
+	padding:0px 17px;
+}
+.input1{
+	padding:0px 17px 0px 23px;
+}
+#navlink{
+	color:black;
+}
+.nav1{
+	padding: 10px;
+}
+.btn2{
+	padding:15px 0px 0px 0px;  
+}
+strong{
+	color:#212F3D;
+	font-size:16px;
+}
+h2{
+	text-align:center;
+	padding-top:8px;
+}
+
+.food h2{
+	text-align:center;
+	padding-top:20px;
+}
+
+.col{
+	color:black;
+	background-color: red;
 }
 
 .dark{

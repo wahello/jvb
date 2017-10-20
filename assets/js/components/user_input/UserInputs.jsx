@@ -261,7 +261,7 @@ class UserInputs extends React.Component{
                     <div className="col-md-8 col-lg-10 col-sm-12">
 
                     
-                      <div className="col-sm-2">
+                      <div className="col-sm-2 col-sm-1">
                            <CalendarWidget onDaySelect={this.processDate}/>,
                       </div>
                         <h2 className="head">Daily User Inputs Report</h2>

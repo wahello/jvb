@@ -160,7 +160,7 @@ componentDidMount(){
             <div className="container">
              <NavbarMenu/>
               <div className="col-lg-12 col-md-6 col-sm-3">
-              <div className="row">
+              <div className="row justify-content-center">
                  <div className="tbcw">
                 <h2>Weekly Summary</h2>
                </div>

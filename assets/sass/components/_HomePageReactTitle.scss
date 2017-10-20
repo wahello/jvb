@@ -3,15 +3,15 @@ html, body {
   height: 100%;
   width: 100%;
 }
-body {
-  padding: 2rem;
-}
 
+body{
+	padding:10px 0px;
+}
 .container .row {
   margin-bottom: 1rem;
 }
 
-.container .row > [class^="col-"] {
+.top-content .container .row > [class^="col-"] {
   padding-top: .75rem;
   padding-bottom: .75rem;
   background-color: #E5EDF5;
