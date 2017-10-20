@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router'
 import { Container, Select, Option, option, Row, Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
-import Navbar from '../components/navbar';
+import NavbarMenu from './navbar';
 import Iframe from 'react-iframe';
 
 class ServiceConnect extends React.Component {
@@ -17,7 +17,7 @@ class ServiceConnect extends React.Component {
   return (
     <div>
   	<Container>
-
+  <NavbarMenu/>
       <br/>
       <br/>
       <br/>
