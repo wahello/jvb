@@ -60,9 +60,16 @@ export function handleChangeUnprocessedFood(event){
   const value = target.value;
   const name = target.name;
 
-  this.setState({
-	prcnt_unprocessed_food:value
-  });
+  if(value > 0){
+    this.setState({
+    	prcnt_unprocessed_food:value
+    });
+  }else{
+    this.setState({
+      prcnt_unprocessed_food:value,
+      unprocessed_food_list:''
+    });
+  }
 }
 
 
@@ -71,19 +78,32 @@ export function handleChangeSick(event){
   const value = target.value;
   const name = target.name;
 
-  this.setState({
-	sick:value
-  });
+  if(value === 'yes'){
+    this.setState({
+  	sick:value
+    });
+  }else{
+    this.setState({
+      sick:value,
+      sickness:''
+    })
+  }
 }
 
 export function handleChangeSleepAids(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
-
-  this.setState({
-	prescription_sleep_aids:value
-  });
+  if(value === 'yes'){
+    this.setState({
+  	prescription_sleep_aids:value
+    });
+  }else{
+    this.setState({
+      prescription_sleep_aids:value,
+      sleep_aid_taken:''
+    });
+  }
 }
 
 export function handleChangePrescription(event){
@@ -91,9 +111,16 @@ export function handleChangePrescription(event){
   const value = target.value;
   const name = target.name;
 
-  this.setState({
-	medications:value
-  });
+  if(value==='yes'){
+    this.setState({
+  	 medications:value
+    });
+  }else{
+    this.setState({
+      medications:value,
+      medications_taken_list:''
+    })
+  }
 }
 
 export function handleChangeFasted(event){
@@ -101,9 +128,16 @@ export function handleChangeFasted(event){
   const value = target.value;
   const name = target.name;
 
-  this.setState({
-	fasted:value
-  });
+  if(value === 'yes'){
+    this.setState({
+  	  fasted:value,
+      food_ate_before_workout:''
+    });
+  }else{
+    this.setState({
+      fasted:value
+    });
+  }
 }
 
 export function handleChangeDietModel(event){
@@ -129,7 +163,14 @@ export function handleChangeSmokeSubstance(event){
   const value = target.value;
   const name = target.name;
 
-  this.setState({
-	smoke_substances:value
-  });
+  if(value === 'yes'){
+    this.setState({
+  	smoke_substances:value
+    });
+  }else{
+    this.setState({
+      smoke_substances:value,
+      smoked_substance_list:''
+    });
+  }
 }

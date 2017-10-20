@@ -112,7 +112,7 @@ class UserInputs extends React.Component{
         if(data.data.optional_input.type_of_diet_eaten === diet)
           other_diet = false;
       }
-      console.log("i'm here with diet:",other_diet)
+      
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
@@ -201,7 +201,7 @@ class UserInputs extends React.Component{
       const yesterday = new Date(today.getFullYear(),
                                 today.getMonth(),
                                 today.getDate()-1);
-      const clone = true;
+      const clone = false;
       userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
     }
 

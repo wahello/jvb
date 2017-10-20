@@ -10,12 +10,17 @@ export default class PrescriptionSleepAids extends Component{
 			sleep_aid_taken:sleep_aid_taken,
 			collapse:true
 		}
-
-		
 		this.handleChangePrescriptionSleep = this.handleChangePrescriptionSleep.bind(this);
-	
 	}
 
+	componentWillReceiveProps(nextProps) {
+  	  if(nextProps.sleep_aid_taken !== this.props.sleep_aid_taken) {
+    	  	this.setState({
+    	  		sleep_aid_taken:nextProps.sleep_aid_taken
+    	  	});
+    	}
+  	}
+  	
 	handleChangePrescriptionSleep(event){
 		const value = event.target.value;
 		this.setState({
