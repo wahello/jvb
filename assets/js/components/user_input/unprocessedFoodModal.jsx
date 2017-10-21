@@ -39,7 +39,7 @@ export default class UnprocesedFoodModal extends Component{
 			<div>
 				<Collapse isOpen={this.state.collapse}>				
 						<FormGroup>   
-                            <Label>14.1 What Unprocessed Food Were Consumed?</Label>
+                            <Label>4.1 What Unprocessed Food Were Consumed?</Label>
 								<div className="input1">
 		                            <Input 
 			                            type="textarea" 

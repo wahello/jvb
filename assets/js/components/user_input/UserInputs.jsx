@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-
+import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
-
 import { Container, Select, option, Option, Row, Col, Button, Form,
          FormGroup, Label, Input, FormText, className, Modal,
-          ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink } from 'reactstrap';
+          ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
+         NavbarBrand, } from 'reactstrap';
 
 import * as handlers from './handlers';
 import * as renderers from './renderers';
@@ -23,6 +23,7 @@ class UserInputs extends React.Component{
         selected_date:new Date(),
         fetched_user_input_created_at:'',
         update_form:false,
+        isOpen: false,
         gender:'M',
         diet_to_show:'',
 
@@ -102,6 +103,7 @@ class UserInputs extends React.Component{
       this.onProfileSuccessFetch = this.onProfileSuccessFetch.bind(this);
       this.onNoWorkoutToday = this.onNoWorkoutToday.bind(this);
       this.fetchYesterdayData = this.fetchYesterdayData.bind(this); 
+      this.toggle = this.toggle.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -250,6 +252,12 @@ class UserInputs extends React.Component{
     return elements;
   }
 
+   toggle() {
+    this.setState({
+      isOpen: !this.state.isOpen,
+     
+    });
+  }
 
     render(){
 
@@ -261,31 +269,42 @@ class UserInputs extends React.Component{
                     <div className="col-md-8 col-lg-10 col-sm-12">
 
                     
-                      <div className="col-sm-2 col-sm-1">
-                           <CalendarWidget onDaySelect={this.processDate}/>,
-                      </div>
+                     
                         <h2 className="head">Daily User Inputs Report</h2>
 
-                         <Nav className="nav1">
-                              <NavItem>
-                                <NavLink id="navlink" href="#workout">Workout</NavLink>
-                              </NavItem>
-                              <NavItem>
-                                <NavLink id="navlink" href="#sleep">Sleep</NavLink>
-                              </NavItem>
-                              <NavItem>
-                                <NavLink id="navlink" href="#food">Food/Drink/Other</NavLink>
-                              </NavItem>
-                              <NavItem>
-                                <NavLink id="navlink" href="#smoking">Sleep Aids/Smoking/Medications/Supplements Inputs</NavLink>
-                              </NavItem>
-                              <NavItem>
-                                <NavLink id="navlink" href="#stress">Stress/Illness Inputs</NavLink>
-                              </NavItem>
-                              <NavItem>
-                                <NavLink id="navlink" href="#daily">Daily User Inputs (optional)</NavLink>
-                              </NavItem>
-                         </Nav>
+                         <div className="row justify-content-center">
+                         <header>
+                          <div className="col-md-8 col-lg-12 col-sm-12"> 
+                                                 
+                           <Navbar light toggleable  className="navbar navbar-expand-sm  navbar-fixed ">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
+                                <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
+                                  <Nav className="nav navbar-nav" navbar>
+
+                                          <NavItem>
+                                          <abbr  id="abbri"  title="Workout"><NavLink id="navlink" href="#workout">Workout</NavLink></abbr>
+                                        </NavItem>
+                                        <NavItem>
+                                          <abbr  id="abbri"  title="sleep"><NavLink id="navlink" href="#sleep">Sleep</NavLink></abbr>
+                                        </NavItem>
+                                        <NavItem>
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs"><NavLink id="navlink" href="#food">Nutrition</NavLink></abbr>
+                                        </NavItem>                          
+                                        <NavItem>
+                                          <abbr  id="abbri"  title="Stress/Illness Inputs"><NavLink id="navlink" href="#stress">Stress</NavLink></abbr>
+                                        </NavItem>
+                                        <NavItem>
+                                          <abbr  id="abbri"  title="Extra Inputs"><NavLink id="navlink" href="#daily">Extra Inputs</NavLink></abbr>
+                                       </NavItem>                                   
+                                  </Nav>
+                                </Collapse>
+                           </Navbar>
+                         
+                           </div>
+                           </header>
+                           </div>
+
+                           
                         <div className="row justify-content-center">
                        
                         <div className="btn2">
@@ -309,60 +328,78 @@ class UserInputs extends React.Component{
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
-                            <div className="input">
-                            <Input 
-                            type="select" 
-                            className="custom-select form-control" 
-                            name="workout"
-                            value={this.state.workout}
-                            onChange={this.handleChange}>
-                                <option value="">select</option>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                                <option value="not yet">Not Yet</option>
-                            </Input> 
-                            </div> 
+                            <div className="input"> 
+                            <Label check>
+                                <Input type="radio" name="workout"
+                                  value="yes"
+                                  checked={this.state.workout === 'yes'}
+                                  onChange={this.handleChange}/>{' '}
+                                Yes
+                            </Label> 
+                            <Label check>
+                                <Input type="radio" name="workout" 
+                                  value="no"
+                                  checked={this.state.workout === 'no'}
+                                  onChange={this.handleChange}/>{' '}
+                                No
+                            </Label>
+                             <Label check>
+                                <Input type="radio" name="workout" 
+                                  value="not yet"
+                                  checked={this.state.workout === 'not yet'}
+                                  onChange={this.handleChange}/>{' '}
+                                Not Yet
+                            </Label>
+                           </div> 
                           </FormGroup> 
 
                           { this.state.workout == "yes" &&
                           <FormGroup>   
-                            <Label className="padding">2. Was Your Workout Easy or Hard?</Label>
+                            <Label className="padding">1.2 Was Your Workout Easy or Hard?</Label>
                              <div className="input">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control" 
-                                name="workout_easy"
-                                value={this.state.workout_easy}
-                                onChange={this.handleChangeWorkout}>
-                                    <option value="">select</option>
-                                    <option value="easy">Easy</option>
-                                    <option value="hard">Hard</option>
-                                </Input> 
+                            <Input 
+                                  type="select" 
+                                  className="custom-select form-control" 
+                                  name="workout_easy"
+                                  value={this.state.workout_easy}
+                                  onChange={this.handleChangeWorkout} >
+                                        <option value="">select</option>                                 
+                                        <option value="easy">Easy</option>
+                                        <option value="hard">Hard</option>
+                                       
+                                  </Input>
                               </div> 
                           </FormGroup> 
                         }
 
                         { this.state.workout == "yes" &&
                         <FormGroup>   
-                            <Label className="padding">3. Was Your Workout Today Enjoyable?</Label>
+                            <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
                             <div className="input">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control" 
-                                name="workout_enjoyable"
-                                value={this.state.workout_enjoyable}
-                                onChange={this.handleChange}>
-                                      <option value="">select</option>                               
-                                      <option value="yes">Yes</option>
-                                      <option value="no">No</option>
-                                </Input>
+
+                                 <Label check>
+                                    <Input type="radio" name="workout_enjoyable" 
+                                    value="yes"
+                                    checked={this.state.workout_enjoyable === 'yes'}
+                                    onChange={this.handleChange}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="workout_enjoyable" 
+                                        value="no"
+                                        checked={this.state.workout_enjoyable === 'no'}
+                                        onChange={this.handleChange}/>{' '}
+                                      No
+                                </Label>
+
                             </div>  
                         </FormGroup>
                       }
 
                           { this.state.workout == "yes" &&
                           <FormGroup>   
-                            <Label className="padding">4. Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
+                            <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
                               <div className="input">
                                   <Input 
                                   type="select" 
@@ -393,19 +430,24 @@ class UserInputs extends React.Component{
 
                           { this.state.workout == "yes" &&
                           <FormGroup>
-                            <Label className="padding">5. Did You Have Any Pain or Twinges During or After Your Workout?</Label>
+                            <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?</Label>
                                 <div className="input">
-                                    <Input 
-                                    type="select" 
-                                    className="custom-select form-control" 
-                                    id="pain_select" 
-                                    name="pain"
-                                    value={this.state.pain}
-                                    onChange={this.handleChangePain}>
-                                        <option value="">select</option>                              
-                                        <option value="yes">Yes</option>
-                                        <option value="no">No</option>
-                                    </Input>
+                                   
+                                     <Label check>
+                                    <Input type="radio" name="pain" 
+                                    value="yes"
+                                    checked={this.state.pain === 'yes'}
+                                    onChange={this.handleChangePain}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="pain" 
+                                        value="no"
+                                        checked={this.state.pain === 'no'}
+                                        onChange={this.handleChangePain}/>{' '}
+                                      No
+                                </Label>
                                 </div>
                             <FormGroup id="padd"> 
                             {this.renderPainModal()}
@@ -415,7 +457,7 @@ class UserInputs extends React.Component{
 
                           { this.state.workout == "yes" &&
                           <FormGroup>    
-                            <Label className="padding">6. Water Consumed During Workout (Ounces)</Label>
+                            <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
                             <div className="input">
                                 <Input type="select" 
                                        className="custom-select form-control" 
@@ -431,7 +473,7 @@ class UserInputs extends React.Component{
 
                           { this.state.workout == "yes" &&     
                           <FormGroup>      
-                            <Label className="padding">7. Tablespoons of Chia Seeds Consumed During Workout?</Label>
+                            <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
                                 <div className="input">
                                     <Input 
                                     type="select" 
@@ -448,7 +490,7 @@ class UserInputs extends React.Component{
 
                          { this.state.workout == "yes" &&     
                           <FormGroup>
-                            <Label className="padding">8. What % of Your Workout Did you breathe in and out through Your nose?</Label>
+                            <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?</Label>
                                 <div className="input">
                                     <Input type="select"
                                      className="form-control custom-select" 
@@ -464,18 +506,24 @@ class UserInputs extends React.Component{
                         }
                            { this.state.workout == "yes" &&
                            <FormGroup>
-                            <Label className="padding">9. Were You Fasted During Your Workout? </Label>
+                            <Label className="padding">1.9 Were You Fasted During Your Workout? </Label>
                               <div className="input">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control" 
-                                name="fasted"
-                                value={this.state.fasted}
-                                onChange={this.handleChangeFasted}>
-                                    <option value="">select</option>                                   
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                                </Input>
+                                
+                                  <Label check>
+                                    <Input type="radio" name="fasted" 
+                                    value="yes"
+                                    checked={this.state.fasted === 'yes'}
+                                    onChange={this.handleChangeFasted}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="fasted" 
+                                        value="no"
+                                        checked={this.state.fasted === 'no'}
+                                        onChange={this.handleChangeFasted}/>{' '}
+                                      No
+                                </Label>
                               </div>
                                  <FormGroup id="padd">
                                    {this.renderFasted()}
@@ -488,7 +536,7 @@ class UserInputs extends React.Component{
 
                            { this.state.workout == "yes" &&     
                           <FormGroup>      
-                            <Label className="padding">10. General Workout Comments</Label>
+                            <Label className="padding">1.10 General Workout Comments</Label>
                               <div className="input1">
                                    <Input type="textarea" name="workout_comment" 
                                    placeholder="please leave a comment" 
@@ -502,7 +550,7 @@ class UserInputs extends React.Component{
 
                          { this.state.workout == "yes" &&
                           <FormGroup>      
-                            <Label className="padding">11. Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             <div className="input1">
                                <Input type="text" name="calories" 
                                value={this.state.calories}
@@ -513,7 +561,7 @@ class UserInputs extends React.Component{
 
                         { this.state.workout == "yes" &&
                           <FormGroup>      
-                            <Label className="padding">12. What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
                             <div className="input1">
                                <Input type="textarea" name="calories_item"
                                 rows="5" cols="5" 
@@ -531,7 +579,7 @@ class UserInputs extends React.Component{
                           
                            <FormGroup>
                           
-                            <Label className="padding">13. How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
+                            <Label className="padding">2. How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
                            
                              <div className="col-xs-6">
                            
@@ -545,7 +593,7 @@ class UserInputs extends React.Component{
                             </Input>
                             </div>                          
                             <div className="col-xs-6 justify-content-right">
-                            <div className="Minutes">
+                           
                             <Input type="select" name="sleep_mins_last_night"
                              placeholder="Minutes"
                              id="minutes"
@@ -554,21 +602,44 @@ class UserInputs extends React.Component{
                             onChange={this.handleChange}>
                              <option key="mins" value="">Minutes</option>
                             {this.createDropdown(0,59)}                        
-                            </Input>
-                         
-                            </div>
-                       
-                          </div>
-                          
+                            </Input>                        
+                            </div>                          
+                          </FormGroup>
+
+                           <FormGroup>
+                             <Label className="padding">3. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
+                              <div className="input1">
+                                
+
+                                   <Label check>
+                                    <Input type="radio" name="prescription_sleep_aids" 
+                                    value="yes"
+                                    checked={this.state.prescription_sleep_aids === 'yes'}
+                                    onChange={this.handleChangeSleepAids}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="prescription_sleep_aids" 
+                                        value="no"
+                                        checked={this.state.prescription_sleep_aids === 'no'}
+                                        onChange={this.handleChangeSleepAids}/>{' '}
+                                      No
+                                </Label>
+
+                              </div>
+                              <FormGroup id="padd"> 
+                              {this.renderPrescriptionSleepAids()}
+                              </FormGroup>
                           </FormGroup>
                           </div>
                         
                         <div id="food">
-                        <h2><strong>Food/Drink/Other Inputs</strong></h2>
+                        <h2><strong>Nutrition and Lifestyle Inputs</strong></h2>
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding">14. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
+                            <Label className="padding">4. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
                               <div className="input1">
                                 <Input
                                 type="select" 
@@ -586,7 +657,7 @@ class UserInputs extends React.Component{
                           </FormGroup>
 
                           <FormGroup>
-                               <Label className="padding">15. Number of Alcohol Drinks Consumed Yesterday?</Label>
+                               <Label className="padding">5. Number of Alcohol Drinks Consumed Yesterday?</Label>
                                 <div className="input1">
                                      <Input 
                                      type="select" 
@@ -620,43 +691,29 @@ class UserInputs extends React.Component{
                                       </Input>
                                   </div>
                           </FormGroup>
-                          </div>
-                          
-                          <div id="smoking">
-                           <h2><strong>Sleep Aids/Smoking/Medications/Supplements Inputs</strong></h2>
-                           <FormGroup>
-                             <Label className="padding">16. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
-                              <div className="input1">
-                                  <Input 
-                                  type="select" 
-                                  className="custom-select form-control" 
-                                  id="prescription_select" 
-                                  name="prescription_sleep_aids"
-                                  value={this.state.prescription_sleep_aids}
-                                  onChange={this.handleChangeSleepAids}>
-                                      <option value="">select</option>
-                                      <option value="yes">Yes</option>
-                                      <option value="no">No</option>
-                                  </Input>
-                              </div>
-                              <FormGroup id="padd"> 
-                              {this.renderPrescriptionSleepAids()}
-                              </FormGroup>
-                          </FormGroup>
-                         
+                                            
                           <FormGroup>
-                            <Label className="padding">17. Did You Smoke Any Substances Yesterday?</Label>
+                            <Label className="padding">6. Did You Smoke Any Substances Yesterday?</Label>
                             <div className="input1">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control" 
-                                name="smoke_substances"
-                                value={this.state.smoke_substances}
-                                onChange = {this.handleChangeSmokeSubstance}>
-                                        <option value="">select</option>
-                                        <option value="yes">Yes</option>
-                                        <option value="no">No</option>
-                                </Input>
+                                
+
+                                 <Label check>
+                                    <Input type="radio" name="smoke_substances" 
+                                    value="yes"
+                                    checked={this.state.smoke_substances === 'yes'}
+                                    onChange={this.handleChangeSmokeSubstance}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="smoke_substances" 
+                                        value="no"
+                                        checked={this.state.smoke_substances === 'no'}
+                                        onChange={this.handleChangeSmokeSubstance}/>{' '}
+                                      No
+                                </Label>
+
+
                             </div>
                             <FormGroup id="padd"> 
                             {this.renderSmokeSubstance()}   
@@ -664,18 +721,26 @@ class UserInputs extends React.Component{
                           </FormGroup>
 
                            <FormGroup>
-                              <Label className="padding">18. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
+                              <Label className="padding">7. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
                                 <div className="input1">
-                                  <Input 
-                                  type="select" 
-                                  className="custom-select form-control" 
-                                  name="medications"
-                                  value={this.state.medications}
-                                  onChange={this.handleChangePrescription}>
-                                          <option value="">select</option>
-                                          <option value="yes">Yes</option>
-                                          <option value="no">No</option>
-                                  </Input>
+                                 
+                                   <Label check>
+                                    <Input type="radio" name="medications" 
+                                    value="yes"
+                                    checked={this.state.medications === 'yes'}
+                                    onChange={this.handleChangePrescription}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="medications" 
+                                        value="no"
+                                        checked={this.state.medications === 'no'}
+                                        onChange={this.handleChangePrescription}/>{' '}
+                                      No
+                                </Label>
+
+
                                 </div>
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionMedication()}
@@ -688,7 +753,7 @@ class UserInputs extends React.Component{
                           <div id="stress">
                            <h2><strong>Stress/Illness Inputs</strong></h2>
                           <FormGroup>
-                            <Label className="padding">19. Yesterday's Stress Level</Label>
+                            <Label className="padding">8. Yesterday's Stress Level</Label>
                               <div className="input1">
                                 <Input 
                                 type="select" 
@@ -705,19 +770,27 @@ class UserInputs extends React.Component{
                           </FormGroup>
 
                           <FormGroup>
-                            <Label className="padding">20. Are You Sick Today?</Label>
+                            <Label className="padding">9. Are You Sick Today?</Label>
                               <div className="input1">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control" 
-                                id="sick_select"
-                                name="sick"
-                                value={this.state.sick}
-                                onChange={this.handleChangeSick}>
-                                    <option value="">select</option>
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                                </Input>
+                               
+
+                                  <Label check>
+                                    <Input type="radio" name="sick" 
+                                    value="yes"
+                                    checked={this.state.sick === 'yes'}
+                                    onChange={this.handleChangeSick}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="sick" 
+                                        value="no"
+                                        checked={this.state.sick === 'no'}
+                                        onChange={this.handleChangeSick}/>{' '}
+                                      No
+                                </Label>
+
+
                               </div>
                             <FormGroup id="padd"> 
                             {this.renderPainSick()}
@@ -729,9 +802,9 @@ class UserInputs extends React.Component{
                           </div>
                          
                          <div id="daily">
-                          <h2><strong>Daily User Inputs (optional)</strong></h2>
+                          <h2><strong>Extra Inputs</strong></h2>
                           <FormGroup>
-                            <Label className="padding">21. Weight (Pounds)</Label>
+                            <Label className="padding">10. Weight (Pounds)</Label>
                             <div className="input1">
                                 <Input type="select" 
                                    className="custom-select form-control"
@@ -746,7 +819,7 @@ class UserInputs extends React.Component{
 
                           { this.state.gender === 'M' &&
                             <FormGroup>       
-                              <Label className="padding">22. Waist Size (Male)</Label>
+                              <Label className="padding">11. Waist Size (Male)</Label>
                             <div className="input1">
                               <Input 
                                 type="text" 
@@ -762,7 +835,7 @@ class UserInputs extends React.Component{
 
                           { this.state.gender === 'F' &&
                             <FormGroup>
-                              <Label className="padding">22. Clothes Size (Womens)</Label>
+                              <Label className="padding">11. Clothes Size (Womens)</Label>
                             <div className="input1">
                               <Input 
                                 type="text" 
@@ -777,7 +850,7 @@ class UserInputs extends React.Component{
                           }
 
                           <FormGroup>
-                              <Label className="padding">23. What Type Of Diet Do You Eat?</Label>
+                              <Label className="padding">12. What Type Of Diet Do You Eat?</Label>
                                   <div className="input1">
                                       <Input 
                                       type="select" 
@@ -803,18 +876,27 @@ class UserInputs extends React.Component{
                         
 
                            <FormGroup>     
-                            <Label className="padding">24. Did You Stand For 3 Hours or More Yesterday? </Label>
+                            <Label className="padding">13. Did You Stand For 3 Hours or More Yesterday? </Label>
                               <div className="input1">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control"  
-                                name="stand"
-                                value={this.state.stand}
-                                onChange={this.handleChange}>
-                                    <option value="">select</option>
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                                 </Input>
+                                
+
+                                  <Label check>
+                                    <Input type="radio" name="stand" 
+                                    value="yes"
+                                    checked={this.state.stand === 'yes'}
+                                    onChange={this.handleChange}/>{' '}
+                                    Yes
+                                 </Label>
+
+                                 <Label check>
+                                   <Input type="radio" name="stand" 
+                                        value="no"
+                                        checked={this.state.stand === 'no'}
+                                        onChange={this.handleChange}/>{' '}
+                                      No
+                                </Label>
+
+
                                 </div>
                           </FormGroup>
                           </div>

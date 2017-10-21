@@ -5,7 +5,8 @@ import 'react-select/dist/react-select.css';
 import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
 	
 
-const option=[
+const option=[	
+				{ value:"other",label:'Other'},
                 { value:"right knee",label:'Right knee'},
                 { value:'left knee',label:'Light knee'},
                 { value:"right ankle",label:'Right ankle'},
@@ -25,8 +26,8 @@ const option=[
                 { value:"neck",label:'Neck'},
                 { value:"upper back",label:'Upper back'},
                 { value:"mid back",label:'Mid back'},
-                { value:"lower back",label:'Lower back'},
-                { value:"other",label:'Other'}
+                { value:"lower back",label:'Lower back'}
+                
 
 		];
 
@@ -123,7 +124,7 @@ export default class PainModal extends Component{
 			<div>
 				<FormGroup>   
 
-                    <Label>5.1) Where Did You Have Pain/Twinges?</Label>
+                    <Label>1.5.1 Where Did You Have Pain/Twinges?</Label>
 					<div className="input1">
 	                    <Select
 								closeOnSelect={!this.state.stayOpen}
@@ -139,12 +140,12 @@ export default class PainModal extends Component{
 
 				<Collapse isOpen={this.state.collapse}>
 					<FormGroup>
-						<Label>5.2 Please Write Where You Have Pain/Twinges</Label>
+						<Label>1.5.2 Please Write Where You Have Pain/Twinges</Label>
 							<div className="input1">
 								<Input
 								type="text"
 								className="form-control"
-								placeholder="Write where you have pain here.."
+								placeholder="Write in....."
 								value={this.state.pain_area}
 								onChange={this.handleChange} />
 							</div>

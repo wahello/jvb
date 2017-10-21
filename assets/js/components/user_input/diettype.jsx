@@ -43,7 +43,7 @@ export default class DietType extends Component{
 				<Collapse isOpen={this.state.collapse}>
 				
 							<FormGroup>
-							    <Label>23.1 Hi, What Did You Take?</Label>
+							    <Label>12.1 What Did You Take?</Label>
 							    	<div className="input1">
 										<Input 
 			                            type="FormText" 

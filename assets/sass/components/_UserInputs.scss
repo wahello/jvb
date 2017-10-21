@@ -14,7 +14,7 @@ body{
 
 #user-inputs .head{
 	text-align: center;
-	padding: 50px;
+	padding: 15px;
 	color: gray;
 }
 #user-inputs .user-inputs-form{
@@ -59,7 +59,7 @@ margin-top: 46px;
 	color:black;
 }
 .btn2{
-	padding:15px 0px 0px 0px;  
+	padding:10px 0px 0px 0px;  
 }
 strong{
 	color:#212F3D;
@@ -104,13 +104,15 @@ h2{
 	padding:0px 17px 0px 23px;
 }
 #navlink{
-	color:black;
+	color:white;
+	padding:0px 28px;
+	font-size: 16px;
 }
 .nav1{
-	padding: 10px;
+	padding-left:10px;
 }
 .btn2{
-	padding:15px 0px 0px 0px;  
+	padding:10px 0px 0px 0px;  
 }
 strong{
 	color:#212F3D;
@@ -140,3 +142,11 @@ h2{
 #padd{
 	padding-top:17px;
 }
+.calender{
+	height: 100px;
+}
+#abbri{
+	text-decoration: none;
+}
+
+	

@@ -37,7 +37,7 @@ export default class PrescriptionSleepAids extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-							<Label>16.1 Hi, What Did You Take?</Label>
+							<Label>3.1 What Did You Take?</Label>
 							  <div className="input1">
 								<Input 
 	                            type="FormText" 
