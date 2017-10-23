@@ -26,6 +26,8 @@ class UserInputs extends React.Component{
         isOpen: false,
         gender:'M',
         diet_to_show:'',
+        cloning_data:false,
+        fetching_data:false,
 
         workout:'yes',
         workout_easy:'',
@@ -93,6 +95,8 @@ class UserInputs extends React.Component{
       this.renderFasted = renderers.renderFasted.bind(this);
       this.renderDietType = renderers.renderDietType.bind(this);
       this.renderSmokeSubstance = renderers.renderSmokeSubstance.bind(this);
+      this.renderCloneOverlay = renderers.renderCloneOverlay.bind(this);
+      this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -119,6 +123,8 @@ class UserInputs extends React.Component{
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
         diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+        cloning_data:false,
+        fetching_data:false,
 
         workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
@@ -191,7 +197,8 @@ class UserInputs extends React.Component{
 
     processDate(date){
       this.setState({
-        selected_date:date
+        selected_date:date,
+        fetching_data:true
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -204,7 +211,11 @@ class UserInputs extends React.Component{
                                 today.getMonth(),
                                 today.getDate()-1);
       const clone = false;
-      userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
+      this.setState({
+        cloning_data:true
+      },function(){
+        userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
+      }.bind(this))
     }
 
     resetForm(){
@@ -263,7 +274,6 @@ class UserInputs extends React.Component{
 
         return(
             <div>
-            
                 <Container id="user-inputs">
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
@@ -935,6 +945,8 @@ class UserInputs extends React.Component{
                     </div>
                  </div>
                 </Container>
+                {this.renderCloneOverlay()}
+                {this.renderFetchOverlay()}
             </div>
         );
     }

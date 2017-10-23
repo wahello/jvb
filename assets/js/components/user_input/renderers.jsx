@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import FontAwesome from "react-fontawesome";
+import moment from 'moment';
 
 import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
@@ -154,4 +156,40 @@ export function renderSmokeSubstance(callback){
 	  />
 	);
   }
+}
+
+export function renderCloneOverlay(callback){
+	if(this.state.cloning_data){
+		let yesterday = moment(this.state.selected_date).subtract(1,'days');
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					Copying yesterday user inputs ({yesterday.format('MMM D, YYYY')})
+					<FontAwesome 
+						name='spinner' 
+						size='3x'
+						pulse spin
+					/>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderFetchOverlay(callback){
+	if(this.state.fetching_data){
+		let selected_date = moment(this.state.selected_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					Fetching user inputs for {selected_date.format('MMM D, YYYY')}
+					<FontAwesome 
+						name='spinner' 
+						size='3x'
+						pulse spin
+					/>
+				</div>
+			</div>
+		);
+	}
 }
