@@ -283,14 +283,16 @@ class UserInputs extends React.Component{
                         <h2 className="head">Daily User Inputs Report</h2>
 
                          <div className="row justify-content-center">
-                         <header>
+                       
                           <div className="col-md-8 col-lg-12 col-sm-12"> 
                                                  
                            <Navbar light toggleable  className="navbar navbar-expand-sm  navbar-fixed ">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
                                 <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
-
+                                          <NavItem>
+                                          <abbr id="abbri" title="Calender"><Button id="calender" size="sm">Calender</Button></abbr>
+                                          </NavItem>
                                           <NavItem>
                                           <abbr  id="abbri"  title="Workout"><NavLink id="navlink" href="#workout">Workout</NavLink></abbr>
                                         </NavItem>
@@ -311,7 +313,7 @@ class UserInputs extends React.Component{
                            </Navbar>
                          
                            </div>
-                           </header>
+                         
                            </div>
 
                            
