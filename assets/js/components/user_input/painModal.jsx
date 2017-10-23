@@ -33,41 +33,49 @@ const option=[
 
 export default class PainModal extends Component{
 
-	isOtherPainArea(area){
-		let other = true;
-		const area_list = area.split(',');
+	OtherPainArea(area){
+		let options = {
+            "right knee":true,"left knee":true,"right ankle":true,
+            "left ankle":true,"right foot":true,"left foot":true,
+            "right shins":true,"left shins":true,"right hip":true,
+            "left hip":true,"right achilles":true,"left achilles":true,
+            "right calf":true,"left calf":true,"right toes":true,
+            "left toes":true,"neck":true,"upper back":true,
+            "mid back":true,"lower back":true
+		}
 
-		if(area === ""){
-			other = false;
-		}else{
-			for(let item of option){
-				for(let a of area_list){
-					if(item.value === a){
-						other = false;
-						break;
-					}
-				}
+		let other_areas = [];
+		let area_list = area.split(',');
+		
+		for(let a of area.split(',')){
+			if(!options[a]){
+				other_areas.push(a);
+				area_list.splice(area_list.indexOf(a),1);		
 			}
 		}
-		return other;
+		return [area_list,other_areas];
 	}
 
 	constructor(props){
 		super(props);
 		let area = this.props.pain_area;
-		let other = this.isOtherPainArea(area);
+		let tmp = this.OtherPainArea(area);
+		area = tmp[0].join(',');
+		let other_pain_areas = tmp[1].join(',');
 		let pain_area_to_show = area;
-		if(other)
-			pain_area_to_show = 'other'
+		if(other_pain_areas.length)
+			pain_area_to_show = area+",other"
 
 
 		this.state = {
-			collapse:other ? true : false,	
+			collapse:other_pain_areas.length ? true : false,	
 			disabled: false,
 			stayOpen: true,
 			pain_area: area,
-			pain_area_to_show: pain_area_to_show
+			pain_area_to_show: pain_area_to_show,
+			other_pain_areas:other_pain_areas
 		};
+
 		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
@@ -75,29 +83,40 @@ export default class PainModal extends Component{
 	componentWillReceiveProps(nextProps) {
   	  if(nextProps.pain_area !== this.props.pain_area) {
 
-	  	  	let other = this.isOtherPainArea(nextProps.pain_area);
-			let pain_area_to_show = nextProps.pain_area;
-			if(other)
-				pain_area_to_show = 'other'
+	  	  	let tmp = this.OtherPainArea(nextProps.pain_area);
+			let area = tmp[0].join(',');
+			let other_pain_areas = tmp[1].join(',');
+			let pain_area_to_show = area;
+			if(other_pain_areas.length)
+				pain_area_to_show = area+",other"
+
     	  	this.setState({
-    	  		pain_area: nextProps.pain_area,
-    	  		collapse:other ? true : false,
-    	  		pain_area_to_show:pain_area_to_show
+    	  		pain_area: area,
+    	  		collapse:other_pain_areas.length ? true : false,
+    	  		pain_area_to_show:pain_area_to_show,
+    	  		other_pain_areas:other_pain_areas
     	  	});
     	}
   	}
 
 	handleChange(event){
-		const value = event.target.value;
+		let value = event.target.value;
 		this.setState({
-			pain_area:value
+			other_pain_areas:value
 		},() => {
-		    	this.props.updateState(this.state.pain_area);
+				if (value && this.state.pain_area){
+		    		value = this.state.pain_area + "," + value;
+		    	}else if(this.state.pain_area){
+		    		value = this.state.pain_area;
+		    	}
+		    	this.props.updateState(value);
 		 });
 	}
-	handleSelectChange(value) {
 
-		if (value === 'other'){
+	handleSelectChange(value) {
+		console.log(value);
+		let otherPattern = /.*other.*/i;
+		if (otherPattern.test(value)){
 		    this.setState({
 		    	pain_area_to_show: value,
 		    	collapse:true
@@ -106,7 +125,10 @@ export default class PainModal extends Component{
 			this.setState({
 				pain_area:'',
 				pain_area_to_show:'',
+				other_pain_areas:'',
 				collapse:false				
+			},()=>{
+				this.props.updateState(this.state.pain_area);
 			});
 		}
 		else{
@@ -146,7 +168,7 @@ export default class PainModal extends Component{
 								type="text"
 								className="form-control"
 								placeholder="Write in....."
-								value={this.state.pain_area}
+								value={this.state.other_pain_areas}
 								onChange={this.handleChange} />
 							</div>
 					</FormGroup>
