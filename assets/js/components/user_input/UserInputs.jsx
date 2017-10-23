@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
-import { Container, Select, option, Option, Row, Col, Button, Form,
+import { Container, Select, option, Option, Row, Col, Button, ButtonGroup, Form,
          FormGroup, Label, Input, FormText, className, Modal,
           ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
          NavbarBrand, } from 'reactstrap';
@@ -338,29 +338,30 @@ class UserInputs extends React.Component{
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
-                            <div className="input"> 
-                            <Label check>
-                                <Input type="radio" name="workout"
-                                  value="yes"
+                            <div className="input">                           
+                            
+                                <Label className="btn btn-secondary radio1">
+                                  <Input type="radio" 
+                                  name="workout" 
+                                  value="yes" 
                                   checked={this.state.workout === 'yes'}
-                                  onChange={this.handleChange}/>{' '}
-                                Yes
-                            </Label> 
-                            <Label check>
-                                <Input type="radio" name="workout" 
+                                  onChange={this.handleChange}/> Yes
+                                </Label>
+                                <Label className="btn btn-secondary radio1">
+                                  <Input type="radio" name="workout" 
                                   value="no"
                                   checked={this.state.workout === 'no'}
-                                  onChange={this.handleChange}/>{' '}
-                                No
-                            </Label>
-                             <Label check>
-                                <Input type="radio" name="workout" 
+                                  onChange={this.handleChange}/> No
+                                </Label>
+                                <Label className="btn btn-secondary radio1">
+                                  <Input type="radio" 
+                                  name="workout" 
                                   value="not yet"
                                   checked={this.state.workout === 'not yet'}
-                                  onChange={this.handleChange}/>{' '}
-                                Not Yet
-                            </Label>
-                           </div> 
+                                  onChange={this.handleChange}/> Not Yet
+                                </Label>
+                              </div>
+                           
                           </FormGroup> 
 
                           { this.state.workout == "yes" &&
@@ -387,7 +388,7 @@ class UserInputs extends React.Component{
                             <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
                             <div className="input">
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="workout_enjoyable" 
                                     value="yes"
                                     checked={this.state.workout_enjoyable === 'yes'}
@@ -395,14 +396,13 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="workout_enjoyable" 
                                         value="no"
                                         checked={this.state.workout_enjoyable === 'no'}
                                         onChange={this.handleChange}/>{' '}
                                       No
                                 </Label>
-
                             </div>  
                         </FormGroup>
                       }
@@ -443,7 +443,7 @@ class UserInputs extends React.Component{
                             <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?</Label>
                                 <div className="input">
                                    
-                                     <Label check>
+                                     <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="pain" 
                                     value="yes"
                                     checked={this.state.pain === 'yes'}
@@ -451,7 +451,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="pain" 
                                         value="no"
                                         checked={this.state.pain === 'no'}
@@ -519,7 +519,7 @@ class UserInputs extends React.Component{
                             <Label className="padding">1.9 Were You Fasted During Your Workout? </Label>
                               <div className="input">
                                 
-                                  <Label check>
+                                  <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="fasted" 
                                     value="yes"
                                     checked={this.state.fasted === 'yes'}
@@ -527,7 +527,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="fasted" 
                                         value="no"
                                         checked={this.state.fasted === 'no'}
@@ -621,7 +621,7 @@ class UserInputs extends React.Component{
                               <div className="input1">
                                 
 
-                                   <Label check>
+                                   <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="prescription_sleep_aids" 
                                     value="yes"
                                     checked={this.state.prescription_sleep_aids === 'yes'}
@@ -629,7 +629,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="prescription_sleep_aids" 
                                         value="no"
                                         checked={this.state.prescription_sleep_aids === 'no'}
@@ -707,7 +707,7 @@ class UserInputs extends React.Component{
                             <div className="input1">
                                 
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="smoke_substances" 
                                     value="yes"
                                     checked={this.state.smoke_substances === 'yes'}
@@ -715,7 +715,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="smoke_substances" 
                                         value="no"
                                         checked={this.state.smoke_substances === 'no'}
@@ -734,7 +734,7 @@ class UserInputs extends React.Component{
                               <Label className="padding">7. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
                                 <div className="input1">
                                  
-                                   <Label check>
+                                   <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="medications" 
                                     value="yes"
                                     checked={this.state.medications === 'yes'}
@@ -742,7 +742,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="medications" 
                                         value="no"
                                         checked={this.state.medications === 'no'}
@@ -784,7 +784,7 @@ class UserInputs extends React.Component{
                               <div className="input1">
                                
 
-                                  <Label check>
+                                  <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="sick" 
                                     value="yes"
                                     checked={this.state.sick === 'yes'}
@@ -792,7 +792,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="sick" 
                                         value="no"
                                         checked={this.state.sick === 'no'}
@@ -890,7 +890,7 @@ class UserInputs extends React.Component{
                               <div className="input1">
                                 
 
-                                  <Label check>
+                                  <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="stand" 
                                     value="yes"
                                     checked={this.state.stand === 'yes'}
@@ -898,7 +898,7 @@ class UserInputs extends React.Component{
                                     Yes
                                  </Label>
 
-                                 <Label check>
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stand" 
                                         value="no"
                                         checked={this.state.stand === 'no'}
