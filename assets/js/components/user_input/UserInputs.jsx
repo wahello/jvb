@@ -9,6 +9,7 @@ import { Container, Select, option, Option, Row, Col, Button,
          className, Modal,ModalHeader, ModalBody, ModalFooter,
          Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
          NavbarBrand,Popover,PopoverBody } from 'reactstrap';
+import moment from 'moment';
 
 import * as handlers from './handlers';
 import * as renderers from './renderers';
@@ -309,8 +310,6 @@ handleScroll() {
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
 
-                    
-                     
                         <h2 className="head">Daily User Inputs Report</h2>
 
                          <div className="row justify-content-center">
@@ -324,24 +323,81 @@ handleScroll() {
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
                                 <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
+
                                           <NavItem>
-                                          <abbr id="abbri" title="Calender"><Button id="calender" size="sm" on click="">Calender</Button></abbr>
+                                            <abbr id="abbri" title="Calender">
+                                              <NavLink id="navlink" href="#">
+                                                <FontAwesome 
+                                                  name = "calendar"
+                                                  size = "2x"
+                                                  id="calender" 
+                                                  onClick={this.toggleCalendar}
+                                                />
+                                              </NavLink>
+                                            </abbr>
                                           </NavItem>
+
                                           <NavItem>
-                                          <abbr  id="abbri"  title="Workout"><NavLink id="navlink" href="#workout">Workout</NavLink></abbr>
+                                            <abbr  id="abbri"  title="Workout Inputs">
+                                              <NavLink id="navlink" href="#workout">
+                                               <FontAwesome
+                                                  name = "heartbeat"
+                                                  size = "2x"
+                                                />
+                                              </NavLink>
+                                            </abbr>
+                                          </NavItem>
+
+                                        <NavItem>
+                                          <abbr  id="abbri"  title="Sleep Inputs">
+                                            <NavLink id="navlink" href="#sleep">
+                                              <FontAwesome
+                                                name = "bed"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
                                         </NavItem>
+
                                         <NavItem>
-                                          <abbr  id="abbri"  title="sleep"><NavLink id="navlink" href="#sleep">Sleep</NavLink></abbr>
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
+                                            <NavLink id="navlink" href="#food">
+                                              <FontAwesome
+                                                name = "cutlery"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
                                         </NavItem>
+
                                         <NavItem>
-                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs"><NavLink id="navlink" href="#food">Nutrition</NavLink></abbr>
-                                        </NavItem>                          
-                                        <NavItem>
-                                          <abbr  id="abbri"  title="Stress/Illness Inputs"><NavLink id="navlink" href="#stress">Stress</NavLink></abbr>
+                                          <abbr  id="abbri"  title="Stress/Illness Inputs">
+                                            <NavLink id="navlink" href="#stress">
+                                              <FontAwesome
+                                                name = "stethoscope"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
                                         </NavItem>
+
                                         <NavItem>
-                                          <abbr  id="abbri"  title="Extra Inputs"><NavLink id="navlink" href="#daily">Extra Inputs</NavLink></abbr>
-                                       </NavItem>                                   
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink id="navlink" href="#daily">
+                                              <FontAwesome
+                                                name = "plus-circle"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
+                                       </NavItem>
+
+                                       <NavItem 
+                                        style={{margin:"auto"}}>
+                                            <span style={{color:"#fff"}}>
+                                              {moment(this.state.selected_date).format('MMM D, YYYY')}
+                                            </span>
+                                        </NavItem>                                  
                                   </Nav>
                                 </Collapse>
                            </Navbar>
