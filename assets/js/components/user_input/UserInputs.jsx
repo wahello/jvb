@@ -24,6 +24,7 @@ class UserInputs extends React.Component{
         fetched_user_input_created_at:'',
         update_form:false,
         isOpen: false,
+        scrollingLock: false,
         gender:'M',
         diet_to_show:'',
 
@@ -104,6 +105,7 @@ class UserInputs extends React.Component{
       this.onNoWorkoutToday = this.onNoWorkoutToday.bind(this);
       this.fetchYesterdayData = this.fetchYesterdayData.bind(this); 
       this.toggle = this.toggle.bind(this);
+      this.handleScroll = this.handleScroll.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -240,6 +242,7 @@ class UserInputs extends React.Component{
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
       getUserProfile(this.onProfileSuccessFetch);
+      window.addEventListener('scroll', this.handleScroll);
     }
 
     createDropdown(start_num , end_num, step=1){
@@ -259,6 +262,26 @@ class UserInputs extends React.Component{
     });
   }
 
+componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+}
+
+handleScroll() {
+
+  if (window.scrollY >= 135) {
+    console.log("should lock");
+    this.setState({
+      scrollingLock: true
+    });
+  } else {
+    console.log("not locked" );
+    this.setState({
+      scrollingLock: false
+    });
+  }
+}
+
+
     render(){
 
         return(
@@ -274,14 +297,17 @@ class UserInputs extends React.Component{
 
                          <div className="row justify-content-center">
                        
-                          <div className="col-md-8 col-lg-12 col-sm-12"> 
-                                                 
-                           <Navbar light toggleable  className="navbar navbar-expand-sm  navbar-fixed ">
+                          <div className="col-md-8 col-lg-12 col-sm-12 "> 
+
+
+                           <div style={{top:"0",position: this.state.scrollingLock ? "fixed" : "relative"}}>
+                                              
+                           <Navbar light toggleable className="navbar navbar-expand-sm ">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
                                 <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
                                           <NavItem>
-                                          <abbr id="abbri" title="Calender"><Button id="calender" size="sm">Calender</Button></abbr>
+                                          <abbr id="abbri" title="Calender"><Button id="calender" size="sm" on click="">Calender</Button></abbr>
                                           </NavItem>
                                           <NavItem>
                                           <abbr  id="abbri"  title="Workout"><NavLink id="navlink" href="#workout">Workout</NavLink></abbr>
@@ -301,12 +327,10 @@ class UserInputs extends React.Component{
                                   </Nav>
                                 </Collapse>
                            </Navbar>
-                         
+                            </div>
                            </div>
                          
-                           </div>
-
-                           
+                           </div>                         
                         <div className="row justify-content-center">
                        
                         <div className="btn2">

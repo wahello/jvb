@@ -74,17 +74,6 @@ h2{
 	text-align:center;
 	padding-top:20px;
 }
-#hours{
-	
-	float:left;
-	margin-left: 10px;
-}
-#minutes{
-	
-	float:left;
-	margin-left: 10px;
-
-}
 
 .dark{
 	font-size:12px;
@@ -95,7 +84,6 @@ h2{
 #padd{
 	padding-top:17px;
 }
-
 }
 .input{
 	padding:0px 17px;
@@ -108,8 +96,11 @@ h2{
 	padding:0px 19px;
 	font-size: 16px;
 }
-.nav1{
-	padding-left:10px;
+
+.nav1 {
+  position: fixed;
+  top:0; left:0;
+  overflow-y: 100px;
 }
 .btn2{
 	padding:10px 0px 0px 0px;    
@@ -149,5 +140,3 @@ h2{
 #calender{
 	background-color: #292C2E;
 }
-
-	
