@@ -318,6 +318,10 @@ handleScroll() {
 
 
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
+
+                           <div className="header">
+                             <div className="col-md-8 col-lg-12 col-sm-12 "> 
+
                                               
                            <Navbar light toggleable className="navbar navbar-expand-sm ">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
@@ -338,7 +342,7 @@ handleScroll() {
                                           </NavItem>
 
                                           <NavItem>
-                                            <abbr  id="abbri"  title="Workout Inputs">
+                                            <abbr id="abbri"  title="Workout Inputs">
                                               <NavLink id="navlink" href="#workout">
                                                <FontAwesome
                                                   name = "heartbeat"
@@ -391,16 +395,24 @@ handleScroll() {
                                             </NavLink>
                                           </abbr>
                                        </NavItem>
-
-                                       <NavItem 
-                                        style={{margin:"auto"}}>
+                                      <NavItem>
+                                       <Button  
+                                            size="sm"
+                                            onClick={this.fetchYesterdayData}
+                                            className="btn btn-info">
+                                            Copy Yesterday’s Inputs
+                                          </Button>
+                                      </NavItem>
+                                       <NavItem className="date">
                                             <span style={{color:"#fff"}}>
                                               {moment(this.state.selected_date).format('MMM D, YYYY')}
                                             </span>
                                         </NavItem>                                  
                                   </Nav>
                                 </Collapse>
-                           </Navbar>                        
+                           </Navbar> 
+                           </div> 
+                           </div>                      
                             </div>
                            </div>
                          
@@ -408,12 +420,7 @@ handleScroll() {
                         <div className="row justify-content-center">
                        
                         <div className="btn2">
-                          <Button  
-                        size="sm"
-                            onClick={this.fetchYesterdayData}
-                            className="btn btn-info">
-                            Copy Yesterday’s Inputs
-                          </Button>
+                         
                           </div>
                         </div>
                       
