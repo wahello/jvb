@@ -4,10 +4,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
-import { Container, Select, option, Option, Row, Col, Button, ButtonGroup, Form,
-         FormGroup, Label, Input, FormText, className, Modal,
-          ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand, } from 'reactstrap';
+import { Container, Select, option, Option, Row, Col, Button, 
+         ButtonGroup, Form,FormGroup, Label, Input, FormText,
+         className, Modal,ModalHeader, ModalBody, ModalFooter,
+         Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
+         NavbarBrand,Popover,PopoverBody } from 'reactstrap';
+import moment from 'moment';
 
 import * as handlers from './handlers';
 import * as renderers from './renderers';
@@ -27,6 +29,9 @@ class UserInputs extends React.Component{
         scrollingLock: false,
         gender:'M',
         diet_to_show:'',
+        cloning_data:false,
+        fetching_data:false,
+        calendarOpen:false,
 
         workout:'yes',
         workout_easy:'',
@@ -94,6 +99,8 @@ class UserInputs extends React.Component{
       this.renderFasted = renderers.renderFasted.bind(this);
       this.renderDietType = renderers.renderDietType.bind(this);
       this.renderSmokeSubstance = renderers.renderSmokeSubstance.bind(this);
+      this.renderCloneOverlay = renderers.renderCloneOverlay.bind(this);
+      this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -106,6 +113,7 @@ class UserInputs extends React.Component{
       this.fetchYesterdayData = this.fetchYesterdayData.bind(this); 
       this.toggle = this.toggle.bind(this);
       this.handleScroll = this.handleScroll.bind(this);
+      this.toggleCalendar = this.toggleCalendar.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -121,6 +129,8 @@ class UserInputs extends React.Component{
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
         diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+        cloning_data:false,
+        fetching_data:false,
 
         workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
@@ -193,7 +203,8 @@ class UserInputs extends React.Component{
 
     processDate(date){
       this.setState({
-        selected_date:date
+        selected_date:date,
+        fetching_data:true
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -206,7 +217,11 @@ class UserInputs extends React.Component{
                                 today.getMonth(),
                                 today.getDate()-1);
       const clone = false;
-      userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
+      this.setState({
+        cloning_data:true
+      },function(){
+        userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
+      }.bind(this))
     }
 
     resetForm(){
@@ -281,18 +296,20 @@ handleScroll() {
   }
 }
 
+  toggleCalendar(){
+    this.setState({
+      calendarOpen:!this.state.calendarOpen
+    });
+  }
 
     render(){
 
         return(
             <div>
-            
                 <Container id="user-inputs">
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
 
-                    
-                     
                         <h2 className="head">Daily User Inputs Report</h2>
 
                          <div className="row justify-content-center">
@@ -306,24 +323,81 @@ handleScroll() {
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
                                 <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
+
                                           <NavItem>
-                                          <abbr id="abbri" title="Calender"><Button id="calender" size="sm" on click="">Calender</Button></abbr>
+                                            <abbr id="abbri" title="Calender">
+                                              <NavLink id="navlink" href="#">
+                                                <FontAwesome 
+                                                  name = "calendar"
+                                                  size = "2x"
+                                                  id="calender" 
+                                                  onClick={this.toggleCalendar}
+                                                />
+                                              </NavLink>
+                                            </abbr>
                                           </NavItem>
+
                                           <NavItem>
-                                          <abbr  id="abbri"  title="Workout"><NavLink id="navlink" href="#workout">Workout</NavLink></abbr>
+                                            <abbr  id="abbri"  title="Workout Inputs">
+                                              <NavLink id="navlink" href="#workout">
+                                               <FontAwesome
+                                                  name = "heartbeat"
+                                                  size = "2x"
+                                                />
+                                              </NavLink>
+                                            </abbr>
+                                          </NavItem>
+
+                                        <NavItem>
+                                          <abbr  id="abbri"  title="Sleep Inputs">
+                                            <NavLink id="navlink" href="#sleep">
+                                              <FontAwesome
+                                                name = "bed"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
                                         </NavItem>
+
                                         <NavItem>
-                                          <abbr  id="abbri"  title="sleep"><NavLink id="navlink" href="#sleep">Sleep</NavLink></abbr>
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
+                                            <NavLink id="navlink" href="#food">
+                                              <FontAwesome
+                                                name = "cutlery"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
                                         </NavItem>
+
                                         <NavItem>
-                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs"><NavLink id="navlink" href="#food">Nutrition</NavLink></abbr>
-                                        </NavItem>                          
-                                        <NavItem>
-                                          <abbr  id="abbri"  title="Stress/Illness Inputs"><NavLink id="navlink" href="#stress">Stress</NavLink></abbr>
+                                          <abbr  id="abbri"  title="Stress/Illness Inputs">
+                                            <NavLink id="navlink" href="#stress">
+                                              <FontAwesome
+                                                name = "stethoscope"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
                                         </NavItem>
+
                                         <NavItem>
-                                          <abbr  id="abbri"  title="Extra Inputs"><NavLink id="navlink" href="#daily">Extra Inputs</NavLink></abbr>
-                                       </NavItem>                                   
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink id="navlink" href="#daily">
+                                              <FontAwesome
+                                                name = "plus-circle"
+                                                size = "2x"
+                                              />
+                                            </NavLink>
+                                          </abbr>
+                                       </NavItem>
+
+                                       <NavItem 
+                                        style={{margin:"auto"}}>
+                                            <span style={{color:"#fff"}}>
+                                              {moment(this.state.selected_date).format('MMM D, YYYY')}
+                                            </span>
+                                        </NavItem>                                  
                                   </Nav>
                                 </Collapse>
                            </Navbar>                        
@@ -961,6 +1035,8 @@ handleScroll() {
                     </div>
                 
                 </Container>
+                {this.renderCloneOverlay()}
+                {this.renderFetchOverlay()}
             </div>
         );
     }
