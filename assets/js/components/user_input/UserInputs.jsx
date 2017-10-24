@@ -412,9 +412,7 @@ handleScroll() {
                                 </Collapse>
                            </Navbar> 
                            </div> 
-                           </div>                      
-
-                           </Navbar>
+                           </div>                                   
                            <Popover 
                             placement="left" 
                             isOpen={this.state.calendarOpen}
