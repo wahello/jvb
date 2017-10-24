@@ -164,12 +164,16 @@ export function renderCloneOverlay(callback){
 		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">
-					Copying yesterday user inputs ({yesterday.format('MMM D, YYYY')})
-					<FontAwesome 
-						name='spinner' 
-						size='3x'
-						pulse spin
-					/>
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"
+						/>
+					</div>
+					<br/>
+					<p>Copying yesterday user inputs ({yesterday.format('MMM D, YYYY')})</p>
 				</div>
 			</div>
 		);
@@ -182,12 +186,16 @@ export function renderFetchOverlay(callback){
 		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">
-					Fetching user inputs for {selected_date.format('MMM D, YYYY')}
-					<FontAwesome 
-						name='spinner' 
-						size='3x'
-						pulse spin
-					/>
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"
+						/>
+					</div>
+					<br/>
+					<p>Fetching user inputs for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);

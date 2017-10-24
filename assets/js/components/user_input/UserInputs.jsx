@@ -4,10 +4,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
-import { Container, Select, option, Option, Row, Col, Button, ButtonGroup, Form,
-         FormGroup, Label, Input, FormText, className, Modal,
-          ModalHeader, ModalBody, ModalFooter,Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand, } from 'reactstrap';
+import { Container, Select, option, Option, Row, Col, Button, 
+         ButtonGroup, Form,FormGroup, Label, Input, FormText,
+         className, Modal,ModalHeader, ModalBody, ModalFooter,
+         Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
+         NavbarBrand,Popover,PopoverBody } from 'reactstrap';
 
 import * as handlers from './handlers';
 import * as renderers from './renderers';
@@ -28,6 +29,7 @@ class UserInputs extends React.Component{
         diet_to_show:'',
         cloning_data:false,
         fetching_data:false,
+        calendarOpen:false,
 
         workout:'yes',
         workout_easy:'',
@@ -108,6 +110,7 @@ class UserInputs extends React.Component{
       this.onNoWorkoutToday = this.onNoWorkoutToday.bind(this);
       this.fetchYesterdayData = this.fetchYesterdayData.bind(this); 
       this.toggle = this.toggle.bind(this);
+      this.toggleCalendar = this.toggleCalendar.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -270,6 +273,12 @@ class UserInputs extends React.Component{
     });
   }
 
+  toggleCalendar(){
+    this.setState({
+      calendarOpen:!this.state.calendarOpen
+    });
+  }
+
     render(){
 
         return(
@@ -291,7 +300,14 @@ class UserInputs extends React.Component{
                                 <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
                                           <NavItem>
-                                          <abbr id="abbri" title="Calender"><Button id="calender" size="sm">Calender</Button></abbr>
+                                          <abbr>
+                                            <Button 
+                                              id="calendar" 
+                                              size="sm" 
+                                              onClick={this.toggleCalendar}>
+                                                Calendar
+                                            </Button>
+                                            </abbr>
                                           </NavItem>
                                           <NavItem>
                                           <abbr  id="abbri"  title="Workout"><NavLink id="navlink" href="#workout">Workout</NavLink></abbr>
@@ -311,7 +327,6 @@ class UserInputs extends React.Component{
                                   </Nav>
                                 </Collapse>
                            </Navbar>
-                         
                            </div>
                          
                            </div>
