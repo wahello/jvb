@@ -98,9 +98,8 @@ h2{
 }
 
 .nav1 {
-  position: fixed;
-  top:0; left:0;
-  overflow-y: 100px;
+  top:0; 
+  z-index:100;
 }
 .btn2{
 	padding:10px 0px 0px 0px;    
@@ -117,6 +116,14 @@ h2{
 .food h2{
 	text-align:center;
 	padding-top:20px;
+}
+#hours{
+	float: left;
+	margin-left: 10px;
+}
+#minutes{
+	float: left;
+	margin-left: 10px;
 }
 
 .dark{

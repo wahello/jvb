@@ -300,7 +300,7 @@ handleScroll() {
                           <div className="col-md-8 col-lg-12 col-sm-12 "> 
 
 
-                           <div style={{top:"0",position: this.state.scrollingLock ? "fixed" : "relative"}}>
+                           <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                                               
                            <Navbar light toggleable className="navbar navbar-expand-sm ">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
@@ -326,7 +326,7 @@ handleScroll() {
                                        </NavItem>                                   
                                   </Nav>
                                 </Collapse>
-                           </Navbar>
+                           </Navbar>                        
                             </div>
                            </div>
                          
@@ -342,7 +342,7 @@ handleScroll() {
                           </Button>
                           </div>
                         </div>
-
+                      
                         <Form 
                           getRef = {(input) => this.input_form = input}
                           onSubmit = {this.onSubmit}
@@ -621,7 +621,6 @@ handleScroll() {
                             <div className="col-xs-6 justify-content-right">
                            
                             <Input type="select" name="sleep_mins_last_night"
-                             placeholder="Minutes"
                              id="minutes"
                             className="form-control custom-select "
                             value={this.state.sleep_mins_last_night}
@@ -959,7 +958,8 @@ handleScroll() {
                               />
                     </Form>
                     </div>
-                 </div>
+                    </div>
+                
                 </Container>
             </div>
         );
