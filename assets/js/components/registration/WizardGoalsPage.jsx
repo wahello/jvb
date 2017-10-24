@@ -29,14 +29,17 @@ const WizardGoalsPage = (props) => {
 						</Label>
 					</div><br />
 
-					<Field
-						name = "sleep_goal"
-						type = "number"
-						label = "Sleep Goal"
-						placeholder = "Your daily sleep goal (in hours)"
-						value=""
-						component = {renderField}
-					/>
+					<FormGroup>
+						<Label> Daily Sleep Goals (in hours)</Label>
+						<Field
+							name = "sleep_goal"
+							type = "number"
+							label = "Sleep Goal"
+							placeholder = "7"
+							value=""
+							component = {renderField}
+						/>
+					</FormGroup>
 
 					<div className="f-footer">
 						<Button outline color="primary" onClick={previousPage}>

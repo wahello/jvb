@@ -5,10 +5,6 @@ export function account_validate(values){
 		errors.username = "Username is required";
 	}
 
-	if(values.username && values.username.length < 5){
-		errors.username = "Username must be atleast 5 character";
-	}
-
 	if(!values.email){
 		errors.email = "Email is Required";
 	}

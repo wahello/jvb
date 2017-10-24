@@ -61,7 +61,7 @@
     "react-toastify": "^2.1.0",
     "react-transition-group": "^1.2.0",
     "react-widgets": "^3.4.8",
-    "reactstrap": "^4.8.0",
+    "reactstrap": "^5.0.0-alpha.3",
     "recharts": "^1.0.0-alpha.3",
     "recharts-scale": "^0.3.2",
     "redux": "^3.7.2",

@@ -13,46 +13,68 @@ const WizardPersonalPage = (props) => {
 		<Form  onSubmit={handleSubmit(onSubmit)}>
 			<Row>
 				<Col className="form-item">
-					<Field
-						name = "first_name"
-						type = "input"
-						label = "First Name"
-						placeholder = "First Name"
-						value=""
-						component = {renderField}
-					/>
-					<Field
-						name = "last_name"
-						type = "input"
-						label = "Last Name"
-						placeholder = "Last Name"
-						value=""
-						component = {renderField}
-					/>
-					<Field
-						name = "date_of_birth"
-						type = "date"
-						label = "Birthday"
-						placeholder = "dd/mm/yyyy"
-						value=""
-						component = {renderField}
-					/>
-					<Field
-						name = "height"
-						type = "input"
-						label = "Height"
-						placeholder = "Height eg. 5'11"
-						value=""
-						component = {renderField}
-					/>
-					<Field
-						name = "weight"
-						type = "number"
-						label = "Weight"
-						placeholder = "Weight in Kg"
-						value=""
-						component = {renderField}
-					/>
+
+					<FormGroup>
+						<Label>First Name</Label>
+						<Field
+							name = "first_name"
+							type = "input"
+							label = "First Name"
+							placeholder = "John"
+							value=""
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label>Last Name </Label>
+						<Field
+							name = "last_name"
+							type = "input"
+							label = "Last Name"
+							placeholder = "Doe"
+							value=""
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label> Date of Birth </Label>
+						<Field
+							name = "date_of_birth"
+							type = "date"
+							label = "Birthday"
+							placeholder = "dd/mm/yyyy"
+							value=""
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label>Height</Label>
+						<Field
+							name = "height"
+							type = "input"
+							label = "Height"
+							placeholder = "5'11"
+							value=""
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label> Weight (in pounds)</Label>
+						<Field
+							name = "weight"
+							type = "number"
+							label = "Weight"
+							placeholder = "150"
+							value=""
+							component = {renderField}
+						/>
+					</FormGroup>
+
+
 					 <FormGroup>
 				          <Label className="custom-control custom-radio">
 				            	<Field 
