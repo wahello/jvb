@@ -14,34 +14,50 @@ const WizardAccountPage = (props) => {
 		<Form onSubmit={handleSubmit(onSubmit)} >
 			<Row>
 				<Col className="form-item">
-					<Field
-						name = "username"
-						type = "text"
-						label = "Username"
-						placeholder = "username"
-						component = {renderField}
-					/>
-					<Field
-						name = "email"
-						type = "email"
-						label = "Email"
-						placeholder = "Email"
-						component = {renderField}
-					/>
-					<Field
-						name = "password"
-						type = "password"
-						label = "Password"
-						placeholder = "Password"
-						component = {renderField}
-					/>
-					<Field
-						name = "re_password"
-						type = "password"
-						label = "re_password"
-						placeholder = "Repeat password"
-						component = {renderField}
-					/>
+					<FormGroup>
+						<Label>Username</Label>
+						<Field
+							name = "username"
+							type = "text"
+							label = "Username"
+							placeholder = "john"
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label>Email</Label>
+						<Field
+							name = "email"
+							type = "email"
+							label = "Email"
+							placeholder = "example@address.com"
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label>Password</Label>
+						<Field
+							name = "password"
+							type = "password"
+							label = "Password"
+							placeholder = ""
+							component = {renderField}
+						/>
+					</FormGroup>
+
+					<FormGroup>
+						<Label>Repeat Password</Label>
+						<Field
+							name = "re_password"
+							type = "password"
+							label = "re_password"
+							placeholder = ""
+							component = {renderField}
+						/>
+					</FormGroup>
+
 					<div className="f-footer">
 						<Button type="submit" outline color="primary">Next</Button>
 					</div>

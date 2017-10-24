@@ -33,7 +33,7 @@ class UserInputs extends React.Component{
         fetching_data:false,
         calendarOpen:false,
 
-        workout:'yes',
+        workout:'',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -324,7 +324,7 @@ handleScroll() {
 
                                               
                            <Navbar light toggleable className="navbar navbar-expand-sm ">
-                                <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />                               
+                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} />                               
                                 <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
 
@@ -334,7 +334,7 @@ handleScroll() {
                                                 <FontAwesome 
                                                   name = "calendar"
                                                   size = "2x"
-                                                  id="calender" 
+                                                  id="calendar" 
                                                   onClick={this.toggleCalendar}
                                                 />
                                               </NavLink>
@@ -413,6 +413,18 @@ handleScroll() {
                            </Navbar> 
                            </div> 
                            </div>                      
+
+                           </Navbar>
+                           <Popover 
+                            placement="left" 
+                            isOpen={this.state.calendarOpen}
+                            target="calendar" 
+                            toggle={this.toggleCalendar}>
+                              <PopoverBody>
+                                <CalendarWidget onDaySelect={this.processDate}/>
+                              </PopoverBody>
+                           </Popover> 
+
                             </div>
                            </div>
                          
@@ -425,7 +437,6 @@ handleScroll() {
                         </div>
                       
                         <Form 
-                          getRef = {(input) => this.input_form = input}
                           onSubmit = {this.onSubmit}
                           className="user-inputs-form bootstrap_validator" 
                           role="form" 
@@ -441,6 +452,7 @@ handleScroll() {
                                   <Input type="radio" 
                                   name="workout" 
                                   value="yes" 
+                                  required
                                   checked={this.state.workout === 'yes'}
                                   onChange={this.handleChange}/> Yes
                                 </Label>
@@ -461,7 +473,7 @@ handleScroll() {
                            
                           </FormGroup> 
 
-                          { this.state.workout == "yes" &&
+                          { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>   
                             <Label className="padding">1.2 Was Your Workout Easy or Hard?</Label>
                              <div className="input">
@@ -480,7 +492,7 @@ handleScroll() {
                           </FormGroup> 
                         }
 
-                        { this.state.workout == "yes" &&
+                        { (this.state.workout == "yes" || this.state.workout == "") &&
                         <FormGroup>   
                             <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
                             <div className="input">
@@ -504,7 +516,7 @@ handleScroll() {
                         </FormGroup>
                       }
 
-                          { this.state.workout == "yes" &&
+                          { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>   
                             <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
                               <div className="input">
@@ -535,7 +547,7 @@ handleScroll() {
               
                   
 
-                          { this.state.workout == "yes" &&
+                          { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>
                             <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?</Label>
                                 <div className="input">
@@ -562,7 +574,7 @@ handleScroll() {
                           </FormGroup>
                           }
 
-                          { this.state.workout == "yes" &&
+                          { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>    
                             <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
                             <div className="input">
@@ -578,7 +590,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                          { this.state.workout == "yes" &&     
+                          { (this.state.workout == "yes" || this.state.workout == "") &&     
                           <FormGroup>      
                             <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
                                 <div className="input">
@@ -595,7 +607,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         { this.state.workout == "yes" &&     
+                         { (this.state.workout == "yes" || this.state.workout == "") &&     
                           <FormGroup>
                             <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?</Label>
                                 <div className="input">
@@ -611,7 +623,7 @@ handleScroll() {
                           </FormGroup>
 
                         }
-                           { this.state.workout == "yes" &&
+                           { (this.state.workout == "yes" || this.state.workout == "") &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? </Label>
                               <div className="input">
@@ -641,7 +653,7 @@ handleScroll() {
                          
 
 
-                           { this.state.workout == "yes" &&     
+                           { (this.state.workout == "yes" || this.state.workout == "") &&     
                           <FormGroup>      
                             <Label className="padding">1.10 General Workout Comments</Label>
                               <div className="input1">
@@ -655,7 +667,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         { this.state.workout == "yes" &&
+                         { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>      
                             <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             <div className="input1">
@@ -666,7 +678,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                        { this.state.workout == "yes" &&
+                        { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>      
                             <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
                             <div className="input1">
