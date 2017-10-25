@@ -110,84 +110,85 @@ margin-top: 46px;
 		padding-top:17px;
 	}
 }
+
+
+
+
 	.input{
 		padding:0px 17px;
 	}
 	.input1{
 		padding:0px 17px 0px 23px;
 	}
-#navlink{
-	color:white;
-	padding:0px 10px;
-	font-size: 26px;
-}
+	#navlink{
+		color:white;
+		padding:0px 11px;
+		font-size: 26px;
+	}
 
-.nav1 {
-  top:0; 
-  z-index:100;
-}
+	.nav1 {
+	  top:0; 
+	  z-index:100;
+	}
 
-strong{
-	color:#212F3D;
-	font-size:16px;
-}
-h2{
-	text-align:center;
-	padding-top:8px;
-}
+	strong{
+		color:#212F3D;
+		font-size:16px;
+	}
+	h2{
+		text-align:center;
+		padding-top:8px;
+	}
 
-.food h2{
-	text-align:center;
-	padding-top:20px;
-}
-#hours{
-	float: left;
-	margin-left: 10px;
-}
-#minutes{
-	float: left;
-	margin-left: 10px;
-}
+	.food h2{
+		text-align:center;
+		padding-top:20px;
+	}
+	#hours{
+		float: left;
+		margin-left: 10px;
+	}
+	#minutes{
+		float: left;
+		margin-left: 10px;
+	}
 
-.dark{
-	font-size:12px;
-	align-items: center;
-	text-align: center;
-
-
-}
-.btn1{
-	padding:3.5px 0px 0px 10px ;
-}
-#padd{
-	padding-top:17px;
-}
-.date{
-	margin: auto;
-	padding-left: 10px;
-	color: white;
-
-}
-#abbri{
-	text-decoration: none;
-}
-.radio1{
-	margin:0px 6px;
-}
-#calender{
-	background-color: #292C2E;
-}
-.overlay{
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    background-color: rgb(0,0,0); /* Black fallback color */
-    background-color: rgba(0,0,0, 0.8); /* Black w/opacity */
-    overflow-x: hidden;
-}
+	.dark{
+		font-size:12px;
+		align-items: center;
+		text-align: center;
+	}
+	.btn1{
+		padding:3.5px 0px 0px 10px ;
+	}	
+	#padd{
+		padding-top:17px;
+	}
+	.date{
+		margin: auto;
+		padding-left: 10px;
+		color: white;
+	}
+	#abbri{
+		text-decoration: none;
+	}
+	.radio1{
+		margin:0px 6px;
+	}
+	#calender{
+		background-color: #292C2E;
+	}
+	.overlay{
+	    height: 100%;
+	    width: 100%;
+	    position: fixed;
+	    z-index: 1;
+	    left: 0;
+	    top: 0;
+	    background-color: rgb(0,0,0); /* Black fallback color */
+	    background-color: rgba(0,0,0, 0.8); /* Black w/opacity */
+	    overflow-x: hidden;
+	}
 
 .overlay-content {
 	color: #fff;
