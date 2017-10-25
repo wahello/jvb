@@ -45,6 +45,7 @@ export default class UnprocesedFoodModal extends Component{
 			                            type="textarea" 
 			                            className="custom-select form-control" 
 			                            value={this.state.unprocessed_food_list}
+			                            rows="5" cols="5"
 			                            onChange={this.handleChange}
 			                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
 		                        </div> 

@@ -56,6 +56,7 @@ class UserInputs extends React.Component{
         calories_item:'',
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
+        sleep_comment:'',
         prescription_sleep_aids:'',
         sleep_aid_taken:'',
         smoke_substances:'',
@@ -155,6 +156,7 @@ class UserInputs extends React.Component{
         calories_item:data.data.optional_input.food_ate_during_workout,
         sleep_hours_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0],
         sleep_mins_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1],
+        sleep_comment:data.data.strong_input.sleep_comment,
         prescription_sleep_aids:data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
         sleep_aid_taken:data.data.strong_input.sleep_aid_taken,
         smoke_substances:data.data.strong_input.smoke_any_substances_whatsoever,
@@ -734,8 +736,20 @@ handleScroll() {
                             </div>                          
                           </FormGroup>
 
+                          <FormGroup>      
+                            <Label className="padding">3 Sleep Comments</Label>
+                              <div className="input1">
+                                   <Input type="textarea" name="sleep_comment" 
+                                   placeholder="please leave a comment" 
+                                   className="form-control"
+                                   rows="5" cols="5" 
+                                   value={this.state.sleep_comment}
+                                   onChange={this.handleChange}/>
+                              </div>
+                          </FormGroup>
+
                            <FormGroup>
-                             <Label className="padding">3. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
+                             <Label className="padding">4. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
                               <div className="input1">
                                 
 
@@ -767,7 +781,7 @@ handleScroll() {
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding">4. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
+                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
                               <div className="input1">
                                 <Input
                                 type="select" 
@@ -785,7 +799,7 @@ handleScroll() {
                           </FormGroup>
 
                           <FormGroup>
-                               <Label className="padding">5. Number of Alcohol Drinks Consumed Yesterday?</Label>
+                               <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>
                                 <div className="input1">
                                      <Input 
                                      type="select" 
@@ -821,7 +835,7 @@ handleScroll() {
                           </FormGroup>
                                             
                           <FormGroup>
-                            <Label className="padding">6. Did You Smoke Any Substances Yesterday?</Label>
+                            <Label className="padding">7. Did You Smoke Any Substances Yesterday?</Label>
                             <div className="input1">
                                 
 
@@ -849,7 +863,7 @@ handleScroll() {
                           </FormGroup>
 
                            <FormGroup>
-                              <Label className="padding">7. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
+                              <Label className="padding">8. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
                                 <div className="input1">
                                  
                                    <Label check className="btn btn-secondary radio1">
@@ -881,7 +895,7 @@ handleScroll() {
                           <div id="stress">
                            <h2><strong>Stress/Illness Inputs</strong></h2>
                           <FormGroup>
-                            <Label className="padding">8. Yesterday's Stress Level</Label>
+                            <Label className="padding">9. Yesterday's Stress Level</Label>
                               <div className="input1">
                                 <Input 
                                 type="select" 
@@ -898,7 +912,7 @@ handleScroll() {
                           </FormGroup>
 
                           <FormGroup>
-                            <Label className="padding">9. Are You Sick Today?</Label>
+                            <Label className="padding">10. Are You Sick Today?</Label>
                               <div className="input1">
                                
 
@@ -932,7 +946,7 @@ handleScroll() {
                          <div id="daily">
                           <h2><strong>Extra Inputs</strong></h2>
                           <FormGroup>
-                            <Label className="padding">10. Weight (Pounds)</Label>
+                            <Label className="padding">11. Weight (Pounds)</Label>
                             <div className="input1">
                                 <Input type="select" 
                                    className="custom-select form-control"
@@ -947,7 +961,7 @@ handleScroll() {
 
                           { this.state.gender === 'M' &&
                             <FormGroup>       
-                              <Label className="padding">11. Waist Size (Male)</Label>
+                              <Label className="padding">12. Waist Size (Male)</Label>
                             <div className="input1">
                               <Input 
                                 type="text" 
@@ -963,7 +977,7 @@ handleScroll() {
 
                           { this.state.gender === 'F' &&
                             <FormGroup>
-                              <Label className="padding">11. Clothes Size (Womens)</Label>
+                              <Label className="padding">13. Clothes Size (Womens)</Label>
                             <div className="input1">
                               <Input 
                                 type="text" 
@@ -978,7 +992,7 @@ handleScroll() {
                           }
 
                           <FormGroup>
-                              <Label className="padding">12. What Type Of Diet Do You Eat?</Label>
+                              <Label className="padding">14. What Type Of Diet Do You Eat?</Label>
                                   <div className="input1">
                                       <Input 
                                       type="select" 
@@ -1004,7 +1018,7 @@ handleScroll() {
                         
 
                            <FormGroup>     
-                            <Label className="padding">13. Did You Stand For 3 Hours or More Yesterday? </Label>
+                            <Label className="padding">15. Did You Stand For 3 Hours or More Yesterday? </Label>
                               <div className="input1">
                                 
 

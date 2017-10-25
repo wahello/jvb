@@ -37,7 +37,6 @@ export default class SickModal extends Component{
 	render(){
 		return(
 			<div>
-				
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
                             <Label>9.1 Please Tell Us Your Illness</Label>
@@ -46,6 +45,7 @@ export default class SickModal extends Component{
 		                            type="textarea" 
 		                            className="custom-select form-control" 
 		                            value={this.state.sickness}
+		                            rows="5" cols="5"
 		                            onChange={this.handleChange}
 		                            placeholder="cold, since 1 week..." /> 
 		                      </div>

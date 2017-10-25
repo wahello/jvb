@@ -132,6 +132,8 @@ class DailyUserInputStrong(models.Model):
 
     sleep_time_excluding_awake_time = models.CharField(max_length=10, blank = True)
 
+    sleep_comment = models.TextField(blank=True)
+
     prescription_or_non_prescription_sleep_aids_last_night = models.CharField(
         max_length=4,choices=YN_CHOICE, blank = True)
 

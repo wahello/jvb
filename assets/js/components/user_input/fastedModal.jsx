@@ -44,9 +44,11 @@ export default class FastedModal extends Component{
 		                            <Input 
 			                            type="textarea" 
 			                            className="custom-select form-control" 
+			                            placeholder="dairy, cheese, pasta, bread, white rice etc..."
+			                            rows="5" cols="5"
 			                            value={this.state.food_ate_before_workout}
 			                            onChange={this.handleChange}
-			                            placeholder="Apple, riceballs..." /> 
+			                             /> 
 			                    </div>        	
                           </FormGroup> 
 					</Collapse>		

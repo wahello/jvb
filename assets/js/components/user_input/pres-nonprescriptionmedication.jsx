@@ -44,9 +44,10 @@ export default class PrescriptionMedication extends Component{
 								<Label>7.1 What Did You Take?</Label>
 									<div className="input1">
 										<Input 
-			                            type="FormText" 
+			                            type="textarea" 
 			                            className="form-control" 
 			                            value={this.state.medications_taken_list}
+			                            rows="5" cols="5"
 			                          onChange={this.handleChangeMedications} >			                           
 			                            </Input>
 			                        </div>    
