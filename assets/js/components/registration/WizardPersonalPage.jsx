@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
-		 Row, Col, Container} from 'reactstrap';
+		 Row, Col, Container,InputGroup} from 'reactstrap';
 
-import renderField from './fieldRenderer';
+import {renderFieldFormGroup,renderSelectFeet, renderSelectInches} from './fieldRenderer';
 import { personal_validate } from './validation';
 
 const WizardPersonalPage = (props) => {
@@ -14,66 +14,58 @@ const WizardPersonalPage = (props) => {
 			<Row>
 				<Col className="form-item">
 
-					<FormGroup>
-						<Label>First Name</Label>
-						<Field
-							name = "first_name"
-							type = "input"
-							label = "First Name"
-							placeholder = "John"
-							value=""
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "first_name"
+						type = "input"
+						label = "First Name"
+						placeholder = "John"
+						value=""
+						component = {renderFieldFormGroup}
+					/>
 
-					<FormGroup>
-						<Label>Last Name </Label>
-						<Field
-							name = "last_name"
-							type = "input"
-							label = "Last Name"
-							placeholder = "Doe"
-							value=""
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "last_name"
+						type = "input"
+						label = "Last Name"
+						placeholder = "Doe"
+						value=""
+						component = {renderFieldFormGroup}
+					/>
 
-					<FormGroup>
-						<Label> Date of Birth </Label>
-						<Field
-							name = "date_of_birth"
-							type = "date"
-							label = "Birthday"
-							placeholder = "dd/mm/yyyy"
-							value=""
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "date_of_birth"
+						type = "date"
+						label = "Date of Birth"
+						placeholder = "dd/mm/yyyy"
+						value=""
+						component = {renderFieldFormGroup}
+					/>
 
 					<FormGroup>
 						<Label>Height</Label>
-						<Field
-							name = "height"
-							type = "input"
-							label = "Height"
-							placeholder = "5'11"
-							value=""
-							component = {renderField}
-						/>
+						<InputGroup>
+							<Field
+								name = "feet"
+								type = "select"
+								component = {renderSelectFeet}	
+							/>
+							&nbsp;&nbsp;
+							<Field
+								name = "inches"
+								type = "select"
+								component = {renderSelectInches}	
+							/>
+						</InputGroup>
 					</FormGroup>
 
-					<FormGroup>
-						<Label> Weight (in pounds)</Label>
-						<Field
-							name = "weight"
-							type = "number"
-							label = "Weight"
-							placeholder = "150"
-							value=""
-							component = {renderField}
-						/>
-					</FormGroup>
-
+					<Field
+						name = "weight"
+						type = "number"
+						label = " Weight (in pounds)"
+						placeholder = "150"
+						value=""
+						component = {renderFieldFormGroup}
+					/>
 
 					 <FormGroup>
 				          <Label className="custom-control custom-radio">

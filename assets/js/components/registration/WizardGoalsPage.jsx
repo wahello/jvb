@@ -5,7 +5,7 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Container} from 'reactstrap';
 
 import { goals_validate } from './validation';
-import renderField from './fieldRenderer';
+import {renderFieldFormGroup} from './fieldRenderer';
 
 const WizardGoalsPage = (props) => {
 	const { handleSubmit, previousPage, onSubmit } = props;
@@ -29,20 +29,17 @@ const WizardGoalsPage = (props) => {
 						</Label>
 					</div><br />
 
-					<FormGroup>
-						<Label> Daily Sleep Goals (in hours)</Label>
-						<Field
-							name = "sleep_goal"
-							type = "number"
-							label = "Sleep Goal"
-							placeholder = "7"
-							value=""
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "sleep_goal"
+						type = "number"
+						label = "Daily Sleep Goals (in hours)"
+						placeholder = "7"
+						value=""
+						component = {renderFieldFormGroup}
+					/>
 
 					<div className="f-footer">
-						<Button outline color="primary" onClick={previousPage}>
+						<Button outline color="primary" onClick={renderFieldFormGroup}>
 							Previous
 						</Button>
 						<Button type="submit" outline color="primary" style={{float:'right'}}>

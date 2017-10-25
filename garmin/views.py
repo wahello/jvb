@@ -268,7 +268,7 @@ class GarminPing(APIView):
 					model(	user=user,
 						 	summary_id=obj.get("summaryId"),
 						 	record_date_in_seconds=record_date,
-						 	calendar_date=obj.get("calendar_date"),
+						 	calendar_date=obj.get("calendarDate"),
 						 	data=obj)
 					for obj in json_data
 				]

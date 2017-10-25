@@ -4,7 +4,7 @@ import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Container} from 'reactstrap';
 
-import renderField from './fieldRenderer';
+import {renderFieldFormGroup} from './fieldRenderer';
 import { account_validate } from './validation';
 
 const WizardAccountPage = (props) => {
@@ -14,49 +14,37 @@ const WizardAccountPage = (props) => {
 		<Form onSubmit={handleSubmit(onSubmit)} >
 			<Row>
 				<Col className="form-item">
-					<FormGroup>
-						<Label>Username</Label>
-						<Field
-							name = "username"
-							type = "text"
-							label = "Username"
-							placeholder = "john"
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "username"
+						type = "text"
+						label = "Username"
+						placeholder = "john"
+						component = {renderFieldFormGroup}
+					/>
 
-					<FormGroup>
-						<Label>Email</Label>
-						<Field
-							name = "email"
-							type = "email"
-							label = "Email"
-							placeholder = "example@address.com"
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "email"
+						type = "email"
+						label = "Email"
+						placeholder = "example@address.com"
+						component = {renderFieldFormGroup}
+					/>
 
-					<FormGroup>
-						<Label>Password</Label>
-						<Field
-							name = "password"
-							type = "password"
-							label = "Password"
-							placeholder = ""
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "password"
+						type = "password"
+						label = "Password"
+						placeholder = ""
+						component = {renderFieldFormGroup}
+					/>
 
-					<FormGroup>
-						<Label>Repeat Password</Label>
-						<Field
-							name = "re_password"
-							type = "password"
-							label = "re_password"
-							placeholder = ""
-							component = {renderField}
-						/>
-					</FormGroup>
+					<Field
+						name = "re_password"
+						type = "password"
+						label = "Re-Password"
+						placeholder = ""
+						component = {renderFieldFormGroup}
+					/>
 
 					<div className="f-footer">
 						<Button type="submit" outline color="primary">Next</Button>
