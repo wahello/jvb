@@ -165,9 +165,10 @@ export default class PainModal extends Component{
 						<Label>1.5.2 Please Write Where You Have Pain/Twinges</Label>
 							<div className="input1">
 								<Input
-								type="text"
+								type="textarea"
 								className="form-control"
 								placeholder="Write in....."
+								rows="5" cols="5"
 								value={this.state.other_pain_areas}
 								onChange={this.handleChange} />
 							</div>
