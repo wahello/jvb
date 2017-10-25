@@ -953,7 +953,8 @@ handleScroll() {
                                    name="weight"                                  
                                    value={this.state.weight}
                                    onChange={this.handleChange} >
-                                    <option key="select" value="">select</option>
+                                    <option key = "select" value="select">select</option>
+                                    <option key = "no-weigh" value="">I Din't weigh myself today</option> 
                                    {this.createDropdown(30,300)}
                                    </Input>
                             </div>
