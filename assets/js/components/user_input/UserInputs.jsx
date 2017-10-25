@@ -325,39 +325,32 @@ handleScroll() {
                                               
                            <Navbar light toggleable className="navbar navbar-expand-sm nav1">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-                                              <div className="toggler">
-                                                <FontAwesome
-                                                  name = "bars"
-                                                  size = "1.5x"
-                                                />
-                                                </div>
-                                                </NavbarToggler> 
-                                                 <span id="spa">
-                                            <abbr id="abbri" title="Calender">
-                                              <NavLink id="navlink" href="#">
-                                                <FontAwesome 
-                                                  name = "calendar"
-                                                  size = "1x"
-                                                  id="calendar" 
-                                                  onClick={this.toggleCalendar}
-                                                />
-                                              </NavLink>
-                                            </abbr>
-                                            </span>  
+                                    <div className="toggler">
+                                      <FontAwesome
+                                        name = "bars"
+                                        size = "1.5x"
+                                      />
+                                    </div>
+                                  </NavbarToggler> 
+                                  <span id="spa">
+                                    <abbr id="abbri" title="Calender">
+                                      <NavLink id="navlink" href="#">
+                                        <FontAwesome 
+                                          name = "calendar"
+                                          size = "1x"
+                                          id="calendar" 
+                                          onClick={this.toggleCalendar}
+                                        />
+                                      </NavLink>
+                                    </abbr>
+                                  </span>
 
-                                            <Button disabled style={{color:"#fff"}}>
-                                            <span style={{color:"#fff"}} className="date">                                              
-                                              {moment(this.state.selected_date).format('MMM D, YYYY')}
-                                            </span>
-                                             </Button>
-                                                                                                  
+                                  <span id="current-date">
+                                   {moment(this.state.selected_date).format('MMM D, YYYY')}
+                                  </span>  
+
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
-
-                                          <NavItem >
-                                         
-                                          </NavItem>
-
                                           <NavItem>
                                           <span id="spa">
                                             <abbr id="abbri"  title="Workout Inputs">
@@ -430,7 +423,7 @@ handleScroll() {
                                             className="btn btn-info">
                                             Copy Yesterday’s Inputs
                                           </Button>
-                                          </span>
+                                        </span>
                                       </NavItem>
                                                                    
                                   </Nav>
@@ -439,7 +432,7 @@ handleScroll() {
                            </div> 
                            </div>                                   
                            <Popover 
-                            placement="left" 
+                            placement="bottom" 
                             isOpen={this.state.calendarOpen}
                             target="calendar" 
                             toggle={this.toggleCalendar}>
