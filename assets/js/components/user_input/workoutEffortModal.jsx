@@ -57,8 +57,8 @@ export default class WorkoutEffortModal extends Component{
 			<div>
 					
 				<Label>1.4.1 Was Any Portion Of Your Workout Hard?</Label>
-				<FormGroup check>
-					<Label check>
+				<FormGroup check className="radio2">
+					<Label check className="btn btn-secondary radio1">
 						<Input type="radio" name="is_workout_hard"
 							value="yes"
 						 	checked={this.state.is_workout_hard === 'yes'}
@@ -66,7 +66,7 @@ export default class WorkoutEffortModal extends Component{
 						Yes
 					</Label>
 					{' '}
-					<Label check>
+					<Label check className="btn btn-secondary radio1">
 						<Input type="radio" name="is_workout_hard" 
 							value="no"
 							checked={this.state.is_workout_hard === 'no'}

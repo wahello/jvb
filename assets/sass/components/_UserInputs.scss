@@ -62,8 +62,8 @@ margin-top: 46px;
 		margin-top: 5px;
 	}
 	#btn1{
-		padding: 10px 45px;
-		
+		margin: 10px 65px;
+		position:relative;	
 	}
 	.input{
 		padding:0px 17px;
@@ -84,9 +84,6 @@ margin-top: 46px;
 	.toggler{
 		color: white;
 		float: left;
-	}
-	.btn2{
-		padding:10px 0px 0px 0px;  
 	}
 	strong{
 		color:#212F3D;
@@ -174,6 +171,9 @@ margin-top: 46px;
 	}
 	.radio1{
 		margin:0px 6px;
+	}
+	.radio2{
+		padding-left: 35px;
 	}
 	#calender{
 		background-color: #292C2E;
