@@ -319,95 +319,120 @@ handleScroll() {
 
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
 
-                           <div className="header">
+                      
                              <div className="col-md-8 col-lg-12 col-sm-12 "> 
 
                                               
-                           <Navbar light toggleable className="navbar navbar-expand-sm ">
-                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} />                               
-                                <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
-                                  <Nav className="nav navbar-nav" navbar>
-
-                                          <NavItem>
+                           <Navbar light toggleable className="navbar navbar-expand-sm nav1">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+                                              <div className="toggler">
+                                                <FontAwesome
+                                                  name = "bars"
+                                                  size = "1.5x"
+                                                />
+                                                </div>
+                                                </NavbarToggler> 
+                                                 <span id="spa">
                                             <abbr id="abbri" title="Calender">
                                               <NavLink id="navlink" href="#">
                                                 <FontAwesome 
                                                   name = "calendar"
-                                                  size = "2x"
+                                                  size = "1x"
                                                   id="calendar" 
                                                   onClick={this.toggleCalendar}
                                                 />
                                               </NavLink>
                                             </abbr>
+                                            </span>  
+
+                                            <Button disabled style={{color:"#fff"}}>
+                                            <span style={{color:"#fff"}} className="date">                                              
+                                              {moment(this.state.selected_date).format('MMM D, YYYY')}
+                                            </span>
+                                             </Button>
+                                                                                                  
+                               <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
+                                  <Nav className="nav navbar-nav" navbar>
+
+                                          <NavItem >
+                                         
                                           </NavItem>
 
                                           <NavItem>
+                                          <span id="spa">
                                             <abbr id="abbri"  title="Workout Inputs">
                                               <NavLink id="navlink" href="#workout">
                                                <FontAwesome
                                                   name = "heartbeat"
-                                                  size = "2x"
+                                                  size = "1x"
                                                 />
                                               </NavLink>
                                             </abbr>
+                                            </span>
                                           </NavItem>
 
                                         <NavItem>
+                                        <span id="spa">
                                           <abbr  id="abbri"  title="Sleep Inputs">
                                             <NavLink id="navlink" href="#sleep">
                                               <FontAwesome
                                                 name = "bed"
-                                                size = "2x"
+                                                size = "1x"
                                               />
                                             </NavLink>
                                           </abbr>
+                                          </span>
                                         </NavItem>
 
                                         <NavItem>
+                                        <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
                                             <NavLink id="navlink" href="#food">
                                               <FontAwesome
                                                 name = "cutlery"
-                                                size = "2x"
+                                                size = "1x"
                                               />
                                             </NavLink>
                                           </abbr>
+                                          </span>
                                         </NavItem>
 
                                         <NavItem>
+                                        <span id="spa">
                                           <abbr  id="abbri"  title="Stress/Illness Inputs">
                                             <NavLink id="navlink" href="#stress">
                                               <FontAwesome
                                                 name = "stethoscope"
-                                                size = "2x"
+                                                size = "1x"
                                               />
                                             </NavLink>
                                           </abbr>
+                                          </span>
                                         </NavItem>
 
                                         <NavItem>
+                                        <span id="spa">
                                           <abbr  id="abbri"  title="Extra Inputs">
                                             <NavLink id="navlink" href="#daily">
                                               <FontAwesome
                                                 name = "plus-circle"
-                                                size = "2x"
+                                                size = "1x"
                                               />
                                             </NavLink>
                                           </abbr>
+                                          </span>
                                        </NavItem>
-                                      <NavItem>
+                                      <NavItem className="btn1">
+                                      <span id="btn1">
                                        <Button  
                                             size="sm"
                                             onClick={this.fetchYesterdayData}
                                             className="btn btn-info">
                                             Copy Yesterday’s Inputs
                                           </Button>
+                                          </span>
                                       </NavItem>
-                                       <NavItem className="date">
-                                            <span style={{color:"#fff"}}>
-                                              {moment(this.state.selected_date).format('MMM D, YYYY')}
-                                            </span>
-                                        </NavItem>                                  
+                                                                   
                                   </Nav>
                                 </Collapse>
                            </Navbar> 
@@ -426,14 +451,8 @@ handleScroll() {
                             </div>
                            </div>
                          
-                           </div>                         
-                        <div className="row justify-content-center">
-                       
-                        <div className="btn2">
-                         
-                          </div>
-                        </div>
-                      
+                                                 
+                                          
                         <Form 
                           onSubmit = {this.onSubmit}
                           className="user-inputs-form bootstrap_validator" 
