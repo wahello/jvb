@@ -30,7 +30,7 @@ class NavbarMenu extends React.Component {
   render() {
     return (
       <div>
-        <Navbar light toggleable fixed="top" className="navbar navbar-expand-sm  navbar-fixed-top">
+        <Navbar custom toggleable fixed="top" className="navbar navbar-expand-sm  navbar-fixed-top">
           <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />
           <NavbarBrand className="navbar-brand float-xs-right float-sm-left" id="navbarTogglerDemo" href="/">HEALTH AND WELLNESS</NavbarBrand>
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
