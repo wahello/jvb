@@ -51,14 +51,6 @@ export function personal_validate(values){
 		errors.height = "Height is required";
 	}
 
-	if(values.height){
-		//Restricting height from 3-9 ft only
-		const patt = /^(:?[3-9])'(:?\s*(?:(:?1[01])|[0-9])(?:'|")?)?$/;
-		if(!patt.test(values.height)){
-			errors.height = "Enter valid height eg. 5'11 or 5'";
-		}
-	}
-
 	if(!values.weight){
 		errors.weight = "Weight is required";
 	}

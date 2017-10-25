@@ -1,8 +1,9 @@
-// http://azmind.com/demo/bootzard-bootstrap-wizard-template/
-
 import React, { Component } from 'react';
 import { Container, Row, Col, Card,CardTitle, 
 		 CardHeader, CardBlock, CardText, Progress } from 'reactstrap';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
+
 import RegisterNetwork from '../../network/register';
 
 import WizardAccountPage from './WizardAccountPage';
@@ -29,7 +30,10 @@ class Register extends Component {
 		});
 
 		//redirect to user newly created profile
-		alert("Acount created Successfully!");
+		toast.info(
+		"User Acount created successfully!",{
+          className:"dark"
+        });
 	}
 
 	onRegisterFailure(error){
@@ -112,6 +116,14 @@ class Register extends Component {
 						</Col>
 					</Row>
 				</Container>
+				<ToastContainer 
+					position="top-center"
+					type="success"
+					autoClose={5000}
+					hideProgressBar={true}
+					newestOnTop={false}
+					closeOnClick
+				/>
 			</div>
 		);
 	}
