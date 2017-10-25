@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, Card,CardTitle, 
-		 CardHeader, CardBlock, CardText, Progress } from 'reactstrap';
+		 CardHeader, CardBody, CardText, Progress } from 'reactstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
@@ -19,7 +19,7 @@ class Register extends Component {
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onRegisterSuccess = this.onRegisterSuccess.bind(this);
 		this.state = {
-			page: 1,
+			page:1,
 			progress:20
 		};
 	}
@@ -72,8 +72,13 @@ class Register extends Component {
 						<Col md="6" className="h-100">
 							<Card className="form-card">
 								<CardHeader className="text-center">
-									<h3>REGISTER TO OUR APP</h3>
-									<p>Fill in the form to get instant access</p>
+									<div className="img-fluid">
+										<img src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157"
+											 alt="jvb-logo"
+											 height="100"
+											 width="100" 
+										/>
+									</div>
 									<div className="f-progress">
 										<Progress 
 											className="f-progress-bar" 
@@ -99,7 +104,7 @@ class Register extends Component {
 										</div>
 									</div>
 								</CardHeader>
-								<CardBlock>
+								<CardBody>
 									{page === 1 && <WizardAccountPage onSubmit = {this.nextPage} />}
 									{page === 2 &&
 									 <WizardPersonalPage 
@@ -111,7 +116,7 @@ class Register extends Component {
 											onSubmit = {this.onSubmit}
 											previousPage = {this.previousPage}
 									 />}
-								</CardBlock>
+								</CardBody>
 							</Card>
 						</Col>
 					</Row>
