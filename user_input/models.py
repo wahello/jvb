@@ -137,7 +137,7 @@ class DailyUserInputStrong(models.Model):
     prescription_or_non_prescription_sleep_aids_last_night = models.CharField(
         max_length=4,choices=YN_CHOICE, blank = True)
 
-    sleep_aid_taken = models.TextField(max_length=300, blank=True)
+    sleep_aid_taken = models.TextField(blank=True)
 
     smoke_any_substances_whatsoever = models.CharField(
         max_length=4, choices=YN_CHOICE, blank = True)
@@ -257,7 +257,7 @@ class DailyUserInputOptional(models.Model):
         choices = YN_NO_WRKOUT_CHOICE,
         blank = True)
 
-    general_Workout_Comments = models.TextField( max_length = 300, blank=True )
+    general_Workout_Comments = models.TextField(blank=True )
 
     weight = models.CharField(
         max_length=20,
