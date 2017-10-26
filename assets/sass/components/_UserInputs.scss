@@ -59,7 +59,10 @@ margin-top: 46px;
 		text-align: center;
 	}
 	.btn1{
-		margin-top: 5px;
+		margin: auto;
+	}
+	.btn2{
+		margin: auto;
 	}
 	#btn1{
 		margin: 10px 65px;
@@ -93,6 +96,13 @@ margin-top: 46px;
 		text-align:center;
 		padding-top:8px;
 	}
+	#hours,#minutes{
+		float: left;
+		margin-left: 23px;
+		width:41%;
+		position: relative;
+	}
+
 	.food h2{
 		text-align:center;
 		padding-top:20px;
@@ -143,22 +153,25 @@ margin-top: 46px;
 		text-align:center;
 		padding-top:20px;
 	}
-	#hours{
+	#hours,#minutes{
 		float: left;
 		margin-left: 10px;
-	}
-	#minutes{
-		float: left;
-		margin-left: 10px;
+		width:44%;
+		position: relative;
 	}
 
 	.dark{
 		font-size:12px;
 		align-items: center;
 		text-align: center;
+		z-index: 120;
 	}
 	.btn1{
-		padding:2px 0px 0px 6px ;
+		padding:1px 0px 0px 0px ;
+	}
+	.btn2{
+		margin-left: 3px;
+		padding: 4px 7px;
 	}	
 	#padd{
 		padding-top:17px;
@@ -173,6 +186,7 @@ margin-top: 46px;
 	}
 	.radio1{
 		margin:0px 6px;
+		padding-left: 29px;
 	}
 	.radio2{
 		padding-left: 35px;
@@ -199,6 +213,6 @@ margin-top: 46px;
 }
 
 #current-date{
-	width:148px;
+	width:92px;
 	color:#fff;
 }

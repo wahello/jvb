@@ -239,7 +239,9 @@ class UserInputs extends React.Component{
 
 
     onUpdateSuccess(response){
-      alert("Successfully updated form");
+       toast.info(" Successfully updated form!",{
+          className:"dark"
+                });
     }
 
     onUpdate(){
@@ -340,7 +342,7 @@ handleScroll() {
                                         size = "1.5x"
                                       />
                                     </div>
-                                  </NavbarToggler> 
+                               </NavbarToggler> 
                                   <span id="spa">
                                     <abbr id="abbri" title="Calender">
                                       <NavLink id="navlink" href="#">
@@ -436,13 +438,14 @@ handleScroll() {
                                       </NavItem>                                                                   
                                   </Nav>
                                 </Collapse>
-                                 
+                                 <span className="btn2">
                                    <Button  
                                       size="sm"
                                       onClick={this.toggleEditForm}
                                       className="btn btn-info hidden-sm-up">
                                       {this.state.editable ? 'View Inputs' : 'Edit Form'}
                                    </Button>
+                                   </span>
                                  
                            </Navbar> 
                            
@@ -780,7 +783,7 @@ handleScroll() {
                               </div>
                             }
                             {
-                              !this.state.calories &&
+                              !this.state.editable &&
                               <div className="input">
                                 <p>{this.state.workout_easy}</p>
                               </div>
