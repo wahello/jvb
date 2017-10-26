@@ -851,7 +851,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                              {(this.state.sleep_hours_last_night && this.sleep_mins_last_night) &&
+                              {(this.state.sleep_hours_last_night && this.state.sleep_mins_last_night) &&
                                 <p>{this.state.sleep_hours_last_night} hours {this.state.sleep_mins_last_night} minutes</p>
                               }
                               </div>
