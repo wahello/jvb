@@ -780,7 +780,7 @@ handleScroll() {
                               </div>
                             }
                             {
-                              !this.state.calories &&
+                              !this.state.editable &&
                               <div className="input">
                                 <p>{this.state.workout_easy}</p>
                               </div>
