@@ -119,19 +119,17 @@ margin-top: 46px;
 	}
 	#navlink{
 		color:white;
-		padding:0px 11px;
-		font-size: 26px;
+		padding:0px 7px;
+		font-size: 22px;
 	}
 
 	.nav1 {
 	  top:0; 
 	  z-index:100;
-	  right: 0;
-	  width: 100%;
+	  width: 100%; 
+	  left: 0;
 	}
-	.nav2{
-		width:100%;
-	}
+	
 
 	strong{
 		color:#212F3D;
@@ -161,7 +159,7 @@ margin-top: 46px;
 		text-align: center;
 	}
 	.btn1{
-		padding:3.5px 0px 0px 10px ;
+		padding:2px 0px 0px 6px ;
 	}	
 	#padd{
 		padding-top:17px;
@@ -202,6 +200,6 @@ margin-top: 46px;
 }
 
 #current-date{
-	width:130px;
+	width:148px;
 	color:#fff;
 }

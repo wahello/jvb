@@ -325,7 +325,7 @@ handleScroll() {
                        
                          
 
-                          <div className="nav2">
+                       
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
 
                       
@@ -433,21 +433,17 @@ handleScroll() {
                                             Copy Yesterday’s Inputs
                                           </Button>
                                         </span>
-                                      </NavItem>
-
-                                      <NavItem className="btn1">
-                                      <span id="btn1">
-                                       <Button  
-                                            size="sm"
-                                            onClick={this.toggleEditForm}
-                                            className="btn btn-info">
-                                            {this.state.editable ? 'View Inputs' : 'Edit Form'}
-                                        </Button>
-                                        </span>
-                                      </NavItem>
-                                                                   
+                                      </NavItem>                                                                   
                                   </Nav>
                                 </Collapse>
+                                 
+                                   <Button  
+                                      size="sm"
+                                      onClick={this.toggleEditForm}
+                                      className="btn btn-info hidden-sm-up">
+                                      {this.state.editable ? 'View Inputs' : 'Edit Form'}
+                                   </Button>
+                                 
                            </Navbar> 
                            
                            </div>                                   
@@ -461,7 +457,7 @@ handleScroll() {
                               </PopoverBody>
                            </Popover>                             
                            </div>
-                           </div>
+                          
                          
                                                  
                                           
@@ -1181,18 +1177,7 @@ handleScroll() {
                           { this.state.gender === 'F' &&
                             <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
-<<<<<<< HEAD
-                            <div className="input1">
-                              <Input 
-                                type="text" 
-                                className="form-control"
-                                placeholder="Between 0 - 16" 
-                                name="clothes_size"                                
-                                value={this.state.clothes_size}
-                                onChange={this.handleChange}>
-                              </Input>
-                            </div>
-=======
+
                               {
                                 <div className="input1">
                                   <Input 
@@ -1211,32 +1196,12 @@ handleScroll() {
                                   <p>{this.state.alchol_consumed}</p>
                                 </div>
                               }
->>>>>>> 61500cff6791c61af1cb663c13e2a7c5ea2c9c28
                             </FormGroup>
                           }
 
                           <FormGroup>
                               <Label className="padding">13. What Type Of Diet Do You Eat?</Label>
-<<<<<<< HEAD
-                                  <div className="input1">
-                                      <Input 
-                                      type="select" 
-                                      className="custom-select form-control" 
-                                      name="diet_type"
-                                      value={this.state.diet_to_show}
-                                      onChange={this.handleChangeDietModel}>
-                                              <option value="select">select</option>
-                                              <option value="other">Other</option> 
-                                              <option value="vegan">Vegan</option>
-                                              <option value="vegetarian">Vegetarian</option>
-                                              <option value="paleo">Paleo</option>
-                                              <option value="low carb/high fat">Low carb/High fat</option>
-                                              <option value="high carb">High Carb</option>
-                                              <option value="">None</option>
-                                              
-                                      </Input>
-                                  </div>
-=======
+
                                   {this.state.editable &&
                                     <div className="input1">
                                         <Input 
@@ -1263,7 +1228,6 @@ handleScroll() {
                                       <p>{this.state.diet_to_show === "" ? 'none' : this.state.diet_to_show}</p>
                                     </div>
                                   }
->>>>>>> 61500cff6791c61af1cb663c13e2a7c5ea2c9c28
                               <FormGroup id="padd"> 
                                {this.renderDietType()}
                                </FormGroup>
@@ -1272,30 +1236,11 @@ handleScroll() {
 
                            <FormGroup>     
                             <Label className="padding">14. Did You Stand For 3 Hours or More Yesterday? </Label>
-<<<<<<< HEAD
-                              <div className="input1">
-                                
 
-                                  <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="stand" 
-                                    value="yes"
-                                    checked={this.state.stand === 'yes'}
-                                    onChange={this.handleChange}/>{' '}
-                                    Yes
-                                 </Label>
-
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="stand" 
-                                        value="no"
-                                        checked={this.state.stand === 'no'}
-                                        onChange={this.handleChange}/>{' '}
-                                      No
-                                </Label>
-=======
                               {this.state.editable &&
                                 <div className="input1">
                                   
->>>>>>> 61500cff6791c61af1cb663c13e2a7c5ea2c9c28
+
 
                                     <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="stand" 
