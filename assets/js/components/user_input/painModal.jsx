@@ -41,7 +41,7 @@ export default class PainModal extends Component{
             "left hip":true,"right achilles":true,"left achilles":true,
             "right calf":true,"left calf":true,"right toes":true,
             "left toes":true,"neck":true,"upper back":true,
-            "mid back":true,"lower back":true
+            "mid back":true,"lower back":true,"other":true
 		}
 
 		let other_areas = [];
@@ -66,7 +66,7 @@ export default class PainModal extends Component{
 		if(other_pain_areas.length)
 		{	
 			if(area.length) 
-				pain_area_to_show = area+',other';
+				pain_area_to_show = area;
 			else
 				pain_area_to_show = 'other';
 		}
@@ -80,7 +80,6 @@ export default class PainModal extends Component{
 			pain_area_to_show: pain_area_to_show,
 			other_pain_areas:other_pain_areas
 		};
-
 		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
@@ -94,7 +93,7 @@ export default class PainModal extends Component{
 			let pain_area_to_show = area;
 			if(other_pain_areas.length){
 				if(area.length)
-					pain_area_to_show = area+",other";
+					pain_area_to_show = area;
 				else
 					pain_area_to_show = 'other';
 			}

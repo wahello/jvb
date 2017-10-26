@@ -288,11 +288,11 @@ componentWillUnmount() {
 
 handleScroll() {
 
-  if (window.scrollY >= 135) {
+  if (window.scrollY >= 135 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else {
+  } else if(window.scrollY < 135 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -846,7 +846,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                              {(this.state.sleep_hours_last_night && this.sleep_mins_last_night) &&
+                              {(this.state.sleep_hours_last_night && this.state.sleep_mins_last_night) &&
                                 <p>{this.state.sleep_hours_last_night} hours {this.state.sleep_mins_last_night} minutes</p>
                               }
                               </div>
@@ -1278,7 +1278,7 @@ handleScroll() {
 
                           }
 
-                          {this.state.update_form &&
+                          {(this.state.update_form && this.state.editable) &&
                             <Button 
                               color="info" 
                               className="btn btn-block btn-primary"
