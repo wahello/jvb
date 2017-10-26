@@ -288,11 +288,11 @@ componentWillUnmount() {
 
 handleScroll() {
 
-  if (window.scrollY >= 135) {
+  if (window.scrollY >= 135 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else {
+  } else if(window.scrollY < 135 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
