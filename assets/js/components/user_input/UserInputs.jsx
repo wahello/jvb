@@ -317,7 +317,10 @@ handleScroll() {
 
         return(
             <div>
-                <Container id="user-inputs">                  
+                <Container id="user-inputs">
+                    <div className="row justify-content-center">
+                    <div className="col-md-8 col-lg-10 col-sm-12">
+
                         <h2 className="head">Daily User Inputs Report</h2>
 
                          <div className="row justify-content-center">
@@ -459,8 +462,7 @@ handleScroll() {
                            </div>
                           
                          
-                       <div className="row justify-content-center">
-                       <div className="col-md-8 col-lg-10 col-sm-12">                                              
+                                                 
                                           
                         <Form 
                           onSubmit = {this.onSubmit}
