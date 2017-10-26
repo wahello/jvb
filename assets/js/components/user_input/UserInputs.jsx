@@ -1279,7 +1279,7 @@ handleScroll() {
 
                           }
 
-                          {this.state.update_form &&
+                          {(this.state.update_form && this.state.editable) &&
                             <Button 
                               color="info" 
                               className="btn btn-block btn-primary"
