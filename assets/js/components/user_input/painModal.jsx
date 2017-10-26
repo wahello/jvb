@@ -64,7 +64,12 @@ export default class PainModal extends Component{
 		let other_pain_areas = tmp[1].join(',');
 		let pain_area_to_show = area;
 		if(other_pain_areas.length)
-			pain_area_to_show = area+",other"
+		{	
+			if(area.length) 
+				pain_area_to_show = area+',other';
+			else
+				pain_area_to_show = 'other';
+		}
 
 
 		this.state = {
@@ -87,8 +92,12 @@ export default class PainModal extends Component{
 			let area = tmp[0].join(',');
 			let other_pain_areas = tmp[1].join(',');
 			let pain_area_to_show = area;
-			if(other_pain_areas.length)
-				pain_area_to_show = area+",other"
+			if(other_pain_areas.length){
+				if(area.length)
+					pain_area_to_show = area+",other";
+				else
+					pain_area_to_show = 'other';
+			}
 
     	  	this.setState({
     	  		pain_area: area,
@@ -118,6 +127,7 @@ export default class PainModal extends Component{
 		let otherPattern = /.*other.*/i;
 		if (otherPattern.test(value)){
 		    this.setState({
+		    	pain_area:value,
 		    	pain_area_to_show: value,
 		    	collapse:true
 		    });
@@ -136,7 +146,7 @@ export default class PainModal extends Component{
 		    	pain_area:value,
 		    	pain_area_to_show:value
 		    },()=>{
-		    	this.props.updateState(this.state.pain_area)
+		    	this.props.updateState(this.state.pain_area);
 		    });
 		}
 	}
@@ -147,31 +157,47 @@ export default class PainModal extends Component{
 				<FormGroup>   
 
                     <Label>1.5.1 Where Did You Have Pain/Twinges?</Label>
-					<div className="input1">
-	                    <Select
-								closeOnSelect={!this.state.stayOpen}
-								disabled={this.state.disabled}
-								multi
-								onChange={this.handleSelectChange}
-								options={option}
-								simpleValue
-								value={this.state.pain_area_to_show}
-						/> 
-					</div>
+                    {this.props.editable &&
+						<div className="input1">
+		                    <Select
+									closeOnSelect={!this.state.stayOpen}
+									disabled={this.state.disabled}
+									multi
+									onChange={this.handleSelectChange}
+									options={option}
+									simpleValue
+									value={this.state.pain_area_to_show}
+							/> 
+						</div>
+					}
+					{
+                      	!this.props.editable &&
+                      	<div className="input">
+                        	<p>{this.state.pain_area_to_show}</p>
+                      	</div>
+                    }
                   </FormGroup> 
 
 				<Collapse isOpen={this.state.collapse}>
 					<FormGroup>
 						<Label>1.5.2 Please Write Where You Have Pain/Twinges</Label>
-							<div className="input1">
-								<Input
-								type="textarea"
-								className="form-control"
-								placeholder="Write in....."
-								rows="5" cols="5"
-								value={this.state.other_pain_areas}
-								onChange={this.handleChange} />
-							</div>
+							{this.props.editable &&
+								<div className="input1">
+									<Input
+									type="textarea"
+									className="form-control"
+									placeholder="Write in....."
+									rows="5" cols="5"
+									value={this.state.other_pain_areas}
+									onChange={this.handleChange} />
+								</div>
+							}
+							{
+                             	 !this.props.editable &&
+                             	 <div className="input">
+                                	<p>{this.state.other_pain_areas}</p>
+                              	 </div>
+                            }
 					</FormGroup>
 				</Collapse>
 			</div>

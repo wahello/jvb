@@ -25,6 +25,7 @@ class UserInputs extends React.Component{
         selected_date:new Date(),
         fetched_user_input_created_at:'',
         update_form:false,
+        editable:true,
         isOpen: false,
         scrollingLock: false,
         gender:'M',
@@ -115,6 +116,7 @@ class UserInputs extends React.Component{
       this.toggle = this.toggle.bind(this);
       this.handleScroll = this.handleScroll.bind(this);
       this.toggleCalendar = this.toggleCalendar.bind(this);
+      this.toggleEditForm = this.toggleEditForm.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -132,6 +134,7 @@ class UserInputs extends React.Component{
         diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
         cloning_data:false,
         fetching_data:false,
+        editable:false,
 
         workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
@@ -286,12 +289,10 @@ componentWillUnmount() {
 handleScroll() {
 
   if (window.scrollY >= 135) {
-    console.log("should lock");
     this.setState({
       scrollingLock: true
     });
   } else {
-    console.log("not locked" );
     this.setState({
       scrollingLock: false
     });
@@ -301,6 +302,12 @@ handleScroll() {
   toggleCalendar(){
     this.setState({
       calendarOpen:!this.state.calendarOpen
+    });
+  }
+
+  toggleEditForm(){
+    this.setState({
+      editable:!this.state.editable
     });
   }
 
@@ -427,6 +434,17 @@ handleScroll() {
                                           </Button>
                                         </span>
                                       </NavItem>
+
+                                      <NavItem className="btn1">
+                                      <span id="btn1">
+                                       <Button  
+                                            size="sm"
+                                            onClick={this.toggleEditForm}
+                                            className="btn btn-info">
+                                            {this.state.editable ? 'View Inputs' : 'Edit Form'}
+                                        </Button>
+                                        </span>
+                                      </NavItem>
                                                                    
                                   </Nav>
                                 </Collapse>
@@ -457,318 +475,437 @@ handleScroll() {
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
-                            <div className="input">                           
-                            
-                                <Label className="btn btn-secondary radio1">
-                                  <Input type="radio" 
-                                  name="workout" 
-                                  value="yes" 
-                                  required
-                                  checked={this.state.workout === 'yes'}
-                                  onChange={this.handleChange}/> Yes
-                                </Label>
-                                <Label className="btn btn-secondary radio1">
-                                  <Input type="radio" name="workout" 
-                                  value="no"
-                                  checked={this.state.workout === 'no'}
-                                  onChange={this.handleChange}/> No
-                                </Label>
-                                <Label className="btn btn-secondary radio1">
-                                  <Input type="radio" 
-                                  name="workout" 
-                                  value="not yet"
-                                  checked={this.state.workout === 'not yet'}
-                                  onChange={this.handleChange}/> Not Yet
-                                </Label>
-                              </div>
+                            {this.state.editable &&
+                              <div className="input">                           
+                              
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="workout" 
+                                    value="yes" 
+                                    required
+                                    checked={this.state.workout === 'yes'}
+                                    onChange={this.handleChange}/> Yes
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" name="workout" 
+                                    value="no"
+                                    checked={this.state.workout === 'no'}
+                                    onChange={this.handleChange}/> No
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="workout" 
+                                    value="not yet"
+                                    checked={this.state.workout === 'not yet'}
+                                    onChange={this.handleChange}/> Not Yet
+                                  </Label>
+                                </div>
+                              }
+                              {!this.state.editable && 
+                                <div className="input">
+                                  <p>{this.state.workout}</p>
+                                </div>
+                              }
                            
                           </FormGroup> 
 
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
-                          <FormGroup>   
-                            <Label className="padding">1.2 Was Your Workout Easy or Hard?</Label>
-                             <div className="input">
-                            <Input 
-                                  type="select" 
-                                  className="custom-select form-control" 
-                                  name="workout_easy"
-                                  value={this.state.workout_easy}
-                                  onChange={this.handleChangeWorkout} >
-                                        <option value="">select</option>                                 
-                                        <option value="easy">Easy</option>
-                                        <option value="hard">Hard</option>
-                                       
-                                  </Input>
-                              </div> 
-                          </FormGroup> 
-                        }
+                            {(this.state.workout == "yes" || this.state.workout == "") &&
+                              <FormGroup>   
+                                <Label className="padding">1.2 Was Your Workout Easy or Hard?</Label>
+                                {this.state.editable && 
+                                  <div className="input">
+                                  <Input 
+                                        type="select" 
+                                        className="custom-select form-control" 
+                                        name="workout_easy"
+                                        value={this.state.workout_easy}
+                                        onChange={this.handleChangeWorkout} >
+                                              <option value="">select</option>                                 
+                                              <option value="easy">Easy</option>
+                                              <option value="hard">Hard</option>
+                                             
+                                        </Input>
+                                    </div>
+                                }
+                                {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.workout_easy}</p>
+                                  </div>
+                                }
+                              </FormGroup> 
+                          }
 
                         { (this.state.workout == "yes" || this.state.workout == "") &&
-                        <FormGroup>   
-                            <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
-                            <div className="input">
+                          <FormGroup>   
+                              <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
+                              {this.state.editable &&
+                                <div className="input">
 
-                                 <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="workout_enjoyable" 
-                                    value="yes"
-                                    checked={this.state.workout_enjoyable === 'yes'}
-                                    onChange={this.handleChange}/>{' '}
-                                    Yes
-                                 </Label>
-
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="workout_enjoyable" 
-                                        value="no"
-                                        checked={this.state.workout_enjoyable === 'no'}
+                                     <Label check className="btn btn-secondary radio1">
+                                        <Input type="radio" name="workout_enjoyable" 
+                                        value="yes"
+                                        checked={this.state.workout_enjoyable === 'yes'}
                                         onChange={this.handleChange}/>{' '}
-                                      No
-                                </Label>
-                            </div>  
-                        </FormGroup>
-                      }
+                                        Yes
+                                     </Label>
+
+                                     <Label check className="btn btn-secondary radio1">
+                                       <Input type="radio" name="workout_enjoyable" 
+                                            value="no"
+                                            checked={this.state.workout_enjoyable === 'no'}
+                                            onChange={this.handleChange}/>{' '}
+                                          No
+                                    </Label>
+                                </div>  
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.workout_enjoyable}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                        }
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
-                          <FormGroup>   
-                            <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
-                              <div className="input">
-                                  <Input 
-                                  type="select" 
-                                  className="custom-select form-control" 
-                                  name="workout_effort"
-                                  value={this.state.workout_effort}
-                                  onChange={this.handleChangeWorkoutEffort} >
-                                        <option value="">select</option>                                 
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                  </Input>
-                              </div>
-                            <FormGroup id="padd">  
-                            {this.renderWorkoutEffortModal()}
-                             </FormGroup>
-                          </FormGroup>
+                            <FormGroup>   
+                              <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
+                                { this.state.editable &&
+                                  <div className="input">
+                                      <Input 
+                                      type="select" 
+                                      className="custom-select form-control" 
+                                      name="workout_effort"
+                                      value={this.state.workout_effort}
+                                      onChange={this.handleChangeWorkoutEffort} >
+                                            <option value="">select</option>                                 
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                      </Input>
+                                  </div>
                                 }
+                                {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.workout_effort}</p>
+                                  </div>
+                                }
+                                <FormGroup id="padd">  
+                                {this.renderWorkoutEffortModal()}
+                                </FormGroup>
+                            </FormGroup>
+                          }
               
                   
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>
                             <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?</Label>
-                                <div className="input">
-                                   
-                                     <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="pain" 
-                                    value="yes"
-                                    checked={this.state.pain === 'yes'}
-                                    onChange={this.handleChangePain}/>{' '}
-                                    Yes
-                                 </Label>
+                                {this.state.editable &&
+                                  <div className="input">
+                                     
+                                       <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="pain" 
+                                      value="yes"
+                                      checked={this.state.pain === 'yes'}
+                                      onChange={this.handleChangePain}/>{' '}
+                                      Yes
+                                   </Label>
 
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="pain" 
-                                        value="no"
-                                        checked={this.state.pain === 'no'}
-                                        onChange={this.handleChangePain}/>{' '}
-                                      No
-                                </Label>
-                                </div>
-                            <FormGroup id="padd"> 
-                            {this.renderPainModal()}
-                            </FormGroup>
+                                   <Label check className="btn btn-secondary radio1">
+                                     <Input type="radio" name="pain" 
+                                          value="no"
+                                          checked={this.state.pain === 'no'}
+                                          onChange={this.handleChangePain}/>{' '}
+                                        No
+                                  </Label>
+                                  </div>
+                                }
+                                {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.pain}</p>
+                                  </div>
+                                }
+                                <FormGroup id="padd"> 
+                                {this.renderPainModal()}
+                                </FormGroup>
                           </FormGroup>
                           }
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>    
                             <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
-                            <div className="input">
-                                <Input type="select" 
-                                       className="custom-select form-control" 
-                                       name="water_consumed"                                 
-                                       value={this.state.water_consumed}
-                                       onChange={this.handleChange}>
-                                       <option key="select"value="">select</option>                                   
-                                       {this.createDropdown(0,250)}
-                                </Input>
-                            </div>
+                              { this.state.editable &&
+                              <div className="input">
+                                  <Input type="select" 
+                                         className="custom-select form-control" 
+                                         name="water_consumed"                                 
+                                         value={this.state.water_consumed}
+                                         onChange={this.handleChange}>
+                                         <option key="select"value="">select</option>                                   
+                                         {this.createDropdown(0,250)}
+                                  </Input>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.water_consumed}</p>
+                              </div>
+                            }
                           </FormGroup>
                         }
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&     
                           <FormGroup>      
                             <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
-                                <div className="input">
-                                    <Input 
-                                    type="select" 
-                                    className="custom-select form-control" 
-                                    name="chia_seeds"
-                                    value={this.state.chia_seeds}
-                                    onChange={this.handleChange}>
-                                        <option value="">select</option>
-                                        {this.createDropdown(0,10)}
-                                    </Input>
-                                </div>    
+                                { this.state.editable &&
+                                  <div className="input">
+                                      <Input 
+                                      type="select" 
+                                      className="custom-select form-control" 
+                                      name="chia_seeds"
+                                      value={this.state.chia_seeds}
+                                      onChange={this.handleChange}>
+                                          <option value="">select</option>
+                                          {this.createDropdown(0,10)}
+                                      </Input>
+                                  </div>
+                                }
+                                {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.chia_seeds}</p>
+                                  </div>
+                                }   
                           </FormGroup>
                         }
 
                          { (this.state.workout == "yes" || this.state.workout == "") &&     
-                          <FormGroup>
-                            <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?</Label>
-                                <div className="input">
-                                    <Input type="select"
-                                     className="form-control custom-select" 
-                                     name="breath_nose"                         
-                                     value={this.state.breath_nose}
-                                     onChange={this.handleChange}>
-                                     <option key="select" value="">select</option>                            
-                                      {this.createDropdown(1,100)}
-                                    </Input>
-                                </div>
-                          </FormGroup>
+                            <FormGroup>
+                              <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?</Label>
+                                  {this.state.editable &&
+                                    <div className="input">
+                                        <Input type="select"
+                                         className="form-control custom-select" 
+                                         name="breath_nose"                         
+                                         value={this.state.breath_nose}
+                                         onChange={this.handleChange}>
+                                         <option key="select" value="">select</option>                            
+                                          {this.createDropdown(1,100)}
+                                        </Input>
+                                    </div>
+                                  }
+                                  {
+                                    !this.state.editable &&
+                                    <div className="input">
+                                      <p>{this.state.breath_nose}</p>
+                                    </div>
+                                  }
+                            </FormGroup>
 
-                        }
+                          }
+
                            { (this.state.workout == "yes" || this.state.workout == "") &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? </Label>
-                              <div className="input">
-                                
-                                  <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="fasted" 
-                                    value="yes"
-                                    checked={this.state.fasted === 'yes'}
-                                    onChange={this.handleChangeFasted}/>{' '}
-                                    Yes
-                                 </Label>
+                              {this.state.editable &&
+                                <div className="input">
+                                  
+                                    <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="fasted" 
+                                      value="yes"
+                                      checked={this.state.fasted === 'yes'}
+                                      onChange={this.handleChangeFasted}/>{' '}
+                                      Yes
+                                   </Label>
 
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="fasted" 
-                                        value="no"
-                                        checked={this.state.fasted === 'no'}
-                                        onChange={this.handleChangeFasted}/>{' '}
-                                      No
-                                </Label>
-                              </div>
-                                 <FormGroup id="padd">
-                                   {this.renderFasted()}
-                                 </FormGroup>
+                                   <Label check className="btn btn-secondary radio1">
+                                     <Input type="radio" name="fasted" 
+                                          value="no"
+                                          checked={this.state.fasted === 'no'}
+                                          onChange={this.handleChangeFasted}/>{' '}
+                                        No
+                                  </Label>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.fasted}</p>
+                                </div>
+                              }
+                               <FormGroup id="padd">
+                                 {this.renderFasted()}
+                               </FormGroup>
                           </FormGroup>
                         }
 
-                         
-
-
-                           { (this.state.workout == "yes" || this.state.workout == "") &&     
+                        { (this.state.workout == "yes" || this.state.workout == "") &&     
                           <FormGroup>      
                             <Label className="padding">1.10 General Workout Comments</Label>
-                              <div className="input1">
-                                   <Input type="textarea" name="workout_comment" 
-                                   placeholder="please leave a comment" 
-                                   className="form-control"
-                                   rows="5" cols="5" 
-                                   value={this.state.workout_comment}
-                                   onChange={this.handleChange}/>
-                              </div>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Input type="textarea" name="workout_comment" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.workout_comment}
+                                     onChange={this.handleChange}/>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.workout_comment}</p>
+                                </div>
+                              }
                           </FormGroup>
                         }
 
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>      
                             <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
-                            <div className="input1">
-                               <Input type="text" name="calories" 
-                               value={this.state.calories}
-                               onChange={this.handleChange}/>
-                            </div>
+                            {this.state.editable &&
+                              <div className="input1">
+                                 <Input type="text" name="calories" 
+                                 value={this.state.calories}
+                                 onChange={this.handleChange}/>
+                              </div>
+                            }
+                            {
+                              !this.state.calories &&
+                              <div className="input">
+                                <p>{this.state.workout_easy}</p>
+                              </div>
+                            }
                           </FormGroup>
                         }
 
                         { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>      
                             <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
-                            <div className="input1">
-                               <Input type="textarea" name="calories_item"
-                                rows="5" cols="5" 
-                                className="form-control" 
-                               value={this.state.calories_item}
-                               onChange={this.handleChange}/>
-                            </div>
+                            {this.state.editable &&
+                              <div className="input1">
+                                 <Input type="textarea" name="calories_item"
+                                  rows="5" cols="5" 
+                                  className="form-control" 
+                                 value={this.state.calories_item}
+                                 onChange={this.handleChange}/>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.calories_item}</p>
+                              </div>
+                            }
                           </FormGroup>
                             }
-                            </div>
+                      </div>
 
                             <div id="sleep">
-                          <h2><strong>Sleep Input</strong></h2>
+                            <h2><strong>Sleep Input</strong></h2>
                          
                           
-                           <FormGroup>
+                            <FormGroup>
                           
                             <Label className="padding">2. How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
-                           
-                             <div className="col-xs-6">
-                           
-                            <Input type="select" name="sleep_hours_last_night"
-                            id="hours"
-                            className="form-control custom-select"
-                            value={this.state.sleep_hours_last_night}
-                            onChange={this.handleChange}>
-                             <option key="hours" value="">Hours</option>
-                            {this.createDropdown(0,24)}                        
-                            </Input>
-                            </div>                          
-                            <div className="col-xs-6 justify-content-right">
-                           
-                            <Input type="select" name="sleep_mins_last_night"
-                             id="minutes"
-                            className="form-control custom-select "
-                            value={this.state.sleep_mins_last_night}
-                            onChange={this.handleChange}>
-                             <option key="mins" value="">Minutes</option>
-                            {this.createDropdown(0,59)}                        
-                            </Input>                        
-                            </div>                          
+                            {this.state.editable &&
+                              <div>
+                                <div className="col-xs-6">    
+                                <Input type="select" name="sleep_hours_last_night"
+                                id="hours"
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_last_night}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createDropdown(0,24)}                        
+                                </Input>
+                                </div>
+                              
+                                <div className="col-xs-6 justify-content-right">
+                               
+                                <Input type="select" name="sleep_mins_last_night"
+                                 id="minutes"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_last_night}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createDropdown(0,59)}                        
+                                </Input>                        
+                                </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.sleep_hours_last_night && this.sleep_mins_last_night) &&
+                                <p>{this.state.sleep_hours_last_night} hours {this.state.sleep_mins_last_night} minutes</p>
+                              }
+                              </div>
+                            }                          
                           </FormGroup>
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>
-                              <div className="input1">
-                                   <Input type="textarea" name="sleep_comment" 
-                                   placeholder="please leave a comment" 
-                                   className="form-control"
-                                   rows="5" cols="5" 
-                                   value={this.state.sleep_comment}
-                                   onChange={this.handleChange}/>
-                              </div>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Input type="textarea" name="sleep_comment" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.sleep_comment}
+                                     onChange={this.handleChange}/>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.sleep_comment}</p>
+                                </div>
+                              }
                           </FormGroup>
 
                            <FormGroup>
                              <Label className="padding">4. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
-                              <div className="input1">
+                              {this.state.editable &&
+                                <div className="input1">
                                 
+                                     <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="prescription_sleep_aids" 
+                                      value="yes"
+                                      checked={this.state.prescription_sleep_aids === 'yes'}
+                                      onChange={this.handleChangeSleepAids}/>{' '}
+                                      Yes
+                                   </Label>
 
                                    <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="prescription_sleep_aids" 
-                                    value="yes"
-                                    checked={this.state.prescription_sleep_aids === 'yes'}
-                                    onChange={this.handleChangeSleepAids}/>{' '}
-                                    Yes
-                                 </Label>
+                                     <Input type="radio" name="prescription_sleep_aids" 
+                                          value="no"
+                                          checked={this.state.prescription_sleep_aids === 'no'}
+                                          onChange={this.handleChangeSleepAids}/>{' '}
+                                        No
+                                  </Label>
 
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="prescription_sleep_aids" 
-                                        value="no"
-                                        checked={this.state.prescription_sleep_aids === 'no'}
-                                        onChange={this.handleChangeSleepAids}/>{' '}
-                                      No
-                                </Label>
-
-                              </div>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.prescription_sleep_aids}</p>
+                                </div>
+                              }
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionSleepAids()}
                               </FormGroup>
@@ -781,17 +918,25 @@ handleScroll() {
                           <FormGroup className="food">
                             
                             <Label className="padding">5. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
-                              <div className="input1">
-                                <Input
-                                type="select" 
-                                className="form-control custom-select" 
-                                name="prcnt_unprocessed_food"                            
-                                value={this.state.prcnt_unprocessed_food}
-                                onChange={this.handleChangeUnprocessedFood}>
-                                <option key="select" value="">select</option>
-                                {this.createDropdown(0,100,5)}
-                                </Input>
-                              </div>
+                              {this.state.editable &&
+                                <div className="input1">
+                                  <Input
+                                  type="select" 
+                                  className="form-control custom-select" 
+                                  name="prcnt_unprocessed_food"                            
+                                  value={this.state.prcnt_unprocessed_food}
+                                  onChange={this.handleChangeUnprocessedFood}>
+                                  <option key="select" value="">select</option>
+                                  {this.createDropdown(0,100,5)}
+                                  </Input>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.prcnt_unprocessed_food}</p>
+                                </div>
+                              }
                             <FormGroup id="padd"> 
                             {this.renderUnprocessedFoodModal()}
                             </FormGroup>
@@ -799,63 +944,80 @@ handleScroll() {
 
                           <FormGroup>
                                <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>
-                                <div className="input1">
-                                     <Input 
-                                     type="select" 
-                                     className="custom-select form-control" 
-                                     name="alchol_consumed"
-                                     value={this.state.alchol_consumed}
-                                     onChange={this.handleChange}>
-                                        <option value="">select</option>
-                                        <option value="0">0</option>
-                                        <option value="0.5">0.5</option>
-                                        <option value="1">1</option>
-                                        <option value="1.5">1.5</option>
-                                        <option value="2">2</option>
-                                        <option value="2.5">2.5</option>
-                                        <option value="3">3</option>
-                                        <option value="3.5">3.5</option>
-                                        <option value="4">4</option>
-                                        <option value="4.5">4.5</option>
-                                        <option value="5">5</option>
-                                        <option value="5.5">5.5</option>
-                                        <option value="6">6</option>
-                                        <option value="6.5">6.5</option>
-                                        <option value="7">7</option>
-                                        <option value="7.5">7.5</option>
-                                        <option value="8">8</option>
-                                        <option value="8.5">8.5</option>
-                                        <option value="9">9</option>
-                                        <option value="9.5">9.5</option>
-                                        <option value="10">10</option>
-                                        <option value="10+">More Than 10</option>
-                                      </Input>
-                                  </div>
+                                {this.state.editable &&
+                                  <div className="input1">
+                                       <Input 
+                                       type="select" 
+                                       className="custom-select form-control" 
+                                       name="alchol_consumed"
+                                       value={this.state.alchol_consumed}
+                                       onChange={this.handleChange}>
+                                          <option value="">select</option>
+                                          <option value="0">0</option>
+                                          <option value="0.5">0.5</option>
+                                          <option value="1">1</option>
+                                          <option value="1.5">1.5</option>
+                                          <option value="2">2</option>
+                                          <option value="2.5">2.5</option>
+                                          <option value="3">3</option>
+                                          <option value="3.5">3.5</option>
+                                          <option value="4">4</option>
+                                          <option value="4.5">4.5</option>
+                                          <option value="5">5</option>
+                                          <option value="5.5">5.5</option>
+                                          <option value="6">6</option>
+                                          <option value="6.5">6.5</option>
+                                          <option value="7">7</option>
+                                          <option value="7.5">7.5</option>
+                                          <option value="8">8</option>
+                                          <option value="8.5">8.5</option>
+                                          <option value="9">9</option>
+                                          <option value="9.5">9.5</option>
+                                          <option value="10">10</option>
+                                          <option value="10+">More Than 10</option>
+                                        </Input>
+                                    </div>
+                                  }
+                                  {
+                                    !this.state.editable &&
+                                    <div className="input">
+                                      <p>{this.state.alchol_consumed}</p>
+                                    </div>
+                                  }
                           </FormGroup>
                                             
                           <FormGroup>
                             <Label className="padding">7. Did You Smoke Any Substances Yesterday?</Label>
-                            <div className="input1">
-                                
+                            {this.state.editable &&
+                              <div className="input1">
+                                  
 
-                                 <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="smoke_substances" 
-                                    value="yes"
-                                    checked={this.state.smoke_substances === 'yes'}
-                                    onChange={this.handleChangeSmokeSubstance}/>{' '}
-                                    Yes
-                                 </Label>
+                                   <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="smoke_substances" 
+                                      value="yes"
+                                      checked={this.state.smoke_substances === 'yes'}
+                                      onChange={this.handleChangeSmokeSubstance}/>{' '}
+                                      Yes
+                                   </Label>
 
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="smoke_substances" 
-                                        value="no"
-                                        checked={this.state.smoke_substances === 'no'}
-                                        onChange={this.handleChangeSmokeSubstance}/>{' '}
-                                      No
-                                </Label>
+                                   <Label check className="btn btn-secondary radio1">
+                                     <Input type="radio" name="smoke_substances" 
+                                          value="no"
+                                          checked={this.state.smoke_substances === 'no'}
+                                          onChange={this.handleChangeSmokeSubstance}/>{' '}
+                                        No
+                                  </Label>
 
 
-                            </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.smoke_substances}</p>
+                              </div>
+                            }
+
                             <FormGroup id="padd"> 
                             {this.renderSmokeSubstance()}   
                             </FormGroup>    
@@ -863,26 +1025,34 @@ handleScroll() {
 
                            <FormGroup>
                               <Label className="padding">8. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
-                                <div className="input1">
-                                 
+                                {this.state.editable &&
+                                  <div className="input1">
+                                   
+                                     <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="medications" 
+                                      value="yes"
+                                      checked={this.state.medications === 'yes'}
+                                      onChange={this.handleChangePrescription}/>{' '}
+                                      Yes
+                                   </Label>
+
                                    <Label check className="btn btn-secondary radio1">
-                                    <Input type="radio" name="medications" 
-                                    value="yes"
-                                    checked={this.state.medications === 'yes'}
-                                    onChange={this.handleChangePrescription}/>{' '}
-                                    Yes
-                                 </Label>
-
-                                 <Label check className="btn btn-secondary radio1">
-                                   <Input type="radio" name="medications" 
-                                        value="no"
-                                        checked={this.state.medications === 'no'}
-                                        onChange={this.handleChangePrescription}/>{' '}
-                                      No
-                                </Label>
+                                     <Input type="radio" name="medications" 
+                                          value="no"
+                                          checked={this.state.medications === 'no'}
+                                          onChange={this.handleChangePrescription}/>{' '}
+                                        No
+                                  </Label>
 
 
-                                </div>
+                                  </div>
+                                }
+                                {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.medications}</p>
+                                  </div>
+                                }
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
@@ -895,23 +1065,32 @@ handleScroll() {
                            <h2><strong>Stress/Illness Inputs</strong></h2>
                           <FormGroup>
                             <Label className="padding">9. Yesterday's Stress Level</Label>
-                              <div className="input1">
-                                <Input 
-                                type="select" 
-                                className="custom-select form-control" 
-                                name="stress"
-                                value={this.state.stress}
-                                onChange={this.handleChange}>
-                                    <option value="">select</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </Input>
-                              </div>
+                              {this.state.editable &&
+                                <div className="input1">
+                                  <Input 
+                                  type="select" 
+                                  className="custom-select form-control" 
+                                  name="stress"
+                                  value={this.state.stress}
+                                  onChange={this.handleChange}>
+                                      <option value="">select</option>
+                                      <option value="low">Low</option>
+                                      <option value="medium">Medium</option>
+                                      <option value="high">High</option>
+                                  </Input>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.stress}</p>
+                                </div>
+                              }
                           </FormGroup>
 
                           <FormGroup>
                             <Label className="padding">10. Are You Sick Today?</Label>
+                            {this.state.editable &&
                               <div className="input1">
                                
 
@@ -933,6 +1112,14 @@ handleScroll() {
 
 
                               </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.sick}</p>
+                              </div>
+                            }
+
                             <FormGroup id="padd"> 
                             {this.renderPainSick()}
                             </FormGroup>
@@ -946,38 +1133,55 @@ handleScroll() {
                           <h2><strong>Extra Inputs</strong></h2>
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>
-                            <div className="input1">
-                                <Input type="select" 
-                                   className="custom-select form-control"
-                                   name="weight"                                  
-                                   value={this.state.weight}
-                                   onChange={this.handleChange} >
-                                    <option key = "select" value="select">select</option>
-                                    <option key = "no-weigh" value="">I Din't weigh myself today</option> 
-                                   {this.createDropdown(30,300)}
-                                   </Input>
-                            </div>
+                            {this.state.editable &&
+                              <div className="input1">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     name="weight"                                  
+                                     value={this.state.weight}
+                                     onChange={this.handleChange} >
+                                      <option key = "select" value="select">select</option>
+                                      <option key = "no-weigh" value="">I Din't weigh myself today</option> 
+                                     {this.createDropdown(30,300)}
+                                     </Input>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.weight}</p>
+                              </div>
+                            }
                           </FormGroup>
 
                           { this.state.gender === 'M' &&
                             <FormGroup>       
                               <Label className="padding">12. Waist Size (Male)</Label>
-                            <div className="input1">
-                              <Input 
-                                type="text" 
-                                className="form-control" 
-                                placeholder="Between 20 - 60"
-                                name="waist"                               
-                                value={this.state.waist}
-                                onChange={this.handleChange}>
-                              </Input>
-                            </div>
+                              {this.state.editable &&
+                                <div className="input1">
+                                  <Input 
+                                    type="text" 
+                                    className="form-control" 
+                                    placeholder="Between 20 - 60"
+                                    name="waist"                               
+                                    value={this.state.waist}
+                                    onChange={this.handleChange}>
+                                  </Input>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.waist}</p>
+                                </div>
+                              }
                             </FormGroup>
                           }
 
                           { this.state.gender === 'F' &&
                             <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
+<<<<<<< HEAD
                             <div className="input1">
                               <Input 
                                 type="text" 
@@ -988,11 +1192,32 @@ handleScroll() {
                                 onChange={this.handleChange}>
                               </Input>
                             </div>
+=======
+                              {
+                                <div className="input1">
+                                  <Input 
+                                    type="text" 
+                                    className="form-control"
+                                    placeholder="Between 0 - 16" 
+                                    name="clothes_size"                                
+                                    value={this.state.clothes_size}
+                                    onChange={this.handleChange}>
+                                  </Input>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.alchol_consumed}</p>
+                                </div>
+                              }
+>>>>>>> 61500cff6791c61af1cb663c13e2a7c5ea2c9c28
                             </FormGroup>
                           }
 
                           <FormGroup>
                               <Label className="padding">13. What Type Of Diet Do You Eat?</Label>
+<<<<<<< HEAD
                                   <div className="input1">
                                       <Input 
                                       type="select" 
@@ -1011,6 +1236,34 @@ handleScroll() {
                                               
                                       </Input>
                                   </div>
+=======
+                                  {this.state.editable &&
+                                    <div className="input1">
+                                        <Input 
+                                        type="select" 
+                                        className="custom-select form-control" 
+                                        name="diet_type"
+                                        value={this.state.diet_to_show}
+                                        onChange={this.handleChangeDietModel}>
+                                                <option value="select">select</option>
+                                                <option value="other">Other</option> 
+                                                <option value="vegan">Vegan</option>
+                                                <option value="vegetarian">Vegetarian</option>
+                                                <option value="paleo">Paleo</option>
+                                                <option value="low carb/high fat">Low carb/High fat</option>
+                                                <option value="high carb">High Carb</option>
+                                                <option value="">None</option>
+                                                
+                                        </Input>
+                                    </div>
+                                  }
+                                  {
+                                    !this.state.editable &&
+                                    <div className="input">
+                                      <p>{this.state.diet_to_show === "" ? 'none' : this.state.diet_to_show}</p>
+                                    </div>
+                                  }
+>>>>>>> 61500cff6791c61af1cb663c13e2a7c5ea2c9c28
                               <FormGroup id="padd"> 
                                {this.renderDietType()}
                                </FormGroup>
@@ -1019,6 +1272,7 @@ handleScroll() {
 
                            <FormGroup>     
                             <Label className="padding">14. Did You Stand For 3 Hours or More Yesterday? </Label>
+<<<<<<< HEAD
                               <div className="input1">
                                 
 
@@ -1037,9 +1291,35 @@ handleScroll() {
                                         onChange={this.handleChange}/>{' '}
                                       No
                                 </Label>
+=======
+                              {this.state.editable &&
+                                <div className="input1">
+                                  
+>>>>>>> 61500cff6791c61af1cb663c13e2a7c5ea2c9c28
 
+                                    <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="stand" 
+                                      value="yes"
+                                      checked={this.state.stand === 'yes'}
+                                      onChange={this.handleChange}/>{' '}
+                                      Yes
+                                   </Label>
 
+                                   <Label check className="btn btn-secondary radio1">
+                                     <Input type="radio" name="stand" 
+                                          value="no"
+                                          checked={this.state.stand === 'no'}
+                                          onChange={this.handleChange}/>{' '}
+                                        No
+                                  </Label>
+                                  </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.stand}</p>
                                 </div>
+                              }
                           </FormGroup>
                           </div>
 

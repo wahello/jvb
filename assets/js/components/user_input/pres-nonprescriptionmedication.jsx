@@ -42,15 +42,23 @@ export default class PrescriptionMedication extends Component{
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
 								<Label>8.1 What Did You Take?</Label>
-									<div className="input1">
-										<Input 
-			                            type="textarea" 
-			                            className="form-control" 
-			                            value={this.state.medications_taken_list}
-			                            rows="5" cols="5"
-			                          onChange={this.handleChangeMedications} >			                           
-			                            </Input>
-			                        </div>    
+									{this.props.editable &&
+										<div className="input1">
+											<Input 
+				                            type="textarea" 
+				                            className="form-control" 
+				                            value={this.state.medications_taken_list}
+				                            rows="5" cols="5"
+				                          onChange={this.handleChangeMedications} >			                           
+				                            </Input>
+				                        </div>
+				                    }
+				                    {
+	                                  !this.props.editable &&
+	                                  <div className="input">
+	                                    <p>{this.state.medications_taken_list}</p>
+	                                  </div>
+	                                }    
 							</FormGroup>
 					</Collapse>
 					
