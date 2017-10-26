@@ -39,7 +39,7 @@ export default class SickModal extends Component{
 			<div>
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>9.1 Please Tell Us Your Illness</Label>
+                            <Label>10.1 Please Tell Us Your Illness</Label>
                            	  <div className="input1">
 	                            <Input 
 		                            type="textarea" 

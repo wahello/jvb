@@ -113,7 +113,7 @@ export default class SmokedSubstance extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>6.1 What Did You Smoke Yesterday?</Label>
+                            <Label>7.1 What Did You Smoke Yesterday?</Label>
                             <div className="input1">
 	                            <Input 
 	                            type="select" 
@@ -129,7 +129,7 @@ export default class SmokedSubstance extends Component{
 
                         <Collapse isOpen={this.state.collapseCigarettesCount}>
 							<FormGroup>
-								<Label>6.2 How Many Cigarettes You Have Smoked?</Label>
+								<Label>7.2 How Many Cigarettes You Have Smoked?</Label>
 								<div className="input1">
 									<Input 
 			                            type="select" 

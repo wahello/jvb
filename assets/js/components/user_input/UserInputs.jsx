@@ -316,13 +316,13 @@ handleScroll() {
 
                          <div className="row justify-content-center">
                        
-                          <div className="col-md-8 col-lg-12 col-sm-12 "> 
+                         
 
-
+                          <div className="nav2">
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
 
                       
-                             <div className="col-md-8 col-lg-12 col-sm-12 "> 
+                            
 
                                               
                            <Navbar light toggleable className="navbar navbar-expand-sm nav1">
@@ -431,7 +431,7 @@ handleScroll() {
                                   </Nav>
                                 </Collapse>
                            </Navbar> 
-                           </div> 
+                           
                            </div>                                   
                            <Popover 
                             placement="bottom" 
@@ -441,9 +441,8 @@ handleScroll() {
                               <PopoverBody>
                                 <CalendarWidget onDaySelect={this.processDate}/>
                               </PopoverBody>
-                           </Popover> 
-
-                            </div>
+                           </Popover>                             
+                           </div>
                            </div>
                          
                                                  
@@ -978,7 +977,7 @@ handleScroll() {
 
                           { this.state.gender === 'F' &&
                             <FormGroup>
-                              <Label className="padding">13. Clothes Size (Womens)</Label>
+                              <Label className="padding">12. Clothes Size (Womens)</Label>
                             <div className="input1">
                               <Input 
                                 type="text" 
@@ -993,7 +992,7 @@ handleScroll() {
                           }
 
                           <FormGroup>
-                              <Label className="padding">14. What Type Of Diet Do You Eat?</Label>
+                              <Label className="padding">13. What Type Of Diet Do You Eat?</Label>
                                   <div className="input1">
                                       <Input 
                                       type="select" 
@@ -1019,7 +1018,7 @@ handleScroll() {
                         
 
                            <FormGroup>     
-                            <Label className="padding">15. Did You Stand For 3 Hours or More Yesterday? </Label>
+                            <Label className="padding">14. Did You Stand For 3 Hours or More Yesterday? </Label>
                               <div className="input1">
                                 
 

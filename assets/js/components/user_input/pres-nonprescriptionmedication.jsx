@@ -41,7 +41,7 @@ export default class PrescriptionMedication extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-								<Label>7.1 What Did You Take?</Label>
+								<Label>8.1 What Did You Take?</Label>
 									<div className="input1">
 										<Input 
 			                            type="textarea" 
