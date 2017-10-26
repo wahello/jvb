@@ -58,26 +58,37 @@ export default class WorkoutEffortModal extends Component{
 					
 				<Label>1.4.1 Was Any Portion Of Your Workout Hard?</Label>
 				<FormGroup check>
-					<Label check>
-						<Input type="radio" name="is_workout_hard"
-							value="yes"
-						 	checked={this.state.is_workout_hard === 'yes'}
-						 	onChange={this.handleRadioChange}/>{' '}
-						Yes
-					</Label>
-					{' '}
-					<Label check>
-						<Input type="radio" name="is_workout_hard" 
-							value="no"
-							checked={this.state.is_workout_hard === 'no'}
-							onChange={this.handleRadioChange}/>{' '}
-						No
-					</Label>
+					{this.props.editable &&
+						<div>
+							<Label check>
+								<Input type="radio" name="is_workout_hard"
+									value="yes"
+								 	checked={this.state.is_workout_hard === 'yes'}
+								 	onChange={this.handleRadioChange}/> &nbsp;
+								Yes
+							</Label>
+							&nbsp;
+							<Label check>
+								<Input type="radio" name="is_workout_hard" 
+									value="no"
+									checked={this.state.is_workout_hard === 'no'}
+									onChange={this.handleRadioChange}/> &nbsp;
+								No
+							</Label>
+						</div>
+					}
+					{
+                      !this.props.editable &&
+                      <div className="input">
+                        <p>{this.state.is_workout_hard}</p>
+                      </div>
+                    }
 				</FormGroup>
 
 				<Collapse isOpen={this.state.is_workout_hard === 'yes'}>
 					<FormGroup>
 						<Label className="padding">1.4.2 What Was Your Average Effort Level For The Hard Part Of Your Workout?</Label>
+						{this.props.editable &&
 						<div className="input1">
 							<Input 
 	                        type="select" 
@@ -97,6 +108,13 @@ export default class WorkoutEffortModal extends Component{
 	                              <option value="10">10</option>                            
 	                        </Input>
                         </div>
+                       }
+                       {
+                          !this.props.editable &&
+                          <div className="input">
+                            <p>{this.state.workout_effort_hard_portion}</p>
+                          </div>
+                        }
 					</FormGroup>
 				</Collapse>
 			</div>

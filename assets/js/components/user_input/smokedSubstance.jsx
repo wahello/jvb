@@ -113,46 +113,73 @@ export default class SmokedSubstance extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>6.1 What Did You Smoke Yesterday?</Label>
-                            <div className="input1">
-	                            <Input 
-	                            type="select" 
-	                            className="custom-select form-control" 
-	                            value={this.state.smoked_substance_to_show}
-	                            onChange={this.handleChange}>
-	                            	<option value="">select</option>
-	                                <option value="other">Other</option>
-	                                <option value="cigarettes">Cigarettes</option>
-	                            </Input> 
-                            </div> 
+                            <Label>7.1 What Did You Smoke Yesterday?</Label>
+                            {this.props.editable &&
+	                            <div className="input1">
+		                            <Input 
+		                            type="select" 
+		                            className="custom-select form-control" 
+		                            value={this.state.smoked_substance_to_show}
+		                            onChange={this.handleChange}>
+		                            	<option value="">select</option>
+		                                <option value="other">Other</option>
+		                                <option value="cigarettes">Cigarettes</option>
+		                            </Input> 
+	                            </div> 
+	                        }
+	                        {
+	                          !this.props.editable &&
+	                          <div className="input">
+	                            <p>{this.state.smoked_substance_to_show}</p>
+	                          </div>
+	                        }
                           </FormGroup> 
 
                         <Collapse isOpen={this.state.collapseCigarettesCount}>
 							<FormGroup>
-								<Label>6.2 How Many Cigarettes You Have Smoked?</Label>
-								<div className="input1">
-									<Input 
-			                            type="select" 
-			                            className="custom-select form-control" 
-			                            value={this.state.cigarettes_count}
-			                            onChange={this.handleChangeCigarettes}>
-		                            {this.createCigarettesDropdown(60)}
-	                            </Input>
-                            </div> 
+								<Label>7.2 How Many Cigarettes You Have Smoked?</Label>
+								{this.props.editable &&
+									<div className="input1">
+										<Input 
+				                            type="select" 
+				                            className="custom-select form-control" 
+				                            value={this.state.cigarettes_count}
+				                            onChange={this.handleChangeCigarettes}>
+				                            {this.createCigarettesDropdown(60)}
+			                            </Input>
+		                            </div> 
+		                        }
+		                        {
+                                  !this.props.editable &&
+                                  <div className="input">
+                                    <p>{this.state.cigarettes_count}</p>
+                                  </div>
+                                }
 							</FormGroup>
 						</Collapse>
 
 						<Collapse isOpen={this.state.collapseOther}>
 							<FormGroup>
-							<div className="input1">
-								<Input 
-	                            type="textarea" 
-	                            className="form-control" 
-	                            rows="5" cols="5"
-	                            placeholder="Please type in..."
-	                            value={this.state.smoked_substance_list}
-	                            onChange={this.handleChange} />
+							{this.props.editable &&
+								<div className="input1">
+									<Input 
+		                            type="textarea" 
+		                            className="form-control" 
+		                            rows="5" cols="5"
+		                            placeholder="Please type in..."
+		                            value={this.state.smoked_substance_list}
+		                            onChange={this.handleChange} />
 	                            </div>
+	                        }
+	                        {
+                              !this.props.editable &&
+                              <div>
+                              	  <Label>6.2 Other Smoked Substances </Label>
+	                              <div className="input">
+	                                <p>{this.state.smoked_substance_list}</p>
+	                              </div>
+                              </div>
+                            }
 							</FormGroup>
 						</Collapse>
 

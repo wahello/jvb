@@ -37,16 +37,24 @@ export default class PrescriptionSleepAids extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-							<Label>3.1 What Did You Take?</Label>
-							  <div className="input1">
-								<Input 
-	                            type="textarea" 
-	                            className="form-control"
-	                            rows="5" cols="5" 
-	                            value={this.state.sleep_aid_taken}
-	                          onChange={this.handleChangePrescriptionSleep} >	                           
-	                            </Input>
-	                          </div>
+							<Label>4.1 What Did You Take?</Label>
+							  {this.props.editable &&
+								  <div className="input1">
+									<Input 
+		                            type="textarea" 
+		                            className="form-control"
+		                            rows="5" cols="5" 
+		                            value={this.state.sleep_aid_taken}
+		                          onChange={this.handleChangePrescriptionSleep} >	                           
+		                            </Input>
+		                          </div>
+		                       }
+		                       {
+	                              !this.props.editable &&
+	                              <div className="input">
+	                                <p>{this.state.sleep_aid_taken}</p>
+	                              </div>
+	                           }
 							</FormGroup>
 					</Collapse>
 					

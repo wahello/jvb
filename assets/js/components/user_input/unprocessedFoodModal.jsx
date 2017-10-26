@@ -39,16 +39,24 @@ export default class UnprocesedFoodModal extends Component{
 			<div>
 				<Collapse isOpen={this.state.collapse}>				
 						<FormGroup>   
-                            <Label>4.1 What Unprocessed Food Were Consumed?</Label>
-								<div className="input1">
-		                            <Input 
-			                            type="textarea" 
-			                            className="custom-select form-control" 
-			                            value={this.state.unprocessed_food_list}
-			                            rows="5" cols="5"
-			                            onChange={this.handleChange}
-			                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
-		                        </div> 
+                            <Label>5.1 What Unprocessed Food Were Consumed?</Label>
+                            	{this.props.editable &&
+									<div className="input1">
+			                            <Input 
+				                            type="textarea" 
+				                            className="custom-select form-control" 
+				                            value={this.state.unprocessed_food_list}
+				                            rows="5" cols="5"
+				                            onChange={this.handleChange}
+				                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
+			                        </div> 
+			                    }
+			                    {
+	                              !this.props.editable &&
+	                              <div className="input">
+	                                <p>{this.state.unprocessed_food_list}</p>
+	                              </div>
+	                            }
                           </FormGroup> 			
 				</Collapse>
 			</div>

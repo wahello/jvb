@@ -24,6 +24,7 @@ export function renderWorkoutEffortModal(){
 	return(
 	  <WorkoutEffortModal
 		workout_effort_hard_portion={this.state.workout_effort_hard_portion}
+		editable = {this.state.editable}
 		updateState={updateState}
 	  />
 	);
@@ -40,6 +41,7 @@ export function renderPainModal(){
 	  <PainModal
 		pain_area={this.state.pain_area}
 		updateState={updateState}
+		editable = {this.state.editable}
 	  />
 	);
   }
@@ -55,6 +57,7 @@ export function renderDietType(){
 		<DietType
 		  diet_type={this.state.diet_type}
 		  updateState={updateState}
+		  editable = {this.state.editable}
 		/>
 		);
 	}
@@ -72,6 +75,7 @@ export function renderUnprocessedFoodModal(){
 		<UnprocesedFoodModal
 		unprocessed_food_list={this.state.unprocessed_food_list}
 		updateState={updateState}
+		editable = {this.state.editable}
 	  />
 	  );
 	}
@@ -87,6 +91,7 @@ export function renderFasted(){
 			<FastedModal
 			  food_ate_before_workout={this.state.food_ate_before_workout}
 			  updateState={updateState}
+			  editable = {this.state.editable}
 			/>
   );
  }  
@@ -103,6 +108,7 @@ export function renderPrescriptionMedication(){
 		  <PrescriptionMedication
 		  medications_taken_list={this.state.medications_taken_list}
 		  updateState={updateState}
+		  editable = {this.state.editable}
 		  />
 		);
 	  }
@@ -118,6 +124,7 @@ export function renderPrescriptionSleepAids(){
 			<PrescriptionSleepAids
 			sleep_aid_taken={this.state.sleep_aid_taken}
 			updateState={updateState}
+			editable = {this.state.editable}
 			/>
 		);
 	  }
@@ -135,6 +142,7 @@ export function renderPainSick(){
 		  <SickModal
 			sickness={this.state.sickness}
 			updateState={updateState}
+			editable = {this.state.editable}
 		  />
 		 );
   }
@@ -153,6 +161,7 @@ export function renderSmokeSubstance(callback){
 	  <SmokedSubstance
 		smoked_substance_list={this.state.smoked_substance_list}
 		updateState={updateState}
+		editable = {this.state.editable}
 	  />
 	);
   }

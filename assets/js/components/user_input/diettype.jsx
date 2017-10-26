@@ -44,15 +44,23 @@ export default class DietType extends Component{
 				
 							<FormGroup>
 							    <Label>12.1 What Did You Take?</Label>
-							    	<div className="input1">
-										<Input 
-			                            type="FormText" 
-			                            className="form-control" 
-			                            value={this.state.diet_type}
-				                          onChange={this.handleChangeDiet}
-				                          onBlur = {this.handleOnBlurDiet} >	                      
-			                            </Input>
-			                        </div>
+							    	{ this.props.editable &&
+								    	<div className="input1">
+											<Input 
+				                            type="FormText" 
+				                            className="form-control" 
+				                            value={this.state.diet_type}
+					                          onChange={this.handleChangeDiet}
+					                          onBlur = {this.handleOnBlurDiet} >	                      
+				                            </Input>
+				                        </div>
+			                    	}
+			                    	{
+	                                  !this.props.editable &&
+	                                  <div className="input">
+	                                    <p>{this.state.diet_type}</p>
+	                                  </div>
+	                                }
 							</FormGroup>	
 
 				</Collapse>
