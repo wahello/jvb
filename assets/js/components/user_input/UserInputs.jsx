@@ -317,24 +317,12 @@ handleScroll() {
 
         return(
             <div>
-                <Container id="user-inputs">
-                    <div className="row justify-content-center">
-                    <div className="col-md-8 col-lg-10 col-sm-12">
 
-                        <h2 className="head">Daily User Inputs Report</h2>
-
-                         <div className="row justify-content-center">
-                       
-                         
-
-                       
+      
+                            <h2 className="head">Daily User Inputs Report</h2>
+                 
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
-
-                      
-                            
-
-                                              
-                           <Navbar light toggleable className="navbar navbar-expand-sm nav1">
+                           <Navbar light toggleable className="navbar nav1">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
                                     <div className="toggler">
                                       <FontAwesome
@@ -369,7 +357,7 @@ handleScroll() {
                                                <FontAwesome
                                                   name = "heartbeat"
                                                   size = "1x"
-                                                />
+                                                />&nbsp; Work Out
                                               </NavLink>
                                             </abbr>
                                             </span>
@@ -382,7 +370,7 @@ handleScroll() {
                                               <FontAwesome
                                                 name = "bed"
                                                 size = "1x"
-                                              />
+                                              />&nbsp; Sleep
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -395,7 +383,7 @@ handleScroll() {
                                               <FontAwesome
                                                 name = "cutlery"
                                                 size = "1x"
-                                              />
+                                              />&nbsp; Nutrition and Lifestyle
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -408,7 +396,7 @@ handleScroll() {
                                               <FontAwesome
                                                 name = "stethoscope"
                                                 size = "1x"
-                                              />
+                                              />&nbsp; Stress/Illness
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -421,7 +409,7 @@ handleScroll() {
                                               <FontAwesome
                                                 name = "plus-circle"
                                                 size = "1x"
-                                              />
+                                              />&nbsp; Extra 
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -458,12 +446,11 @@ handleScroll() {
                               <PopoverBody>
                                 <CalendarWidget onDaySelect={this.processDate}/>
                               </PopoverBody>
-                           </Popover>                             
-                           </div>
-                          
-                         
-                                                 
-                                          
+                           </Popover>                                                      
+               
+                <Container id="user-inputs">                          
+                    <div className="row justify-content-center">
+                    <div className="col-md-8 col-lg-10 col-sm-12">
                         <Form 
                           onSubmit = {this.onSubmit}
                           className="user-inputs-form bootstrap_validator" 

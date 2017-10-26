@@ -12,7 +12,7 @@ body{
 	color: rgba(0,0,0,0.5);
 }
 
-#user-inputs .head{
+ .head{
 	text-align: center;
 	padding: 15px;
 	color: gray;
@@ -62,7 +62,8 @@ margin-top: 46px;
 		margin: auto;
 	}
 	.btn2{
-		margin: auto;
+		
+		margin-left: 22px;
 	}
 	#btn1{
 		margin: 10px 65px;
@@ -129,13 +130,15 @@ margin-top: 46px;
 	}
 	#navlink{
 		color:white;
-		padding:0px 6px;
-		font-size: 22px;
+		padding:3px 10px;
+		font-size: 16px;
 	}
 
 	.nav1 {
 	  top:0; 
 	  z-index:100;
+	  width: 100%;
+	  left: 0;
 	  
 	}
 	
@@ -167,10 +170,10 @@ margin-top: 46px;
 		z-index: 120;
 	}
 	.btn1{
-		padding:1px 0px 0px 0px ;
+		padding:0px 0px 0px 40px ;
 	}
 	.btn2{
-		margin-left: 3px;
+		
 		padding: 4px 7px;
 	}	
 	#padd{
@@ -213,6 +216,7 @@ margin-top: 46px;
 }
 
 #current-date{
-	width:94px;
+	width:136px;
 	color:#fff;
+	padding-left: 10px;
 }
