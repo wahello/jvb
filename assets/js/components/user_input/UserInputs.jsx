@@ -32,6 +32,7 @@ class UserInputs extends React.Component{
         diet_to_show:'',
         cloning_data:false,
         fetching_data:false,
+        updating_form:false,
         calendarOpen:false,
 
         workout:'',
@@ -103,9 +104,11 @@ class UserInputs extends React.Component{
       this.renderSmokeSubstance = renderers.renderSmokeSubstance.bind(this);
       this.renderCloneOverlay = renderers.renderCloneOverlay.bind(this);
       this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
+      this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
+      this.onUpdateSuccess = this.onUpdateSuccess.bind(this);
       this.resetForm = this.resetForm.bind(this);
       this.processDate = this.processDate.bind(this);
       this.onFetchSuccess = this.onFetchSuccess.bind(this);
@@ -237,13 +240,21 @@ class UserInputs extends React.Component{
 
 
     onUpdateSuccess(response){
-       toast.info(" Successfully updated form!",{
+      this.setState({
+        updating_form:false
+      },()=>{
+        toast.info(" Successfully updated form!",{
           className:"dark"
-                });
+        });
+      });
     }
 
     onUpdate(){
-      userDailyInputUpdate(this.state,this.onUpdateSuccess);
+      this.setState({
+        updating_form:true
+      },function(){
+        userDailyInputUpdate(this.state,this.onUpdateSuccess);
+      }.bind(this));
     }
 
     onSubmit(event){
@@ -1299,6 +1310,7 @@ handleScroll() {
                 </Container>
                 {this.renderCloneOverlay()}
                 {this.renderFetchOverlay()}
+                {this.renderUpdateOverlay()}
             </div>
         );
     }
