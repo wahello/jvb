@@ -130,14 +130,14 @@ class UserInputs extends React.Component{
         if(data.data.optional_input.type_of_diet_eaten === diet)
           other_diet = false;
       }
-      
+      let was_cloning = this.state.cloning_data;
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
         diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
         cloning_data:false,
         fetching_data:false,
-        editable:false,
+        editable: was_cloning ? true : false,
 
         workout:data.data.strong_input.workout,
         workout_easy:data.data.strong_input.work_out_easy_or_hard,
@@ -461,6 +461,7 @@ handleScroll() {
                           className="user-inputs-form bootstrap_validator" 
                           role="form" 
                           data-toggle="validator">
+                          {this.state.editable &&
                                  <div className="row justify-content-center"> 
                                    <span id="btn1">
                                        <Button  
@@ -471,6 +472,7 @@ handleScroll() {
                                           </Button>
                                    </span>
                                 </div>
+                          }
 
                           <div id="workout">
                           <h2><strong>Workout Inputs</strong></h2>
