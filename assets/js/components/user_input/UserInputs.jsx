@@ -316,11 +316,9 @@ handleScroll() {
         return(
             <div>
                              
-                            <div className="col-md-8 col-lg-8 col-sm-12">
-                               
-                             <h2 className="head">Daily User Inputs Report</h2>
-                            
-                             </div>
+                            <div className="col-md-8 col-lg-8 col-sm-12">                              
+                             <h2 className="head">Daily User Inputs Report</h2>                            
+                            </div>
 
                         <div className="nav3">
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
@@ -813,7 +811,8 @@ handleScroll() {
                             <Label className="padding">2. How Much Time Did You Sleep Last Night (Excluding Awake Time)?</Label>
                             {this.state.editable &&
                               <div>
-                                <div className="col-xs-6">    
+                                <div className="col-xs-6">
+                                  <div className="input"> 
                                 <Input type="select" name="sleep_hours_last_night"
                                 id="hours"
                                 className="form-control custom-select"
@@ -823,9 +822,10 @@ handleScroll() {
                                 {this.createDropdown(0,24)}                        
                                 </Input>
                                 </div>
+                                </div>
                               
                                 <div className="col-xs-6 justify-content-right">
-                               
+                               <div className="input">
                                 <Input type="select" name="sleep_mins_last_night"
                                  id="minutes"
                                 className="form-control custom-select "
@@ -834,6 +834,7 @@ handleScroll() {
                                  <option key="mins" value="">Minutes</option>
                                 {this.createDropdown(0,59)}                        
                                 </Input>                        
+                                </div>
                                 </div>
                               </div>
                             }
