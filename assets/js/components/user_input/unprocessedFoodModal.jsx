@@ -45,7 +45,7 @@ export default class UnprocesedFoodModal extends Component{
 									<div className="input1">
 			                            <Input 
 				                            type="textarea" 
-				                            className="custom-select form-control" 
+				                            className="form-control" 
 				                            value={this.state.unprocessed_food_list}
 				                            rows="5" cols="5"
 				                            onChange={this.handleChange}

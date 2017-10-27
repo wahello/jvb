@@ -316,10 +316,10 @@ handleScroll() {
         return(
             <div>
                              
-                            <div className="col-md-8 col-lg-10 col-sm-12">
-                             <div className="row justify-content-center">   
+                            <div className="col-md-8 col-lg-8 col-sm-12">
+                               
                              <h2 className="head">Daily User Inputs Report</h2>
-                             </div>
+                            
                              </div>
 
                         <div className="nav3">
@@ -335,7 +335,7 @@ handleScroll() {
                                </NavbarToggler> 
                                   <span id="spa">
                                     <abbr id="abbri" title="Calender">
-                                      <NavLink id="navlink" href="#">
+                                      <NavLink id="navlink1" href="#">
                                         <FontAwesome 
                                           name = "calendar"
                                           size = "1x"
@@ -350,6 +350,14 @@ handleScroll() {
                                    {moment(this.state.selected_date).format('MMM D, YYYY')}
                                   </span>  
 
+                                   <span className="btn2">
+                                   <Button  
+                                      size="sm"
+                                      onClick={this.toggleEditForm}
+                                      className="btn btn-info hidden-sm-up">
+                                      {this.state.editable ? 'View Inputs' : 'Edit Form'}
+                                   </Button>
+                                   </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
                                           <NavItem>
@@ -415,27 +423,10 @@ handleScroll() {
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>
-                                      <NavItem className="btn1">
-                                      <span id="btn1">
-                                       <Button  
-                                            size="sm"
-                                            onClick={this.fetchYesterdayData}
-                                            className="btn btn-info">
-                                            Copy Yesterday’s Inputs
-                                          </Button>
-                                        </span>
-                                      </NavItem>                                                                   
+                                       </NavItem>                                                                                                       
                                   </Nav>
                                 </Collapse>
-                                 <span className="btn2">
-                                   <Button  
-                                      size="sm"
-                                      onClick={this.toggleEditForm}
-                                      className="btn btn-info hidden-sm-up">
-                                      {this.state.editable ? 'View Inputs' : 'Edit Form'}
-                                   </Button>
-                                   </span>
+                                
                                  
                            </Navbar> 
                            
@@ -459,6 +450,17 @@ handleScroll() {
                           className="user-inputs-form bootstrap_validator" 
                           role="form" 
                           data-toggle="validator">
+                                 <div className="row justify-content-center"> 
+                                   <span id="btn1">
+                                       <Button  
+                                            size="sm"
+                                            onClick={this.fetchYesterdayData}
+                                            className="btn btn-info">
+                                            Copy Yesterday’s Inputs
+                                          </Button>
+                                   </span>
+                                </div>
+
                           <div id="workout">
                           <h2><strong>Workout Inputs</strong></h2>
 

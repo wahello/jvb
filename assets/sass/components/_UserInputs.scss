@@ -14,7 +14,7 @@ body{
 
  .head{
 	text-align: center;
-	padding: 15px;
+	padding:0px 0px  10px 97px ;
 	color: gray;
 }
 #user-inputs .user-inputs-form{
@@ -50,25 +50,18 @@ margin-top: 46px;
 
 	}
 
+	.head{
+	text-align: center;
+	padding:0px 0px  10px 0px ;
+	color: gray;
+}
+
 	#navlink{
 	color:white;
 	margin-top: 5px;
+	padding: 3px 6px;
+    font-size: 16px;
       }
-
-	#spa{
-		text-align: center;
-	}
-	.btn1{
-		margin: auto;
-	}
-	.btn2{
-		
-		margin-left: 22px;
-	}
-	#btn1{
-		margin: 10px 65px;
-		position:relative;	
-	}
 	.input{
 		padding:0px 17px;
 	}
@@ -81,6 +74,9 @@ margin-top: 46px;
 		 left:0;	 
 	    z-index:100;
 	   	
+	}
+	.btn2{
+		padding: 4px 6px;
 	}
 	.date{
 	padding:10px;
@@ -117,6 +113,11 @@ margin-top: 46px;
 	#padd{
 		padding-top:17px;
 	}
+	#current-date{
+	width:125px;
+	color:#fff;
+	padding-left: 10px;
+}
 }
 
 
@@ -131,6 +132,11 @@ margin-top: 46px;
 	#navlink{
 		color:white;
 		padding:3px 10px;
+		font-size: 16px;
+	}
+	#navlink1{
+		color:white;
+		padding:3px 0px;
 		font-size: 16px;
 	}
 
@@ -168,14 +174,13 @@ margin-top: 46px;
 		font-size:12px;
 		align-items: center;
 		text-align: center;
-		z-index: 120;
 	}
 	.btn1{
 		padding:0px 0px 0px 40px ;
 	}
 	.btn2{
 		
-		padding: 4px 7px;
+		padding: 4px 6px;
 	}	
 	#padd{
 		padding-top:17px;
@@ -217,12 +222,12 @@ margin-top: 46px;
 }
 
 #current-date{
-	width:136px;
+	width:125px;
 	color:#fff;
-	padding-left: 10px;
+	padding-left: 12px;
 }
 .nav3{
-	padding-bottom: 20px;
+	padding:0px 0px 20px 0px;
 }
 
 .toast-popup{
