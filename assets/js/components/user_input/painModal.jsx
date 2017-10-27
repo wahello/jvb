@@ -26,7 +26,8 @@ const option=[
                 { value:"neck",label:'Neck'},
                 { value:"upper back",label:'Upper back'},
                 { value:"mid back",label:'Mid back'},
-                { value:"lower back",label:'Lower back'}
+                { value:"lower back",label:'Lower back'},
+                { value:"groin",label:'Groin'}
                 
 
 		];

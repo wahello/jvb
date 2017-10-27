@@ -59,7 +59,7 @@ export default class WorkoutEffortModal extends Component{
 				<Label>1.4.1 Was Any Portion Of Your Workout Hard?</Label>
 				<FormGroup check>
 					{this.props.editable &&
-						<div>
+						<div className="work_hard">
 							<Label check className="btn btn-secondary radio1">
 								<Input type="radio" name="is_workout_hard"
 									value="yes"
