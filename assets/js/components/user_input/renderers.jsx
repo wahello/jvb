@@ -148,7 +148,7 @@ export function renderPainSick(){
   }
 }
 
-export function renderSmokeSubstance(callback){
+export function renderSmokeSubstance(){
   if (this.state.smoke_substances === 'yes'){
 
 	const updateState = function(val){
@@ -167,7 +167,7 @@ export function renderSmokeSubstance(callback){
   }
 }
 
-export function renderCloneOverlay(callback){
+export function renderCloneOverlay(){
 	if(this.state.cloning_data){
 		let yesterday = moment(this.state.selected_date).subtract(1,'days');
 		return(
@@ -189,7 +189,7 @@ export function renderCloneOverlay(callback){
 	}
 }
 
-export function renderFetchOverlay(callback){
+export function renderFetchOverlay(){
 	if(this.state.fetching_data){
 		let selected_date = moment(this.state.selected_date);
 		return(
@@ -205,6 +205,28 @@ export function renderFetchOverlay(callback){
 					</div>
 					<br/>
 					<p>Fetching user inputs for {selected_date.format('MMM D, YYYY')}</p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderUpdateOverlay(){
+	if(this.state.updating_form){
+		let selected_date = moment(this.state.selected_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"
+						/>
+					</div>
+					<br/>
+					<p>Updating user inputs for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);
