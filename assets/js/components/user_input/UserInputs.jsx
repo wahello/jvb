@@ -175,8 +175,6 @@ class UserInputs extends React.Component{
         breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
         breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
         diet_type:data.data.optional_input.type_of_diet_eaten
-      },()=>{
-        console.log(this.state);
       });
     }
 
@@ -473,7 +471,6 @@ handleScroll() {
                                     <Input type="radio" 
                                     name="workout" 
                                     value="yes" 
-                                    required
                                     checked={this.state.workout === 'yes'}
                                     onChange={this.handleChange}/> Yes
                                   </Label>
@@ -1132,7 +1129,7 @@ handleScroll() {
                                      value={this.state.weight}
                                      onChange={this.handleChange} >
                                       <option key = "select" value="select">select</option>
-                                      <option key = "no-weigh" value="">I Din't weigh myself today</option> 
+                                      <option key = "no-weigh" value="">I did not weigh myself today</option> 
                                      {this.createDropdown(30,300)}
                                      </Input>
                               </div>
@@ -1287,11 +1284,11 @@ handleScroll() {
                            <ToastContainer 
                                 position="top-center"
                                 type="success"
-                                autoClose={10000}
-                                hideProgressBar={false}
+                                autoClose={5000}
+                                hideProgressBar={true}
                                 newestOnTop={false}
                                 closeOnClick
-                                pauseOnHover
+                                className="toast-popup"
                               />
                     </Form>
                     </div>

@@ -100,8 +100,9 @@ class DailyUserInputStrong(models.Model):
 
     user_input = models.OneToOneField(UserDailyInput,related_name='strong_input')
     workout = models.CharField(
-        max_length=3,
-        choices=WORKOUT_DONE_CHOICES
+        max_length=10,
+        choices=WORKOUT_DONE_CHOICES,
+        blank=True
     )
 
     work_out_easy_or_hard = models.CharField(
