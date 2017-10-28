@@ -33,6 +33,7 @@ class UserInputs extends React.Component{
         cloning_data:false,
         fetching_data:false,
         updating_form:false,
+        submitting_form:false,
         calendarOpen:false,
 
         workout:'',
@@ -109,6 +110,7 @@ class UserInputs extends React.Component{
       this.renderCloneOverlay = renderers.renderCloneOverlay.bind(this);
       this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
+      this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -237,11 +239,14 @@ class UserInputs extends React.Component{
     }
 
     resetForm(){
-       toast.info(" User Input submitted successfully!",{
-          className:"dark"
-                });
       const initial_state = this.getInitialState();
-      this.setState({...initial_state,gender:this.state.gender});
+      this.setState({...initial_state,
+                    gender:this.state.gender,
+                    selected_date:this.state.selected_date},
+                    ()=>{toast.info(" User Input submitted successfully!",{
+                      className:"dark"
+                    })
+                  });
     }
 
 
@@ -264,9 +269,12 @@ class UserInputs extends React.Component{
     }
 
     onSubmit(event){
-      console.log(this.state);
       event.preventDefault();
-      userDailyInputSend(this.state,this.resetForm);    
+      this.setState({
+        submitting_form:true
+      },function(){
+        userDailyInputSend(this.state,this.resetForm);
+      }.bind(this));    
     }
 
     onProfileSuccessFetch(data){
@@ -1348,6 +1356,7 @@ handleScroll() {
                 {this.renderCloneOverlay()}
                 {this.renderFetchOverlay()}
                 {this.renderUpdateOverlay()}
+                {this.renderSubmitOverlay()}
             </div>
         );
     }

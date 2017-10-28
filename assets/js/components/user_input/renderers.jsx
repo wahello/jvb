@@ -16,7 +16,8 @@ import AlcoholModal from './alcoholModal';
 
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" && 
-	 this.state.workout_effort !== ""){
+	 this.state.workout_effort !== "" &&
+  	 this.state.workout_easy === "easy"){
 	const updateState = function(val){
 						  this.setState({
 							workout_effort_hard_portion:val
@@ -246,6 +247,28 @@ export function renderUpdateOverlay(){
 					</div>
 					<br/>
 					<p>Updating user inputs for {selected_date.format('MMM D, YYYY')}</p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderSubmitOverlay(){
+	if(this.state.submitting_form){
+		let selected_date = moment(this.state.selected_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"
+						/>
+					</div>
+					<br/>
+					<p>Submitting user inputs for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);

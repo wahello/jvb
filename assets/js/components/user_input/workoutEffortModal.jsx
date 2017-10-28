@@ -6,7 +6,7 @@ export default class WorkoutEffortModal extends Component{
 	constructor(props){
 		super(props);
 		const effort = this.props.workout_effort_hard_portion;
-		const is_workout_hard = effort !== '' ? 'yes' : 'no';
+		const is_workout_hard = effort !== '' ? 'yes' : '';
 		this.state = {
 			is_workout_hard:is_workout_hard,
 			workout_effort_hard_portion:effort
