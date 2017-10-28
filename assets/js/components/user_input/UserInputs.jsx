@@ -73,7 +73,8 @@ class UserInputs extends React.Component{
         heart_variability:'',
         breath_sleep:'',
         breath_day:'',
-        diet_type:''
+        diet_type:'',
+        general_comment:''
       };
       return initialState;
     }
@@ -177,7 +178,8 @@ class UserInputs extends React.Component{
         heart_variability:data.data.optional_input.heart_rate_variability,
         breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
         breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
-        diet_type:data.data.optional_input.type_of_diet_eaten
+        diet_type:data.data.optional_input.type_of_diet_eaten,
+        general_comment:data.data.optional_input.general_comment
       });
     }
 
