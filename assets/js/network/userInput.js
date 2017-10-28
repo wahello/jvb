@@ -63,7 +63,8 @@ function formatJSON(data){
 		        "stand_for_three_hours": "yes",
 		        "percent_breath_nose_last_night": 90,
 		        "percent_breath_nose_all_day_not_exercising": 90,
-		        "type_of_diet_eaten": "paleo"
+		        "type_of_diet_eaten": "paleo",
+		        "general_comment":"Some comment"
 		    }
 	}
 	*/
