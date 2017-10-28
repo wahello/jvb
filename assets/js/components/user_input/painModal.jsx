@@ -42,7 +42,7 @@ export default class PainModal extends Component{
             "left hip":true,"right achilles":true,"left achilles":true,
             "right calf":true,"left calf":true,"right toes":true,
             "left toes":true,"neck":true,"upper back":true,
-            "mid back":true,"lower back":true,"other":true
+            "mid back":true,"lower back":true,"other":true,"groin":true
 		}
 
 		let other_areas = [];
@@ -180,7 +180,7 @@ export default class PainModal extends Component{
 
 				<Collapse isOpen={this.state.collapse}>
 					<FormGroup>
-						<Label>1.5.2 Please Write Where You Have Pain/Twinges</Label>
+						<Label>1.5.1.1 Please Write Where You Have Pain/Twinges</Label>
 							{this.props.editable &&
 								<div className="input1">
 									<Input
