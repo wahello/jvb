@@ -12,6 +12,7 @@ import PrescriptionMedication from './pres-nonprescriptionmedication';
 import FastedModal from './fastedModal';
 import DietType from './diettype';
 import SmokedSubstance from './smokedSubstance';
+import AlcoholModal from './alcoholModal';
 
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" && 
@@ -165,6 +166,24 @@ export function renderSmokeSubstance(){
 	  />
 	);
   }
+}
+
+export function renderAlcoholModal(){
+  
+	if(this.state. alchol_consumed > 0 ){
+	  const updateState = function(val){
+						  this.setState({
+						  alcohol_drink_consumed_list: val
+						  })}.bind(this);
+
+		return(
+		<AlcoholModal
+		alcohol_drink_consumed_list={this.state.alcohol_drink_consumed_list}
+		updateState={updateState}
+		editable = {this.state.editable}
+	  />
+	  );
+	}
 }
 
 export function renderCloneOverlay(){

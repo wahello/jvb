@@ -174,3 +174,18 @@ export function handleChangeSmokeSubstance(event){
     });
   }
 }
+
+export function handleChangeAlcoholDrink(event){
+  const value = event.target.value;
+
+  if(value <= 0){
+    this.setState({
+      alchol_consumed:0,
+      alcohol_drink_consumed_list:''
+    });
+  }else{
+    this.setState({
+      alchol_consumed:value
+    });
+  }
+}

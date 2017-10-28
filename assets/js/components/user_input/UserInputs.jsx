@@ -48,6 +48,7 @@ class UserInputs extends React.Component{
         prcnt_unprocessed_food:'',
         unprocessed_food_list:'',
         alchol_consumed:'',
+        alcohol_drink_consumed_list:'',
         stress:'',
         sick:'',
         sickness:'',
@@ -93,6 +94,7 @@ class UserInputs extends React.Component{
       this.handleChangeFasted = handlers.handleChangeFasted.bind(this);
       this.handleChangeDietModel = handlers.handleChangeDietModel.bind(this);
       this.handleChangeSmokeSubstance = handlers.handleChangeSmokeSubstance.bind(this);
+      this.handleChangeAlcoholDrink = handlers.handleChangeAlcoholDrink.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -103,6 +105,7 @@ class UserInputs extends React.Component{
       this.renderFasted = renderers.renderFasted.bind(this);
       this.renderDietType = renderers.renderDietType.bind(this);
       this.renderSmokeSubstance = renderers.renderSmokeSubstance.bind(this);
+      this.renderAlcoholModal = renderers.renderAlcoholModal.bind(this);
       this.renderCloneOverlay = renderers.renderCloneOverlay.bind(this);
       this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
@@ -124,8 +127,8 @@ class UserInputs extends React.Component{
     }
     
     onFetchSuccess(data,clone_form=undefined){
-      const DIET_TYPE = ['vegan','vegetarian','paleo',
-                         'low carb/high fat','high carb',''];
+      const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                        'high carb','ketogenic diet','whole foods/mostly unprocessed'];
       let other_diet = true;
       for(let diet of DIET_TYPE){
         if(data.data.optional_input.type_of_diet_eaten === diet)
@@ -153,6 +156,7 @@ class UserInputs extends React.Component{
         prcnt_unprocessed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
         unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
         alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
+        alcohol_drink_consumed_list:data.data.strong_input.alcohol_drink_consumed_list,
         stress:data.data.encouraged_input.stress_level_yesterday,
         sick:data.data.optional_input.sick,
         sickness:data.data.optional_input.sickness,
@@ -962,7 +966,7 @@ handleScroll() {
                                        className="custom-select form-control" 
                                        name="alchol_consumed"
                                        value={this.state.alchol_consumed}
-                                       onChange={this.handleChange}>
+                                       onChange={this.handleChangeAlcoholDrink}>
                                           <option value="">select</option>
                                           <option value="0">0</option>
                                           <option value="0.5">0.5</option>
@@ -995,6 +999,9 @@ handleScroll() {
                                       <p>{this.state.alchol_consumed}</p>
                                     </div>
                                   }
+                                  <FormGroup id="padd"> 
+                                    {this.renderAlcoholModal()}
+                                  </FormGroup>
                           </FormGroup>
                                             
                           <FormGroup>
@@ -1240,7 +1247,7 @@ handleScroll() {
                                   {
                                     !this.state.editable &&
                                     <div className="input">
-                                      <p>{this.state.diet_to_show === "" ? 'none' : this.state.diet_to_show}</p>
+                                      <p>{this.state.diet_to_show === "" ? 'I do not follow any specific diet' : this.state.diet_to_show}</p>
                                     </div>
                                   }
                               <FormGroup id="padd"> 
