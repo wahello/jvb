@@ -179,7 +179,7 @@ class UserInputs extends React.Component{
         breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
         breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
         diet_type:data.data.optional_input.type_of_diet_eaten,
-        
+        general_comment:data.data.optional_input.general_comment
       });
     }
 

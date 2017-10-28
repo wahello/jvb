@@ -149,7 +149,7 @@ class DailyUserInputStrong(models.Model):
         max_length=4, choices=YN_CHOICE, blank = True)
 
     medications_or_controlled_substances_taken = models.TextField(blank=True)
-
+    
 class DailyUserInputEncouraged(models.Model):
 
     NO_WORKOUT = 'no workout today'
@@ -285,7 +285,7 @@ class DailyUserInputOptional(models.Model):
         choices = YN_CHOICE,
         blank=True)
 
-    sickness = models.TextField(max_length=300,blank=True)
+    sickness = models.TextField(blank=True)
 
     stand_for_three_hours = models.CharField(
         max_length=3,
@@ -305,6 +305,8 @@ class DailyUserInputOptional(models.Model):
     type_of_diet_eaten = models.CharField(
         max_length=100,
         blank=True)
+
+    general_comment = models.TextField(blank=True)
 
 
 class InputsChangesFromThirdSources(models.Model):

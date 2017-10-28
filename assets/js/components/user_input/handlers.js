@@ -144,8 +144,8 @@ export function handleChangeDietModel(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
-  const DIET_TYPE = ['vegan','vegetarian','paleo',
-                         'low carb/high fat','high carb',''];
+  const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                     'high carb','ketogenic diet','whole foods/mostly unprocessed'];
   let other_diet = true;
   for(let diet of DIET_TYPE){
     if(value === diet)
