@@ -179,7 +179,11 @@ class UserInputs extends React.Component{
         breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
         breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
         diet_type:data.data.optional_input.type_of_diet_eaten,
+<<<<<<< HEAD
         general_comment:data.data.optional_input.general_comment
+=======
+        
+>>>>>>> aa23d934f59648424370045ec84891ad862aa3ce
       });
     }
 
@@ -329,7 +333,15 @@ handleScroll() {
         return(
             <div>
                              
-                            <div className="col-md-8 col-lg-8 col-sm-12">                              
+                            <div className="col-md-8 col-lg-8 col-sm-12">
+
+                            <div className="d-flex justify-content-center">
+
+                              <img className="img-fluid"
+                               src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>
+
+                            </div>
+                              
                              <h2 className="head">Daily User Inputs Report</h2>                            
                             </div>
 
@@ -338,10 +350,7 @@ handleScroll() {
                            <Navbar light toggleable className="navbar nav1">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
                                     <div className="toggler">
-                                      <FontAwesome
-                                        name = "bars"
-                                        size = "1.5x"
-                                      />
+                                     <img src="https://www.shutterstock.com/image-illustration/running-man-illustration-motion-blur-track-394133143"/>
                                     </div>
                                </NavbarToggler> 
                                   <span id="spa">
@@ -378,7 +387,7 @@ handleScroll() {
                                                <FontAwesome
                                                   name = "heartbeat"
                                                   size = "1x"
-                                                />&nbsp; Work Out
+                                                />&nbsp; Workout
                                               </NavLink>
                                             </abbr>
                                             </span>
@@ -1220,16 +1229,16 @@ handleScroll() {
                                         name="diet_type"
                                         value={this.state.diet_to_show}
                                         onChange={this.handleChangeDietModel}>
-                                                <option value="select">select</option>
-                                                <option value="other">Other</option> 
+                                                <option value="">I do not follow any specific diet</option>
+                                                <option value="other">Other</option>
+                                                <option value="high carb">High Carb</option> 
+                                                <option value="ketogenic diet">Ketogenic Diet</option>
+                                                <option value="low carb/high fat">Low carb/High fat</option>
+                                                <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="paleo">Paleo</option>
-                                                <option value="low carb/high fat">Low carb/High fat</option>
-                                                <option value="high carb">High Carb</option>
-                                                <option value="">None</option>
-                                                
-                                        </Input>
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>                                                                                                                                                                            
+                                      </Input>
                                     </div>
                                   }
                                   {
@@ -1273,6 +1282,26 @@ handleScroll() {
                                 !this.state.editable &&
                                 <div className="input">
                                   <p>{this.state.stand}</p>
+                                </div>
+                              }
+                          </FormGroup>
+
+                           <FormGroup>      
+                            <Label className="padding">15. General Comments</Label>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Input type="textarea" name="general_comment" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.general_comment}
+                                     onChange={this.handleChange}/>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.general_comment}</p>
                                 </div>
                               }
                           </FormGroup>

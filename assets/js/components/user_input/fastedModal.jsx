@@ -39,7 +39,7 @@ export default class FastedModal extends Component{
 			
 					<Collapse isOpen={this.state.collapse}>			
 						<FormGroup>   
-                            <Label>1.9.1 What Food Eaten Before Workout?</Label>
+                            <Label>1.9.1 What Food Did You Eat Before Your Workout?</Label>
                             	{this.props.editable &&
 	                            	<div className="input1">
 			                            <Input 
