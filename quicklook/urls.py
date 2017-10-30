@@ -33,6 +33,6 @@ urlpatterns = [
 		views_calculated.movementConsistencySummary.as_view(),
 		name = "movement_consistency"),
 
-	url(r'^users/calculations',views_calculated.GetGarminData.as_view(),
+	url(r'^users/calculations',views_calculated.QuicklookCalculationView.as_view(),
 		name="quicklookcalculations"),
 ]
