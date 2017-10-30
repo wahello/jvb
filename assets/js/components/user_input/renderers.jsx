@@ -66,7 +66,6 @@ export function renderDietType(){
 }
 
 export function renderProcessedFoodModal(){
-  	console.log("here in renderer");
 	if(this.state.prcnt_processed_food > 0 ){
 	  const updateState = function(val,name){
 						  this.setState({
