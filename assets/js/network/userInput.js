@@ -24,6 +24,7 @@ function formatJSON(data){
 		        "hard_portion_workout_effort_level": 8,
 		        "prcnt_unprocessed_food_consumed_yesterday": 20,
 		        "list_of_unprocessed_food_consumed_yesterday": "some unprocessed food",
+
 		        "number_of_alcohol_consumed_yesterday": 2.5,
 		        "sleep_time_excluding_awake_time": "7:10",
 		        "sleep_comment":"Some sleep comment",
@@ -85,6 +86,7 @@ function formatJSON(data){
 	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;
 	json_data.strong_input['prcnt_unprocessed_food_consumed_yesterday'] = data.prcnt_unprocessed_food;
 	json_data.strong_input['list_of_unprocessed_food_consumed_yesterday'] = data.unprocessed_food_list; 
+	// json_data.strong_input['list_of_processed_food_consumed_yesterday'] =data.processed_food_list;
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
