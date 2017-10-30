@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
+import Textarea from 'react-textarea-autosize';
 
 export default class PrescriptionMedication extends Component{
 
@@ -44,13 +45,12 @@ export default class PrescriptionMedication extends Component{
 								<Label>8.1 What Did You Take?</Label>
 									{this.props.editable &&
 										<div className="input1">
-											<Input 
-				                            type="textarea" 
+											<Textarea 				                           
 				                            className="form-control" 
 				                            value={this.state.medications_taken_list}
 				                            rows="5" cols="5"
-				                          onChange={this.handleChangeMedications} >			                           
-				                            </Input>
+				                          onChange={this.handleChangeMedications} />			                           
+				                           
 				                        </div>
 				                    }
 				                    {

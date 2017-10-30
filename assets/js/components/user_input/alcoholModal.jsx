@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
+import Textarea from 'react-textarea-autosize';
 
 export default class AlcoholModal extends Component{
 
@@ -43,13 +44,12 @@ export default class AlcoholModal extends Component{
 
                             	{this.props.editable &&
 									<div className="input1">
-			                            <Input 
-				                            type="textarea" 
+			                            <Textarea 				                            
 				                            className="form-control" 
 				                            value={this.state.alcohol_drink_consumed_list}
 				                            rows="5" cols="5"
 				                            onChange={this.handleChange}
-				                            placeholder="Write in ..." />
+				                            placeholder="Write in ..." ></Textarea>
 			                        </div> 
 			                    }
 			                    {

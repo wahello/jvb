@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
+import Textarea from 'react-textarea-autosize';
 
 export default class SmokedSubstance extends Component{
 
@@ -164,8 +165,7 @@ export default class SmokedSubstance extends Component{
 							<FormGroup>
 							{this.props.editable &&
 								<div className="input1">
-									<Input 
-		                            type="textarea" 
+									<Textarea 		                           
 		                            className="form-control" 
 		                            rows="5" cols="5"
 		                            placeholder="Please type in..."

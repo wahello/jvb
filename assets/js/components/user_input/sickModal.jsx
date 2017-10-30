@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
+import Textarea from 'react-textarea-autosize';
 
 export default class SickModal extends Component{
 
@@ -43,8 +44,7 @@ export default class SickModal extends Component{
 
                               {this.props.editable &&
 	                           	  <div className="input1">
-		                            <Input 
-			                            type="textarea" 
+		                            <Textarea			                           
 			                            className="form-control" 
 			                            value={this.state.sickness}
 			                            rows="5" cols="5"

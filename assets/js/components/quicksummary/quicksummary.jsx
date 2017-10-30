@@ -65,7 +65,7 @@ class Quicklook extends Component{
 			        user_ql: data.grades_ql.user_ql,
 			        overall_truth_grade: data.grades_ql.overall_truth_grade,
 			        overall_truth_health_gpa: data.grades_ql.overall_truth_health_gpa,
-			        movement_non_exercise_grade: data.grades_ql.movement_non_exercise_grade,
+			        movement_non_exercise_grade: data.grades_ql.movement_non_exercise_grade,   
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
@@ -294,7 +294,7 @@ class Quicklook extends Component{
 						</div>
 					 </div>
                      </div>
-						 <div id="quick1" className="row">
+						 <div id="quick1" className="row ">
 			                 <h2>Quick Summary</h2>			                
 			             </div>
 
