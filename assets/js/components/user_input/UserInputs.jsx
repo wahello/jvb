@@ -48,6 +48,7 @@ class UserInputs extends React.Component{
         breath_nose:'',
         prcnt_unprocessed_food:'',
         unprocessed_food_list:'',
+        processed_food_list:'',
         alchol_consumed:'',
         alcohol_drink_consumed_list:'',
         stress:'',
@@ -157,6 +158,7 @@ class UserInputs extends React.Component{
         breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
         prcnt_unprocessed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
         unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
+       // processed_food_list:data.data.strong_input>list_of_processed_food_consumed_yesterday,
         alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
         alcohol_drink_consumed_list:data.data.strong_input.alcohol_drink_consumed_list,
         stress:data.data.encouraged_input.stress_level_yesterday,
@@ -362,19 +364,18 @@ handleScroll() {
                                     </div>
                                </NavbarToggler> 
                                   <span id="spa">
-                                    <abbr id="abbri" title="Calender">
                                       <NavLink id="navlink1" href="#">
                                         <FontAwesome 
                                           name = "calendar"
                                           size = "1x"
-                                          id="calendar" 
-                                          onClick={this.toggleCalendar}
+                                          
                                         />
                                       </NavLink>
-                                    </abbr>
                                   </span>
 
-                                  <span id="current-date">
+                                  <span id="calendar"
+                                  onClick={this.toggleCalendar}>
+
                                    {moment(this.state.selected_date).format('MMM D, YYYY')}
                                   </span>  
 
@@ -1306,7 +1307,7 @@ handleScroll() {
                                      className="form-control"
                                      rows="5" cols="5" 
                                      value={this.state.general_comment}
-                                     onChange={this.handleChange}/>
+                                     onChange={this.handleChange} />
                                 </div>
                               }
                               {
