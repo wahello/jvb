@@ -26,6 +26,7 @@ function formatJSON(data){
 		        "list_of_unprocessed_food_consumed_yesterday": "some unprocessed food",
 
 		        "number_of_alcohol_consumed_yesterday": 2.5,
+		        "alcohol_drink_consumed_list":"beer",
 		        "sleep_time_excluding_awake_time": "7:10",
 		        "sleep_comment":"Some sleep comment",
 		        "prescription_or_non_prescription_sleep_aids_last_night": "yes",
@@ -88,6 +89,7 @@ function formatJSON(data){
 	json_data.strong_input['list_of_unprocessed_food_consumed_yesterday'] = data.unprocessed_food_list; 
 	// json_data.strong_input['list_of_processed_food_consumed_yesterday'] =data.processed_food_list;
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
+	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;

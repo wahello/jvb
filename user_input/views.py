@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -16,10 +17,29 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 		return
 
 class UserDailyInputView(generics.ListCreateAPIView):
+
+	'''
+		- Create the userDailyInput instance
+		- List all the userDailyInput instance
+		- If query parameters "to" and "from" are provided
+		  then filter the userDailyInput data for provided date interval
+		  and return the list
+	'''
 	authentication_classes = (CsrfExemptSessionAuthentication,)
 	permission_classes = (IsAuthenticated,)
-	queryset = UserDailyInput.objects.all()
 	serializer_class = UserDailyInputSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('from',None)
+		end_dt = self.request.query_params.get('to',None)
+
+		if start_dt and end_dt:
+			return UserDailyInput.objects.filter(Q(created_at__gte=start_dt)&
+												 Q(created_at__lte=end_dt),
+												 user = user)
+		else:
+			return UserDailyInput.objects.all()
 
 class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
 	'''

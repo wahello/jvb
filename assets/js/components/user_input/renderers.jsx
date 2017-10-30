@@ -12,10 +12,12 @@ import PrescriptionMedication from './pres-nonprescriptionmedication';
 import FastedModal from './fastedModal';
 import DietType from './diettype';
 import SmokedSubstance from './smokedSubstance';
+import AlcoholModal from './alcoholModal';
 
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" && 
-	 this.state.workout_effort !== ""){
+	 this.state.workout_effort !== "" &&
+  	 this.state.workout_easy === "easy"){
 	const updateState = function(val){
 						  this.setState({
 							workout_effort_hard_portion:val
@@ -167,6 +169,24 @@ export function renderSmokeSubstance(){
   }
 }
 
+export function renderAlcoholModal(){
+  
+	if(this.state. alchol_consumed > 0 ){
+	  const updateState = function(val){
+						  this.setState({
+						  alcohol_drink_consumed_list: val
+						  })}.bind(this);
+
+		return(
+		<AlcoholModal
+		alcohol_drink_consumed_list={this.state.alcohol_drink_consumed_list}
+		updateState={updateState}
+		editable = {this.state.editable}
+	  />
+	  );
+	}
+}
+
 export function renderCloneOverlay(){
 	if(this.state.cloning_data){
 		let yesterday = moment(this.state.selected_date).subtract(1,'days');
@@ -227,6 +247,28 @@ export function renderUpdateOverlay(){
 					</div>
 					<br/>
 					<p>Updating user inputs for {selected_date.format('MMM D, YYYY')}</p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderSubmitOverlay(){
+	if(this.state.submitting_form){
+		let selected_date = moment(this.state.selected_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"
+						/>
+					</div>
+					<br/>
+					<p>Submitting user inputs for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);
