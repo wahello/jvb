@@ -18,6 +18,7 @@ export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" && 
 	 this.state.workout_effort !== "" &&
   	 this.state.workout_easy === "easy"){
+  	console.log("rendering");
 	const updateState = function(val){
 						  this.setState({
 							workout_effort_hard_portion:val

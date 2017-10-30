@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
+import Textarea from 'react-textarea-autosize';
 
 export default class UnprocesedFoodModal extends Component{
 
@@ -58,8 +59,7 @@ export default class UnprocesedFoodModal extends Component{
 										<div className="col-xs-5">
 											<Label>5.1 What Unprocessed Food Were Consumed?</Label>
 											<div className="input1">	
-					                            <Input 
-						                            type="textarea" 
+					                            <Textarea 						                           
 						                            className="form-control" 
 						                            value={this.state.unprocessed_food_list}
 						                            rows="5" cols="5"
@@ -70,8 +70,7 @@ export default class UnprocesedFoodModal extends Component{
 					                        <div className="col-xs-5">
 					                        <Label>5.2 What Processed Food Was Consumed?</Label>
 											<div className="input1">	
-					                            <Input 
-						                            type="textarea" 
+					                            <Textarea 						                           
 						                            className="form-control" 
 						                            value={this.state.unprocessed_food_list}
 						                            rows="5" cols="5"

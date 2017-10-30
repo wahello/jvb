@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import Textarea from 'react-textarea-autosize';
 
 import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
 	
@@ -183,7 +184,7 @@ export default class PainModal extends Component{
 						<Label>1.5.1.1 Please Write Where You Have Pain/Twinges</Label>
 							{this.props.editable &&
 								<div className="input1">
-									<Input
+									<Textarea
 									type="textarea"
 									className="form-control"
 									placeholder="Write in....."

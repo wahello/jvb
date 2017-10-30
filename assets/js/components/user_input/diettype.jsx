@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'reactstrap';
-
+import Textarea from 'react-textarea-autosize';
 export default class DietType extends Component{
 
 	constructor(props){
@@ -46,13 +46,12 @@ export default class DietType extends Component{
 							    <Label>13.1 What Did You Take?</Label>
 							    	{ this.props.editable &&
 								    	<div className="input1">
-											<Input 
-				                            type="FormText" 
+											<Textarea				                          
 				                            className="form-control" 
 				                            value={this.state.diet_type}
 					                          onChange={this.handleChangeDiet}
-					                          onBlur = {this.handleOnBlurDiet} >	                      
-				                            </Input>
+					                          onBlur = {this.handleOnBlurDiet} />	                      
+				                           
 				                        </div>
 			                    	}
 			                    	{

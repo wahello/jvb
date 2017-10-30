@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className,Collapse} from 'reactstrap';
-
+import Textarea from 'react-textarea-autosize';
 export default class FastedModal extends Component{
 
 	constructor(props){
@@ -42,11 +42,10 @@ export default class FastedModal extends Component{
                             <Label>1.9.1 What Food Did You Eat Before Your Workout?</Label>
                             	{this.props.editable &&
 	                            	<div className="input1">
-			                            <Input 
-				                            type="textarea" 
-				                            className="custom-select form-control" 
+			                            <Textarea 				                           
+				                            className=" form-control" 
 				                            placeholder="dairy, cheese, pasta, bread, white rice etc..."
-				                            rows="5" cols="5"
+				                            rows={5} cols={5}
 				                            value={this.state.food_ate_before_workout}
 				                            onChange={this.handleChange}
 				                             /> 
