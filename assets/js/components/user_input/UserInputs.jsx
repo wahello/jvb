@@ -292,7 +292,8 @@ class UserInputs extends React.Component{
       window.addEventListener('scroll', this.handleScroll);
     }
 
-    createDropdown(start_num , end_num, step=1){
+    
+createDropdown(start_num , end_num, step=1){
     let elements = [];
     let i = start_num;
     while(i<=end_num){
@@ -302,6 +303,16 @@ class UserInputs extends React.Component{
     return elements;
   }
 
+  createSleepDropdown(start_num , end_num, mins=false, step=1){
+    let elements = [];
+    let i = start_num;
+    while(i<=end_num){
+      let j = (mins && i < 10) ? "0"+i : i;
+      elements.push(<option key={j} value={j}>{j}</option>);
+      i=i+step;
+    }
+    return elements;
+  }
    toggle() {
     this.setState({
       isOpen: !this.state.isOpen,
@@ -534,19 +545,27 @@ handleScroll() {
                               <FormGroup>   
                                 <Label className="padding">1.2 Was Your Workout Easy or Hard?</Label>
                                 {this.state.editable && 
-                                  <div className="input">
-                                  <Input 
-                                        type="select" 
-                                        className="custom-select form-control" 
-                                        name="workout_easy"
-                                        value={this.state.workout_easy}
-                                        onChange={this.handleChangeWorkout} >
-                                              <option value="">select</option>                                 
-                                              <option value="easy">Easy</option>
-                                              <option value="hard">Hard</option>
-                                             
-                                        </Input>
-                                    </div>
+                                 
+
+                                         <div className="input">
+
+                                     <Label check className="btn btn-secondary radio1">
+                                        <Input type="radio" name="workout_easy" 
+                                        value="yes"
+                                        checked={this.state.workout_easy === 'yes'}
+                                        onChange={this.handleChangeWorkout}/>{' '}
+                                        Yes
+                                     </Label>
+
+                                     <Label check className="btn btn-secondary radio1">
+                                       <Input type="radio" name="workout_easy"
+                                            value="no"
+                                            checked={this.state.workout_easy === 'no'}
+                                            onChange={this.handleChangeWorkout}/>{' '}
+                                          No
+                                    </Label>
+                                </div>  
+                                    
                                 }
                                 {
                                   !this.state.editable &&
@@ -852,7 +871,7 @@ handleScroll() {
                                 value={this.state.sleep_hours_last_night}
                                 onChange={this.handleChange}>
                                  <option key="hours" value="">Hours</option>
-                                {this.createDropdown(0,24)}                        
+                                {this.createSleepDropdown(0,24)}                        
                                 </Input>
                                 </div>
                                 </div>
@@ -865,7 +884,7 @@ handleScroll() {
                                 value={this.state.sleep_mins_last_night}
                                 onChange={this.handleChange}>
                                  <option key="mins" value="">Minutes</option>
-                                {this.createDropdown(0,59)}                        
+                                {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
                                 </div>
                                 </div>
