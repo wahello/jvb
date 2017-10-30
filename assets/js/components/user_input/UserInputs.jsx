@@ -908,7 +908,7 @@ handleScroll() {
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
+                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Processed?</Label>
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input
