@@ -40,27 +40,22 @@ from user_input.models import UserDailyInput,\
 					DailyUserInputOptional,\
 					InputsChangesFromThirdSources
 
-class GetGarminData(APIView):
+class QuicklookCalculationView(APIView):
 
 	def get(self, request, format=None):
 		user = request.user
 		epochs = [q.data for q in UserGarminDataEpoch.objects.filter(user = request.user)]
 		sleeps = [q.data for q in UserGarminDataSleep.objects.filter(user = request.user)]
-		bodyComps = [q.data for q in UserGarminDataBodyComposition.objects.filter(user = request.user)]
 		dailies = [q.data for q in UserGarminDataDaily.objects.filter(user = request.user)]
 		activities =[q.data for q in UserGarminDataActivity.objects.filter(user = request.user)]
-		manuallyUpdatedActivities = [q.data for q in UserGarminDataManuallyUpdated.objects.filter(user = request.user)]
 		daily_strong = DailyUserInputStrong.objects.filter(user_input__user = user)
 		daily_encouraged = DailyUserInputEncouraged.objects.filter(user_input__user = user)
 		daily_optional = DailyUserInputOptional.objects.filter(user_input__user = user)
-		input_from_third_source = InputsChangesFromThirdSources.objects.filter(user_input__user = user)
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		activities_json = [ast.literal_eval(dic) for dic in activities]
-		manuallyUpdatedActivities_json = [ast.literal_eval(dic) for dic in manuallyUpdatedActivities]
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
-		bodyComps_json = [ast.literal_eval(dic) for dic in bodyComps]
 
 
 		def my_sum(d, key):
@@ -107,7 +102,6 @@ class GetGarminData(APIView):
 			'elevation_gain':my_sum(activities_json,'totalElevationGainInMeters'),
 			'elevation_loss':my_sum(activities_json,'totalElevationLossInMeters'),
 			'effort_level':[int(q.work_out_effort_level) for q in daily_strong][0],
-			'effort_level':0,
 			'dew_point': 0,
 			'temperature': 0,
 			'humidity': 0,
@@ -186,21 +180,28 @@ class GetGarminData(APIView):
 			#'non_processed_food':0,
 			'diet_type':'',
 		}
+
 		alcohol_calculated_data = {
 			'alcohol_day': [int(q.number_of_alcohol_consumed_yesterday) for q in daily_strong][0],
 			#'alcohol_day':0,
 			'alcohol_week': 0
 		}
 
+		#Calculation of grades
+
+		#Average sleep per night grade claculation
+
+
+
 		user_ql = UserQuickLook.objects.create(user = request.user)
-		grades_obj = Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
-		exercise_obj = ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
-		swim_obj = SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
-		bike_obj = BikeStats.objects.create(user_ql = user_ql,**bike_calculated_data)
-		steps_obj = Steps.objects.create(user_ql = user_ql,**steps_calculated_data)
-		sleeps_obj = Sleep.objects.create(user_ql = user_ql,**sleeps_calculated_data)
-		food_obj = Food.objects.create(user_ql = user_ql,**food_calculated_data)
-		alcohol_obj = Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
+		Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
+		ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
+		SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
+		BikeStats.objects.create(user_ql = user_ql,**bike_calculated_data)
+		Steps.objects.create(user_ql = user_ql,**steps_calculated_data)
+		Sleep.objects.create(user_ql = user_ql,**sleeps_calculated_data)
+		Food.objects.create(user_ql = user_ql,**food_calculated_data)
+		Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
 
 		return Response({"message":"Successfuly created quicklook"},status = status.HTTP_201_CREATED)
 
