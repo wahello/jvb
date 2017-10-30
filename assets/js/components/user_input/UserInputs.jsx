@@ -46,7 +46,7 @@ class UserInputs extends React.Component{
         water_consumed:'',
         chia_seeds:'',
         breath_nose:'',
-        prcnt_unprocessed_food:'',
+        prcnt_processed_food:'',
         unprocessed_food_list:'',
         processed_food_list:'',
         alchol_consumed:'',
@@ -89,7 +89,7 @@ class UserInputs extends React.Component{
       this.handleChangeWorkout = handlers.handleChangeWorkout.bind(this);
       this.handleChangeWorkoutEffort = handlers.handleChangeWorkoutEffort.bind(this);
       this.handleChangePain = handlers.handleChangePain.bind(this);
-      this.handleChangeUnprocessedFood = handlers.handleChangeUnprocessedFood.bind(this);
+      this.handleChangeProcessedFood = handlers.handleChangeProcessedFood.bind(this);
       this.handleChangeSick = handlers.handleChangeSick.bind(this);
       this.handleChangeSleepAids = handlers.handleChangeSleepAids.bind(this);
       this.handleChangePrescription = handlers.handleChangePrescription.bind(this);
@@ -100,7 +100,7 @@ class UserInputs extends React.Component{
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
-      this.renderUnprocessedFoodModal = renderers.renderUnprocessedFoodModal.bind(this);
+      this.renderProcessedFoodModal = renderers.renderProcessedFoodModal.bind(this);
       this.renderPainSick = renderers.renderPainSick.bind(this);
       this.renderPrescriptionSleepAids = renderers.renderPrescriptionSleepAids.bind(this);
       this.renderPrescriptionMedication = renderers.renderPrescriptionMedication.bind(this);
@@ -156,9 +156,9 @@ class UserInputs extends React.Component{
         water_consumed:data.data.encouraged_input.water_consumed_during_workout,
         chia_seeds:data.data.optional_input.chia_seeds_consumed_during_workout,
         breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
-        prcnt_unprocessed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
+        prcnt_processed_food:data.data.strong_input.prcnt_processed_food_consumed_yesterday,
         unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
-       // processed_food_list:data.data.strong_input>list_of_processed_food_consumed_yesterday,
+        processed_food_list:data.data.strong_input.list_of_processed_food_consumed_yesterday,
         alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
         alcohol_drink_consumed_list:data.data.strong_input.alcohol_drink_consumed_list,
         stress:data.data.encouraged_input.stress_level_yesterday,
@@ -941,15 +941,15 @@ handleScroll() {
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
+                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Processed?</Label>
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input
                                   type="select" 
                                   className="form-control custom-select" 
-                                  name="prcnt_unprocessed_food"                            
-                                  value={this.state.prcnt_unprocessed_food}
-                                  onChange={this.handleChangeUnprocessedFood}>
+                                  name="prcnt_processed_food"                            
+                                  value={this.state.prcnt_processed_food}
+                                  onChange={this.handleChangeProcessedFood}>
                                   <option key="select" value="">select</option>
                                   {this.createDropdown(0,100,5)}
                                   </Input>
@@ -958,11 +958,11 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">
-                                  <p>{this.state.prcnt_unprocessed_food}</p>
+                                  <p>{this.state.prcnt_processed_food}</p>
                                 </div>
                               }
                             <FormGroup id="padd"> 
-                            {this.renderUnprocessedFoodModal()}
+                            {this.renderProcessedFoodModal()}
                             </FormGroup>
                           </FormGroup>
 

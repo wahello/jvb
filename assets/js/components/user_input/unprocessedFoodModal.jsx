@@ -6,10 +6,13 @@ export default class UnprocesedFoodModal extends Component{
 	constructor(props){
 		super(props);
 		const unprocessed_food_list = this.props.unprocessed_food_list;
+		const processed_food_list = this.props.processed_food_list;
+
 		this.state = {
 			collapse:true,
-			enter_food:false,
-			unprocessed_food_list:unprocessed_food_list
+			enter_food:(processed_food_list !== '' || unprocessed_food_list !== '') ? true : false,
+			unprocessed_food_list:unprocessed_food_list,
+			processed_food_list:processed_food_list
 		};
 		
 		this.handleChange = this.handleChange.bind(this);
@@ -20,17 +23,21 @@ export default class UnprocesedFoodModal extends Component{
 	componentWillReceiveProps(nextProps) {
   	  if(nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) {
     	  	this.setState({
-    	  		unprocessed_food_list:nextProps.unprocessed_food_list
+    	  		enter_food:(nextProps.processed_food_list !== '' ||
+    	  				    nextProps.unprocessed_food_list !== '') ? true : false,
+    	  		unprocessed_food_list:nextProps.unprocessed_food_list,
+    	  		processed_food_list:nextProps.processed_food_list
     	  	});
     	}
   	}
 
 	handleChange(event){
 		const value = event.target.value;
+		const name = event.target.name;
 	    this.setState({
-	    	unprocessed_food_list: value,
+	    	[name]: value,
 	    },()=>{
-	    	this.props.updateState(this.state.unprocessed_food_list)
+	    	this.props.updateState(this.state[name],name)
 	    });
 	}
 
@@ -62,6 +69,7 @@ export default class UnprocesedFoodModal extends Component{
 						                            type="textarea" 
 						                            className="form-control" 
 						                            value={this.state.unprocessed_food_list}
+						                            name = "unprocessed_food_list"
 						                            rows="5" cols="5"
 						                            onChange={this.handleChange}
 						                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
@@ -73,7 +81,8 @@ export default class UnprocesedFoodModal extends Component{
 					                            <Input 
 						                            type="textarea" 
 						                            className="form-control" 
-						                            value={this.state.unprocessed_food_list}
+						                            value={this.state.processed_food_list}
+						                            name="processed_food_list"
 						                            rows="5" cols="5"
 						                            onChange={this.handleChange}
 						                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
@@ -86,7 +95,10 @@ export default class UnprocesedFoodModal extends Component{
 			                    {!this.props.editable &&
 	                             
 	                              <div className="input">
-	                              	<Label>5.1 What Unprocessed Food Were Consumed?</Label>
+	                              	<Label>5.1 What Unrocessed Food Were Consumed?</Label><br/>
+	                              	<Label>Processed Food List</Label>
+	                                <p>{this.state.processed_food_list}</p>
+	                                <Label>Unprocessed Food List</Label>
 	                                <p>{this.state.unprocessed_food_list}</p>
 	                              </div>
 	                             

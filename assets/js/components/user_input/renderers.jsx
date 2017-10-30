@@ -65,16 +65,17 @@ export function renderDietType(){
 	}
 }
 
-export function renderUnprocessedFoodModal(){
-  
-	if(this.state. prcnt_unprocessed_food > 0 ){
-	  const updateState = function(val){
+export function renderProcessedFoodModal(){
+  	console.log("here in renderer");
+	if(this.state.prcnt_processed_food > 0 ){
+	  const updateState = function(val,name){
 						  this.setState({
-						  unprocessed_food_list: val
+						  [name]: val
 						  })}.bind(this);
 
 		  return(
 		<UnprocesedFoodModal
+		processed_food_list={this.state.processed_food_list}
 		unprocessed_food_list={this.state.unprocessed_food_list}
 		updateState={updateState}
 		editable = {this.state.editable}
