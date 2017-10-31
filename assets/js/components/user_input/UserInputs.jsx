@@ -803,10 +803,11 @@ handleScroll() {
                                      onChange={this.handleChange}></Textarea>
                                 </div>
                               }
+
                               {
                                 !this.state.editable &&
-                                <div className="input">
-                                  <p>{this.state.workout_comment}</p>
+                                <div className="input">                             
+                                  <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.workout_comment}</p>
                                 </div>
                               }
                           </FormGroup>
@@ -825,7 +826,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.workout_easy}</p>
+                                <p>{this.state.calories}</p>
                               </div>
                             }
                           </FormGroup>
@@ -846,7 +847,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.calories_item}</p>
+                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.calories_item}</p>
                               </div>
                             }
                           </FormGroup>
@@ -914,7 +915,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">
-                                  <p>{this.state.sleep_comment}</p>
+                                  <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.sleep_comment}</p>
                                 </div>
                               }
                           </FormGroup>
@@ -959,7 +960,7 @@ handleScroll() {
                         
                           <FormGroup className="food">
                             
-                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Processed?</Label>
+                            <Label className="padding">5. What % of The Food You Consumed Yesterday Was Unprocessed?</Label>
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input
@@ -1312,7 +1313,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">
-                                  <p>{this.state.general_comment}</p>
+                                  <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.general_comment}</p>
                                 </div>
                               }
                           </FormGroup>

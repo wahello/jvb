@@ -52,7 +52,7 @@ export default class PrescriptionSleepAids extends Component{
 		                       {
 	                              !this.props.editable &&
 	                              <div className="input">
-	                                <p>{this.state.sleep_aid_taken}</p>
+	                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.sleep_aid_taken}</p>
 	                              </div>
 	                           }
 							</FormGroup>

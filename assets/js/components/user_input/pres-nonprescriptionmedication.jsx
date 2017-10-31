@@ -49,14 +49,14 @@ export default class PrescriptionMedication extends Component{
 				                            className="form-control" 
 				                            value={this.state.medications_taken_list}
 				                            rows="5" cols="5"
-				                          onChange={this.handleChangeMedications} />			                           
+				                          onChange={this.handleChangeMedications}>	</Textarea>		                           
 				                           
 				                        </div>
 				                    }
 				                    {
 	                                  !this.props.editable &&
 	                                  <div className="input">
-	                                    <p>{this.state.medications_taken_list}</p>
+	                                    <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.medications_taken_list}</p>
 	                                  </div>
 	                                }    
 							</FormGroup>
