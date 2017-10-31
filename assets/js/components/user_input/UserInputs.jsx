@@ -41,7 +41,7 @@ class UserInputs extends React.Component{
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
-        workout_effort_hard_portion:'',
+        workout_effort_hard_portion:'',  
         pain:'',
         pain_area:'',
         water_consumed:'',
@@ -242,10 +242,13 @@ class UserInputs extends React.Component{
     }
 
     resetForm(){
-      const initial_state = this.getInitialState();
       this.setState({editable:false,
-                     submitting_form:false},
-                    ()=>{toast.info(" User Input submitted successfully!",{
+                    submitting_form:false,
+                    update_form:true,
+                    fetched_user_input_created_at:moment(this.state.selected_date).format('YYYY-MM-DD')},
+                    ()=>{
+                      console.log(this.state);
+                      toast.info(" User Input submitted successfully!",{
                       className:"dark"
                     })
                   });
@@ -371,7 +374,11 @@ handleScroll() {
                            <Navbar light toggleable className="navbar nav1">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
                                     <div className="toggler">
-                                     <img src="https://www.shutterstock.com/image-illustration/running-man-illustration-motion-blur-track-394133143"/>
+                                    <FontAwesome 
+                                          name = "bars"
+                                          size = "1x"
+                                          
+                                        />
                                     </div>
                                </NavbarToggler> 
                                   <span id="spa">
@@ -1094,17 +1101,28 @@ handleScroll() {
                             <Label className="padding">9. Yesterday's Stress Level</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                  <Input 
-                                  type="select" 
-                                  className="custom-select form-control" 
-                                  name="stress"
-                                  value={this.state.stress}
-                                  onChange={this.handleChange}>
-                                      <option value="">select</option>
-                                      <option value="low">Low</option>
-                                      <option value="medium">Medium</option>
-                                      <option value="high">High</option>
-                                  </Input>
+                                 <Label check className="btn btn-secondary radio1">
+                                    <Input type="radio" name="stress" 
+                                    value="low"
+                                    checked={this.state.stress === 'low'}
+                                    onChange={this.handleChange}/>{' '}
+                                    Low
+                                 </Label>
+
+                                 <Label check className="btn btn-secondary radio1">
+                                   <Input type="radio" name="stress" 
+                                        value="medium"
+                                        checked={this.state.stress === 'medium'}
+                                        onChange={this.handleChange}/>{' '}
+                                      Medium
+                                </Label>
+                                 <Label check className="btn btn-secondary radio1">
+                                   <Input type="radio" name="stress" 
+                                        value="high"
+                                        checked={this.state.stress === 'high'}
+                                        onChange={this.handleChange}/>{' '}
+                                      High
+                                </Label>
                                 </div>
                               }
                               {
@@ -1319,7 +1337,7 @@ handleScroll() {
                           </FormGroup>
                           </div>
 
-                          { !this.state.update_form &&
+                          { (!this.state.update_form && this.state.editable) &&
                             <Button 
                               type="submit"
                               color="info" 

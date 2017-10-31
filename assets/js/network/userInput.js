@@ -70,6 +70,8 @@ function formatJSON(data){
 		    }
 	}
 	*/
+
+	console.log(data)
 	const d = data.selected_date.getDate();
     const m = data.selected_date.getMonth()+1;
     const y = data.selected_date.getFullYear();

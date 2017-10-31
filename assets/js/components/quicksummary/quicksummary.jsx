@@ -20,7 +20,7 @@ import Sleep from './quicksummary_sleep';
 import Food from './quicksummary_food';  
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
-import Movement from './movement_summary'; 
+import User from './user_inputs'; 
 import AllStats from './quicksummary_allstats'; 
 
 
@@ -278,7 +278,8 @@ class Quicklook extends Component{
 		const class_sleep=`nav-link ${activeTab === "sleep" ? 'active':''}`;
 		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
         const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
-        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;            
+        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
+         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
 	return(
 		<div className="container-fluid">
 		<NavbarMenu/>
@@ -377,6 +378,15 @@ class Quicklook extends Component{
 						    		 </a>
 						    		 </div>
 						    </li>
+						    <li className="nav-item">
+						    		<div>
+						    		<a href="#" className={class_user} value="user"
+						    		 onClick={this.activateTab.bind(this,"user")}>
+						    		 User Inputs
+						    		 </a>
+						    		 </div>
+						    </li>
+						     
 						     
 						 </ul>
 			      		</div>
@@ -419,6 +429,7 @@ class Quicklook extends Component{
                     	{this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
                     	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
                     	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
+                    	{this.state.activeTab === "user" && <User data={this.state.data}/>}
                     </div>
 					</div>
 					</div>
