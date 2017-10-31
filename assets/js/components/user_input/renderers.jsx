@@ -172,7 +172,7 @@ export function renderSmokeSubstance(){
 
 export function renderAlcoholModal(){
   
-	if(this.state. alchol_consumed > 0 ){
+	if(this.state. alchol_consumed){
 	  const updateState = function(val){
 						  this.setState({
 						  alcohol_drink_consumed_list: val

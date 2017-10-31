@@ -243,9 +243,8 @@ class UserInputs extends React.Component{
 
     resetForm(){
       const initial_state = this.getInitialState();
-      this.setState({...initial_state,
-                    gender:this.state.gender,
-                    selected_date:this.state.selected_date},
+      this.setState({editable:false,
+                     submitting_form:false},
                     ()=>{toast.info(" User Input submitted successfully!",{
                       className:"dark"
                     })
