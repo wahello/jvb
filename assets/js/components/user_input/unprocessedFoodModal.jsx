@@ -56,7 +56,6 @@ export default class UnprocesedFoodModal extends Component{
 			<div>
 				<Collapse isOpen={this.state.collapse}>				
 						<FormGroup>   
-                            <Label>5.1 What Processed Food Were Consumed?</Label>
                             	{this.props.editable &&
                             		<div>
                             		  <div className="d-flex justify-content-center">
