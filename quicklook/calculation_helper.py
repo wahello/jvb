@@ -50,3 +50,65 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
 
 	return GRADES[points]
  
+def cal_processed_food_grade(prcnt_food):
+ 	prcnt_food = int(prcnt_food)
+ 	grade = ''
+
+ 	if (prcnt_food >= 80 and prcnt_food <= 100):
+ 		grade = 'A'
+
+ 	elif (prcnt_food >= 70 and prcnt_food <= 79):
+ 		grade = 'B'
+
+ 	elif (prcnt_food >= 60 and prcnt_food <= 69):
+ 		grade = 'C'
+
+ 	elif (prcnt_food >= 50 and prcnt_food <= 59):
+ 		grade = 'D'
+
+ 	elif (prcnt_food < 50):
+ 		grade = 'F'
+
+ 	return grade
+
+def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
+	drink_avg = sum(map(int,alcohol_drank_past_week))\
+				/len(alcohol_drank_past_week)
+
+	grade = ''
+
+	if gender == 'M':
+		if (drink_avg >= 0 and drink_avg <= 4):
+			grade = 'A'
+
+		elif (drink_avg >= 4.01 and drink_avg <= 7):
+			grade = 'B'
+
+		elif (drink_avg >= 7.01 and drink_avg <= 10):
+			grade = 'C'
+
+		elif (drink_avg >= 10.01 and drink_avg <= 13.99):
+			grade = 'D'
+
+		elif (drink_avg >= 14):
+			grade = 'F'
+
+		return grade
+
+	else:
+		if (drink_avg >= 0 and drink_avg <= 2):
+			grade = 'A'
+
+		elif (drink_avg >= 2.01 and drink_avg <= 4):
+			grade = 'B'
+
+		elif (drink_avg >= 4.01 and drink_avg <= 5):
+			grade = 'C'
+
+		elif (drink_avg >= 5.01 and drink_avg <= 6.99):
+			grade = 'D'
+
+		elif (drink_avg >= 7):
+			grade = 'F'
+
+		return grade

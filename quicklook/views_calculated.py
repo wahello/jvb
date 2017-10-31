@@ -44,6 +44,9 @@ class QuicklookCalculationView(APIView):
 
 	def get(self, request, format=None):
 		user = request.user
+		# date for which quicklook is calculated
+		dt = self.request.query_parama.get('dt',None)
+
 		epochs = [q.data for q in UserGarminDataEpoch.objects.filter(user = request.user)]
 		sleeps = [q.data for q in UserGarminDataSleep.objects.filter(user = request.user)]
 		dailies = [q.data for q in UserGarminDataDaily.objects.filter(user = request.user)]
@@ -86,8 +89,6 @@ class QuicklookCalculationView(APIView):
 			'penalty':''
 		}
 
-
-
 		exercise_calculated_data = {
 			'workout_easy_hard':[q.work_out_easy_or_hard for q in daily_strong][0],
 			'workout_type': '',
@@ -115,9 +116,7 @@ class QuicklookCalculationView(APIView):
 			'running_cadence':my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
 			'nose_breath_prcnt_workout': 0,
 			'water_consumed_workout':[int(q.water_consumed_during_workout) for q in daily_encouraged][0],
-			#'water_consumed_workout':0,
 			'chia_seeds_consumed_workout':[int(q.chia_seeds_consumed_during_workout) for q in daily_optional][0],
-			#'chia_seeds_consumed_workout':0,
 			'fast_before_workout': [q.fasted_during_workout for q in daily_optional][0],
 			'pain': [q.pains_twings_during_or_after_your_workout for q in daily_encouraged][0],
 			'pain_area': [q.pain_area for q in daily_encouraged][0],
@@ -190,7 +189,7 @@ class QuicklookCalculationView(APIView):
 		#Calculation of grades
 
 		#Average sleep per night grade claculation
-
+		
 
 
 		user_ql = UserQuickLook.objects.create(user = request.user)
@@ -204,6 +203,8 @@ class QuicklookCalculationView(APIView):
 		Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
 
 		return Response({"message":"Successfuly created quicklook"},status = status.HTTP_201_CREATED)
+
+
 
 class movementConsistencySummary(APIView):
 	permission_classes = (IsAuthenticated,)

@@ -55,19 +55,20 @@ export function handleChangePain(event){
   });
 }
 
-export function handleChangeUnprocessedFood(event){
+export function handleChangeProcessedFood(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
 
   if(value > 0){
     this.setState({
-    	prcnt_unprocessed_food:value
+    	prcnt_processed_food:value
     });
   }else{
     this.setState({
-      prcnt_unprocessed_food:value,
-      unprocessed_food_list:''
+      prcnt_processed_food:value,
+      unprocessed_food_list:'',
+      processed_food_list:''
     });
   }
 }

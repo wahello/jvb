@@ -66,16 +66,16 @@ export function renderDietType(){
 	}
 }
 
-export function renderUnprocessedFoodModal(){
-  
-	if(this.state. prcnt_unprocessed_food > 0 ){
-	  const updateState = function(val){
+export function renderProcessedFoodModal(){
+	if(this.state.prcnt_processed_food > 0 ){
+	  const updateState = function(val,name){
 						  this.setState({
-						  unprocessed_food_list: val
+						  [name]: val
 						  })}.bind(this);
 
 		  return(
 		<UnprocesedFoodModal
+		processed_food_list={this.state.processed_food_list}
 		unprocessed_food_list={this.state.unprocessed_food_list}
 		updateState={updateState}
 		editable = {this.state.editable}
@@ -172,7 +172,7 @@ export function renderSmokeSubstance(){
 
 export function renderAlcoholModal(){
   
-	if(this.state. alchol_consumed > 0 ){
+	if(this.state. alchol_consumed){
 	  const updateState = function(val){
 						  this.setState({
 						  alcohol_drink_consumed_list: val

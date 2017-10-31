@@ -176,7 +176,7 @@ export default class SmokedSubstance extends Component{
 	                        {
                               !this.props.editable &&
                               <div>
-                              	  <Label>6.2 Other Smoked Substances </Label>
+                              	  <Label>7.2 Other Smoked Substances </Label>
 	                              <div className="input">
 	                                <p>{this.state.smoked_substance_list}</p>
 	                              </div>

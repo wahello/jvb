@@ -84,7 +84,11 @@ class DailyUserInputStrong(models.Model):
         ('2.5','2.5'),('3','3'),('3.5','3.5'),('4','4'),('4.5','4.5'),
         ('5','5'),('5.5','5.5'),('6','6'),('6.5','6.5'),('7','7'),
         ('7.5','7.5'),('8','8'),('8.5','8.5'),('9','9'),('9.5','9.5'),
-        ('10','10'),('10+','More than 10')
+        ('10','10'),('10.5','10.5'),('11','11'),('11.5','11.5'),('12','12'),
+        ('12.5','12.5'),('13','13'),('13.5','13.5'),('14','14'),('14.5','14.5'),
+        ('15','15'),('15.5','15.5'),('16','16'),('16.5','16.5'),('17','17'),
+        ('17.5','17.5'),('18','18'),('18.5','18.5'),('19','19'),('19.5','19.5'),
+        ('20','20'),('20+','More than 20')
     )
     YN_CHOICE = (
         ('','-'),
@@ -120,7 +124,7 @@ class DailyUserInputStrong(models.Model):
         validators=[CharMinValueValidator(0),CharMaxValueValidator(10)],
         blank=True, null=True)
 
-    prcnt_unprocessed_food_consumed_yesterday = models.CharField(
+    prcnt_processed_food_consumed_yesterday = models.CharField(
         max_length=20,
         validators=[CharMinValueValidator(0),CharMaxValueValidator(100)],
         blank = True,null = True)
@@ -130,7 +134,7 @@ class DailyUserInputStrong(models.Model):
     list_of_processed_food_consumed_yesterday = models.TextField(blank=True)
 
     number_of_alcohol_consumed_yesterday = models.CharField(
-        max_length=3,choices=NUMBER_ALCOHOL_CHOICE,
+        max_length=5,choices=NUMBER_ALCOHOL_CHOICE,
         blank = True,null = True)
 
     alcohol_drink_consumed_list = models.TextField(blank=True)
@@ -239,8 +243,6 @@ class DailyUserInputOptional(models.Model):
         (OTHER, 'Other')
     )
     user_input = models.OneToOneField(UserDailyInput, related_name='optional_input')
-    list_of_processed_food_consumed_yesterday = models.TextField(blank=True)
-
     chia_seeds_consumed_during_workout = models.CharField(
         max_length=20,
         validators = [CharMinValueValidator(0),CharMaxValueValidator(20)],
