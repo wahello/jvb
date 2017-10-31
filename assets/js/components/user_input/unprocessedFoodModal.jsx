@@ -96,9 +96,9 @@ export default class UnprocesedFoodModal extends Component{
 	                              <div className="input">
 	                              	<Label>5.1 What Unrocessed Food Were Consumed?</Label><br/>
 	                              	<Label>Processed Food List</Label>
-	                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.processed_food_list}</p>
+	                                <p>{this.state.processed_food_list}</p>
 	                                <Label>Unprocessed Food List</Label>
-	                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.unprocessed_food_list}</p>
+	                                <p >{this.state.unprocessed_food_list}</p>
 	                              </div>
 	                             
 	                            }

@@ -814,7 +814,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">                             
-                                  <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.workout_comment}</p>
+                                  <p>{this.state.workout_comment}</p>
                                 </div>
                               }
                           </FormGroup>
@@ -922,7 +922,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">
-                                  <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.sleep_comment}</p>
+                                  <p>{this.state.sleep_comment}</p>
                                 </div>
                               }
                           </FormGroup>
@@ -1331,7 +1331,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">
-                                  <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.general_comment}</p>
+                                  <p>{this.state.general_comment}</p>
                                 </div>
                               }
                           </FormGroup>

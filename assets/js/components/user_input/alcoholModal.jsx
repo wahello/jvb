@@ -55,7 +55,7 @@ export default class AlcoholModal extends Component{
 			                    {
 	                              !this.props.editable &&
 	                              <div className="input">
-	                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.alcohol_drink_consumed_list}</p>
+	                                <p >{this.state.alcohol_drink_consumed_list}</p>
 	                              </div>
 	                            }
                           </FormGroup> 			

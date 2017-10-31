@@ -56,7 +56,7 @@ export default class PrescriptionMedication extends Component{
 				                    {
 	                                  !this.props.editable &&
 	                                  <div className="input">
-	                                    <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.medications_taken_list}</p>
+	                                    <p >{this.state.medications_taken_list}</p>
 	                                  </div>
 	                                }    
 							</FormGroup>

@@ -178,7 +178,7 @@ export default class SmokedSubstance extends Component{
                               <div>
                               	  <Label>7.2 Other Smoked Substances </Label>
 	                              <div className="input">
-	                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.smoked_substance_list}</p>
+	                                <p >{this.state.smoked_substance_list}</p>
 	                              </div>
                               </div>
                             }
