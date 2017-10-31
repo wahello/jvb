@@ -1004,7 +1004,8 @@ handleScroll() {
                                   {
                                     !this.state.editable &&
                                     <div className="input">
-                                      <p>{this.state.alchol_consumed}</p>
+                                      <p>{this.state.alchol_consumed === '20+'?"More than 20" :
+                                          this.state.alchol_consumed }</p>
                                     </div>
                                   }
                                   <FormGroup id="padd"> 
