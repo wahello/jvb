@@ -5,11 +5,25 @@ import { withRouter, Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import { loginUser } from '../network/auth';
 
+import {loadLocalState,saveLocalState} from './localStorage';
+
 
 class HomePageReactTitle extends Component {
 
   constructor(props){
     super(props);
+
+    const persisted_state = loadLocalState();
+    
+    if(location.hash === '#logout'){
+      location.hash = ''
+      location.reload(true);
+    }
+
+    if(persisted_state.authenticated){
+      this.props.history.push("/users/dashboard");
+    }
+
     this.onSubmit = this.onSubmit.bind(this);
     this.renderAlert = this.renderAlert.bind(this);
     this.onLoginSuccess = this.onLoginSuccess.bind(this);

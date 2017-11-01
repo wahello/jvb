@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate,login,logout
 from django.shortcuts import get_object_or_404
 
 from rest_framework.permissions import IsAuthenticated
@@ -32,6 +32,11 @@ class Login(APIView):
 		else:
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+class Logout(APIView):
+	def get(self,request,format="json"):
+		logout(request)
+		return Response(status=status.HTTP_200_OK)
+
 class UserCreate(APIView):
     def post(self, request, format="json"):
         serializer = UserProfileSerializer(data=request.data)
@@ -51,3 +56,8 @@ class UserItemView(generics.RetrieveUpdateDestroyAPIView):
 		print(self.request.user)
 		obj = get_object_or_404(qs,user=self.request.user)
 		return obj
+
+class IsUserLoggedIn(APIView):
+	def get(self, request, format="json"):
+		return Response({"user_status":request.user.is_authenticated()},
+			   status=status.HTTP_200_OK)
