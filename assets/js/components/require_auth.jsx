@@ -9,8 +9,8 @@ import {loadLocalState} from './localStorage';
 // user to homepage if user is not auhenticated
 
 export default function(ComposedComponent) {
-	class Authentication extends Component{
-		static contextTypes = {
+ class Authentication extends Component{
+		static contextTypes ={
 			router: PropTypes.object
 		};
 
