@@ -391,20 +391,22 @@ handleScroll() {
                                         />
                                     </div>
                                </NavbarToggler> 
-                                  <span id="spa">
-                                      <NavLink id="navlink1" href="#">
+                                  
+                                  <span id="calendar" 
+                                  onClick={this.toggleCalendar}>
+                                  <span id="spa" >
+                                     <span id="navlink">
                                         <FontAwesome 
                                           name = "calendar"
                                           size = "1x"
                                           
                                         />
-                                      </NavLink>
-                                  </span>
-
-                                  <span id="calendar"
-                                  onClick={this.toggleCalendar}>
-
-                                   {moment(this.state.selected_date).format('MMM D, YYYY')}
+                                        </span>
+                                      <span id="navlink">
+                                      {moment(this.state.selected_date).format('MMM D, YYYY')}
+                                      </span>  
+                                  </span>                                  
+                                                                  
                                   </span>  
 
                                    <span className="btn2">

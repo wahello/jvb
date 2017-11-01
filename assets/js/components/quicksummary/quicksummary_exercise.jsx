@@ -13,7 +13,7 @@ function renderTableRows(dateWiseData,category,field,classes=""){
 			);	
 		}else{
 			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
+				<th key={date} className={classes}><h5>{data[category][field]}</h5></th> 
 			);
 		}
 	}

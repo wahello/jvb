@@ -40,7 +40,7 @@ function formatJSON(data){
 		        "id": 1,
 		        "user_input": 18,
 		        "stress_level_yesterday": "medium",
-		        "pains_twings_during_or_after_your_workout": "yes",
+		        "pains_twings_during_or_after_your_workout": "yes", 
 		        "water_consumed_during_workout": 58,
 		        "workout_that_user_breathed_through_nose": 90,
 		        "pain_area": "right shins"
