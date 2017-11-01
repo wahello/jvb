@@ -854,7 +854,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p style={{width:"600px",padding:"0px 30px 0px 0px"}}>{this.state.calories_item}</p>
+                                <p >{this.state.calories_item}</p>
                               </div>
                             }
                           </FormGroup>
