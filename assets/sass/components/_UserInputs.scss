@@ -71,7 +71,8 @@ margin-top: 46px;
 	.nav1{
 		width: 100%;
 		 top:0; 
-		 left:0;	 
+		 left:0;
+		 right:0;	 
 	    z-index:100;
 	   	
 	}
@@ -117,6 +118,12 @@ margin-top: 46px;
 	width:125px;
 	color:#fff;
 	padding-left: 10px;
+}
+.toast-popup{
+	z-index: 101;
+	width:100%;
+	left:0;
+	right:0;
 }
 }
 

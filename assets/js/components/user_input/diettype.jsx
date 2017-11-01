@@ -57,7 +57,7 @@ export default class DietType extends Component{
 			                    	{
 	                                  !this.props.editable &&
 	                                  <div className="input">
-	                                    <p>{this.state.diet_type}</p>
+	                                    <p >{this.state.diet_type}</p>
 	                                  </div>
 	                                }
 							</FormGroup>	

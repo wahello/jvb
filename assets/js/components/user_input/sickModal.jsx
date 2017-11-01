@@ -55,7 +55,7 @@ export default class SickModal extends Component{
 			                   {
 	                              !this.props.editable &&
 	                              <div className="input">
-	                                <p>{this.state.sickness}</p>
+	                                <p >{this.state.sickness}</p>
 	                              </div>
 	                           }
                           </FormGroup> 

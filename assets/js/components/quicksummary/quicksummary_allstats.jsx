@@ -10,6 +10,7 @@ import Sleep from './quicksummary_sleep';
 import Food from './quicksummary_food';  
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
+import User from './user_inputs';
 
  const AllStats =(props)=>{
 		return(
@@ -24,6 +25,8 @@ import Exercise from './quicksummary_exercise';
                    <Food data={props.data}/>
                    <Alcohol data={props.data}/>
                    <Exercise data={props.data}/>
+                   <User data={props.data}/>
+
                   
 </div>
 

@@ -196,7 +196,7 @@ export default class PainModal extends Component{
 							{
                              	 !this.props.editable &&
                              	 <div className="input">
-                                	<p>{this.state.other_pain_areas}</p>
+                                	<p >{this.state.other_pain_areas}</p>
                               	 </div>
                             }
 					</FormGroup>

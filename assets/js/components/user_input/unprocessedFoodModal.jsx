@@ -59,7 +59,7 @@ export default class UnprocesedFoodModal extends Component{
                             	{this.props.editable &&
                             		<div>
                             		  <div className="d-flex justify-content-center">
-                            			<btn onClick={this.onClickFoodList} className="btn btn-info">I Want to Enter a List of all Foods I Consumed</btn>
+                            			<btn onClick={this.onClickFoodList} className="btn btn-info">I Want To Enter A List Of Unprocessed Foods I Consumed</btn>
                             			</div>
                             			<div className="unprocess_food">
 										<Collapse isOpen={this.state.enter_food}>
@@ -98,7 +98,7 @@ export default class UnprocesedFoodModal extends Component{
 	                              	<Label>Processed Food List</Label>
 	                                <p>{this.state.processed_food_list}</p>
 	                                <Label>Unprocessed Food List</Label>
-	                                <p>{this.state.unprocessed_food_list}</p>
+	                                <p >{this.state.unprocessed_food_list}</p>
 	                              </div>
 	                             
 	                            }
