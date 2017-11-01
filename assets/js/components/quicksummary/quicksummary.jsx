@@ -9,6 +9,7 @@ import moment from 'moment';
 import {getInitialState} from './initialState';
 import {fetchQuickLook}  from '../../network/quick';
 import {quicksummaryDate}  from '../../network/quick';
+import {userInputDate} from '../../network/quick';
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
@@ -175,7 +176,59 @@ class Quicklook extends Component{
 			        user_ql: data.alcohol_ql.user_ql,
 			        alcohol_day: data.alcohol_ql.alcohol_day,
 			        alcohol_week: data.alcohol_ql.alcohol_week
+			    },
+				strong_input:{
+			    	id:data.strong_input.id,
+			    	user_input:data.strong_input.user_input,
+			    	workout:data.strong_input.workout,
+			    	workout_easy:data.strong_input.workout_easy,
+			    	workout_effort:data.strong_input.workout_effort,
+		            workout_effort_hard_portion:data.strong_input.workout_effort_hard_portion,
+		            prcnt_processed_food:data.strong_input.prcnt_processed_food,
+			        unprocessed_food_list:data.strong_input.unprocessed_food_list,
+			        processed_food_list:data.strong_input.processed_food_list,
+			        alchol_consumed:data.strong_input.alchol_consumed,
+		        	alcohol_drink_consumed_list:data.strong_input.alcohol_drink_consumed_list,
+		        	sleep_hours_last_night:data.strong_input.sleep_hours_last_night,
+			        sleep_mins_last_night:data.strong_input.sleep_mins_last_night,
+			        sleep_comment:data.strong_input.sleep_comment,
+			        prescription_sleep_aids:data.strong_input.prescription_sleep_aids,
+			        sleep_aid_taken:data.strong_input.sleep_aid_taken,
+			        smoke_substances:data.strong_input.smoke_substances,
+			        smoked_substance_list:data.strong_input.smoked_substance_list,
+			        medications:data.strong_input.medications,
+			        medications_taken_list:data.strong_input.medications_taken_list
+
+			    },
+			    encouraged_input:{
+			    	 id:data.encouraged_input.id,
+			    	 user_input:data.encouraged_input.user_input,
+			    	 stress:data.encouraged_input.stress,
+			    	 pain:data.encouraged_input.pain,
+		        	 pain_area:data.encouraged_input.pain_area,
+		        	 water_consumed:data.encouraged_input.water_consumed,
+		        	 breath_nose:data.encouraged_input.breath_nose
+			    },
+			    optional_input:{
+			    	  id:data.optional_input.id,
+			    	  user_input:data.optional_input.user_input,
+			    	  food_consumed:data.optional_input.food_consumed,
+			    	  chia_seeds:data.optional_input.chia_seeds,
+			    	  fasted:data.optional_input.fasted,
+		              food_ate_before_workout:data.optional_input.food_ate_before_workout,
+		              calories:data.optional_input.calories,
+		              calories_item:data.optional_input.calories_item,
+		              workout_enjoyable:data.optional_input.workout_enjoyable,
+		              workout_comment:data.optional_input.workout_comment,
+		              weight:data.optional_input.weight,
+		       		  waist:data.optional_input.waist,
+		       		  sick:data.optional_input.sick,
+		              sickness:data.optional_input.sickness,
+		              stand:data.optional_input.stand,
+		              diet_type:data.optional_input.diet_type,
+		       		  general_comment:data.optional_input.general_comment
 			    }
+
              };
              return properties;
        		}
@@ -231,6 +284,8 @@ class Quicklook extends Component{
 		let start_dt = moment(date);
 		let end_dt = moment(date).add(6,'days');
 		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
+		//userInputDate(start_dt,end_dt,this.successquick,this.errorquick);
+
 	}
 
 	 handleChange(event){
@@ -247,12 +302,15 @@ class Quicklook extends Component{
   	let start_dt=moment(this.state.start_date);
   	let end_dt=moment(this.state.end_date);
   	quicksummaryDate(start_dt,end_dt,this.successquick,this.errorquick);
+  	//userInputDate(start_dt,end_dt,this.successquick,this.errorquick);
   }
 
 	componentDidMount(){
 		let start_dt = moment();
 		let end_dt = moment().add(6,'days');
 		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
+		//userInputDate(start_dt,end_dt,this.successquick,this.errorquick);
+
 	}
 	onDismiss(){
 		this.setState(

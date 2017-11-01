@@ -306,6 +306,16 @@ createDropdown(start_num , end_num, step=1){
     return elements;
   }
 
+  createNoseDropdown(start_num , end_num, step=10){
+    let elements = [];
+    let i = start_num;
+    while(i<=end_num){
+      elements.push(<option key={i} value={i}>{i}</option>);
+      i=i+step;
+    }
+    return elements;
+  }
+
   createSleepDropdown(start_num , end_num, mins=false, step=1){
     let elements = [];
     let i = start_num;
@@ -748,7 +758,7 @@ handleScroll() {
                                          value={this.state.breath_nose}
                                          onChange={this.handleChange}>
                                          <option key="select" value="">select</option>                            
-                                          {this.createDropdown(1,100)}
+                                          {this.createNoseDropdown(0,100)}
                                         </Input>
                                     </div>
                                   }

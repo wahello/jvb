@@ -116,14 +116,13 @@ export function getInitialState(start_dt, end_dt=undefined){
 	    },
 	    "alcohol_ql": {
 	        "alcohol_day": '-',
-	        "alcohol_week": '-'
+	        "alcohol_week": '-' 
 	    },
-	    "strong_input":{
-
-	    	"user_id":'-',
+	    "strong_input":{	    	
 	    	"workout":'-',
 	    	"workout_easy":'-',
 	    	"workout_effort":'-',
+	    	"is_workout_hard":'-',
             "workout_effort_hard_portion":'-',
             "prcnt_processed_food":'-',
 	        "unprocessed_food_list":'-',
