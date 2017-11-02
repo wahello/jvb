@@ -340,7 +340,7 @@ class Quicklook extends Component{
          const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
 	return(
 		<div className="container-fluid">
-		<NavbarMenu/>
+		<NavbarMenu fix={true}/>
 	
 		           	
 					

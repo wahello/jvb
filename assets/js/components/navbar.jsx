@@ -36,12 +36,12 @@ class NavbarMenu extends React.Component {
   }
 
   render() {
-    const toFix = this.props.noFix === undefined ? true : false;
+    const {fix} = this.props;
     return (
       <div className="container">
         <Navbar toggleable 
-         fixed="top"
-          className="navbar navbar-expand-sm  navbar-fixed-top">
+         fixed={fix ? 'top' : ''} 
+          className="navbar navbar-expand-sm ">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
            <FontAwesome 
                  name = "bars"
@@ -82,10 +82,6 @@ function mapStateToProps(state){
 }
 
 export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(NavbarMenu));
-
-NavbarMenu.propTypes={
-    noFix: PropTypes.string
-}
 
 Navbar.propTypes={
     fixed: PropTypes.string,
