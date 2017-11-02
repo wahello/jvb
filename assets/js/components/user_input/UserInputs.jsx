@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import NavbarMenu from '../navbar';
+
 import { ToastContainer, toast } from 'react-toastify';
 import Textarea from 'react-textarea-autosize';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -369,7 +371,9 @@ handleScroll() {
                              
                             <div className="col-md-8 col-lg-8 col-sm-12">
 
-                            <div className="d-flex justify-content-center">
+                            <NavbarMenu/>
+
+                            <div className="d-flex justify-content-center" id="body1">
 
                               <img className="img-fluid"
                                src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>

@@ -58,25 +58,7 @@ export default class UnprocesedFoodModal extends Component{
 						<FormGroup>   
                             	{this.props.editable &&
                             		<div>
-                            		  <div className="d-flex justify-content-center">
-                            			<btn onClick={this.onClickFoodList} className="btn btn-info">I Want To Enter A List Of Unprocessed Foods I Consumed</btn>
-                            			</div>
-                            			<div className="unprocess_food">
-										<Collapse isOpen={this.state.enter_food}>
-										<div className="col-xs-5">
-											<Label>5.1 What Unprocessed Food Were Consumed?</Label>
-											<div className="input1">	
-					                            <Textarea 						                           
-						                            className="form-control" 
-						                            value={this.state.unprocessed_food_list}
-						                            name = "unprocessed_food_list"
-						                            rows="5" cols="5"
-						                            onChange={this.handleChange}
-						                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
-					                        </div>
-					                        </div>
-					                        <div className="col-xs-5">
-					                        <Label>5.2 What Processed Food Was Consumed?</Label>
+                            		 <Label>5.1 What Processed Food Was Consumed?</Label>
 											<div className="input1">	
 					                            <Textarea 						                           
 						                            className="form-control" 
@@ -84,9 +66,28 @@ export default class UnprocesedFoodModal extends Component{
 						                            name="processed_food_list"
 						                            rows="5" cols="5"
 						                            onChange={this.handleChange}
-						                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
+						                             />
 					                        </div>
+					                        <div className="unprocess_food">
+                            		  <div className="d-flex justify-content-center">
+                            			<btn onClick={this.onClickFoodList} className="btn btn-info unprocessed" size="sm"><span id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</span></btn>
+                            			</div>
+                            			</div>
+                            			<div className="unprocess_food">
+										<Collapse isOpen={this.state.enter_food}>
+
+										<Label>5.2 What Unprocessed Food Were Consumed?</Label>
+											<div className="input1">	
+					                            <Textarea 						                           
+						                            className="form-control" 
+						                            value={this.state.unprocessed_food_list}
+						                            name = "unprocessed_food_list"
+						                            rows="5" cols="5"
+						                            onChange={this.handleChange}
+						                            />
 					                        </div>
+					                       
+					                        
 					                    </Collapse>
 					                    </div> 
 					                    </div>

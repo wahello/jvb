@@ -1,6 +1,7 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import {connect} from 'react-redux';
+import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
         Button} from 'reactstrap';
@@ -36,9 +37,15 @@ class NavbarMenu extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="container">
         <Navbar toggleable fixed="top" className="navbar navbar-expand-sm  navbar-fixed-top">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} />
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
+            <FontAwesome 
+                 name = "bars"
+                 size = "1x"
+                                          
+             />
+          </NavbarToggler>
           <Link to='/'>
             <NavbarBrand 
               className="navbar-brand float-xs-right float-sm-left" 
@@ -50,13 +57,11 @@ class NavbarMenu extends React.Component {
               <NavItem className="float-sm-right">  
                 <Link className="nav-link" to='/'>Home</Link>
               </NavItem>
-               <NavItem className="float-sm-right">
-                
-                   <Button 
-                      outline color="primary"
-                      onClick={this.handleLogout}>Log Out
-                    </Button>
-                
+               <NavItem className="float-sm-right">                
+                   <NavLink  
+                   className="nav-link"                    
+                   onClick={this.handleLogout}>Log Out
+                    </NavLink>               
               </NavItem>  
             </Nav>
           </Collapse>

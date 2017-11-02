@@ -17,11 +17,9 @@ color: #d1d1d1;
 }
 .navbar .nav .nav-item .nav-link:hover{
 	color: #292c2f;
-
-
 }
  .navbar .navbar-toggler { /*this is to color color than three lines in to white wich apper when it is in mobil*/
-	color:red !important;
+	color:white !important;
 	
 
 }
@@ -33,7 +31,10 @@ color: #d1d1d1;
 
  .navbar  .navbar-brand{
  	color: white;
- }  
+ } 
+ .nav{
+ padding-right:25px;
+ } 
  
 
 
