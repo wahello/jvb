@@ -370,8 +370,9 @@ handleScroll() {
             <div>
                              
                             <div className="col-md-8 col-lg-8 col-sm-12">
-
-                            <NavbarMenu/>
+                            <div id="hambergar">
+                            <NavbarMenu style={{position:"relative !important"}}/>
+                            </div>
 
                             <div className="d-flex justify-content-center" id="body1">
 
