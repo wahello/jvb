@@ -11,12 +11,13 @@ export function renderFieldFormGroup(field){
 			{label}
 			<Input 
 				type={field.type} 
-				name={field.name} 
+				name={field.input.name} 
 				placeholder={field.placeholder} 
 				value={field.value}
+				required
 				{...field.input}
 			/>
-			<div className="form-control-feedback">
+			<div style={{color:"red"}}className="form-control-feedback">
 				{touched ? error : ''}
 			</div>
 		</FormGroup>
@@ -34,27 +35,34 @@ function createDropdown(start_num , end_num, step=1){
 }
 
 export function renderSelectFeet(field){
+	console.log(field);
 	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(
 			<Input 
 				type={field.type} 
-				name={field.name} 
+				name={field.input.name} 
+				required
 				{...field.input}>
-				<option>Feet</option> 
+				<option value="feet">Feet</option> 
 				{createDropdown(1,9)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
 	);
 }
 
 export function renderSelectInches(field){
 	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(
 			<Input 
 				type={field.type} 
-				name={field.name} 
+				name={field.input.name}
+				required 
 				{...field.input}>
-				<option>Inches</option> 
+				<option value="inches">Inches</option> 
 				{createDropdown(1,12)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
 	);
 }
