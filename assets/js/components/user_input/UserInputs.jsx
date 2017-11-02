@@ -190,6 +190,7 @@ class UserInputs extends React.Component{
         diet_type:data.data.optional_input.type_of_diet_eaten,
         general_comment:data.data.optional_input.general_comment
       });
+      window.scrollTo(0,0);
     }
 
     onNoWorkoutToday(){
@@ -295,7 +296,6 @@ class UserInputs extends React.Component{
       window.addEventListener('scroll', this.handleScroll);
     }
 
-    
 createDropdown(start_num , end_num, step=1){
     let elements = [];
     let i = start_num;
