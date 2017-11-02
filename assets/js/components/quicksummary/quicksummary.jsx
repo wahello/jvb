@@ -477,7 +477,7 @@ class Quicklook extends Component{
 						   </Form>
 					</div>
                     </div>
-                    <div className="col-sm-10">
+                    <div className="col-sm-12">
                     	{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}

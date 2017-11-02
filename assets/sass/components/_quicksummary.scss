@@ -3,8 +3,28 @@ html,body{
 }
 
 .quick{
-	padding: 70px;
+	padding-top: 70px;
 }
+
+@media (max-width: 1023px){
+
+.quick3{
+	padding: 0px;  
+	text-align: left;
+	max-width: 820px;
+	overflow: auto;
+		}
+
+#quick2{
+	padding: 0px;
+		}
+.quick5{
+	padding: 0px 20px 0px 20px;
+}
+}
+
+
+
 	#quick1{
 		padding: 15px 0px 5px 60px;   
 	font-family: 'Roboto', sans-serif;
@@ -13,10 +33,10 @@ html,body{
 
 }
 #quick2{
-	padding: 10px;
+	padding-top: 0px;
 }
 .quick3{
-	padding: 13px;  
+	padding-top: 0px;  
 	text-align: left;
 	max-width: 820px;
 	overflow: auto;
@@ -46,7 +66,7 @@ html,body{
 	text-align: left;
 }
 .quick5{
-	padding: 14px 0px 0px 50px;
+	padding: 0px 20px 15px 20px;
 }
 #quick6{
 	font-size: 13px;

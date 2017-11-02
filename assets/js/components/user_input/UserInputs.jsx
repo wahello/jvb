@@ -341,11 +341,11 @@ componentWillUnmount() {
 
 handleScroll() {
 
-  if (window.scrollY >= 135 && !this.state.scrollingLock) {
+  if (window.scrollY >= 300 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 135 && this.state.scrollingLock) {
+  } else if(window.scrollY < 300 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -367,21 +367,27 @@ handleScroll() {
     render(){
 
         return(
-            <div>
-                             
-                            <div className="col-md-8 col-lg-8 col-sm-12">
-                            <div id="hambergar">
-                            <NavbarMenu style={{position:"relative !important"}}/>
-                            </div>
+            <div>            
+                           <div id="hambergar" className="container-fluid">
+                             <NavbarMenu fix={false} />
+                              </div>
 
-                            <div className="d-flex justify-content-center" id="body1">
+
+                               <div className="d-flex justify-content-center" id="body1">
 
                               <img className="img-fluid"
                                src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>
 
                             </div>
                               
-                             <h2 className="head">Daily User Inputs Report</h2>                            
+                             <h2 className="head">Daily User Inputs Report</h2>   
+                             
+                            <div className="col-md-8 col-lg-8 col-sm-12">
+                            
+                            
+                            
+
+                                                    
                             </div>
 
                         <div className="nav3">

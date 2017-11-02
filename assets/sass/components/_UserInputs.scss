@@ -3,11 +3,12 @@ body{
 	height: 100%;
 	background-size: cover;
 	font-size:16px;
+	padding-top: 0px;
 }
 
 
 #body1{
-padding-top: 90px;
+padding-top: 10px;
 }
 
 #user-inputs{
@@ -47,6 +48,11 @@ margin-top: 46px;
 // }
 
 @media (max-width: 1023px) {
+
+#body1{
+padding-top: 30px;
+}
+
    #user-inputs .user-inputs-form{
 	background-color:rgba(20,10,15,0.5);
 	border-radius: 20px;
@@ -260,8 +266,11 @@ font-size: 11px;
 #text{
 font-size: 11px;
 }
-
-#hambergar{
-	position:relative !important;
-	width: 100%;
+.container-fluid{
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+.nav3 .navbar{
+background-color: #777777;
 }

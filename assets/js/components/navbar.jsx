@@ -38,10 +38,10 @@ class NavbarMenu extends React.Component {
   render() {
     const {fix} = this.props;
     return (
-      <div className="container">
+      <div className="container-fluid">
         <Navbar toggleable 
          fixed={fix ? 'top' : ''} 
-          className="navbar navbar-expand-sm ">
+          className="navbar navbar-expand-sm navbar-inverse">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
            <FontAwesome 
                  name = "bars"

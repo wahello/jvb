@@ -29,7 +29,7 @@ class Dashboard extends Component {
 	render(){
 		return (
 			<div>
-				<NavbarMenu />
+				<NavbarMenu fix={true}/>
 				<div>
 				      <div className="row">
                         <div className="col-sm-6 col-sm-offset-3 social-login">

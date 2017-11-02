@@ -16,7 +16,9 @@ html,body{/*have to mention html parent element other wise it wont show pic*/
 color: #d1d1d1;
 }
 .navbar .nav .nav-item .nav-link:hover{
-	color: #292c2f;
+	color: #292c2f !important;
+	background-color:white;
+
 }
  .navbar .navbar-toggler { /*this is to color color than three lines in to white wich apper when it is in mobil*/
 	color:white !important;
@@ -25,6 +27,7 @@ color: #d1d1d1;
 }
 .navbar-brand{
 	color:white !important;
+	padding-top:10px;
 }
 
 
@@ -32,9 +35,8 @@ color: #d1d1d1;
  .navbar  .navbar-brand{
  	color: white;
  } 
- .nav{
- padding-right:25px;
- } 
+  
+ 
  
 
 
