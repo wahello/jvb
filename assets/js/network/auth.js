@@ -42,7 +42,7 @@ export function errorHandler(dispatch, error, type){
 	}
 }
 
-export function loginUser(data, callback){
+export function loginUser(data, successCallback=undefined, errorCallback=undefined){
 	return function (dispatch){
 		const URL = '/api/users/login/';
 		const config = {
@@ -56,17 +56,28 @@ export function loginUser(data, callback){
 			const auth_state = {
 					authenticated: true
 				};
+
 			saveLocalState(auth_state);
 			dispatch({
 				type: AUTH_USER,
 			});
-			callback();
+
+			if(successCallback !== undefined){
+				successCallback();
+			}else{
+				console.log("Successfully logged in!");
+			}
 		}).catch((error) => {
 			const auth_state = {
 					authenticated: false
 				};
 			saveLocalState(auth_state);
-			console.log(error);
+			
+			if(errorCallback !== undefined){
+				errorCallback(error);
+			}else{
+				console.log(error.message);
+			}
 		});
 	}
 }
