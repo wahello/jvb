@@ -22,6 +22,7 @@ const WizardGoalsPage = (props) => {
 								  	name="goals"
 								  	type="checkbox"
 								  	value="Maintain overall health"
+								  	required
 								  	component="input" 
 							   />
 							  <span className="custom-control-indicator"></span>
@@ -39,7 +40,7 @@ const WizardGoalsPage = (props) => {
 					/>
 
 					<div className="f-footer">
-						<Button outline color="primary" onClick={renderFieldFormGroup}>
+						<Button outline color="primary" onClick={previousPage}>
 							Previous
 						</Button>
 						<Button type="submit" outline color="primary" style={{float:'right'}}>

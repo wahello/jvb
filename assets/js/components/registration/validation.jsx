@@ -47,8 +47,12 @@ export function personal_validate(values){
 		errors.date_of_birth = "Birthday is required";
 	}
 
-	if(!values.height){
-		errors.height = "Height is required";
+	if(!values.feet || values.feet === 'feet'){
+		errors.feet = "Feet is required";
+	}
+
+	if(!values.inches || values.inches === 'inches'){
+		errors.inches = "Inches is required";
 	}
 
 	if(!values.weight){
