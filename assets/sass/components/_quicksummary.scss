@@ -21,15 +21,18 @@ html,body{
 .quick5{
 	padding: 0px 20px 0px 20px;
 }
+.quick7{
+	padding-left: 8px;
+}
 }
 
 
 
 	#quick1{
-		padding: 15px 0px 5px 60px;   
+		
 	font-family: 'Roboto', sans-serif;
 	font-weight: bold;
-	font-size: 40px;
+	
 
 }
 #quick2{
@@ -42,9 +45,7 @@ html,body{
 	overflow: auto;
 }
 .quick3 h5{
-	padding:10px 0px;
-	font-weight: bold;
-
+	padding:10px 0px;	
 }
 .quick4 th{
 	border: 1px solid #dddddd;
@@ -69,11 +70,11 @@ html,body{
 	padding: 0px 20px 15px 20px;
 }
 #quick6{
-	font-size: 13px;
-	font-weight: 600;
+	font-size: 16px;
+	
 }
 .quick7{
-	padding:10px 0px 20px 22px;
+	padding:10px 0px 20px 7px;
 }
 #quick6 a{
 	color: black;
@@ -100,7 +101,7 @@ html,body{
 .alert{
 	width:60%;
 	text-align: center;
-	font-size: 14px;
+	font-size: 16px;
 	padding: 10px;
 
 }

@@ -346,15 +346,16 @@ class Quicklook extends Component{
 					
 			<div className="col-lg-12 col-md-12 col-sm-12">  
 			<div className="quick">
-			        <div className="col-md-12 col-md-offset-2">
+			       
                          <div className="row justify-content-center">
 						<div className="alert">
 							{this.renderAlert()}
 						</div>
 					 </div>
-                     </div>
+                      <div className="row justify-content-center">
 						 <div id="quick1" className="row ">
 			                 <h2>Quick Summary</h2>			                
+			             </div>
 			             </div>
 
 			             <div className="row">
@@ -477,7 +478,7 @@ class Quicklook extends Component{
 						   </Form>
 					</div>
                     </div>
-                    <div className="col-sm-12">
+                    <div className="col-lg-8 col-md-10 col-sm-12">
                     	{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
