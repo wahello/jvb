@@ -218,7 +218,9 @@ class UserInputs extends React.Component{
       const initial_state = this.getInitialState();
       this.setState(
         {...initial_state,
-        selected_date:this.state.selected_date})
+        selected_date:this.state.selected_date},()=>{
+          window.scrollTo(0,0);
+        });
     }
 
     processDate(date){
