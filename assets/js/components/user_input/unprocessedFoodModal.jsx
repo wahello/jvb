@@ -11,7 +11,7 @@ export default class UnprocesedFoodModal extends Component{
 
 		this.state = {
 			collapse:true,
-			enter_food:(processed_food_list !== '' || unprocessed_food_list !== '') ? true : false,
+			enter_food:(unprocessed_food_list !== '') ? true : false,
 			unprocessed_food_list:unprocessed_food_list,
 			processed_food_list:processed_food_list
 		};
@@ -24,8 +24,7 @@ export default class UnprocesedFoodModal extends Component{
 	componentWillReceiveProps(nextProps) {
   	  if(nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) {
     	  	this.setState({
-    	  		enter_food:(nextProps.processed_food_list !== '' ||
-    	  				    nextProps.unprocessed_food_list !== '') ? true : false,
+    	  		enter_food:(nextProps.unprocessed_food_list !== '') ? true : false,
     	  		unprocessed_food_list:nextProps.unprocessed_food_list,
     	  		processed_food_list:nextProps.processed_food_list
     	  	});
@@ -43,7 +42,6 @@ export default class UnprocesedFoodModal extends Component{
 	}
 
 	onClickFoodList(event){
-		console
 			this.setState({
 				enter_food:!this.state.enter_food
 			});
@@ -71,6 +69,7 @@ export default class UnprocesedFoodModal extends Component{
 					                        <div className="unprocess_food">
 						                        <Input type="checkbox"
 					                           	onClick={this.onClickFoodList}
+					                           	checked={this.state.enter_food ? 'checked':''}
 					                           	/>                           		  
 		                            			 <Label id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</Label>
 	                            			</div>
