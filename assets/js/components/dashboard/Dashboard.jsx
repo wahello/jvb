@@ -32,7 +32,7 @@ class Dashboard extends Component {
 				<NavbarMenu fix={true}/>
 				<div>
 				      <div className="row">
-                        <div className="col-sm-6 col-sm-offset-3 social-login">
+                        <div className="col-sm-6 col-sm-offset-3 social-login" style={{marginTop:"80px"}}>
                           <h3>Link's</h3>
                           <div className="social-login-buttons">
       

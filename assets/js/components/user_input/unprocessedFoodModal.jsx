@@ -69,15 +69,11 @@ export default class UnprocesedFoodModal extends Component{
 						                             />
 					                        </div>
 					                        <div className="unprocess_food">
-					                        <Input type="checkbox"
-			                           	onClick={this.onClickFoodList}
-			                           	/>                           		  
-                            			 <Label id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</Label>
-			                           	
-											
-
-                            			
-                            			</div>
+						                        <Input type="checkbox"
+					                           	onClick={this.onClickFoodList}
+					                           	/>                           		  
+		                            			 <Label id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</Label>
+	                            			</div>
                             			<div>
 										<Collapse isOpen={this.state.enter_food}>
 
