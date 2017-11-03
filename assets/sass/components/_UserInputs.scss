@@ -129,21 +129,24 @@ padding-top: 30px;
 	width:125px;
 	color:#fff;
 	padding-left: 10px;
-}
-.toast-popup{
+	}
+	.toast-popup{
 	z-index: 101;
 	width:100%;
 	left:0;
 	right:0;
-}
-#text{
-font-size: 11px;
-}
-#calendar{
-	width:152px;
-	color:#fff;
-	padding-left: 5px;
-}
+	}
+	#text{
+	padding-left: 20px;
+	}
+	#calendar{
+		width:152px;
+		color:#fff;
+		padding-left: 5px;
+	}
+	.unprocess_food{
+	padding: 20px 20px 10px 25px;
+	}
 }
 
 
@@ -254,7 +257,6 @@ font-size: 11px;
 }
 .unprocess_food{
 	padding: 20px 20px 10px 25px;
-
 }
 
 #calendar{
