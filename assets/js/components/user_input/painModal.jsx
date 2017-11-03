@@ -102,7 +102,6 @@ export default class PainModal extends Component{
 
     	  	this.setState({
     	  		pain_area: area,
-    	  		collapse:other_pain_areas.length ? true : false,
     	  		pain_area_to_show:pain_area_to_show,
     	  		other_pain_areas:other_pain_areas
     	  	});
