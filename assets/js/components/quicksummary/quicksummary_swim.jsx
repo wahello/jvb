@@ -8,11 +8,11 @@ import {Table,Button} from "reactstrap";
 	for(let [date,data] of Object.entries(dateWiseData)){
 		if(field === "created_at"){
 			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
+				<th key={date} className={classes}>{date}</th>
 			);	
 		}else{
 			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
+				<th key={date} className={classes}>{data[category][field]}</th>
 			);
 		}
 	}
@@ -25,7 +25,7 @@ const Swim = (props) =>{
 	
 	     <Table className="table table-responsive quick4">
 	          <tr className="quick8"> 
-	         	<th><h5>Swim Stats</h5></th>
+	         	<th>Swim Stats</th>
 			    {renderTableRows(props.data,"swim_stats_ql","created_at")}
 			  </tr>
 

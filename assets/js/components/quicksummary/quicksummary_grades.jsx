@@ -8,11 +8,11 @@ function renderTableRows(dateWiseData,category,field,classes=""){
 	for(let [date,data] of Object.entries(dateWiseData)){
 		if(field === "created_at"){
 			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
+				<th key={date} className={classes}>{date}</th>
 			);	
 		}else{
 			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
+				<th key={date} className={classes}>{data[category][field]}</th>
 			);
 		}
 	}
@@ -28,7 +28,7 @@ const Grades = (props) => {
 			       
 			           <tr className="quick8">
 			                <th >  
-							 <h5> Grades</h5>
+							 Grades
 							</th>
 							{renderTableRows(props.data,"grades_ql","created_at")}							
 							</tr>
