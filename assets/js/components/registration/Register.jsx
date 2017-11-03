@@ -31,7 +31,7 @@ class Register extends Component {
 
 		//redirect to user newly created profile
 		toast.info(
-		"User Acount created successfully!",{
+		"User Account created successfully!",{
           className:"dark"
         });
 	}

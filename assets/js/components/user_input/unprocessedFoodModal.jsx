@@ -69,11 +69,16 @@ export default class UnprocesedFoodModal extends Component{
 						                             />
 					                        </div>
 					                        <div className="unprocess_food">
-                            		  <div className="d-flex justify-content-center">
-                            			<btn onClick={this.onClickFoodList} className="btn btn-info unprocessed" size="sm"><span id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</span></btn>
+					                        <Input type="checkbox"
+			                           	onClick={this.onClickFoodList}
+			                           	/>                           		  
+                            			 <Label id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</Label>
+			                           	
+											
+
+                            			
                             			</div>
-                            			</div>
-                            			<div className="unprocess_food">
+                            			<div>
 										<Collapse isOpen={this.state.enter_food}>
 
 										<Label>5.2 What Unprocessed Food Were Consumed?</Label>
@@ -95,10 +100,10 @@ export default class UnprocesedFoodModal extends Component{
 			                    {!this.props.editable &&
 	                             
 	                              <div className="input">
-	                              	<Label>5.1 What Unrocessed Food Were Consumed?</Label><br/>
-	                              	<Label>Processed Food List</Label>
+	                              	<Label>5.1 What Processed Food Were Consumed?</Label><br/>
+	                              	
 	                                <p>{this.state.processed_food_list}</p>
-	                                <Label>Unprocessed Food List</Label>
+	                                <Label>5.2 What Unprocessed Food Were Consumed?</Label>
 	                                <p >{this.state.unprocessed_food_list}</p>
 	                              </div>
 	                             
