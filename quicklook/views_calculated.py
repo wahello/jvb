@@ -44,16 +44,48 @@ class QuicklookCalculationView(APIView):
 
 	def get(self, request, format=None):
 		user = request.user
+
 		# date for which quicklook is calculated
 		dt = self.request.query_parama.get('dt',None)
+		y,m,d = map(int,dt.split('-'))
+		start_date_dt = datetime(y,m,d,0,0,0)
+		last_seven_days_date = start_date_dt - timedelta(days=6)
+		start_dt = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
+		end_dt = start_dt + 86400
 
-		epochs = [q.data for q in UserGarminDataEpoch.objects.filter(user = request.user)]
-		sleeps = [q.data for q in UserGarminDataSleep.objects.filter(user = request.user)]
-		dailies = [q.data for q in UserGarminDataDaily.objects.filter(user = request.user)]
-		activities =[q.data for q in UserGarminDataActivity.objects.filter(user = request.user)]
-		daily_strong = DailyUserInputStrong.objects.filter(user_input__user = user)
-		daily_encouraged = DailyUserInputEncouraged.objects.filter(user_input__user = user)
-		daily_optional = DailyUserInputOptional.objects.filter(user_input__user = user)
+		epochs = [q.data for q in UserGarminDataEpoch.objects.filter(
+			user = request.user,
+			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__lte = end_dt
+			)]
+
+		sleeps = [q.data for q in UserGarminDataSleep.objects.filter(
+			user = request.user,
+			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__lte = end_dt)]
+
+		dailies = [q.data for q in UserGarminDataDaily.objects.filter(
+			user = request.user,
+			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__lte = end_dt)]
+
+		activities =[q.data for q in UserGarminDataActivity.objects.filter(
+			user = request.user,
+			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__lte = end_dt)]
+
+		daily_strong = DailyUserInputStrong.objects.filter(
+			user_input__user = user,
+			created_at__gte = last_seven_days_date,
+			created_at__lte = start_date_dt)
+
+		daily_encouraged = DailyUserInputEncouraged.objects.filter(
+			user_input__user = user,
+			created_at = start_date_dt)
+
+		daily_optional = DailyUserInputOptional.objects.filter(
+			user_input__user = user,
+			created_at = start_date_dt)
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		activities_json = [ast.literal_eval(dic) for dic in activities]
@@ -73,8 +105,6 @@ class QuicklookCalculationView(APIView):
 				return(max(seq))
 			else:
 				return(0)
-
-
 
 		grades_calculated_data = {
 			'overall_truth_grade':'',
@@ -176,19 +206,18 @@ class QuicklookCalculationView(APIView):
 			'prcnt_non_processed_food':0,
 			'prcnt_non_processed_food_grade': '',
 			'non_processed_food': [int(q.unprocessed_food_consumed_yesterday) for q in daily_strong][0],
-			#'non_processed_food':0,
 			'diet_type':'',
 		}
 
 		alcohol_calculated_data = {
 			'alcohol_day': [int(q.number_of_alcohol_consumed_yesterday) for q in daily_strong][0],
-			#'alcohol_day':0,
 			'alcohol_week': 0
 		}
 
 		#Calculation of grades
 
-		#Average sleep per night grade claculation
+		#Average sleep per night grade calculation
+
 		
 
 
