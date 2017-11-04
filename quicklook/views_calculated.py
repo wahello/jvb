@@ -7,6 +7,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from . import calculation_helper
+
+
 from garmin.models import UserGarminDataEpoch,\
 		  UserGarminDataSleep,\
 		  UserGarminDataBodyComposition,\
@@ -42,11 +45,20 @@ from user_input.models import UserDailyInput,\
 
 class QuicklookCalculationView(APIView):
 
+	def _safe_get(lst,attr,default_val):
+		try:
+			item = lst[0]
+			if type(default_val) is int:
+				return int(item.__dict__.get(attr))
+			return item.__dict__.get(attr)
+		except:
+			return default 
+
 	def get(self, request, format=None):
 		user = request.user
 
 		# date for which quicklook is calculated
-		dt = self.request.query_parama.get('dt',None)
+		dt = self.request.query_params.get('dt',None)
 		y,m,d = map(int,dt.split('-'))
 		start_date_dt = datetime(y,m,d,0,0,0)
 		last_seven_days_date = start_date_dt - timedelta(days=6)
@@ -55,37 +67,39 @@ class QuicklookCalculationView(APIView):
 
 		epochs = [q.data for q in UserGarminDataEpoch.objects.filter(
 			user = request.user,
-			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt
 			)]
 
 		sleeps = [q.data for q in UserGarminDataSleep.objects.filter(
 			user = request.user,
-			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt)]
 
 		dailies = [q.data for q in UserGarminDataDaily.objects.filter(
 			user = request.user,
-			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt)]
 
 		activities =[q.data for q in UserGarminDataActivity.objects.filter(
 			user = request.user,
-			start_time_in_seconds__gte = dt,
+			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt)]
 
+
+		# pull data for past 7 days (incuding today)
 		daily_strong = DailyUserInputStrong.objects.filter(
 			user_input__user = user,
-			created_at__gte = last_seven_days_date,
-			created_at__lte = start_date_dt)
+			user_input__created_at__gte = last_seven_days_date,
+			user_input__created_at__lte = start_date_dt)
 
 		daily_encouraged = DailyUserInputEncouraged.objects.filter(
 			user_input__user = user,
-			created_at = start_date_dt)
+			user_input__created_at = start_date_dt)
 
 		daily_optional = DailyUserInputOptional.objects.filter(
 			user_input__user = user,
-			created_at = start_date_dt)
+			user_input__created_at = start_date_dt)
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		activities_json = [ast.literal_eval(dic) for dic in activities]
@@ -114,13 +128,13 @@ class QuicklookCalculationView(APIView):
 			'avg_sleep_per_night_grade':'',
 			'exercise_consistency_grade':'' ,
 			'overall_workout_grade':'',
-			'prcnt_non_processed_food_consumed_grade':'',
+			'prcnt_unprocessed_food_consumed_grade':'',
 			'alcoholic_drink_per_week_grade':'' ,
 			'penalty':''
 		}
 
 		exercise_calculated_data = {
-			'workout_easy_hard':[q.work_out_easy_or_hard for q in daily_strong][0],
+			'workout_easy_hard':self._safe_get(daily_strong, "work_out_easy_or_hard",''),
 			'workout_type': '',
 			'workout_time': '',
 			'workout_location': '',
@@ -132,7 +146,8 @@ class QuicklookCalculationView(APIView):
 			'avg_heartrate':0,
 			'elevation_gain':my_sum(activities_json,'totalElevationGainInMeters'),
 			'elevation_loss':my_sum(activities_json,'totalElevationLossInMeters'),
-			'effort_level':[int(q.work_out_effort_level) for q in daily_strong][0],
+			'effort_level':self._safe_get(daily_strong, "workout_effort_level", 0),
+
 			'dew_point': 0,
 			'temperature': 0,
 			'humidity': 0,
@@ -145,10 +160,18 @@ class QuicklookCalculationView(APIView):
 			'vo2_max': 0,
 			'running_cadence':my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
 			'nose_breath_prcnt_workout': 0,
-			'water_consumed_workout':[int(q.water_consumed_during_workout) for q in daily_encouraged][0],
-			'chia_seeds_consumed_workout':[int(q.chia_seeds_consumed_during_workout) for q in daily_optional][0],
-			'fast_before_workout': [q.fasted_during_workout for q in daily_optional][0],
-			'pain': [q.pains_twings_during_or_after_your_workout for q in daily_encouraged][0],
+			'water_consumed_workout':self._safe_get(daily_encouraged,
+									"water_consumed_during_workout",0),
+
+			'chia_seeds_consumed_workout':self._safe_get(daily_optional,
+										 "chia_seeds_consumed_during_workout",0),
+
+			'fast_before_workout': self._safe_get(daily_optional,
+								  "fasted_during_workout",''),
+
+			'pain': self._safe_get(daily_encouraged,
+					"pains_twings_during_or_after_your_workout",''),
+
 			'pain_area': [q.pain_area for q in daily_encouraged][0],
 			'stress_level':[q.stress_level_yesterday for q in daily_encouraged][0],
 			'sick': [q.sick for q in daily_optional][0],
@@ -192,7 +215,6 @@ class QuicklookCalculationView(APIView):
 		sleeps_calculated_data = {
 			'sleep_per_wearable': '',
 			'sleep_per_user_input':'',
-			#'sleep_per_user_input': [q.sleep_time_excluding_awake_time for q in input_from_third_source][0],
 			'sleep_aid': [q.sleep_aids_last_night for q in daily_strong][0],
 			'sleep_bed_time': '',
 			'sleep_awake_time': '',
@@ -214,11 +236,30 @@ class QuicklookCalculationView(APIView):
 			'alcohol_week': 0
 		}
 
-		#Calculation of grades
+		# Calculation of grades
 
-		#Average sleep per night grade calculation
+		# Average sleep per night grade calculation
+		for q in daily_strong:
+			if q.user_input.created_at == start_date_dt:
+				grade = calculation_helper.cal_average_sleep_grade(
+									  q.sleep_time_excluding_awake_time,
+									  q.sleep_aid_taken)
+				grades_calculated_data['avg_sleep_per_night_grade'] = grade
 
-		
+		# Unprocessed food grade calculation 
+		for q in daily_strong:
+			if q.user_input.created_at == start_date_dt:
+				grade = calculation_helper.cal_unprocessed_food_grade(
+										 q.prcnt_unprocessed_food_consumed_yesterday)
+
+				grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
+
+		# Alcohol drink consumed grade
+		alcohol_grade = calculation_helper.cal_alcohol_drink_grade(
+			[q.number_of_alcohol_consumed_yesterday for q in daily_strong],
+			user.profile.gender)
+
+		grades_calculated_data['alcoholic_drink_per_week_grade'] = alcohol_grade
 
 
 		user_ql = UserQuickLook.objects.create(user = request.user)

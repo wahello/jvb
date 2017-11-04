@@ -15,14 +15,14 @@ class DailyUserInputStrongSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
 
 	def validate(self, data):
-		prcnt_food = data['prcnt_processed_food_consumed_yesterday']
+		prcnt_food = data['prcnt_unprocessed_food_consumed_yesterday']
 		pattern = re.compile("(^\d{1,3}).*")
 		if prcnt_food and not pattern.match(prcnt_food):
 			raise serializers.ValidationError("not a valid percentage value")
 
 		if prcnt_food:
 			prcnt_food = pattern.match(prcnt_food).group(1)
-			data['prcnt_processed_food_consumed_yesterday'] = prcnt_food
+			data['prcnt_unprocessed_food_consumed_yesterday'] = prcnt_food
 		return data
 
 	class Meta:

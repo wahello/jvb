@@ -22,7 +22,7 @@ function formatJSON(data){
 		        "work_out_easy_or_hard": "easy",
 		        "workout_effort_level": 5,
 		        "hard_portion_workout_effort_level": 8,
-		        "prcnt_processed_food_consumed_yesterday": 20,
+		        "prcnt_unprocessed_food_consumed_yesterday": 20,
 		        "list_of_unprocessed_food_consumed_yesterday": "some unprocessed food",
 		        "list_of_processed_food_consumed_yesterday": "some processed food",
 		        "number_of_alcohol_consumed_yesterday": 2.5,
@@ -87,7 +87,7 @@ function formatJSON(data){
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
 	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;
-	json_data.strong_input['prcnt_processed_food_consumed_yesterday'] = data.prcnt_processed_food;
+	json_data.strong_input['prcnt_unprocessed_food_consumed_yesterday'] = data.prcnt_processed_food;
 	json_data.strong_input['list_of_unprocessed_food_consumed_yesterday'] = data.unprocessed_food_list; 
 	json_data.strong_input['list_of_processed_food_consumed_yesterday'] =data.processed_food_list;
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 

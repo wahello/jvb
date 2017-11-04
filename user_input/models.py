@@ -124,7 +124,7 @@ class DailyUserInputStrong(models.Model):
         validators=[CharMinValueValidator(0),CharMaxValueValidator(10)],
         blank=True, null=True)
 
-    prcnt_processed_food_consumed_yesterday = models.CharField(
+    prcnt_unprocessed_food_consumed_yesterday = models.CharField(
         max_length=20,
         validators=[CharMinValueValidator(0),CharMaxValueValidator(100)],
         blank = True,null = True)
