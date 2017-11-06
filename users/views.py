@@ -427,8 +427,6 @@ class fetchGarminData(APIView):
             )
       sess = service.get_session((access_token, access_token_secret))
 
-      # UTC time is 4 hour ahead of EST so we have to minus 14400
-      # seconds to get actual EST starting time
       data = {
         'uploadStartTimeInSeconds': startDateTimeInSeconds,
         'uploadEndTimeInSeconds':startDateTimeInSeconds+86400
@@ -588,7 +586,7 @@ class fetchGarminData(APIView):
         epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
         for data in epochs_json:
           if data.get('activityType') == 'WALKING': 
-            start_time = data.get('startTimeInSeconds')-14400
+            start_time = data.get('startTimeInSeconds') + data.get('startTimeOffsetInSeconds')
 
             date_of_data = datetime.utcfromtimestamp(start_time).strftime("%Y-%m-%d")
             td = timedelta(hours=1)

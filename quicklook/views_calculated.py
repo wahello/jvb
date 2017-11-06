@@ -45,14 +45,18 @@ from user_input.models import UserDailyInput,\
 
 class QuicklookCalculationView(APIView):
 
-	def _safe_get(lst,attr,default_val):
+	def _safe_get(self,lst,attr,default_val):
 		try:
 			item = lst[0]
+			val = item.__dict__.get(attr)
 			if type(default_val) is int:
-				return int(item.__dict__.get(attr))
-			return item.__dict__.get(attr)
+				if(val == ''):
+					return default_val
+				return int(val)
+
+			return val
 		except:
-			return default 
+			return default_val 
 
 	def get(self, request, format=None):
 		user = request.user
@@ -123,7 +127,7 @@ class QuicklookCalculationView(APIView):
 		grades_calculated_data = {
 			'overall_truth_grade':'',
 			'overall_truth_health_gpa':0,
-			'movement_non_exercise_grade':'' ,
+			'movement_non_exercise_steps_grade':'' ,
 			'movement_consistency_grade': '' ,
 			'avg_sleep_per_night_grade':'',
 			'exercise_consistency_grade':'' ,
@@ -172,13 +176,17 @@ class QuicklookCalculationView(APIView):
 			'pain': self._safe_get(daily_encouraged,
 					"pains_twings_during_or_after_your_workout",''),
 
-			'pain_area': [q.pain_area for q in daily_encouraged][0],
-			'stress_level':[q.stress_level_yesterday for q in daily_encouraged][0],
-			'sick': [q.sick for q in daily_optional][0],
+			'pain_area': self._safe_get(daily_encouraged,"pain_area", ""),
+			'stress_level':self._safe_get(daily_encouraged, "stress_level_yesterday", ""),
+			'sick': self._safe_get(daily_optional, "sick", ""),
 			'drug_consumed': '',
 			'drug': '',
-			'medication':[q.medications_or_controlled_substances_yesterday for q in daily_strong][0],
-			'smoke_substance':[q.smoke_any_substances_whatsoever for q in daily_strong][0],
+			'medication':self._safe_get(daily_strong,
+							 "medications_or_controlled_substances_yesterday", ""),
+
+			'smoke_substance':self._safe_get(daily_strong,
+							 "smoke_any_substances_whatsoever", ""),
+
 			'exercise_fifteen_more': '',
 			'workout_elapsed_time': '',
 			'timewatch_paused_workout': '',
@@ -188,7 +196,7 @@ class QuicklookCalculationView(APIView):
 			'avg_heartrate_grade': '',
 			'overall_workout_grade': '',
 			'heartrate_variability_grade': '',
-			'workout_comment':[q.general_Workout_Comments for q in daily_optional][0]
+			'workout_comment':self._safe_get(daily_optional, "general_Workout_Comments", "")
 		}
 		swim_calculated_data = {
 
@@ -206,16 +214,20 @@ class QuicklookCalculationView(APIView):
 		steps_calculated_data = {
 			 'non_exercise_steps': my_sum(epochs_json,'steps') ,
 			 'exercise_steps': my_sum(activities_json,'steps'),
-			 'total_steps': my_sum(dailies_json,'steps')+my_sum(activities_json,'steps')+my_sum(epochs_json,'steps'),
+			 'total_steps': my_sum(dailies_json,'steps')+\
+			 				my_sum(activities_json,'steps')+\
+			 				my_sum(epochs_json,'steps'),
+
 			 'floor_climed': my_sum(dailies_json,'floorsClimbed'),
 			 'floor_decended':0,
-			 'movement_consistency': 0,
+			 'movement_consistency': '',
 		}
 
 		sleeps_calculated_data = {
 			'sleep_per_wearable': '',
 			'sleep_per_user_input':'',
-			'sleep_aid': [q.sleep_aids_last_night for q in daily_strong][0],
+			'sleep_aid': self._safe_get(daily_strong,
+						 "prescription_or_non_prescription_sleep_aids_last_night", ""),
 			'sleep_bed_time': '',
 			'sleep_awake_time': '',
 			'deep_sleep': my_sum(sleeps_json,'deepSleepDurationInSeconds'),
@@ -227,12 +239,13 @@ class QuicklookCalculationView(APIView):
 		food_calculated_data = {
 			'prcnt_non_processed_food':0,
 			'prcnt_non_processed_food_grade': '',
-			'non_processed_food': [int(q.unprocessed_food_consumed_yesterday) for q in daily_strong][0],
+			'non_processed_food': self._safe_get(daily_strong,
+								 "list_of_unprocessed_food_consumed_yesterday", ""),
 			'diet_type':'',
 		}
 
 		alcohol_calculated_data = {
-			'alcohol_day': [int(q.number_of_alcohol_consumed_yesterday) for q in daily_strong][0],
+			'alcohol_day': self._safe_get(daily_strong,"number_of_alcohol_consumed_yesterday",""),
 			'alcohol_week': 0
 		}
 
@@ -240,15 +253,16 @@ class QuicklookCalculationView(APIView):
 
 		# Average sleep per night grade calculation
 		for q in daily_strong:
-			if q.user_input.created_at == start_date_dt:
+			if q.user_input.created_at == start_date_dt.date():
+				print("Calculating the stuffs")
 				grade = calculation_helper.cal_average_sleep_grade(
 									  q.sleep_time_excluding_awake_time,
-									  q.sleep_aid_taken)
+									  q.prescription_or_non_prescription_sleep_aids_last_night)
 				grades_calculated_data['avg_sleep_per_night_grade'] = grade
 
 		# Unprocessed food grade calculation 
 		for q in daily_strong:
-			if q.user_input.created_at == start_date_dt:
+			if q.user_input.created_at == start_date_dt.date():
 				grade = calculation_helper.cal_unprocessed_food_grade(
 										 q.prcnt_unprocessed_food_consumed_yesterday)
 
@@ -256,10 +270,20 @@ class QuicklookCalculationView(APIView):
 
 		# Alcohol drink consumed grade
 		alcohol_grade = calculation_helper.cal_alcohol_drink_grade(
-			[q.number_of_alcohol_consumed_yesterday for q in daily_strong],
+			[q.number_of_alcohol_consumed_yesterday
+			if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
+			for q in daily_strong],
 			user.profile.gender)
 
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = alcohol_grade
+
+		# Movement consistency and grade calculation
+		movement_consistency_summary = calculation_helper.cal_movement_consistency_summary(epochs_json)
+		if movement_consistency_summary:
+			steps_calculated_data['movement_consistency'] = movement_consistency_summary
+			inactive_hours = movement_consistency_summary.get("inactive_hours")
+			grade = calculation_helper.cal_movement_consistency_grade(inactive_hours)
+			grades_calculated_data['movement_consistency_grade'] = grade
 
 
 		user_ql = UserQuickLook.objects.create(user = request.user)
@@ -287,8 +311,8 @@ class movementConsistencySummary(APIView):
 
 		epochs_json = [q.data for q in UserGarminDataEpoch.objects.filter(
                       user=user,
-                      record_date_in_seconds__gte=startDateTimeInSeconds-14400,
-                      record_date_in_seconds__lte=startDateTimeInSeconds+86400-14400)]
+                      record_date_in_seconds__gte=startDateTimeInSeconds,
+                      record_date_in_seconds__lte=startDateTimeInSeconds+86400)]
 
 		epochs_json = [ast.literal_eval(dic) for dic in epochs_json]
 
@@ -298,7 +322,7 @@ class movementConsistencySummary(APIView):
 			epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 			for data in epochs_json:
 				if data.get('activityType') == 'WALKING': 
-					start_time = data.get('startTimeInSeconds')-14400
+					start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
 
 					date_of_data = datetime.utcfromtimestamp(start_time).strftime("%Y-%m-%d")
 					td = timedelta(hours=1)

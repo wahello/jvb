@@ -27,12 +27,12 @@ class Grades(models.Model):
 	overall_truth_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	overall_truth_health_gpa = models.FloatField(validators=[
 								MinValueValidator(0),MaxValueValidator(4)])
-	movement_non_exercise_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	movement_non_exercise_steps_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	prcnt_non_processed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	penalty = models.CharField(choices=GRADE_CHOICES, max_length=1)
 
@@ -182,7 +182,7 @@ class Steps(models.Model):
 	total_steps = models.PositiveIntegerField()
 	floor_climed = models.PositiveIntegerField()
 	floor_decended = models.PositiveIntegerField()
-	movement_consistency = models.FloatField()
+	movement_consistency = models.TextField(blank=True)
 
 class Sleep(models.Model):
 	Yes = 'yes'
