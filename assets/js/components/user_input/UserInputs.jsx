@@ -159,7 +159,7 @@ class UserInputs extends React.Component{
         water_consumed:data.data.encouraged_input.water_consumed_during_workout,
         chia_seeds:data.data.optional_input.chia_seeds_consumed_during_workout,
         breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
-        prcnt_processed_food:data.data.strong_input.prcnt_processed_food_consumed_yesterday,
+        prcnt_processed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
         unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
         processed_food_list:data.data.strong_input.list_of_processed_food_consumed_yesterday,
         alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,

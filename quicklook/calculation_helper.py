@@ -50,7 +50,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
 
 	return GRADES[points]
  
-def cal_processed_food_grade(prcnt_food):
+def cal_unprocessed_food_grade(prcnt_food):
  	prcnt_food = int(prcnt_food)
  	grade = ''
 
