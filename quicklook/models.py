@@ -7,12 +7,15 @@ from django.core.validators import MinValueValidator ,MaxValueValidator
 
 class UserQuickLook(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	created_at = models.DateField(auto_now_add=True,unique=True)
+	created_at = models.DateField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
 	    dtime = str(self.created_at)
 	    return "{}-{}".format(self.user.username,dtime)
+	    
+	class Meta:
+		unique_together = ("user", "created_at")
 
 class Grades(models.Model):
 	GRADE_CHOICES = (

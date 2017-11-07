@@ -61,6 +61,9 @@ class Profile(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.user.username
+
     def age(self):
         today = date.today()
         dob = self.date_of_birth

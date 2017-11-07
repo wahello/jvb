@@ -86,36 +86,36 @@ class QuicklookCalculationView(APIView):
 		end_dt = start_dt + 86400
 
 		epochs = [q.data for q in UserGarminDataEpoch.objects.filter(
-			user = request.user,
+			user = user,
 			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt
 			)]
 
 		sleeps = [q.data for q in UserGarminDataSleep.objects.filter(
-			user = request.user,
+			user = user,
 			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt)]
 
 		dailies = [q.data for q in UserGarminDataDaily.objects.filter(
-			user = request.user,
+			user = user,
 			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt).order_by(
 			'-start_time_duration_in_seconds'
 			)]
 
 		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
-				user = request.user,
+				user = user,
 				calendar_date = start_date_dt.date()
 			)]
 
 		stress = [q.data for q in UserGarminDataStressDetails.objects.filter(
-				user = request.user,
+				user = user,
 				start_time_in_seconds__gte = start_dt,
 				start_time_in_seconds__lte = end_dt
 			)]
 
 		activities =[q.data for q in UserGarminDataActivity.objects.filter(
-			user = request.user,
+			user = user,
 			start_time_in_seconds__gte = start_dt,
 			start_time_in_seconds__lte = end_dt)]
 
@@ -316,7 +316,7 @@ class QuicklookCalculationView(APIView):
 			grades_calculated_data['movement_consistency_grade'] = grade
 
 
-		user_ql = UserQuickLook.objects.create(user = request.user)
+		user_ql = UserQuickLook.objects.create(user = user)
 		Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
 		ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
 		SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
@@ -327,7 +327,6 @@ class QuicklookCalculationView(APIView):
 		Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
 
 		return Response({"message":"Successfuly created quicklook"},status = status.HTTP_201_CREATED)
-
 
 
 class movementConsistencySummary(APIView):
