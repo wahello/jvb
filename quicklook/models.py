@@ -131,7 +131,7 @@ class ExerciseAndReporting(models.Model):
 	hrr_start_point = models.IntegerField()
 	hrr_beats_lowered = models.IntegerField()
 	sleep_resting_hr_last_night = models.IntegerField()
-	vo2_max = models.IntegerField()
+	vo2_max = models.FloatField()
 	running_cadence = models.IntegerField()
 	nose_breath_prcnt_workout = models.FloatField(
 		validators=[MinValueValidator(0),MaxValueValidator(100)])
@@ -236,5 +236,5 @@ class Food(models.Model):
 
 class Alcohol(models.Model):
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "alcohol_ql")
-	alcohol_day = models.FloatField()
+	alcohol_day = models.CharField(max_length = 4)
 	alcohol_week = models.FloatField()

@@ -30,16 +30,15 @@ def cal_movement_consistency_summary(epochs_json):
 				movement_consistency[time_interval]['status']\
 					= 'active' if is_active else 'inactive'
 
-		for dt,data in list(movement_consistency.items()):
-			active_hours = 0
-			inactive_hours = 0
-			for interval,values in list(data.items()):
-				if values['status'] == 'active': 
-					active_hours += 1 
-				else:
-					inactive_hours += 1
-				movement_consistency[dt]['active_hours'] = active_hours
-				movement_consistency[dt]['inactive_hours'] = inactive_hours
+		active_hours = 0
+		inactive_hours = 0
+		for interval,values in list(movement_consistency.items()):
+			if values['status'] == 'active': 
+				active_hours += 1 
+			else:
+				inactive_hours += 1
+			movement_consistency['active_hours'] = active_hours
+			movement_consistency['inactive_hours'] = inactive_hours
 
 		return movement_consistency
 
@@ -110,7 +109,9 @@ def cal_unprocessed_food_grade(prcnt_food):
  		return 'F'
 
 def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
-	print(alcohol_drank_past_week)
+	alcohol_drank_past_week = ['21' if x == '20+' else x
+								for x in alcohol_drank_past_week]
+								
 	drink_avg = sum(map(float,alcohol_drank_past_week))\
 				/len(alcohol_drank_past_week)
 

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from collections import OrderedDict
 import ast
+import json
 
 from rest_framework.views import APIView
 from rest_framework import status
@@ -15,7 +16,10 @@ from garmin.models import UserGarminDataEpoch,\
 		  UserGarminDataBodyComposition,\
 		  UserGarminDataDaily,\
 		  UserGarminDataActivity,\
-		  UserGarminDataManuallyUpdated
+		  UserGarminDataManuallyUpdated,\
+		  UserGarminDataStressDetails,\
+          UserGarminDataMetrics,\
+          UserGarminDataMoveIQ
 
 from quicklook.serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
@@ -53,10 +57,22 @@ class QuicklookCalculationView(APIView):
 				if(val == ''):
 					return default_val
 				return int(val)
-
 			return val
 		except:
 			return default_val 
+
+	def _safe_get_dict(self,lst,attr,default_val):
+		try:
+			item = lst[0]
+			val = item.get(attr)
+			if type(default_val) is int:
+				if(val == ''):
+					return default_val
+				return int(val)
+			return val
+		except:
+			return default_val 
+
 
 	def get(self, request, format=None):
 		user = request.user
@@ -83,7 +99,20 @@ class QuicklookCalculationView(APIView):
 		dailies = [q.data for q in UserGarminDataDaily.objects.filter(
 			user = request.user,
 			start_time_in_seconds__gte = start_dt,
-			start_time_in_seconds__lte = end_dt)]
+			start_time_in_seconds__lte = end_dt).order_by(
+			'-start_time_duration_in_seconds'
+			)]
+
+		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
+				user = request.user,
+				calendar_date = start_date_dt.date()
+			)]
+
+		stress = [q.data for q in UserGarminDataStressDetails.objects.filter(
+				user = request.user,
+				start_time_in_seconds__gte = start_dt,
+				start_time_in_seconds__lte = end_dt
+			)]
 
 		activities =[q.data for q in UserGarminDataActivity.objects.filter(
 			user = request.user,
@@ -109,7 +138,8 @@ class QuicklookCalculationView(APIView):
 		activities_json = [ast.literal_eval(dic) for dic in activities]
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
-
+		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
+		stress_json = [ast.literal_eval(dic) for dic in stress]
 
 		def my_sum(d, key):
 			if(d!=[]):
@@ -160,8 +190,8 @@ class QuicklookCalculationView(APIView):
 			'hrr': '',
 			'hrr_start_point': 0,
 			'hrr_beats_lowered': 0,
-			'sleep_resting_hr_last_night': 0,
-			'vo2_max': 0,
+			'sleep_resting_hr_last_night': self._safe_get_dict(dailies_json,'restingHeartRateInBeatsPerMinute',0),
+			'vo2_max': self._safe_get_dict(user_metrics_json,"vo2Max",0),
 			'running_cadence':my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
 			'nose_breath_prcnt_workout': 0,
 			'water_consumed_workout':self._safe_get(daily_encouraged,
@@ -277,10 +307,10 @@ class QuicklookCalculationView(APIView):
 
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = alcohol_grade
 
-		# Movement consistency and grade calculation
+		# Movement consistency and movement consistency grade calculation
 		movement_consistency_summary = calculation_helper.cal_movement_consistency_summary(epochs_json)
 		if movement_consistency_summary:
-			steps_calculated_data['movement_consistency'] = movement_consistency_summary
+			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
 			inactive_hours = movement_consistency_summary.get("inactive_hours")
 			grade = calculation_helper.cal_movement_consistency_grade(inactive_hours)
 			grades_calculated_data['movement_consistency_grade'] = grade

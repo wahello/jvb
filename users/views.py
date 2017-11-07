@@ -1,11 +1,7 @@
-import dateutil.parser
 import ast
-import json
 import urllib
 import logging
-from datetime import datetime,timedelta,date, time,timezone
-import calendar
-from collections import OrderedDict
+from datetime import datetime,timezone
 
 from rauth import OAuth1Service
 
@@ -28,7 +24,10 @@ from garmin.models import UserGarminDataEpoch,\
           UserGarminDataBodyComposition,\
           UserGarminDataDaily,\
           UserGarminDataActivity,\
-          UserGarminDataManuallyUpdated
+          UserGarminDataManuallyUpdated,\
+          UserGarminDataStressDetails,\
+          UserGarminDataMetrics,\
+          UserGarminDataMoveIQ
 
 try:
     import http.client as http_client
@@ -42,21 +41,6 @@ logging.getLogger().setLevel(logging.DEBUG)
 requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
-
-
-
-class Login(APIView):
-  def post(self, request, format="json"):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    user = authenticate(request,username=username, password=password)
-    if user:
-      login(request,user)
-      return Response(status=status.HTTP_200_OK)
-    else:
-      return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-
 
 def request_token(request):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
@@ -91,32 +75,6 @@ def request_token(request):
     callback_string = urllib.parse.quote('http://app.jvbwellness.com/callbacks/garmin')
     return redirect(authurl + '?oauth_token={0}&oauth_callback={1}'.format(request_token,callback_string))
 
-  #   if not 'oauth_token' in session and not 'state' in session:
-  #       # request_token, request_token_secret = service.get_request_token(params =
-  # #                     {'oauth_callback': 'oob',
-  # #                      'format': 'json'})
-
-        # request_token, request_token_secret = service.get_request_token()
-        # # $request_token_info = $oauth->getRequestToken($req_url)
-        # session['request_token'] = request_token
-        # session['request_token_secret'] = request_token_secret
-        # session['state'] = 1
-        # return redirect(authurl + '?oauth_token={0}'.format(request_token))
-  #   elif 'state' in session and session['state'] ==1:
-  #       #oauth token already exists
-  #       #determine access token temporaily for work
-  #       #continue
-  #       access_token, access_token_secret = service.get_access_token(session['request_token'],
-  #           session['request_token_secret'])
-
-  #       # need to validate that the token still works.... not done
-  #       session['state'] = 2
-  #       session['access_token'] = access_token
-  #       session['access_secret'] = access_token_secret
-  #       return redirect('/')
-    # except Exception, e:
-    #     print(e)
-
 def receive_token(request):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connect.garmin.com/oauthConfirm'
@@ -127,39 +85,6 @@ def receive_token(request):
 
     # oauth_token = request.GET['oauth_token']
     oauth_verifier = request.GET['oauth_verifier']
-
-    # encoded_verifier = urllib.parse.quote(oauth_verifier)
-    # xacc_url = '{0}?oauth_verifier={1}'.format(acc_url,encoded_verifier)
-
-    # oauth = OAuthSimple(apiKey=conskey, sharedSecret=conssec)
-    # request = oauth.sign({
-    #   'action': "POST",
-    #   'path': acc_url,
-    #   'parameters': {  'oauth_verifier': oauth_verifier,
-    #     'oauth_token': oauth_token,
-    #     'oauth_version': '1.0',
-    #     'oauth_timestamp': time.time(),
-    #   }
-    # })
-
-    # from requests_oauthlib import OAuth1, OAuth1Session
-    # s = requests.Session()
-    # auth = OAuth1(conskey, conssec, verifier=oauth_verifier, resource_owner_key=oauth_token)
-    # s.auth = auth
-    # s.headers.update({
-    #     #'oauth_verifier': oauth_verifier,
-    #     # 'oauth_token': oauth_token,
-    #     'Content-Length': '0'
-    #      })
-
-    # print(s.headers)
-
-    # print(request)
-
-
-    # r = s.post(acc_url)
-    # print(r.text)
-    # print(r.json())
 
     service = OAuth1Service(
           # name = 'etrade',
@@ -175,53 +100,7 @@ def receive_token(request):
     session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
     header_auth=True)
 
-    # sess = service.get_auth_session(session['request_token'], session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier}, header_auth=True)
     sess = service.get_session((access_token, access_token_secret))
-
-    # # need to validate that the token still works.... not done
-    # session['state'] = 2
-    # session['access_token'] = access_token
-    # session['access_secret'] = access_token_secret
-    # print('access token')
-    # print(access_token)
-    # print('access_token_secret')
-    # print(access_token_secret)
-    # session = service.get_auth_session(access_token,access_token_secret,method='POST',data=data)
-
-
-    # data = {
-    #   'uploadStartTimeInSeconds': 1503148183-86300,
-    #   'uploadEndTimeInSeconds': 1503148183,
-    # }
-
-    # count = 0
-    # while count < 20:
-    #     r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
-    #     print(r)
-    #     print(r.json())
-    #     count += 1
-    #     data['uploadEndTimeInSeconds'] = data['uploadStartTimeInSeconds']
-    #     data['uploadStartTimeInSeconds'] = data['uploadStartTimeInSeconds'] - 86300
-
-    # session.headers.update({'access-token': access_token})
-    # print(r.json())
-
-
-    # from requests_oauthlib import OAuth1, OAuth1Session
-    # s = requests.Session()
-    # auth = OAuth1(conskey, conssec, resource_owner_key=access_token)
-    # s.auth = auth
-    # s.headers.update({
-    #     #'oauth_verifier': oauth_verifier,
-    #     # 'oauth_token': oauth_token,
-    #     'Content-Length': '0'
-    #      })
-
-
-    # print(s.headers)
-
-    # print(request)
-
     request.session['token'] = access_token
     request.session['token_secret'] = access_token_secret
     request.session['oauth_verifier'] = oauth_verifier
@@ -231,15 +110,6 @@ def receive_token(request):
                                token_secret=access_token_secret)
 
     return redirect('/service_connect')
-
-
-    # print(request)
-    # $json = json_decode($_POST['uploadMetaData']);
-    # $tmp_name = $_FILES['file']['tmp_name'];
-    # $file_name = $_FILES['file']['name'];
-    # move_uploaded_file($tmp_name, YOUR_FILE_PATH);
-    # header('Location: YOUR_URL_FOR_THE_SAVED_FILE', true, 201);
-
 
 class GetGarminToken(APIView):
   permission_classes = (permissions.IsAuthenticated,)
@@ -266,77 +136,6 @@ class GetGarminToken(APIView):
       return Response(serializer.data,status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-'''
-class fetchGarminData(APIView):
-
-  def get(self, request, format="json"):
-    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-    authurl = 'http://connect.garmin.com/oauthConfirm'
-    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
-    conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
-    conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
-
-    startDateTimeInSeconds = int(request.GET.get('start_date'))
-
-    # session = request.session
-    # access_token = session.get('token',None)
-    # access_token_secret = session.get('token_secret',None)
-
-    access_token = request.user.garmin_token.token
-    access_token_secret = request.user.garmin_token.token_secret
-
-    if access_token and access_token_secret:
-      service = OAuth1Service(
-            consumer_key = conskey,
-            consumer_secret = conssec,
-            request_token_url = req_url,
-            access_token_url = acc_url,
-            authorize_url = authurl,
-            )
-      sess = service.get_session((access_token, access_token_secret))
-
-      data = {
-        'uploadStartTimeInSeconds': startDateTimeInSeconds,
-        'uploadEndTimeInSeconds':startDateTimeInSeconds+86300
-      }
-
-      # data = {
-      #   'uploadStartTimeInSeconds': 1503187200-86300,
-      #   'uploadEndTimeInSeconds': 1503187200,
-      # }
-
-      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/epochs', header_auth=True, params=data)
-      output_dict = {
-        'epochs': r.json()
-      }
-
-      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/bodyComps', header_auth=True, params=data)
-      output_dict['bodyComps'] = r.json()
-
-      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/sleeps', header_auth=True, params=data)
-      output_dict['sleeps'] = r.json()
-
-      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/manuallyUpdatedActivities', header_auth=True, params=data)
-      output_dict['manuallyUpdatedActivities'] = r.json()
-
-      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/activities', header_auth=True, params=data)
-      output_dict['activities'] = r.json()
-
-      r = sess.get('https://healthapi.garmin.com/wellness-api/rest/dailies', header_auth=True, params=data)
-      output_dict['dailies'] = r.json()
-
-
-      output_dict['garmin_health_api'] = {
-        'average_ground_contact_time': ''
-      }
-
-      return Response(output_dict)
-
-
-    else:
-      return Response(status.HTTP_401_UNAUTHORIZED)
-'''
 class fetchGarminData(APIView):
 
   '''
@@ -353,6 +152,9 @@ class fetchGarminData(APIView):
         "EPOCH_SUMMARIES":"epochs",
         "SLEEP_SUMMARIES":"sleeps",
         "BODY_COMPOSITION":"bodyComps",
+        "STRESS_DETAILS":"stressDetails",
+        "MOVEMENT_IQ":"moveiq",
+        "USER_METRICS":"userMetrics"
       }
 
   MODEL_TYPES = {
@@ -361,38 +163,50 @@ class fetchGarminData(APIView):
     "manuallyUpdatedActivities":UserGarminDataManuallyUpdated,
     "epochs":UserGarminDataEpoch,
     "sleeps":UserGarminDataSleep,
-    "bodyComps":UserGarminDataBodyComposition
+    "bodyComps":UserGarminDataBodyComposition,
+    "stressDetails":UserGarminDataStressDetails,
+    "moveiq":UserGarminDataMoveIQ,
+    "userMetrics":UserGarminDataMetrics
   }
 
   # just for demo storing data in db. Pulling data from api and storing
   # in db is functionality of other view
-  def _createObjectList(self, json_data, dtype,record_date):
+  def _createObjectList(self,json_data,dtype,record_dt):
     '''
-      Helper method of bulk_create method to create model
-      objects for each data dictionary in json data received
+      Helper method to create instance of model
     '''
     if len(json_data):
       model = self.MODEL_TYPES[dtype]
-      if not dtype == 'bodyComps':
+      user = self.request.user
+      if not dtype in ["bodyComps","userMetrics"]:
         objects = [
-          model(user=self.request.user,
+          model(user=user,
               summary_id=obj.get("summaryId"),
-              record_date_in_seconds=record_date,
+              record_date_in_seconds=record_dt,
               start_time_in_seconds=obj.get("startTimeInSeconds")+\
-                                    obj.get("startTimeOffsetInSeconds"),
+                          obj.get("startTimeOffsetInSeconds"),
               start_time_duration_in_seconds=obj.get("durationInSeconds"),
               data = obj)
           for obj in json_data
         ]
-      else:
+      if dtype == "bodyComps":
         objects = [
-          model(user=self.request.user,
+          model(  user=user,
               summary_id=obj.get("summaryId"),
-              record_date_in_seconds=record_date,
+              record_date_in_seconds=record_dt,
               start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
                                     obj.get("measurementTimeOffsetInSeconds"),
               start_time_duration_in_seconds=obj.get("durationInSeconds"),
               data = obj)
+          for obj in json_data
+            ]
+      if dtype == "userMetrics":
+        objects = [
+          model(  user=user,
+              summary_id=obj.get("summaryId"),
+              record_date_in_seconds=record_dt,
+              calendar_date=obj.get("calendarDate"),
+              data=obj)
           for obj in json_data
         ]
 
@@ -444,7 +258,10 @@ class fetchGarminData(APIView):
         "manuallyUpdatedActivities":False,
         "epochs":False,
         "sleeps":False,
-        "bodyComps":False
+        "bodyComps":False,
+        "stressDetails":False,
+        "moveiq":False,
+        "userMetrics":False
       }
 
       for dtype in self.DATA_TYPES.values():
@@ -453,7 +270,13 @@ class fetchGarminData(APIView):
         model = self.MODEL_TYPES[dtype]
         pull = False
         # start_time_in_seconds
-        output_dict[dtype] = [q.data for q in model.objects.filter(
+
+        if dtype == 'userMetrics':
+          output_dict[dtype] = [q.data for q in model.objects.filter(
+                      user=user,
+                      record_date_in_seconds=data['uploadStartTimeInSeconds'])]
+        else:
+          output_dict[dtype] = [q.data for q in model.objects.filter(
                       user=user,
                       start_time_in_seconds__gte=data['uploadStartTimeInSeconds'],
                       start_time_in_seconds__lte=data['uploadEndTimeInSeconds'])]
@@ -575,59 +398,7 @@ class fetchGarminData(APIView):
         "Bed Time":my_sum(sleeps_json,'lightSleepDurationInSeconds')+my_sum(sleeps_json,'deepSleepDurationInSeconds')+my_sum(sleeps_json,'awakeDurationInSeconds'),
         "Sleep Awake time":my_sum(sleeps_json,'awakeDurationInSeconds'),
         "Stress Field (HRV throughout the day)":""
-                }
-
-      # movement consistency calculation
-
-      movement_consistency = OrderedDict()
-
-      if epochs_json:
-
-        epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
-        for data in epochs_json:
-          if data.get('activityType') == 'WALKING': 
-            start_time = data.get('startTimeInSeconds') + data.get('startTimeOffsetInSeconds')
-
-            date_of_data = datetime.utcfromtimestamp(start_time).strftime("%Y-%m-%d")
-            td = timedelta(hours=1)
-            hour_start = datetime.utcfromtimestamp(start_time).strftime("%I %p")
-            hour_end = (datetime.utcfromtimestamp(start_time)+td).strftime("%I %p")
-            time_interval = hour_start+" to "+hour_end
-
-            if not movement_consistency.get(date_of_data,None):
-              movement_consistency[date_of_data] = OrderedDict()
-
-            if not movement_consistency[date_of_data].get(time_interval,None):
-              movement_consistency[date_of_data][time_interval] = {
-                "steps":0,
-                "status":"inactive"
-              }
-
-            steps_in_interval = movement_consistency[date_of_data][time_interval].get('steps')
-            status = movement_consistency[date_of_data][time_interval].get('status')
-            is_active = True if data.get('steps') + steps_in_interval > 300 else False
-
-            movement_consistency[date_of_data][time_interval]['steps']\
-                = steps_in_interval + data.get('steps')
-
-            movement_consistency[date_of_data][time_interval]['status']\
-                = 'active' if is_active else 'inactive'
-
-        # converting Ordered dict "movement_consistency" to list
-        # to avoid the bug "RuntimeError: OrderedDict mutated during iteration"
-        # in DRF (is guess so!) 
-        for dt,data in list(movement_consistency.items()):
-          active_hours = 0
-          inactive_hours = 0
-          for interval,values in list(data.items()):
-            if values['status'] == 'active': 
-              active_hours += 1 
-            else:
-              inactive_hours += 1
-          movement_consistency[dt]['active_hours'] = active_hours
-          movement_consistency[dt]['inactive_hours'] = inactive_hours
-
-      output_dict['movement_consistency'] = movement_consistency
+      }
 
       return Response(output_dict)
 
