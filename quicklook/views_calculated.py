@@ -21,16 +21,6 @@ from garmin.models import UserGarminDataEpoch,\
           UserGarminDataMetrics,\
           UserGarminDataMoveIQ
 
-from quicklook.serializers import UserQuickLookSerializer,\
-						 GradesSerializer,\
-						 StepsSerializer,\
-						 SleepSerializer,\
-						 ExerciseAndReporting,\
-						 SwimStats,\
-						 BikeStats,\
-						 FoodSerializer,\
-						 AlcoholSerializer
-
 from quicklook.models import UserQuickLook,\
 					Grades,\
 					Sleep,\
@@ -283,8 +273,9 @@ class QuicklookCalculationView(APIView):
 
 		# Average sleep per night grade calculation
 		for q in daily_strong:
-			if q.user_input.created_at == start_date_dt.date():
-				print("Calculating the stuffs")
+			if (q.user_input.created_at == start_date_dt.date() and 
+				q.sleep_time_excluding_awake_time != '' and 
+				q.prescription_or_non_prescription_sleep_aids_last_night != ''):
 				grade = calculation_helper.cal_average_sleep_grade(
 									  q.sleep_time_excluding_awake_time,
 									  q.prescription_or_non_prescription_sleep_aids_last_night)
@@ -292,7 +283,8 @@ class QuicklookCalculationView(APIView):
 
 		# Unprocessed food grade calculation 
 		for q in daily_strong:
-			if q.user_input.created_at == start_date_dt.date():
+			if (q.user_input.created_at == start_date_dt.date() and
+				q.prcnt_unprocessed_food_consumed_yesterday != ''):
 				grade = calculation_helper.cal_unprocessed_food_grade(
 										 q.prcnt_unprocessed_food_consumed_yesterday)
 
