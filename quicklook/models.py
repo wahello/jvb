@@ -122,9 +122,9 @@ class ExerciseAndReporting(models.Model):
 	elevation_gain = models.IntegerField()
 	elevation_loss = models.IntegerField()
 	effort_level = models.PositiveIntegerField()
-	dew_point = models.PositiveIntegerField()
+	dew_point = models.FloatField()
 	temperature = models.FloatField()
-	humidity = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(100)])
+	humidity = models.FloatField()
 	temperature_feels_like = models.FloatField()
 	wind = models.FloatField()
 

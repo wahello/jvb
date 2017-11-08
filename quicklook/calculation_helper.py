@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from collections import OrderedDict
 import json, ast
+import requests
 
 from garmin.models import UserGarminDataEpoch,\
 		  UserGarminDataSleep,\
@@ -26,7 +27,32 @@ from quicklook.models import UserQuickLook,\
 					Food,\
 					Alcohol
 
+def fetch_weather_data(latitude,longitude,date):
+	'''
+		Fetch Weather daily data for certain date
+		from www.darksky.net api  
+
+		Expect date in UNIX timestamp format 
+
+		Latitude of NYC =  40.730610
+		Longitude of NYC = -73.935242 
+	'''
+	KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
+	EXCLUDE = ['currently','minutely','hourly','alerts','flags']
+	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}'.format(
+				KEY, latitude, longitude, date,",".join(EXCLUDE))
+
+	try:
+		r = requests.get(URL)
+		return r.json()
+	except:
+		return {}
+
 def cal_movement_consistency_summary(epochs_json):
+	
+	'''
+		Calculate the movement consistency summary
+	'''
 	movement_consistency = OrderedDict()
 
 	if epochs_json:
@@ -67,8 +93,29 @@ def cal_movement_consistency_summary(epochs_json):
 
 		return movement_consistency
 
+def cal_non_exercise_steps_total_steps(dailies_json, epochs_json):
+	'''
+		Calculate non exercise steps
+	'''	
+
+	NON_EXERCISE_ACTIVITIES = ['WALKING','CASUAL_WALKING','SPEED_WALKING',
+							   'MOTORCYCLING','FLYING','HORSEBACK_RIDING'
+							   'SNOWMOBILING']
+	total_steps = 0
+	non_exercise_steps = 0
+
+	if epochs_json:
+		for dobj in epochs_json:
+			if dobj['activityType'] not in NON_EXERCISE_ACTIVITIES:
+				non_exercise_steps += dobj['steps']
+
+	if dailies_json:
+		total_steps = dailies_json[0]['steps']
+
+	return (non_exercise_steps, total_steps)
+
 def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
-	print("calculation sleep grade")
+	
 	_to_sec = lambda x : int(x.split(":")[0]) * 3600 + int(x.split(":")[1]) * 60
 
 	_tobj = {
@@ -214,11 +261,51 @@ def create_quick_look(user, dt):
 		except:
 			return default_val 
 
+	def _update_helper(instance,data_dict):
+		'''
+			Helper function to update the instance
+			with provided key,value pair
+
+			Warning: This will not trigger any signals
+					 like post or pre save
+		'''
+		for attr, value in data_dict.items():
+			setattr(instance,attr,value)
+		instance.save()
+
+	def _extract_weather_data(data):
+		'''
+			Extract weather information like - Temperature, Dew point
+			Humidity, Apparent Temperature, Wind
+		'''
+		DATA = {
+			"temperature":0,
+			"dewPoint":0,
+			"humidity":0,
+			"apparentTemperature":0,
+			"windSpeed":0
+		}
+
+		if data:
+			data = data['daily']['data'][0]
+			DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
+			DATA['dewPoint'] = data['dewPoint']
+			DATA['humidity'] = data['humidity'] 
+			DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
+										  data['apparentTemperatureMax'])/2, 2)
+			DATA['windSpeed'] = data['windSpeed']
+
+		return DATA
+
+
 	y,m,d = map(int,dt.split('-'))
 	start_date_dt = datetime(y,m,d,0,0,0)
 	last_seven_days_date = start_date_dt - timedelta(days=6)
 	start_dt = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
 	end_dt = start_dt + 86400
+
+	weather_data = _extract_weather_data(
+		fetch_weather_data(40.730610,-73.935242,start_dt))
 
 	epochs = [q.data for q in UserGarminDataEpoch.objects.filter(
 		user = user,
@@ -317,11 +404,11 @@ def create_quick_look(user, dt):
 		'elevation_loss':my_sum(activities_json,'totalElevationLossInMeters'),
 		'effort_level':_safe_get(daily_strong, "workout_effort_level", 0),
 
-		'dew_point': 0,
-		'temperature': 0,
-		'humidity': 0,
-		'temperature_feels_like': 0,
-		'wind': 0,
+		'dew_point': weather_data['dewPoint'],
+		'temperature': weather_data['temperature'],
+		'humidity': weather_data['humidity'],
+		'temperature_feels_like': weather_data['apparentTemperature'],
+		'wind': weather_data['windSpeed'],
 		'hrr': '',
 		'hrr_start_point': 0,
 		'hrr_beats_lowered': 0,
@@ -453,13 +540,29 @@ def create_quick_look(user, dt):
 		grade = cal_movement_consistency_grade(inactive_hours)
 		grades_calculated_data['movement_consistency_grade'] = grade
 
+	# Non Exercise 
 
-	user_ql = UserQuickLook.objects.create(user = user)
-	Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
-	ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
-	SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
-	BikeStats.objects.create(user_ql = user_ql,**bike_calculated_data)
-	Steps.objects.create(user_ql = user_ql,**steps_calculated_data)
-	Sleep.objects.create(user_ql = user_ql,**sleeps_calculated_data)
-	Food.objects.create(user_ql = user_ql,**food_calculated_data)
-	Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
+
+	# If quick look for provided date exist then update it otherwise
+	# create new quicklook instance 
+	try:
+		user_ql = UserQuickLook.objects.get(created_at = start_date_dt.date())
+		_update_helper(user_ql.grades_ql,grades_calculated_data)
+		_update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
+		_update_helper(user_ql.swim_stats_ql, swim_calculated_data)
+		_update_helper(user_ql.bike_stats_ql, bike_calculated_data)
+		_update_helper(user_ql.steps_ql, steps_calculated_data)
+		_update_helper(user_ql.sleep_ql, sleeps_calculated_data)
+		_update_helper(user_ql.food_ql, food_calculated_data)
+		_update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
+
+	except UserQuickLook.DoesNotExist:
+		user_ql = UserQuickLook.objects.create(user = user)
+		Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
+		ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
+		SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
+		BikeStats.objects.create(user_ql = user_ql,**bike_calculated_data)
+		Steps.objects.create(user_ql = user_ql,**steps_calculated_data)
+		Sleep.objects.create(user_ql = user_ql,**sleeps_calculated_data)
+		Food.objects.create(user_ql = user_ql,**food_calculated_data)
+		Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)

@@ -154,6 +154,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# Goals.objects.create(user_input=user_input_obj,
 		# 								 **goals_data)
 
+
+		#sending signal to calculate quicklook
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
@@ -183,6 +185,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# goals_obj = instance.goals
 		# self._update_helper(goals_obj, goals_data)
 
+		#sending signal to calculate quicklook
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
