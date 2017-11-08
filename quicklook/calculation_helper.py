@@ -464,12 +464,9 @@ def create_quick_look(user, dt):
 	}
 
 	steps_calculated_data = {
-		 'non_exercise_steps': my_sum(epochs_json,'steps') ,
-		 'exercise_steps': my_sum(activities_json,'steps'),
-		 'total_steps': my_sum(dailies_json,'steps')+\
-		 				my_sum(activities_json,'steps')+\
-		 				my_sum(epochs_json,'steps'),
-
+		 'non_exercise_steps':0,
+		 'exercise_steps': 0,
+		 'total_steps': 0,
 		 'floor_climed': my_sum(dailies_json,'floorsClimbed'),
 		 'floor_decended':0,
 		 'movement_consistency': '',
@@ -540,7 +537,16 @@ def create_quick_look(user, dt):
 		grade = cal_movement_consistency_grade(inactive_hours)
 		grades_calculated_data['movement_consistency_grade'] = grade
 
-	# Non Exercise 
+	# Exercise step calculation, Non exercise step calculation and
+	# Non-Exercise steps grade calculation
+	non_exercise_steps, total_steps = cal_non_exercise_steps_total_steps(
+									  dailies_json,epochs_json)	
+	steps_calculated_data['non_exercise_steps'] = non_exercise_steps
+	steps_calculated_data['exercise_steps'] = total_steps - non_exercise_steps
+	steps_calculated_data['total_steps'] = total_steps
+
+	grades_calculated_data['movement_non_exercise_steps_grade'] = \
+	cal_non_exercise_step_grade(non_exercise_steps)
 
 
 	# If quick look for provided date exist then update it otherwise
