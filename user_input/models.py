@@ -102,11 +102,34 @@ class DailyUserInputStrong(models.Model):
         (NOT_YET,'Not Yet')
     )
 
+    WORKOUT_TYPE_CHOICES = (
+        ('cardio','Cardio'),
+        ('strength','Strength'),
+        ('both','Both')
+    )
+
+    WORKOUT_INPUT_TYPE_CHOICES = (
+        ('cardio','Cardio'),
+        ('strength','Strength')
+    )
+
     user_input = models.OneToOneField(UserDailyInput,related_name='strong_input')
     workout = models.CharField(
         max_length=10,
         choices=WORKOUT_DONE_CHOICES,
         blank=True
+    )
+
+    workout_type = models.CharField(
+        max_length = 10,
+        choices = WORKOUT_TYPE_CHOICES,
+        blank = True
+    )
+
+    workout_input_type = models.CharField(
+        max_length = 10,
+        choices = WORKOUT_INPUT_TYPE_CHOICES,
+        blank = True
     )
 
     work_out_easy_or_hard = models.CharField(

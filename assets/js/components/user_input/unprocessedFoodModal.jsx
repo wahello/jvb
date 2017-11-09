@@ -22,7 +22,8 @@ export default class UnprocesedFoodModal extends Component{
 	}
 
 	componentWillReceiveProps(nextProps) {
-  	  if(nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) {
+  	  if((nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) ||
+  	  	 (nextProps.processed_food_list !== this.props.processed_food_list)) {
     	  	this.setState({
     	  		enter_food:(nextProps.unprocessed_food_list !== '') ? true : false,
     	  		unprocessed_food_list:nextProps.unprocessed_food_list,

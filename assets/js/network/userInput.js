@@ -19,6 +19,8 @@ function formatJSON(data){
 		        "id": 1,
 		        "user_input": 18,
 		        "workout":"yes",
+		        "workout_type":"cardio",
+		        "workout_input_type":"strength",
 		        "work_out_easy_or_hard": "easy",
 		        "workout_effort_level": 5,
 		        "hard_portion_workout_effort_level": 8,
@@ -84,6 +86,8 @@ function formatJSON(data){
 		"optional_input":{}
 	};
 	json_data.strong_input['workout'] = data.workout;
+	json_data.strong_input['workout_type'] = data.workout_type;
+	json_data.strong_input['workout_input_type'] = data.workout_input_type;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
 	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;
