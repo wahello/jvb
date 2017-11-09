@@ -332,7 +332,7 @@ class fetchGarminData(APIView):
 
       def max_values(d,key):
           if(d!=[]):
-              seq = [x[key] for x in d]
+              seq = [x.get(key,0) for x in d]
               return(max(seq))
           else:
               return(0)

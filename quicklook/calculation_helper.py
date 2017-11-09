@@ -93,7 +93,7 @@ def cal_movement_consistency_summary(epochs_json):
 
 		return movement_consistency
 
-def cal_non_exercise_steps_total_steps(dailies_json, epochs_json):
+def cal_exercise_steps_total_steps(dailies_json, epochs_json):
 	'''
 		Calculate non exercise steps
 	'''	
@@ -102,17 +102,17 @@ def cal_non_exercise_steps_total_steps(dailies_json, epochs_json):
 							   'MOTORCYCLING','FLYING','HORSEBACK_RIDING'
 							   'SNOWMOBILING']
 	total_steps = 0
-	non_exercise_steps = 0
+	exercise_steps = 0
 
 	if epochs_json:
 		for dobj in epochs_json:
 			if dobj['activityType'] not in NON_EXERCISE_ACTIVITIES:
-				non_exercise_steps += dobj['steps']
+				exercise_steps += dobj['steps']
 
 	if dailies_json:
 		total_steps = dailies_json[0]['steps']
 
-	return (non_exercise_steps, total_steps)
+	return (exercise_steps, total_steps)
 
 def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
 	
@@ -539,14 +539,14 @@ def create_quick_look(user, dt):
 
 	# Exercise step calculation, Non exercise step calculation and
 	# Non-Exercise steps grade calculation
-	non_exercise_steps, total_steps = cal_non_exercise_steps_total_steps(
+	exercise_steps, total_steps = cal_exercise_steps_total_steps(
 									  dailies_json,epochs_json)	
-	steps_calculated_data['non_exercise_steps'] = non_exercise_steps
-	steps_calculated_data['exercise_steps'] = total_steps - non_exercise_steps
+	steps_calculated_data['non_exercise_steps'] = total_steps - exercise_steps
+	steps_calculated_data['exercise_steps'] = exercise_steps
 	steps_calculated_data['total_steps'] = total_steps
 
 	grades_calculated_data['movement_non_exercise_steps_grade'] = \
-	cal_non_exercise_step_grade(non_exercise_steps)
+	cal_non_exercise_step_grade(total_steps - exercise_steps)
 
 
 	# If quick look for provided date exist then update it otherwise
@@ -563,7 +563,7 @@ def create_quick_look(user, dt):
 		_update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
 
 	except UserQuickLook.DoesNotExist:
-		user_ql = UserQuickLook.objects.create(user = user)
+		user_ql = UserQuickLook.objects.create(user = user,created_at=start_date_dt.date())
 		Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
 		ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
 		SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
