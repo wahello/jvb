@@ -25,6 +25,11 @@ import User from './user_inputs';
        <Food data={props.data}/>
        <Alcohol data={props.data}/>
        <Exercise data={props.data}/>
+       {/*<User 
+              data={props.userInputData}
+              start_date = {props.start_date}
+              end_date = {props.end_date}
+        />*/}
 </div>
 
 			);
