@@ -7,12 +7,15 @@ from django.core.validators import MinValueValidator ,MaxValueValidator
 
 class UserQuickLook(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	created_at = models.DateField(auto_now_add=True,unique=True)
+	created_at = models.DateField()
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
 	    dtime = str(self.created_at)
 	    return "{}-{}".format(self.user.username,dtime)
+	    
+	class Meta:
+		unique_together = ("user", "created_at")
 
 class Grades(models.Model):
 	GRADE_CHOICES = (
@@ -27,12 +30,12 @@ class Grades(models.Model):
 	overall_truth_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	overall_truth_health_gpa = models.FloatField(validators=[
 								MinValueValidator(0),MaxValueValidator(4)])
-	movement_non_exercise_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	movement_non_exercise_steps_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	prcnt_non_processed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	penalty = models.CharField(choices=GRADE_CHOICES, max_length=1)
 
@@ -119,9 +122,9 @@ class ExerciseAndReporting(models.Model):
 	elevation_gain = models.IntegerField()
 	elevation_loss = models.IntegerField()
 	effort_level = models.PositiveIntegerField()
-	dew_point = models.PositiveIntegerField()
+	dew_point = models.FloatField()
 	temperature = models.FloatField()
-	humidity = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(100)])
+	humidity = models.FloatField()
 	temperature_feels_like = models.FloatField()
 	wind = models.FloatField()
 
@@ -131,7 +134,7 @@ class ExerciseAndReporting(models.Model):
 	hrr_start_point = models.IntegerField()
 	hrr_beats_lowered = models.IntegerField()
 	sleep_resting_hr_last_night = models.IntegerField()
-	vo2_max = models.IntegerField()
+	vo2_max = models.FloatField()
 	running_cadence = models.IntegerField()
 	nose_breath_prcnt_workout = models.FloatField(
 		validators=[MinValueValidator(0),MaxValueValidator(100)])
@@ -182,7 +185,7 @@ class Steps(models.Model):
 	total_steps = models.PositiveIntegerField()
 	floor_climed = models.PositiveIntegerField()
 	floor_decended = models.PositiveIntegerField()
-	movement_consistency = models.FloatField()
+	movement_consistency = models.TextField(blank=True)
 
 class Sleep(models.Model):
 	Yes = 'yes'
@@ -236,5 +239,5 @@ class Food(models.Model):
 
 class Alcohol(models.Model):
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "alcohol_ql")
-	alcohol_day = models.FloatField()
+	alcohol_day = models.CharField(max_length = 4)
 	alcohol_week = models.FloatField()

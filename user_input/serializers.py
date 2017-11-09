@@ -1,5 +1,5 @@
-import datetime
 import re
+from .custom_signals import user_input_post_save
 
 from rest_framework import serializers
 
@@ -154,6 +154,13 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# Goals.objects.create(user_input=user_input_obj,
 		# 								 **goals_data)
 
+
+		#sending signal to calculate quicklook
+		user_input_post_save.send(
+			sender=self.__class__,
+		 	request=self.context['request'],
+		 	dt=validated_data['created_at'])
+
 		return user_input_obj
 
 	def update(self,instance,validated_data):
@@ -177,4 +184,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		# goals_obj = instance.goals
 		# self._update_helper(goals_obj, goals_data)
+
+		#sending signal to calculate quicklook
+		user_input_post_save.send(
+			sender=self.__class__,
+		 	request=self.context['request'],
+		 	dt=validated_data['created_at'])
+
 		return instance

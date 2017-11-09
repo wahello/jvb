@@ -10,5 +10,4 @@ urlpatterns = [
 	url(r'users/data/activity$',views.UserGarminDataActivityView.as_view(), name="activity_data"),
 	url(r'users/data/manually_updated$',views.UserGarminDataManuallyUpdatedView.as_view(),
 	    name="manually_updated_data"),
-	url(r'users/data/pull$',views.PullGarminData.as_view(), name="pull_data")
 ]
