@@ -21,12 +21,12 @@ export function getInitialState(start_dt, end_dt=undefined){
 		"grades_ql":{
 			    "overall_truth_grade": '-',
 		        "overall_truth_health_gpa": '-',
-		        "movement_non_exercise_grade": '-',
+		        "movement_non_exercise_steps_grade": '-',
 		        "movement_consistency_grade": '-',
 		        "avg_sleep_per_night_grade": '-',
 		        "exercise_consistency_grade": '-',
 		        "overall_workout_grade": '-',
-		        "prcnt_non_processed_food_consumed_grade": '-',
+		        "prcnt_unprocessed_food_consumed_grade": '-',
 		        "alcoholic_drink_per_week_grade": '-',
 		        "penalty": '-'
 
@@ -117,53 +117,8 @@ export function getInitialState(start_dt, end_dt=undefined){
 	    "alcohol_ql": {
 	        "alcohol_day": '-',
 	        "alcohol_week": '-' 
-	    },
-	    "strong_input":{	    	
-	    	"workout":'-',
-	    	"workout_easy":'-',
-	    	"workout_effort":'-',
-	    	"is_workout_hard":'-',
-            "workout_effort_hard_portion":'-',
-            "prcnt_processed_food":'-',
-	        "unprocessed_food_list":'-',
-	        "processed_food_list":'-',
-	        "alchol_consumed":'-',
-        	"alcohol_drink_consumed_list":'-',
-        	"sleep_hours_last_night":'-',
-	        "sleep_mins_last_night":'-',
-	        "sleep_comment":'-',
-	        "prescription_sleep_aids":'-',
-	        "sleep_aid_taken":'-',
-	        "smoke_substances":'-',
-	        "smoked_substance_list":'-',
-	        "medications":'-',
-	        "medications_taken_list":'-'
-
-	    },
-	    "encouraged_input":{
-	    	 "stress":'-',
-	    	 "pain":'-',
-        	 "pain_area":'-',
-        	 "water_consumed":'-',
-        	 "breath_nose":'-'
-	    },
-	    "optional_input":{
-	    	  "food_consumed":'-',
-	    	  "chia_seeds":'-',
-	    	  "fasted":'-',
-              "food_ate_before_workout":'-',
-              "calories":'-',
-              "calories_item":'-',
-              "workout_enjoyable":'-',
-              "workout_comment":'-',
-              "weight":'-',
-       		  "waist":'-',
-       		  "sick":'-',
-              "sickness":'-',
-              "stand":'-',
-              "diet_type":'-',
-       		  "general_comment":'-'
 	    }
+
 
 	};
 	for(const day of Object.keys(initial_state)){

@@ -74,7 +74,7 @@ componentDidMount() {
 				         </tr>
 				         <tr>
 					        <td>Movement Non Exercise Grade</td>
-					        {renderTableRows(this.props.data,"grades_ql","movement_non_exercise_grade")}				           
+					        {renderTableRows(this.props.data,"grades_ql","movement_non_exercise_steps_grade")}				           
 				         </tr>
 
 				         <tr className="quick9">
@@ -91,7 +91,7 @@ componentDidMount() {
 				         </tr>
 				         <tr>
 					        <td>percent NonProcessed Food Consumed Grade</td>
-					        {renderTableRows(this.props.data,"grades_ql","prcnt_non_processed_food_consumed_grade")}		            
+					        {renderTableRows(this.props.data,"grades_ql","prcnt_unprocessed_food_consumed_grade")}		            
 				         </tr>
 				          <tr className="quick9">
 					        <td>Alcoholic Drink Per Week Grade</td>

@@ -17,17 +17,14 @@ import User from './user_inputs';
 
 
  <div>
-                   <Grades data={props.data}/>
-                   <Swim data={props.data}/>
-                   <Bike data={props.data}/>
-                   <Steps data={props.data}/>
-                   <Sleep data={props.data}/>
-                   <Food data={props.data}/>
-                   <Alcohol data={props.data}/>
-                   <Exercise data={props.data}/>
-                   <User data={props.data}/>
-
-                  
+       <Grades data={props.data}/>
+       <Swim data={props.data}/>
+       <Bike data={props.data}/>
+       <Steps data={props.data}/>
+       <Sleep data={props.data}/>
+       <Food data={props.data}/>
+       <Alcohol data={props.data}/>
+       <Exercise data={props.data}/>
 </div>
 
 			);

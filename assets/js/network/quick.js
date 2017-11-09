@@ -28,7 +28,7 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
 
 	export function userInputDate(startDate,endDate,successquick, errorquick){
     // startDate and endDate are moment objects
-    const URL = `quicklook/users/data`;
+    const URL = `users/daily_input/`;
     const config = {
       method: "get",
       params:{

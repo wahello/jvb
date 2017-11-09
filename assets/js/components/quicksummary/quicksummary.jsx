@@ -7,9 +7,8 @@ import axiosRetry from 'axios-retry';
 import moment from 'moment';
 
 import {getInitialState} from './initialState';
-import {fetchQuickLook}  from '../../network/quick';
-import {quicksummaryDate}  from '../../network/quick';
-import {userInputDate} from '../../network/quick';
+import {quicksummaryDate,userInputDate}  from '../../network/quick';
+
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
@@ -40,6 +39,8 @@ class Quicklook extends Component{
 
 		this.successquick = this.successquick.bind(this);
 		this.errorquick = this.errorquick.bind(this);
+		this.userInputFetchSuccess = this.userInputFetchSuccess.bind(this);
+		this.userInputFetchFailure = this.userInputFetchFailure.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.onDismiss = this.onDismiss.bind(this);
 		this.updateDateState=this.updateDateState.bind(this);
@@ -49,14 +50,14 @@ class Quicklook extends Component{
 		let initial_state = getInitialState(moment(new Date()));   
 
 		this.state = {
-			today_date:moment(new Date()),
-			start_date:null,
-			end_date:null,
+			today_date:moment(),
+			start_date:moment(),
+			end_date:moment().add(6,'days'),
 			visible: true,
 			error:false,
 			data:initial_state,
-			activeTab : 'allstats'
-			
+			activeTab : 'allstats',
+			userInputData:{}
 		};
 	}
 
@@ -68,12 +69,12 @@ class Quicklook extends Component{
 			        user_ql: data.grades_ql.user_ql,
 			        overall_truth_grade: data.grades_ql.overall_truth_grade,
 			        overall_truth_health_gpa: data.grades_ql.overall_truth_health_gpa,
-			        movement_non_exercise_grade: data.grades_ql.movement_non_exercise_grade,   
+			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,   
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
 			        overall_workout_grade: data.grades_ql.overall_workout_grade,
-			        prcnt_non_processed_food_consumed_grade: data.grades_ql.prcnt_non_processed_food_consumed_grade,
+			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
 			        penalty:data.grades_ql.penalty		
 	    		},
@@ -178,59 +179,7 @@ class Quicklook extends Component{
 			        user_ql: data.alcohol_ql.user_ql,
 			        alcohol_day: data.alcohol_ql.alcohol_day,
 			        alcohol_week: data.alcohol_ql.alcohol_week
-			    },
-				strong_input:{
-			    	id:data.strong_input.id,
-			    	user_input:data.strong_input.user_input,
-			    	workout:data.strong_input.workout,
-			    	workout_easy:data.strong_input.workout_easy,
-			    	workout_effort:data.strong_input.workout_effort,
-		            workout_effort_hard_portion:data.strong_input.workout_effort_hard_portion,
-		            prcnt_processed_food:data.strong_input.prcnt_processed_food,
-			        unprocessed_food_list:data.strong_input.unprocessed_food_list,
-			        processed_food_list:data.strong_input.processed_food_list,
-			        alchol_consumed:data.strong_input.alchol_consumed,
-		        	alcohol_drink_consumed_list:data.strong_input.alcohol_drink_consumed_list,
-		        	sleep_hours_last_night:data.strong_input.sleep_hours_last_night,
-			        sleep_mins_last_night:data.strong_input.sleep_mins_last_night,
-			        sleep_comment:data.strong_input.sleep_comment,
-			        prescription_sleep_aids:data.strong_input.prescription_sleep_aids,
-			        sleep_aid_taken:data.strong_input.sleep_aid_taken,
-			        smoke_substances:data.strong_input.smoke_substances,
-			        smoked_substance_list:data.strong_input.smoked_substance_list,
-			        medications:data.strong_input.medications,
-			        medications_taken_list:data.strong_input.medications_taken_list
-
-			    },
-			    encouraged_input:{
-			    	 id:data.encouraged_input.id,
-			    	 user_input:data.encouraged_input.user_input,
-			    	 stress:data.encouraged_input.stress,
-			    	 pain:data.encouraged_input.pain,
-		        	 pain_area:data.encouraged_input.pain_area,
-		        	 water_consumed:data.encouraged_input.water_consumed,
-		        	 breath_nose:data.encouraged_input.breath_nose
-			    },
-			    optional_input:{
-			    	  id:data.optional_input.id,
-			    	  user_input:data.optional_input.user_input,
-			    	  food_consumed:data.optional_input.food_consumed,
-			    	  chia_seeds:data.optional_input.chia_seeds,
-			    	  fasted:data.optional_input.fasted,
-		              food_ate_before_workout:data.optional_input.food_ate_before_workout,
-		              calories:data.optional_input.calories,
-		              calories_item:data.optional_input.calories_item,
-		              workout_enjoyable:data.optional_input.workout_enjoyable,
-		              workout_comment:data.optional_input.workout_comment,
-		              weight:data.optional_input.weight,
-		       		  waist:data.optional_input.waist,
-		       		  sick:data.optional_input.sick,
-		              sickness:data.optional_input.sickness,
-		              stand:data.optional_input.stand,
-		              diet_type:data.optional_input.diet_type,
-		       		  general_comment:data.optional_input.general_comment
 			    }
-
              };
              return properties;
        		}
@@ -270,6 +219,19 @@ class Quicklook extends Component{
 		});
 	}
 
+	userInputFetchSuccess(data){
+		this.setState({
+			userInputData:data
+		});
+	}
+
+	userInputFetchFailure(error){
+		console.log(error.message);
+		this.setState({
+			userInputData:{}
+		});
+	}
+
 	renderAlert(){
 
 		if (this.state.error){
@@ -285,9 +247,14 @@ class Quicklook extends Component{
 	processDate(date){
 		let start_dt = moment(date);
 		let end_dt = moment(date).add(6,'days');
-		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
-		//userInputDate(start_dt,end_dt,this.successquick,this.errorquick);
-
+		this.setState({
+			start_date : start_dt,
+			end_date : end_dt
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
+						  this.userInputFetchfailure);
+		});
 	}
 
 	 handleChange(event){
@@ -301,18 +268,22 @@ class Quicklook extends Component{
   
   onSubmitDate(event){
   	event.preventDefault();
-  	let start_dt=moment(this.state.start_date);
-  	let end_dt=moment(this.state.end_date);
-  	quicksummaryDate(start_dt,end_dt,this.successquick,this.errorquick);
-  	//userInputDate(start_dt,end_dt,this.successquick,this.errorquick);
+  	let start_dt = moment(this.state.start_date);
+  	let end_dt = moment(this.state.end_date);
+  	this.setState({
+			start_date : start_dt,
+			end_date : end_dt
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
+						  this.userInputFetchfailure);
+		});
   }
 
 	componentDidMount(){
-		let start_dt = moment();
-		let end_dt = moment().add(6,'days');
-		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
-		//userInputDate(start_dt,end_dt,this.successquick,this.errorquick);
-
+		quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
+					  this.userInputFetchfailure);
 	}
 	onDismiss(){
 		this.setState(
@@ -493,7 +464,12 @@ class Quicklook extends Component{
                     	{this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
                     	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
                     	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
-                    	{this.state.activeTab === "user" && <User data={this.state.data}/>}
+                    	{this.state.activeTab === "user" &&
+	                    	 <User data={this.state.userInputData}
+	                    		 	start_date = {this.state.start_date}
+	                    		 	end_date = {this.state.end_date}
+	                    	 />
+                    	}
                     </div>
 					</div>
 					</div>
@@ -506,4 +482,4 @@ class Quicklook extends Component{
 	);
 	}
 }
-export default connect(null,{fetchQuickLook})(Quicklook);
+export default connect(null,{})(Quicklook);
