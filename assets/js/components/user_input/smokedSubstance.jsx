@@ -104,7 +104,7 @@ export default class SmokedSubstance extends Component{
 		for(let i=1;i<=num;i++){
 			elements.push(<option key={i} value={i}>{i}</option>);
 		}
-		elements.push(<option key={num+"+"} value={num+"+"}>{num+"+"}</option>);
+		elements.push(<option key={num} value={num+"+"}>{num+"+"}</option>);
 		return elements;
 	}
 
@@ -118,15 +118,33 @@ export default class SmokedSubstance extends Component{
 
                             {this.props.editable &&
 	                            <div className="input1">
-		                            <Input 
-		                            type="select" 
-		                            className="custom-select form-control" 
-		                            value={this.state.smoked_substance_to_show}
-		                            onChange={this.handleChange}>
-		                            	<option value="">select</option>
-		                                <option value="other">Other</option>
-		                                <option value="cigarettes">Cigarettes</option>
-		                            </Input> 
+		                              <Label className="btn btn-secondary radio1">
+                                    <Input type="radio"
+                                    name="smoked_substance_to_show"                                                                   
+                                    value="cigarettes" 
+                                    checked={this.state.smoked_substance_to_show === 'cigarettes'}
+                                    onChange={this.handleChange}/> Cigarettes
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" name="smoked_substance_to_show" 
+                                    value="cigars"
+                                    checked={this.state.smoked_substance_to_show === 'cigars'}
+                                    onChange={this.handleChange}/> Cigars
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="smoked_substance_to_show" 
+                                    value="marijuana"
+                                    checked={this.state.smoked_substance_to_show === 'marijuana'}
+                                    onChange={this.handleChange}/>Marijuana
+                                  </Label> 
+                                   <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="smoked_substance_to_show" 
+                                    value="other"
+                                    checked={this.state.smoked_substance_to_show === 'other'}
+                                    onChange={this.handleChange}/> Other
+                                  </Label> 
 	                            </div> 
 	                        }
 	                        {
@@ -148,7 +166,7 @@ export default class SmokedSubstance extends Component{
 				                            className="custom-select form-control" 
 				                            value={this.state.cigarettes_count}
 				                            onChange={this.handleChangeCigarettes}>
-				                            {this.createCigarettesDropdown(60)}
+				                            {this.createCigarettesDropdown(80)}
 			                            </Input>
 		                            </div> 
 		                        }
@@ -163,6 +181,8 @@ export default class SmokedSubstance extends Component{
 
 						<Collapse isOpen={this.state.collapseOther}>
 							<FormGroup>
+
+							<Label>7.3 Write in What You Smoked</Label>
 							{this.props.editable &&
 								<div className="input1">
 									<Textarea 		                           

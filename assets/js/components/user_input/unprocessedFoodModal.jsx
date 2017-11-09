@@ -56,7 +56,7 @@ export default class UnprocesedFoodModal extends Component{
 						<FormGroup>   
                             	{this.props.editable &&
                             		<div>
-                            		 <Label>5.1 What Processed Food Was Consumed?</Label>
+                            		 <Label>5.1 What Processed Food were Consumed?</Label>
 											<div className="input1">	
 					                            <Textarea 						                           
 						                            className="form-control" 

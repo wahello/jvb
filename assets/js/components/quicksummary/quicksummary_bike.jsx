@@ -19,39 +19,66 @@ function renderTableRows(dateWiseData,category,field,classes=""){
 	return elements;
 }
 
-const Bike = (props) => {
+export class Bike extends Component {
+
+
+	constructor(props){
+	super(props);
+	this.bikeStatScroll=this.bikeStatScroll.bind(this);
+
+}
+componentDidMount() {
+	document.getElementById('tBodyBike').addEventListener('scroll', this.bikeStatScroll);
+}
+
+
+  bikeStatScroll(e) { 
+        var tbody = document.getElementById("tBodyBike");
+        document.getElementById("tHeadBike").style.left = '-'+tbody.scrollLeft+'px';
+        document.querySelector('#tHeadBike th:nth-child(1)').style.left = tbody.scrollLeft+'px';
+        var trLength = document.querySelector('#tBodyBike').children;
+        for (var i = 0; i < trLength.length; i++) {
+        	trLength[i].querySelector('#tBodyBike td:nth-child(1)').style.left = tbody.scrollLeft+'px';
+        }
+
+    };
+	render(){
+
+
 	return(
                           <div className="quick3">
-                          <Table className="table table-responsive quick4">
-                           
+                          <table className="table table-responsive quick4">
+                          <thead id="tHeadBike"> 
 				        <tr className="quick8">
 				         <th >
 						  Bike Stats
 						  </th>
-						    {renderTableRows(props.data,"bike_stats_ql","created_at")}
+						    {renderTableRows(this.props.data,"bike_stats_ql","created_at")}
 						    </tr>
-						
-					
+						</thead>
+					<tbody id="tBodyBike" onScroll={this.bikeStatScroll}>
 						 <tr>
 					        <td>Avg Speed</td>
-				            {renderTableRows(props.data,"bike_stats_ql","avg_speed")}
+				            {renderTableRows(this.props.data,"bike_stats_ql","avg_speed")}
 				         </tr>
 
 				         <tr className="quick9">
 					        <td >Avg Power</td>
-				           {renderTableRows(props.data,"bike_stats_ql","avg_power")}
+				           {renderTableRows(this.props.data,"bike_stats_ql","avg_power")}
 				         </tr>
 				         <tr>
 					        <td>Asvg Speed Per Mile</td>
-				            {renderTableRows(props.data,"bike_stats_ql","avg_speed_per_mile")}
+				            {renderTableRows(this.props.data,"bike_stats_ql","avg_speed_per_mile")}
 				         </tr>
 				         <tr className="quick9">
 					        <td >Avg Cadence</td>
-					        {renderTableRows(props.data,"bike_stats_ql","avg_cadence")}
+					        {renderTableRows(this.props.data,"bike_stats_ql","avg_cadence")}
 				         </tr>
-				         </Table>
+				         </tbody>
+				         </table>
                          </div>
 
 		);
+}
 }
 export default Bike;

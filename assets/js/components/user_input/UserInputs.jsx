@@ -11,7 +11,7 @@ import { Container, Select, option, Option, Row, Col, Button,
          ButtonGroup, Form,FormGroup, Label, Input, FormText,
          className, Modal,ModalHeader, ModalBody, ModalFooter,
          Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand,Popover,PopoverBody } from 'reactstrap';
+         NavbarBrand,Popover,PopoverBody} from 'reactstrap';
 import moment from 'moment';
 
 import * as handlers from './handlers';
@@ -40,6 +40,8 @@ class UserInputs extends React.Component{
         calendarOpen:false,
 
         workout:'',
+        workout_type:'',
+        workout_both:'',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -60,6 +62,7 @@ class UserInputs extends React.Component{
         fasted:'',
         food_ate_before_workout:'',
         workout_comment:'',
+        workout_strength:'',
         calories:'',
         calories_item:'',
         sleep_hours_last_night:'',
@@ -124,7 +127,6 @@ class UserInputs extends React.Component{
       this.onFetchSuccess = this.onFetchSuccess.bind(this);
       this.onFetchFailure = this.onFetchFailure.bind(this);
       this.onProfileSuccessFetch = this.onProfileSuccessFetch.bind(this);
-      this.onNoWorkoutToday = this.onNoWorkoutToday.bind(this);
       this.fetchYesterdayData = this.fetchYesterdayData.bind(this); 
       this.toggle = this.toggle.bind(this);
       this.handleScroll = this.handleScroll.bind(this);
@@ -193,25 +195,6 @@ class UserInputs extends React.Component{
         general_comment:data.data.optional_input.general_comment
       });
       window.scrollTo(0,0);
-    }
-
-    onNoWorkoutToday(){
-      const value = "no workout today";
-       this.setState({  
-        workout_easy:value,
-        workout_effort:value,
-        workout_effort_hard_portion:value,
-        workout_enjoyable:value,
-        pain:value,
-        water_consumed:value,
-        breath_nose:value,
-        chia_seeds:value,
-        calories:'No Workout Today',
-        fasted:value,          
-        calories_item:'No Workout Today',
-        workout_comment:'No Workout Today'
-      });
-
     }
     
     onFetchFailure(error){
@@ -571,7 +554,82 @@ handleScroll() {
                                 </div>
                               }
                            
-                          </FormGroup> 
+                          </FormGroup>
+                          
+                          {(this.state.workout == "yes" || this.state.workout == "") &&
+                            <FormGroup>   
+                            <Label className="padding">1.1 What Type of Workout Did You Do Today?</Label>
+
+                            {this.state.editable &&
+                              <div className="input">                           
+                              
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="workout_type" 
+                                    value="cardio" 
+                                    checked={this.state.workout_type === 'cardio'}
+                                    onChange={this.handleChange}/> Cardio
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" name="workout_type" 
+                                    value="strength"
+                                    checked={this.state.workout_type === 'strength'}
+                                    onChange={this.handleChange}/> Strength
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="workout_type" 
+                                    value="both"
+                                    checked={this.state.workout_type === 'both'}
+                                    onChange={this.handleChange}/> Both
+                                  </Label>
+                                </div>
+                              }
+
+                           
+                              {!this.state.editable && 
+                                <div className="input">
+                                  <p>{this.state.workout_type}</p>
+                                </div>
+                              }
+                               </FormGroup>        
+                            }
+
+                            <Collapse isOpen={this.state.workout_type=== 'both'}>
+                             {(this.state.workout == "yes" || this.state.workout == "") &&
+                              <FormGroup>   
+                                <Label className="padding">1.1.1 Please Complete Your Inputs For Both Workouts Today.
+                                Select Which Workout You’d Like to Enter Your Inputs For</Label>
+                                {this.state.editable &&                                  
+                                     <div className="input">
+                                     <Label check className="btn btn-secondary radio1">
+                                        <Input type="radio" name="workout_both" 
+                                        value="cardio"
+                                        checked={this.state.workout_both === 'cardio'}
+                                        onChange={this.handleChange}/>{' '}
+                                        Cardio Workout
+                                     </Label>
+
+                                     <Label check className="btn btn-secondary radio1">
+                                       <Input type="radio" name="workout_both"
+                                            value="strength"
+                                            checked={this.state.workout_both === 'strength'}
+                                            onChange={this.handleChange}/>{' '}
+                                          Strength Workout
+                                    </Label>
+                                </div>  
+                                    
+                                }
+                                {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.workout_both}</p>
+                                  </div>
+                                }
+                              </FormGroup> 
+                          }
+                          </Collapse>
+                                           
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
@@ -713,7 +771,7 @@ handleScroll() {
                           </FormGroup>
                           }
 
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          { (this.state.workout == "yes" || this.state.workout == "") && (this.state.workout_type="cardio" || this.state.workout_type=="") &&
                           <FormGroup>    
                             <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
                               { this.state.editable &&
@@ -737,7 +795,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                          { (this.state.workout == "yes" || this.state.workout == "") &&     
+                          { (this.state.workout == "yes" || this.state.workout == "") && (this.state.workout_type="cardio" || this.state.workout_type=="") &&    
                           <FormGroup>      
                             <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
                                 { this.state.editable &&
@@ -762,7 +820,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         { (this.state.workout == "yes" || this.state.workout == "") &&     
+                         { (this.state.workout == "yes" || this.state.workout == "") &&  (this.state.workout_type="cardio" || this.state.workout_type=="") &&   
                             <FormGroup>
                               <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?</Label>
                                   {this.state.editable &&
@@ -787,7 +845,7 @@ handleScroll() {
 
                           }
 
-                           { (this.state.workout == "yes" || this.state.workout == "") &&
+                           { (this.state.workout == "yes" || this.state.workout == "") && (this.state.workout_type="cardio" || this.state.workout_type=="") &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? </Label>
                               {this.state.editable &&
@@ -845,7 +903,31 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         { (this.state.workout == "yes" || this.state.workout == "") &&
+                         { (this.state.workout == "yes" || this.state.workout == "") && (this.state.workout_type="strength" || this.state.workout_type=="") &&
+                          <FormGroup>      
+                            <Label className="padding">1.10 General Strength Comments/What Strength Sets Did You Do</Label>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Textarea name="workout_strength"                             
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.workout_strength}
+                                     onChange={this.handleChange}></Textarea>
+                                </div>
+                              }
+
+                              {
+                                !this.state.editable &&
+                                <div className="input">                             
+                                  <p>{this.state.workout_strength}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                        }  
+                         
+
+                         { (this.state.workout == "yes" || this.state.workout == "") && (this.state.workout_type="cardio" || this.state.workout_type=="") &&
                           <FormGroup>      
                             <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
@@ -864,7 +946,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                        { (this.state.workout == "yes" || this.state.workout == "") &&
+                        { (this.state.workout == "yes" || this.state.workout == "") && (this.state.workout_type="cardio" || this.state.workout_type=="") &&
                           <FormGroup>      
                             <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
@@ -1252,7 +1334,7 @@ handleScroll() {
                             <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
 
-                              {
+                              {this.state.editable &&
                                 <div className="input1">
                                   <Input 
                                     type="text" 
@@ -1267,7 +1349,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div className="input">
-                                  <p>{this.state.alchol_consumed}</p>
+                                  <p>{this.state.clothes_size}</p>
                                 </div>
                               }
                             </FormGroup>

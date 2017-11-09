@@ -28,44 +28,74 @@ html,body{
 
 
 
-	#quick1{
+#quick1{
 		
-	font-family: 'Roboto', sans-serif;
-	font-weight: bold;
+font-family: 'Roboto', sans-serif;
+font-weight: bold;
 	
 
 }
 #quick2{
 	padding-top: 0px;
 }
-.quick3{
-	padding-top: 0px;  
-	text-align: left;
-	max-width: 820px;
-	overflow: auto;
-}
+
+
 .quick3 h5{
 	padding:10px 0px;	
 }
-.quick4 th{
-	border: 1px solid #dddddd;
-	text-align: left;
-}
+		.quick3 table {
+            position: relative;
+            width: 750px;
+            background-color: #aaa;
+            overflow: hidden;
+            border-collapse: collapse;
+            }
+ 		.quick4 thead {
+            position: relative;
+            display: block; /*seperates the header from the body allowing it to be positioned*/
+            width: 753px;
+            overflow: visible;
 
-.quick4 tbody{
-	border: 1px solid #dddddd;
-	text-align: left;
-}
-.quick4 tr{
-	border: 1px solid #dddddd;
-	text-align: left;
-	box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
-}
+            }
 
-.quick4 td{
-	border: 1px solid #dddddd;
-	text-align: left;
-}
+            .quick4 thead th {
+            background-color: #99a;
+            min-width: 120px;
+             margin-left: 1px;           
+            border: 1px solid white;
+            border-collapse: collapse;
+
+            }
+
+           .quick4 thead th:nth-child(1) {/*first cell in the header*/
+            position: relative;
+            display: block; /*seperates the first cell in the header from the header*/
+            background-color: #88b;
+            }
+
+
+            /*tbody*/
+           .quick4 tbody {
+            position: relative;
+            display: block; /*seperates the tbody from the header*/           
+            height: 239px;
+            width: 750px;
+            overflow: scroll;
+            }
+
+           .quick4 tbody td {
+            background-color: #bbc;
+            min-width: 120px;
+            border: 1px solid white;
+            border-collapse: collapse;
+            }
+
+           .quick4 tbody tr td:nth-child(1) {  /*the first cell in each tr*/
+            position: relative;
+            display: block; /*seperates the first column from the tbody*/           
+            background-color: #99a;
+            }
+
 .quick5{
 	padding: 0px 20px 15px 20px;
 }

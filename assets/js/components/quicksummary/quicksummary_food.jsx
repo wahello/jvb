@@ -12,7 +12,7 @@ function renderTableRows(dateWiseData,category,field,classes=""){
 			);	
 		}else{
 			elements.push(
-				<th key={date} className={classes}>{data[category][field]}</th>
+				<td key={date} className={classes}>{data[category][field]}</td>
 			);
 		}
 	}
@@ -20,37 +20,64 @@ function renderTableRows(dateWiseData,category,field,classes=""){
 }
 
 
-const Food =(props)=>{
+export class Food extends Component{
+	constructor(props){
+	super(props);
+	this.foodScroll=this.foodScroll.bind(this);
+
+}
+componentDidMount() {
+	document.getElementById('tBodyFood').addEventListener('scroll', this.bikeStatScroll);
+}
+
+
+  foodScroll(e) { 
+        var tbody = document.getElementById("tBodyFood");
+        document.getElementById("tHeadFood").style.left = '-'+tbody.scrollLeft+'px';
+        document.querySelector('#tHeadFood th:nth-child(1)').style.left = tbody.scrollLeft+'px';
+        var trLength = document.querySelector('#tBodyFood').children;
+        for (var i = 0; i < trLength.length; i++) {
+        	trLength[i].querySelector('#tBodyFood td:nth-child(1)').style.left = tbody.scrollLeft+'px';
+        }
+
+    };
+
+    render(){
 	return(
  						 <div className="quick3">
-				         <Table className="table table-responsive quick4">
-				      
+				         <table className="table table-responsive quick4">
+				      <thead id="tHeadFood">
 				         <tr className="quick8">
 				         <th >
 						  Food
 						  </th>
-			           	  {renderTableRows(props.data,"food_ql","created_at")}
+			           	  {renderTableRows(this.props.data,"food_ql","created_at")}
 						  </tr>
+						  </thead>
 						 
+						 <tbody id="tBodyFood" onScroll={this.foodScroll}>
 						 <tr >
 					        <td>percentage Non Processed Food</td>
-					         {renderTableRows(props.data,"food_ql","prcnt_non_processed_food")}				            
+					         {renderTableRows(this.props.data,"food_ql","prcnt_non_processed_food")}				            
 				         </tr>
 				         <tr className="quick9">
 					        <td>Percentage Non Processed Food Grade</td>
-					         {renderTableRows(props.data,"food_ql","prcnt_non_processed_food_grade")}				            
+					         {renderTableRows(this.props.data,"food_ql","prcnt_non_processed_food_grade")}				            
 				         </tr>
 				          <tr >
 					        <td>Non Processed Food</td>
-					         {renderTableRows(props.data,"food_ql","non_processed_food")}				            
+					         {renderTableRows(this.props.data,"food_ql","non_processed_food")}				            
 				         </tr>
 				         <tr className="quick9">
 					        <td>Diet Type</td>
-					         {renderTableRows(props.data,"food_ql","diet_type")}				           
+					         {renderTableRows(this.props.data,"food_ql","diet_type")}				           
 				         </tr>
-				         </Table>
+				         </tbody>
+				         </table>
                           </div>
 
 		);
+}
+
 }
 export default Food;

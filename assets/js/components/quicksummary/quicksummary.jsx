@@ -23,6 +23,8 @@ import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
 import User from './user_inputs'; 
 import AllStats from './quicksummary_allstats'; 
+import AllStats1 from './quicksummary_allstats1'; 
+
 
 
 axiosRetry(axios, { retries: 3});
@@ -328,6 +330,7 @@ class Quicklook extends Component{
 
 	render(){
 		const {activeTab}=this.state;
+		const class_allstats1=`nav-link ${activeTab === "allstats1" ? 'active':''}`;
 		const class_allstats=`nav-link ${activeTab === "allstats" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
 		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
@@ -359,10 +362,11 @@ class Quicklook extends Component{
 			             </div>
 
 			             <div className="row">
-			             <div className="col-sm-8 col-sm-offset-2">
+			             <div className="col-sm-12">
 			             <div className="quick7">
 			             <ul className="nav nav-tabs" id="quick6">
 
+			            
 			             <li className="nav-item">
 						    		<div>
 						    		<a href="#" className={class_allstats} value="allstats"
@@ -479,6 +483,7 @@ class Quicklook extends Component{
 					</div>
                     </div>
                     <div className="col-lg-8 col-md-10 col-sm-12">
+                    	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
