@@ -9,7 +9,6 @@ export default class SmokedSubstance extends Component{
 		let pat = /^cigarettes/i;
 		let isCigarettes = pat.test(item);
 		let cigarettes_count = '';
-		let smoked_substance_to_show = '';
 
 		if (isCigarettes){
 			if(item === 'cigarettes(60+)')
@@ -21,19 +20,22 @@ export default class SmokedSubstance extends Component{
 			item = 'cigarettes';
 		}
 
-		if(isCigarettes)
-			smoked_substance_to_show = 'cigarettes';
-		else if(item === '')
-			smoked_substance_to_show = '';
-		else
-			smoked_substance_to_show = 'other';
+		let isOther = true;
+		let smoke_items = ["",'cigarettes','cigars','marijuana'];
+
+		for(let i of smoke_items){
+			if(item === i){
+				isOther = false;
+				break;
+			} 
+		} 
 
 		let stateObj = {
 			collapse:true,
-			smoked_substance_to_show:smoked_substance_to_show,
 			smoked_substance_list:item,
+			smoked_substance_to_show:isOther?'other':item,
 			cigarettes_count:cigarettes_count,
-			collapseOther: (item !== '' && item !== 'cigarettes')? true : false,
+			collapseOther: isOther,
 			collapseCigarettesCount: isCigarettes ? true : false
 		}
 
@@ -65,6 +67,7 @@ export default class SmokedSubstance extends Component{
 		if (value === 'other'){
 		    this.setState({
 		    	collapseOther:true,
+		    	smoked_substance_list:'',
 		    	smoked_substance_to_show:value,
 		    	collapseCigarettesCount:false
 		    });
@@ -78,7 +81,7 @@ export default class SmokedSubstance extends Component{
 		}else {
 			this.setState({
 				smoked_substance_list: value,
-				smoked_substance_to_show:'other'
+				smoked_substance_to_show:value
 			},()=>{
 					this.props.updateState(this.state.smoked_substance_list)
 				});
@@ -181,9 +184,9 @@ export default class SmokedSubstance extends Component{
 
 						<Collapse isOpen={this.state.collapseOther}>
 							<FormGroup>
-
-							<Label>7.3 Write in What You Smoked</Label>
 							{this.props.editable &&
+								<div>
+								<Label>7.2 Write in What You Smoked</Label>
 								<div className="input1">
 									<Textarea 		                           
 		                            className="form-control" 
@@ -192,11 +195,12 @@ export default class SmokedSubstance extends Component{
 		                            value={this.state.smoked_substance_list}
 		                            onChange={this.handleChange} />
 	                            </div>
+	                            </div>
 	                        }
 	                        {
                               !this.props.editable &&
                               <div>
-                              	  <Label>7.2 Other Smoked Substances </Label>
+                              	  <Label>7.2 Write in What You Smoked </Label>
 	                              <div className="input">
 	                                <p >{this.state.smoked_substance_list}</p>
 	                              </div>

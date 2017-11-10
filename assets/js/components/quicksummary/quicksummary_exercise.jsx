@@ -60,7 +60,7 @@ componentDidMount() {
 						
 						<tbody id="tBodyExer" onScroll={this.ExerScroll}>
 						<tr>
-					        <td>WorkOut Easy Hard</td>
+					        <td>Workout Easy Hard</td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","workout_easy_hard")}
 				         </tr>
 				         <tr className="quick9">
@@ -68,15 +68,15 @@ componentDidMount() {
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","workout_type")}
 				         </tr>
 				         <tr>
-					        <td>WorkOut Time</td>
+					        <td>Workout Time</td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","workout_time")}
 				         </tr>
 				         <tr className="quick9">
-					        <td>WorkOut Location</td>
+					        <td>Workout Location</td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","workout_location")}
 				         </tr>
 				         <tr>
-					        <td>WorkOut Duration</td>
+					        <td>Workout Duration</td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","workout_duration")}
 				         </tr>
 				         <tr className="quick9">
@@ -96,7 +96,7 @@ componentDidMount() {
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","pace")}
 				         </tr>
 				         <tr className="quick9">
-					        <td>Asvg Heartrate</td>
+					        <td>Average Heartrate</td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","avg_heartrate")}		
 				         </tr>
 				         <tr>
@@ -112,7 +112,7 @@ componentDidMount() {
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","effort_level")}				            
 				         </tr>
 				         <tr className="quick9">
-					        <td>Dsew Point </td>
+					        <td>Dew Point </td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","dew_point")}				           
 				         </tr>
 				         <tr>
@@ -124,11 +124,11 @@ componentDidMount() {
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","humidity")}				         
 				         </tr>
 				         <tr>
-					        <td>Tsemperature Feels Like </td>
+					        <td>Temperature Feels Like </td>
 					         {renderTableRows(this.props.data,"exercise_reporting_ql","temperature_feels_like")}			           
 				         </tr>
 				         <tr className="quick9">
-					        <td>wind</td>
+					        <td>Wind</td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","wind")}		            
 				         </tr>
 				         <tr>
@@ -153,23 +153,23 @@ componentDidMount() {
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","vo2_max")}	            
 				         </tr>
 				         <tr className="quick9">
-					        <td>Rsunning Cadence</td>
+					        <td>Running Cadence</td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","running_cadence")}				           
 				         </tr>
 				         <tr>
-					        <td>Nose Breath Prcnt Workout </td>
+					        <td>Percent Breath through Nose During Workout </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","nose_breath_prcnt_workout")}		            
 				         </tr>
 				         <tr className="quick9">
-					        <td>Water Consumed WorkOut </td>
+					        <td>Water Consumed during Workout </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","water_consumed_workout")}		            
 				         </tr>
 				         <tr>
-					        <td>Chia Seeds consumed WorkOut</td>
+					        <td>Chia Seeds consumed during Workout</td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","chia_seeds_consumed_workout")}		           
 				         </tr>
 				         <tr className="quick9">
-					        <td>Fast Before WorkOut</td>
+					        <td>Fast Before Workout</td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","fast_before_workout")}	            
 				         </tr>
 				         <tr>
@@ -185,7 +185,7 @@ componentDidMount() {
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","stress_level")}				           
 				         </tr>
 				         <tr className="quick9">
-					        <td>Sicks </td>
+					        <td>Sick </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","sick")}				            
 				         </tr>
 				         <tr>
@@ -209,11 +209,11 @@ componentDidMount() {
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","exercise_fifteen_more")}			            
 				         </tr>
 				         <tr className="quick9">
-					        <td>WorkOut Elapsed Time </td>
+					        <td>Workout Elapsed Time </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","workout_elapsed_time")}			            
 				         </tr>
 				         <tr>
-					        <td>TimeWatch Paused WorkOut </td>
+					        <td>TimeWatch Paused Workout </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","timewatch_paused_workout")}			            
 				         </tr>
 				         <tr className="quick9">
@@ -221,11 +221,11 @@ componentDidMount() {
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","exercise_consistency")}		           
 				         </tr>
 				         <tr>
-					        <td>WorkOut Duration Grade </td>
+					        <td>Workout Duration Grade </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","workout_duration_grade")}			             
 				         </tr>
 				         <tr className="quick9">
-					        <td>WorkOut Effort Level Grade</td>
+					        <td>Workout Effort Level Grade</td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","workout_effortlvl_grade")}				            
 				         </tr>
 				         <tr>
@@ -233,7 +233,7 @@ componentDidMount() {
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","avg_heartrate_grade")}		             
 				         </tr>
 				          <tr className="quick9">
-					        <td>OverAll WorkOut Grade</td>
+					        <td>OverAll Workout Grade</td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","overall_workout_grade")}			             
 				         </tr>
 				         <tr>
@@ -241,7 +241,7 @@ componentDidMount() {
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","heartrate_variability_grade")}	             
 				         </tr>
 				         <tr className="quick9">
-					        <td>WorkOut Comment </td>
+					        <td>Workout Comment </td>
 					        {renderTableRows(this.props.data,"exercise_reporting_ql","workout_comment")}				            
 				         </tr>
 				         </tbody>

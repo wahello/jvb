@@ -455,7 +455,14 @@ class Quicklook extends Component{
                     </div>
                     <div className="col-lg-8 col-md-10 col-sm-12">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
-                    	{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/>}
+                    	{this.state.activeTab === "allstats" && 
+	                    	<AllStats 
+	                    		data={this.state.data} 
+	                    		userInputData={this.state.userInputData}
+	                    		start_date={this.state.start_date}
+	                    		end_date={this.state.end_date}
+	                    	/>
+                    	}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
                     	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
@@ -465,7 +472,7 @@ class Quicklook extends Component{
                     	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
                     	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
                     	{this.state.activeTab === "user" &&
-	                    	 <User data={this.state.userInputData}
+	                    	 <User  data={this.state.userInputData}
 	                    		 	start_date = {this.state.start_date}
 	                    		 	end_date = {this.state.end_date}
 	                    	 />

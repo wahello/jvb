@@ -115,8 +115,11 @@ def cal_exercise_steps_total_steps(dailies_json, epochs_json):
 	return (exercise_steps, total_steps)
 
 def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
-	
-	_to_sec = lambda x : int(x.split(":")[0]) * 3600 + int(x.split(":")[1]) * 60
+
+	def _to_sec(duration):
+		hours,mins = map(int,[0 if x == '' else x 
+					for x in duration.split(':')])
+		return hours * 3600 + mins * 60
 
 	_tobj = {
 		"6:00":_to_sec("6:00"),

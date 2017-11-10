@@ -31,6 +31,7 @@ export class User extends Component{
 
 	constructor(props){
 	super(props);
+	console.log("Constructor props:",this.props)
 	this.userScroll=this.userScroll.bind(this);
 
 	let initial_state = getInitialStateUserInput(moment(new Date()));
@@ -38,7 +39,8 @@ export class User extends Component{
 	if(this.props.data !== {}){
 		const dates = [];
 		let data = this.props.data;
-		let tmp_initial_state = getInitialStateUserInput(this.props.start_date,this.props.end_date);
+		let tmp_initial_state = getInitialStateUserInput(moment(new Date()));
+		console.log("Temp initial state",tmp_initial_state);
 		for(let date of Object.keys(initial_state)){
 			dates.push(date);
 		} 
@@ -51,6 +53,7 @@ export class User extends Component{
 		      initial_state = tmp_initial_state;
 	     }
 	}
+	console.log("Initial State", initial_state);
 	this.state = {
 		start_date:this.props.start_date,
 		end_date:this.props.end_date,
@@ -122,15 +125,15 @@ updateDateState(data){
 
 	componentWillReceiveProps(nextProps){
 		console.log("This is next props",nextProps);
-		console.log(this.state.start_date);
-		console.log(this.state.end_date);
+		console.log(this.props.start_date);
+		console.log(this.props.end_date);
 		console.log(nextProps.start_date);
 		console.log(nextProps.end_date);
-		if(nextProps.start_date !== this.state.start_date ||
-		   nextProps.end_date !== this.state.end_date ||
-		   nextProps.data !== this.state.data) {
+		if(nextProps.start_date !== this.props.start_date ||
+		   nextProps.end_date !== this.props.end_date ||
+		   nextProps.data !== this.props.data) {
 		   	let initial_state = getInitialStateUserInput(nextProps.start_date,nextProps.end_date);
-			if(this.nextProps.data !== {}){
+			if(nextProps.data !== {}){
 				const dates = [];
 				let data = nextProps.data;
 				for(let date of Object.keys(initial_state)){
@@ -142,12 +145,11 @@ updateDateState(data){
 				      	let obj = this.updateDateState(dataitem);
 				      	initial_state[date] = obj;
 				      }
-				      initial_state = tmp_initial_state;
 			     }
 			}
 			this.setState = ({
-				start_date:this.props.start_date,
-				end_date:this.props.end_date,
+				start_date:nextProps.start_date,
+				end_date:nextProps.end_date,
 				data:initial_state
 			},function(){
 				console.log(this.state)
