@@ -597,43 +597,7 @@ handleScroll() {
                                 </div>
                               }
                                </FormGroup>        
-                            }
-
-                            <Collapse isOpen={this.state.workout_type === 'both'}>
-                             {(this.state.workout === "yes" || this.state.workout === "") &&
-                              <FormGroup>   
-                                <Label className="padding">1.1.1 Please Complete Your Inputs For Both Workouts Today.
-                                Select Which Workout You’d Like to Enter Your Inputs For</Label>
-                                {this.state.editable &&                                  
-                                     <div className="input">
-                                     <Label check className="btn btn-secondary radio1">
-                                        <Input type="radio" name="workout_input_type" 
-                                        value="cardio"
-                                        checked={this.state.workout_input_type === 'cardio'}
-                                        onChange={this.handleChange}/>{' '}
-                                        Cardio Workout
-                                     </Label>
-
-                                     <Label check className="btn btn-secondary radio1">
-                                       <Input type="radio" name="workout_input_type"
-                                            value="strength"
-                                            checked={this.state.workout_input_type === 'strength'}
-                                            onChange={this.handleChange}/>{' '}
-                                          Strength Workout
-                                    </Label>
-                                </div>  
-                                    
-                                }
-                                {
-                                  !this.state.editable &&
-                                  <div className="input">
-                                    <p>{this.state.workout_input_type}</p>
-                                  </div>
-                                }
-                              </FormGroup> 
-                          }
-                          </Collapse>
-                                           
+                            }                   
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
