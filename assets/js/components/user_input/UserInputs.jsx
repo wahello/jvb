@@ -898,7 +898,8 @@ handleScroll() {
                         { (this.state.workout === "yes" || this.state.workout === "") &&     
                           <FormGroup>      
                             <Label className="padding">
-                              {this.state.workout_type === 'strength' ?
+                              {(this.state.workout_type === 'strength' ||
+                                this.state.workout_input_type === 'strength')?
                                '1.10 General Strength Comments/What Strength Sets Did You Do?':
                                '1.10 General Workout Comments'}
                             </Label>

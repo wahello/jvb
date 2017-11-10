@@ -557,7 +557,7 @@ def create_quick_look(user, dt):
 	# If quick look for provided date exist then update it otherwise
 	# create new quicklook instance 
 	try:
-		user_ql = UserQuickLook.objects.get(created_at = start_date_dt.date())
+		user_ql = UserQuickLook.objects.get(user=user,created_at = start_date_dt.date())
 		_update_helper(user_ql.grades_ql,grades_calculated_data)
 		_update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
 		_update_helper(user_ql.swim_stats_ql, swim_calculated_data)
