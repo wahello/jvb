@@ -115,7 +115,7 @@ def cal_exercise_steps_total_steps(dailies_json, epochs_json):
 	return (exercise_steps, total_steps)
 
 def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
-
+	print("\n\nSleep Duration",sleep_duration)
 	def _to_sec(duration):
 		hours,mins = map(int,[0 if x == '' else x 
 					for x in duration.split(':')])
@@ -240,6 +240,12 @@ def cal_movement_consistency_grade(hours_inactive):
 
 def create_quick_look(user, dt):
 
+	y,m,d = map(int,dt.split('-'))
+	start_date_dt = datetime(y,m,d,0,0,0)
+	last_seven_days_date = start_date_dt - timedelta(days=6)
+	start_dt = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
+	end_dt = start_dt + 86400
+
 	def _safe_get(lst,attr,default_val):
 		try:
 			item = lst[0]
@@ -300,13 +306,6 @@ def create_quick_look(user, dt):
 
 		return DATA
 
-
-	y,m,d = map(int,dt.split('-'))
-	start_date_dt = datetime(y,m,d,0,0,0)
-	last_seven_days_date = start_date_dt - timedelta(days=6)
-	start_dt = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
-	end_dt = start_dt + 86400
-
 	weather_data = _extract_weather_data(
 		fetch_weather_data(40.730610,-73.935242,start_dt))
 
@@ -351,6 +350,10 @@ def create_quick_look(user, dt):
 		user_input__created_at__gte = last_seven_days_date,
 		user_input__created_at__lte = start_date_dt)
 
+	todays_daily_strong = list(filter(
+			lambda x: x.user_input.created_at == start_date_dt.date(),
+			daily_strong))
+
 	daily_encouraged = DailyUserInputEncouraged.objects.filter(
 		user_input__user = user,
 		user_input__created_at = start_date_dt)
@@ -393,7 +396,7 @@ def create_quick_look(user, dt):
 	}
 
 	exercise_calculated_data = {
-		'workout_easy_hard':_safe_get(daily_strong, "work_out_easy_or_hard",''),
+		'workout_easy_hard':_safe_get(todays_daily_strong, "work_out_easy_or_hard",''),
 		'workout_type': '',
 		'workout_time': '',
 		'workout_location': '',
@@ -405,7 +408,7 @@ def create_quick_look(user, dt):
 		'avg_heartrate':0,
 		'elevation_gain':my_sum(activities_json,'totalElevationGainInMeters'),
 		'elevation_loss':my_sum(activities_json,'totalElevationLossInMeters'),
-		'effort_level':_safe_get(daily_strong, "workout_effort_level", 0),
+		'effort_level':_safe_get(todays_daily_strong, "workout_effort_level", 0),
 
 		'dew_point': weather_data['dewPoint'],
 		'temperature': weather_data['temperature'],
@@ -436,10 +439,10 @@ def create_quick_look(user, dt):
 		'sick': _safe_get(daily_optional, "sick", ""),
 		'drug_consumed': '',
 		'drug': '',
-		'medication':_safe_get(daily_strong,
+		'medication':_safe_get(todays_daily_strong,
 						 "medications_or_controlled_substances_yesterday", ""),
 
-		'smoke_substance':_safe_get(daily_strong,
+		'smoke_substance':_safe_get(todays_daily_strong,
 						 "smoke_any_substances_whatsoever", ""),
 
 		'exercise_fifteen_more': '',
@@ -478,7 +481,7 @@ def create_quick_look(user, dt):
 	sleeps_calculated_data = {
 		'sleep_per_wearable': '',
 		'sleep_per_user_input':'',
-		'sleep_aid': _safe_get(daily_strong,
+		'sleep_aid': _safe_get(todays_daily_strong,
 					 "prescription_or_non_prescription_sleep_aids_last_night", ""),
 		'sleep_bed_time': '',
 		'sleep_awake_time': '',
@@ -491,13 +494,13 @@ def create_quick_look(user, dt):
 	food_calculated_data = {
 		'prcnt_non_processed_food':0,
 		'prcnt_non_processed_food_grade': '',
-		'non_processed_food': _safe_get(daily_strong,
+		'non_processed_food': _safe_get(todays_daily_strong,
 							 "list_of_unprocessed_food_consumed_yesterday", ""),
 		'diet_type':'',
 	}
 
 	alcohol_calculated_data = {
-		'alcohol_day': _safe_get(daily_strong,"number_of_alcohol_consumed_yesterday",""),
+		'alcohol_day': _safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday",""),
 		'alcohol_week': 0
 	}
 
@@ -506,8 +509,7 @@ def create_quick_look(user, dt):
 	# Average sleep per night grade calculation
 	for q in daily_strong:
 		if (q.user_input.created_at == start_date_dt.date() and 
-			q.sleep_time_excluding_awake_time != '' and 
-			q.prescription_or_non_prescription_sleep_aids_last_night != ''):
+			q.sleep_time_excluding_awake_time != ''):
 
 			grade = cal_average_sleep_grade(
 								  q.sleep_time_excluding_awake_time,
