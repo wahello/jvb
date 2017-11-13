@@ -9,7 +9,7 @@ import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'rea
 const option=[	
 				{ value:"other",label:'Other'},
                 { value:"right knee",label:'Right knee'},
-                { value:'left knee',label:'Light knee'},
+                { value:'left knee',label:'Left knee'},
                 { value:"right ankle",label:'Right ankle'},
                 { value:"left ankle",label:'Left ankle'},
                 { value:"right foot",label:'Right foot'},

@@ -94,6 +94,7 @@ class UserInputs extends React.Component{
       this.state = this.getInitialState();
       this.handleChange = handlers.handleChange.bind(this);
       this.handleChangeWorkout = handlers.handleChangeWorkout.bind(this);
+      this.handleChangeWorkoutDone = handlers.handleChangeWorkoutDone.bind(this);
       this.handleChangeWorkoutEffort = handlers.handleChangeWorkoutEffort.bind(this);
       this.handleChangePain = handlers.handleChangePain.bind(this);
       this.handleChangeProcessedFood = handlers.handleChangeProcessedFood.bind(this);
@@ -207,7 +208,6 @@ class UserInputs extends React.Component{
         {...initial_state,
         selected_date:this.state.selected_date,
         gender:this.state.gender},()=>{
-          console.log(this.state);
           window.scrollTo(0,0);
         });
     }
@@ -241,7 +241,6 @@ class UserInputs extends React.Component{
                     update_form:true,
                     fetched_user_input_created_at:moment(this.state.selected_date).format('YYYY-MM-DD')},
                     ()=>{
-                      console.log(this.state);
                       toast.info(" User Input submitted successfully!",{
                       className:"dark"
                     })
@@ -542,20 +541,20 @@ handleChecked(){
                                     name="workout" 
                                     value="yes" 
                                     checked={this.state.workout === 'yes'}
-                                    onChange={this.handleChange}/> Yes
+                                    onChange={this.handleChangeWorkoutDone}/> Yes
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" name="workout" 
                                     value="no"
                                     checked={this.state.workout === 'no'}
-                                    onChange={this.handleChange}/> No
+                                    onChange={this.handleChangeWorkoutDone}/> No
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout" 
                                     value="not yet"
                                     checked={this.state.workout === 'not yet'}
-                                    onChange={this.handleChange}/> Not Yet
+                                    onChange={this.handleChangeWorkoutDone}/> Not Yet
                                   </Label>
                                 </div>
                               }
