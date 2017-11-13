@@ -4,35 +4,46 @@ export function handleChange(event){
   const name = target.name;
   this.setState({
 	[name]: value
-  },()=>{
-    console.log(this.state);
   });
+}
+
+export function handleChangeWorkoutDone(event){
+  const value = event.target.value;
+  if(value === 'no' || value === 'not yet'){
+      this.setState({
+        workout:value,
+        workout_type:'',
+        workout_input_type:'',
+        workout_easy:'',
+        workout_effort:'',
+        workout_effort_hard_portion:'',
+        workout_enjoyable:'',
+        pain:'',
+        pain_area:'',
+        water_consumed:'',
+        breath_nose:'',
+        chia_seeds:'',
+        calories:'',
+        calories_item:'',
+        fasted:'', 
+        food_ate_before_workout:'',         
+        workout_comment:''
+    });
+  }else{
+    this.setState({
+      workout:value
+    });
+  }
 }
 
 export function handleChangeWorkout(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
-  if (value === "no workout today"){
-	this.setState({
-	  workout_easy:value,
-	  workout_effort:value,
-	  workout_effort_hard_portion:value,
-	  workout_enjoyable:value,
-	  pain:value,
-	  water_consumed:value,
-	  breath_nose:value,
-	  chia_seeds:value,
-	  calories:'No Workout Today',
-	  fasted:value,          
-	  calories_item:'No Workout Today',
-	  workout_comment:'No Workout Today'
-	});
-  }else{
-	  this.setState({
+
+  this.setState({
 	  workout_easy:value
 	});
-  }
 }
 
 export function handleChangeWorkoutEffort(event){
@@ -45,16 +56,19 @@ export function handleChangeWorkoutEffort(event){
   });
 }
 
-
-
 export function handleChangePain(event){
   const target = event.target;
   const value = target.value;
-  const name = target.name;
-
-  this.setState({
-	pain:value
-  });
+  if (value === 'no'){
+    this.setState({
+    	pain:value,
+      pain_area:''
+    });
+  }else{
+    this.setState({
+      pain:value
+    });
+  }
 }
 
 export function handleChangeProcessedFood(event){
