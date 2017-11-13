@@ -38,6 +38,7 @@ class UserInputs extends React.Component{
         updating_form:false,
         submitting_form:false,
         calendarOpen:false,
+        checked:false,
 
         workout:'',
         workout_type:'',
@@ -82,7 +83,8 @@ class UserInputs extends React.Component{
         breath_sleep:'',
         breath_day:'',
         diet_type:'',
-        general_comment:''
+        general_comment:'',
+
       };
       return initialState;
     }
@@ -131,6 +133,7 @@ class UserInputs extends React.Component{
       this.handleScroll = this.handleScroll.bind(this);
       this.toggleCalendar = this.toggleCalendar.bind(this);
       this.toggleEditForm = this.toggleEditForm.bind(this);
+      this.handleChecked = this.handleChecked.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -351,6 +354,11 @@ handleScroll() {
       editable:!this.state.editable
     });
   }
+handleChecked(){
+  this.setState({
+    checked:!this.state.checked
+  })
+}
 
     render(){
 
@@ -887,10 +895,28 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         
+                         { (this.state.workout == "yes" || this.state.workout == "") &&
+                            this.state.workout_type !== "strength" &&
+                            this.state.workout_input_type !== "strength" &&
+                        <FormGroup>
+                         <div className="input1">
+                        <Input
+                        type="checkbox"
+                        onChange={this.handleChange}
+                        onClick={this.handleChecked}
+                        >
+                        </Input>
+                        <Label>I did a long workout and want to enter what I ate/calories consumed</Label>
+                        </div>
+                         </FormGroup>
+                       }
+
+                        <Collapse isOpen={this.state.checked}>
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
+
+                            
                           <FormGroup>      
                             <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
@@ -932,8 +958,10 @@ handleScroll() {
                             }
                           </FormGroup>
                             }
-                      </div>
+                             </Collapse>
 
+                      </div>
+                     
                             <div id="sleep">
                             <h2><strong>Sleep Input</strong></h2>
                          
