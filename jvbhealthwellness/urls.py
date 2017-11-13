@@ -23,11 +23,19 @@ urlpatterns = [
                           name='password_reset_complete'),
 
     url(r'^djangojs/', include('djangojs.urls')),
+
     url(r'^callbacks/garmin$', userViews.receive_token, name='receive_token'),
+    url(r'^callbacks/garminconnect$',garmin_views.connect_receive_token, name='connect_receive_token'),
+
     url(r'^callbacks/garmin/push$',garmin_views.GarminPing.as_view(), name="garmin_ping"),
+    url(r'^callbacks/garminconnectpush$', garmin_views.GarminConnectPing.as_view(), name="garmin_connect_ping"),
+
     url(r'^users/request_token$',userViews.request_token,name='request_token'),
+    url(r'^users/connect_request_token$', garmin_views.connect_request_token, name='connect_request_token'),
+
     url(r'^users/garmin/token/$',userViews.GetGarminToken.as_view(), name='garmin_token'),
     url(r'^users/garmin/fetch$',userViews.fetchGarminData.as_view(),name='garmin_data'),
+
     url(r'^garmin/',include(garminUrls)),
     url(r'^quicklook/',include(quicklookUrls)),
     url(r'^users/',include(userInputUrls)),

@@ -100,14 +100,15 @@ def receive_token(request):
     session['request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
     header_auth=True)
 
-    sess = service.get_session((access_token, access_token_secret))
-    request.session['token'] = access_token
-    request.session['token_secret'] = access_token_secret
-    request.session['oauth_verifier'] = oauth_verifier
-
-    # store the token in the db
-    GarminToken.objects.create(user=request.user,token=access_token,
-                               token_secret=access_token_secret)
+    # Check if token and token secret exist. If exist then update otherwise
+    # create new entry in the database
+    try:
+      token = GarminToken.objects.get(user = request.user)
+      if token:
+        token.save(token=access_token, token_secret = access_token_secret)
+    except GarminToken.DoesNotExist:
+      GarminToken.objects.create(user=request.user,token=access_token,
+                                 token_secret=access_token_secret)
 
     return redirect('/service_connect')
 

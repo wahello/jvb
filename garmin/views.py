@@ -1,7 +1,8 @@
-import json 
 import re
+import urllib
 
 from django.contrib.auth.models import User
+from django.shortcuts import redirect
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -29,7 +30,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataManuallyUpdated,\
 					UserGarminDataStressDetails,\
 					UserGarminDataMetrics,\
-					UserGarminDataMoveIQ
+					UserGarminDataMoveIQ,\
+					GarminConnectToken
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -107,8 +109,8 @@ class UserGarminDataMoveIQView(generics.ListCreateAPIView):
 
 class GarminPing(APIView):
 	'''
-		This view will receive PING API data and 
-		send that data to email address : atulk@s7inc.cm
+		This view will receive Health PING API data and 
+		store in database 
 	'''
 
 	DATA_TYPES = {
@@ -119,7 +121,7 @@ class GarminPing(APIView):
 				"SLEEP_SUMMARIES":"sleeps",
 				"BODY_COMPOSITION":"bodyComps",
 				"STRESS_DETAILS":"stressDetails",
-				"MOVEMENT_IQ":"moveiq",
+				"MOVEMENT_IQ":"moveIQActivities",
 				"USER_METRICS":"userMetrics"
 			}
 
@@ -131,7 +133,7 @@ class GarminPing(APIView):
 		"sleeps":UserGarminDataSleep,
 		"bodyComps":UserGarminDataBodyComposition,
 		"stressDetails":UserGarminDataStressDetails,
-		"moveiq":UserGarminDataMoveIQ,
+		"moveIQActivities":UserGarminDataMoveIQ,
 		"userMetrics":UserGarminDataMetrics
 	}
 
@@ -148,7 +150,7 @@ class GarminPing(APIView):
 						  summary_id=obj.get("summaryId"),
 						  record_date_in_seconds=record_date,
 						  start_time_in_seconds=obj.get("startTimeInSeconds")+\
-						  						obj.get("startTimeOffsetInSeconds"),
+												obj.get("startTimeOffsetInSeconds"),
 						  start_time_duration_in_seconds=obj.get("durationInSeconds"),
 						  data = obj)
 					for obj in json_data
@@ -159,18 +161,18 @@ class GarminPing(APIView):
 							summary_id=obj.get("summaryId"),
 							record_date_in_seconds=record_date,
 							start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
-							                   	  obj.get("measurementTimeOffsetInSeconds"),
+												  obj.get("measurementTimeOffsetInSeconds"),
 							start_time_duration_in_seconds=obj.get("durationInSeconds"),
 							data = obj)
 					for obj in json_data
-        		]
+				]
 			if dtype == "userMetrics":
 				objects = [
 					model(	user=user,
-						 	summary_id=obj.get("summaryId"),
-						 	record_date_in_seconds=record_date,
-						 	calendar_date=obj.get("calendarDate"),
-						 	data=obj)
+							summary_id=obj.get("summaryId"),
+							record_date_in_seconds=record_date,
+							calendar_date=obj.get("calendarDate"),
+							data=obj)
 					for obj in json_data
 				]
 
@@ -204,12 +206,12 @@ class GarminPing(APIView):
 				access_token_secret = user.garmin_token.token_secret
 
 				service = OAuth1Service(
-				    consumer_key = conskey,
-				    consumer_secret = conssec,
-				    request_token_url = req_url,
-				    access_token_url = acc_url,
-				    authorize_url = authurl, 
-			    )
+					consumer_key = conskey,
+					consumer_secret = conssec,
+					request_token_url = req_url,
+					access_token_url = acc_url,
+					authorize_url = authurl, 
+				)
 				
 				upload_start_time = int(re.search('uploadStartTimeInSeconds=(\d+)*',
 									callback_url).group(1))
@@ -221,7 +223,7 @@ class GarminPing(APIView):
 
 				data = {
 					'uploadStartTimeInSeconds': upload_start_time,
-        			'uploadEndTimeInSeconds':upload_end_time
+					'uploadEndTimeInSeconds':upload_end_time
 				}
 
 				sess = service.get_session((access_token, access_token_secret))
@@ -233,3 +235,86 @@ class GarminPing(APIView):
 				self.MODEL_TYPES[dtype].objects.bulk_create(obj_list)
 
 		return Response(status = status.HTTP_200_OK)
+
+class GarminConnectPing(APIView):
+	def post(self, request, format=None):
+		'''
+			This view will receive Health PING API data and 
+			store in database 
+		'''
+		print("Yay! received the files")
+		for filename, file in request.FILES.items():
+		    print(filename)
+		headers={"Location":"some header"}
+		return Response(status = status.HTTP_201_CREATED,headers=headers)
+
+def connect_request_token(request):
+	'''
+		Request for unauthorized request token and request token secret 
+	'''
+	req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+	authurl = 'http://connect.garmin.com/oauthConfirm'
+	acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+	conskey = 'fc281870-3111-47fd-8576-fc90efef0fb1';
+	conssec = 'hZPITG4SuEIXiFdInYs9or8TI9psvroqdGZ';
+	session = request.session
+	if not 'auth_token' in session and ('state' in session and session['state'])==1:
+	  session['state'] = 0;
+
+	service = OAuth1Service(
+		  consumer_key = conskey,
+		  consumer_secret = conssec,
+		  request_token_url = req_url,
+		  access_token_url = acc_url,
+		  authorize_url = authurl,
+		  )
+
+	session = request.session
+	request_token, request_token_secret = service.get_request_token()
+
+	session['connect_request_token'] = request_token
+	session['connect_request_token_secret'] = request_token_secret
+	session['state'] = 1
+	callback_string = urllib.parse.quote('https://app.jvbwellness.com/callbacks/garminconnect')
+	return redirect(authurl + '?oauth_token={0}&oauth_callback={1}'.format(request_token,callback_string))
+
+def connect_receive_token(request):
+	'''
+		Request for auth token and token secret. Save them in database for associated user
+	'''
+	req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+	authurl = 'http://connect.garmin.com/oauthConfirm'
+	acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+	conskey = 'fc281870-3111-47fd-8576-fc90efef0fb1';
+	conssec = 'hZPITG4SuEIXiFdInYs9or8TI9psvroqdGZ';
+	session = request.session
+
+	# oauth_token = request.GET['oauth_token']
+	oauth_verifier = request.GET['oauth_verifier']
+
+	service = OAuth1Service(
+		  consumer_key = conskey,
+		  consumer_secret = conssec,
+		  request_token_url = req_url,
+		  access_token_url = acc_url,
+		  authorize_url = authurl,
+		  )
+
+	access_token, access_token_secret = service.get_access_token(session['connect_request_token'],
+	session['connect_request_token_secret'],method='POST',data={'oauth_verifier': oauth_verifier},
+	header_auth=True)
+
+	# sess = service.get_session((access_token, access_token_secret))
+
+	# Check if token and token secret exist. If exist then update otherwise
+	# create new entry in the database
+	try:
+		token = GarminConnectToken.objects.get(user = request.user)
+		if token:    
+			token.save(token=access_token,token_secret=access_token_secret)
+
+	except GarminConnectToken.DoesNotExist:
+		GarminConnectToken.objects.create(user=request.user,token=access_token,
+									   token_secret=access_token_secret)
+
+	return redirect('/service_connect')
