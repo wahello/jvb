@@ -40,9 +40,13 @@ class Logout(APIView):
 class UserCreate(APIView):
     def post(self, request, format="json"):
         serializer = UserProfileSerializer(data=request.data)
+       
         if serializer.is_valid():
             user = serializer.save()
             if user:
+                user = authenticate(request,username=request.data['username'],
+                                        password=request.data['password'])
+                login(request,user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

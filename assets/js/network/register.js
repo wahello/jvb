@@ -1,6 +1,8 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
+import {loadLocalState,saveLocalState} from '../components/localStorage';
+
 axiosRetry(axios, { retries: 3}); 
 
 class RegisterNetwork {
@@ -12,7 +14,6 @@ class RegisterNetwork {
 		delete post_data['inches'];
 		delete post_data['goals'];
 
-		console.log(post_data);
 		const URL = "/api/users/";
 		var config = {
 			method: 'post',
@@ -20,6 +21,10 @@ class RegisterNetwork {
 			data:post_data
 		};
 		axios(config).then(function(response){
+			const auth_state = {
+					authenticated: true
+				};
+			saveLocalState(auth_state);
 			if (callback != undefined) callback(response);
 		})
 		.catch(function(error){

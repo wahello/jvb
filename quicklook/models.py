@@ -105,7 +105,7 @@ class ExerciseAndReporting(models.Model):
 	workout_time = models.CharField(max_length=10)
 	# workout_time = models.TimeField()
 
-	workout_location = models.CharField(max_length=100)
+	workout_location = models.TextField()
 
 	workout_duration = models.CharField(max_length=10)
 	# workout_duration = models.TimeField()
@@ -141,13 +141,13 @@ class ExerciseAndReporting(models.Model):
 	water_consumed_workout = models.FloatField()
 	chia_seeds_consumed_workout = models.IntegerField(
 		validators = [MinValueValidator(0),MaxValueValidator(20)])
-	fast_before_workout = models.CharField(choices= YN_CHOICES, max_length=3)
-	pain = models.CharField(choices=YN_CHOICES, max_length=3)
-	pain_area = models.CharField(max_length=20, blank=True)
+	fast_before_workout = models.CharField(choices= YN_CHOICES, max_length=3,blank=True)
+	pain = models.CharField(choices=YN_CHOICES, max_length=3, blank=True)
+	pain_area = models.TextField(blank=True)
 	stress_level = models.CharField(choices=STRESS_LEVEL_CHOICES, max_length=6)
 	sick = models.CharField(choices=YN_CHOICES, max_length=3)
 	drug_consumed = models.CharField(choices=YN_CHOICES, max_length=3)
-	drug = models.CharField(choices = DRUGS, max_length=30,blank=True)
+	drug = models.TextField(blank=True)
 	medication = models.TextField()
 	smoke_substance = models.CharField(choices=YN_CHOICES, max_length=3)
 	exercise_fifteen_more = models.CharField(choices=YN_CHOICES, max_length=3)
@@ -164,7 +164,7 @@ class ExerciseAndReporting(models.Model):
 	avg_heartrate_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	heartrate_variability_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	workout_comment = models.CharField(max_length=250)
+	workout_comment = models.TextField()
 
 class SwimStats(models.Model):
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "swim_stats_ql")
@@ -234,7 +234,7 @@ class Food(models.Model):
 	non_processed_food = models.TextField()
 
 	# choices are not provided, will be choice field in the future
-	diet_type = models.CharField(max_length=50)
+	diet_type = models.TextField()
 
 
 class Alcohol(models.Model):

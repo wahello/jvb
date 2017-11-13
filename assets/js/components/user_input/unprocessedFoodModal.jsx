@@ -72,12 +72,18 @@ export default class UnprocesedFoodModal extends Component{
 					                           	onClick={this.onClickFoodList}
 					                           	checked={this.state.enter_food ? 'checked':''}
 					                           	/>                           		  
-		                            			 <Label id="text">I Want To Enter A List Of Unprocessed Foods I Consumed</Label>
+		                            			 <Label id="text">I Want To Enter A List Of &nbsp;
+			                            			 <span style={{fontWeight:"bold"}}>
+						                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
+						                             </span> Foods I Consumed</Label>
 	                            			</div>
                             			<div>
 										<Collapse isOpen={this.state.enter_food}>
 
-										<Label>5.2 What Unprocessed Food Were Consumed?</Label>
+										<Label>5.2 What &nbsp;
+										 <span style={{fontWeight:"bold"}}>
+			                              	<span style={{textDecoration:"underline"}}>Un</span>processed?
+			                             </span> Food Were Consumed?</Label>
 											<div className="input1">	
 					                            <Textarea 						                           
 						                            className="form-control" 
@@ -99,7 +105,10 @@ export default class UnprocesedFoodModal extends Component{
 	                              	<Label>5.1 What Processed Food Were Consumed?</Label><br/>
 	                              	
 	                                <p>{this.state.processed_food_list}</p>
-	                                <Label>5.2 What Unprocessed Food Were Consumed?</Label>
+	                                <Label>5.2 What &nbsp;
+	                                <span style={{fontWeight:"bold"}}>
+		                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
+		                             </span> Food Were Consumed?</Label>
 	                                <p >{this.state.unprocessed_food_list}</p>
 	                              </div>
 	                             
