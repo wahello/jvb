@@ -123,8 +123,7 @@ class HomePageReactTitle extends Component {
                                     <div className="social-login-buttons">
 
                                     <Link to='register'>Register</Link><br/>
-                                      <Link to="forgotpassword">Forgot Password</Link><br/>
-
+                                    <a href="password_reset/">Forgot Password</a><br/>
                                     </div>
                                   </div>
                               </div>

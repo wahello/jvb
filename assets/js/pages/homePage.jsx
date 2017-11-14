@@ -47,7 +47,7 @@ function initializeLocalState(){
 			        <Route path='/register' component={Register} />
 			        <Route path='/UserInputs' component={RequireAuth(UserInputs)} />
 			        <Route path='/service_connect' component={RequireAuth(ServiceConnect)} />
-					{/*<Route path='/ForgotPassword' component={Forgotpassword} /> */}
+					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
 					{/*<Route path='/nes' component={RequireAuth(Nes)} /> */}
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}
 					{/*<Route path='/WeeklyGrade' component={RequireAuth(Weeklygrade)} /> */}
