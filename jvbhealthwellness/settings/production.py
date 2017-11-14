@@ -22,11 +22,15 @@ MEDIA_URL = '/media/'
 
 SERVER_EMAIL = 'foo@example.com'
 
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = config('SENDGRID_USERNAME')
-EMAIL_HOST_PASSWORD = config('SENDGRID_PASSWORD')
-EMAIL_PORT = 587
+#Email (Mailjet)
+
 EMAIL_USE_TLS = True
+EMAIL_HOST = 'in-v3.mailjet.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = '41b890e418b96a9596a25d18d375d5ce'
+EMAIL_HOST_PASSWORD = 'cc8f267cf052d8519798109d07686fa7'
+DEFAULT_FROM_EMAIL = 'saumyag@s7inc.co'
+
 
 # Security
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
