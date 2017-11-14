@@ -260,6 +260,10 @@ class GarminConnectPing(APIView):
         headers={"Location":"/"}
         return Response(status = status.HTTP_201_CREATED,headers=headers)
 
+    def get(self, request, format=None):
+        print("\n\nGARMIN CONNECT PUSH GET METHOD CALL\n\n",request.data,"\n\n")
+        return Response(status = status.HTTP_200_OK) 
+
 def connect_request_token(request):
     '''
         Request for unauthorized request token and request token secret 
