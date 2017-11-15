@@ -1,7 +1,7 @@
-import datetime
+# import datetime
 
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+# from django.contrib.postgres.fields import JSONField
 
 class UserGarminDataEpoch(models.Model):
 	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="epoch_data")
@@ -109,3 +109,12 @@ class UserGarminDataMoveIQ(models.Model):
 	#data = JSONField()
 	# data = models.CharField(max_length=2000)
 	data = models.TextField()
+
+class GarminConnectToken(models.Model):
+
+	user = models.OneToOneField('auth.User',related_name="garmin_connect_token")
+	token = models.CharField(max_length=250)
+	token_secret = models.CharField(max_length=250)
+
+	def __str__(self):
+		return "%s"%(self.user.username)
