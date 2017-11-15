@@ -1,102 +1,115 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
-
-function renderTableRows(dateWiseData,category,field,classes=""){
-	let elements = [];
-	for(let [date,data] of Object.entries(dateWiseData)){
-		if(field === "created_at"){
-			elements.push(
-				<th key={date} className={classes}>{date}</th>
-			);	
-		}else{
-			elements.push(
-				<td key={date} className={classes}>{data[category][field]}</td>
-			);
-		}
-	}
-	return elements;
-}
+// function renderTableRows(dateWiseData,category,field,classes=""){
+// 	let elements = [];
+// 	for(let [date,data] of Object.entries(dateWiseData)){
+// 		if(field === "created_at"){
+// 			elements.push(
+// 				<th key={date} className={classes}>{date}</th>
+// 			);	
+// 		}else{
+// 			elements.push(
+// 				<td key={date} className={classes}>{data[category][field]}</td>
+// 			);
+// 		}
+// 	}
+// 	return elements;
+// }
 
 
 export class Sleep extends Component{
 	constructor(props){
 	super(props);
-	this.sleepScroll=this.sleepScroll.bind(this);
+	//this.bikeStatScroll=this.bikeStatScroll.bind(this);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
 
-}
-componentDidMount() {
-	document.getElementById('tBodySleep').addEventListener('scroll', this.sleepScroll);
-}
-
-
-  sleepScroll(e) { 
-        var tbody = document.getElementById("tBodySleep");
-        document.getElementById("tHeadSleep").style.left = '-'+tbody.scrollLeft+'px';
-        document.querySelector('#tHeadSleep th:nth-child(1)').style.left = tbody.scrollLeft+'px';
-        var trLength = document.querySelector('#tBodySleep').children;
-        for (var i = 0; i < trLength.length; i++) {
-        	trLength[i].querySelector('#tBodySleep td:nth-child(1)').style.left = tbody.scrollLeft+'px';
-        }
-
+	 this.state = {
+      myTableData: [
+        {name: 'Sleep Per Wearable'},
+        {name: 'Sleep Per User Input'},
+        {name: 'Sleep Aid'},
+        {name: 'Sleep Bed Time'}, 
+        {name: 'Sleep Awake Time'},
+        {name: 'Deep Sleep'},
+        {name: 'Light Sleep'},
+        {name: 'Awake Time'},                       
+      ],
     };
-	render(){
+  }
+
+renderTableColumns(dateWiseData,category,classes=""){
+		let columns = [];
+		for(let [date,data] of Object.entries(dateWiseData)){
+			columns.push(
+				<Column 
+					header={<Cell>{date}</Cell>}
+			        cell={props => (
+				            <Cell {...props}>
+				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
+				            </Cell>
+				          )}
+			        width={200}
+				/>
+			)
+		}
+		return columns;
+	}
+// 	constructor(props){
+// 	super(props);
+// 	this.sleepScroll=this.sleepScroll.bind(this);
+
+// }
+// componentDidMount() {
+// 	document.getElementById('tBodySleep').addEventListener('scroll', this.sleepScroll);
+// }
 
 
-	        return(
-						  <div className="quick3">
-                          <Table className="table table-responsive quick4">
+//   sleepScroll(e) { 
+//         var tbody = document.getElementById("tBodySleep");
+//         document.getElementById("tHeadSleep").style.left = '-'+tbody.scrollLeft+'px';
+//         document.querySelector('#tHeadSleep th:nth-child(1)').style.left = tbody.scrollLeft+'px';
+//         var trLength = document.querySelector('#tBodySleep').children;
+//         for (var i = 0; i < trLength.length; i++) {
+//         	trLength[i].querySelector('#tBodySleep td:nth-child(1)').style.left = tbody.scrollLeft+'px';
+//         }
 
-                         <thead id="tHeadSleep">
-				         <tr className="quick8">
-				         <th >
-						  Sleep
-						  </th>
-						   {renderTableRows(this.props.data,"sleep_ql","created_at")}
-						</tr>
-						</thead>
-					<tbody id="tBodySleep" onScroll={this.sleepScroll}>
-						 <tr>
-					        <td>Sleep Per Wearable</td>
-					        {renderTableRows(this.props.data,"sleep_ql","sleep_per_wearable")}				          
-				         </tr>
-				         <tr className="quick9">
-					        <td>Sleep Per User Input</td>
-					        {renderTableRows(this.props.data,"sleep_ql","sleep_per_wearable")}				          
-				         </tr>
-				         <tr>
-					        <td>Sleep Aid</td>
-					        {renderTableRows(this.props.data,"sleep_ql","sleep_aid")}				         
-				         </tr>
-				         <tr className="quick9">
-					        <td>Sleep Bed Time</td>
-					        {renderTableRows(this.props.data,"sleep_ql","sleep_bed_time")}				            
-				         </tr>
-				         <tr>
-					        <td>Sleep Awake Time</td>
-					        {renderTableRows(this.props.data,"sleep_ql","sleep_awake_time")}				            
-				         </tr>
-				         
-				         <tr className="quick9">
-					        <td>Deep Sleep</td>
-					        {renderTableRows(this.props.data,"sleep_ql","deep_sleep")}
-				           </tr>
-				          <tr>
-					        <td>Light Sleep</td>
-					        {renderTableRows(this.props.data,"sleep_ql","light_sleep")}				            
-				         </tr>
-				          <tr className="quick9">
-					        <td>Awake Time</td>
-					        {renderTableRows(this.props.data,"sleep_ql","awake_time")}				           
-				         </tr>
-				         </tbody>
-                          </Table>
-                          </div>
+//     };
+	
+	 render(){
+		 // var {dataList} = this.state;
+		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["sleep_ql"]).length;
+		return(
+			<div className="quick3"
+			  containerWidth={this.props.containerWidth}
+      		  containerHeight={this.props.containerHeight}>
+			 <Table
+		        rowsCount={rowsCount}
+		        rowHeight={50}
+		        headerHeight={50}
+		        width={1000}
+		        height={300}>
+		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
+		        <Column
+		          header={<Cell>Sleep</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.myTableData[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={200}
+		          fixed={true}
+		        />
+			    {this.renderTableColumns(this.props.data,"sleep_ql")}
+      		</Table>
+			</div>
 
-		);
-
-	 }
+			);
+	}
 }
 export default Sleep;

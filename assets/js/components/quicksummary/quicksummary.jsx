@@ -301,7 +301,7 @@ class Quicklook extends Component{
 
 	render(){
 		const {activeTab}=this.state;
-		const class_allstats1=`nav-link ${activeTab === "allstats1" ? 'active':''}`;
+		
 		const class_allstats=`nav-link ${activeTab === "allstats" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
 		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
@@ -311,7 +311,7 @@ class Quicklook extends Component{
 		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
         const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
-         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
+        const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
 	return(
 		<div className="container-fluid">
 		<NavbarMenu fix={true}/>
@@ -337,6 +337,7 @@ class Quicklook extends Component{
 			             <div className="quick7">
 			             <ul className="nav nav-tabs" id="quick6">
 
+			             
 			            
 			             <li className="nav-item">
 						    		<div>
