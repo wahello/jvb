@@ -125,8 +125,7 @@ updateDateState(data){
 
 	componentWillReceiveProps(nextProps){
 		console.log("This is next props",nextProps);
-		console.log(this.props.start_date);
-		console.log(this.props.end_date);
+		
 		console.log(nextProps.start_date);
 		console.log(nextProps.end_date);
 		if(nextProps.start_date !== this.props.start_date ||

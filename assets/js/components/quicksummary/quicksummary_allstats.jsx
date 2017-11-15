@@ -11,12 +11,16 @@ import Food from './quicksummary_food';
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
 import User from './user_inputs';
+import Dimensions from 'react-dimensions';
 
  const AllStats =(props)=>{
 		return(
 
 
- <div>
+ <div
+      //containerWidth={this.props.containerWidth}
+     // containerHeight={this.props.containerHeight}
+     >
        <Grades data={props.data}/>
        <Swim data={props.data}/>
        <Bike data={props.data}/>

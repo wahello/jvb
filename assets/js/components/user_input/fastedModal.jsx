@@ -43,8 +43,7 @@ export default class FastedModal extends Component{
                             	{this.props.editable &&
 	                            	<div className="input1">
 			                            <Textarea 				                           
-				                            className=" form-control" 
-				                            placeholder="dairy, cheese, pasta, bread, white rice etc..."
+				                            className=" form-control" 				                            
 				                            rows={5} cols={5}
 				                            value={this.state.food_ate_before_workout}
 				                            onChange={this.handleChange}
