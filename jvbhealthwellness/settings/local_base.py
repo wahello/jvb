@@ -29,8 +29,16 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 # Email
 INSTALLED_APPS += ('naomi',)
-EMAIL_BACKEND = 'naomi.mail.backends.naomi.NaomiBackend'
-EMAIL_FILE_PATH = base_dir_join('tmp_email')
+# EMAIL_BACKEND = 'naomi.mail.backends.naomi.NaomiBackend'
+# EMAIL_FILE_PATH = base_dir_join('tmp_email')
+
+#Email (Mailjet)
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'in-v3.mailjet.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = '41b890e418b96a9596a25d18d375d5ce'
+EMAIL_HOST_PASSWORD = 'cc8f267cf052d8519798109d07686fa7'
+DEFAULT_FROM_EMAIL = 'saumyag@s7inc.co'
 
 # Fix My Django
 INSTALLED_APPS += ('fixmydjango',)
@@ -65,6 +73,5 @@ LOGGING = {
 }
 
 #cors 
-CORS_ORIGIN_ALLOW_ALL = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+CORS_ORIGIN_ALLOW_ALL = True

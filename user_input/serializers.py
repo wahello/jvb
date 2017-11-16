@@ -1,5 +1,5 @@
 import re
-from .custom_signals import user_input_post_save
+from .custom_signals import user_input_post_save,user_input_notify
 
 from rest_framework import serializers
 
@@ -154,12 +154,19 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# Goals.objects.create(user_input=user_input_obj,
 		# 								 **goals_data)
 
-
 		#sending signal to calculate quicklook
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
 		 	dt=validated_data['created_at'])
+
+		# send signal to notify admins by sending email about 
+		# this newly created userinput 
+		user_input_notify.send(
+			sender=self.__class__,
+			request=self.context['request'],
+			instance = user_input_obj,
+			created=True)
 
 		return user_input_obj
 
