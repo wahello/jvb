@@ -138,7 +138,7 @@ class GarminPing(APIView):
         "userMetrics":UserGarminDataMetrics
     }
 
-    def _safe_get(data,attr,default):
+    def _safe_get(self,data,attr,default):
         data_item = data.get(attr,None)
         if not data_item:
             return default
