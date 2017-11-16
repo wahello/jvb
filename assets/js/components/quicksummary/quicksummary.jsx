@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button,Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody } from "reactstrap";
 import axios from 'axios';
+import FontAwesome from "react-fontawesome";
+import CalendarWidget from 'react-calendar-widget';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
 
@@ -28,7 +30,7 @@ import AllStats1 from './quicksummary_allstats1';
 
 axiosRetry(axios, { retries: 3});
 
-var CalendarWidget = require('react-calendar-widget');  
+
 var ReactDOM = require('react-dom');
 
 
@@ -46,6 +48,8 @@ class Quicklook extends Component{
 		this.updateDateState=this.updateDateState.bind(this);
 		this.onSubmitDate=this.onSubmitDate.bind(this);
 		this.handleChange=this.handleChange.bind(this);
+		this.handleScroll = this.handleScroll.bind(this);
+		this.toggleCalendar=this.toggleCalendar.bind(this);
 		
 		let initial_state = getInitialState(moment(new Date()));   
 
@@ -55,6 +59,8 @@ class Quicklook extends Component{
 			end_date:moment().add(6,'days'),
 			visible: true,
 			error:false,
+			calendarOpen:false,
+			scrollingLock: false,
 			data:initial_state,
 			activeTab : 'allstats',
 			userInputData:{}
@@ -199,8 +205,8 @@ class Quicklook extends Component{
 		      }
 		      this.setState({
 				data:initial_state,
-				visible:true,
-				error:false
+				visible:false,
+				error:true
 			});
 	     }
 	     else{
@@ -232,17 +238,7 @@ class Quicklook extends Component{
 		});
 	}
 
-	renderAlert(){
-
-		if (this.state.error){
-			
-			return(
-				 <Alert color="danger" isOpen={this.state.error} toggle={this.onDismiss}>
-					No Quicklook data is found!		       
-				</Alert>
-			);
-		}
-	}
+	
 
 	processDate(date){
 		let start_dt = moment(date);
@@ -284,6 +280,7 @@ class Quicklook extends Component{
 		quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 					  this.userInputFetchfailure);
+		 window.addEventListener('scroll', this.handleScroll);
 	}
 	onDismiss(){
 		this.setState(
@@ -299,9 +296,32 @@ class Quicklook extends Component{
        });
 	}
 
+	componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+}
+
+handleScroll() {
+
+  if (window.scrollY >= 150 && !this.state.scrollingLock) {
+    this.setState({
+      scrollingLock: true
+    });
+  } else if(window.scrollY < 150 && this.state.scrollingLock) {
+    this.setState({
+      scrollingLock: false
+    });
+  }
+}
+ toggleCalendar(){
+    this.setState({
+      calendarOpen:!this.state.calendarOpen
+    });
+  }
+
+
 	render(){
 		const {activeTab}=this.state;
-		
+		const class_allstats1=`nav-link ${activeTab === "allstats1" ? 'active':''}`;
 		const class_allstats=`nav-link ${activeTab === "allstats" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
 		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
@@ -314,33 +334,40 @@ class Quicklook extends Component{
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
 	return(
 		<div className="container-fluid">
-		<NavbarMenu fix={true}/>
+		<NavbarMenu fix={false}/>
 	
 		           	
 					
 			<div className="col-lg-12 col-md-12 col-sm-12">  
 			<div className="quick">
 			       
-                         <div className="row justify-content-center">
-						<div className="alert">
-							{this.renderAlert()}
-						</div>
-					 </div>
+                         
                       <div className="row justify-content-center">
 						 <div id="quick1" className="row ">
 			                 <h2>Quick Summary</h2>			                
 			             </div>
 			             </div>
 
-			             <div className="row">
+			             <div className="row justify-content-center">
 			             <div className="col-sm-12">
 			             <div className="quick7">
-			             <ul className="nav nav-tabs" id="quick6">
+			             <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
+			             <ul className="nav nav-tabs" id="quick6" style={{backgroundColor:"#777777",color:"#ddd"}}>
 
-			             
+			              <li className="nav-item" id="calendar1" 
+                              onClick={this.toggleCalendar}>			              
+                                 <span id="calendar1" >                                
+                                       <FontAwesome 
+                                          name = "calendar"
+                                          size = "1x"                                         
+                                        />
+                                        </span>                          
+                         		 </li>
+                         		 
 			            
+
 			             <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_allstats} value="allstats"
 						    		 onClick={this.activateTab.bind(this,"allstats")}>
 						    		All Stats
@@ -349,16 +376,16 @@ class Quicklook extends Component{
 						    </li>
                               
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_grade} value="grade"
 						    		 onClick={this.activateTab.bind(this,"grade")}>
-						    		Grade
+						    		Grades
 						    		</a>
 						    		</div>
 						    </li>
 						   
 						    <li className="nav-item">
-						    		<div >
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_swim}  value="swim"
 						    		 onClick={this.activateTab.bind(this,"swim")}>
 						    		 Swim Stats
@@ -366,7 +393,7 @@ class Quicklook extends Component{
 						    		 </div>
 						     </li>
 						    <li className="nav-item">
-						    		<div >
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_bike} value="bike"
 						    		 onClick={this.activateTab.bind(this,"bike")}>
 						    		 Bike Stats
@@ -374,7 +401,7 @@ class Quicklook extends Component{
 						    		</div>
 						    </li>
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_steps}  value="steps"
 						    		 onClick={this.activateTab.bind(this,"steps")}>
 						    		 Steps
@@ -382,7 +409,7 @@ class Quicklook extends Component{
 						    		</div>
 						    </li>
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_sleep}  value="sleep"
 						    		 onClick={this.activateTab.bind(this,"sleep")}>
 						    		 Sleep
@@ -390,7 +417,7 @@ class Quicklook extends Component{
 						    		</div>
 						    </li>
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_food}  value="food"
 						    		 onClick={this.activateTab.bind(this,"food")}>
 						    		 Food
@@ -398,7 +425,7 @@ class Quicklook extends Component{
 						    		</div>
 						    </li>
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_alcohol} value="alcohol"
 						    		 onClick={this.activateTab.bind(this,"alcohol")}>
 						    		 Alcohol
@@ -406,7 +433,7 @@ class Quicklook extends Component{
 						    		 </div>
 						    </li>
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_exercise} value="exercise"
 						    		 onClick={this.activateTab.bind(this,"exercise")}>
 						    		 Exercise Reporting
@@ -414,7 +441,7 @@ class Quicklook extends Component{
 						    		 </div>
 						    </li>
 						    <li className="nav-item">
-						    		<div>
+						    		<div id="nav-thing">
 						    		<a href="#" className={class_user} value="user"
 						    		 onClick={this.activateTab.bind(this,"user")}>
 						    		 User Inputs
@@ -422,39 +449,50 @@ class Quicklook extends Component{
 						    		 </div>
 						    </li>
 						     
-						     
 						 </ul>
+						 </div>
 			      		</div>
 			             </div>
 			             </div>
+			              <Popover 
+                            placement="bottom" 
+                            isOpen={this.state.calendarOpen}
+                            target="calendar1" 
+                            toggle={this.toggleCalendar}>
+                              <PopoverBody>
+                                <CalendarWidget onDaySelect={this.processDate}/>
+                              </PopoverBody>
+                           </Popover> 
                         
-			   <div id="quick2" className="row">
-			    <div className="col-sm-2 quick5">
-		            <CalendarWidget onDaySelect={this.processDate}/>,
+			   <div id="quick2" className="row justify-content-center">
+			   		   <div className="col-lg-10 col-md-12 col-sm-12">       
 		            <div className="quick10">
 				           <Form>
-						        <FormGroup>
-						          <Label>Start Date</Label>
-						          <Input type="date"
+						        <span style={{paddingLeft:"20px",paddingBottom:"20px"}}>
+						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          <input type="date"
 						           name="start_date"
 						           value={this.state.start_date}
-						           onChange={this.handleChange}/>
-						        </FormGroup>
-						        <FormGroup>
-						          <Label for="examplePassword">End date</Label>
-						          <Input type="date"
+						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
+						        </span>
+						        <span style={{paddingLeft:"27px"}}>
+						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          <input type="date"
 						           name="end_date"
 						           value={this.state.end_date}
-						           onChange={this.handleChange}/>
-						        </FormGroup>
-						        <Button
+						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
+						        </span>
+						        <span style={{paddingLeft:"50px"}}>
+						        <button						        
 						         type="submit"
-						         className="btn btn-block btn-info"
-						         onClick={this.onSubmitDate}>Submit</Button>
+						         className="btn btn-block-lg btn-info"
+						         onClick={this.onSubmitDate} style={{width:"200px"}}>Submit</button></span>
 						   </Form>
 					</div>
-                    </div>
-                    <div className="col-lg-8 col-md-10 col-sm-12">
+					</div>
+					</div>
+                    <div className="row justify-content-center">
+                    <div className="col-lg-10 col-md-12 col-sm-12">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "allstats" && 
 	                    	<AllStats 
@@ -484,7 +522,8 @@ class Quicklook extends Component{
                  
 				
 				</div>
-				  </div>
+				</div>
+				 
 					
 		
 	);

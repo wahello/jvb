@@ -23,8 +23,7 @@ import Dimensions from 'react-dimensions';
 // }
 
 
-
-export class Grades extends Component{
+ class Grades extends Component{
 
 	constructor(props){
 	super(props);
@@ -58,7 +57,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={132}
 				/>
 			)
 		}
@@ -87,19 +86,19 @@ renderTableColumns(dateWiseData,category,classes=""){
 //     };
 	
 	render(){
+		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		 // var {dataList} = this.state;
 		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["grades_ql"]).length;
 		return(
-			<div className="quick3"
-			 containerWidth={this.props.containerWidth}
-             containerHeight={this.props.containerHeight}>
+			<div className="quick3">
 			 <Table
 			 	className="responsive"
 		        rowsCount={rowsCount}
 		        rowHeight={50}
 		        headerHeight={50}
-		        width={1000}
-		        height={300}>
+		        width={containerWidth}
+        		height={containerHeight}
+        		{...props}>
 		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Grades</Cell>}
@@ -118,4 +117,12 @@ renderTableColumns(dateWiseData,category,classes=""){
 			);
 	}
 }
-export default Grades;
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 200;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 680 ? 0 : 240;
+    return window.innerWidth - widthOffset;
+  }
+})(Grades);

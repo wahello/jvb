@@ -6,7 +6,7 @@ import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 
-export class Alcohol extends Component{
+class Alcohol extends Component{
 
 	constructor(props) {
     super(props);
@@ -32,7 +32,7 @@ export class Alcohol extends Component{
 				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={132}
 				/>
 			)
 		}
@@ -56,17 +56,17 @@ export class Alcohol extends Component{
 	// }
 	render(){
 		 // var {dataList} = this.state;
+		 const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["alcohol_ql"]).length;
 		return(
-			<div className="quick3"
-			 containerWidth={this.props.containerWidth}
-             containerHeight={this.props.containerHeight}>
+			<div className="quick3">			
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
 		        headerHeight={50}
-		        width={1000}
-		        height={170}>
+		        width={containerWidth}
+        		height={containerHeight}
+        		{...props}>
 		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Alchohol</Cell>}
@@ -76,6 +76,7 @@ export class Alcohol extends Component{
 		            </Cell>
 		          )}
 		          width={200}
+		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"alcohol_ql")}
       		</Table>
@@ -84,4 +85,12 @@ export class Alcohol extends Component{
 			);
 	}
 }
-export default Alcohol;
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 200;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 680 ? 0 : 240;
+    return window.innerWidth - widthOffset;
+  }
+})(Alcohol);

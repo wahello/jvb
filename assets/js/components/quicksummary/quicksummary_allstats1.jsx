@@ -14,7 +14,9 @@ export class AllStats1 extends Component{
 
     this.state = {
       myTableData: [
-      	{name: 'Overall Truth Grade'},
+        {name: 'Alcohol Per Day'},
+        {name: 'Alcohol Per Week'},
+        {name: 'Overall Truth Grade'},
         {name: 'Overall Truth Health Gpa'},
         {name: 'Movement Non Exercise steps Grade'},
         {name: 'Movement Consistency Grade'}, 
@@ -23,11 +25,7 @@ export class AllStats1 extends Component{
         {name: 'Overall Workout Grade'},
         {name: 'percent NonProcessed Food Consumed Grade'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
-        {name: 'Penalty'},  
-        {name: 'Overall Truth Grade'},
-        {name: 'Total Strokes'}, 
-        {name: 'Alcohol Per Day'},
-        {name: 'Alcohol Per Week'},       
+        {name: 'Penalty'},        
       ],
     };
   }
@@ -43,13 +41,12 @@ export class AllStats1 extends Component{
 				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={132}
 				/>
 			)
 		}
 		return columns;
 	}
-
 	// renderTableAttrColumn(dateWiseData,category,table_name,classes="")
 	// {
 	// 	let attributes = Object.keys(Object.entries(dateWiseData)[0][1][category]);
@@ -67,7 +64,8 @@ export class AllStats1 extends Component{
 	// }
 	render(){
 		 // var {dataList} = this.state;
-		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["grades_ql"]).length;		
+		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["alcohol_ql","grades_ql"]).length;
+				
 		return(
 			<div>
 			 <Table
@@ -85,11 +83,9 @@ export class AllStats1 extends Component{
 		            </Cell>
 		          )}
 		          width={200}
+		          fixed={true}
 		        />
-			    {this.renderTableColumns(this.props.data,"grades_ql")}
-			     {this.renderTableColumns(this.props.data,"swim_stats_ql")}
-			      {this.renderTableColumns(this.props.data,"alcohol_ql")}
-			   
+			    {this.renderTableColumns(this.props.data,"alcohol_ql",this.props.data,"grades_ql")}	   
       		</Table>
 			</div>
 

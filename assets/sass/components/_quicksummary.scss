@@ -3,7 +3,7 @@ html,body{
 }
 
 .quick{
-	padding-top: 70px;
+	padding-top: 10px;
 }
 
 @media (max-width: 1023px){
@@ -47,13 +47,15 @@ font-weight: bold;
 #quick6{
 	font-size: 16px;
 	
+	
 }
 .quick7{
-	padding:10px 0px 20px 7px;
+	padding:10px 0px 20px 0px;
 }
 #quick6 a{
 	color: black;
 }
+
 .quick8{
 	background-color: #292C2E;
 	color: white;
@@ -63,7 +65,7 @@ font-weight: bold;
 
 }
 .quick10{
-	padding-top: 22px;
+	padding: 22px 0px;
 }
 #examplestartdate{
 	padding: 8px;
@@ -78,5 +80,10 @@ font-weight: bold;
 	text-align: center;
 	font-size: 16px;
 	padding: 10px;
+
+}
+#calendar1{
+	padding:10px 10px 10px 10px;
+	color:white;
 
 }

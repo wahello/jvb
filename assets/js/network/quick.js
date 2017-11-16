@@ -7,7 +7,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 axiosRetry(axios, { retries: 4}); 
 
-export function quicksummaryDate(startDate,endDate,successquick, errorquick){
+export function quicksummaryDate(startDate,endDate,successquick, errorquick){  
 	  // startDate and endDate are moment objects
     const URL = `quicklook/users/data`;
     const config = {
@@ -26,7 +26,7 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
     });
   }
 
-	export function userInputDate(startDate,endDate,successquick, errorquick){
+	export function userInputDate(startDate,endDate,userInputFetchSuccess, userInputFetchfailure){
     // startDate and endDate are moment objects
     const URL = `users/daily_input/`;
     const config = {
@@ -39,8 +39,8 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
       withCredentials: true
     };
      axios(config).then((response) => {
-       successquick(response,startDate,endDate);
+       userInputFetchSuccess(response,startDate,endDate);
      }).catch(function (error){
-       errorquick(error);
+       userInputFetchfailure(error);
     });
   }
