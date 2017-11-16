@@ -23,7 +23,6 @@ import Food from './quicksummary_food';
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
 import User from './user_inputs'; 
-import AllStats from './quicksummary_allstats'; 
 import AllStats1 from './quicksummary_allstats1'; 
 
 
@@ -62,7 +61,7 @@ class Quicklook extends Component{
 			calendarOpen:false,
 			scrollingLock: false,
 			data:initial_state,
-			activeTab : 'allstats',
+			activeTab : 'allstats1',
 			userInputData:{}
 		};
 	}
@@ -322,7 +321,6 @@ handleScroll() {
 	render(){
 		const {activeTab}=this.state;
 		const class_allstats1=`nav-link ${activeTab === "allstats1" ? 'active':''}`;
-		const class_allstats=`nav-link ${activeTab === "allstats" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
 		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
 		const class_bike=`nav-link ${activeTab === "bike" ? 'active':''}`;
@@ -364,16 +362,16 @@ handleScroll() {
                                         </span>                          
                          		 </li>
                          		 
-			            
-
-			             <li className="nav-item">
+			            <li className="nav-item">
 						    		<div id="nav-thing">
-						    		<a href="#" className={class_allstats} value="allstats"
-						    		 onClick={this.activateTab.bind(this,"allstats")}>
+						    		<a href="#" className={class_allstats1} value="allstats1"
+						    		 onClick={this.activateTab.bind(this,"allstats1")}>
 						    		All Stats
 						    		</a>
 						    		</div>
 						    </li>
+
+			            
                               
 						    <li className="nav-item">
 						    		<div id="nav-thing">
