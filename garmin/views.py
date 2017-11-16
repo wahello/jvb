@@ -200,8 +200,7 @@ class GarminPing(APIView):
                 user = User.objects.get(garmin_token__token = user_key)
             except User.DoesNotExist:
                 user = None
-                return Response(status = status.HTTP_404_NOT_FOUND)
-
+                
             if user:
                 callback_url = obj.get('callbackURL')
 
