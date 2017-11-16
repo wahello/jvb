@@ -31,8 +31,8 @@ from .models import UserGarminDataEpoch,\
                     UserGarminDataManuallyUpdated,\
                     UserGarminDataStressDetails,\
                     UserGarminDataMetrics,\
-                    UserGarminDataMoveIQ,\
-                    GarminConnectToken
+                    UserGarminDataMoveIQ
+                    # GarminConnectToken
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -183,6 +183,8 @@ class GarminPing(APIView):
 
         data = request.data
 
+        print("\n\nGARMIN HEALTH PUSH POST DATA\n\n",data,"\n\n")
+
         req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
         authurl = 'http://connect.garmin.com/oauthConfirm'
         acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
@@ -235,6 +237,10 @@ class GarminPing(APIView):
 
                 self.MODEL_TYPES[dtype].objects.bulk_create(obj_list)
 
+        return Response(status = status.HTTP_200_OK)
+
+    def get(self, request, format=None):
+        print("\n\nGARMIN HEALTH PUSH GET METHOD CALL\n\n",request.data,"\n\n")
         return Response(status = status.HTTP_200_OK)
 
 class GarminConnectPing(APIView):
@@ -324,13 +330,13 @@ def connect_receive_token(request):
 
     # Check if token and token secret exist. If exist then update otherwise
     # create new entry in the database
-    try:
-        token = GarminConnectToken.objects.get(user = request.user)
-        if token:    
-            token.save(token=access_token,token_secret=access_token_secret)
+    # try:
+    #     token = GarminConnectToken.objects.get(user = request.user)
+    #     if token:    
+    #         token.save(token=access_token,token_secret=access_token_secret)
 
-    except GarminConnectToken.DoesNotExist:
-        GarminConnectToken.objects.create(user=request.user,token=access_token,
-                                       token_secret=access_token_secret)
+    # except GarminConnectToken.DoesNotExist:
+    #     GarminConnectToken.objects.create(user=request.user,token=access_token,
+    #                                    token_secret=access_token_secret)
 
     return redirect('/service_connect')
