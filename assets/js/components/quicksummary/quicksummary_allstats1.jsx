@@ -154,7 +154,7 @@ class AllStats1 extends Component{
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={185}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data)}	   
@@ -169,7 +169,7 @@ export default Dimensions({
     return window.innerHeight - 200;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 680 ? 0 : 240;
+    var widthOffset = window.innerWidth < 1024 ? 30 : 240;
     return window.innerWidth - widthOffset;
   }
 })(AllStats1);

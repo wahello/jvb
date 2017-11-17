@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody } from "reactstrap";
+import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
+	     NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
+         NavbarBrand } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
@@ -49,6 +51,7 @@ class Quicklook extends Component{
 		this.handleChange=this.handleChange.bind(this);
 		this.handleScroll = this.handleScroll.bind(this);
 		this.toggleCalendar=this.toggleCalendar.bind(this);
+		this.toggle = this.toggle.bind(this);
 		
 		let initial_state = getInitialState(moment(new Date()));   
 
@@ -60,6 +63,7 @@ class Quicklook extends Component{
 			error:false,
 			calendarOpen:false,
 			scrollingLock: false,
+			isOpen: false,
 			data:initial_state,
 			activeTab : 'allstats1',
 			userInputData:{}
@@ -301,11 +305,11 @@ class Quicklook extends Component{
 
 handleScroll() {
 
-  if (window.scrollY >= 150 && !this.state.scrollingLock) {
+  if (window.scrollY >= 120 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 150 && this.state.scrollingLock) {
+  } else if(window.scrollY < 120 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -314,6 +318,12 @@ handleScroll() {
  toggleCalendar(){
     this.setState({
       calendarOpen:!this.state.calendarOpen
+    });
+  }
+ toggle() {
+    this.setState({
+      isOpen: !this.state.isOpen,
+     
     });
   }
 
@@ -349,105 +359,156 @@ handleScroll() {
 			             <div className="row justify-content-center">
 			             <div className="col-sm-12">
 			             <div className="quick7">
-			             <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
-			             <ul className="nav nav-tabs" id="quick6" style={{backgroundColor:"#777777",color:"#ddd"}}>
-
-			              <li className="nav-item" id="calendar1" 
-                              onClick={this.toggleCalendar}>			              
-                                 <span id="calendar1" >                                
-                                       <FontAwesome 
-                                          name = "calendar"
-                                          size = "1x"                                         
+			             <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
+						  <Navbar light toggleable className="navbar nav1">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+                                    <div className="toggler">
+                                    <FontAwesome 
+                                          name = "bars"
+                                          size = "1x"
+                                          
                                         />
-                                        </span>                          
-                         		 </li>
-                         		 
-			            <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_allstats1} value="allstats1"
-						    		 onClick={this.activateTab.bind(this,"allstats1")}>
-						    		All Stats
-						    		</a>
-						    		</div>
-						    </li>
+                                    </div>
+                               </NavbarToggler> 
+                                  
+                                  <span id="calendar1" 
+                                  onClick={this.toggleCalendar}>
+                                  <span id="spa" >
+                                     <span id="navlink">
+                                        <FontAwesome 
+                                          name = "calendar"
+                                          size = "1x"
+                                          
+                                        />
+                                        </span>                                      
+                                  </span>                                  
+                                                                  
+                                  </span>  
 
-			            
-                              
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_grade} value="grade"
-						    		 onClick={this.activateTab.bind(this,"grade")}>
-						    		Grades
-						    		</a>
-						    		</div>
-						    </li>
-						   
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_swim}  value="swim"
-						    		 onClick={this.activateTab.bind(this,"swim")}>
-						    		 Swim Stats
-						    		 </a>
-						    		 </div>
-						     </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_bike} value="bike"
-						    		 onClick={this.activateTab.bind(this,"bike")}>
-						    		 Bike Stats
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_steps}  value="steps"
-						    		 onClick={this.activateTab.bind(this,"steps")}>
-						    		 Steps
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_sleep}  value="sleep"
-						    		 onClick={this.activateTab.bind(this,"sleep")}>
-						    		 Sleep
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_food}  value="food"
-						    		 onClick={this.activateTab.bind(this,"food")}>
-						    		 Food
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_alcohol} value="alcohol"
-						    		 onClick={this.activateTab.bind(this,"alcohol")}>
-						    		 Alcohol
-						    		 </a>
-						    		 </div>
-						    </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_exercise} value="exercise"
-						    		 onClick={this.activateTab.bind(this,"exercise")}>
-						    		 Exercise Reporting
-						    		 </a>
-						    		 </div>
-						    </li>
-						    <li className="nav-item">
-						    		<div id="nav-thing">
-						    		<a href="#" className={class_user} value="user"
-						    		 onClick={this.activateTab.bind(this,"user")}>
-						    		 User Inputs
-						    		 </a>
-						    		 </div>
-						    </li>
-						     
-						 </ul>
+                                   <span className="btn2">
+                                  <Button						        
+							         	   type="submit"
+							               className="btn btn-block-lg btn-info"
+							               >Creat Quicklook</Button>
+                                   </span>
+                               <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
+                                  <Nav className="nav navbar-nav" navbar>
+                                          <NavItem>
+                                          <span id="spa">
+                                            <abbr id="abbri"  title="Workout Inputs">
+                                              <NavLink  href="#" className={class_allstats1} value="allstats1"
+						    								 onClick={this.activateTab.bind(this,"allstats1")}>
+                                               All Stats
+                                              </NavLink>
+                                            </abbr>
+                                            </span>
+                                          </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Sleep Inputs">
+                                            <NavLink href="#" className={class_grade} value="grade"
+						    						 onClick={this.activateTab.bind(this,"grade")}>
+                                             Grades
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                        </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
+                                            <NavLink  href="#" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>
+						    		 		Swim Stats
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                        </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Stress/Illness Inputs">
+                                            <NavLink href="#" className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>
+							    			 Bike Stats
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                        </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink  href="#" className={class_steps}  value="steps"
+						    		 				  onClick={this.activateTab.bind(this,"steps")}>
+						    		 		Steps
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink href="#" className={class_sleep}  value="sleep"
+						    		 				 onClick={this.activateTab.bind(this,"sleep")}>
+						    				 Sleep 
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>  
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink href="#" className={class_food}  value="food"
+						    		 				 onClick={this.activateTab.bind(this,"food")}>
+						    		 		Food
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>  
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink href="#" className={class_alcohol} value="alcohol"
+						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>
+						    		 		 Alcohol 
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>  
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink  href="#" className={class_exercise} value="exercise"
+						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
+						    		 		Exercise Reporting
+                                            </NavLink>                                           
+                                          </abbr>
+                                          </span>
+                                       </NavItem> 
+
+
+                                       	<NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Extra Inputs">
+                                            <NavLink href="#" className={class_user} value="user"
+						    		 				onClick={this.activateTab.bind(this,"user")}>
+						    		 		 User Inputs 
+                                            </NavLink>                                           
+                                          </abbr>
+                                          </span>
+                                       </NavItem>                                        									
+                                  </Nav>
+                                </Collapse>
+                                
+                                 
+                           </Navbar> 
+                           
 						 </div>
 			      		</div>
 			             </div>
@@ -467,24 +528,31 @@ handleScroll() {
 		            <div className="quick10">
 				           <Form>
 						        <span style={{paddingLeft:"20px",paddingBottom:"20px"}}>
+						      
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <input type="date"
 						           name="start_date"
 						           value={this.state.start_date}
 						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
+						           
 						        </span>
-						        <span style={{paddingLeft:"27px"}}>
+						        <span style={{paddingLeft:"27px"}} id="date">
+						       
 						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <input type="date"
 						           name="end_date"
 						           value={this.state.end_date}
 						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
+						        
 						        </span>
-						        <span style={{paddingLeft:"50px"}}>
+						        <span style={{paddingLeft:"88px"}} id="date">
+						       
 						        <button						        
 						         type="submit"
 						         className="btn btn-block-lg btn-info"
-						         onClick={this.onSubmitDate} style={{width:"200px"}}>Submit</button></span>
+						         onClick={this.onSubmitDate} style={{width:"200px"}}>Submit</button>
+						         </span>
+
 						   </Form>
 					</div>
 					</div>

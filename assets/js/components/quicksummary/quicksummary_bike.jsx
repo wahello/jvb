@@ -94,7 +94,7 @@ export default Dimensions({
     return window.innerHeight - 200;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 680 ? 0 : 240;
+    var widthOffset = window.innerWidth < 1024 ? 30 : 240;
     return window.innerWidth - widthOffset;
   }
 })(Bike);
