@@ -170,6 +170,12 @@ class fetchGarminData(APIView):
     "userMetrics":UserGarminDataMetrics
   }
 
+  def _safe_get(self,data,attr,default):
+        data_item = data.get(attr,None)
+        if not data_item:
+            return default
+        return data_item
+
   # just for demo storing data in db. Pulling data from api and storing
   # in db is functionality of other view
   def _createObjectList(self,json_data,dtype,record_dt):
@@ -185,7 +191,7 @@ class fetchGarminData(APIView):
               summary_id=obj.get("summaryId"),
               record_date_in_seconds=record_dt,
               start_time_in_seconds=obj.get("startTimeInSeconds")+\
-                          obj.get("startTimeOffsetInSeconds"),
+                          self._safe_get(obj,"startTimeOffsetInSeconds",0),
               start_time_duration_in_seconds=obj.get("durationInSeconds"),
               data = obj)
           for obj in json_data
@@ -196,7 +202,7 @@ class fetchGarminData(APIView):
               summary_id=obj.get("summaryId"),
               record_date_in_seconds=record_dt,
               start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
-                                    obj.get("measurementTimeOffsetInSeconds"),
+                                    self._safe_get(obj,"measurementTimeOffsetInSeconds",0),
               start_time_duration_in_seconds=obj.get("durationInSeconds"),
               data = obj)
           for obj in json_data

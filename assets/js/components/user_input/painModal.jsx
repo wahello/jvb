@@ -29,8 +29,8 @@ const option=[
                 { value:"mid back",label:'Mid back'},
                 { value:"lower back",label:'Lower back'},
                 { value:"groin",label:'Groin'},
-                { value:"left it band",label:'Left It Band'},
-                { value:"right it band",label:'Right It Band'}
+                { value:"left it band",label:'Left IT Band'},
+                { value:"right it band",label:'Right IT Band'}
                 
                 
 

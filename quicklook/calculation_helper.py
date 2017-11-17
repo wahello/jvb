@@ -27,6 +27,83 @@ from quicklook.models import UserQuickLook,\
 					Food,\
 					Alcohol
 
+def str_to_datetime(str_date):
+	y,m,d = map(int,str_date.split('-'))
+	return datetime(y,m,d,0,0,0)
+
+def safe_sum(d, key):
+	if(d!=[]):
+		return sum([i.get(key,0) for i in d ])
+	else:
+		return(0)
+
+def safe_max_values(d,key):
+	if(d!=[]):
+		seq = [x[key] for x in d]
+		return(max(seq))
+	else:
+		return(0)
+
+def safe_get(lst,attr,default_val):
+		try:
+			item = lst[0]
+			val = item.__dict__.get(attr)
+			if type(default_val) is int:
+				if(val == ''):
+					return default_val
+				return int(val)
+			return val
+		except:
+			return default_val 
+
+def safe_get_dict(lst,attr,default_val):
+	try:
+		item = lst[0]
+		val = item.get(attr)
+		if type(default_val) is int:
+			if(val == ''):
+				return default_val
+			return int(val)
+		return val
+	except:
+		return default_val 
+
+def update_helper(instance,data_dict):
+	'''
+		Helper function to update the instance
+		with provided key,value pair
+
+		Warning: This will not trigger any signals
+				 like post or pre save
+	'''
+	for attr, value in data_dict.items():
+		setattr(instance,attr,value)
+	instance.save()
+
+def extract_weather_data(data):
+	'''
+		Extract weather information like - Temperature, Dew point
+		Humidity, Apparent Temperature, Wind
+	'''
+	DATA = {
+		"temperature":0,
+		"dewPoint":0,
+		"humidity":0,
+		"apparentTemperature":0,
+		"windSpeed":0
+	}
+
+	if data:
+		data = data['daily']['data'][0]
+		DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
+		DATA['dewPoint'] = data['dewPoint']
+		DATA['humidity'] = data['humidity'] 
+		DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
+									  data['apparentTemperatureMax'])/2, 2)
+		DATA['windSpeed'] = data['windSpeed']
+
+	return DATA
+
 def fetch_weather_data(latitude,longitude,date):
 	'''
 		Fetch Weather daily data for certain date

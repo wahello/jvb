@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from . import views
-from . import views_calculated
+from . import calculation_views
 
 urlpatterns = [
 	url(r'^users/data$',views.UserQuickLookView.as_view(),
@@ -30,9 +30,9 @@ urlpatterns = [
 						views.SleepItemView.as_view(),name="sleep_item"),
 
 	url(r'^users/movement_consistency$', 
-		views_calculated.movementConsistencySummary.as_view(),
+		calculation_views.movementConsistencySummary.as_view(),
 		name = "movement_consistency"),
 
-	url(r'^users/calculations',views_calculated.QuicklookCalculationView.as_view(),
+	url(r'^users/calculations',calculation_views.QuicklookCalculationView.as_view(),
 		name="quicklookcalculations"),
 ]
