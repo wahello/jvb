@@ -198,4 +198,12 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		 	request=self.context['request'],
 		 	dt=validated_data['created_at'])
 
+		# send signal to notify admins by sending email about 
+		# update of this instance
+		user_input_notify.send(
+			sender=self.__class__,
+			request=self.context['request'],
+			instance = instance,
+			created=False)
+
 		return instance

@@ -138,6 +138,12 @@ class GarminPing(APIView):
         "userMetrics":UserGarminDataMetrics
     }
 
+    def _safe_get(self,data,attr,default):
+        data_item = data.get(attr,None)
+        if not data_item:
+            return default
+        return data_item
+
     def _createObjectList(self,user,json_data,dtype,record_dt):
         '''
             Helper method to create instance of model
@@ -151,7 +157,7 @@ class GarminPing(APIView):
                           summary_id=obj.get("summaryId"),
                           record_date_in_seconds=record_date,
                           start_time_in_seconds=obj.get("startTimeInSeconds")+\
-                                                obj.get("startTimeOffsetInSeconds"),
+                                                self._safe_get(obj,"startTimeOffsetInSeconds",0),
                           start_time_duration_in_seconds=obj.get("durationInSeconds"),
                           data = obj)
                     for obj in json_data
@@ -162,7 +168,7 @@ class GarminPing(APIView):
                             summary_id=obj.get("summaryId"),
                             record_date_in_seconds=record_date,
                             start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
-                                                  obj.get("measurementTimeOffsetInSeconds"),
+                                                  self._safe_get(obj,"measurementTimeOffsetInSeconds",0),
                             start_time_duration_in_seconds=obj.get("durationInSeconds"),
                             data = obj)
                     for obj in json_data
@@ -200,8 +206,7 @@ class GarminPing(APIView):
                 user = User.objects.get(garmin_token__token = user_key)
             except User.DoesNotExist:
                 user = None
-                return Response(status = status.HTTP_404_NOT_FOUND)
-
+                
             if user:
                 callback_url = obj.get('callbackURL')
 

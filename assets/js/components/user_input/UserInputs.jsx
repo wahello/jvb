@@ -250,7 +250,8 @@ class UserInputs extends React.Component{
 
     onUpdateSuccess(response){
       this.setState({
-        updating_form:false
+        updating_form:false,
+        editable:false
       },()=>{
         toast.info(" Successfully updated form!",{
           className:"dark"
@@ -1288,8 +1289,10 @@ handleChecked(){
                                      name="weight"                                  
                                      value={this.state.weight}
                                      onChange={this.handleChange} >
-                                      <option key = "select" value="select">select</option>
-                                      <option key = "no-weigh" value="">I did not weigh myself today</option> 
+                                      <option key = "select" value="">select</option>
+                                      <option key = "no-weigh" value="i do not weigh myself today">
+                                        I did not weigh myself today
+                                      </option> 
                                      {this.createDropdown(30,300)}
                                      </Input>
                               </div>

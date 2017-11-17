@@ -19,12 +19,12 @@ class CharMinValueValidator(BaseValidator):
     code = 'min_value'
 
     def compare(self, a, b):
-        if a == 'no workout today':
+        if a == 'i do not weigh myself today':
             return False
         return a < b
 
     def clean(self, x):
-        if x == 'no workout today':
+        if x == 'i do not weigh myself today':
             return x
 
         pattern = re.compile("(^\d{1,3}).*")
@@ -40,12 +40,12 @@ class CharMaxValueValidator(BaseValidator):
     code = 'max_value'
 
     def compare(self, a, b):
-        if a == 'no workout today':
+        if a == 'i do not weigh myself today':
             return False
         return a > b
 
     def clean(self, x):
-        if x == 'no workout today':
+        if x == 'i do not weigh myself today':
             return x
 
         pattern = re.compile("(^\d{1,3}).*")
@@ -290,7 +290,7 @@ class DailyUserInputOptional(models.Model):
     general_Workout_Comments = models.TextField(blank=True )
 
     weight = models.CharField(
-        max_length=20,
+        max_length=50,
         validators = [CharMinValueValidator(30),CharMaxValueValidator(300)],
         blank=True, null=True)
 
