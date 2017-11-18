@@ -6,28 +6,10 @@ import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 
-// function renderTableRows(dateWiseData,category,field,classes=""){ 
-// 	let elements = [];
-// 	for(let [date,data] of Object.entries(dateWiseData)){
-// 		if(field === "created_at"){
-// 			elements.push(
-// 				<th key={date} className={classes}>{date}</th>
-// 			);	
-// 		}else{
-// 			elements.push(
-// 				<td key={date} className={classes}>{data[category][field]}</td>
-// 			);
-// 		}
-// 	}
-// 	return elements;
-// }
-
-
  class Grades extends Component{
 
 	constructor(props){
 	super(props);
-	//this.bikeStatScroll=this.bikeStatScroll.bind(this);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 
 	 this.state = {
@@ -41,7 +23,7 @@ import Dimensions from 'react-dimensions';
         {name: 'Overall Workout Grade'},
         {name: 'percent NonProcessed Food Consumed Grade'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
-        {name: 'Penalty'},              
+        {name: 'Penalty'}              
       ],
     };
   }
@@ -63,31 +45,9 @@ renderTableColumns(dateWiseData,category,classes=""){
 		}
 		return columns;
 	}
-// constructor(props){
-// 	super(props);
-// 	this.myFunction=this.myFunction.bind(this);
-
-// }
-// componentDidMount() {
-// 	document.getElementById('tBodyGrades').addEventListener('scroll', this.myFunction);
-// }
-
-
-//   myFunction(e) { 
-//   console.log('Scroll event detected!');//detect a scroll event on the tbody
-//         var tbody = document.getElementById("tBodyGrades");
-//         document.getElementById("tHeadGrades").style.left = '-'+tbody.scrollLeft+'px';
-//         document.querySelector('#tHeadGrades th:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         var trLength = document.querySelector('#tBodyGrades').children;
-//         for (var i = 0; i < trLength.length; i++) {
-//         	trLength[i].querySelector('#tBodyGrades td:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         }
-
-//     };
 	
 	render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		 // var {dataList} = this.state;
 		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["grades_ql"]).length;
 		return(
 			<div className="quick3">
@@ -99,7 +59,6 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        width={containerWidth}
         		height={containerHeight}
         		{...props}>
-		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Grades</Cell>}
 		          cell={props => (

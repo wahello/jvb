@@ -5,26 +5,10 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
-//  function renderTableRows(dateWiseData,category,field,classes=""){
-// 	let elements = [];
-// 	for(let [date,data] of Object.entries(dateWiseData)){
-// 		if(field === "created_at"){
-// 			elements.push(
-// 				<th key={date} className={classes}>{date}</th>
-// 			);	
-// 		}else{
-// 			elements.push(
-// 				<td key={date} className={classes}>{data[category][field]}</td>
-// 			);
-// 		}
-// 	}
-// 	return elements;
-// }
 
  class Swim extends Component{
 	constructor(props){
 	super(props);
-	//this.bikeStatScroll=this.bikeStatScroll.bind(this);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 
 	 this.state = {
@@ -52,26 +36,6 @@ renderTableColumns(dateWiseData,category,classes=""){
 		}
 		return columns;
 	}
-// 	constructor(props){
-// 	super(props);
-// 	this.swimScroll=this.swimScroll.bind(this);
-
-// }
-// componentDidMount() {
-// 	document.getElementById('tBodySwim').addEventListener('scroll', this.swimScroll);
-// }
-
-
-//   swimScroll(e) { 
-//         var tbody = document.getElementById("tBodySwim");
-//         document.getElementById("tHeadSwim").style.left = '-'+tbody.scrollLeft+'px';
-//         document.querySelector('#tHeadSwim th:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         var trLength = document.querySelector('#tBodySwim').children;
-//         for (var i = 0; i < trLength.length; i++) {
-//         	trLength[i].querySelector('#tBodySwim td:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         }
-
-//     };
 	
  render(){
  		const {height, width, containerHeight, containerWidth, ...props} = this.props;
