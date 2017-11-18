@@ -5,27 +5,11 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
-// function renderTableRows(dateWiseData,category,field,classes=""){
-// 	let elements = [];
-// 	for(let [date,data] of Object.entries(dateWiseData)){
-// 		if(field === "created_at"){
-// 			elements.push(
-// 				<th key={date} className={classes}>{date}</th>
-// 			);	
-// 		}else{
-// 			elements.push(
-// 				<td key={date} className={classes}>{data[category][field]}</td>
-// 			);
-// 		}
-// 	}
-// 	return elements;
-// }
 
 class Steps extends Component{
 
 	constructor(props){
 	super(props);
-	//this.bikeStatScroll=this.bikeStatScroll.bind(this);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 
 	 this.state = {
@@ -45,6 +29,11 @@ class Steps extends Component{
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+			let mc = data[category]["movement_consistency"];
+			if( mc != undefined && mc != "" && mc != "-"){
+				mc = JSON.parse(mc);
+				data[category]["movement_consistency"] = mc.inactive_hours;
+			}
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
@@ -59,29 +48,9 @@ renderTableColumns(dateWiseData,category,classes=""){
 		}
 		return columns;
 	}
-// 	constructor(props){
-// 	super(props);
-// 	this.stepsScroll=this.stepsScroll.bind(this);
 
-// }
-// componentDidMount() {
-// 	document.getElementById('tBodySteps').addEventListener('scroll', this.stepsScroll);
-// }
-
-
-//   stepsScroll(e) { 
-//         var tbody = document.getElementById("tBodySteps");
-//         document.getElementById("tHeadSteps").style.left = '-'+tbody.scrollLeft+'px';
-//         document.querySelector('#tHeadSteps th:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         var trLength = document.querySelector('#tBodySteps').children;
-//         for (var i = 0; i < trLength.length; i++) {
-//         	trLength[i].querySelector('#tBodySteps td:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         }
-
-//     };	
  render(){
  		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		 // var {dataList} = this.state;
 		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["steps_ql"]).length;
 		return(
 			<div>
@@ -94,7 +63,6 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        width={containerWidth}
         		height={containerHeight}
         		{...props}>
-		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Steps</Cell>}
 		          cell={props => (

@@ -59,7 +59,8 @@ class Quicklook extends Component{
 		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
 		
-		let initial_state = getInitialState(moment(new Date()));   
+		let initial_state = getInitialState(moment().subtract(7,'days'),
+											moment());   
 
 		this.state = {
 			today_date:moment(),
@@ -254,8 +255,8 @@ class Quicklook extends Component{
 	
 
 	processDate(date){
-		let start_dt = moment(date);
-		let end_dt = moment(date).add(6,'days');
+		let end_dt = moment(date);
+		let start_dt = moment(date).subtract(7,'days');
 		this.setState({
 			start_date : start_dt,
 			end_date : end_dt,
