@@ -129,7 +129,6 @@ class AllStats1 extends Component{
 			        width={132}
 				/>
 			)
-			console.log(keys);
 		}
 		return columns;
 	}

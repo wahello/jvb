@@ -44,3 +44,30 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
        userInputFetchfailure(error);
     });
   }
+
+  export function createQuicklook(startDate, endDate,
+                                  successCallback=undefined,
+                                  errorCallback=undefined){
+     // startDate and endDate are moment objects
+    const URL = `/quicklook/users/ql_calculation`;
+    const config = {
+      method: "post",
+      data:{
+        from_date: startDate.format('YYYY-MM-DD'),
+        to_date: endDate.format('YYYY-MM-DD')
+      },
+      url: URL,
+      withCredentials: true
+    };
+     axios(config).then((response) => {
+       if(successCallback !== undefined)
+         successCallback(response,startDate,endDate);
+       else
+        console.log("Quicklook is created successfully")
+     }).catch(function (error){
+       if(errorCallback !== undefined)
+         errorCallback(error);
+       else
+         console.log("Creating Quicklook failed: "+error.message);
+    });
+  }

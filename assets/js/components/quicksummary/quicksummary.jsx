@@ -11,7 +11,8 @@ import axiosRetry from 'axios-retry';
 import moment from 'moment';
 
 import {getInitialState} from './initialState';
-import {quicksummaryDate,userInputDate}  from '../../network/quick';
+import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
+import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/quick';
 
 
 import NavbarMenu from '../navbar';
@@ -52,21 +53,28 @@ class Quicklook extends Component{
 		this.handleScroll = this.handleScroll.bind(this);
 		this.toggleCalendar=this.toggleCalendar.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.handleCreateQuicklook = this.handleCreateQuicklook.bind(this);
+		this.onQuicklookSuccess = this.onQuicklookSuccess.bind(this);
+		this.onQuicklookFailure = this.onQuicklookFailure.bind(this);
+		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
+		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
 		
 		let initial_state = getInitialState(moment(new Date()));   
 
 		this.state = {
 			today_date:moment(),
-			start_date:moment(),
-			end_date:moment().add(6,'days'),
+			start_date:moment().subtract(7,'days'),
+			end_date:moment(),
 			visible: true,
 			error:false,
 			calendarOpen:false,
 			scrollingLock: false,
 			isOpen: false,
-			data:initial_state,
 			activeTab : 'allstats1',
-			userInputData:{}
+			fetching_ql:false,
+			creating_ql:false,
+			userInputData:{},
+			data:initial_state
 		};
 	}
 
@@ -199,7 +207,6 @@ class Quicklook extends Component{
 		for(let date of Object.keys(initial_state)){
 			dates.push(date);
 		} 
-
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
 		      	const date = dataitem.created_at;
@@ -209,6 +216,7 @@ class Quicklook extends Component{
 		      this.setState({
 				data:initial_state,
 				visible:false,
+				fetching_ql:false,
 				error:true
 			});
 	     }
@@ -216,6 +224,7 @@ class Quicklook extends Component{
 	     		this.setState({
 				data:initial_state,
 				visible:true,
+				fetching_ql:false,
 				error:false
 			});
 	     }
@@ -224,7 +233,8 @@ class Quicklook extends Component{
 	errorquick(error){
 		console.log(error.message);
 		this.setState({
-			error:true
+			error:true,
+			fetching_ql:false
 		});
 	}
 
@@ -248,7 +258,8 @@ class Quicklook extends Component{
 		let end_dt = moment(date).add(6,'days');
 		this.setState({
 			start_date : start_dt,
-			end_date : end_dt
+			end_date : end_dt,
+			fetching_ql:true
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
@@ -271,7 +282,8 @@ class Quicklook extends Component{
   	let end_dt = moment(this.state.end_date);
   	this.setState({
 			start_date : start_dt,
-			end_date : end_dt
+			end_date : end_dt,
+			fetching_ql:true
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
@@ -325,6 +337,29 @@ handleScroll() {
       isOpen: !this.state.isOpen,
      
     });
+  }
+
+  onQuicklookSuccess(data){
+  	console.log("quicklook created successfully");
+  	this.setState({
+  		creating_ql:false
+  	});
+  }
+
+  onQuicklookFailure(error){
+  	console.log(error.message);
+  	this.setState({
+  		creating_ql:false
+  	});
+  }
+
+  handleCreateQuicklook(){
+  	this.setState({
+  		creating_ql:true
+  	},function(){
+  		createQuicklook(this.state.start_date, this.state.end_date,
+  					this.onQuicklookSuccess, this.onQuicklookFailure);
+  	}.bind(this));
   }
 
 
@@ -386,10 +421,12 @@ handleScroll() {
                                   </span>  
 
                                    <span className="btn2">
-                                  <Button						        
-							         	   type="submit"
-							               className="btn btn-block-lg btn-info"
-							               >Creat Quicklook</Button>
+	                                  <Button						        
+						         	   type="submit"
+						               className="btn btn-block-lg btn-info"
+						               onClick = {this.handleCreateQuicklook}>
+							               Creat Quicklook
+								      </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
@@ -588,6 +625,8 @@ handleScroll() {
                  
 				
 				</div>
+				{this.renderQlFetchOverlay()}
+				{this.renderQlCreateOverlay()}
 				</div>
 				 
 					

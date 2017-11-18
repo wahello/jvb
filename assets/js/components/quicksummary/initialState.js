@@ -10,12 +10,14 @@ export function getInitialState(start_dt, end_dt=undefined){
 	initial_state[start_dt.format('YYYY-MM-DD')] = {}
 
 	var diff = end_dt.diff(start_dt, 'days');
+
+	let tmp_start_date = moment(start_dt);
 	for(var i=0; i<diff; i++){
-		var dt = start_dt.add(1,'days');
+		var dt = tmp_start_date.add(1,'days');
 		var current_dt = dt.format('YYYY-MM-DD');
 		initial_state[current_dt]={};
  	}
-	 	
+ 		 	
 	let blank_properties={
 		"created_at":'',	
 		"grades_ql":{

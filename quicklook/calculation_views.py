@@ -48,6 +48,9 @@ class QuicklookCalculationView(APIView):
 		from_dt = hlpr.str_to_datetime(self.request.data.get('from_date',None))
 		to_dt = hlpr.str_to_datetime(self.request.data.get('to_date',None))
 
+		print("From Date", from_dt)
+		print("to Date", to_dt)
+
 		current_date = from_dt
 		while current_date <= to_dt:
 			last_seven_days_date = current_date - timedelta(days=6)
