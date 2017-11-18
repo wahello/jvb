@@ -33,6 +33,6 @@ urlpatterns = [
 		calculation_views.movementConsistencySummary.as_view(),
 		name = "movement_consistency"),
 
-	url(r'^users/calculations',calculation_views.QuicklookCalculationView.as_view(),
+	url(r'^users/ql_calculation$',calculation_views.QuicklookCalculationView.as_view(),
 		name="quicklookcalculations"),
 ]
