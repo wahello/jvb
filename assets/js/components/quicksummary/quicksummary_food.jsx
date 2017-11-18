@@ -51,7 +51,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
 				            </Cell>
 				          )}
-			        width={132}
+			        width={134}
 				/>
 			)
 		}
@@ -100,7 +100,7 @@ render(){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={185}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"food_ql")}
@@ -113,7 +113,7 @@ render(){
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 200;
+    return window.innerHeight - 395;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 30 : 240;

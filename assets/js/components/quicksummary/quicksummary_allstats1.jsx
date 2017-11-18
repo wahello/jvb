@@ -126,7 +126,7 @@ class AllStats1 extends Component{
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={132}
+			        width={134}
 				/>
 			)
 		}
@@ -165,7 +165,7 @@ class AllStats1 extends Component{
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 200;
+    return window.innerHeight - 320;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 30 : 240;

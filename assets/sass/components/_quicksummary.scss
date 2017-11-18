@@ -3,7 +3,7 @@ html,body{
 }
 
 .quick{
-	padding-top: 10px;
+	padding-top: 0px;
 }
 
 @media (max-width: 1023px){
@@ -30,9 +30,10 @@ html,body{
 	}
 
 #quick1{
-		
+		text-align: center;
 font-family: 'Roboto', sans-serif;
 font-weight: bold;
+font-size: 22px;
 	
 
 }
@@ -40,7 +41,7 @@ font-weight: bold;
 	padding-top: 0px;
 }
 .quick3{
-    padding:10px 0px 10px 0px;
+    padding:8px 0px 8px 0px;
     
 }
 
@@ -72,7 +73,7 @@ font-weight: bold;
 
 }
 .quick10{
-	padding: 22px 0px;
+	padding: 10px 0px;
 }
 #examplestartdate{
 	padding: 8px;
@@ -95,5 +96,9 @@ font-weight: bold;
 
 }
 #nav3{
-padding:10px 0px 20px 0px;
+padding:0px 0px 5px 0px;
+}
+
+#nav3 .navbar{
+background-color: #777777;
 }

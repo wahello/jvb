@@ -317,11 +317,11 @@ class Quicklook extends Component{
 
 handleScroll() {
 
-  if (window.scrollY >= 90 && !this.state.scrollingLock) {
+  if (window.scrollY >= 77 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 90 && this.state.scrollingLock) {
+  } else if(window.scrollY < 77 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -388,7 +388,7 @@ handleScroll() {
                          
                       
 						 <div id="quick1">
-			                 <h2>Quick Look</h2>			                
+			                 <p>Quick Look</p>			                
 			             </div>
 			             
 

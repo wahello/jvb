@@ -32,7 +32,7 @@ class Alcohol extends Component{
 				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
 				            </Cell>
 				          )}
-			        width={132}
+			        width={134}
 				/>
 			)
 		}
@@ -87,7 +87,7 @@ class Alcohol extends Component{
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 200;
+    return window.innerHeight - 495;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth <1024 ? 30 : 240;
