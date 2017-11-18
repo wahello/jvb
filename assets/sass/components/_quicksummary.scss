@@ -20,7 +20,14 @@ html,body{
 }
 }
 
-
+.nav2{
+	  top:0; 
+	  z-index:100;
+	  width: 100%;
+	  left: 0;
+	  right: 0;
+	  
+	}
 
 #quick1{
 		
@@ -86,4 +93,7 @@ font-weight: bold;
 	padding:10px 15px 10px 10px;
 	color:white;
 
+}
+#nav3{
+padding:10px 0px 20px 0px;
 }

@@ -378,14 +378,7 @@ handleChecked(){
                               
                              <h2 className="head">Daily User Inputs Report</h2>   
                              
-                            <div className="col-md-8 col-lg-8 col-sm-12">
-                            
-                            
-                            
-
-                                                    
-                            </div>
-
+                           
                         <div className="nav3">
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1">

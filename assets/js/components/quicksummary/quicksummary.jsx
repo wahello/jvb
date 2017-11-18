@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
 	     NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand } from "reactstrap";
+         NavbarBrand,Container } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
@@ -305,11 +305,11 @@ class Quicklook extends Component{
 
 handleScroll() {
 
-  if (window.scrollY >= 120 && !this.state.scrollingLock) {
+  if (window.scrollY >= 90 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 120 && this.state.scrollingLock) {
+  } else if(window.scrollY < 90 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -341,26 +341,27 @@ handleScroll() {
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
 	return(
+		<div>
 		<div className="container-fluid">
 		<NavbarMenu fix={false}/>
-	
+		</div>
 		           	
 					
-			<div className="col-lg-12 col-md-12 col-sm-12">  
+			
 			<div className="quick">
 			       
                          
-                      <div className="row justify-content-center">
-						 <div id="quick1" className="row ">
-			                 <h2>Quick Summary</h2>			                
+                      
+						 <div id="quick1">
+			                 <h2>Quick Look</h2>			                
 			             </div>
-			             </div>
+			             
 
-			             <div className="row justify-content-center">
-			             <div className="col-sm-12">
-			             <div className="quick7">
-			             <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
-						  <Navbar light toggleable className="navbar nav1">
+			             
+			             
+			             <div id="nav3">
+			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
+						  <Navbar light toggleable className="navbar nav2">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
                                     <div className="toggler">
                                     <FontAwesome 
@@ -395,7 +396,7 @@ handleScroll() {
                                   <Nav className="nav navbar-nav" navbar>
                                           <NavItem>
                                           <span id="spa">
-                                            <abbr id="abbri"  title="Workout Inputs">
+                                            <abbr id="abbri"  title="All Stats">
                                               <NavLink  href="#" className={class_allstats1} value="allstats1"
 						    								 onClick={this.activateTab.bind(this,"allstats1")}>
                                                All Stats
@@ -406,7 +407,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Sleep Inputs">
+                                          <abbr  id="abbri"  title="Grades">
                                             <NavLink href="#" className={class_grade} value="grade"
 						    						 onClick={this.activateTab.bind(this,"grade")}>
                                              Grades
@@ -428,7 +429,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Stress/Illness Inputs">
+                                          <abbr  id="abbri"  title="Bike">
                                             <NavLink href="#" className={class_bike} value="bike"
 							    		 			onClick={this.activateTab.bind(this,"bike")}>
 							    			 Bike Stats
@@ -439,7 +440,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Extra Inputs">
+                                          <abbr  id="abbri"  title="Steps">
                                             <NavLink  href="#" className={class_steps}  value="steps"
 						    		 				  onClick={this.activateTab.bind(this,"steps")}>
 						    		 		Steps
@@ -450,7 +451,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Extra Inputs">
+                                          <abbr  id="abbri"  title="Sleep">
                                             <NavLink href="#" className={class_sleep}  value="sleep"
 						    		 				 onClick={this.activateTab.bind(this,"sleep")}>
 						    				 Sleep 
@@ -461,7 +462,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Extra Inputs">
+                                          <abbr  id="abbri"  title="Food">
                                             <NavLink href="#" className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>
 						    		 		Food
@@ -472,7 +473,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Extra Inputs">
+                                          <abbr  id="abbri"  title="Alcohol">
                                             <NavLink href="#" className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>
 						    		 		 Alcohol 
@@ -483,7 +484,7 @@ handleScroll() {
 
                                         <NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Extra Inputs">
+                                          <abbr  id="abbri"  title="Exercise Reporting">
                                             <NavLink  href="#" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
 						    		 		Exercise Reporting
@@ -495,7 +496,7 @@ handleScroll() {
 
                                        	<NavItem>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Extra Inputs">
+                                          <abbr  id="abbri"  title="User Inputs">
                                             <NavLink href="#" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>
 						    		 		 User Inputs 
@@ -511,8 +512,8 @@ handleScroll() {
                            
 						 </div>
 			      		</div>
-			             </div>
-			             </div>
+			            
+			            
 			              <Popover 
                             placement="bottom" 
                             isOpen={this.state.calendarOpen}
@@ -522,8 +523,9 @@ handleScroll() {
                                 <CalendarWidget onDaySelect={this.processDate}/>
                               </PopoverBody>
                            </Popover> 
-                        
-			   <div id="quick2" className="row justify-content-center">
+                    	
+                    	<Container>    
+			   <div id="quick2" className="row ">
 			   		   <div className="col-lg-10 col-md-12 col-sm-12">       
 		            <div className="quick10">
 				           <Form>
@@ -557,7 +559,7 @@ handleScroll() {
 					</div>
 					</div>
 					</div>
-                    <div className="row justify-content-center">
+                    <div className="row ">
                     <div className="col-lg-10 col-md-12 col-sm-12">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "allstats" && 
@@ -584,11 +586,13 @@ handleScroll() {
                     	}
                     </div>
 					</div>
+					</Container>
 					</div>
+
                  
 				
 				</div>
-				</div>
+				
 				 
 					
 		
