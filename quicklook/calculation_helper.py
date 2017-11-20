@@ -264,8 +264,11 @@ def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
 	alcohol_drank_past_week = ['21' if x == '20+' else x
 								for x in alcohol_drank_past_week]
 
-	drink_avg = sum(map(float,alcohol_drank_past_week))\
-				/len(alcohol_drank_past_week)
+	if len(alcohol_drank_past_week):
+		drink_avg = sum(map(float,alcohol_drank_past_week))\
+					/len(alcohol_drank_past_week)
+	else:
+		drink_avg = 0
 
 	if gender == 'M':
 		if (drink_avg >= 0 and drink_avg <= 4):
