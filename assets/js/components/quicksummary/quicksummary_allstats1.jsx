@@ -11,7 +11,6 @@ class AllStats1 extends Component{
 	constructor(props) {
     super(props);
     this.renderTableColumns = this.renderTableColumns.bind(this);
-    // this.renderTableAttrColumn = this.renderTableAttrColumn.bind(this);
 
     this.state = {
        myTableData: [
@@ -135,7 +134,6 @@ class AllStats1 extends Component{
 
 	render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		 // var {dataList} = this.state;
 		let rowsCount = this.state.myTableData.length;
 				
 		return(

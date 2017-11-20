@@ -11,7 +11,6 @@ class Alcohol extends Component{
 	constructor(props) {
     super(props);
     this.renderTableColumns = this.renderTableColumns.bind(this);
-    // this.renderTableAttrColumn = this.renderTableAttrColumn.bind(this);
 
     this.state = {
       myTableData: [
@@ -24,12 +23,19 @@ class Alcohol extends Component{
  	renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+			let all_data = [];
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					all_data.push(value);
+				}
+			}
+
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
 			        cell={props => (
 				            <Cell {...props}>
-				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
+				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
 			        width={134}
@@ -39,25 +45,9 @@ class Alcohol extends Component{
 		return columns;
 	}
 
-	// renderTableAttrColumn(dateWiseData,category,table_name,classes="")
-	// {
-	// 	let attributes = Object.keys(Object.entries(dateWiseData)[0][1][category]);
-	// 	return(
-	// 		<Column
-	// 			header={<Cell>{table_name}</Cell>}
-	// 	        cell={props => (
-	// 		            <Cell {...props}>
-	// 		              {attributes[props.rowIndex]}
-	// 		            </Cell>
-	// 		          )}
-	// 	        width={200}
-	// 	    />
-	// 	);
-	// }
 	render(){
-		 // var {dataList} = this.state;
 		 const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["alcohol_ql"]).length;
+		let rowsCount = this.state.myTableData.length;
 		return(
 			<div className="quick3">			
 			 <Table
@@ -67,7 +57,6 @@ class Alcohol extends Component{
 		        width={containerWidth}
         		height={containerHeight}
         		{...props}>
-		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Alchohol</Cell>}
 		          cell={props => (

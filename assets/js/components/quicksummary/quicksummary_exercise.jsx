@@ -8,31 +8,9 @@ import Dimensions from 'react-dimensions';
 
 
 
- class Exercise extends Component {
-
-// 	constructor(props){
-// 	super(props);
-// 	 this.ExerScroll=this.ExerScroll.bind(this);
-
-// }
-// componentDidMount() {
-// 	document.getElementById('tBodyExer').addEventListener('scroll', this.ExerScroll);
-// }
-
-
-//   ExerScroll(e) { 
-//         var tbody = document.getElementById("tBodyExer");
-//         document.getElementById("tHeadExer").style.left = '-'+tbody.scrollLeft+'px';
-//         document.querySelector('#tHeadExer th:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         var trLength = document.querySelector('#tBodyExer').children;
-//         for (var i = 0; i < trLength.length; i++) {
-//         	trLength[i].querySelector('#tBodyExer td:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         }
-
-//     };
+class Exercise extends Component {
 constructor(props){
 	super(props);
-	//this.bikeStatScroll=this.bikeStatScroll.bind(this);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 
 	 this.state = {
@@ -90,12 +68,20 @@ constructor(props){
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+
+            let all_data = [];
+            for(let [key,value] of Object.entries(data[category])){
+                if(key !== 'id' && key !== 'user_ql'){
+                    all_data.push(value);
+                }
+            }
+
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
 			        cell={props => (
 				            <Cell {...props}>
-				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
+				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
 			        width={134}
@@ -106,8 +92,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 	}	
 	render(){
         const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		 // var {dataList} = this.state;
-		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["exercise_reporting_ql"]).length;
+		let rowsCount = this.state.myTableData.length;
 		return(
 			<div className="quick3"
             >
@@ -118,7 +103,6 @@ renderTableColumns(dateWiseData,category,classes=""){
 		         width={containerWidth}
                 height={containerHeight}
                 {...props}>
-		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Exercise Reporting</Cell>}
 		          cell={props => (

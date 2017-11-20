@@ -18,7 +18,7 @@ import Dimensions from 'react-dimensions';
       myTableData: [
         {name: 'Avg Speed'},
         {name: 'Avg Power'},
-        {name: 'Asvg Speed Per Mile'},
+        {name: 'Avg Speed Per Mile'},
         {name: 'Avg Cadence'},       
       ],
     };
@@ -27,12 +27,20 @@ import Dimensions from 'react-dimensions';
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+
+			let all_data = [];
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					all_data.push(value);
+				}
+			}
+
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
 			        cell={props => (
 				            <Cell {...props}>
-				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
+				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
 			        width={134}
@@ -41,26 +49,11 @@ renderTableColumns(dateWiseData,category,classes=""){
 		}
 		return columns;
 	}
-// componentDidMount() {
-// 	document.getElementById('tBodyBike').addEventListener('scroll', this.bikeStatScroll);
-// }
 
-
-//   bikeStatScroll(e) { 
-//         var tbody = document.getElementById("tBodyBike");
-//         document.getElementById("tHeadBike").style.left = '-'+tbody.scrollLeft+'px';
-//         document.querySelector('#tHeadBike th:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         var trLength = document.querySelector('#tBodyBike').children;
-//         for (var i = 0; i < trLength.length; i++) {
-//         	trLength[i].querySelector('#tBodyBike td:nth-child(1)').style.left = tbody.scrollLeft+'px';
-//         }
-
-//     };
 	
 render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		 // var {dataList} = this.state;
-		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["bike_stats_ql"]).length;
+		let rowsCount = this.state.myTableData.length;
 		return(
 			<div className="quick3"
 			 >
@@ -71,7 +64,6 @@ render(){
 		        width={containerWidth}
         		height={containerHeight}
         		{...props}>
-		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Bike Stats</Cell>}
 		          cell={props => (
