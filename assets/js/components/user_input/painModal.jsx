@@ -30,7 +30,9 @@ const option=[
                 { value:"lower back",label:'Lower back'},
                 { value:"groin",label:'Groin'},
                 { value:"left it band",label:'Left IT Band'},
-                { value:"right it band",label:'Right IT Band'}
+                { value:"right it band",label:'Right IT Band'},
+                { value:"left shoulder",label:'Left Shoulder'},
+                { value:"right shoulder",label:'Right Shoulder'}
                 
                 
 
@@ -47,7 +49,8 @@ export default class PainModal extends Component{
             "right calf":true,"left calf":true,"right toes":true,
             "left toes":true,"neck":true,"upper back":true,
             "mid back":true,"lower back":true,"other":true,"groin":true,
-            "left it band":true,"right it band":true,
+            "left it band":true,"right it band":true,"left shoulder":true,
+            "right shoulder":true,
 
 		}
 

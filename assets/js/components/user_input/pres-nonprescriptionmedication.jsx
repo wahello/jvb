@@ -10,10 +10,12 @@ export default class PrescriptionMedication extends Component{
 		const medications_taken_list = this.props.medications_taken_list;
 		this.state = {			
 			medications_taken_list:medications_taken_list,
-			collapse:true
+			collapse:true,
+			processed_unprocessed:""
 		}
 
-		this.handleChangeMedications = this.handleChangeMedications.bind(this);	
+		this.handleChangeMedications = this.handleChangeMedications.bind(this);
+		this.handleChange=this.handleChange.bind(this);	
 
 	}
 
@@ -35,12 +37,63 @@ export default class PrescriptionMedication extends Component{
 		});
 	}
 
+	 handleChange(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
+  this.setState({
+	[name]: value
+  });
+}
 	
 	render(){
 		return(
 			<div>
 				
 					<Collapse isOpen={this.state.collapse}>
+
+					<Label>8.1 Did you take a controlled or uncontrolled 
+					substance today (marijuana is not considered either)</Label>
+				<FormGroup check>
+					{this.props.editable &&
+						<div className="work_hard">
+							<Label check className="btn btn-secondary radio1">
+								<Input type="radio" name="processed_unprocessed"
+									value="yes"
+								 	checked={this.state.processed_unprocessed === 'yes'}
+								 	onChange={this.handleChange}/> &nbsp;
+								Yes
+							</Label>
+							&nbsp;
+							<Label check className="btn btn-secondary radio1">
+								<Input type="radio" name="processed_unprocessed" 
+									value="no"
+									checked={this.state.processed_unprocessed === 'no'}
+									onChange={this.handleChange}/> &nbsp;
+								No
+							</Label>
+							<Label check className="btn btn-secondary radio1">
+								<Input type="radio" name="processed_unprocessed" 
+									value="notyet"
+									checked={this.state.processed_unprocessed === 'notyet'}
+									onChange={this.handleChange}/> &nbsp;
+								I Decline
+							</Label>
+						</div>
+					}
+					{
+                      !this.props.editable &&
+                      <div className="input">
+                        <p>{this.state.processed_unprocessed}</p>
+                      </div>
+                    }
+                    
+				</FormGroup>
+					</Collapse>
+
+
+					<Collapse isOpen={this.state.processed_unprocessed =="yes"}>
+
 							<FormGroup>
 								<Label>8.1 What Did You Take?</Label>
 									{this.props.editable &&
