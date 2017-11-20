@@ -22,12 +22,20 @@ import Dimensions from 'react-dimensions';
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+
+			let all_data = [];
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					all_data.push(value);
+				}
+			}
+
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
 			        cell={props => (
 				            <Cell {...props}>
-				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
+				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
 			        width={134}
@@ -40,8 +48,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 	
  render(){
  		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		 // var {dataList} = this.state;
-		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["swim_stats_ql"]).length;
+		let rowsCount = this.state.myTableData.length;
 		return(
 		
 			 <div className="quick3"
@@ -53,7 +60,6 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        width={containerWidth}
         		height={containerHeight}
         		{...props}>
-		        {/*this.renderTableAttrColumn(this.props.data,"alcohol_ql","Alcohol")*/}
 		        <Column
 		          header={<Cell>Swim Stats</Cell>}
 		          cell={props => (

@@ -19,9 +19,7 @@ class Steps extends Component{
         {name: 'Total Steps'},
         {name: 'Floor Climed'}, 
         {name: 'Floor Decended'},
-        {name: 'Movement Consistency'},
-        {name: 'Light Sleep'},
-        {name: 'Awake Time'},                       
+        {name: 'Movement Consistency'}                     
       ],
     };
   }
@@ -30,16 +28,25 @@ renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let mc = data[category]["movement_consistency"];
+			let all_data = [];
+
 			if( mc != undefined && mc != "" && mc != "-"){
 				mc = JSON.parse(mc);
 				data[category]["movement_consistency"] = mc.inactive_hours;
 			}
+
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					all_data.push(value);
+				}
+			}
+
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
 			        cell={props => (
 				            <Cell {...props}>
-				              {data[category][Object.keys(data[category])[props.rowIndex+2]]}
+				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
 			        width={134}
@@ -51,7 +58,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
  render(){
  		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		let rowsCount = Object.keys(Object.entries(this.props.data)[0][1]["steps_ql"]).length;
+		let rowsCount = this.state.myTableData.length;
 		return(
 			<div>
 			 <div className="quick3"
