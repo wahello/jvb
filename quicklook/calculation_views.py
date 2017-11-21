@@ -37,9 +37,11 @@ from user_input.models import UserDailyInput,\
 					DailyUserInputOptional,\
 					InputsChangesFromThirdSources
 
+from quicklook.serializers import UserQuickLookSerializer
+
 class QuicklookCalculationView(APIView):
 
-	def post(self, request, format=None):
+	def post(self, request, format="json"):
 
 		user = request.user
 
@@ -48,12 +50,10 @@ class QuicklookCalculationView(APIView):
 		from_dt = hlpr.str_to_datetime(self.request.data.get('from_date',None))
 		to_dt = hlpr.str_to_datetime(self.request.data.get('to_date',None))
 
-		print("From Date", from_dt)
-		print("to Date", to_dt)
-
 		current_date = from_dt
+		SERIALIZED_DATA = []
 		while current_date <= to_dt:
-			last_seven_days_date = current_date - timedelta(days=6)
+			last_seven_days_date = current_date - timedelta(days=7)
 			start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 			end_epoch = start_epoch + 86400
 
@@ -96,14 +96,20 @@ class QuicklookCalculationView(APIView):
 
 
 			# pull data for past 7 days (incuding today)
-			daily_strong = DailyUserInputStrong.objects.filter(
+			daily_strong = list(DailyUserInputStrong.objects.filter(
 				user_input__user = user,
 				user_input__created_at__gte = last_seven_days_date,
-				user_input__created_at__lte = current_date)
+				user_input__created_at__lte = current_date))
 
-			todays_daily_strong = list(filter(
-					lambda x: x.user_input.created_at == current_date.date(),
-					daily_strong))
+			# todays_daily_strong = list(filter(
+			# 		lambda x: x.user_input.created_at == current_date.date(),
+			# 		daily_strong))
+
+			todays_daily_strong = []
+			for i,q in enumerate(daily_strong):
+				if q.user_input.created_at == current_date.date():
+					todays_daily_strong.append(daily_strong.pop(i))
+					break
 
 			daily_encouraged = DailyUserInputEncouraged.objects.filter(
 				user_input__user = user,
@@ -291,7 +297,19 @@ class QuicklookCalculationView(APIView):
 			grades_calculated_data['movement_non_exercise_steps_grade'] = \
 			hlpr.cal_non_exercise_step_grade(total_steps - exercise_steps)
 
+			# Exercise Consistency grade calculation over period of 7 days
+			exercise_consistency_grade = hlpr.cal_exercise_consistency_grade(
+				[q.workout for q in daily_strong],7)
+			grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
 
+			# Penalty calculation
+			penalty = hlpr.cal_penalty(
+				hlpr.safe_get(todays_daily_strong,"smoke_any_substances_whatsoever",""),
+				hlpr.safe_get(todays_daily_strong,"medications_or_controlled_substances_yesterday","")
+			)
+			grades_calculated_data["penalty"] = penalty
+
+			
 			# If quick look for provided date exist then update it otherwise
 			# create new quicklook instance 
 			try:
@@ -316,10 +334,11 @@ class QuicklookCalculationView(APIView):
 				Food.objects.create(user_ql = user_ql,**food_calculated_data)
 				Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
 
+			SERIALIZED_DATA.append(UserQuickLookSerializer(user_ql).data)
 			#Add one day to current date
 			current_date += timedelta(days=1)
 
-		return Response({"message":"Successfuly created quicklook"},status = status.HTTP_201_CREATED)
+		return Response(SERIALIZED_DATA,status = status.HTTP_201_CREATED)
 
 
 class movementConsistencySummary(APIView):

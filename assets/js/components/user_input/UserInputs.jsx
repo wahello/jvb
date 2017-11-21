@@ -1282,7 +1282,7 @@ handleChecked(){
                                      name="weight"                                  
                                      value={this.state.weight}
                                      onChange={this.handleChange} >
-                                      <option key = "select" value="">select</option>
+                                      <option key = "" value="">select</option>
                                       <option key = "no-weigh" value="i do not weigh myself today">
                                         I did not weigh myself today
                                       </option> 
