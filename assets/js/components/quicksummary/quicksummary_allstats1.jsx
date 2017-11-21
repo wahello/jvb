@@ -163,7 +163,7 @@ class AllStats1 extends Component{
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 320;
+    return window.innerHeight - 250;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 30 : 400;
