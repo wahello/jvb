@@ -84,7 +84,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 334;
+    return window.innerHeight - 265;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 30 : 400;
