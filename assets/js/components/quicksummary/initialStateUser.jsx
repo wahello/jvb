@@ -1,17 +1,16 @@
 import moment from 'moment';
 
-export function getInitialStateUserInput(start_dt, end_dt=undefined){
+export function getInitialStateUserInput(start_dt, end_dt){
 	// expect moment objects
-	if (end_dt === undefined){
-		end_dt = new moment(start_dt).add(6,'days'); 
-	}
 	var initial_state = {};
 
-	initial_state[start_dt.format('YYYY-MM-DD')] = {}
+	initial_state[end_dt.format('YYYY-MM-DD')] = {};
 
 	var diff = end_dt.diff(start_dt, 'days');
+
+	let tmp_end_date = moment(end_dt);
 	for(var i=0; i<diff; i++){
-		var dt = start_dt.add(1,'days');
+		var dt = tmp_end_date.subtract(1,'days');
 		var current_dt = dt.format('YYYY-MM-DD');
 		initial_state[current_dt]={};
  	}

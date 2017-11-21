@@ -469,10 +469,10 @@ renderTableColumns(dateWiseData,category,classes=""){
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 200;
+    return window.innerHeight - 334;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 30 : 240;
+    var widthOffset = window.innerWidth < 1024 ? 30 : 400;
     return window.innerWidth - widthOffset;
   }
 })(User);

@@ -381,21 +381,11 @@ handleScroll() {
 		<div>
 		<div className="container-fluid">
 		<NavbarMenu fix={false}/>
-		</div>
-		           	
-					
-			
+		</div>		           									
 			<div className="quick">
-			       
-                         
-                      
-						 <div id="quick1">
-			                 <p>Quick Look</p>			                
-			             </div>
-			             
-
-			             
-			             
+			 				<div id="quick1">
+			                 	<p>Quick Look</p>			                
+			             	</div>
 			             <div id="nav3">
 			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
 						  <Navbar light toggleable className="navbar nav2">
@@ -551,9 +541,7 @@ handleScroll() {
                            
 						 </div>
 			      		</div>
-			            
-			            
-			              <Popover 
+			      			<Popover 
                             placement="bottom" 
                             isOpen={this.state.calendarOpen}
                             target="calendar1" 
@@ -563,43 +551,44 @@ handleScroll() {
                               </PopoverBody>
                            </Popover> 
                     	
-                    	<Container>    
-			   <div id="quick2" className="row ">
-			   		   <div className="col-lg-10 col-md-12 col-sm-12">       
+                    	<Container style={{maxWidth:"1250px"}}> 
+                    	<div id="quick2" className="row">
+			   		   <div className="col-lg-2 col-md-2 col-sm-12" style={{marginRight:"30px"}}>       
 		            <div className="quick10">
 				           <Form>
-						        <span style={{paddingLeft:"20px",paddingBottom:"20px"}}>
+						        <div style={{paddingBottom:"20px"}} className="justify-content-center">
 						      
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-						          <input type="date"
+						          <Input type="date"
 						           name="start_date"
 						           value={this.state.start_date}
 						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
 						           
-						        </span>
-						        <span style={{paddingLeft:"27px"}} id="date">
+						        </div>
+						        <div id="date" className="justify-content-center">
 						       
 						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-						          <input type="date"
+						          <Input type="date"
 						           name="end_date"
 						           value={this.state.end_date}
 						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
 						        
-						        </span>
-						        <span style={{paddingLeft:"88px"}} id="date">
+						        </div>
+						        <div id="date" style={{marginTop:"20px"}} className="justify-content-center">
 						       
-						        <button						        
+						        <button
+						        						        
 						         type="submit"
 						         className="btn btn-block-lg btn-info"
-						         onClick={this.onSubmitDate} style={{width:"200px"}}>Submit</button>
-						         </span>
+						         onClick={this.onSubmitDate} style={{width:"175px"}}>Submit</button>
+						         </div>
 
 						   </Form>
 					</div>
 					</div>
-					</div>
-                    <div className="row ">
-                    <div className="col-lg-10 col-md-12 col-sm-12">
+					
+                  
+                    <div className="col-lg-9 col-md-9 col-sm-12">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "allstats" && 
 	                    	<AllStats 
@@ -629,7 +618,8 @@ handleScroll() {
 					</div>
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
-				</div>		
+				</div>
+				
 		
 	);
 	}

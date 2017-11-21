@@ -166,7 +166,7 @@ export default Dimensions({
     return window.innerHeight - 320;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 30 : 240;
+    var widthOffset = window.innerWidth < 1024 ? 30 : 400;
     return window.innerWidth - widthOffset;
   }
 })(AllStats1);
