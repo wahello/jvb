@@ -71,7 +71,8 @@ class DailyUserInputStrong(models.Model):
     HARD = 'hard'
     NO_WORKOUT = 'no workout today'
     NOT_YET = 'not yet'
-
+    DECLINE = 'decline'
+ 
     WORK_OUT_EASY_OR_HARD_CHOICES = (
     ('','-'),
     (EASY,'Easy'),
@@ -94,6 +95,13 @@ class DailyUserInputStrong(models.Model):
         ('','-'),
         (YES,'Yes'),
         (NO,'No'),
+    )
+
+    CTRL_SUBS_CHOICE = (
+        ('','-'),
+        (YES,'Yes'),
+        (NO,'NO'),
+        (DECLINE,'I Decline')
     )
 
     WORKOUT_DONE_CHOICES = (
@@ -176,10 +184,12 @@ class DailyUserInputStrong(models.Model):
 
     smoked_substance = models.TextField(blank=True)
 
-    medications_or_controlled_substances_yesterday= models.CharField(
+    prescription_or_non_prescription_medication_yesterday= models.CharField(
         max_length=4, choices=YN_CHOICE, blank = True)
 
-    medications_or_controlled_substances_taken = models.TextField(blank=True)
+    prescription_or_non_prescription_medication_taken = models.TextField(blank=True)
+    controlled_uncontrolled_substance = models.CharField(
+        max_length=4, choices=CTRL_SUBS_CHOICE, blank = True)
     
 class DailyUserInputEncouraged(models.Model):
 

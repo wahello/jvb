@@ -305,7 +305,7 @@ class QuicklookCalculationView(APIView):
 			# Penalty calculation
 			penalty = hlpr.cal_penalty(
 				hlpr.safe_get(todays_daily_strong,"smoke_any_substances_whatsoever",""),
-				hlpr.safe_get(todays_daily_strong,"medications_or_controlled_substances_yesterday","")
+				hlpr.safe_get(todays_daily_strong,"controlled_uncontrolled_substance","")
 			)
 			grades_calculated_data["penalty"] = penalty
 

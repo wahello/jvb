@@ -35,9 +35,10 @@ function formatJSON(data){
 		        "sleep_aid_taken": "some prescription",
 		        "smoke_any_substances_whatsoever": "yes",
 		        "smoked_substance": "cigarettes(7)",
-		        "medications_or_controlled_substances_yesterday": "yes",
-		        "medications_or_controlled_substances_taken": "some prescription"
-		    },
+		        "prescription_or_non_prescription_medication_yesterday": "yes",
+		        "prescription_or_non_prescription_medication_taken": "some prescription",
+		        "controlled_uncontrolled_substance":"yes"
+		    },	
 		    "encouraged_input": {
 		        "id": 1,
 		        "user_input": 18,
@@ -102,9 +103,9 @@ function formatJSON(data){
 	json_data.strong_input['prescription_or_non_prescription_sleep_aids_last_night'] = data.prescription_sleep_aids; 
 	json_data.strong_input['smoke_any_substances_whatsoever'] = data.smoke_substances;
 	json_data.strong_input['smoked_substance'] = data.smoked_substance_list;
-	json_data.strong_input['medications_or_controlled_substances_yesterday'] = data.medications; 
-	json_data.strong_input['medications_or_controlled_substances_taken'] = data.medications_taken_list; 
-
+	json_data.strong_input['prescription_or_non_prescription_medication_yesterday'] = data.medications; 
+	json_data.strong_input['prescription_or_non_prescription_medication_taken'] = data.medications_taken_list; 
+	json_data.strong_input['controlled_uncontrolled_substance'] = data.controlled_uncontrolled_substance;
 
 	json_data.encouraged_input['stress_level_yesterday'] = data.stress; 
 	json_data.encouraged_input['pains_twings_during_or_after_your_workout'] = data.pain; 

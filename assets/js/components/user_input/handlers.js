@@ -135,8 +135,9 @@ export function handleChangePrescription(event){
   }else{
     this.setState({
       medications:value,
-      medications_taken_list:''
-    })
+      medications_taken_list:'',
+      controlled_uncontrolled_substance:''
+    });
   }
 }
 

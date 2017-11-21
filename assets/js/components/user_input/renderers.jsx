@@ -103,14 +103,21 @@ export function renderFasted(){
 
 export function renderPrescriptionMedication(){
 	if(this.state. medications === 'yes'){
-	 const updateState = function(val){
+	 const updateStateMedication = function(val){
 							  this.setState({
 						   medications_taken_list: val
-							  })}.bind(this);         
+							  })}.bind(this);
+
+	 const updateStateCtrlSubs = function(val){
+							  this.setState({
+						   controlled_uncontrolled_substance: val
+							  })}.bind(this);          
 	  return(
 		  <PrescriptionMedication
 		  medications_taken_list={this.state.medications_taken_list}
-		  updateState={updateState}
+		  controlled_uncontrolled_substance = {this.state.controlled_uncontrolled_substance}
+		  updateStateMedication={updateStateMedication}
+		  updateStateCtrlSubs={updateStateCtrlSubs}
 		  editable = {this.state.editable}
 		  />
 		);
