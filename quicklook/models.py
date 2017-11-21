@@ -37,7 +37,7 @@ class Grades(models.Model):
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	penalty = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	penalty = models.IntegerField()
 
 class ExerciseAndReporting(models.Model):
 	Low = 'low'
