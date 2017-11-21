@@ -184,7 +184,7 @@ class QuicklookCalculationView(APIView):
 				'drug_consumed': '',
 				'drug': '',
 				'medication':hlpr.safe_get(todays_daily_strong,
-								 "medications_or_controlled_substances_yesterday", ""),
+								 "prescription_or_non_prescription_medication_yesterday", ""),
 
 				'smoke_substance':hlpr.safe_get(todays_daily_strong,
 								 "smoke_any_substances_whatsoever", ""),
