@@ -2,6 +2,7 @@ from celery.decorators import task
 from celery.utils.log import get_task_logger
 
 from .garmin_push import store_garmin_health_push
+from .custom_signals import garmin_post_save
 
 logger = get_task_logger(__name__)
 

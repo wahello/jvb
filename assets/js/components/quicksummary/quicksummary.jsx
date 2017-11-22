@@ -418,7 +418,7 @@ handleScroll() {
 						         	   type="submit"
 						               className="btn btn-block-lg btn-info"
 						               onClick = {this.handleCreateQuicklook}>
-							               Creat Quicklook
+							               Create Quicklook
 								      </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>

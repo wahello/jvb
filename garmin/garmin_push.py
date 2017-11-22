@@ -1,8 +1,10 @@
 import re
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from rauth import OAuth1Service
 
+from .custom_signals import garmin_post_save
 from .models import UserGarminDataEpoch,\
                     UserGarminDataSleep,\
                     UserGarminDataBodyComposition,\
@@ -76,6 +78,17 @@ def _createObjectList(user,json_data,dtype,record_dt):
 
 		return objects
 
+def _get_data_start_time(json_data,data_type):
+	if len(json_data):
+		obj = json_data[0]
+		if data_type != "userMetrics":
+			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
+			start_time = datetime.utcfromtimestamp(int(start_time)).date() 
+		else:
+			start_time = obj.get("calendarDate")
+		return start_time
+
+
 def store_garmin_health_push(data):
 
 	'''
@@ -144,3 +157,5 @@ def store_garmin_health_push(data):
 			obj_list = _createObjectList(user, r.json(), dtype,upload_start_time)
 
 			MODEL_TYPES[dtype].objects.bulk_create(obj_list)
+
+			garmin_post_save.send(user,_get_data_start_time(r.json()),sender=None)
