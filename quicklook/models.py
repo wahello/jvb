@@ -28,8 +28,7 @@ class Grades(models.Model):
 
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "grades_ql")
 	overall_truth_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	overall_truth_health_gpa = models.FloatField(validators=[
-								MinValueValidator(0),MaxValueValidator(4)])
+	overall_truth_health_gpa = models.FloatField()
 	movement_non_exercise_steps_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
@@ -37,7 +36,7 @@ class Grades(models.Model):
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	penalty = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	penalty = models.FloatField()
 
 class ExerciseAndReporting(models.Model):
 	Low = 'low'

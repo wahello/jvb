@@ -5,14 +5,14 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 
 from .serializers import UserDailyInputSerializer
-from quicklook.calculation_helper import create_quick_look
+# from quicklook.calculation_helper import create_quick_look
 from .custom_signals import user_input_post_save,user_input_notify
 
-@receiver(user_input_post_save, sender=UserDailyInputSerializer)
-def create_or_update_quicklook(sender, **kwargs):
-	request = kwargs.get('request')
-	dt = kwargs.get('dt').strftime("%Y-%m-%d")
-	# create_quick_look(request.user, dt)
+# @receiver(user_input_post_save, sender=UserDailyInputSerializer)
+# def create_or_update_quicklook(sender, **kwargs):
+# 	request = kwargs.get('request')
+# 	dt = kwargs.get('dt').strftime("%Y-%m-%d")
+# 	# create_quick_look(request.user, dt)
 
 
 @receiver(user_input_notify, sender=UserDailyInputSerializer)

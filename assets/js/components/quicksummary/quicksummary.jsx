@@ -340,8 +340,9 @@ handleScroll() {
     });
   }
 
-  onQuicklookSuccess(data){
+  onQuicklookSuccess(data,start_date,end_date){
   	console.log("quicklook created successfully");
+  	this.successquick(data,start_date,end_date);
   	this.setState({
   		creating_ql:false
   	});

@@ -13,6 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from rauth import OAuth1Service
 
+from .tasks import store_health_data
+
 from .serializers import UserGarminDataEpochSerializer,\
                     UserGarminDataSleepSerializer,\
                     UserGarminDataBodyCompositionSerializer,\
@@ -108,145 +110,158 @@ class UserGarminDataMoveIQView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+# class GarminPing(APIView):
+#     '''
+#         This view will receive Health PING API data and 
+#         store in database 
+#     '''
+
+#     DATA_TYPES = {
+#                 "DAILY_SUMMARIES":"dailies",
+#                 "ACTIVITY_SUMMARIES":"activities",
+#                 "MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
+#                 "EPOCH_SUMMARIES":"epochs",
+#                 "SLEEP_SUMMARIES":"sleeps",
+#                 "BODY_COMPOSITION":"bodyComps",
+#                 "STRESS_DETAILS":"stressDetails",
+#                 "MOVEMENT_IQ":"moveIQActivities",
+#                 "USER_METRICS":"userMetrics"
+#             }
+
+#     MODEL_TYPES = {
+#         "dailies":UserGarminDataDaily,
+#         "activities":UserGarminDataActivity,
+#         "manuallyUpdatedActivities":UserGarminDataManuallyUpdated,
+#         "epochs":UserGarminDataEpoch,
+#         "sleeps":UserGarminDataSleep,
+#         "bodyComps":UserGarminDataBodyComposition,
+#         "stressDetails":UserGarminDataStressDetails,
+#         "moveIQActivities":UserGarminDataMoveIQ,
+#         "userMetrics":UserGarminDataMetrics
+#     }
+
+#     def _safe_get(self,data,attr,default):
+#         data_item = data.get(attr,None)
+#         if not data_item:
+#             return default
+#         return data_item
+
+#     def _createObjectList(self,user,json_data,dtype,record_dt):
+#         '''
+#             Helper method to create instance of model
+#         '''
+#         if len(json_data):
+#             model = self.MODEL_TYPES[dtype]
+#             record_date = record_dt
+#             if not dtype in ["bodyComps","userMetrics"]:
+#                 objects = [
+#                     model(user=user,
+#                           summary_id=obj.get("summaryId"),
+#                           record_date_in_seconds=record_date,
+#                           start_time_in_seconds=obj.get("startTimeInSeconds")+\
+#                                                 self._safe_get(obj,"startTimeOffsetInSeconds",0),
+#                           start_time_duration_in_seconds=obj.get("durationInSeconds"),
+#                           data = obj)
+#                     for obj in json_data
+#                 ]
+#             if dtype == "bodyComps":
+#                 objects = [
+#                     model(  user=user,
+#                             summary_id=obj.get("summaryId"),
+#                             record_date_in_seconds=record_date,
+#                             start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
+#                                                   self._safe_get(obj,"measurementTimeOffsetInSeconds",0),
+#                             start_time_duration_in_seconds=obj.get("durationInSeconds"),
+#                             data = obj)
+#                     for obj in json_data
+#                 ]
+#             if dtype == "userMetrics":
+#                 objects = [
+#                     model(  user=user,
+#                             summary_id=obj.get("summaryId"),
+#                             record_date_in_seconds=record_date,
+#                             calendar_date=obj.get("calendarDate"),
+#                             data=obj)
+#                     for obj in json_data
+#                 ]
+
+#             return objects
+
+#     def post(self, request, format=None):
+
+#         data = request.data
+
+#         print("\n\nGARMIN HEALTH PUSH POST DATA\n\n",data,"\n\n")
+
+#         req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+#         authurl = 'http://connect.garmin.com/oauthConfirm'
+#         acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+#         conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
+#         conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
+
+#         dtype = list(data.keys())[0]
+
+#         for obj in data.get(dtype):
+
+#             user_key = obj.get('userAccessToken')
+#             try:
+#                 user = User.objects.get(garmin_token__token = user_key)
+#             except User.DoesNotExist:
+#                 user = None
+                
+#             if user:
+#                 callback_url = obj.get('callbackURL')
+
+#                 access_token = user.garmin_token.token
+#                 access_token_secret = user.garmin_token.token_secret
+
+#                 service = OAuth1Service(
+#                     consumer_key = conskey,
+#                     consumer_secret = conssec,
+#                     request_token_url = req_url,
+#                     access_token_url = acc_url,
+#                     authorize_url = authurl, 
+#                 )
+                
+#                 upload_start_time = int(re.search('uploadStartTimeInSeconds=(\d+)*',
+#                                     callback_url).group(1))
+
+#                 upload_end_time = int(re.search('uploadEndTimeInSeconds=(\d+)*',
+#                                     callback_url).group(1))
+
+#                 callback_url = callback_url.split('?')[0]+"/"
+
+#                 data = {
+#                     'uploadStartTimeInSeconds': upload_start_time,
+#                     'uploadEndTimeInSeconds':upload_end_time
+#                 }
+
+#                 sess = service.get_session((access_token, access_token_secret))
+                
+#                 r = sess.get(callback_url, header_auth=True, params=data)
+                
+#                 obj_list = self._createObjectList(user, r.json(), dtype,upload_start_time)
+
+#                 self.MODEL_TYPES[dtype].objects.bulk_create(obj_list)
+
+#         return Response(status = status.HTTP_200_OK)
+
+#     def get(self, request, format=None):
+#         print("\n\nGARMIN HEALTH PUSH GET METHOD CALL\n\n",request.data,"\n\n")
+#         return Response(status = status.HTTP_200_OK)
+
 class GarminPing(APIView):
     '''
         This view will receive Health PING API data and 
-        store in database 
+        call the celery taks to store that data in database
     '''
-
-    DATA_TYPES = {
-                "DAILY_SUMMARIES":"dailies",
-                "ACTIVITY_SUMMARIES":"activities",
-                "MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
-                "EPOCH_SUMMARIES":"epochs",
-                "SLEEP_SUMMARIES":"sleeps",
-                "BODY_COMPOSITION":"bodyComps",
-                "STRESS_DETAILS":"stressDetails",
-                "MOVEMENT_IQ":"moveIQActivities",
-                "USER_METRICS":"userMetrics"
-            }
-
-    MODEL_TYPES = {
-        "dailies":UserGarminDataDaily,
-        "activities":UserGarminDataActivity,
-        "manuallyUpdatedActivities":UserGarminDataManuallyUpdated,
-        "epochs":UserGarminDataEpoch,
-        "sleeps":UserGarminDataSleep,
-        "bodyComps":UserGarminDataBodyComposition,
-        "stressDetails":UserGarminDataStressDetails,
-        "moveIQActivities":UserGarminDataMoveIQ,
-        "userMetrics":UserGarminDataMetrics
-    }
-
-    def _safe_get(self,data,attr,default):
-        data_item = data.get(attr,None)
-        if not data_item:
-            return default
-        return data_item
-
-    def _createObjectList(self,user,json_data,dtype,record_dt):
-        '''
-            Helper method to create instance of model
-        '''
-        if len(json_data):
-            model = self.MODEL_TYPES[dtype]
-            record_date = record_dt
-            if not dtype in ["bodyComps","userMetrics"]:
-                objects = [
-                    model(user=user,
-                          summary_id=obj.get("summaryId"),
-                          record_date_in_seconds=record_date,
-                          start_time_in_seconds=obj.get("startTimeInSeconds")+\
-                                                self._safe_get(obj,"startTimeOffsetInSeconds",0),
-                          start_time_duration_in_seconds=obj.get("durationInSeconds"),
-                          data = obj)
-                    for obj in json_data
-                ]
-            if dtype == "bodyComps":
-                objects = [
-                    model(  user=user,
-                            summary_id=obj.get("summaryId"),
-                            record_date_in_seconds=record_date,
-                            start_time_in_seconds=obj.get("measurementTimeInSeconds")+\
-                                                  self._safe_get(obj,"measurementTimeOffsetInSeconds",0),
-                            start_time_duration_in_seconds=obj.get("durationInSeconds"),
-                            data = obj)
-                    for obj in json_data
-                ]
-            if dtype == "userMetrics":
-                objects = [
-                    model(  user=user,
-                            summary_id=obj.get("summaryId"),
-                            record_date_in_seconds=record_date,
-                            calendar_date=obj.get("calendarDate"),
-                            data=obj)
-                    for obj in json_data
-                ]
-
-            return objects
-
-    def post(self, request, format=None):
-
-        data = request.data
-
-        print("\n\nGARMIN HEALTH PUSH POST DATA\n\n",data,"\n\n")
-
-        req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-        authurl = 'http://connect.garmin.com/oauthConfirm'
-        acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
-        conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
-        conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
-
-        dtype = list(data.keys())[0]
-
-        for obj in data.get(dtype):
-
-            user_key = obj.get('userAccessToken')
-            try:
-                user = User.objects.get(garmin_token__token = user_key)
-            except User.DoesNotExist:
-                user = None
-                
-            if user:
-                callback_url = obj.get('callbackURL')
-
-                access_token = user.garmin_token.token
-                access_token_secret = user.garmin_token.token_secret
-
-                service = OAuth1Service(
-                    consumer_key = conskey,
-                    consumer_secret = conssec,
-                    request_token_url = req_url,
-                    access_token_url = acc_url,
-                    authorize_url = authurl, 
-                )
-                
-                upload_start_time = int(re.search('uploadStartTimeInSeconds=(\d+)*',
-                                    callback_url).group(1))
-
-                upload_end_time = int(re.search('uploadEndTimeInSeconds=(\d+)*',
-                                    callback_url).group(1))
-
-                callback_url = callback_url.split('?')[0]+"/"
-
-                data = {
-                    'uploadStartTimeInSeconds': upload_start_time,
-                    'uploadEndTimeInSeconds':upload_end_time
-                }
-
-                sess = service.get_session((access_token, access_token_secret))
-                
-                r = sess.get(callback_url, header_auth=True, params=data)
-                
-                obj_list = self._createObjectList(user, r.json(), dtype,upload_start_time)
-
-                self.MODEL_TYPES[dtype].objects.bulk_create(obj_list)
-
+    def post(self, request, format="json"):
+        store_health_data.delay(request.data)
+        return Response(status=status.HTTP_200_OK)
+        
+    def get(self, request, format="json"):
         return Response(status = status.HTTP_200_OK)
 
-    def get(self, request, format=None):
-        print("\n\nGARMIN HEALTH PUSH GET METHOD CALL\n\n",request.data,"\n\n")
-        return Response(status = status.HTTP_200_OK)
 
 class GarminConnectPing(APIView):
 

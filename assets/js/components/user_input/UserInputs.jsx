@@ -76,6 +76,7 @@ class UserInputs extends React.Component{
         smoked_substance_list:'',
         medications:'',
         medications_taken_list:'',
+        controlled_uncontrolled_substance:'',
         stand:'',
         food_consumed:'',
         weight:'',
@@ -190,8 +191,9 @@ class UserInputs extends React.Component{
         sleep_aid_taken:data.data.strong_input.sleep_aid_taken,
         smoke_substances:data.data.strong_input.smoke_any_substances_whatsoever,
         smoked_substance_list:data.data.strong_input.smoked_substance,
-        medications:data.data.strong_input.medications_or_controlled_substances_yesterday,
-        medications_taken_list:data.data.strong_input.medications_or_controlled_substances_taken,
+        medications:data.data.strong_input.prescription_or_non_prescription_medication_yesterday,
+        medications_taken_list:data.data.strong_input.prescription_or_non_prescription_medication_taken,
+        controlled_uncontrolled_substance:data.data.strong_input.controlled_uncontrolled_substance,
         stand:data.data.optional_input.stand_for_three_hours,
         food_consumed:data.data.optional_input.list_of_processed_food_consumed_yesterday,
         weight:data.data.optional_input.weight,
@@ -1389,7 +1391,7 @@ handleChecked(){
                                      name="weight"                                  
                                      value={this.state.weight}
                                      onChange={this.handleChange} >
-                                      <option key = "select" value="">select</option>
+                                      <option key = "" value="">select</option>
                                       <option key = "no-weigh" value="i do not weigh myself today">
                                         I did not weigh myself today
                                       </option> 
