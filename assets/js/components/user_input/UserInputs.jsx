@@ -39,6 +39,8 @@ class UserInputs extends React.Component{
         submitting_form:false,
         calendarOpen:false,
         checked:false,
+        infoButton:false,
+        infoBtn:false,
 
         workout:'',
         workout_type:'',
@@ -135,6 +137,8 @@ class UserInputs extends React.Component{
       this.toggleCalendar = this.toggleCalendar.bind(this);
       this.toggleEditForm = this.toggleEditForm.bind(this);
       this.handleChecked = this.handleChecked.bind(this);
+      this.toggleInfo=this.toggleInfo.bind(this);
+      this.toggleInfo2=this.toggleInfo2.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -349,6 +353,18 @@ handleScroll() {
     });
   }
 
+  toggleInfo(){
+    this.setState({
+      infoButton:!this.state.infoButton
+    });
+  }
+   
+   toggleInfo2(){
+    this.setState({
+      infoBtn:!this.state.infoBtn
+    });
+   }
+
   toggleEditForm(){
     this.setState({
       editable:!this.state.editable
@@ -375,9 +391,66 @@ handleChecked(){
                                src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>
 
                             </div>
-                              
-                             <h2 className="head">Daily User Inputs Report</h2>   
+                              <div>
+                             <h2 className="head">Daily User Inputs Report 
+                              <span id="infobutton"
+                             onClick={this.toggleInfo} 
+                             style={{float:"right",paddingRight:"30px",color:"gray"}}>
+                             <a href="#" style={{color:"gray"}}> 
+                             <FontAwesome 
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                              </a>
+                              </span> 
+                             </h2>
                              
+                              </div>
+
+
+                            <Popover
+                            style={{zIndex:"0"}} 
+                            placement="left" 
+                            isOpen={this.state.infoButton}
+                            target="infobutton" 
+                            toggle={this.toggleInfo}>
+                              <PopoverBody>
+                                <div>
+                                  <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
+                                  to your results and our hope is that you will make healthier
+                                  life choices as a result of having to report various topics
+                                  (and we see significantly improved results for those that report daily).
+                                  Reporting only takes a few minutes a day and is well worth
+                                  the time investment. You provide the inputs and we will provide
+                                  you the analyses! Create a new habit of reporting your inputs daily!</div>
+
+                                  <p>Reporting your inputs to us has many benefits:</p>
+
+                                  <div>(1) It enables us to report your data to you in a simple, understandable,
+                                   and customizable way. Our reporting and proprietary grading system will 
+                                   provide you with a powerful tool to identify positive and negative trends
+                                    in your health and life, so you can (1) work on improving areas you want
+                                     to improve and (2) maintain areas where you are performing well;</div>
+
+                                  <div>(2) If you wear a wearable device, we grab your data from your device
+                                   and correlate it to your inputs. The correlation of this data provides
+                                    a powerful tool for us to make recommendations for improvements across
+                                     various categories;</div>
+
+                                  <div>(3) We will also provide you with how you compare against others in various
+                                   reporting categories and how your grades stack up against others;</div>
+
+                                  <div>(4) Periodically, we will provide you with suggestions on how to improve in various categories.
+                                  We find that those that submit their Daily User Inputs Report to us EVERY DAY
+                                   often are healthier, happier, have more energy, are leaner, have better blood
+                                    work results, are more productive at their job, are less stiff, injured less
+                                     frequently, and have (far) better training results than those that don’t report
+                                      their results, to name a few benefits.</div>
+                                </div>
+                              </PopoverBody>
+                           </Popover> 
+                                  
                            
                         <div className="nav3">
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
@@ -401,14 +474,24 @@ handleChecked(){
                                           size = "1x"
                                           
                                         />
-                                        </span>
+                                        </span>                                        
                                       <span id="navlink">
                                       {moment(this.state.selected_date).format('MMM D, YYYY')}
                                       </span>  
                                   </span>                                  
                                                                   
-                                  </span>  
+                                  </span>
 
+                                  <span onClick={this.toggleInfo2} id="info2">
+                                   <span id="spa">
+                                        <NavLink id="navlink" href="#">
+                                              <FontAwesome
+                                                  name = "info-circle"
+                                                  size = "1x"
+                                                />
+                                        </NavLink>                                  
+                                   </span>
+                                   </span>
                                    <span className="btn2">
                                    <Button  
                                       size="sm"
@@ -499,7 +582,31 @@ handleChecked(){
                               <PopoverBody>
                                 <CalendarWidget onDaySelect={this.processDate}/>
                               </PopoverBody>
-                           </Popover>                                                      
+                           </Popover> 
+
+                           <Popover 
+                            placement="right" 
+                            isOpen={this.state.infoBtn}
+                            target="info2" 
+                            toggle={this.toggleInfo2}>
+                              <PopoverBody>
+                               <div>
+                                 Use the calendar to select the date you want to enter your inputs for.  The calendar defaults to today,
+                                 but if you need to enter your inputs for another date, you can select any date by clicking the calendar
+                                 icon OR the date text at the top of the inputs page and then navigating to any date you would like to enter information for.
+                                 Use the calendar to enter your inputs for a previous day you forgot to submit your inputs!  
+                               </div>
+
+                               <div>
+                               TIP:  Many people use the calendar to select tomorrow’s date in order to enter their processed
+                               food consumed for the next day’s reporting (since the % unprocessed food question is for the food
+                               consumed yesterday and people often forget what they eat unless they write it down right away).
+                               For example, if you have a chocolate bar today, go to the calendar, select tomorrow’s date, and
+                               enter “Chocolate Bar” in for question 5.1 for your reporting for tomorrow and update question 5,
+                               “What % of the food you ate yesterday was unprocessed” to reflect eating the chocolate bar.
+                               </div>
+                              </PopoverBody>
+                           </Popover>                                                        
                
                 <Container id="user-inputs">                          
                     <div className="row justify-content-center">
