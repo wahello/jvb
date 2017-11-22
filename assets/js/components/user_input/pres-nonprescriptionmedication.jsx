@@ -63,9 +63,30 @@ export default class PrescriptionMedication extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 
-					<Label>8.1 Did you take a controlled or uncontrolled 
-					substance today (marijuana is not considered either)</Label>
-				<FormGroup check>
+					<FormGroup>
+								<Label>8.1 What Did You Take?</Label>
+									{this.props.editable &&
+										<div className="input1">
+											<Textarea 				                           
+				                            className="form-control" 
+				                            value={this.state.medications_taken_list}
+				                            rows="5" cols="5"
+				                          onChange={this.handleChangeMedications}>	</Textarea>		                           
+				                           
+				                        </div>
+				                    }
+				                    {
+	                                  !this.props.editable &&
+	                                  <div className="input">
+	                                    <p >{this.state.medications_taken_list}</p>
+	                                  </div>
+	                                }    
+							</FormGroup>
+
+
+					<FormGroup check>
+					<Label>8.2 Did you take a controlled or uncontrolled 
+					substance today (marijuana is not considered either)</Label>				
 					{this.props.editable &&
 						<div className="work_hard">
 							<Label check className="btn btn-secondary radio1">
@@ -102,6 +123,9 @@ export default class PrescriptionMedication extends Component{
                       </div>
                     }
                     
+<<<<<<< HEAD
+				</FormGroup>							
+=======
 				</FormGroup>
 					</Collapse>
 
@@ -127,6 +151,7 @@ export default class PrescriptionMedication extends Component{
 	                                  </div>
 	                                }    
 							</FormGroup>
+>>>>>>> d6a2b1dd9aecc4ea939b9e583692c6f5f275a83c
 					</Collapse>
 					
 			</div>
