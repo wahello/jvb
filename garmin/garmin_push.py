@@ -4,7 +4,6 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from rauth import OAuth1Service
 
-from .custom_signals import garmin_post_save
 from .models import UserGarminDataEpoch,\
                     UserGarminDataSleep,\
                     UserGarminDataBodyComposition,\
@@ -16,6 +15,7 @@ from .models import UserGarminDataEpoch,\
                     UserGarminDataMoveIQ
                     # GarminConnectToken
 
+from quicklook.tasks import generate_quicklook
 
 def _get_model_types():
 	MODEL_TYPES = {
@@ -158,4 +158,7 @@ def store_garmin_health_push(data):
 
 			MODEL_TYPES[dtype].objects.bulk_create(obj_list)
 
-			garmin_post_save.send(user,_get_data_start_time(r.json()),sender=None)
+			# Call celery task to calculate/recalculate quick look for date to
+			# which received data belongs for the target user
+			date = _get_data_start_time(r.json())
+			generate_quicklook.delay(user,date,date)

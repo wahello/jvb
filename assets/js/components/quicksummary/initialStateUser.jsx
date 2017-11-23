@@ -1,9 +1,9 @@
 import moment from 'moment';
 
 export function getInitialStateUserInput(start_dt, end_dt){
-	// expect moment objects
 	var initial_state = {};
-
+	start_dt = moment(start_dt);
+	end_dt = moment(end_dt);
 	initial_state[end_dt.format('YYYY-MM-DD')] = {};
 
 	var diff = end_dt.diff(start_dt, 'days');
@@ -17,8 +17,7 @@ export function getInitialStateUserInput(start_dt, end_dt){
 
  	let blank_properties={
 		"created_at":'',			
-	    "strong_input":{
-	    	"id":'-',	    	
+	    "strong_input":{    	
 	    	"workout":'-',
 	    	"workout_easy":'-',
 	    	"workout_effort":'-',
@@ -41,7 +40,6 @@ export function getInitialStateUserInput(start_dt, end_dt){
 
 	    },
 	    "encouraged_input":{
-	    	"id":'-',
 	    	 "stress":'-',
 	    	 "pain":'-',
         	 "pain_area":'-',
@@ -49,7 +47,6 @@ export function getInitialStateUserInput(start_dt, end_dt){
         	 "breath_nose":'-'
 	    },
 	    "optional_input":{
-	    	  "id":'-',
 	    	  "food_consumed":'-',
 	    	  "chia_seeds":'-',
 	    	  "fasted":'-',

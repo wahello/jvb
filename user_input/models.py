@@ -100,7 +100,7 @@ class DailyUserInputStrong(models.Model):
     CTRL_SUBS_CHOICE = (
         ('','-'),
         (YES,'Yes'),
-        (NO,'NO'),
+        (NO,'No'),
         (DECLINE,'I Decline')
     )
 
