@@ -13,7 +13,7 @@ def create_or_update_quicklook(sender, **kwargs):
 	request = kwargs.get('request')
 	from_date = kwargs.get('from_date').strftime("%Y-%m-%d")
 	to_date = kwargs.get('to_date').strftime("%Y-%m-%d")
-	generate_quicklook.delay(request.user,from_date,to_date)
+	generate_quicklook.delay(request.user.id,from_date,to_date)
 
 
 @receiver(user_input_notify, sender=UserDailyInputSerializer)

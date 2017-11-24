@@ -161,4 +161,4 @@ def store_garmin_health_push(data):
 			# Call celery task to calculate/recalculate quick look for date to
 			# which received data belongs for the target user
 			date = _get_data_start_time(r.json())
-			generate_quicklook.delay(user,date,date)
+			generate_quicklook.delay(user.id,date,date)
