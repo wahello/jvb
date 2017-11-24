@@ -502,7 +502,8 @@ def cal_penalty(is_smoke,is_ctrl_subs):
 def get_avg_sleep_grade(daily_strong,current_date):
 	for q in daily_strong:
 		if (q.user_input.created_at == current_date.date() and 
-			q.sleep_time_excluding_awake_time != ''):
+			q.sleep_time_excluding_awake_time != '' and
+			q.sleep_time_excluding_awake_time != None):
 			grade = cal_average_sleep_grade(
 				  q.sleep_time_excluding_awake_time,
 				  q.prescription_or_non_prescription_sleep_aids_last_night)
@@ -512,7 +513,8 @@ def get_avg_sleep_grade(daily_strong,current_date):
 def get_unprocessed_food_grade(daily_strong,current_date):
 	for q in daily_strong:
 		if (q.user_input.created_at == current_date.date() and
-			q.prcnt_unprocessed_food_consumed_yesterday != ''):
+			q.prcnt_unprocessed_food_consumed_yesterday != '' and
+			q.prcnt_unprocessed_food_consumed_yesterday != None):
 			grade = cal_unprocessed_food_grade(
 					q.prcnt_unprocessed_food_consumed_yesterday)
 			return grade
