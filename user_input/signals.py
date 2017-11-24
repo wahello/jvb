@@ -49,11 +49,11 @@ JVB Health & Wellness
 		instance_admin_url
 	)
 
-	# if admin_users_email:
-	# 	send_mail(
-	# 		subject="New User Input" if created else "User Input Updated",
-	# 		message = message,
-	# 		from_email = "saumyag@s7inc.co",
-	# 		recipient_list = admin_users_email,
-	# 		fail_silently = True  
-	# 	)
+	if admin_users_email:
+		send_mail(
+			subject="New User Input" if created else "User Input Updated",
+			message = message,
+			from_email = "saumyag@s7inc.co",
+			recipient_list = admin_users_email,
+			fail_silently = True  
+		)
