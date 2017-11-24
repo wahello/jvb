@@ -11,6 +11,7 @@ import axiosRetry from 'axios-retry';
 import moment from 'moment';
 
 import {getInitialState} from './initialState';
+import {getInitialStateUserInput} from './initialStateUser';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
 import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/quick';
 
@@ -202,6 +203,57 @@ class Quicklook extends Component{
              return properties;
        		}
 
+    updateUserInputDateState(data){
+       			var properties={
+					strong_input:{
+	                    workout:data.strong_input.workout,
+	                    workout_type:data.strong_input.workout_type,
+	                    work_out_easy_or_hard:data.strong_input.work_out_easy_or_hard,
+	                    workout_effort_level:data.strong_input.workout_effort_level,
+	                    hard_portion_workout_effort_level:data.strong_input.hard_portion_workout_effort_level,
+	                    prcnt_unprocessed_food_consumed_yesterday:data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
+	                    list_of_unprocessed_food_consumed_yesterday:data.strong_input.list_of_unprocessed_food_consumed_yesterday,
+	                    list_of_processed_food_consumed_yesterday:data.strong_input.list_of_processed_food_consumed_yesterday,
+	                    number_of_alcohol_consumed_yesterday:data.strong_input.number_of_alcohol_consumed_yesterday,
+	                    alcohol_drink_consumed_list:data.strong_input.alcohol_drink_consumed_list,
+	                    sleep_time_excluding_awake_time:data.strong_input.sleep_time_excluding_awake_time,
+	                    sleep_comment:data.strong_input.sleep_comment,
+	                    prescription_or_non_prescription_sleep_aids_last_night:data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
+	                    sleep_aid_taken:data.strong_input.sleep_aid_taken,
+	                    smoke_any_substances_whatsoever:data.strong_input.smoke_any_substances_whatsoever,
+	                    smoked_substance:data.strong_input.smoked_substance,
+	                    prescription_or_non_prescription_medication_yesterday:data.strong_input.prescription_or_non_prescription_medication_yesterday,
+	                    prescription_or_non_prescription_medication_taken:data.strong_input.prescription_or_non_prescription_medication_taken,
+	                    controlled_uncontrolled_substance:data.strong_input.controlled_uncontrolled_substance
+	                },
+	                encouraged_input:{
+	                      "stress_level_yesterday":data.encouraged_input.stress_level_yesterday,
+				    	  "pains_twings_during_or_after_your_workout":data.encouraged_input.pains_twings_during_or_after_your_workout,
+			        	  "pain_area":data.encouraged_input.pain_area,
+			        	  "water_consumed_during_workout":data.encouraged_input.water_consumed_during_workout,
+			        	  "workout_that_user_breathed_through_nose":data.encouraged_input.workout_that_user_breathed_through_nose
+	                },
+	                optional_input:{
+				          "chia_seeds_consumed_during_workout":data.optional_input.chia_seeds_consumed_during_workout,
+				    	  "fasted_during_workout":data.optional_input.fasted_during_workout,
+			              "food_ate_before_workout":data.optional_input.food_ate_before_workout,
+			              "calories_consumed_during_workout":data.optional_input.calories_consumed_during_workout,
+			              "food_ate_during_workout":data.optional_input.food_ate_during_workout,
+			              "workout_enjoyable":data.optional_input.workout_enjoyable,
+			              "general_Workout_Comments":data.optional_input.general_Workout_Comments,
+			              "weight":data.optional_input.weight,
+			       		  "waist_size":data.optional_input.waist_size,
+			       		  "clothes_size":data.optional_input.clothes_size,
+			       		  "sick":data.optional_input.sick,
+			              "sickness":data.optional_input.sickness,
+			              "stand_for_three_hours":data.optional_input.stand_for_three_hours,
+			              "type_of_diet_eaten":data.optional_input.type_of_diet_eaten,
+			       		  "general_comment":data.optional_input.general_comment
+	                }
+             };
+             return properties;
+       		}
+
 	successquick(data,start_dt,end_dt){
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
@@ -240,15 +292,35 @@ class Quicklook extends Component{
 	}
 
 	userInputFetchSuccess(data){
+		let initial_state = getInitialStateUserInput(this.state.start_date,
+													 this.state.end_date);
+		if(data.data.length){
+			const dates = [];
+			for(let date of Object.keys(initial_state)){
+				dates.push(date);
+			} 
+		    if (data.data.length > 0){
+			 	 for(var dataitem of data.data){
+			      	const date = dataitem.created_at;
+			      	let obj = this.updateUserInputDateState(dataitem);
+			      	initial_state[date] = obj;
+			      }
+		     }
+		}
+
+		// console.log("User Input onsuccess state:",initial_state);
 		this.setState({
-			userInputData:data
+			userInputData:initial_state
 		});
 	}
 
 	userInputFetchFailure(error){
-		console.log(error.message);
+		let initial_state = getInitialStateUserInput(this.state.start_date,
+													 this.state.end_date);
+
+		// console.log("User Input onfailure state:",initial_state);
 		this.setState({
-			userInputData:{}
+			userInputData:initial_state
 		});
 	}
 
@@ -264,7 +336,7 @@ class Quicklook extends Component{
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
-						  this.userInputFetchfailure);
+						  this.userInputFetchFailure);
 		});
 	}
 
@@ -288,14 +360,14 @@ class Quicklook extends Component{
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
-						  this.userInputFetchfailure);
+						  this.userInputFetchFailure);
 		});
   }
 
 	componentDidMount(){
 		quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
-					  this.userInputFetchfailure);
+					  this.userInputFetchFailure);
 		 window.addEventListener('scroll', this.handleScroll);
 	}
 	onDismiss(){
@@ -341,7 +413,6 @@ handleScroll() {
   }
 
   onQuicklookSuccess(data,start_date,end_date){
-  	console.log("quicklook created successfully");
   	this.successquick(data,start_date,end_date);
   	this.setState({
   		creating_ql:false
@@ -590,14 +661,6 @@ handleScroll() {
                   
                     <div className="col-lg-9 col-md-9 col-sm-12">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
-                    	{this.state.activeTab === "allstats" && 
-	                    	<AllStats 
-	                    		data={this.state.data} 
-	                    		userInputData={this.state.userInputData}
-	                    		start_date={this.state.start_date}
-	                    		end_date={this.state.end_date}
-	                    	/>
-                    	}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
                     	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
@@ -607,10 +670,7 @@ handleScroll() {
                     	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
                     	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
                     	{this.state.activeTab === "user" &&
-	                    	 <User  data={this.state.userInputData}
-	                    		 	start_date = {this.state.start_date}
-	                    		 	end_date = {this.state.end_date}
-	                    	 />
+	                    	 <User  data={this.state.userInputData}/>
                     	}
                     </div>
 					</div>
