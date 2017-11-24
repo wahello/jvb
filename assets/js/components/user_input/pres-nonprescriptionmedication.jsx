@@ -123,37 +123,8 @@ export default class PrescriptionMedication extends Component{
                       </div>
                     }
                     
-<<<<<<< HEAD
-				</FormGroup>							
-=======
 				</FormGroup>
-					</Collapse>
-
-
-					<Collapse isOpen={this.state.controlled_uncontrolled_substance =="yes"}>
-
-							<FormGroup>
-								<Label>8.2 What Did You Take?</Label>
-									{this.props.editable &&
-										<div className="input1">
-											<Textarea 				                           
-				                            className="form-control" 
-				                            value={this.state.medications_taken_list}
-				                            rows="5" cols="5"
-				                          onChange={this.handleChangeMedications}>	</Textarea>		                           
-				                           
-				                        </div>
-				                    }
-				                    {
-	                                  !this.props.editable &&
-	                                  <div className="input">
-	                                    <p >{this.state.medications_taken_list}</p>
-	                                  </div>
-	                                }    
-							</FormGroup>
->>>>>>> d6a2b1dd9aecc4ea939b9e583692c6f5f275a83c
-					</Collapse>
-					
+				</Collapse>			
 			</div>
 		);
 	}

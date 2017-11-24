@@ -318,11 +318,11 @@ class Quicklook extends Component{
 
 handleScroll() {
 
-  if (window.scrollY >= 77 && !this.state.scrollingLock) {
+  if (window.scrollY >= 72 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 77 && this.state.scrollingLock) {
+  } else if(window.scrollY < 72 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -418,7 +418,7 @@ handleScroll() {
 						         	   type="submit"
 						               className="btn btn-block-lg btn-info"
 						               onClick = {this.handleCreateQuicklook}>
-							               Creat Quicklook
+							               Create Quick Look Report
 								      </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>

@@ -16,10 +16,10 @@ import Dimensions from 'react-dimensions';
 
 	 this.state = {
       myTableData: [
-        {name: 'Avg Speed'},
-        {name: 'Avg Power'},
-        {name: 'Avg Speed Per Mile'},
-        {name: 'Avg Cadence'},       
+        {name: 'Avg Speed (MPH) Bike'},
+        {name: 'Avg Power Bike'},
+        {name: 'Asvg Speed Per Mile'},
+        {name: 'Avg Cadence Bike'},       
       ],
     };
   }

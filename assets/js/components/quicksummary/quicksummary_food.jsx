@@ -14,7 +14,7 @@ import Dimensions from 'react-dimensions';
 
 	 this.state = {
       myTableData: [
-        {name: 'percentage Non Processed Food'},
+        {name: 'Percentage of Unprocessed Food'},
         {name: 'Percentage Non Processed Food Grade'},
         {name: 'Non Processed Food'},
         {name: 'Diet Type'},       
