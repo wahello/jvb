@@ -682,7 +682,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Non-Exercise steps grade calculation
 		exercise_steps, total_steps = cal_exercise_steps_total_steps(
 										  dailies_json,epochs_json)	
-		steps_calculated_data['non_exercise_steps'] = total_steps - exercise_steps
+		# Have to fix this
+		steps_calculated_data['non_exercise_steps'] = abs(total_steps - exercise_steps)
 		steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps
 
