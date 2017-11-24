@@ -158,7 +158,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
-		 	dt=validated_data['created_at'])
+		 	from_date=validated_data['created_at'],
+		 	to_date=validated_data['created_at'])
 
 		# send signal to notify admins by sending email about 
 		# this newly created userinput 
@@ -196,7 +197,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
-		 	dt=validated_data['created_at'])
+		 	from_date=validated_data['created_at'],
+		 	to_date=validated_data['created_at'])
 
 		# send signal to notify admins by sending email about 
 		# update of this instance

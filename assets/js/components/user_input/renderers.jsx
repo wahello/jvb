@@ -232,7 +232,7 @@ export function renderFetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching user inputs for {selected_date.format('MMM D, YYYY')}</p>
+					<p>Looking for user inputs for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);

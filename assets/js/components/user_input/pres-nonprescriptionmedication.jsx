@@ -122,9 +122,10 @@ export default class PrescriptionMedication extends Component{
                     	</p>
                       </div>
                     }
-                    
-				</FormGroup>
-				</Collapse>			
+
+				</FormGroup>							
+				</Collapse>
+
 			</div>
 		);
 	}

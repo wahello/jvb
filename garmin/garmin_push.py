@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from rauth import OAuth1Service
@@ -14,6 +15,7 @@ from .models import UserGarminDataEpoch,\
                     UserGarminDataMoveIQ
                     # GarminConnectToken
 
+from quicklook.tasks import generate_quicklook
 
 def _get_model_types():
 	MODEL_TYPES = {
@@ -75,6 +77,17 @@ def _createObjectList(user,json_data,dtype,record_dt):
 			]
 
 		return objects
+
+def _get_data_start_time(json_data,data_type):
+	if len(json_data):
+		obj = json_data[0]
+		if data_type != "userMetrics":
+			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
+			start_time = datetime.utcfromtimestamp(int(start_time)).date() 
+		else:
+			start_time = obj.get("calendarDate")
+		return start_time
+
 
 def store_garmin_health_push(data):
 
@@ -144,3 +157,8 @@ def store_garmin_health_push(data):
 			obj_list = _createObjectList(user, r.json(), dtype,upload_start_time)
 
 			MODEL_TYPES[dtype].objects.bulk_create(obj_list)
+
+			# Call celery task to calculate/recalculate quick look for date to
+			# which received data belongs for the target user
+			date = _get_data_start_time(r.json())
+			generate_quicklook.delay(user,date,date)

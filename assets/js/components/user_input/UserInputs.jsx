@@ -289,6 +289,9 @@ class UserInputs extends React.Component{
     }
 
     componentDidMount(){
+      this.setState({
+        fetching_data:true
+      });
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
       getUserProfile(this.onProfileSuccessFetch);

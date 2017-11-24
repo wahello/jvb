@@ -27,6 +27,8 @@ from quicklook.models import UserQuickLook,\
 					Food,\
 					Alcohol
 
+from quicklook.serializers import UserQuickLookSerializer
+
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
@@ -79,6 +81,145 @@ def update_helper(instance,data_dict):
 	for attr, value in data_dict.items():
 		setattr(instance,attr,value)
 	instance.save()
+
+def get_blank_model_fields(model):
+	if model == "grade":
+		fields = {
+			'overall_truth_grade':'',
+			'overall_truth_health_gpa':0,
+			'movement_non_exercise_steps_grade':'' ,
+			'movement_consistency_grade': '' ,
+			'avg_sleep_per_night_grade':'',
+			'exercise_consistency_grade':'' ,
+			'overall_workout_grade':'',
+			'prcnt_unprocessed_food_consumed_grade':'',
+			'alcoholic_drink_per_week_grade':'' ,
+			'penalty':0
+		}
+		return fields
+
+	elif model == "exercise":
+		fields = {
+			'workout_easy_hard':'',
+			'workout_type': '',
+			'workout_time': '',
+			'workout_location': '',
+			'workout_duration': '',
+			'maximum_elevation_workout': 0,
+			'minutes_walked_before_workout': '',
+			'distance': 0,
+			'pace': '',
+			'avg_heartrate':0,
+			'elevation_gain':0,
+			'elevation_loss':0,
+			'effort_level':0,
+
+			'dew_point': 0,
+			'temperature': 0,
+			'humidity': 0,
+			'temperature_feels_like':0,
+			'wind': 0,
+			'hrr': '',
+			'hrr_start_point': 0,
+			'hrr_beats_lowered': 0,
+			'sleep_resting_hr_last_night': 0,
+			'vo2_max': 0,
+			'running_cadence':0,
+			'nose_breath_prcnt_workout': 0,
+			'water_consumed_workout':0,
+			'chia_seeds_consumed_workout':0,
+			'fast_before_workout': '',
+			'pain': '',
+			'pain_area': '',
+			'stress_level':'',
+			'sick': '',
+			'drug_consumed': '',
+			'drug': '',
+			'medication':'',
+			'smoke_substance':'',
+			'exercise_fifteen_more': '',
+			'workout_elapsed_time': '',
+			'timewatch_paused_workout': '',
+			'exercise_consistency':0,
+			'workout_duration_grade': '',
+			'workout_effortlvl_grade': '',
+			'avg_heartrate_grade': '',
+			'overall_workout_grade': '',
+			'heartrate_variability_grade': '',
+			'workout_comment':''
+		}
+		return fields
+
+	elif model == "swim":
+		fields = {
+			'pace_per_100_yard': 0,
+			'total_strokes': 0,
+		}
+		return fields
+
+	elif model == "bike":
+		fields = {
+			'avg_speed': 0,
+			'avg_power': 0,
+			'avg_speed_per_mile': 0,
+			'avg_cadence': 0,
+		}
+		return fields
+
+	elif model == "step":
+		fields = {
+			 'non_exercise_steps':0,
+			 'exercise_steps': 0,
+			 'total_steps': 0,
+			 'floor_climed':0,
+			 'floor_decended':0,
+			 'movement_consistency':'',
+		}
+		return fields
+
+	elif model == "sleep":
+		fields = {
+			'sleep_per_wearable': '',
+			'sleep_per_user_input':'',
+			'sleep_aid': '',
+			'sleep_bed_time': '',
+			'sleep_awake_time': '',
+			'deep_sleep': 0,
+			'light_sleep': 0,
+			'awake_time': 0,
+		}
+		return fields
+
+	elif model == "food":
+		fields = {
+			'prcnt_non_processed_food':0,
+			'prcnt_non_processed_food_grade': '',
+			'non_processed_food': '',
+			'diet_type':'',
+		}
+		return fields
+
+	elif model == "alcohol":
+		fields = {
+			'alcohol_day': '',
+			'alcohol_week': 0
+		}
+		return fields
+
+def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None):
+	if order_by:
+		data = [q.data for q in model.objects.filter(
+			user = user,
+			start_time_in_seconds__gte = start_epoch,
+			start_time_in_seconds__lte = end_epoch).order_by(order_by)]
+		return data
+	else:
+		data = [q.data for q in model.objects.filter(
+			user = user,
+			start_time_in_seconds__gte = start_epoch,
+			start_time_in_seconds__lte = end_epoch)]
+		return data
+
 
 def extract_weather_data(data):
 	'''
@@ -192,7 +333,6 @@ def cal_exercise_steps_total_steps(dailies_json, epochs_json):
 	return (exercise_steps, total_steps)
 
 def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
-	print("\n\nSleep Duration",sleep_duration)
 	def _to_sec(duration):
 		hours,mins = map(int,[0 if x == '' else x 
 					for x in duration.split(':')])
@@ -246,7 +386,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
 	return GRADES[points]
  
 def cal_unprocessed_food_grade(prcnt_food):
-
  	prcnt_food = int(prcnt_food)
  	
  	if (prcnt_food >= 80 and prcnt_food <= 100):
@@ -360,343 +499,232 @@ def cal_penalty(is_smoke,is_ctrl_subs):
 	ctrl_subs_penalty = -3.1 if is_ctrl_subs == 'yes' else 0
 	return smoke_penalty + ctrl_subs_penalty
 
+def get_avg_sleep_grade(daily_strong,current_date):
+	for q in daily_strong:
+		if (q.user_input.created_at == current_date.date() and 
+			q.sleep_time_excluding_awake_time != ''):
+			grade = cal_average_sleep_grade(
+				  q.sleep_time_excluding_awake_time,
+				  q.prescription_or_non_prescription_sleep_aids_last_night)
+			return grade
+	return ''
 
-# def create_quick_look(user, dt):
+def get_unprocessed_food_grade(daily_strong,current_date):
+	for q in daily_strong:
+		if (q.user_input.created_at == current_date.date() and
+			q.prcnt_unprocessed_food_consumed_yesterday != ''):
+			grade = cal_unprocessed_food_grade(
+					q.prcnt_unprocessed_food_consumed_yesterday)
+			return grade
+	return ''
 
-# 	y,m,d = map(int,dt.split('-'))
-# 	start_date_dt = datetime(y,m,d,0,0,0)
-# 	last_seven_days_date = start_date_dt - timedelta(days=6)
-# 	start_dt = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
-# 	end_dt = start_dt + 86400
+def get_alcohol_grade(daily_strong,user):
+	alcohol_grade = cal_alcohol_drink_grade(
+		[q.number_of_alcohol_consumed_yesterday
+		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
+		for q in daily_strong],
+		user.profile.gender)
+	return alcohol_grade
 
-# 	def _safe_get(lst,attr,default_val):
-# 		try:
-# 			item = lst[0]
-# 			val = item.__dict__.get(attr)
-# 			if type(default_val) is int:
-# 				if(val == ''):
-# 					return default_val
-# 				return int(val)
-# 			return val
-# 		except:
-# 			return default_val 
+def create_quick_look(user,from_date=None,to_date=None):
+	'''
+		calculate and create quicklook instance for given date range
 
-# 	def _safe_get_dict(lst,attr,default_val):
-# 		try:
-# 			item = lst[0]
-# 			val = item.get(attr)
-# 			if type(default_val) is int:
-# 				if(val == ''):
-# 					return default_val
-# 				return int(val)
-# 			return val
-# 		except:
-# 			return default_val 
+		Arguments -
+			1) user is a "User" instance representing currently logged in user 
+			2) from_date expect date string in format YYYY-MM-DD
+			3) to_date expect date string in format YYYY-MM-DD   
 
-# 	def _update_helper(instance,data_dict):
-# 		'''
-# 			Helper function to update the instance
-# 			with provided key,value pair
+	'''
+	# date range for which quicklook is calculated
+	from_dt = str_to_datetime(from_date)
+	to_dt = str_to_datetime(to_date)
+	current_date = from_dt
+	SERIALIZED_DATA = []
 
-# 			Warning: This will not trigger any signals
-# 					 like post or pre save
-# 		'''
-# 		for attr, value in data_dict.items():
-# 			setattr(instance,attr,value)
-# 		instance.save()
+	while current_date <= to_dt:
+		last_seven_days_date = current_date - timedelta(days=7)
+		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+		end_epoch = start_epoch + 86400
 
-# 	def _extract_weather_data(data):
-# 		'''
-# 			Extract weather information like - Temperature, Dew point
-# 			Humidity, Apparent Temperature, Wind
-# 		'''
-# 		DATA = {
-# 			"temperature":0,
-# 			"dewPoint":0,
-# 			"humidity":0,
-# 			"apparentTemperature":0,
-# 			"windSpeed":0
-# 		}
+		weather_data = extract_weather_data(
+		fetch_weather_data(40.730610,-73.935242,start_epoch))
 
-# 		if data:
-# 			data = data['daily']['data'][0]
-# 			DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
-# 			DATA['dewPoint'] = data['dewPoint']
-# 			DATA['humidity'] = data['humidity'] 
-# 			DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
-# 										  data['apparentTemperatureMax'])/2, 2)
-# 			DATA['windSpeed'] = data['windSpeed']
+		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch)
+		sleeps = get_garmin_model_data(UserGarminDataSleep,user,start_epoch,end_epoch)
+		dailies = get_garmin_model_data(UserGarminDataDaily,user,
+										start_epoch,end_epoch,
+										'-start_time_duration_in_seconds')
+		stress = get_garmin_model_data(UserGarminDataStressDetails,user,start_epoch,end_epoch)
+		activities =get_garmin_model_data(UserGarminDataActivity,user,start_epoch,end_epoch)
+		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
+				user = user,calendar_date = current_date.date())]
 
-# 		return DATA
+		# pull data for past 7 days (incuding today)
+		daily_strong = list(DailyUserInputStrong.objects.filter(
+			user_input__user = user,
+			user_input__created_at__gte = last_seven_days_date,
+			user_input__created_at__lte = current_date))
 
-# 	weather_data = _extract_weather_data(
-# 		fetch_weather_data(40.730610,-73.935242,start_dt))
+		todays_daily_strong = []
+		for i,q in enumerate(daily_strong):
+			if q.user_input.created_at == current_date.date():
+				todays_daily_strong.append(daily_strong.pop(i))
+				break
 
-# 	epochs = [q.data for q in UserGarminDataEpoch.objects.filter(
-# 		user = user,
-# 		start_time_in_seconds__gte = start_dt,
-# 		start_time_in_seconds__lte = end_dt
-# 		)]
+		daily_encouraged = DailyUserInputEncouraged.objects.filter(
+			user_input__user = user,
+			user_input__created_at = current_date)
 
-# 	sleeps = [q.data for q in UserGarminDataSleep.objects.filter(
-# 		user = user,
-# 		start_time_in_seconds__gte = start_dt,
-# 		start_time_in_seconds__lte = end_dt)]
+		daily_optional = DailyUserInputOptional.objects.filter(
+			user_input__user = user,
+			user_input__created_at = current_date)
 
-# 	dailies = [q.data for q in UserGarminDataDaily.objects.filter(
-# 		user = user,
-# 		start_time_in_seconds__gte = start_dt,
-# 		start_time_in_seconds__lte = end_dt).order_by(
-# 		'-start_time_duration_in_seconds'
-# 		)]
+		dailies_json = [ast.literal_eval(dic) for dic in dailies]
+		activities_json = [ast.literal_eval(dic) for dic in activities]
+		epochs_json = [ast.literal_eval(dic) for dic in epochs]
+		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
+		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
+		stress_json = [ast.literal_eval(dic) for dic in stress]
 
-# 	user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
-# 			user = user,
-# 			calendar_date = start_date_dt.date()
-# 		)]
+		grades_calculated_data = get_blank_model_fields('grade')
+		exercise_calculated_data = get_blank_model_fields('exercise')
+		swim_calculated_data = get_blank_model_fields('swim')
+		bike_calculated_data = get_blank_model_fields('bike')
+		steps_calculated_data = get_blank_model_fields('step')
+		sleeps_calculated_data = get_blank_model_fields('sleep')
+		food_calculated_data = get_blank_model_fields("food")
+		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
-# 	stress = [q.data for q in UserGarminDataStressDetails.objects.filter(
-# 			user = user,
-# 			start_time_in_seconds__gte = start_dt,
-# 			start_time_in_seconds__lte = end_dt
-# 		)]
+		# Exercise
+		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
+														 "work_out_easy_or_hard",'')
+		exercise_calculated_data['elevation_gain'] = safe_sum(activities_json,
+													'totalElevationGainInMeters')
+		exercise_calculated_data['elevation_loss'] = safe_sum(activities_json,
+													'totalElevationLossInMeters')
+		exercise_calculated_data['effort_level'] = safe_get(todays_daily_strong,
+													"workout_effort_level", 0)
+		exercise_calculated_data['dew_point'] = weather_data['dewPoint']
+		exercise_calculated_data['temperature'] = weather_data['temperature']
+		exercise_calculated_data['humidity'] = weather_data['humidity']
+		exercise_calculated_data['temperature_feels_like'] = weather_data['apparentTemperature']
+		exercise_calculated_data['wind'] = weather_data['windSpeed']
+		exercise_calculated_data['sleep_resting_hr_last_night'] = safe_get_dict(dailies_json,
+															'restingHeartRateInBeatsPerMinute',0)
+		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
+		exercise_calculated_data['running_cadence'] = safe_sum(activities_json,
+											'averageRunCadenceInStepsPerMinute')
+		exercise_calculated_data['water_consumed_workout'] = safe_get(daily_encouraged,
+												"water_consumed_during_workout",0)
+		exercise_calculated_data['chia_seeds_consumed_workout'] = safe_get(daily_optional,
+									 		"chia_seeds_consumed_during_workout",0)
+		exercise_calculated_data['fast_before_workout'] = safe_get(daily_optional,
+							  						"fasted_during_workout",'')
+		exercise_calculated_data['pain'] = safe_get(daily_encouraged,
+								"pains_twings_during_or_after_your_workout",'')
+		exercise_calculated_data['pain_area'] = safe_get(daily_encouraged,"pain_area", "")
+		exercise_calculated_data['stress_level'] = safe_get(daily_encouraged,
+												   "stress_level_yesterday", "")
+		exercise_calculated_data['sick'] = safe_get(daily_optional, "sick", "")
+		exercise_calculated_data['medication'] = safe_get(todays_daily_strong,
+						 "prescription_or_non_prescription_medication_yesterday", "")
+		exercise_calculated_data['smoke_substance'] = safe_get(todays_daily_strong,
+						 					"smoke_any_substances_whatsoever", "")
+		exercise_calculated_data['workout_comment'] = safe_get(daily_optional,
+													 "general_Workout_Comments", "")
+		
+		# Steps
+		steps_calculated_data['floor_climed'] =safe_sum(dailies_json,'floorsClimbed')
 
-# 	activities =[q.data for q in UserGarminDataActivity.objects.filter(
-# 		user = user,
-# 		start_time_in_seconds__gte = start_dt,
-# 		start_time_in_seconds__lte = end_dt)]
+		# Sleeps
+		sleeps_calculated_data['sleep_aid'] = safe_get(todays_daily_strong,
+					 "prescription_or_non_prescription_sleep_aids_last_night", "")
+		sleeps_calculated_data['deep_sleep'] = safe_sum(sleeps_json,'deepSleepDurationInSeconds')
+		sleeps_calculated_data['light_sleep'] = safe_sum(sleeps_json,'lightSleepDurationInSeconds')
+		sleeps_calculated_data['awake_time'] = safe_sum(sleeps_json,'awakeDurationInSeconds')
 
+		# Food
+		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,
+									   "prcnt_unprocessed_food_consumed_yesterday", 0)
+		food_calculated_data['non_processed_food'] = safe_get(todays_daily_strong,
+								 "list_of_unprocessed_food_consumed_yesterday", "")
+		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
 
-# 	# pull data for past 7 days (incuding today)
-# 	daily_strong = DailyUserInputStrong.objects.filter(
-# 		user_input__user = user,
-# 		user_input__created_at__gte = last_seven_days_date,
-# 		user_input__created_at__lte = start_date_dt)
+		# Alcohol
+		alcohol_calculated_data['alcohol_day'] = safe_get(todays_daily_strong,
+											"number_of_alcohol_consumed_yesterday","")
 
-# 	todays_daily_strong = list(filter(
-# 			lambda x: x.user_input.created_at == start_date_dt.date(),
-# 			daily_strong))
+		# Calculation of grades
 
-# 	daily_encouraged = DailyUserInputEncouraged.objects.filter(
-# 		user_input__user = user,
-# 		user_input__created_at = start_date_dt)
+		# Average sleep per night grade calculation
+		grades_calculated_data['avg_sleep_per_night_grade'] = get_avg_sleep_grade(todays_daily_strong, current_date)
 
-# 	daily_optional = DailyUserInputOptional.objects.filter(
-# 		user_input__user = user,
-# 		user_input__created_at = start_date_dt)
+		# Unprocessed food grade calculation 
+		grade  = get_unprocessed_food_grade(todays_daily_strong, current_date)
+		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
+		food_calculated_data['prcnt_non_processed_food_grade'] = grade
 
-# 	dailies_json = [ast.literal_eval(dic) for dic in dailies]
-# 	activities_json = [ast.literal_eval(dic) for dic in activities]
-# 	epochs_json = [ast.literal_eval(dic) for dic in epochs]
-# 	sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
-# 	user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
-# 	stress_json = [ast.literal_eval(dic) for dic in stress]
+		# Alcohol drink consumed grade
+		grades_calculated_data['alcoholic_drink_per_week_grade'] = get_alcohol_grade(daily_strong,user)
 
-# 	def my_sum(d, key):
-# 		if(d!=[]):
-# 			return sum([i.get(key,0) for i in d ])
-# 		else:
-# 			return(0)
+		# Movement consistency and movement consistency grade calculation
+		movement_consistency_summary = cal_movement_consistency_summary(epochs_json)
+		if movement_consistency_summary:
+			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
+			inactive_hours = movement_consistency_summary.get("inactive_hours")
+			grade = cal_movement_consistency_grade(inactive_hours)
+			grades_calculated_data['movement_consistency_grade'] = grade
 
-# 	def max_values(d,key):
-# 		if(d!=[]):
-# 			seq = [x[key] for x in d]
-# 			return(max(seq))
-# 		else:
-# 			return(0)
+		# Exercise step calculation, Non exercise step calculation and
+		# Non-Exercise steps grade calculation
+		exercise_steps, total_steps = cal_exercise_steps_total_steps(
+										  dailies_json,epochs_json)	
+		steps_calculated_data['non_exercise_steps'] = total_steps - exercise_steps
+		steps_calculated_data['exercise_steps'] = exercise_steps
+		steps_calculated_data['total_steps'] = total_steps
 
-# 	grades_calculated_data = {
-# 		'overall_truth_grade':'',
-# 		'overall_truth_health_gpa':0,
-# 		'movement_non_exercise_steps_grade':'' ,
-# 		'movement_consistency_grade': '' ,
-# 		'avg_sleep_per_night_grade':'',
-# 		'exercise_consistency_grade':'' ,
-# 		'overall_workout_grade':'',
-# 		'prcnt_unprocessed_food_consumed_grade':'',
-# 		'alcoholic_drink_per_week_grade':'' ,
-# 		'penalty':''
-# 	}
+		grades_calculated_data['movement_non_exercise_steps_grade'] = \
+		cal_non_exercise_step_grade(total_steps - exercise_steps)
 
-# 	exercise_calculated_data = {
-# 		'workout_easy_hard':_safe_get(todays_daily_strong, "work_out_easy_or_hard",''),
-# 		'workout_type': '',
-# 		'workout_time': '',
-# 		'workout_location': '',
-# 		'workout_duration': '',
-# 		'maximum_elevation_workout': 0,
-# 		'minutes_walked_before_workout': '',
-# 		'distance': 0,
-# 		'pace': '',
-# 		'avg_heartrate':0,
-# 		'elevation_gain':my_sum(activities_json,'totalElevationGainInMeters'),
-# 		'elevation_loss':my_sum(activities_json,'totalElevationLossInMeters'),
-# 		'effort_level':_safe_get(todays_daily_strong, "workout_effort_level", 0),
+		# Exercise Consistency grade calculation over period of 7 days
+		exercise_consistency_grade = cal_exercise_consistency_grade(
+			[q.workout for q in daily_strong],7)
+		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
 
-# 		'dew_point': weather_data['dewPoint'],
-# 		'temperature': weather_data['temperature'],
-# 		'humidity': weather_data['humidity'],
-# 		'temperature_feels_like': weather_data['apparentTemperature'],
-# 		'wind': weather_data['windSpeed'],
-# 		'hrr': '',
-# 		'hrr_start_point': 0,
-# 		'hrr_beats_lowered': 0,
-# 		'sleep_resting_hr_last_night': _safe_get_dict(dailies_json,'restingHeartRateInBeatsPerMinute',0),
-# 		'vo2_max': _safe_get_dict(user_metrics_json,"vo2Max",0),
-# 		'running_cadence':my_sum(activities_json,'averageRunCadenceInStepsPerMinute'),
-# 		'nose_breath_prcnt_workout': 0,
-# 		'water_consumed_workout':_safe_get(daily_encouraged,
-# 								"water_consumed_during_workout",0),
+		# Penalty calculation
+		penalty = cal_penalty(
+			safe_get(todays_daily_strong,"smoke_any_substances_whatsoever",""),
+			safe_get(todays_daily_strong,"controlled_uncontrolled_substance","")
+		)
+		grades_calculated_data["penalty"] = penalty
+		
+		# If quick look for provided date exist then update it otherwise
+		# create new quicklook instance 
+		try:
+			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
+			update_helper(user_ql.grades_ql,grades_calculated_data)
+			update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
+			update_helper(user_ql.swim_stats_ql, swim_calculated_data)
+			update_helper(user_ql.bike_stats_ql, bike_calculated_data)
+			update_helper(user_ql.steps_ql, steps_calculated_data)
+			update_helper(user_ql.sleep_ql, sleeps_calculated_data)
+			update_helper(user_ql.food_ql, food_calculated_data)
+			update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
 
-# 		'chia_seeds_consumed_workout':_safe_get(daily_optional,
-# 									 "chia_seeds_consumed_during_workout",0),
+		except UserQuickLook.DoesNotExist:
+			user_ql = UserQuickLook.objects.create(user = user,created_at=current_date.date())
+			Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
+			ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
+			SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
+			BikeStats.objects.create(user_ql = user_ql,**bike_calculated_data)
+			Steps.objects.create(user_ql = user_ql,**steps_calculated_data)
+			Sleep.objects.create(user_ql = user_ql,**sleeps_calculated_data)
+			Food.objects.create(user_ql = user_ql,**food_calculated_data)
+			Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
 
-# 		'fast_before_workout': _safe_get(daily_optional,
-# 							  "fasted_during_workout",''),
+		SERIALIZED_DATA.append(UserQuickLookSerializer(user_ql).data)
+		#Add one day to current date
+		current_date += timedelta(days=1)
 
-# 		'pain': _safe_get(daily_encouraged,
-# 				"pains_twings_during_or_after_your_workout",''),
-
-# 		'pain_area': _safe_get(daily_encouraged,"pain_area", ""),
-# 		'stress_level':_safe_get(daily_encouraged, "stress_level_yesterday", ""),
-# 		'sick': _safe_get(daily_optional, "sick", ""),
-# 		'drug_consumed': '',
-# 		'drug': '',
-# 		'medication':_safe_get(todays_daily_strong,
-# 						 "medications_or_controlled_substances_yesterday", ""),
-
-# 		'smoke_substance':_safe_get(todays_daily_strong,
-# 						 "smoke_any_substances_whatsoever", ""),
-
-# 		'exercise_fifteen_more': '',
-# 		'workout_elapsed_time': '',
-# 		'timewatch_paused_workout': '',
-# 		'exercise_consistency':0,
-# 		'workout_duration_grade': '',
-# 		'workout_effortlvl_grade': '',
-# 		'avg_heartrate_grade': '',
-# 		'overall_workout_grade': '',
-# 		'heartrate_variability_grade': '',
-# 		'workout_comment':_safe_get(daily_optional, "general_Workout_Comments", "")
-# 	}
-# 	swim_calculated_data = {
-
-# 		'pace_per_100_yard': 0,
-# 		'total_strokes': 0,
-# 	}
-
-# 	bike_calculated_data = {
-# 		'avg_speed': 0,
-# 		'avg_power': 0,
-# 		'avg_speed_per_mile': 0,
-# 		'avg_cadence': 0,
-# 	}
-
-# 	steps_calculated_data = {
-# 		 'non_exercise_steps':0,
-# 		 'exercise_steps': 0,
-# 		 'total_steps': 0,
-# 		 'floor_climed': my_sum(dailies_json,'floorsClimbed'),
-# 		 'floor_decended':0,
-# 		 'movement_consistency': '',
-# 	}
-
-# 	sleeps_calculated_data = {
-# 		'sleep_per_wearable': '',
-# 		'sleep_per_user_input':'',
-# 		'sleep_aid': _safe_get(todays_daily_strong,
-# 					 "prescription_or_non_prescription_sleep_aids_last_night", ""),
-# 		'sleep_bed_time': '',
-# 		'sleep_awake_time': '',
-# 		'deep_sleep': my_sum(sleeps_json,'deepSleepDurationInSeconds'),
-# 		'light_sleep': my_sum(sleeps_json,'lightSleepDurationInSeconds'),
-# 		'awake_time': my_sum(sleeps_json,'awakeDurationInSeconds'),
-
-# 	}
-
-# 	food_calculated_data = {
-# 		'prcnt_non_processed_food':0,
-# 		'prcnt_non_processed_food_grade': '',
-# 		'non_processed_food': _safe_get(todays_daily_strong,
-# 							 "list_of_unprocessed_food_consumed_yesterday", ""),
-# 		'diet_type':'',
-# 	}
-
-# 	alcohol_calculated_data = {
-# 		'alcohol_day': _safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday",""),
-# 		'alcohol_week': 0
-# 	}
-
-# 	# Calculation of grades
-
-# 	# Average sleep per night grade calculation
-# 	for q in daily_strong:
-# 		if (q.user_input.created_at == start_date_dt.date() and 
-# 			q.sleep_time_excluding_awake_time != ''):
-
-# 			grade = cal_average_sleep_grade(
-# 								  q.sleep_time_excluding_awake_time,
-# 								  q.prescription_or_non_prescription_sleep_aids_last_night)
-# 			grades_calculated_data['avg_sleep_per_night_grade'] = grade
-
-# 	# Unprocessed food grade calculation 
-# 	for q in daily_strong:
-# 		if (q.user_input.created_at == start_date_dt.date() and
-# 			q.prcnt_unprocessed_food_consumed_yesterday != ''):
-# 			grade = cal_unprocessed_food_grade(
-# 									 q.prcnt_unprocessed_food_consumed_yesterday)
-
-# 			grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
-
-# 	# Alcohol drink consumed grade
-# 	alcohol_grade = cal_alcohol_drink_grade(
-# 		[q.number_of_alcohol_consumed_yesterday
-# 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
-# 		for q in daily_strong],
-# 		user.profile.gender)
-
-# 	grades_calculated_data['alcoholic_drink_per_week_grade'] = alcohol_grade
-
-# 	# Movement consistency and movement consistency grade calculation
-# 	movement_consistency_summary = cal_movement_consistency_summary(epochs_json)
-# 	if movement_consistency_summary:
-# 		steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
-# 		inactive_hours = movement_consistency_summary.get("inactive_hours")
-# 		grade = cal_movement_consistency_grade(inactive_hours)
-# 		grades_calculated_data['movement_consistency_grade'] = grade
-
-# 	# Exercise step calculation, Non exercise step calculation and
-# 	# Non-Exercise steps grade calculation
-# 	exercise_steps, total_steps = cal_exercise_steps_total_steps(
-# 									  dailies_json,epochs_json)	
-# 	steps_calculated_data['non_exercise_steps'] = total_steps - exercise_steps
-# 	steps_calculated_data['exercise_steps'] = exercise_steps
-# 	steps_calculated_data['total_steps'] = total_steps
-
-# 	grades_calculated_data['movement_non_exercise_steps_grade'] = \
-# 	cal_non_exercise_step_grade(total_steps - exercise_steps)
-
-
-# 	# If quick look for provided date exist then update it otherwise
-# 	# create new quicklook instance 
-# 	try:
-# 		user_ql = UserQuickLook.objects.get(user=user,created_at = start_date_dt.date())
-# 		_update_helper(user_ql.grades_ql,grades_calculated_data)
-# 		_update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
-# 		_update_helper(user_ql.swim_stats_ql, swim_calculated_data)
-# 		_update_helper(user_ql.bike_stats_ql, bike_calculated_data)
-# 		_update_helper(user_ql.steps_ql, steps_calculated_data)
-# 		_update_helper(user_ql.sleep_ql, sleeps_calculated_data)
-# 		_update_helper(user_ql.food_ql, food_calculated_data)
-# 		_update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
-
-# 	except UserQuickLook.DoesNotExist:
-# 		user_ql = UserQuickLook.objects.create(user = user,created_at=start_date_dt.date())
-# 		Grades.objects.create(user_ql=user_ql, **grades_calculated_data)
-# 		ExerciseAndReporting.objects.create(user_ql = user_ql,**exercise_calculated_data)
-# 		SwimStats.objects.create(user_ql=user_ql, **swim_calculated_data)
-# 		BikeStats.objects.create(user_ql = user_ql,**bike_calculated_data)
-# 		Steps.objects.create(user_ql = user_ql,**steps_calculated_data)
-# 		Sleep.objects.create(user_ql = user_ql,**sleeps_calculated_data)
-# 		Food.objects.create(user_ql = user_ql,**food_calculated_data)
-# 		Alcohol.objects.create(user_ql = user_ql,**alcohol_calculated_data)
+	return SERIALIZED_DATA
