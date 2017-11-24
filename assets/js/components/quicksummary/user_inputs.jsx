@@ -186,6 +186,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
+        		touchScrollEnabled={true}
         		{...props}>
 		        <Column
 		          header={<Cell>User Input</Cell>}

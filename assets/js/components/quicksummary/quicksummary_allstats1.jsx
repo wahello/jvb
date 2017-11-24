@@ -143,7 +143,10 @@ class AllStats1 extends Component{
 		        rowHeight={50}
 		        headerHeight={50}
 		        width={containerWidth}
-        		height={containerHeight}>
+        		height={containerHeight}
+                touchScrollEnabled={true}
+                ownerHeight={500}
+                {...props}>
 		        <Column
 		          header={<Cell>All Stats</Cell>}
 		          cell={props => (

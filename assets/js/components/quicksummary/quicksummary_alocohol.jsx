@@ -56,6 +56,7 @@ class Alcohol extends Component{
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
+        		touchScrollEnabled={true}
         		{...props}>
 		        <Column
 		          header={<Cell>Alchohol</Cell>}

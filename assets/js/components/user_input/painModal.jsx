@@ -192,7 +192,7 @@ export default class PainModal extends Component{
 							{this.props.editable &&
 								<div className="input1">
 									<Textarea
-									type="textarea"
+									style={{height:"500px !important"}}
 									className="form-control"
 									placeholder="Write in....."
 									rows="5" cols="5"

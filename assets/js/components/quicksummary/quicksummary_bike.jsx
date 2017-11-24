@@ -16,7 +16,7 @@ import Dimensions from 'react-dimensions';
 
 	 this.state = {
       myTableData: [
-        {name: 'Avg Speed (MPH) Bike'},
+        {name: 'Avg Speed (MPH) Bike'}, 
         {name: 'Avg Power Bike'},
         {name: 'Asvg Speed Per Mile'},
         {name: 'Avg Cadence Bike'},       
@@ -63,6 +63,7 @@ render(){
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
+        		touchScrollEnabled={true}
         		{...props}>
 		        <Column
 		          header={<Cell>Bike Stats</Cell>}

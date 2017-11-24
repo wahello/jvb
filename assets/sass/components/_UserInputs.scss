@@ -285,3 +285,7 @@ background-color: #777777;
 abbr{
 	background-color: white;
 }
+textarea.form-control{
+	min-height:100px !important;
+	max-height:1000px !important;
+}
