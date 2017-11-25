@@ -211,13 +211,13 @@ def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None):
 		data = [q.data for q in model.objects.filter(
 			user = user,
 			start_time_in_seconds__gte = start_epoch,
-			start_time_in_seconds__lte = end_epoch).order_by(order_by)]
+			start_time_in_seconds__lt = end_epoch).order_by(order_by)]
 		return data
 	else:
 		data = [q.data for q in model.objects.filter(
 			user = user,
 			start_time_in_seconds__gte = start_epoch,
-			start_time_in_seconds__lte = end_epoch)]
+			start_time_in_seconds__lt = end_epoch)]
 		return data
 
 
