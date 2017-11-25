@@ -83,9 +83,9 @@ def _get_data_start_time(json_data,data_type):
 		obj = json_data[0]
 		if data_type != "userMetrics":
 			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
-			start_time = datetime.utcfromtimestamp(int(start_time)).date() 
+			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
 		else:
-			start_time = obj.get("calendarDate")
+			start_time = obj.get("calendarDate").strftime("%Y-%m-%d")
 		return start_time
 
 
