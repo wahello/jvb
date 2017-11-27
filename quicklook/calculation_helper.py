@@ -33,6 +33,11 @@ def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
 
+def sec_to_hours_min(seconds):
+	seconds = int(seconds)
+	hour_min_str = "{}:{}".format(seconds//3600,(int((seconds/60)%60)))
+	return hour_min_str
+
 def safe_sum(d, key):
 	if(d!=[]):
 		return sum([i.get(key,0) for i in d ])
@@ -107,7 +112,10 @@ def get_blank_model_fields(model):
 			'workout_duration': '',
 			'maximum_elevation_workout': 0,
 			'minutes_walked_before_workout': '',
-			'distance': 0,
+			'distance_run': 0,
+			'distance_bike':0,
+			'distance_swim':0,
+			'distance_other':0,
 			'pace': '',
 			'avg_heartrate':0,
 			'elevation_gain':0,
@@ -238,7 +246,7 @@ def extract_weather_data(data):
 		data = data['daily']['data'][0]
 		DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
 		DATA['dewPoint'] = data['dewPoint']
-		DATA['humidity'] = data['humidity'] 
+		DATA['humidity'] = data['humidity'] * 100
 		DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
 									  data['apparentTemperatureMax'])/2, 2)
 		DATA['windSpeed'] = data['windSpeed']
@@ -528,6 +536,53 @@ def get_alcohol_grade(daily_strong,user):
 		user.profile.gender)
 	return alcohol_grade
 
+def get_sleep_stats(sleeps_json):
+	recent_auto_manual = None
+	recent_auto_final = None
+	recent_auto_tentative = None
+	target_sleep_data = None
+
+	sleep_stats = {
+		"deep_sleep": '',
+		"light_sleep": '',
+		"awake_time": '',
+		"sleep_bed_time": '',
+		"sleep_awake_time": ''
+	}
+
+	for obj in sleeps_json:
+		if obj.get('validation',None) == 'AUTO_MANUAL':
+			recent_auto_manual = obj
+			break
+		elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
+			recent_auto_final = obj
+		elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
+			recent_auto_tentative = obj
+
+	if recent_auto_manual:
+		target_sleep_data = recent_auto_manual
+	elif recent_auto_final:
+		target_sleep_data = recent_auto_final
+	else:
+		target_sleep_data = recent_auto_tentative
+
+	if target_sleep_data:
+		sleep_stats['deep_sleep'] = sec_to_hours_min(
+									target_sleep_data.get('deepSleepDurationInSeconds'))
+		sleep_stats['light_sleep'] = sec_to_hours_min(
+									target_sleep_data.get('lightSleepDurationInSeconds'))
+		sleep_stats['awake_time'] = sec_to_hours_min(
+									target_sleep_data.get('awakeDurationInSeconds'))
+		bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
+											 target_sleep_data.get('startTimeOffsetInSeconds'))
+		awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+											   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+											   target_sleep_data.get('durationInSeconds'))
+		sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
+		sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+	
+	return sleep_stats
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -553,7 +608,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 		fetch_weather_data(40.730610,-73.935242,start_epoch))
 
 		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch)
-		sleeps = get_garmin_model_data(UserGarminDataSleep,user,start_epoch,end_epoch)
+
+		# Get sleep data for yesterday
+		sleeps = get_garmin_model_data(UserGarminDataSleep,
+									   user,start_epoch-86400,end_epoch-86400,
+									   '-id')
 		dailies = get_garmin_model_data(UserGarminDataDaily,user,
 										start_epoch,end_epoch,
 										'-start_time_duration_in_seconds')
@@ -601,10 +660,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise
 		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
 														 "work_out_easy_or_hard",'')
-		exercise_calculated_data['elevation_gain'] = safe_sum(activities_json,
-													'totalElevationGainInMeters')
-		exercise_calculated_data['elevation_loss'] = safe_sum(activities_json,
-													'totalElevationLossInMeters')
+		# Meters to foot and rounding half up
+		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(activities_json,
+													'totalElevationGainInMeters')*3.28084,1))
+		exercise_calculated_data['elevation_loss'] = int(round(safe_sum(activities_json,
+													'totalElevationLossInMeters')*3.28084,1))
 		exercise_calculated_data['effort_level'] = safe_get(todays_daily_strong,
 													"workout_effort_level", 0)
 		exercise_calculated_data['dew_point'] = weather_data['dewPoint']
@@ -637,14 +697,17 @@ def create_quick_look(user,from_date=None,to_date=None):
 													 "general_Workout_Comments", "")
 		
 		# Steps
-		steps_calculated_data['floor_climed'] =safe_sum(dailies_json,'floorsClimbed')
+		steps_calculated_data['floor_climed'] = safe_get_dict(dailies,"floorsClimbed",0)
 
 		# Sleeps
+		sleep_stats = get_sleep_stats(sleeps_json)
 		sleeps_calculated_data['sleep_aid'] = safe_get(todays_daily_strong,
 					 "prescription_or_non_prescription_sleep_aids_last_night", "")
-		sleeps_calculated_data['deep_sleep'] = safe_sum(sleeps_json,'deepSleepDurationInSeconds')
-		sleeps_calculated_data['light_sleep'] = safe_sum(sleeps_json,'lightSleepDurationInSeconds')
-		sleeps_calculated_data['awake_time'] = safe_sum(sleeps_json,'awakeDurationInSeconds')
+		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
+		sleeps_calculated_data['light_sleep'] = sleep_stats['light_sleep']
+		sleeps_calculated_data['awake_time'] = sleep_stats['awake_time']
+		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
+		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 
 		# Food
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,

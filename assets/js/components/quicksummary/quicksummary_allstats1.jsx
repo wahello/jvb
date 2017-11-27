@@ -24,7 +24,10 @@ class AllStats1 extends Component{
         {name: 'Avg Heart Rate Grade'},
         {name: 'Chia Seeds consumed during Workout'},
         {name: 'Dew Point'},
-        {name: 'Distance'},
+        {name: 'Distance (in Miles) - Bike'},
+        {name: 'Distance (in Miles) - Other'},
+        {name: 'Distance (In Miles) - Run'},
+        {name: 'Distance (in yards) - Swim'},
         {name: 'Drug'},
         {name: 'Drug Consumed'},
         {name: 'Effort Level'},
@@ -111,8 +114,24 @@ class AllStats1 extends Component{
 					cat !== "user"){
 					for(let key of Object.keys(data[cat]).sort()){
 						if(key !== 'id' && key !== 'user_ql'){
-							all_data.push(data[cat][key]);
-							keys.push(key);
+                            if (key == 'movement_consistency'){
+                                let mc = data[cat][key];
+                                if( mc != undefined && mc != "" && mc != "-"){
+                                    mc = JSON.parse(mc);
+                                    all_data.push(mc.inactive_hours);
+                                }
+                            }
+                            else if(data[cat][key] !== '-' && data[cat][key] !== undefined && 
+                               data[cat][key] !== "" && (key == 'deep_sleep' ||
+                                key == 'light_sleep' || key == 'awake_time')){
+                                let hm = data[cat][key].split(':');
+                                let time_str = `${hm[0]} hour ${hm[1]} min`;
+                                all_data.push(time_str);
+                            }
+                            else{
+    							all_data.push(data[cat][key]);
+                            }
+                            keys.push(key);
 						}
 					}
 				}
@@ -127,7 +146,8 @@ class AllStats1 extends Component{
 				          )}
 			        width={134}
 				/>
-			)
+			);
+            console.log(keys);
 		}
 		return columns;
 	}

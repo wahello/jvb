@@ -286,7 +286,7 @@ class fetchGarminData(APIView):
           output_dict[dtype] = [q.data for q in model.objects.filter(
                       user=user,
                       start_time_in_seconds__gte=data['uploadStartTimeInSeconds'],
-                      start_time_in_seconds__lte=data['uploadEndTimeInSeconds'])]
+                      start_time_in_seconds__lt=data['uploadEndTimeInSeconds'])]
 
         if not output_dict[dtype]:
           # no record in db
