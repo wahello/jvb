@@ -13,8 +13,8 @@ import Dimensions from 'react-dimensions';
 
 	 this.state = {
       myTableData: [
-        {name: 'Sleep Per Wearable'},
-        {name: 'Sleep Per User Input'},
+        {name: 'Sleep per Wearable (excluding awake time)'},
+        {name: 'Sleep Per User Input (excluding awake time)'},
         {name: 'Sleep Aid'},
         {name: 'Sleep Bed Time'}, 
         {name: 'Sleep Awake Time'},

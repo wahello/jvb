@@ -41,6 +41,10 @@ class UserInputs extends React.Component{
         checked:false,
         infoButton:false,
         infoBtn:false,
+        infoWorkout:false,
+        infoWorkoutType:false,
+        unprocessedInfo:false,
+        easyorhardInfo:false,
 
         workout:'',
         workout_type:'',
@@ -140,6 +144,10 @@ class UserInputs extends React.Component{
       this.handleChecked = this.handleChecked.bind(this);
       this.toggleInfo=this.toggleInfo.bind(this);
       this.toggleInfo2=this.toggleInfo2.bind(this);
+      this.toggleInfoworkout=this.toggleInfoworkout.bind(this);
+      this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
+      this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
+      this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -370,6 +378,30 @@ handleScroll() {
     });
    }
 
+   toggleInfoworkout(){
+    this.setState({
+      infoWorkout:!this.state.infoWorkout
+    });
+   }
+
+   toggleInfoworkoutType(){
+    this.setState({
+      infoWorkoutType:!this.state.infoWorkoutType
+    });
+   }
+
+   toggleUnprocessedInfo(){
+    this.setState({
+      unprocessedInfo:!this.state.unprocessedInfo
+    });
+   }
+
+   toggleEasyorHard(){
+    this.setState({
+      easyorhardInfo:!this.state.easyorhardInfo
+    });
+   }
+
   toggleEditForm(){
     this.setState({
       editable:!this.state.editable
@@ -415,8 +447,8 @@ handleChecked(){
 
 
                             <Popover
-                            style={{zIndex:"0"}} 
-                            placement="left" 
+                            style={{height:"220px",overflow:"scroll"}} 
+                            placement="top" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
@@ -430,23 +462,23 @@ handleChecked(){
                                   the time investment. You provide the inputs and we will provide
                                   you the analyses! Create a new habit of reporting your inputs daily!</div>
 
-                                  <p>Reporting your inputs to us has many benefits:</p>
+                                  <p style={{paddingTop:"15px"}}>Reporting your inputs to us has many benefits:</p>
 
-                                  <div>(1) It enables us to report your data to you in a simple, understandable,
+                                  <div style={{paddingTop:"15px"}}>(1) It enables us to report your data to you in a simple, understandable,
                                    and customizable way. Our reporting and proprietary grading system will 
                                    provide you with a powerful tool to identify positive and negative trends
                                     in your health and life, so you can (1) work on improving areas you want
                                      to improve and (2) maintain areas where you are performing well;</div>
 
-                                  <div>(2) If you wear a wearable device, we grab your data from your device
+                                  <div style={{paddingTop:"15px"}}>(2) If you wear a wearable device, we grab your data from your device
                                    and correlate it to your inputs. The correlation of this data provides
                                     a powerful tool for us to make recommendations for improvements across
                                      various categories;</div>
 
-                                  <div>(3) We will also provide you with how you compare against others in various
+                                  <div style={{paddingTop:"15px"}}>(3) We will also provide you with how you compare against others in various
                                    reporting categories and how your grades stack up against others;</div>
 
-                                  <div>(4) Periodically, we will provide you with suggestions on how to improve in various categories.
+                                  <div style={{paddingTop:"15px"}}>(4) Periodically, we will provide you with suggestions on how to improve in various categories.
                                   We find that those that submit their Daily User Inputs Report to us EVERY DAY
                                    often are healthier, happier, have more energy, are leaner, have better blood
                                     work results, are more productive at their job, are less stiff, injured less
@@ -590,6 +622,7 @@ handleChecked(){
                            </Popover> 
 
                            <Popover 
+                           style={{height:"220px",overflow:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
@@ -602,7 +635,7 @@ handleChecked(){
                                  Use the calendar to enter your inputs for a previous day you forgot to submit your inputs!  
                                </div>
 
-                               <div>
+                               <div style={{paddingTop:"15px"}}>
                                TIP:  Many people use the calendar to select tomorrow’s date in order to enter their processed
                                food consumed for the next day’s reporting (since the % unprocessed food question is for the food
                                consumed yesterday and people often forget what they eat unless they write it down right away).
@@ -638,7 +671,19 @@ handleChecked(){
                           <h2><strong>Workout Inputs</strong></h2>
 
                            <FormGroup>   
-                            <Label className="padding">1. Did You Workout Today?</Label>
+                            <Label className="padding">1. Did You Workout Today?
+                             <span id="workoutinfo"
+                             onClick={this.toggleInfoworkout} 
+                             style={{float:"right",paddingLeft:"15px",color:"gray"}}>
+                             <a href="#" style={{color:"white"}}> 
+                             <FontAwesome 
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </a>
+                              </span>
+                            </Label>
                             {this.state.editable &&
                               <div className="input">                           
                               
@@ -671,10 +716,50 @@ handleChecked(){
                               }
                            
                           </FormGroup>
+
+                            <Popover 
+                           style={{height:"220px",overflow:"scroll"}} 
+                            placement="top" 
+                            isOpen={this.state.infoWorkout}
+                            target="workoutinfo" 
+                            toggle={this.toggleInfoworkout}>
+                              <PopoverBody>
+                               <div>
+                                If you worked out (exercised) today, select “Yes”, and
+                                 then answer the questions related to your workout that follow.
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                               TIP:  If you did not workout (exercise) today, select “No” or ‘Not Yet” and
+                               all workout questions will disappear, making it easier for you to answer the
+                               remaining (non workout) questions.
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                               If you selected “Not Yet” and work out later in the today, select “Yes” instead of “Not Yet”.
+                               If you end up not working out, go back to the day you entered “Not Yet” and change the button
+                               to “No”.  You can go back or forward to any date by clicking the calendar at the top of the inputs
+                               page and selecting any date you would like to enter information for.
+                               </div>
+                              </PopoverBody>
+                           </Popover>       
                           
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
-                            <Label className="padding">1.1 What Type of Workout Did You Do Today?</Label>
+                            <Label className="padding">1.1 What Type of Workout Did You Do Today?
+
+                             <span id="workouttypeinfo"
+                             onClick={this.toggleInfoworkoutType} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <a href="#" style={{color:"white"}}> 
+                             <FontAwesome 
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                              </a>
+                              </span>
+                            </Label>
 
                             {this.state.editable &&
                               <div className="input">                           
@@ -709,12 +794,51 @@ handleChecked(){
                                   <p>{this.state.workout_type}</p>
                                 </div>
                               }
-                               </FormGroup>        
-                            }                   
+                               </FormGroup>
+
+                                    
+                            }   
+                             <Popover 
+                           style={{height:"220px",overflow:"scroll"}} 
+                            placement="bottom" 
+                            isOpen={this.state.infoWorkoutType}
+                            target="workouttypeinfo" 
+                            toggle={this.toggleInfoworkoutType}>
+                              <PopoverBody>
+                               <div>
+                               User can select “Cardio”, “Strength” or “Both”.
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                              A Cardio workout is exercise that is focused on consistently
+                              getting your heart rate higher than your resting heart rate
+                              over the period of your workout
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                              A strength workout can be with weights (dumbbells, kettlebells, other things to lift/press)
+                              and/or body resistance based exercises (with or without resistance bands), including but not
+                              limited to squats, lunges, planks, push ups, clamshells, bridges, step ups, jumps, balancing
+                              exercises, pull ups, etc.  
+                               </div>
+                              </PopoverBody>
+                           </Popover>                         
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
-                                <Label className="padding">1.2 Was Your Workout Easy or Hard?</Label>
+                                <Label className="padding">1.2 Was Your Workout Easy or Hard?
+                                <span id="easyorhard"
+                             onClick={this.toggleEasyorHard} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <a href="#" style={{color:"white"}}> 
+                             <FontAwesome 
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                              </a>
+                              </span>
+                                </Label>
                                 {this.state.editable && 
                                  
 
@@ -745,6 +869,47 @@ handleChecked(){
                                 }
                               </FormGroup> 
                           }
+
+                           <Popover 
+                           style={{height:"220px",overflow:"scroll"}} 
+                            placement="bottom" 
+                            isOpen={this.state.easyorhardInfo}
+                            target="easyorhard" 
+                            toggle={this.toggleEasyorHard}>
+                              <PopoverBody>
+                               <div>
+                              User should indicate whether the workout was easy or hard.
+                              We will correlate your answer to this question to your perceived
+                              workout effort level (question 1.4) and also to your workout average
+                              heart rate (from a wearable device). Your thoughtful answers to these
+                              questions are an important part of us assessing your exercise and
+                              identifying ways you can improve you overall health, get leaner 
+                              (and keep weight off), and to get faster as an athlete!
+                                 </div>
+
+
+                               <div style={{paddingTop:"15px"}}>
+                                   You should select “Easy” or “Hard” depending on your perceived effort level
+                                   of your exercise.  If your workout felt easy and you could have continued
+                                   exercising at the same effort level for a long time, select “Easy”.  If you
+                                   could not have continued to exercise for a long period of time because your
+                                   workout was difficult and/or because your exertion level during your workout
+                                   was high, select “Hard”.
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                Users should easily be able to talk during an Easy workout
+                               and should not be suffering at any point whatsoever.  
+                               </div>
+
+                                <div style={{paddingTop:"15px"}}>
+                               If it was hard to talk during a portion of your workout, you suffered for some or most
+                               of your workout, and/or your workout was generally difficult,
+                               select Hard as the answer to this question.  
+                               </div>
+                              </PopoverBody>
+                           </Popover> 
+
 
                         { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>   
@@ -1176,7 +1341,19 @@ handleChecked(){
                             <Label className="padding">5. What % of The Food You Consumed Yesterday Was &nbsp; 
                              <span style={{fontWeight:"bold"}}>
                               <span style={{textDecoration:"underline"}}>Un</span>processed?
-                             </span></Label>
+                             </span>
+                             <span id="unprocessedinfo"
+                             onClick={this.toggleUnprocessedInfo} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <a href="#" style={{color:"white"}}> 
+                             <FontAwesome 
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                              </a>
+                              </span>
+                             </Label>
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input
@@ -1200,6 +1377,123 @@ handleChecked(){
                             {this.renderProcessedFoodModal()}
                             </FormGroup>
                           </FormGroup>
+                           <Popover 
+                           style={{height:"220px",overflow:"scroll"}} 
+                            placement="bottom" 
+                            isOpen={this.state.unprocessedInfo}
+                            target="unprocessedinfo" 
+                            toggle={this.toggleUnprocessedInfo}>
+                              <PopoverBody>
+                               <div>
+                               We encourage people to eat as much unprocessed food as possible and if you
+                               do eat processed foods, try and have the higher quality processed foods that
+                               are free from high fructose corn syrup, hydrogenated oils, and/or other highly
+                               processed and unhealthy ingredients. Our hope is that you will make healthier
+                               food choices because you are reporting your daily unprocessed food consumed.
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   We ask you to provide the % of unprocessed food you consumed yesterday. A few comments:
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   1.We ask for yesterday so we have 24 hours of reporting 
+                               </div>
+
+                                <div style={{paddingTop:"15px"}}>
+                                    2.You determine what % of unprocessed food based on the quantity of
+                                    food you consumed yesterday. There are many ways to determine the
+                                    unprocessed %. (1) If you had 3 meals yesterday and one was highly
+                                    processed and the other 2 meals had little to no unprocessed food,
+                                    you may choose 65-70% as your processed count (as approximately 1/3
+                                    of what you ate was processed); (2) Determine approximately how many
+                                    calories you consumed for the day (ballpark estimate) and take the
+                                    processed calories over the total calories. So, if you ate approximately
+                                    2,000 calories yesterday and had a 200 calorie candy bar, then your processed
+                                    portion would be 10% (200/2000), so your unprocessed portion was 90%
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   Processed foods include (but are not limited to):
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                1. Dairy (cheese, milk, yogurt, other refined milk products),
+                               </div>
+
+                                <div style={{paddingTop:"15px"}}>
+                                  2. Processed meats (particularly cold cut meats that have added salts
+                                   and preservatives that keep the meat from spoiling),
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   3. Bread
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                  4. Pasta (including gluten free pasta)
+                               </div>
+                               <div style={{paddingTop:"15px"}}>
+                                    5. White rice (although wild rice and brown rice is not as processed, read the                                     
+                                     ingredients and determine how processed you think the product is.  If you eat
+                                     brown rice at a restaurant and they added sugar and gluten to your rice, then
+                                     it is more processed than if they simply steamed your brown rice with no additives or preservatives)
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                  6. Oils that have been heated up (e.g., olive oil, coconut oil, avocado oils, corn oils,
+                                   soybean oils, etc).  If the oil has been heated up to prepare/sanitize your food, it is
+                                   processed (for example nuts cooked in oil, anything else heated in oil)
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                  7. Fefined flours, 
+                               </div>
+                               <div style={{paddingTop:"15px"}}>
+                               8. Sodas (diet or regular), 
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   9. High fructose corn syrup, 
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                  10. Hydrogenated oils, 
+                               </div>
+                               <div style={{paddingTop:"15px"}}>
+                              11. Chips/popcorn with oil/sugars, preservatives
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   12. Any refined foods,
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                              13. Any food/snacks with refined/added sugars.  
+                               </div>
+
+                                <div style={{paddingTop:"15px"}}>
+                                  14.   Anything where additives have been added to preserve the food from spoiling.  
+                               </div>
+                               <div style={{paddingTop:"15px"}}>
+                                Eating organic is always a good idea (although we would rather have you eat a non-organic
+                                fruit or vegetable vs eating anything refined).
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   Anything that can sit on your kitchen counter or in shelves without spoiling for long
+                                    periods of time is processed.   If you are looking to improve your health, shoot to eat
+                                    as many unprocessed foods as possible, not eating under a label (e.g., vegan, paleo,
+                                    high carb, low carb, gluten free, etc.).  We see tons of unhealthy paleos, gluten free
+                                    people, and vegans that eat a majority of refined foods.      If there is only one thing
+                                    you change, try to minimize eating processed foods.     Read the ingredients of what you 
+                                    eat (or ask if you eat out).  The less ingredients the better. Ingredients are listed in
+                                    descending order of what is included in the food.   So if sugar is one of the first 3
+                                    ingredients, you know there is a lot of sugar and you should avoid the food in most instances.
+
+                               </div>                      
+                              </PopoverBody>
+                           </Popover>       
 
                           <FormGroup>
                                <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>

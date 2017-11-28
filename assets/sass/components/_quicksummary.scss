@@ -103,3 +103,11 @@ padding:0px 0px 5px 0px;
 background-color: #777777;
 }
 
+.public_fixedDataTableCell_cellContent{
+	overflow:auto;
+	max-height: 100px;
+}
+
+.public_fixedDataTableCell_cellContent::-webkit-auto {
+    width: 10px;
+}

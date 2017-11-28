@@ -454,9 +454,7 @@ handleScroll() {
 		<NavbarMenu fix={false}/>
 		</div>		           									
 			<div className="quick">
-			 				<div id="quick1">
-			                 	<p>Quick Look</p>			                
-			             	</div>
+			 				
 			             <div id="nav3">
 			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
 						  <Navbar light toggleable className="navbar nav2">
@@ -623,17 +621,23 @@ handleScroll() {
                            </Popover> 
                     	
                     	<Container style={{maxWidth:"1250px"}}> 
+
+                    	
                     	<div id="quick2" className="row">
 			   		   <div className="col-lg-2 col-md-2 col-sm-12" style={{marginRight:"30px"}}>       
-		            <div className="quick10">
+		            <div >
+
 				           <Form>
-						        <div style={{paddingBottom:"20px"}} className="justify-content-center">
-						      
+				          <div style={{textAlign:"center",fontSize:"20px",marginBottom:"12px"}}>
+				           <Label >Quick Look</Label>
+				           </div>
+				          
+						        <div style={{paddingBottom:"12px"}} className="justify-content-center">						      
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="start_date"
 						           value={this.state.start_date}
-						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 						           
 						        </div>
 						        <div id="date" className="justify-content-center">
@@ -642,10 +646,10 @@ handleScroll() {
 						          <Input type="date"
 						           name="end_date"
 						           value={this.state.end_date}
-						           onChange={this.handleChange} style={{height:"40px",borderRadius:"7px"}}/>
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 						        
 						        </div>
-						        <div id="date" style={{marginTop:"20px"}} className="justify-content-center">
+						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
 						       
 						        <button
 						        						        

@@ -10,6 +10,7 @@ html,body{/*have to mention html parent element other wise it wont show pic*/
 	background-color: #292C2E;
 	border-bottom: 1px solid #dedede;
 	font-family: 'Alegreya Sans',sans-serif;
+	margin:-1px;
 }
 .navbar .nav .nav-item .nav-link { /* this is parrent to child like in <nav> we have .navbar in <ul> we have .nav in <li> we have 
 .nav-item in <img> we have .nav-link we are giving style to nav-link here  */

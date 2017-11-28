@@ -56,6 +56,7 @@
     "react-fontawesome": "^1.6.1",
     "react-hot-loader": "^3.0.0-beta.7",
     "react-iframe": "^1.0.7",
+    "react-lightbox-component": "^0.2.0",
     "react-popper": "^0.7.4",
     "react-redux": "^5.0.6",
     "react-router": "^4.1.2",

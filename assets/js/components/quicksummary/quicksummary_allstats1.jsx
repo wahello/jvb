@@ -86,8 +86,8 @@ class AllStats1 extends Component{
         {name: 'Sleep Aid'},
         {name: 'Sleep Awake Time'},
         {name: 'Sleep Bed Time'},
-        {name: 'Sleep Per User Input'},
-        {name: 'Sleep Per Wearable'},
+        {name: 'Sleep Per User Input (excluding awake time)'},
+        {name: 'Sleep per Wearable (excluding awake time)'},
         {name: 'Exercise Steps'},
         {name: 'Floor Climed'}, 
         {name: 'Floor Decended'},
@@ -125,7 +125,9 @@ class AllStats1 extends Component{
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={134}
+			        width={135}
+
+
 				/>
 			)
 		}
@@ -140,12 +142,14 @@ class AllStats1 extends Component{
 			<div>
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={50}
+		        rowHeight={100}
 		        headerHeight={50}
 		        width={containerWidth}
-        		height={containerHeight}
+        		maxHeight={containerHeight}
                 touchScrollEnabled={true}
-                ownerHeight={500}
+            
+         
+               
                 {...props}>
 		        <Column
 		          header={<Cell>All Stats</Cell>}
@@ -156,6 +160,8 @@ class AllStats1 extends Component{
 		          )}
 		          width={185}
 		          fixed={true}
+
+
 		        />
 			    {this.renderTableColumns(this.props.data)}	   
       		</Table>
