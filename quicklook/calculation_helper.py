@@ -583,6 +583,9 @@ def get_sleep_stats(sleeps_json):
 	
 	return sleep_stats
 
+def get_distance_stats(activities_json):
+	pass
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -660,6 +663,12 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise
 		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
 														 "work_out_easy_or_hard",'')
+		distance_stats = get_distance_stats(activities_json)
+		exercise_calculated_data['distance_run'] = distance_stats['distance_run']
+		exercise_calculated_data['distance_bike'] = distance_stats['distance_bike']
+		exercise_calculated_data['distance_swim'] = distance_stats['distance_swim']
+		exercise_calculated_data['distance_other'] = distance_stats['distance_other']
+
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(activities_json,
 													'totalElevationGainInMeters')*3.28084,1))
