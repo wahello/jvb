@@ -27,17 +27,20 @@ class Steps extends Component{
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
-			let mc = data[category]["movement_consistency"];
 			let all_data = [];
-
-			if( mc != undefined && mc != "" && mc != "-"){
-				mc = JSON.parse(mc);
-				data[category]["movement_consistency"] = mc.inactive_hours;
-			}
 
 			for(let [key,value] of Object.entries(data[category])){
 				if(key !== 'id' && key !== 'user_ql'){
-					all_data.push(value);
+					if (key == 'movement_consistency'){
+                        let mc = value;
+                        if( mc != undefined && mc != "" && mc != "-"){
+                            mc = JSON.parse(mc);
+                            all_data.push(mc.inactive_hours);
+                        }
+                    }
+                    else{
+						all_data.push(value);
+                    }
 				}
 			}
 

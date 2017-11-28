@@ -112,7 +112,10 @@ class ExerciseAndReporting(models.Model):
 
 	minutes_walked_before_workout = models.CharField(max_length=10)
 	# minutes_walked_before_workout = models.TimeField()
-	distance = models.FloatField()
+	distance_run = models.FloatField()
+	distance_bike = models.FloatField()
+	distance_swim = models.FloatField()
+	distance_other = models.FloatField()
 
 	pace = models.CharField(max_length=10)
 	# pace = models.TimeField()
@@ -206,8 +209,8 @@ class Sleep(models.Model):
 	sleep_aid = models.CharField(choices=YN_CHOICES, max_length=3)
 	
 	# TODO : AM or PM should be taken care
-	sleep_bed_time = models.CharField(max_length=10)
-	sleep_awake_time = models.CharField(max_length=10)
+	sleep_bed_time = models.CharField(max_length=20)
+	sleep_awake_time = models.CharField(max_length=20)
 	deep_sleep = models.CharField(max_length=10)
 	light_sleep = models.CharField(max_length=10)
 	awake_time = models.CharField(max_length=10)

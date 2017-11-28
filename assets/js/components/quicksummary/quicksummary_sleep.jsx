@@ -32,7 +32,15 @@ renderTableColumns(dateWiseData,category,classes=""){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){
 				if(key !== 'id' && key !== 'user_ql'){
-					all_data.push(value);
+					if(value !== '-' && value !== undefined && value !== "" &&
+						(key == 'deep_sleep' ||
+						key == 'light_sleep' ||
+						key == 'awake_time')){
+						let hm = value.split(':');
+						let time_str = `${hm[0]} hour ${hm[1]} min`;
+						all_data.push(time_str);
+					}
+					else all_data.push(value);
 				}
 			}
 

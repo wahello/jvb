@@ -83,9 +83,9 @@ def _get_data_start_time(json_data,data_type):
 		obj = json_data[0]
 		if data_type != "userMetrics":
 			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
-			start_time = datetime.utcfromtimestamp(int(start_time)).date() 
+			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
 		else:
-			start_time = obj.get("calendarDate")
+			start_time = obj.get("calendarDate").strftime("%Y-%m-%d")
 		return start_time
 
 
@@ -160,5 +160,5 @@ def store_garmin_health_push(data):
 
 			# Call celery task to calculate/recalculate quick look for date to
 			# which received data belongs for the target user
-			date = _get_data_start_time(r.json())
-			generate_quicklook.delay(user,date,date)
+			date = _get_data_start_time(r.json(),dtype)
+			generate_quicklook.delay(user.id,date,date)
