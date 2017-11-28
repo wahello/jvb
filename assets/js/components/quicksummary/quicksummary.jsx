@@ -390,7 +390,6 @@ class Quicklook extends Component{
 	componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
 }
-
 handleScroll() {
 
   if (window.scrollY >= 72 && !this.state.scrollingLock) {
