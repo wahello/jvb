@@ -21,7 +21,7 @@ import Dimensions from 'react-dimensions';
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Exercise Consistency Grade'},
         {name: 'Overall Workout Grade'},
-        {name: 'percent NonProcessed Food Consumed Grade'}, 
+        {name: 'Percentage of Unprocessed Food Grade'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
         {name: 'Penalty'}              
       ],

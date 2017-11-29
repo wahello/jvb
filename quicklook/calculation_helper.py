@@ -38,6 +38,15 @@ def sec_to_hours_min(seconds):
 	hour_min_str = "{}:{}".format(seconds//3600,(int((seconds/60)%60)))
 	return hour_min_str
 
+def meter_per_sec_to_pace_per_mile(mps):
+	'''
+	Pace per mile means time (hh:mm) required to cover 1 mile
+	1 meter = 0.000621371 miles
+	'''
+	secs = round(1/(mps * 0.000621371))
+	min_sec_str = "{}:{}".format(secs//60,(int(secs%60)))
+	return min_sec_str
+
 def safe_sum(d, key):
 	if(d!=[]):
 		return sum([i.get(key,0) for i in d ])
@@ -153,7 +162,8 @@ def get_blank_model_fields(model):
 			'workout_effortlvl_grade': '',
 			'avg_heartrate_grade': '',
 			'overall_workout_grade': '',
-			'heartrate_variability_grade': '',
+			'heartrate_variability_stress': '',
+			'fitness_age':'',
 			'workout_comment':''
 		}
 		return fields
@@ -246,7 +256,7 @@ def extract_weather_data(data):
 		data = data['daily']['data'][0]
 		DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
 		DATA['dewPoint'] = data['dewPoint']
-		DATA['humidity'] = data['humidity'] * 100
+		DATA['humidity'] = round(data['humidity'] * 100,2)
 		DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
 									  data['apparentTemperatureMax'])/2, 2)
 		DATA['windSpeed'] = data['windSpeed']
@@ -274,38 +284,156 @@ def fetch_weather_data(latitude,longitude,date):
 	except:
 		return {}
 
-def cal_movement_consistency_summary(epochs_json):
+def get_sleep_stats(sleeps_json,str_dt=True):
+	# If str_dt is True then string reperesentation of sleep and awake
+	# time is returned otherwise datetime Object or None if no sleep data.
+
+	recent_auto_manual = None
+	recent_auto_final = None
+	recent_auto_tentative = None
+	target_sleep_data = None
+
+	sleep_stats = {
+		"deep_sleep": '',
+		"light_sleep": '',
+		"awake_time": '',
+		"sleep_bed_time": '',
+		"sleep_awake_time": ''
+	}
+
+	for obj in sleeps_json:
+		if obj.get('validation',None) == 'AUTO_MANUAL':
+			recent_auto_manual = obj
+			break
+		elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
+			recent_auto_final = obj
+		elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
+			recent_auto_tentative = obj
+
+	if recent_auto_manual:
+		target_sleep_data = recent_auto_manual
+	elif recent_auto_final:
+		target_sleep_data = recent_auto_final
+	else:
+		target_sleep_data = recent_auto_tentative
+
+	if target_sleep_data:
+		sleep_stats['deep_sleep'] = sec_to_hours_min(
+									target_sleep_data.get('deepSleepDurationInSeconds'))
+		sleep_stats['light_sleep'] = sec_to_hours_min(
+									target_sleep_data.get('lightSleepDurationInSeconds'))
+		sleep_stats['awake_time'] = sec_to_hours_min(
+									target_sleep_data.get('awakeDurationInSeconds'))
+		bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
+											 target_sleep_data.get('startTimeOffsetInSeconds'))
+		awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+											   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+											   target_sleep_data.get('durationInSeconds'))
+		if str_dt:
+			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
+			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		else:
+			sleep_stats['sleep_bed_time'] = bed_time
+			sleep_stats['sleep_awake_time'] = awake_time
+
+		return sleep_stats
+	
+	if not str_dt:
+		sleep_stats['sleep_bed_time'] = None
+		sleep_stats['sleep_awake_time'] = None
+
+	return sleep_stats
+
+def get_distance_and_pace_stats(activities_json,manually_updated_json):
+	distance_stats = {
+		"distance_run_miles": 0,
+		"distance_bike_miles": 0,
+		"distance_swim_yards": 0,
+		"distance_other_miles": 0,
+		"pace":''
+	}
+	# If same summary is edited manually then give it more preference.
+	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
+	if len(activities_json):
+		runs_count = 0
+		avg_run_speed_mps = 0
+		for obj in activities_json:
+			if 'running' in obj.get('activityType','').lower():
+				obj = manually_edited(obj)
+				# If summary is manually edited, it's type can also be edited so
+				# we have to recheck to make sure
+				if 'running' in obj.get('activityType','').lower():
+					distance_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
+					avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond")
+					runs_count += 1
+
+			elif 'swimming' in obj.get('activityType','').lower():
+				obj = manually_edited(obj)
+				if 'swimming' in obj.get('activityType','').lower():
+					distance_stats['distance_swim_yards'] += obj.get('distanceInMeters',0)
+
+			elif 'biking' in obj.get('activityType','').lower():
+				obj = manually_edited(obj)
+				if 'biking' in obj.get('activityType','').lower():
+					distance_stats['distance_bike_miles'] += obj.get('distanceInMeters',0)
+
+			elif 'other' in obj.get('activityType','').lower():
+				obj = manually_edited(obj)
+				if 'other' in obj.get('activityType','').lower():
+					distance_stats['distance_other_miles'] += obj.get('distanceInMeters',0)
+
+		# Conversion into respective units
+		to_miles = lambda x: round(x * 0.000621371, 2)
+		to_yards = lambda x: round(x * 1.09361, 2)
+		distance_stats['distance_run_miles'] = to_miles(distance_stats['distance_run_miles'])
+		distance_stats['distance_bike_miles'] = to_miles(distance_stats['distance_bike_miles'])
+		distance_stats['distance_other_miles'] = to_miles(distance_stats['distance_other_miles'])
+		distance_stats['distance_swim_yards'] = to_yards(distance_stats['distance_swim_yards'])
+		if runs_count:
+			distance_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
+
+	return distance_stats
+
+
+def cal_movement_consistency_summary(epochs_json,sleeps_json):
 	
 	'''
 		Calculate the movement consistency summary
 	'''
 	movement_consistency = OrderedDict()
+	sleep_stats = get_sleep_stats(sleeps_json,str_dt=False)
+	bedtime = sleep_stats['sleep_bed_time']
+	awake_time = sleep_stats['sleep_awake_time']
 
-	if epochs_json:
+	if epochs_json and bedtime and awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		for data in epochs_json:
-			if data.get('activityType') == 'WALKING': 
+			if data.get('intensity') != 'SEDENTARY': 
 				start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
-
 				td = timedelta(hours=1)
-				hour_start = datetime.utcfromtimestamp(start_time).strftime("%I %p")
-				hour_end = (datetime.utcfromtimestamp(start_time)+td).strftime("%I %p")
-				time_interval = hour_start+" to "+hour_end
+				hour_start = datetime.utcfromtimestamp(start_time)
+				hour_end = (datetime.utcfromtimestamp(start_time)+td)
 
-				if not movement_consistency.get(time_interval,None):
-				  movement_consistency[time_interval] = {
-					"steps":0,
-					"status":"inactive"
-				  }
+				# If movements are between bedtime and awake time then do not 
+				# include them because person is sleeping. May be person wake
+				# to take water or use washroom. This also not be counted
+				if not (hour_start >= bedtime and hour_end <= awake_time):
+					time_interval = hour_start.strftime("%I %p")+" to "+hour_end.strftime("%I %p")
 
-				steps_in_interval = movement_consistency[time_interval].get('steps')
-				is_active = True if data.get('steps') + steps_in_interval > 300 else False
+					if not movement_consistency.get(time_interval,None):
+					  movement_consistency[time_interval] = {
+						"steps":0,
+						"status":"inactive"
+					  }
 
-				movement_consistency[time_interval]['steps']\
-					= steps_in_interval + data.get('steps')
+					steps_in_interval = movement_consistency[time_interval].get('steps')
+					is_active = True if data.get('steps') + steps_in_interval > 300 else False
 
-				movement_consistency[time_interval]['status']\
-					= 'active' if is_active else 'inactive'
+					movement_consistency[time_interval]['steps']\
+						= steps_in_interval + data.get('steps')
+
+					movement_consistency[time_interval]['status']\
+						= 'active' if is_active else 'inactive'
 
 		active_hours = 0
 		inactive_hours = 0
@@ -408,34 +536,40 @@ def cal_unprocessed_food_grade(prcnt_food):
  		return 'F'
 
 def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
+	'''
+	Calculate Average alcohol dring a week and grade
+	return tuple (grade,average drink)
+	'''
 	alcohol_drank_past_week = ['21' if x == '20+' else x
 								for x in alcohol_drank_past_week]
 
 	drink_avg = sum(map(float,alcohol_drank_past_week))/7
+	grade = ''
 
 	if gender == 'M':
 		if (drink_avg >= 0 and drink_avg <= 4):
-			return 'A'
+			grade = 'A'
 		elif (drink_avg >= 4.01 and drink_avg <= 7):
-			return 'B'
+			grade = 'B'
 		elif (drink_avg >= 7.01 and drink_avg <= 10):
-			return 'C'
+			grade = 'C'
 		elif (drink_avg >= 10.01 and drink_avg <= 13.99):
-			return 'D'
+			grade = 'D'
 		elif (drink_avg >= 14):
-			return 'F'
+			grade = 'F'
 
 	else:
 		if (drink_avg >= 0 and drink_avg <= 2):
-			return 'A'
+			grade = 'A'
 		elif (drink_avg >= 2.01 and drink_avg <= 4):
-			return 'B'
+			grade = 'B'
 		elif (drink_avg >= 4.01 and drink_avg <= 5):
-			return 'C'
+			grade = 'C'
 		elif (drink_avg >= 5.01 and drink_avg <= 6.99):
-			return 'D'
+			grade = 'D'
 		elif (drink_avg >= 7):
-			return 'F'
+			grade = 'F'
+	return (grade,round(drink_avg,2))
 
 def cal_non_exercise_step_grade(steps):
 	if steps >= 10000:
@@ -528,63 +662,14 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 			return grade
 	return ''
 
-def get_alcohol_grade(daily_strong,user):
-	alcohol_grade = cal_alcohol_drink_grade(
+def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
+	alcohol_stats = cal_alcohol_drink_grade(
 		[q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
 		for q in daily_strong],
 		user.profile.gender)
-	return alcohol_grade
+	return alcohol_stats
 
-def get_sleep_stats(sleeps_json):
-	recent_auto_manual = None
-	recent_auto_final = None
-	recent_auto_tentative = None
-	target_sleep_data = None
-
-	sleep_stats = {
-		"deep_sleep": '',
-		"light_sleep": '',
-		"awake_time": '',
-		"sleep_bed_time": '',
-		"sleep_awake_time": ''
-	}
-
-	for obj in sleeps_json:
-		if obj.get('validation',None) == 'AUTO_MANUAL':
-			recent_auto_manual = obj
-			break
-		elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
-			recent_auto_final = obj
-		elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
-			recent_auto_tentative = obj
-
-	if recent_auto_manual:
-		target_sleep_data = recent_auto_manual
-	elif recent_auto_final:
-		target_sleep_data = recent_auto_final
-	else:
-		target_sleep_data = recent_auto_tentative
-
-	if target_sleep_data:
-		sleep_stats['deep_sleep'] = sec_to_hours_min(
-									target_sleep_data.get('deepSleepDurationInSeconds'))
-		sleep_stats['light_sleep'] = sec_to_hours_min(
-									target_sleep_data.get('lightSleepDurationInSeconds'))
-		sleep_stats['awake_time'] = sec_to_hours_min(
-									target_sleep_data.get('awakeDurationInSeconds'))
-		bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
-											 target_sleep_data.get('startTimeOffsetInSeconds'))
-		awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
-											   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-											   target_sleep_data.get('durationInSeconds'))
-		sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
-		sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
-	
-	return sleep_stats
-
-def get_distance_stats(activities_json):
-	pass
 
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -620,9 +705,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 										start_epoch,end_epoch,
 										'-start_time_duration_in_seconds')
 		stress = get_garmin_model_data(UserGarminDataStressDetails,user,start_epoch,end_epoch)
-		activities =get_garmin_model_data(UserGarminDataActivity,user,start_epoch,end_epoch)
+		activities = get_garmin_model_data(UserGarminDataActivity,user,start_epoch,end_epoch)
+		manually_updated = get_garmin_model_data(UserGarminDataManuallyUpdated,user,
+															start_epoch,end_epoch)
 		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
-				user = user,calendar_date = current_date.date())]
+				user = user,calendar_date = current_date.date()).order_by('-id')]
 
 		# pull data for past 7 days (incuding today)
 		daily_strong = list(DailyUserInputStrong.objects.filter(
@@ -646,6 +733,12 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		activities_json = [ast.literal_eval(dic) for dic in activities]
+		# manually_updated_json = [ast.literal_eval(dic) for dic in manually_updated]
+		manually_updated_json = {}
+		for dic in manually_updated:
+			dic = ast.literal_eval(dic)
+			manually_updated_json[dic.get('summaryId')] = dic
+
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
 		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
@@ -663,11 +756,12 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise
 		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
 														 "work_out_easy_or_hard",'')
-		distance_stats = get_distance_stats(activities_json)
-		exercise_calculated_data['distance_run'] = distance_stats['distance_run']
-		exercise_calculated_data['distance_bike'] = distance_stats['distance_bike']
-		exercise_calculated_data['distance_swim'] = distance_stats['distance_swim']
-		exercise_calculated_data['distance_other'] = distance_stats['distance_other']
+		distance_pace_stats= get_distance_and_pace_stats(activities_json,manually_updated_json)
+		exercise_calculated_data['distance_run'] = distance_pace_stats['distance_run_miles']
+		exercise_calculated_data['distance_bike'] = distance_pace_stats['distance_bike_miles']
+		exercise_calculated_data['distance_swim'] = distance_pace_stats['distance_swim_yards']
+		exercise_calculated_data['distance_other'] = distance_pace_stats['distance_other_miles']
+		exercise_calculated_data['pace'] = distance_pace_stats['pace']
 
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(activities_json,
@@ -704,6 +798,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 						 					"smoke_any_substances_whatsoever", "")
 		exercise_calculated_data['workout_comment'] = safe_get(daily_optional,
 													 "general_Workout_Comments", "")
+		exercise_calculated_data['fitness_age'] = safe_get_dict(user_metrics_json,
+													 			"fitnessAge", 0)
+		exercise_calculated_data['heartrate_variability_stress'] = safe_get_dict(dailies_json,
+														'averageStressLevel',-1)
 		
 		# Steps
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies,"floorsClimbed",0)
@@ -739,11 +837,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
 		food_calculated_data['prcnt_non_processed_food_grade'] = grade
 
-		# Alcohol drink consumed grade
-		grades_calculated_data['alcoholic_drink_per_week_grade'] = get_alcohol_grade(daily_strong,user)
+		# Alcohol drink consumed grade and avg alcohol per week
+		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
+		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
+		alcohol_calculated_data['alcohol_week'] = avg_alcohol
 
 		# Movement consistency and movement consistency grade calculation
-		movement_consistency_summary = cal_movement_consistency_summary(epochs_json)
+		movement_consistency_summary = cal_movement_consistency_summary(epochs_json,sleeps_json)
 		if movement_consistency_summary:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
 			inactive_hours = movement_consistency_summary.get("inactive_hours")

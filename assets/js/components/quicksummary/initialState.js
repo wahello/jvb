@@ -77,7 +77,8 @@ export function getInitialState(start_dt, end_dt){
 	        "workout_effortlvl_grade": '-',
 	        "avg_heartrate_grade": '-',
 	        "overall_workout_grade": '-',
-	        "heartrate_variability_grade": '-',
+	        "heartrate_variability_stress": '-',
+	        "fitness_age":'-',
 	        "workout_comment": '-'
 	    },
 	    "swim_stats_ql": {    

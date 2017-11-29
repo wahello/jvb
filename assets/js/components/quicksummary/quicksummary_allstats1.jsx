@@ -36,6 +36,7 @@ class AllStats1 extends Component{
         {name: 'Exercise Consistency '},
         {name: 'Exercise Fifteen More'},        
         {name: 'Fast Before Workout'},
+        {name: 'Fitness Age'},
         {name: 'Heart Rate Variability Stress (garmin)'},
         {name: 'HRR'},
         {name: 'HRR Beats Lowered'},
