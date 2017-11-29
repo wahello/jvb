@@ -110,11 +110,11 @@ class UserGarminDataMoveIQ(models.Model):
 	# data = models.CharField(max_length=2000)
 	data = models.TextField()
 
-# class GarminConnectToken(models.Model):
+class GarminConnectToken(models.Model):
 
-# 	user = models.OneToOneField('auth.User',related_name="garmin_connect_token")
-# 	token = models.CharField(max_length=250)
-# 	token_secret = models.CharField(max_length=250)
+	user = models.OneToOneField('auth.User',related_name="garmin_connect_token")
+	token = models.CharField(max_length=250)
+	token_secret = models.CharField(max_length=250)
 
-# 	def __str__(self):
-# 		return "%s"%(self.user.username)
+	def __str__(self):
+		return "%s"%(self.user.username)

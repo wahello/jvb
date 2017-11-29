@@ -124,7 +124,8 @@ class AllStats1 extends Component{
                             }
                             else if(data[cat][key] !== '-' && data[cat][key] !== undefined && 
                                data[cat][key] !== "" && (key == 'deep_sleep' ||
-                                key == 'light_sleep' || key == 'awake_time')){
+                                key == 'light_sleep' || key == 'awake_time' ||
+                                key == 'sleep_per_wearable')){
                                 let hm = data[cat][key].split(':');
                                 let time_str = `${hm[0]} hour ${hm[1]} min`;
                                 all_data.push(time_str);

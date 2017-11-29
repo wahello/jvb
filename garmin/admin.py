@@ -8,7 +8,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataManuallyUpdated,\
 					UserGarminDataStressDetails,\
 					UserGarminDataMetrics,\
-					UserGarminDataMoveIQ
+					UserGarminDataMoveIQ, \
+					GarminConnectToken
 
 class UserGarminDataEpochAdmin(admin.ModelAdmin):
 	list_display = ('user','summary_id','record_date_in_seconds','start_time_in_seconds',
@@ -69,6 +70,12 @@ class UserGarminDataMoveIQAdmin(admin.ModelAdmin):
 	list_display = ('user','summary_id','record_date_in_seconds','start_time_in_seconds',
 					'start_time_duration_in_seconds','data',)
 
+	search_fields = ('user__username','user__email','user__first_name',
+					 'user__last_name',)
+
+@admin.register(GarminConnectToken)
+class GarminConnectTokenAdmin(admin.ModelAdmin):
+	list_display = ('user','token','token_secret',)
 	search_fields = ('user__username','user__email','user__first_name',
 					 'user__last_name',)
 
