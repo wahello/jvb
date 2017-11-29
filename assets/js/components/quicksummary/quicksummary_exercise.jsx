@@ -61,8 +61,9 @@ constructor(props){
         {name: 'Workout Duration Grade'},
         {name: 'Workout Effort Level Grade'},
         {name: 'Avg Heart Rate Grade'},
-        {name: 'OverAll Workout Grade'}, 
+        {name: 'OverAll Workout Grade'},
         {name: 'Heart Rate Variability Stress (Garmin)'},
+        {name: 'Fitness Age'},
         {name: 'Workout Comment'},                    
       ],
     };

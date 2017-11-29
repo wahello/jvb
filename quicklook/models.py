@@ -165,7 +165,8 @@ class ExerciseAndReporting(models.Model):
 	workout_effortlvl_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	avg_heartrate_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
-	heartrate_variability_grade = models.CharField(choices=GRADE_CHOICES, max_length=1)
+	heartrate_variability_stress =  models.IntegerField()
+	fitness_age = models.IntegerField()
 	workout_comment = models.TextField()
 
 class SwimStats(models.Model):

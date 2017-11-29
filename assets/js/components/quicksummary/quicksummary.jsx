@@ -148,7 +148,8 @@ class Quicklook extends Component{
 			        workout_effortlvl_grade: data.exercise_reporting_ql.workout_effortlvl_grade,
 			        avg_heartrate_grade: data.exercise_reporting_ql.avg_heartrate_grade,
 			        overall_workout_grade: data.exercise_reporting_ql.overall_workout_grade,
-			        heartrate_variability_grade: data.exercise_reporting_ql.heartrate_variability_grade,
+			        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
+			        fitness_age:data.exercise_reporting_ql.fitness_age,
 			        workout_comment:data.exercise_reporting_ql.workout_comment
 			    },
 			    swim_stats_ql: {
@@ -321,7 +322,6 @@ class Quicklook extends Component{
 		let initial_state = getInitialStateUserInput(this.state.start_date,
 													 this.state.end_date);
 
-		// console.log("User Input onfailure state:",initial_state);
 		this.setState({
 			userInputData:initial_state
 		});
