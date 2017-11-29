@@ -454,7 +454,7 @@ handleChecked(){
 
                             <Popover
                             style={{height:"220px",overflow:"scroll"}} 
-                            placement="top" 
+                            placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
@@ -629,7 +629,7 @@ handleChecked(){
 
                            <Popover 
                            style={{height:"220px",overflow:"scroll"}} 
-                            placement="right" 
+                            placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
                             toggle={this.toggleInfo2}>
@@ -681,13 +681,12 @@ handleChecked(){
                              <span id="workoutinfo"
                              onClick={this.toggleInfoworkout} 
                              style={{float:"right",paddingLeft:"15px",color:"gray"}}>
-                             <a href="#" style={{color:"white"}}> 
                              <FontAwesome 
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1.5x"                                      
                                         
                               />
-                              </a>
                               </span>
                             </Label>
                             {this.state.editable &&
@@ -725,7 +724,7 @@ handleChecked(){
 
                             <Popover 
                            style={{height:"220px",overflow:"scroll"}} 
-                            placement="top" 
+                            placement="right" 
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
                             toggle={this.toggleInfoworkout}>
@@ -806,7 +805,7 @@ handleChecked(){
                             }   
                              <Popover 
                            style={{height:"220px",overflow:"scroll"}} 
-                            placement="bottom" 
+                            placement="right" 
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
@@ -878,7 +877,7 @@ handleChecked(){
 
                            <Popover 
                            style={{height:"220px",overflow:"scroll"}} 
-                            placement="bottom" 
+                            placement="right" 
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
@@ -1511,7 +1510,7 @@ handleChecked(){
                           </FormGroup>
                            <Popover 
                            style={{height:"220px",overflow:"scroll"}} 
-                            placement="bottom" 
+                            placement="right" 
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
                             toggle={this.toggleUnprocessedInfo}>
