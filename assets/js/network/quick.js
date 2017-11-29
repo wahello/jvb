@@ -8,7 +8,8 @@ axios.defaults.xsrfCookieName = "csrftoken";
 axiosRetry(axios, { retries: 4}); 
 
 export function quicksummaryDate(startDate,endDate,successquick, errorquick){  
-	  // startDate and endDate are moment objects
+	  startDate = moment(startDate);
+    endDate = moment(endDate);
     const URL = `quicklook/users/data`;
     const config = {
       method: "get",
@@ -27,7 +28,8 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
   }
 
 	export function userInputDate(startDate,endDate,userInputFetchSuccess, userInputFetchfailure){
-    // startDate and endDate are moment objects
+    startDate = moment(startDate);
+    endDate = moment(endDate);
     const URL = `users/daily_input/`;
     const config = {
       method: "get",
@@ -48,7 +50,9 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
   export function createQuicklook(startDate, endDate,
                                   successCallback=undefined,
                                   errorCallback=undefined){
-     // startDate and endDate are moment objects
+
+    startDate = moment(startDate);
+    endDate = moment(endDate);
     const URL = `/quicklook/users/ql_calculation`;
     const config = {
       method: "post",

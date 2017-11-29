@@ -1283,6 +1283,7 @@ handleChecked(){
                             }                          
                           </FormGroup>
 
+                          {/*
                            <FormGroup>
                           
                             <Label className="padding">2.1 Sleep Bed Time</Label>
@@ -1408,6 +1409,7 @@ handleChecked(){
                               </div>
                             }                          
                           </FormGroup>
+                        */}
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>

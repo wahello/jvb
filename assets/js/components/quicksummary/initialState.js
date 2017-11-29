@@ -1,8 +1,9 @@
 import moment from 'moment';
 	
 export function getInitialState(start_dt, end_dt){
+	start_dt = moment(start_dt);
+	end_dt = moment(end_dt);
 	var initial_state = {};
-
 	initial_state[end_dt.format('YYYY-MM-DD')] = {};
 
 	var diff = end_dt.diff(start_dt, 'days');
