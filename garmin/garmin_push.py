@@ -81,13 +81,15 @@ def _createObjectList(user,json_data,dtype,record_dt):
 def _get_data_start_time(json_data,data_type):
 	if len(json_data):
 		obj = json_data[0]
-		if data_type != "userMetrics":
+		if not data_type in ["userMetrics","bodyComps"]:
 			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
-		else:
+		elif data_type == "userMetrics":
 			start_time = obj.get("calendarDate").strftime("%Y-%m-%d")
+		elif data_type == "bodyComps":
+			start_time = obj.get("measurementTimeInSeconds",0)+_safe_get(obj,"measurementTimeOffsetInSeconds",0)
+			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
 		return start_time
-
 
 def store_garmin_health_push(data):
 

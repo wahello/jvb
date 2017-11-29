@@ -298,7 +298,8 @@ def get_sleep_stats(sleeps_json,str_dt=True):
 		"light_sleep": '',
 		"awake_time": '',
 		"sleep_bed_time": '',
-		"sleep_awake_time": ''
+		"sleep_awake_time": '',
+		"sleep_per_wearable":''
 	}
 
 	for obj in sleeps_json:
@@ -329,6 +330,9 @@ def get_sleep_stats(sleeps_json,str_dt=True):
 		awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
 											   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 											   target_sleep_data.get('durationInSeconds'))
+		sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
+							 - target_sleep_data.get('awakeDurationInSeconds',0)
+		sleep_stats['sleep_per_wearable'] = sec_to_hours_min(sleep_per_wearable)
 		if str_dt:
 			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
 			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
@@ -815,6 +819,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['awake_time'] = sleep_stats['awake_time']
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
+		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
 
 		# Food
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,
