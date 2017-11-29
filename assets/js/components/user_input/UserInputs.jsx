@@ -73,6 +73,12 @@ class UserInputs extends React.Component{
         calories_item:'',
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
+        sleep_hours_bed_time:'',
+        sleep_mins_bed_time:'',
+        sleep_hours_awake_time:'',
+        sleep_mins_awake_time:'',
+        awake_hours_time:'',
+        awake_mins_time:'',
         sleep_comment:'',
         prescription_sleep_aids:'',
         sleep_aid_taken:'',
@@ -1273,6 +1279,132 @@ handleChecked(){
                               <div className="input">
                               {(this.state.sleep_hours_last_night && this.state.sleep_mins_last_night) &&
                                 <p>{this.state.sleep_hours_last_night} hours {this.state.sleep_mins_last_night} minutes</p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+
+                           <FormGroup>
+                          
+                            <Label className="padding">2.1 Sleep Bed Time</Label>
+                            {this.state.editable &&
+                              <div>
+                                <div className="col-xs-6">
+                                  <div className="input"> 
+                                <Input type="select" name="sleep_hours_last_night"
+                                id="hours"
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_bed_time}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(0,24)}                        
+                                </Input>
+                                </div>
+                                </div>
+                              
+                                <div className="col-xs-6 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="sleep_mins_last_night"
+                                 id="minutes"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_bed_time}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time) &&
+                                <p>{this.state.sleep_hours_bed_time} hours {this.state.sleep_mins_bed_time} minutes</p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+
+                           <FormGroup>
+                          
+                            <Label className="padding">2.2 Sleep Awake Time</Label>
+                            {this.state.editable &&
+                              <div>
+                                <div className="col-xs-6">
+                                  <div className="input"> 
+                                <Input type="select" name="sleep_hours_last_night"
+                                id="hours"
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_awake_time}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(0,24)}                        
+                                </Input>
+                                </div>
+                                </div>
+                              
+                                <div className="col-xs-6 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="sleep_mins_last_night"
+                                 id="minutes"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_awake_time}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.sleep_hours_awake_time && this.state.sleep_mins_awake_time) &&
+                                <p>{this.state.sleep_hours_awake_time} hours {this.state.sleep_mins_awake_time} minutes</p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+
+                           <FormGroup>
+                          
+                            <Label className="padding">2.3 Awake Time</Label>
+                            {this.state.editable &&
+                              <div>
+                                <div className="col-xs-6">
+                                  <div className="input"> 
+                                <Input type="select" name="sleep_hours_last_night"
+                                id="hours"
+                                className="form-control custom-select"
+                                value={this.state.awake_hours_time}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(0,24)}                        
+                                </Input>
+                                </div>
+                                </div>
+                              
+                                <div className="col-xs-6 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="sleep_mins_last_night"
+                                 id="minutes"
+                                className="form-control custom-select "
+                                value={this.state.awake_mins_time}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.awake_hours_time && this.state.awake_mins_time) &&
+                                <p>{this.state.awake_hours_time} hours {this.state.awake_mins_time} minutes</p>
                               }
                               </div>
                             }                          
