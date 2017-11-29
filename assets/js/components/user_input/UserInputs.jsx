@@ -756,13 +756,14 @@ handleChecked(){
                              <span id="workouttypeinfo"
                              onClick={this.toggleInfoworkoutType} 
                              style={{paddingLeft:"15px",color:"gray"}}>
-                             <a href="#" style={{color:"white"}}> 
+                            
                              <FontAwesome 
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
                               />
-                              </a>
+                            
                               </span>
                             </Label>
 
@@ -835,13 +836,14 @@ handleChecked(){
                                 <span id="easyorhard"
                              onClick={this.toggleEasyorHard} 
                              style={{paddingLeft:"15px",color:"gray"}}>
-                             <a href="#" style={{color:"white"}}> 
+                            
                              <FontAwesome 
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
                               />
-                              </a>
+                          
                               </span>
                                 </Label>
                                 {this.state.editable && 
@@ -1478,13 +1480,14 @@ handleChecked(){
                              <span id="unprocessedinfo"
                              onClick={this.toggleUnprocessedInfo} 
                              style={{paddingLeft:"15px",color:"gray"}}>
-                             <a href="#" style={{color:"white"}}> 
+                           
                              <FontAwesome 
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
                               />
-                              </a>
+                        
                               </span>
                              </Label>
                               {this.state.editable &&

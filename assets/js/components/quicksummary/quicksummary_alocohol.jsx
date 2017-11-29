@@ -52,7 +52,7 @@ class Alcohol extends Component{
 			<div className="quick3">			
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={50}
+		        rowHeight={100}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
