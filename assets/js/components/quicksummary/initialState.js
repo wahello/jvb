@@ -1,8 +1,9 @@
 import moment from 'moment';
 	
 export function getInitialState(start_dt, end_dt){
+	start_dt = moment(start_dt);
+	end_dt = moment(end_dt);
 	var initial_state = {};
-
 	initial_state[end_dt.format('YYYY-MM-DD')] = {};
 
 	var diff = end_dt.diff(start_dt, 'days');
@@ -42,7 +43,7 @@ export function getInitialState(start_dt, end_dt){
 	        "distance_swim":'-',
 	        "distance_other":'-',
 	        "pace": '-',
-	        "avg_heartrate": '-',
+	        "avg_heartrate": '{}',
 	        "elevation_gain": '-',
 	        "elevation_loss": '-',
 	        "effort_level": '-',

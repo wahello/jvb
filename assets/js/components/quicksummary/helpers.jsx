@@ -1,10 +1,11 @@
 import React from 'react';
 import FontAwesome from "react-fontawesome";
+import moment from 'moment';
 
 export function renderQlFetchOverlay(){
 	if(this.state.fetching_ql){
-		let start_date = this.state.start_date;
-		let end_date = this.state.end_date;
+		let start_date = moment(this.state.start_date);
+		let end_date = moment(this.state.end_date);
 		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">
@@ -26,8 +27,8 @@ export function renderQlFetchOverlay(){
 
 export function renderQlCreateOverlay(){
 	if(this.state.creating_ql){
-		let start_date = this.state.start_date;
-		let end_date = this.state.end_date;
+		let start_date = moment(this.state.start_date);
+		let end_date = moment(this.state.end_date);
 		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">

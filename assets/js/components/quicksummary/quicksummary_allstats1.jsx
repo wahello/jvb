@@ -151,7 +151,6 @@ class AllStats1 extends Component{
 
 				/>
 			);
-            console.log(keys);
 		}
 		return columns;
 	}

@@ -72,8 +72,8 @@ class Quicklook extends Component{
 
 		this.state = {
 			today_date:moment(),
-			start_date:moment().subtract(7,'days'),
-			end_date:moment(),
+			start_date:moment().subtract(7,'days').toDate(),
+			end_date:moment().toDate(),
 			visible: true,
 			error:false,
 			calendarOpen:false,
@@ -320,8 +320,6 @@ class Quicklook extends Component{
 			      }
 		     }
 		}
-
-		// console.log("User Input onsuccess state:",initial_state);
 		this.setState({
 			userInputData:initial_state
 		});
@@ -342,8 +340,8 @@ class Quicklook extends Component{
 		let end_dt = moment(date);
 		let start_dt = moment(date).subtract(7,'days');
 		this.setState({
-			start_date : start_dt,
-			end_date : end_dt,
+			start_date : start_dt.toDate(),
+			end_date : end_dt.toDate(),
 			fetching_ql:true
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
@@ -366,8 +364,8 @@ class Quicklook extends Component{
   	let start_dt = moment(this.state.start_date);
   	let end_dt = moment(this.state.end_date);
   	this.setState({
-			start_date : start_dt,
-			end_date : end_dt,
+			start_date : start_dt.toDate(),
+			end_date : end_dt.toDate(),
 			fetching_ql:true
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
@@ -730,9 +728,11 @@ onLogoutSuccess(response){
                     	<Container style={{maxWidth:"1260px"}}>
                     	<div style={{textAlign:"center",fontSize:"20px",marginBottom:"12px"}}>
 				           <Label >Quick Look</Label>
+
 				           </div>                   	
-                    	<div id="quick2" className="row justify-content-center">			   		                    
-                    
+
+                    <div className="col-lg-9 col-md-9 col-sm-12">
+
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}

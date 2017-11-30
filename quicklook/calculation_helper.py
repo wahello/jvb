@@ -29,6 +29,21 @@ from quicklook.models import UserQuickLook,\
 
 from quicklook.serializers import UserQuickLookSerializer
 
+def get_activities():
+	activities = [
+	'ALL','UNCATEGORIZED','SEDENTARY','SLEEP','RUNNING','STREET_RUNNING','TRACK_RUNNING',
+	'TRAIL_RUNNING','TREADMILL_RUNNING','CYCLING','CYCLOCROSS','DOWNHILL_BIKING',
+	'INDOOR_CYCLING','MOUNTAIN_BIKING','RECUMBENT_CYCLING','ROAD_BIKING','TRACK_CYCLING',
+	'FITNESS_EQUIPMENT','ELLIPTICAL','INDOOR_CARDIO','INDOOR_ROWING','STAIR_CLIMBING',
+	'STRENGTH_TRAINING','HIKING','SWIMMING','LAP_SWIMMING','OPEN_WATER_SWIMMING','WALKING',
+	'CASUAL_WALKING','SPEED_WALKING','TRANSITION','SWIMTOBIKETRANSITION','BIKETORUNTRANSITION',
+	'RUNTOBIKETRANSITION','MOTORCYCLING','OTHER','BACKCOUNTRY_SKIING_SNOWBOARDING',
+	'BOATING','CROSS_COUNTRY_SKIING','DRIVING_GENERAL','FLYING','GOLF','HORSEBACK_RIDING',
+	'INLINE_SKATING','MOUNTAINEERING','PADDLING','RESORT_SKIING_SNOWBOARDING','ROWING',
+	'SAILING','SKATE_SKIING','SKATING','SNOWMOBILING','SNOW_SHOE','STAND_UP_PADDLEBOARDING',
+	'WHITEWATER_RAFTING_KAYAKING']
+	return activities
+
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
@@ -126,7 +141,7 @@ def get_blank_model_fields(model):
 			'distance_swim':0,
 			'distance_other':0,
 			'pace': '',
-			'avg_heartrate':0,
+			'avg_heartrate':json.dumps({}),
 			'elevation_gain':0,
 			'elevation_loss':0,
 			'effort_level':0,
@@ -348,55 +363,62 @@ def get_sleep_stats(sleeps_json,str_dt=True):
 
 	return sleep_stats
 
-def get_distance_and_pace_stats(activities_json,manually_updated_json):
-	distance_stats = {
+def get_activity_stats(activities_json,manually_updated_json):
+	activity_stats = {
 		"distance_run_miles": 0,
 		"distance_bike_miles": 0,
 		"distance_swim_yards": 0,
 		"distance_other_miles": 0,
-		"pace":''
+		"pace":'',
+		"avg_heartrate":json.dumps({})
 	}
+
+	activities_hr = {act:{"hr":0,"count":0} for act in get_activities()}
+
 	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
+
 	if len(activities_json):
 		runs_count = 0
 		avg_run_speed_mps = 0
 		for obj in activities_json:
+			obj = manually_edited(obj)
+			activities_hr[obj.get('activityType','')]['hr'] += obj.get(
+											'averageHeartRateInBeatsPerMinute',0)
+			activities_hr[obj.get('activityType','')]['count'] += 1
+
 			if 'running' in obj.get('activityType','').lower():
-				obj = manually_edited(obj)
-				# If summary is manually edited, it's type can also be edited so
-				# we have to recheck to make sure
-				if 'running' in obj.get('activityType','').lower():
-					distance_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
-					avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond")
-					runs_count += 1
+				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
+				avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond")
+				runs_count += 1
 
 			elif 'swimming' in obj.get('activityType','').lower():
-				obj = manually_edited(obj)
-				if 'swimming' in obj.get('activityType','').lower():
-					distance_stats['distance_swim_yards'] += obj.get('distanceInMeters',0)
+				activity_stats['distance_swim_yards'] += obj.get('distanceInMeters',0)
 
 			elif 'biking' in obj.get('activityType','').lower():
-				obj = manually_edited(obj)
-				if 'biking' in obj.get('activityType','').lower():
-					distance_stats['distance_bike_miles'] += obj.get('distanceInMeters',0)
+				activity_stats['distance_bike_miles'] += obj.get('distanceInMeters',0)
 
 			elif 'other' in obj.get('activityType','').lower():
-				obj = manually_edited(obj)
-				if 'other' in obj.get('activityType','').lower():
-					distance_stats['distance_other_miles'] += obj.get('distanceInMeters',0)
+				activity_stats['distance_other_miles'] += obj.get('distanceInMeters',0)
 
+		for key,val in activities_hr.items():
+			if val['count']:
+				activities_hr[key] = round(val['hr']/val['count'])
+			else:
+				activities_hr[key] = val['hr']			
+		activity_stats['avg_heartrate'] = json.dumps(activities_hr)
+		
 		# Conversion into respective units
 		to_miles = lambda x: round(x * 0.000621371, 2)
 		to_yards = lambda x: round(x * 1.09361, 2)
-		distance_stats['distance_run_miles'] = to_miles(distance_stats['distance_run_miles'])
-		distance_stats['distance_bike_miles'] = to_miles(distance_stats['distance_bike_miles'])
-		distance_stats['distance_other_miles'] = to_miles(distance_stats['distance_other_miles'])
-		distance_stats['distance_swim_yards'] = to_yards(distance_stats['distance_swim_yards'])
+		activity_stats['distance_run_miles'] = to_miles(activity_stats['distance_run_miles'])
+		activity_stats['distance_bike_miles'] = to_miles(activity_stats['distance_bike_miles'])
+		activity_stats['distance_other_miles'] = to_miles(activity_stats['distance_other_miles'])
+		activity_stats['distance_swim_yards'] = to_yards(activity_stats['distance_swim_yards'])
 		if runs_count:
-			distance_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
+			activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
 
-	return distance_stats
+	return activity_stats
 
 
 def cal_movement_consistency_summary(epochs_json,sleeps_json):
@@ -760,12 +782,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise
 		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
 														 "work_out_easy_or_hard",'')
-		distance_pace_stats= get_distance_and_pace_stats(activities_json,manually_updated_json)
-		exercise_calculated_data['distance_run'] = distance_pace_stats['distance_run_miles']
-		exercise_calculated_data['distance_bike'] = distance_pace_stats['distance_bike_miles']
-		exercise_calculated_data['distance_swim'] = distance_pace_stats['distance_swim_yards']
-		exercise_calculated_data['distance_other'] = distance_pace_stats['distance_other_miles']
-		exercise_calculated_data['pace'] = distance_pace_stats['pace']
+		activity_stats = get_activity_stats(activities_json,manually_updated_json)
+		exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
+		exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
+		exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
+		exercise_calculated_data['distance_other'] = activity_stats['distance_other_miles']
+		exercise_calculated_data['pace'] = activity_stats['pace']
+		exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(activities_json,
