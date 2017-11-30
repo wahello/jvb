@@ -831,7 +831,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 														'averageStressLevel',-1)
 		
 		# Steps
-		steps_calculated_data['floor_climed'] = safe_get_dict(dailies,"floorsClimbed",0)
+		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
 
 		# Sleeps
 		sleep_stats = get_sleep_stats(sleeps_json)
