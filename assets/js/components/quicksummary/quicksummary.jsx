@@ -10,6 +10,9 @@ import CalendarWidget from 'react-calendar-widget';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
 import { withRouter, Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+
+import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';
@@ -757,4 +760,14 @@ onLogoutSuccess(response){
 	);
 	}
 }
-export default connect(null,{})(Quicklook);
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(Quicklook));
+Navbar.propTypes={
+    fixed: PropTypes.string,
+    color: PropTypes.string,
+}
