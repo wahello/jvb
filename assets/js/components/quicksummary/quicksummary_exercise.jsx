@@ -64,49 +64,97 @@ class Exercise extends Component {
 constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
-
+     let cols = this.renderTableColumns(props.data,"exercise_reporting_ql");
 	 this.state = {
-      tableAttrColumn: [{name: 'Workout Easy Hard'}]
+      tableAttrColumn: cols[1],
+      columns:cols[0]
     };
   }
-
+componentWillReceiveProps(nextProps){
+    let cols = this.renderTableColumns(nextProps.data,"exercise_reporting_ql");
+     this.state = {
+      tableAttrColumn: cols[1],
+      columns:cols[0]
+    };
+}
 isEmpty(obj){
     return Object.keys(obj).length === 0 && obj.constructor === Object
 }
 
 renderTableColumns(dateWiseData,category,classes=""){
-		let columns = [];
-        keys = [];
-		for(let [date,data] of Object.entries(dateWiseData)){
-            let all_data = [];
-            for(let [key,value] of Object.entries(data[category])){
-                if(key !== 'id' && key !== 'user_ql'){
-                    if(key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
-                        // avg heart rate logic
-                    }
-                    else
-                        all_data.push(value);
-                    keys.push(key)
+	let columns = [];
+    let avgHrKeys =  [];
+    let keys = [];
+    let pushKeytoggle = true;
+
+    for(let [date,data] of Object.entries(dateWiseData)){
+        let avg_heartrate = data[category]['avg_heartrate'];
+        if(!this.isEmpty(JSON.parse(avg_heartrate))){
+            let avgHrJson = JSON.parse(avg_heartrate);
+            for(let act of Object.keys(avgHrJson).sort()){
+                if (avgHrJson[act] != 0){
+                    if(avgHrKeys.indexOf(act) < 0)
+                        avgHrKeys.push(act);
                 }
             }
+        }
+    }
 
-			columns.push(
-				<Column 
-					header={<Cell>{date}</Cell>}
-			        cell={props => (
-				            <Cell {...props}>
-				              {all_data[props.rowIndex]}
-				            </Cell>
-				          )}
-			        width={134}
-				/>
-			)
-		}
-		return columns;
-	}	
+	for(let [date,data] of Object.entries(dateWiseData)){
+        let all_data = [];
+        for(let [key,value] of Object.entries(data[category])){
+            if(key !== 'id' && key !== 'user_ql'){
+                if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
+                    let avgHrJson = JSON.parse(value);
+                    for(let act of avgHrKeys)
+                        all_data.push(avgHrJson[act]);
+                }
+                else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
+                    for(let act of avgHrKeys)
+                        all_data.push(0);
+                }
+                else
+                    all_data.push(value);
+
+                if(pushKeytoggle)
+                    keys.push(key);
+            }
+
+        }
+
+		columns.push(
+			<Column 
+				header={<Cell>{date}</Cell>}
+		        cell={props => (
+			            <Cell {...props}>
+			              {all_data[props.rowIndex]}
+			            </Cell>
+			          )}
+		        width={134}
+			/>
+		);
+        pushKeytoggle = false;
+	}
+    let tableAttrColumn = [];
+    for(let key of keys){
+        if(key == "avg_heartrate"){
+            for(let act of avgHrKeys){
+                let label = {name:attrVerboseName[key]+" "+act}
+                tableAttrColumn.push(label);
+            }
+        }
+        else{
+            let label = {name:attrVerboseName[key]};
+            tableAttrColumn.push(label);
+        }
+    }
+	return [columns,tableAttrColumn];
+}	
+
 	render(){
         const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.tableAttrColumn.length;
+
 		return(
 			<div className="quick3"
             >
@@ -122,13 +170,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 		          header={<Cell>Exercise Reporting</Cell>}
 		          cell={props => (
 		            <Cell {...props}>
-		              {this.state.myTableData[props.rowIndex].name}
+		              {this.state.tableAttrColumn[props.rowIndex].name}
 		            </Cell>
 		          )}
 		          width={185}
 		          fixed={true}
 		        />
-			    {this.renderTableColumns(this.props.data,"exercise_reporting_ql")}
+			    {this.state.columns}
       		</Table>
 			</div>
 

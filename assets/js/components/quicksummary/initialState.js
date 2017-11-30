@@ -43,7 +43,7 @@ export function getInitialState(start_dt, end_dt){
 	        "distance_swim":'-',
 	        "distance_other":'-',
 	        "pace": '-',
-	        "avg_heartrate": '-',
+	        "avg_heartrate": '{}',
 	        "elevation_gain": '-',
 	        "elevation_loss": '-',
 	        "effort_level": '-',
