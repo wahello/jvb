@@ -532,7 +532,7 @@ onLogoutSuccess(response){
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="start_date"
-						           value={this.state.start_date}
+						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 						           
 						        </div>
@@ -541,7 +541,7 @@ onLogoutSuccess(response){
 						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="end_date"
-						           value={this.state.end_date}
+						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 						        
 						        </div>
