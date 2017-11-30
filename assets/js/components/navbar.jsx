@@ -48,6 +48,7 @@ class NavbarMenu extends React.Component {
                  size = "1x"
                                           
              />
+            
           </NavbarToggler>
           <Link to='/'>
             <NavbarBrand 

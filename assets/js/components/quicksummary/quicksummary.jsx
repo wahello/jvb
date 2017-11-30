@@ -9,6 +9,7 @@ import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
+import { withRouter, Link } from 'react-router-dom';
 
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';
@@ -59,7 +60,13 @@ class Quicklook extends Component{
 		this.onQuicklookFailure = this.onQuicklookFailure.bind(this);
 		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
-		
+
+
+		this.toggleDate=this.toggleDate.bind(this);
+	    this.toggleNav = this.toggleNav.bind(this);
+	    this.handleLogout = this.handleLogout.bind(this);
+	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);	
+
 		let initial_state = getInitialState(moment().subtract(7,'days'),
 											moment());   
 
@@ -72,9 +79,11 @@ class Quicklook extends Component{
 			calendarOpen:false,
 			scrollingLock: false,
 			isOpen: false,
+			isOpen1:false,
 			activeTab : 'allstats1',
 			fetching_ql:false,
 			creating_ql:false,
+			dateRange:false,
 			userInputData:{},
 			data:initial_state
 		};
@@ -413,6 +422,17 @@ handleScroll() {
      
     });
   }
+  toggleNav() {
+    this.setState({
+      isOpen1: !this.state.isOpen1,
+     
+    });
+  }
+ toggleDate(){
+    this.setState({
+      dateRange:!this.state.dateRange
+    });
+   }
 
   onQuicklookSuccess(data,start_date,end_date){
   	this.successquick(data,start_date,end_date);
@@ -436,9 +456,17 @@ handleScroll() {
   					this.onQuicklookSuccess, this.onQuicklookFailure);
   	}.bind(this));
   }
+onLogoutSuccess(response){
+    this.props.history.push("/#logout");
+  }
+
+  handleLogout(){
+    this.props.logoutUser(this.onLogoutSuccess);
+  }
 
 
 	render(){
+		const {fix} = this.props;
 		const {activeTab}=this.state;
 		const class_allstats1=`nav-link ${activeTab === "allstats1" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
@@ -451,10 +479,87 @@ handleScroll() {
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
 	return(
-		<div>
 		<div className="container-fluid">
-		<NavbarMenu fix={false}/>
-		</div>		           									
+		
+		 <Navbar toggleable 
+         fixed={fix ? 'top' : ''} 
+          className="navbar navbar-expand-sm navbar-inverse">
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
+           <FontAwesome 
+                 name = "bars"
+                 size = "1x"
+                                          
+             />
+
+          </NavbarToggler>
+
+          <Link to='/'>
+            <NavbarBrand 
+              className="navbar-brand float-sm-left" 
+              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>HEALTH AND WELLNESS
+            </NavbarBrand>
+          </Link>
+          
+            <button className="btn btn-info"
+            id="daterange"
+            style={{width:"110px"}}
+            onClick={this.toggleDate} >Date Range</button>
+          
+
+          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>            
+              <NavItem className="float-sm-right">  
+                <Link className="nav-link" to='/'>Home</Link>
+              </NavItem>
+               <NavItem className="float-sm-right">                
+                   <NavLink  
+                   className="nav-link"                    
+                   onClick={this.handleLogout}>Log Out
+                    </NavLink>               
+              </NavItem>  
+            </Nav>
+          </Collapse>
+        </Navbar>
+	
+		 					<Popover                         
+                            placement="bottom" 
+                            isOpen={this.state.dateRange}
+                            target="daterange" 
+                            toggle={this.toggleDate}>
+                              <PopoverBody>
+                                <div >
+
+				           <Form>				         				          
+						        <div style={{paddingBottom:"12px"}} className="justify-content-center">						      
+						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          <Input type="date"
+						           name="start_date"
+						           value={this.state.start_date}
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+						           
+						        </div>
+						        <div id="date" className="justify-content-center">
+						       
+						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          <Input type="date"
+						           name="end_date"
+						           value={this.state.end_date}
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+						        
+						        </div>
+						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+						       
+						        <button
+						        						        
+						         type="submit"
+						         className="btn btn-block-lg btn-info"
+						         onClick={this.onSubmitDate} style={{width:"175px"}}>Submit</button>
+						         </div>
+
+						   </Form>
+					</div>
+                              </PopoverBody>
+                           </Popover> 		           									
 			<div className="quick">
 			 				
 			             <div id="nav3">
@@ -622,50 +727,12 @@ handleScroll() {
                               </PopoverBody>
                            </Popover> 
                     	
-                    	<Container style={{maxWidth:"1250px"}}> 
-
-                    	
-                    	<div id="quick2" className="row">
-			   		   <div className="col-lg-2 col-md-2 col-sm-12" style={{marginRight:"30px"}}>       
-		            <div >
-
-				           <Form>
-				          <div style={{textAlign:"center",fontSize:"20px",marginBottom:"12px"}}>
+                    	<Container style={{maxWidth:"1260px"}}>
+                    	<div style={{textAlign:"center",fontSize:"20px",marginBottom:"12px"}}>
 				           <Label >Quick Look</Label>
-				           </div>
-				          
-						        <div style={{paddingBottom:"12px"}} className="justify-content-center">						      
-						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-						          <Input type="date"
-						           name="start_date"
-						           value={this.state.start_date}
-						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-						           
-						        </div>
-						        <div id="date" className="justify-content-center">
-						       
-						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-						          <Input type="date"
-						           name="end_date"
-						           value={this.state.end_date}
-						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-						        
-						        </div>
-						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
-						       
-						        <button
-						        						        
-						         type="submit"
-						         className="btn btn-block-lg btn-info"
-						         onClick={this.onSubmitDate} style={{width:"175px"}}>Submit</button>
-						         </div>
-
-						   </Form>
-					</div>
-					</div>
-					
-                  
-                    <div className="col-lg-9 col-md-9 col-sm-12">
+				           </div>                   	
+                    	<div id="quick2" className="row justify-content-center">			   		                    
+                    
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
@@ -679,7 +746,7 @@ handleScroll() {
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     </div>
-					</div>
+			
 					</Container>
 					</div>
 					{this.renderQlFetchOverlay()}

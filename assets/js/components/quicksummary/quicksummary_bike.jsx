@@ -72,7 +72,7 @@ render(){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={185}
+		          width={167}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"bike_stats_ql")}
@@ -84,10 +84,10 @@ render(){
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 395;
+    return window.innerHeight - 235;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 30 : 400;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 145;
     return window.innerWidth - widthOffset;
   }
 })(Bike);

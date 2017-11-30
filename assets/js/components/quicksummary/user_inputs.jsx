@@ -107,7 +107,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 		              {this.state.columnAttributeName[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={167}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data)}
@@ -119,10 +119,10 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 260;
+    return window.innerHeight - 217;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 30 : 400;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 145;
     return window.innerWidth - widthOffset;
   }
 })(User);

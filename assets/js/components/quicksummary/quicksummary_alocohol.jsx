@@ -65,7 +65,7 @@ class Alcohol extends Component{
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={167}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"alcohol_ql")}
@@ -77,10 +77,10 @@ class Alcohol extends Component{
 }
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 495;
+    return window.innerHeight - 395;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth <1024 ? 30 : 400;
+    var widthOffset = window.innerWidth <1024 ? 0 : 145;
     return window.innerWidth - widthOffset;
   }
 })(Alcohol);
