@@ -443,7 +443,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json):
 				# If movements are between bedtime and awake time then do not 
 				# include them because person is sleeping. May be person wake
 				# to take water or use washroom. This also not be counted
-				if hour_start >= bedtime and hour_end <= awake_time:
+				if hour_start >= bedtime and (not hour_end <= awake_time):
 					time_interval = hour_start.strftime("%I %p")+" to "+hour_end.strftime("%I %p")
 
 					if not movement_consistency.get(time_interval,None):
