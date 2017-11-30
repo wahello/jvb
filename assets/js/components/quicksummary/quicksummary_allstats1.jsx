@@ -151,6 +151,7 @@ class AllStats1 extends Component{
 
 				/>
 			);
+            console.log(keys);
 		}
 		return columns;
 	}
@@ -196,7 +197,7 @@ export default Dimensions({
     return window.innerHeight - 217;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 : 145;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 140;
     return window.innerWidth - widthOffset;
   }
 })(AllStats1);
