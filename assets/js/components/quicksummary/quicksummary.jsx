@@ -732,7 +732,7 @@ onLogoutSuccess(response){
 				           </div>                   	
 
                     
-
+				           <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
@@ -746,7 +746,7 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                    
-			
+			</div>
 					</Container>
 					</div>
 					{this.renderQlFetchOverlay()}
