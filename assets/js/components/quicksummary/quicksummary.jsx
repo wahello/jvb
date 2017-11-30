@@ -731,7 +731,7 @@ onLogoutSuccess(response){
 
 				           </div>                   	
 
-                    <div className="col-lg-9 col-md-9 col-sm-12">
+                    
 
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
@@ -745,7 +745,7 @@ onLogoutSuccess(response){
                     	{this.state.activeTab === "user" &&
 	                    	 <User  data={this.state.userInputData}/>
                     	}
-                    </div>
+                   
 			
 					</Container>
 					</div>
