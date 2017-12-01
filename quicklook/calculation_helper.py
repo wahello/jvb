@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone,time
-import pprint
 from collections import OrderedDict,defaultdict
 import json, ast
 import requests
@@ -254,6 +253,16 @@ def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None):
 			start_time_in_seconds__lt = end_epoch)]
 		return data
 
+def get_weekly_data(data):
+	weekly_data= defaultdict(list)
+	for obj in data:
+		obj_starttime = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0)
+											+obj.get('startTimeOffsetInSeconds',0))
+		if weekly_data.get(obj_starttime.strftime('%Y-%m-%d'),None):
+			weekly_data.append(obj)
+		else:
+			weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
+	return weekly_data
 
 def extract_weather_data(data):
 	'''
@@ -717,8 +726,15 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 		user.profile.gender)
 	return alcohol_stats
 
-def get_exercise_consistency_grade(workout_over_period,weekly_activities,period):
+def get_exercise_consistency_grade(workout_over_period,weekly_activities,
+								   weekly_manual_activities,period):
 	activity_weekly_stats = []
+	for (act,weekly_act) in zip(list(weekly_activities.values()),
+								list(weekly_manual_activities.values())):
+		act_json = [ast.literal_eval(obj) for obj in act]
+		weekly_act_json = [ast.literal_eval(obj) for obj in weekly_act]
+		activity_weekly_stats.append(get_sleep_stats(act_json,weekly_act_json))
+
 
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -757,22 +773,20 @@ def create_quick_look(user,from_date=None,to_date=None):
 										start_epoch,end_epoch,
 										'-start_time_duration_in_seconds')
 		stress = get_garmin_model_data(UserGarminDataStressDetails,user,start_epoch,end_epoch)
+
+		# pull data for past 7 days (including today)
 		manually_updated = get_garmin_model_data(UserGarminDataManuallyUpdated,user,
-															start_epoch,end_epoch)
+			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),start_epoch,
+			end_epoch)
+		weekly_manual_activities = get_weekly_data(manually_updated)
+		todays_manually_updated = weekly_manual_activities.pop(current_date.strftime('%Y-%m-%d'))
+
 		# pull data for past 7 days (incuding today)
 		activities = get_garmin_model_data(UserGarminDataActivity,user,
 				  last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),
 				  end_epoch)
 
-		weekly_activities = defaultdict(list)
-		for i,obj in enumerate(activities):
-			obj_starttime = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0)
-												+obj.get('startTimeOffsetInSeconds',0))
-			if weekly_activities.get(obj_starttime.strftime('%Y-%m-%d'),None):
-				weekly_activities.append(obj)
-			else:
-				weekly_activities[obj_starttime.strftime('%Y-%m-%d')].append(obj)
-
+		weekly_activities = get_weekly_data(activities)
 		todays_activities = weekly_activities.pop(current_date.strftime('%Y-%m-%d'))
 			
 
@@ -783,7 +797,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		daily_strong = list(DailyUserInputStrong.objects.filter(
 			user_input__user = user,
 			user_input__created_at__gte = last_seven_days_date,
-			user_input__created_at__lte = current_date))
+			user_input__created_at__lte = current_date).order_by('created_at'))
 
 		todays_daily_strong = []
 		for i,q in enumerate(daily_strong):
@@ -802,10 +816,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		todays_activities_json = [ast.literal_eval(dic) for dic in todays_activities]
 		# manually_updated_json = [ast.literal_eval(dic) for dic in manually_updated]
-		manually_updated_json = {}
-		for dic in manually_updated:
+		todays_manually_updated_json = {}
+		for dic in todays_manually_updated:
 			dic = ast.literal_eval(dic)
-			manually_updated_json[dic.get('summaryId')] = dic
+			todays_manually_updated_json[dic.get('summaryId')] = dic
 
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
@@ -825,7 +839,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise
 		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
 														 "work_out_easy_or_hard",'')
-		activity_stats = get_activity_stats(todays_activities_json,manually_updated_json)
+		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json)
 		exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 		exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
 		exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
@@ -936,7 +950,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise Consistency grade calculation over period of 7 days
 		exercise_consistency_grade = get_exercise_consistency_grade(
-			[q.workout for q in daily_strong],weekly_activities,7)
+			[q.workout for q in daily_strong],weekly_activities,weekly_manual_activities,7)
 		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
 
 		# Penalty calculation
