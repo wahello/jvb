@@ -1,4 +1,5 @@
 import re
+import pprint
 from .custom_signals import user_input_post_save,user_input_notify
 
 from rest_framework import serializers
@@ -129,7 +130,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		instance.save()
 			
 	def create(self, validated_data):
-		
+		# pprint.pprint(validated_data)
 		user = self.context['request'].user
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
