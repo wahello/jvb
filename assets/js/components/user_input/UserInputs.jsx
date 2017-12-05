@@ -74,6 +74,15 @@ class UserInputs extends React.Component{
         workout_comment:'',
         calories:'',
         calories_item:'',
+
+        indoor_temperature:'',
+        outdoor_temperature:'',
+        temperature_feels_like:'',
+        wind:'',
+        dewpoint:'',
+        humidity:'',
+        weather_comment:'',
+
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
         sleep_bedtime:moment(),
@@ -201,6 +210,15 @@ class UserInputs extends React.Component{
         workout_comment:data.data.optional_input.general_Workout_Comments,
         calories:data.data.optional_input.calories_consumed_during_workout,
         calories_item:data.data.optional_input.food_ate_during_workout,
+
+        indoor_temperature:data.data.strong_input.indoor_temperature,
+        outdoor_temperature:data.data.strong_input.outdoor_temperature,
+        temperature_feels_like:data.data.strong_input.temperature_feels_like,
+        wind:data.data.strong_input.wind,
+        dewpoint:data.data.strong_input.dewpoint,
+        humidity:data.data.strong_input.humidity,
+        weather_comment:data.data.strong_input.weather_comment,
+
         sleep_hours_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0],
         sleep_mins_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1],
         sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),

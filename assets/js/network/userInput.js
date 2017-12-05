@@ -1,7 +1,3 @@
-/*
-	Format of json data API is expecting
-*/
-
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
@@ -32,7 +28,7 @@ function formatJSON(data){
 		        "sleep_time_excluding_awake_time": "7:10",
 		        "sleep_bedtime": 2017-12-01T010:30, 
 			    "sleep_awake_time": 2017-12-02T06:30,
-			    "awake_time":0.30, 
+			    "awake_time":0:30, 
 		        "sleep_comment":"Some sleep comment",
 		        "prescription_or_non_prescription_sleep_aids_last_night": "yes",
 		        "sleep_aid_taken": "some prescription",
@@ -40,7 +36,14 @@ function formatJSON(data){
 		        "smoked_substance": "cigarettes(7)",
 		        "prescription_or_non_prescription_medication_yesterday": "yes",
 		        "prescription_or_non_prescription_medication_taken": "some prescription",
-		        "controlled_uncontrolled_substance":"yes"
+		        "controlled_uncontrolled_substance":"yes",
+		        "indoor_temperature":"80",
+		        "outdoor_temperature":"85",
+		        "temperature_feels_like":"82",
+		        "wind":"6",
+		        "dewpoint":"18",
+		        "humidity":"61",
+		        "weather_comment":"Awesome weather"
 		    },	
 		    "encouraged_input": {
 		        "id": 1,
@@ -112,6 +115,13 @@ function formatJSON(data){
 	json_data.strong_input['prescription_or_non_prescription_medication_yesterday'] = data.medications; 
 	json_data.strong_input['prescription_or_non_prescription_medication_taken'] = data.medications_taken_list; 
 	json_data.strong_input['controlled_uncontrolled_substance'] = data.controlled_uncontrolled_substance;
+	json_data.strong_input['indoor_temperature'] = data.indoor_temperature,
+	json_data.strong_input['outdoor_temperature'] = data.outdoor_temperature,
+	json_data.strong_input['temperature_feels_like'] = data.temperature_feels_like,
+	json_data.strong_input['wind'] = data.wind,
+	json_data.strong_input['dewpoint'] = data.dewpoint,
+	json_data.strong_input['humidity'] = data.humidity,
+	json_data.strong_input['weather_comment'] = data.weather_comment
 
 	json_data.encouraged_input['stress_level_yesterday'] = data.stress; 
 	json_data.encouraged_input['pains_twings_during_or_after_your_workout'] = data.pain; 
