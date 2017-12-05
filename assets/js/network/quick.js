@@ -75,3 +75,40 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
          console.log("Creating Quicklook failed: "+error.message);
     });
   }
+
+export default function movementConcictency(successmovement,errormovement){   
+  console.log('suresh'); 
+  return function(dispatch){
+      const URL=`/quicklook/users/movement_consistency`;
+      const config={
+       method:"get",
+       url:URL,
+       withCredentials: true
+      };
+      axios(config).then((response)=>{
+       successmovement(response);
+      }).catch(function(error){
+                errormovement(error);
+      });
+
+  }
+}
+export function movementDate(date,successmovement,errormovement){
+  console.log(date);
+  const URL=`/quicklook/users/movement_consistency`;
+  const config={
+    method:"get",
+    url:URL,
+    params:{
+      date:date
+    }
+  }
+    axios(config).then((response)=>{
+      successmovement(response);
+    }).catch((error) =>{
+      errormovement(error);
+
+    })
+  
+
+}

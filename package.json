@@ -11,6 +11,7 @@
     "lint": "eslint assets"
   },
   "dependencies": {
+    "aphrodite": "^1.2.5",
     "autoprefixer": "^6.7.7",
     "autoprefixer-core": "^6.0.1",
     "axios": "^0.16.2",

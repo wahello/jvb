@@ -140,6 +140,7 @@ class AllStats1 extends Component{
 			}
 			columns.push(
 				<Column 
+                style={{wordWrap:"break-word"}}
 					header={<Cell>{date}</Cell>}
 			        cell={props => (
 				            <Cell {...props}>
@@ -197,7 +198,7 @@ export default Dimensions({
     return window.innerHeight - 217;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 : 140;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
     return window.innerWidth - widthOffset;
   }
 })(AllStats1);

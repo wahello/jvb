@@ -51,8 +51,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		let rowsCount = this.state.myTableData.length;
 		return(
 		
-			 <div className="quick3"
-			 >
+			
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={100}
@@ -73,7 +72,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        />
 			    {this.renderTableColumns(this.props.data,"swim_stats_ql")}
       		</Table>
-			</div>
+		
 		
 
 			);
@@ -84,7 +83,7 @@ export default Dimensions({
     return window.innerHeight - 395;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 : 145;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
     return window.innerWidth - widthOffset;
   }
 })(Swim);

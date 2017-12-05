@@ -439,7 +439,7 @@ handleChecked(){
                               <span id="infobutton"
                              onClick={this.toggleInfo} 
                              style={{float:"right",paddingRight:"30px",color:"gray"}}>
-                             <a href="#" style={{color:"gray"}}> 
+                             <a style={{color:"gray"}}> 
                              <FontAwesome 
                                           name = "info-circle"
                                           size = "1x"                                      
@@ -453,7 +453,7 @@ handleChecked(){
 
 
                             <Popover
-                            style={{height:"220px",overflow:"scroll"}} 
+                            style={{height:"220px",overflowY:"scroll"}} 
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -628,7 +628,7 @@ handleChecked(){
                            </Popover> 
 
                            <Popover 
-                           style={{height:"220px",overflow:"scroll"}} 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
@@ -723,7 +723,7 @@ handleChecked(){
                           </FormGroup>
 
                             <Popover 
-                           style={{height:"220px",overflow:"scroll"}} 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
@@ -805,7 +805,7 @@ handleChecked(){
                                     
                             }   
                              <Popover 
-                           style={{height:"220px",overflow:"scroll"}} 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
@@ -878,7 +878,7 @@ handleChecked(){
                           }
 
                            <Popover 
-                           style={{height:"220px",overflow:"scroll"}} 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
@@ -1514,7 +1514,7 @@ handleChecked(){
                             </FormGroup>
                           </FormGroup>
                            <Popover 
-                           style={{height:"220px",overflow:"scroll"}} 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
@@ -1574,7 +1574,7 @@ handleChecked(){
                                      ingredients and determine how processed you think the product is.  If you eat
                                      brown rice at a restaurant and they added sugar and gluten to your rice, then
                                      it is more processed than if they simply steamed your brown rice with no additives or preservatives)
-                                 </div>
+                                 </div>  
 
                                <div style={{paddingTop:"15px"}}>
                                   6. Oils that have been heated up (e.g., olive oil, coconut oil, avocado oils, corn oils,
@@ -1583,7 +1583,7 @@ handleChecked(){
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                  7. Fefined flours, 
+                                  7. Refined flours, 
                                </div>
                                <div style={{paddingTop:"15px"}}>
                                8. Sodas (diet or regular), 

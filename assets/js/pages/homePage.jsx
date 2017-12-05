@@ -52,7 +52,7 @@ function initializeLocalState(){
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}
 					{/*<Route path='/WeeklyGrade' component={RequireAuth(Weeklygrade)} /> */}
 					{/*<Route path='/BreakDown' component={RequireAuth(Breakdown)} /> */}
-					{/*<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> */}
+					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
 					<Route path='/quicksummary' component={RequireAuth(Quicklook)} />
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}

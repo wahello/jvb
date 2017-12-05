@@ -15,7 +15,7 @@ var ReactDOM = require('react-dom');
 
 class Weeklysummary extends React.Component{
   constructer(props){
-   // super(props);
+   //super(props);
    this.successweeklysummary=this.successweeklysummary.bind(this);
    //this.processDate=this.processDate.bind(this); 
     this.state={

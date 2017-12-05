@@ -1,5 +1,5 @@
 html,body{
-	font-size: 16px;
+	font-size: 16px;	
 }
 
 .quick{
@@ -8,16 +8,9 @@ html,body{
 
 @media (max-width: 1023px){
 
-
-#quick2{
-	padding: 0px;
-		}
-.quick5{
-	padding: 0px 20px 0px 20px;
+.hori{
+	overflow-x: hidden;
 }
-.quick7{
-	padding-left: 8px;
-}  
 }
 
 .nav2{
@@ -25,17 +18,14 @@ html,body{
 	  z-index:100;
 	  width: 100%;
 	  left: 0;
-	  right: 0;
-	  
+	  right: 0;	  
 	}
 
 #quick1{
 		text-align: center;
-font-family: 'Roboto', sans-serif;
-font-weight: bold;
-font-size: 22px;
-	
-
+		font-family: 'Roboto', sans-serif;
+		font-weight: bold;
+		font-size: 22px;			
 }
 #quick2{
 	padding-top: 0px;
@@ -103,11 +93,3 @@ padding:0px 0px 5px 0px;
 background-color: #777777;
 }
 
-.public_fixedDataTableCell_cellContent{
-	overflow:auto;
-	max-height: 100px;
-}
-
-.public_fixedDataTableCell_cellContent::-webkit-auto {
-    width: 10px;
-}
