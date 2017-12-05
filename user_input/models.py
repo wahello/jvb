@@ -171,8 +171,10 @@ class DailyUserInputStrong(models.Model):
     alcohol_drink_consumed_list = models.TextField(blank=True)
 
     sleep_time_excluding_awake_time = models.CharField(max_length=10, blank = True)
-
-    sleep_comment = models.TextField(blank=True)
+    sleep_bedtime = models.DateTimeField(null=True,blank=True)
+    sleep_awake_time = models.DateTimeField(null=True,blank=True)
+    awake_time = models.CharField(null=True, max_length = 10, blank = True)
+    sleep_comment = models.TextField(null=True, blank=True)
 
     prescription_or_non_prescription_sleep_aids_last_night = models.CharField(
         max_length=4,choices=YN_CHOICE, blank = True)

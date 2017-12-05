@@ -7,6 +7,20 @@ export function handleChange(event){
   });
 }
 
+export function handleChangeSleepBedTime(date){
+  const name = event.target.name;
+  this.setState({
+      sleep_bedtime: date
+    });
+}
+
+export function handleChangeSleepAwakeTime(date){
+  const name = event.target.name;
+  this.setState({
+      sleep_awake_time: date
+    });
+}
+
 export function handleChangeWorkoutDone(event){
   const value = event.target.value;
   if(value === 'no' || value === 'not yet'){

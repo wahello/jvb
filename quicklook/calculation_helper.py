@@ -254,12 +254,27 @@ def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None):
 		return data
 
 def get_weekly_data(data):
-	weekly_data= defaultdict(list)
+	'''
+		Takes and array of garmin data and categorise them according to date
+		to which data belongs
+
+		Output is a Ordered dictionary like this - 
+		{
+			"2017-12-1":[{garmin_data}, {garmin_data}, ....],
+			"2017-12-2":[{garmin_data}, {garmin_data}, ....],
+								...
+
+			"2017-12-7":[{garmin_data}, {garmin_data}, ....],
+		}
+
+	'''
+	weekly_data = defaultdict(list)
 	for obj in data:
+		obj = ast.literal_eval(obj)
 		obj_starttime = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0)
 											+obj.get('startTimeOffsetInSeconds',0))
 		if weekly_data.get(obj_starttime.strftime('%Y-%m-%d'),None):
-			weekly_data.append(obj)
+			weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
 		else:
 			weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
 	return weekly_data
@@ -381,7 +396,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"distance_other_miles": 0,
 		"pace":'',
 		"avg_heartrate":json.dumps({}),
-		"max_duration":0,
+		"hr90_duration_15min":False # exercised for at least 15 min with atleast avg hr 90 
 	}
 
 	activities_hr = {act:{"hr":0,"count":0} for act in get_activities()}
@@ -398,8 +413,10 @@ def get_activity_stats(activities_json,manually_updated_json):
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj.get('activityType','')]['count'] += 1
 
-			activity_stats['max_duration'] = obj['durationInSeconds'] if obj['durationInSeconds'] \
-											> activity_stats['max_duration'] else activity_stats['max_duration']
+			if not activity_stats['hr90_duration_15min']:
+				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
+					obj.get('durationInSeconds',0) >= 900):
+					activity_stats['hr90_duration_15min'] = True
 
 			if 'running' in obj.get('activityType','').lower():
 				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
@@ -653,20 +670,23 @@ def cal_movement_consistency_grade(hours_inactive):
 	elif hours_inactive > 10 :
 		return 'F'
 
-def cal_exercise_consistency_grade(workout_over_period, max_duration_over_period,
-								   heartrate_over_period, period):	
-	workout_points_over_period = [1 if w == 'yes' else 0
-								  for w in workout_over_period]
-	avg_days_workout_week = sum(workout_points_over_period) / (period/7)
-	if avg_days_workout_week >= 4:
+def cal_exercise_consistency_grade(workout_over_period, hr90_duration_15min, period):
+	points = 0
+	for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
+		if hr_over_90: points += 1
+		elif workout == 'yes': points += 1
+
+	avg_point_week = points / (period/7)
+
+	if avg_point_week >= 4:
 		return 'A'
-	elif avg_days_workout_week >= 3 and avg_days_workout_week < 4:
+	elif avg_point_week >= 3 and avg_point_week < 4:
 		return 'B'
-	elif avg_days_workout_week >= 2 and avg_days_workout_week < 3:
+	elif avg_point_week >= 2 and avg_point_week < 3:
 		return 'C'
-	elif avg_days_workout_week >= 1 and avg_days_workout_week < 2:
+	elif avg_point_week >= 1 and avg_point_week < 2:
 		return 'D'
-	elif avg_days_workout_week < 1:
+	elif avg_point_week < 1:
 		return 'F' 
 	
 def cal_overall_grade_gpa(grades):
@@ -729,12 +749,14 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 								   weekly_manual_activities,period):
 	activity_weekly_stats = []
-	for (act,weekly_act) in zip(list(weekly_activities.values()),
+	for (act,manual_act) in zip(list(weekly_activities.values()),
 								list(weekly_manual_activities.values())):
-		act_json = [ast.literal_eval(obj) for obj in act]
-		weekly_act_json = [ast.literal_eval(obj) for obj in weekly_act]
-		activity_weekly_stats.append(get_sleep_stats(act_json,weekly_act_json))
+		manual_act_indexed = {dic.get('summaryId'):dic for dic in manual_act }
+		activity_weekly_stats.append(get_activity_stats(act,manual_act_indexed))
 
+	hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
+	grades = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
+	return grades 
 
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -776,16 +798,17 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# pull data for past 7 days (including today)
 		manually_updated = get_garmin_model_data(UserGarminDataManuallyUpdated,user,
-			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),start_epoch,
-			end_epoch)
+			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch)
+
+		# Already parsed from json to python objects
 		weekly_manual_activities = get_weekly_data(manually_updated)
 		todays_manually_updated = weekly_manual_activities.pop(current_date.strftime('%Y-%m-%d'))
 
 		# pull data for past 7 days (incuding today)
 		activities = get_garmin_model_data(UserGarminDataActivity,user,
-				  last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),
-				  end_epoch)
+			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch)
 
+		# Already parsed from json to python objects
 		weekly_activities = get_weekly_data(activities)
 		todays_activities = weekly_activities.pop(current_date.strftime('%Y-%m-%d'))
 			
@@ -797,7 +820,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		daily_strong = list(DailyUserInputStrong.objects.filter(
 			user_input__user = user,
 			user_input__created_at__gte = last_seven_days_date,
-			user_input__created_at__lte = current_date).order_by('created_at'))
+			user_input__created_at__lte = current_date).order_by('user_input__created_at'))
 
 		todays_daily_strong = []
 		for i,q in enumerate(daily_strong):
@@ -814,11 +837,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 			user_input__created_at = current_date)
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
-		todays_activities_json = [ast.literal_eval(dic) for dic in todays_activities]
-		# manually_updated_json = [ast.literal_eval(dic) for dic in manually_updated]
+		todays_activities_json = todays_activities
+
 		todays_manually_updated_json = {}
 		for dic in todays_manually_updated:
-			dic = ast.literal_eval(dic)
 			todays_manually_updated_json[dic.get('summaryId')] = dic
 
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]

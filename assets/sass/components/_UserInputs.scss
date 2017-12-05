@@ -289,3 +289,11 @@ textarea.form-control{
 	min-height:100px !important;
 	max-height:1000px !important;
 }
+
+.react-datepicker__time-list{
+	padding:0px
+}
+.react-datepicker__time-container .react-datepicker__time 
+.react-datepicker__time-box ul.react-datepicker__time-list{
+	padding-right:0px;
+}

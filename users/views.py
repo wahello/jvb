@@ -297,6 +297,7 @@ class fetchGarminData(APIView):
         if pull:
           # pull from api and store in db
           r = sess.get(URL, header_auth=True, params=data)
+          print("\n\n",r.json())
           output_dict[dtype] = r.json()
 
           model.objects.bulk_create(

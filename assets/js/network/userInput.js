@@ -30,6 +30,9 @@ function formatJSON(data){
 		        "number_of_alcohol_consumed_yesterday": 2.5,
 		        "alcohol_drink_consumed_list":"beer",
 		        "sleep_time_excluding_awake_time": "7:10",
+		        "sleep_bedtime": 2017-12-01T010:30, 
+			    "sleep_awake_time": 2017-12-02T06:30,
+			    "awake_time":0.30, 
 		        "sleep_comment":"Some sleep comment",
 		        "prescription_or_non_prescription_sleep_aids_last_night": "yes",
 		        "sleep_aid_taken": "some prescription",
@@ -98,6 +101,9 @@ function formatJSON(data){
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
+	json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
+	json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
+	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;
 	json_data.strong_input['prescription_or_non_prescription_sleep_aids_last_night'] = data.prescription_sleep_aids; 
