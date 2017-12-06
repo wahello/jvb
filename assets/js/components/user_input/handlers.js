@@ -221,3 +221,38 @@ export function handleChangeAlcoholDrink(event){
     });
   }
 }
+
+export function handleCaloriesItemCheck(){
+  if(this.state.calories_item_check){
+    this.setState({
+      calories_item_check:!this.state.calories_item_check,
+      calories:'',
+      calories_item:''
+    });
+  }
+  else{
+    this.setState({
+      calories_item_check:!this.state.calories_item_check
+    });
+  }
+}
+
+export function handleWeatherCheck(){
+  if(this.state.weather_check){
+    this.setState({
+      weather_check:!this.state.weather_check,
+      indoor_temperature:'',
+      outdoor_temperature:'',
+      temperature_feels_like:'',
+      wind:'',
+      dewpoint:'',
+      humidity:'',
+      weather_comment:''
+    });
+  }
+  else{
+    this.setState({
+      weather_check:!this.state.weather_check
+    })
+  }
+}
