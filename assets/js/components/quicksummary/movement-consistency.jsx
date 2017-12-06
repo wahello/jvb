@@ -154,7 +154,8 @@ class Movementquick extends Component{
                                
       };
 	}
-    createStateInstance(data){
+    createStateInstance(data,from_date){
+      var steps,status;
       let obj = {
         steps:data.steps,
         status:data.status,
@@ -162,7 +163,7 @@ class Movementquick extends Component{
       return obj
     }
 
-   successmovement(data){
+   successmovement(data,from_date){
     console.log(data);
     this.setState({
       created_at:data.data.created_at,

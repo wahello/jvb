@@ -93,14 +93,14 @@ export default function movementConcictency(successmovement,errormovement){
 
   }
 }
-export function movementDate(date,successmovement,errormovement){
-  console.log(date);
+export function movementDate(from_date,successmovement,errormovement){
   const URL=`/quicklook/users/movement_consistency`;
+  from_date = moment(from_date);
   const config={
     method:"get",
     url:URL,
     params:{
-      date:date
+      from_date:from_date.format("YYYY-MM-DD")
     }
   }
     axios(config).then((response)=>{
