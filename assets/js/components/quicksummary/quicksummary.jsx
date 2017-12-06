@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
-	     NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
+	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
          NavbarBrand,Container } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";

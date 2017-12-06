@@ -42,6 +42,7 @@ class UserInputs extends React.Component{
         submitting_form:false,
         calendarOpen:false,
         checked:false,
+        checked1:false,
         infoButton:false,
         infoBtn:false,
         infoWorkout:false,
@@ -160,6 +161,7 @@ class UserInputs extends React.Component{
       this.toggleCalendar = this.toggleCalendar.bind(this);
       this.toggleEditForm = this.toggleEditForm.bind(this);
       this.handleChecked = this.handleChecked.bind(this);
+      this.handleChecked1 = this.handleChecked1.bind(this);
       this.toggleInfo=this.toggleInfo.bind(this);
       this.toggleInfo2=this.toggleInfo2.bind(this);
       this.toggleInfoworkout=this.toggleInfoworkout.bind(this);
@@ -177,12 +179,15 @@ class UserInputs extends React.Component{
           other_diet = false;
       }
       let was_cloning = this.state.cloning_data;
+      let was_ckecked = this.state.checked1;
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
         diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
         cloning_data:false,
         fetching_data:false,
+        checked1: true,
+        checked:true,
         editable: was_cloning ? true : false,
 
         workout:data.data.strong_input.workout,
@@ -443,6 +448,11 @@ handleChecked(){
     checked:!this.state.checked
   })
 }
+handleChecked1(){
+  this.setState({
+    checked1:!this.state.checked1
+  })
+}
 
     render(){
 
@@ -450,15 +460,7 @@ handleChecked(){
             <div>            
                            <div id="hambergar" className="container-fluid">
                              <NavbarMenu fix={false} />
-                              </div>
-
-
-                               <div className="d-flex justify-content-center" id="body1">
-
-                              <img className="img-fluid"
-                               src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>
-
-                            </div>
+                              </div>                              
                               <div>
                              <h2 className="head">Daily User Inputs Report 
                               <span id="infobutton"
@@ -1197,6 +1199,207 @@ handleChecked(){
                           </FormGroup>
                         }
 
+                         { (this.state.workout === "yes" || this.state.workout === "") &&
+                         <FormGroup>
+                         
+                        <Label>1.11 I want to manually enter in weather information for my workout</Label>
+                        <div className="input1">
+                         <Label className="btn btn-secondary radio1">
+                        <Input
+                        type="checkbox"                                             
+                        onChange={this.handleChange}
+                        onClick={this.handleChecked1}
+                        >
+                        </Input>
+                        Hit me!
+                        </Label>
+                      
+                        </div>
+                         </FormGroup>
+                        }
+                         
+                        <Collapse isOpen={this.state.checked1}>
+                         { (this.state.workout === "yes" || this.state.workout === "") &&                                                      
+                         <FormGroup>                          
+                            <Label className="padding">1.11.1 What was the temperature (in fahrenheit degrees)
+                             when I did my workout (get from weather apps)?</Label>
+                            {this.state.editable &&
+                              <div>
+                                <div className="col-xs-6">
+                                  <div className="input"> 
+                                <Input type="select" name="indoor_temperature"
+                                id="hours"
+                                className="form-control custom-select"
+                                value={this.state.indoor_temperature}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Indoor</option>
+                                {this.createDropdown(-20,120)}                        
+                                </Input>
+                                </div>
+                                </div>
+                              
+                                <div className="col-xs-6 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="outdoor_temperature"
+                                 id="minutes"
+                                className="form-control custom-select "
+                                value={this.state.outdoor_temperature}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Outdoor</option>
+                                {this.createDropdown(-20,120,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.indoor_temperature && this.state.outdoor_temperature) &&
+                                <p>Indoor temperature : {this.state.indoor_temperature}  Outdoor temperature : {this.state.outdoor_temperature} </p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+                        }
+
+                         { (this.state.workout === "yes" || this.state.workout === "") &&  
+
+
+                          <FormGroup>
+                            <Label className="padding">1.11.2 What was the dew point when I did my workout (get from weather apps)?</Label>
+                            {this.state.editable &&
+                              <div className="input1">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     name="dewpoint"                                  
+                                     value={this.state.dewpoint}
+                                     onChange={this.handleChange} >
+                                     <option key="select" value="">Select</option>                                    
+                                     {this.createDropdown(-20,120,true)}
+                                     </Input>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.dewpoint}</p>
+                              </div>
+                            }
+                          </FormGroup> 
+
+
+                       }
+
+                        { (this.state.workout === "yes" || this.state.workout === "") && 
+
+                        <FormGroup>
+                            <Label className="padding">1.11.3  What was the humidity when I did my workout (get from weather apps)? </Label>
+                            {this.state.editable &&
+                              <div className="input1">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     name="humidity"                                  
+                                     value={this.state.humidity}
+                                     onChange={this.handleChange} >
+                                     <option key="select" value="">Select</option>                                    
+                                     {this.createDropdown(1,100)}
+                                     </Input>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.humidity}</p>
+                              </div>
+                            }
+                          </FormGroup>  
+
+
+                        }
+
+                         { (this.state.workout === "yes" || this.state.workout === "") &&  
+
+
+                          <FormGroup>
+                            <Label className="padding">1.11.4 What was the wind when I did my workout (get from weather apps)?</Label>
+                            {this.state.editable &&
+                              <div className="input1">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     name="wind"                                  
+                                     value={this.state.wind}
+                                     onChange={this.handleChange} >
+                                     <option key="select" value="">Select</option>                                    
+                                     {this.createDropdown(0,350)}
+                                     </Input>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.wind}</p>
+                              </div>
+                            }
+                          </FormGroup> 
+
+
+                       }
+
+                        { (this.state.workout === "yes" || this.state.workout === "") &&  
+
+
+                          <FormGroup>
+                            <Label className="padding">1.11.5 What was the Temperature Feels Like when I did my workout (get from weather apps)?</Label>
+                            {this.state.editable &&
+                              <div className="input1">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     name="temperature_feels_like"                                  
+                                     value={this.state.temperature_feels_like}
+                                     onChange={this.handleChange} >
+                                     <option key="select" value="">Select</option>                                    
+                                     {this.createDropdown(-20,120)}
+                                     </Input>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p>{this.state.temperature_feels_like}</p>
+                              </div>
+                            }
+                          </FormGroup> 
+
+
+                       }
+
+
+                         { (this.state.workout === "yes" || this.state.workout === "") &&
+
+                          <FormGroup>      
+                            <Label className="padding">1.11.6  Weather Comments (allow the user to enter text with comments)</Label>
+                            {this.state.editable &&
+                              <div className="input1">
+                                 <Textarea  name="weather_comment"
+                                  rows="5" cols="5" 
+                                  className="form-control" 
+                                 value={this.state.weather_comment}
+                                 onChange={this.handleChange}></Textarea>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                                <p >{this.state.weather_comment}</p>
+                              </div>
+                            }
+                          </FormGroup>   
+
+                       }
+                       </Collapse>
+                     
+
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
@@ -1220,7 +1423,7 @@ handleChecked(){
 
                             
                           <FormGroup>      
-                            <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.12 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Input type="text" name="calories" 
@@ -1236,13 +1439,12 @@ handleChecked(){
                             }
                           </FormGroup>
                         }
-
-                        
+                                                
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                           <FormGroup>      
-                            <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.13 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"
@@ -1314,8 +1516,9 @@ handleChecked(){
                           
                             <Label className="padding">2.1 Sleep Bed Time</Label>
                             {this.state.editable &&
-                              <div className="input">
+                              <div className="input1">
                                 <DatePicker
+                                    id="datepicker"
                                     name = "sleep_bedtime"
                                     selected={this.state.sleep_bedtime}
                                     onChange={this.handleChangeSleepBedTime}
@@ -1340,8 +1543,9 @@ handleChecked(){
                           
                             <Label className="padding">2.2 Sleep Awake Time</Label>
                             {this.state.editable &&
-                              <div className="input">
+                              <div className="input1">
                                 <DatePicker
+                                    id="datepicker"
                                     name = "sleep_awake_time"
                                     selected={this.state.sleep_awake_time}
                                     onChange={this.handleChangeSleepAwakeTime}

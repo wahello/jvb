@@ -53,104 +53,108 @@ class Movementquick extends Component{
         {name: 'Inactive-Hours'},              
        ],
       created_at:"-",
-       "12AM_01AM":{
-       	steps:'-',
-       	status:'-',
-       },
-       "01AM_02AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "02AM_03AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "03AM_04AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "04AM_05AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "05AM_06AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "06AM_07AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "07AM_08AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "08AM_09AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "09AM_10AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "10AM_11AM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "11AM_12PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "12PM_01PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "01PM_02PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "02PM_03PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "03PM_04PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "04PM_05PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "05PM_06PM":{
-       	steps:'-',
-       	status:'-',
-       },
-       "06PM_07PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "07PM_08PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "08PM_09PM":{
-       	steps:'-',
-       	status:'-',
-       },
-       "09PM_10PM":{
-       	steps:'-',
-       	status:'-',
-       }, 
-       "10PM_11PM":{
-       	steps:'-',
-       	status:'-',
-       },
-       "11PM_12AM":{
-        steps:'-',
-        status:'-',
-       },  
-       active_hours:'-',
-       inactive_hours:'-',  
+       movement_consistency: {
+        "12AM_01AM":{
+          steps:'-',
+          status:'-',
+         },
+         "01AM_02AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "02AM_03AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "03AM_04AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "04AM_05AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "05AM_06AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "06AM_07AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "07AM_08AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "08AM_09AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "09AM_10AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "10AM_11AM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "11AM_12PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "12PM_01PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "01PM_02PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "02PM_03PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "03PM_04PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "04PM_05PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "05PM_06PM":{
+          steps:'-',
+          status:'-',
+         },
+         "06PM_07PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "07PM_08PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "08PM_09PM":{
+          steps:'-',
+          status:'-',
+         },
+         "09PM_10PM":{
+          steps:'-',
+          status:'-',
+         }, 
+         "10PM_11PM":{
+          steps:'-',
+          status:'-',
+         },
+         "11PM_12AM":{
+          steps:'-',
+          status:'-',
+         }, 
+
+         active_hours:'-',
+         inactive_hours:'-'
+       }
+        
                                
       };
 	}
@@ -167,6 +171,7 @@ class Movementquick extends Component{
     console.log(data);
     this.setState({
       created_at:data.data.created_at,
+      movement_consistency:{
        "12AM_01AM": this.createStateInstance(data.data['12 AM to 01 AM']),
        "01AM_02AM": this.createStateInstance(data.data['01 AM to 02 AM']),       
        "02AM_03AM": this.createStateInstance(data.data['02 AM to 03 AM']),  
@@ -192,7 +197,8 @@ class Movementquick extends Component{
        "10PM_11PM": this.createStateInstance(data.data['10 PM to 11 PM']),
        "11PM_12AM": this.createStateInstance(data.data['11 PM to 12 AM']),
        active_hours:data.data.active_hours,
-       inactive_hours:data.data.inactive_hours,  
+       inactive_hours:data.data.inactive_hours,
+       }  
 
       })
     
@@ -209,6 +215,31 @@ componentDidMount(){
   movementDate(today,this.successmovement,this.errormovement);
   movementConcictency(this.successmovement,this.errormovement)
 }
+
+renderTableColumns(dateWiseData,category,classes=""){
+    let columns = [];
+    for(let [date,data] of Object.entries(dateWiseData)){
+      let all_data = [];
+      for(let [key,value] of Object.entries(data[category])){
+        if(key !== 'id' && key !== 'user_ql'){
+          all_data.push(value);
+        }
+      }
+
+      columns.push(
+        <Column 
+          header={<Cell>{date}</Cell>}
+              cell={props => (
+                    <Cell {...props}>
+                      {all_data[props.rowIndex]}
+                    </Cell>
+                  )}
+              width={134}
+        />
+      )
+    }
+    return columns;
+  }
 	render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
@@ -238,6 +269,7 @@ componentDidMount(){
 		        />
 		         <Column
 		          header={<Cell>Steps</Cell>}
+              cell={<Cell data={this.state.movement_consistency}/>}
 		          width={167}
 		        />
 

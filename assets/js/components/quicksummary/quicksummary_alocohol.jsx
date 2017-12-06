@@ -10,7 +10,7 @@ class Alcohol extends Component{
 
 	constructor(props) {
     super(props);
-    this.renderTableColumns = this.renderTableColumns.bind(this);
+    this.renderTableColumns = this.renderTableColumns.bind(this);  
 
     this.state = {
       myTableData: [

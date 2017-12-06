@@ -163,6 +163,7 @@ padding-top: 30px;
 	.input1{
 		padding:0px 17px 0px 23px;
 	}
+	
 	#navlink{
 		color:white;
 		padding:3px 9px;
@@ -301,4 +302,11 @@ textarea.form-control{
 .react-datepicker__time-container .react-datepicker__time 
 .react-datepicker__time-box ul.react-datepicker__time-list{
 	padding-right:0px;
+}
+#datepicker{
+	color:black;
+	padding:0.5rem 0.75rem;
+	border-radius:5px;
+	font-size:13px;
+	width:200px;
 }
