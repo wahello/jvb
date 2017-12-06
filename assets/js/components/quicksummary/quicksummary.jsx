@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
-	     NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
+	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
          NavbarBrand,Container } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
@@ -31,7 +31,8 @@ import Food from './quicksummary_food';
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
 import User from './user_inputs'; 
-import AllStats1 from './quicksummary_allstats1'; 
+import AllStats1 from './quicksummary_allstats1';
+import Movementquick from './movement-consistency';
 
 
 
@@ -478,8 +479,10 @@ onLogoutSuccess(response){
 		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
         const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
-        const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
+        const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;
+        const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;             
 	return(
+		<div className="hori">
 		<div className="container-fluid">
 		
 		 <Navbar toggleable 
@@ -501,10 +504,10 @@ onLogoutSuccess(response){
             </NavbarBrand>
           </Link>
           
-            <button className="btn btn-info"
+            <a 
             id="daterange"
-            style={{width:"110px"}}
-            onClick={this.toggleDate} >Date Range</button>
+            style={{width:"110px",color:"white"}}
+            onClick={this.toggleDate} >Date Range</a>
           
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
@@ -709,7 +712,18 @@ onLogoutSuccess(response){
                                             </NavLink>                                           
                                           </abbr>
                                           </span>
-                                       </NavItem>                                        									
+                                       </NavItem>
+
+                                       	<NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="User Inputs">
+                                            <NavLink href="#" className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>
+						    		 		 Movement Consistency 
+                                            </NavLink>                                           
+                                          </abbr>
+                                          </span>
+                                       </NavItem>                                         									
                                   </Nav>
                                 </Collapse>
                                 
@@ -728,14 +742,8 @@ onLogoutSuccess(response){
                               </PopoverBody>
                            </Popover> 
                     	
-                    	<Container style={{maxWidth:"1260px"}}>
-                    	<div style={{textAlign:"center",fontSize:"20px",marginBottom:"12px"}}>
-				           <Label >Quick Look</Label>
-
-				           </div>                   	
-
-                    
-				           <div className="row justify-content-center">
+                    	<Container style={{maxWidth:"1245px"}}>                   	
+             		   <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
@@ -748,12 +756,17 @@ onLogoutSuccess(response){
                     	{this.state.activeTab === "user" &&
 	                    	 <User  data={this.state.userInputData}/>
                     	}
+                    	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
+                    	
                    
 			</div>
+
 					</Container>
+					
 					</div>
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
+				</div>
 				</div>
 				
 		

@@ -10,7 +10,7 @@ class Alcohol extends Component{
 
 	constructor(props) {
     super(props);
-    this.renderTableColumns = this.renderTableColumns.bind(this);
+    this.renderTableColumns = this.renderTableColumns.bind(this);  
 
     this.state = {
       myTableData: [
@@ -80,7 +80,7 @@ export default Dimensions({
     return window.innerHeight - 395;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth <1024 ? 0 : 145;
+    var widthOffset = window.innerWidth <1024 ? 0 : 125;
     return window.innerWidth - widthOffset;
   }
 })(Alcohol);
