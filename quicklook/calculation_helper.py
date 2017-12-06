@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone,time
 from collections import OrderedDict,defaultdict
-import json, ast
+import json, ast, pprint
 import requests
+
+from django.db.models import Q
 
 from garmin.models import UserGarminDataEpoch,\
 		  UserGarminDataSleep,\
@@ -242,18 +244,18 @@ def get_blank_model_fields(model):
 def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None):
 	if order_by:
 		data = [q.data for q in model.objects.filter(
-			user = user,
-			start_time_in_seconds__gte = start_epoch,
-			start_time_in_seconds__lt = end_epoch).order_by(order_by)]
+			Q(start_time_in_seconds__gte = start_epoch) &
+			Q(start_time_in_seconds__lt = end_epoch),
+			user = user).order_by(order_by)]
 		return data
 	else:
 		data = [q.data for q in model.objects.filter(
-			user = user,
-			start_time_in_seconds__gte = start_epoch,
-			start_time_in_seconds__lt = end_epoch)]
+			Q(start_time_in_seconds__gte = start_epoch)&
+			Q(start_time_in_seconds__lt = end_epoch),
+			user = user)]
 		return data
 
-def get_weekly_data(data):
+def get_weekly_data(data,to_date,from_date):
 	'''
 		Takes and array of garmin data and categorise them according to date
 		to which data belongs
@@ -268,15 +270,16 @@ def get_weekly_data(data):
 		}
 
 	'''
-	weekly_data = defaultdict(list)
+	weekly_data = OrderedDict()
+	while(from_date <= to_date):
+		weekly_data[from_date.strftime('%Y-%m-%d')]=[]
+		from_date += timedelta(days=1)
+
 	for obj in data:
 		obj = ast.literal_eval(obj)
 		obj_starttime = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0)
 											+obj.get('startTimeOffsetInSeconds',0))
-		if weekly_data.get(obj_starttime.strftime('%Y-%m-%d'),None):
-			weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
-		else:
-			weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
+		weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
 	return weekly_data
 
 def extract_weather_data(data):
@@ -285,11 +288,11 @@ def extract_weather_data(data):
 		Humidity, Apparent Temperature, Wind
 	'''
 	DATA = {
-		"temperature":0,
-		"dewPoint":0,
-		"humidity":0,
-		"apparentTemperature":0,
-		"windSpeed":0
+		"temperature":None,
+		"dewPoint":None,
+		"humidity":None,
+		"apparentTemperature":None,
+		"windSpeed":None
 	}
 
 	if data:
@@ -396,7 +399,9 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"distance_other_miles": 0,
 		"pace":'',
 		"avg_heartrate":json.dumps({}),
-		"hr90_duration_15min":False # exercised for at least 15 min with atleast avg hr 90 
+		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
+		"latitude":None,
+		"longitude":None
 	}
 
 	activities_hr = {act:{"hr":0,"count":0} for act in get_activities()}
@@ -412,6 +417,10 @@ def get_activity_stats(activities_json,manually_updated_json):
 			activities_hr[obj.get('activityType','')]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj.get('activityType','')]['count'] += 1
+
+			if not (activity_stats['latitude'] and activity_stats['longitude']):
+				activity_stats['latitude'] = obj.get('startingLatitudeInDegree',None)
+				activity_stats['longitude'] = obj.get('startingLongitudeInDegree',None)
 
 			if not activity_stats['hr90_duration_15min']:
 				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
@@ -758,6 +767,43 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 	grades = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
 	return grades 
 
+def get_weather_data(todays_daily_strong,todays_activities,
+					 todays_manually_updated, todays_date_epoch):
+	manual_weather = False
+	if(safe_get(todays_daily_strong,'indoor_temperature','') or
+	   safe_get(todays_daily_strong,'outdoor_temperature','') or
+	   safe_get(todays_daily_strong,'dewpoint','') or
+	   safe_get(todays_daily_strong,'humidity','') or
+	   safe_get(todays_daily_strong,'apparent_temperature','') or
+	   safe_get(todays_daily_strong,'wind_speed','')):
+		manual_weather = True
+
+	if manual_weather:
+		DATA = {
+			"temperature":safe_get(todays_daily_strong,'outdoor_temperature',None),
+			"dewPoint":safe_get(todays_daily_strong,'dewpoint',None),
+			"humidity":safe_get(todays_daily_strong,'humidity',None),
+			"apparentTemperature":safe_get(todays_daily_strong,'apparent_temperature',None),
+			"windSpeed":safe_get(todays_daily_strong,'wind_speed',None)
+		}
+		return DATA
+	else:
+		activity_stat = get_activity_stats(todays_activities,todays_manually_updated)
+		latitude = activity_stat['latitude']
+		longitude = activity_stat['longitude']
+		if latitude and longitude:
+			DATA = extract_weather_data(fetch_weather_data(latitude,longitude,todays_date_epoch))
+			return DATA
+		else:
+			DATA = {
+				"temperature":None,
+				"dewPoint":None,
+				"humidity":None,
+				"apparentTemperature":None,
+				"windSpeed":None
+			}
+			return DATA
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -779,9 +825,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
 
-		weather_data = extract_weather_data(
-		fetch_weather_data(40.730610,-73.935242,start_epoch))
-
 		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch)
 
 		# Get sleep data for yesterday
@@ -801,7 +844,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch)
 
 		# Already parsed from json to python objects
-		weekly_manual_activities = get_weekly_data(manually_updated)
+		weekly_manual_activities = get_weekly_data(manually_updated,current_date,last_seven_days_date)
+		print("\n\n")
+		print("last seven day_date", last_seven_days_date)
+		print("last seven day epoch", last_seven_days_date.replace(tzinfo=timezone.utc).timestamp())
+		pprint.pprint(weekly_manual_activities)
 		todays_manually_updated = weekly_manual_activities.pop(current_date.strftime('%Y-%m-%d'))
 
 		# pull data for past 7 days (incuding today)
@@ -809,7 +856,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch)
 
 		# Already parsed from json to python objects
-		weekly_activities = get_weekly_data(activities)
+		weekly_activities = get_weekly_data(activities,current_date,last_seven_days_date)
 		todays_activities = weekly_activities.pop(current_date.strftime('%Y-%m-%d'))
 			
 
@@ -818,9 +865,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# pull data for past 7 days (incuding today)
 		daily_strong = list(DailyUserInputStrong.objects.filter(
-			user_input__user = user,
-			user_input__created_at__gte = last_seven_days_date,
-			user_input__created_at__lte = current_date).order_by('user_input__created_at'))
+			Q(user_input__created_at__gte = last_seven_days_date)&
+			Q(user_input__created_at__lte = current_date),
+			user_input__user = user).order_by('user_input__created_at'))
 
 		todays_daily_strong = []
 		for i,q in enumerate(daily_strong):
@@ -848,6 +895,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
 		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
 		stress_json = [ast.literal_eval(dic) for dic in stress]
+
+		weather_data = get_weather_data(todays_daily_strong,todays_activities_json,
+										todays_manually_updated_json,start_epoch)
 
 		grades_calculated_data = get_blank_model_fields('grade')
 		exercise_calculated_data = get_blank_model_fields('exercise')
