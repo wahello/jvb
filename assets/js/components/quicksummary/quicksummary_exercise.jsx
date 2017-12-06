@@ -24,11 +24,11 @@ const attrVerboseName = {
     elevation_gain: 'Elevation Gain(feet)',
     elevation_loss: 'Elevation Loss(feet)',  
     effort_level: 'Effort Level',
-    dew_point: 'Dew Point',
-    temperature: 'Temperature',
-    humidity: 'Humidity',  
-    temperature_feels_like: 'Temperature Feels Like',
-    wind: 'Wind',
+    dew_point: 'Dew Point (in °F)',
+    temperature: 'Temperature (in °F)',
+    humidity: 'Humidity (in %)',  
+    temperature_feels_like: 'Temperature Feels Like (in °F)',
+    wind: 'Wind (in miles per hour)',
     hrr: 'HRR',
     hrr_start_point: 'HRR Start Point',  
     hrr_beats_lowered: 'HRR Beats Lowered',
@@ -77,8 +77,13 @@ componentWillReceiveProps(nextProps){
       columns:cols[0]
     };
 }
+
 isEmpty(obj){
     return Object.keys(obj).length === 0 && obj.constructor === Object
+}
+
+toFahrenheit(tempInCelcius){
+    return (tempInCelcius * 1.8) + 32;
 }
 
 renderTableColumns(dateWiseData,category,classes=""){
@@ -111,7 +116,20 @@ renderTableColumns(dateWiseData,category,classes=""){
                 }
                 else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
                     for(let act of avgHrKeys)
-                        all_data.push(0);
+                        all_data.push('-');
+                }
+
+                else if ((key == 'dew_point' && value === null) ||
+                         (key == 'temperature' && value === null) ||
+                         (key == 'humidity' && value === null)||
+                         (key == 'temperature_feels_like' && value === null) ||
+                         (key == 'wind' && value === null)){
+                    all_data.push('No GPS data');
+                }
+                else if((key == 'dew_point' && (value && value != '-')) ||
+                        (key == 'temperature' && (value && value != '-'))||
+                        (key == 'temperature_feels_like' && (value && value != '-'))){
+                    all_data.push(this.toFahrenheit(value).toFixed(2));
                 }
                 else
                     all_data.push(value);

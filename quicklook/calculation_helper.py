@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone,time
-from collections import OrderedDict,defaultdict
+from collections import OrderedDict
 import json, ast, pprint
 import requests
 
@@ -318,11 +318,13 @@ def fetch_weather_data(latitude,longitude,date):
 	'''
 	KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
 	EXCLUDE = ['currently','minutely','hourly','alerts','flags']
-	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}'.format(
-				KEY, latitude, longitude, date,",".join(EXCLUDE))
+	UNIT = 'si'
+	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}&units={}'.format(
+				KEY, latitude, longitude, date,",".join(EXCLUDE),UNIT)
 
 	try:
 		r = requests.get(URL)
+		pprint.pprint(r.json())
 		return r.json()
 	except:
 		return {}
@@ -473,8 +475,6 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
-
-	print("\n\nTodays Bedtime",today_bedtime)
 
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
@@ -783,8 +783,8 @@ def get_weather_data(todays_daily_strong,todays_activities,
 			"temperature":safe_get(todays_daily_strong,'outdoor_temperature',None),
 			"dewPoint":safe_get(todays_daily_strong,'dewpoint',None),
 			"humidity":safe_get(todays_daily_strong,'humidity',None),
-			"apparentTemperature":safe_get(todays_daily_strong,'apparent_temperature',None),
-			"windSpeed":safe_get(todays_daily_strong,'wind_speed',None)
+			"apparentTemperature":safe_get(todays_daily_strong,'temperature_feels_like',None),
+			"windSpeed":safe_get(todays_daily_strong,'wind',None)
 		}
 		return DATA
 	else:
@@ -845,10 +845,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Already parsed from json to python objects
 		weekly_manual_activities = get_weekly_data(manually_updated,current_date,last_seven_days_date)
-		print("\n\n")
-		print("last seven day_date", last_seven_days_date)
-		print("last seven day epoch", last_seven_days_date.replace(tzinfo=timezone.utc).timestamp())
-		pprint.pprint(weekly_manual_activities)
+		
 		todays_manually_updated = weekly_manual_activities.pop(current_date.strftime('%Y-%m-%d'))
 
 		# pull data for past 7 days (incuding today)
@@ -981,9 +978,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
 
 		# Alcohol
-		alcohol_calculated_data['alcohol_day'] = safe_get(todays_daily_strong,
-											"number_of_alcohol_consumed_yesterday","")
-
+		alcohol_today = safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday","")
+		alcohol_calculated_data['alcohol_day'] = '' if not alcohol_today else alcohol_today
 		# Calculation of grades
 
 		# Average sleep per night grade calculation
@@ -1034,6 +1030,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
+
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
 			update_helper(user_ql.grades_ql,grades_calculated_data)
