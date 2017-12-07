@@ -5,11 +5,8 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
 
 import {fetchMovementConsistency} from '../../network/quick';
-axiosRetry(axios, { retries: 4}); 
 var CalendarWidget = require('react-calendar-widget');  
 
 var ReactDOM = require('react-dom');
@@ -58,7 +55,6 @@ class Movementquick extends Component{
 	}
 
   errorMCFetch(error){
-    console.log("Called",error);
     const initial_data = [
       {
          created_at:"-",
@@ -170,7 +166,6 @@ class Movementquick extends Component{
   }
 
   successMCFetch(data){
-    console.log(data);
     if(data.data.length){
       this.setState({
           mc_data : data.data
@@ -212,7 +207,7 @@ class Movementquick extends Component{
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
-      console.log(steps_data);
+      
       columns.push(
         <Column 
           header={<Cell>Steps</Cell>}
