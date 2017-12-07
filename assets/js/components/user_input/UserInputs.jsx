@@ -535,7 +535,7 @@ handleScroll() {
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-                                    <div className="toggler" style={{color:"#103047"}}>
+                                    <div className="toggler">
                                     <FontAwesome 
                                           name = "bars"
                                           size = "1x"
