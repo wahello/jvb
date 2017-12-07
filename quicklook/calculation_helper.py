@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone,time
 from collections import OrderedDict
-import json, ast, pprint
+import json, ast
 import requests
 
 from django.db.models import Q
@@ -57,11 +57,16 @@ def sec_to_hours_min(seconds):
 
 def meter_per_sec_to_pace_per_mile(mps):
 	'''
-	Pace per mile means time (hh:mm) required to cover 1 mile
+	Pace per mile means time (mm:ss) required to cover 1 mile
 	1 meter = 0.000621371 miles
 	'''
 	secs = round(1/(mps * 0.000621371))
-	min_sec_str = "{}:{}".format(secs//60,(int(secs%60)))
+	mins = secs // 60
+	sec = int(secs % 60) 
+	if sec > 9:
+		min_sec_str = "{}:{}".format(mins,sec)
+	else:
+		min_sec_str = "{}:{:02d}".format(mins,sec)
 	return min_sec_str
 
 def safe_sum(d, key):
@@ -324,7 +329,6 @@ def fetch_weather_data(latitude,longitude,date):
 
 	try:
 		r = requests.get(URL)
-		pprint.pprint(r.json())
 		return r.json()
 	except:
 		return {}
@@ -531,24 +535,20 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, epochs_json):
+def cal_exercise_steps_total_steps(dailies_json, todays_activities, todays_manually_updated):
 	'''
 		Calculate non exercise steps
 	'''	
-
-	NON_EXERCISE_ACTIVITIES = ['WALKING','CASUAL_WALKING','SPEED_WALKING',
-							   'MOTORCYCLING','FLYING','HORSEBACK_RIDING'
-							   'SNOWMOBILING']
 	total_steps = 0
 	exercise_steps = 0
-
-	if epochs_json:
-		for dobj in epochs_json:
-			if dobj['activityType'] not in NON_EXERCISE_ACTIVITIES:
-				exercise_steps += dobj['steps']
+	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
+	if len(todays_activities):
+		for obj in todays_activities:
+			obj = manually_edited(obj)
+			exercise_steps += obj.get('steps',0)
 
 	if dailies_json:
-		total_steps = dailies_json[0]['steps']
+		total_steps = dailies_json[0].get('steps',0)
 
 	return (exercise_steps, total_steps)
 
@@ -1007,7 +1007,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
 		exercise_steps, total_steps = cal_exercise_steps_total_steps(
-										  dailies_json,epochs_json)	
+					dailies_json,todays_activities_json,todays_manually_updated_json)	
 		# Have to fix this
 		steps_calculated_data['non_exercise_steps'] = abs(total_steps - exercise_steps)
 		steps_calculated_data['exercise_steps'] = exercise_steps
