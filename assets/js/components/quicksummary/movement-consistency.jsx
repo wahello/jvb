@@ -8,8 +8,7 @@ import Dimensions from 'react-dimensions';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-import {movementDate} from '../../network/quick';
-import movementConcictency from '../../network/quick';
+import {fetchMovementConsistency} from '../../network/quick';
 axiosRetry(axios, { retries: 4}); 
 var CalendarWidget = require('react-calendar-widget');  
 
@@ -19,271 +18,259 @@ var ReactDOM = require('react-dom');
 class Movementquick extends Component{
 	constructor(props){
 		super(props);
-    this.errormovement = this.errormovement.bind(this);
-    this.successmovement = this.successmovement.bind(this);
-    this.processDate=this.processDate.bind(this);
-    this.createStateInstance = this.createStateInstance.bind(this);
+    this.errorMCFetch = this.errorMCFetch.bind(this);
+    this.successMCFetch = this.successMCFetch.bind(this);
+    this.processDate = this.processDate.bind(this);
     this.renderTableColumns = this.renderTableColumns.bind(this);
 
 		 this.state = {
-       myTableData: [
-        {name: '12AM - 01AM'},
-        {name: '01AM - 02AM'},
-        {name: '02AM - 03AM'}, 
-        {name: '03AM - 04AM'},
-        {name: '04AM - 05AM'},        
-        {name: '05AM - 06AM'},
-        {name: '06AM - 07AM'},
-        {name: '07AM - 08AM'},
-        {name: '08AM - 09AM'},
-        {name: '09AM - 10AM'},
-        {name: '10AM - 11AM'},
-        {name: '11AM - 12AM'},
-        {name: '12PM - 01PM'},
-        {name: '01PM - 02PM'},
-        {name: '02PM - 03PM'},
-        {name: '03PM - 04PM'},
-        {name: '04PM - 05PM'},
-        {name: '05PM - 06PM'},
-        {name: '06PM - 07PM'},
-        {name: '07PM - 08PM'},
-        {name: '08PM - 09PM'},        
-        {name: '09PM - 10PM'},
-        {name: '10PM - 11PM'},
-        {name: '11PM - 12AM'},
+       tableAttrColumn: [
+        {name: '12 AM - 01 AM'},
+        {name: '01 AM - 02 AM'},
+        {name: '02 AM - 03 AM'}, 
+        {name: '03 AM - 04 AM'},
+        {name: '04 AM - 05 AM'},        
+        {name: '05 AM - 06 AM'},
+        {name: '06 AM - 07 AM'},
+        {name: '07 AM - 08 AM'},
+        {name: '08 AM - 09 AM'},
+        {name: '09 AM - 10 AM'},
+        {name: '10 AM - 11 AM'},
+        {name: '11 AM - 12 AM'},
+        {name: '12 PM - 01 PM'},
+        {name: '01 PM - 02 PM'},
+        {name: '02 PM - 03 PM'},
+        {name: '03 PM - 04 PM'},
+        {name: '04 PM - 05 PM'},
+        {name: '05 PM - 06 PM'},
+        {name: '06 PM - 07 PM'},
+        {name: '07 PM - 08 PM'},
+        {name: '08 PM - 09 PM'},        
+        {name: '09 PM - 10 PM'},
+        {name: '10 PM - 11 PM'},
+        {name: '11 PM - 12 AM'},
         {name: 'Active-Hours'},
         {name: 'Inactive-Hours'},              
        ],
-      created_at:"-",
-       movement_consistency: {
-        "12AM_01AM":{
-          steps:'-',
-          status:'-',
-         },
-         "01AM_02AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "02AM_03AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "03AM_04AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "04AM_05AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "05AM_06AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "06AM_07AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "07AM_08AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "08AM_09AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "09AM_10AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "10AM_11AM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "11AM_12PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "12PM_01PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "01PM_02PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "02PM_03PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "03PM_04PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "04PM_05PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "05PM_06PM":{
-          steps:'-',
-          status:'-',
-         },
-         "06PM_07PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "07PM_08PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "08PM_09PM":{
-          steps:'-',
-          status:'-',
-         },
-         "09PM_10PM":{
-          steps:'-',
-          status:'-',
-         }, 
-         "10PM_11PM":{
-          steps:'-',
-          status:'-',
-         },
-         "11PM_12AM":{
-          steps:'-',
-          status:'-',
-         }, 
-
-         active_hours:'-',
-         inactive_hours:'-'
-       }
-        
-                               
+       mc_data:[],
+       selectedDate: new Date()                      
       };
 	}
-    createStateInstance(data,from_date){       
-      var steps;
-      let obj = {
-        steps:data.steps,
-        status:data.status,
-      }
-      return obj
-    }
 
-   successmovement(data,from_date){
-    console.log(from_date);
-   console.log(data);
+  errorMCFetch(error){
+    console.log("Called",error);
+    const initial_data = [
+      {
+         created_at:"-",
+         movement_consistency: {
+          "12 AM to 01 AM":{
+            steps:'-',
+            status:'-'
+           },
+           "01 AM to 02 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "02 AM to 03 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "03 AM to 04 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "04 AM to 05 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "05 AM to 06 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "06 AM to 07 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "07 AM to 08 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "08 AM to 09 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "09 AM to 10 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "10 AM to 11 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "11 AM to 12 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "12 PM to 01 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "01 PM to 02 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "02 PM to 03 PM":{
+            steps:'-',
+            status:'-'
+           },
+           "03 PM to 04 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "04 PM to 05 PM":{
+            steps:'-',
+            status:'-'
+           },
+           "05 PM to 06 PM":{
+            steps:'-',
+            status:'-'
+           },
+           "06 PM to 07 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "07 PM to 08 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "08 PM to 09 PM":{
+            steps:'-',
+            status:'-'
+           },
+           "09 PM to 10 PM":{
+            steps:'-',
+            status:'-'
+           }, 
+           "10 PM to 11 PM":{
+            steps:'-',
+            status:'-'
+           },
+           "11 PM to 12 AM":{
+            steps:'-',
+            status:'-'
+           }, 
+           active_hours:'-',
+           inactive_hours:'-'
+         }
+      }
+    ];
     this.setState({
-      created_at:data.data.created_at,
-      movement_consistency:{
-       "12AM_01AM": this.createStateInstance(data.data['12 AM to 01 AM']),
-       "01AM_02AM": this.createStateInstance(data.data['01 AM to 02 AM']),       
-       "02AM_03AM": this.createStateInstance(data.data['02 AM to 03 AM']),  
-       "03AM_04AM": this.createStateInstance(data.data['03 AM to 04 AM']),  
-       "04AM_05AM": this.createStateInstance(data.data['04 AM to 05 AM']),  
-       "05AM_06AM": this.createStateInstance(data.data['05 AM to 06 AM']),  
-       "06AM_07AM": this.createStateInstance(data.data['06 AM to 07 AM']),  
-       "07AM_08AM": this.createStateInstance(data.data['07 AM to 08 AM']),  
-       "08AM_09AM": this.createStateInstance(data.data['08 AM to 09 AM']),  
-       "09AM_10AM": this.createStateInstance(data.data['09 AM to 10 AM']),  
-       "10AM_11AM": this.createStateInstance(data.data['10 AM to 11 AM']),  
-       "11AM_12PM": this.createStateInstance(data.data['11 AM to 12 PM']),  
-       "12PM_01PM": this.createStateInstance(data.data['12 PM to 01 PM']),  
-       "01PM_02PM": this.createStateInstance(data.data['01 PM to 02 PM']),
-       "02PM_03PM": this.createStateInstance(data.data['02 PM to 03 PM']),
-       "03PM_04PM": this.createStateInstance(data.data['03 PM to 04 PM']),
-       "04PM_05PM": this.createStateInstance(data.data['04 PM to 05 PM']),
-       "05PM_06PM": this.createStateInstance(data.data['05 PM to 06 PM']),
-       "06PM_07PM": this.createStateInstance(data.data['06 PM to 07 PM']),
-       "07PM_08PM": this.createStateInstance(data.data['07 PM to 08 PM']),
-       "08PM_09PM": this.createStateInstance(data.data['08 PM to 09 PM']),
-       "09PM_10PM": this.createStateInstance(data.data['09 PM to 10 PM']),
-       "10PM_11PM": this.createStateInstance(data.data['10 PM to 11 PM']),
-       "11PM_12AM": this.createStateInstance(data.data['11 PM to 12 AM']),
-       active_hours:data.data.active_hours,
-       inactive_hours:data.data.inactive_hours,
-       }  
-
-      })
-    
+      mc_data:initial_data
+    });
   }
 
-  errormovement(error){
-    console.log(error.message);
+  successMCFetch(data){
+    console.log(data);
+    if(data.data.length){
+      this.setState({
+          mc_data : data.data
+        });
+    }else{
+      this.errorMCFetch(data);
+    }
   }
-  processDate(from_date){
-  movementDate(from_date,this.successmovement,this.errormovement);
-}
-componentDidMount(){
-  var today= new Date();
-  movementDate(today,this.successmovement,this.errormovement);
-  movementConcictency(this.successmovement,this.errormovement)
-}
 
- renderTableColumns(dateWiseData,category=undefined,classes=""){
+  getSortKeysAccordingTime(data){
+    const sortedDate = ["12 AM to 01 AM","01 AM to 02 AM","02 AM to 03 AM","03 AM to 04 AM",
+    "04 AM to 05 AM","05 AM to 06 AM","06 AM to 07 AM","07 AM to 08 AM","08 AM to 09 AM",
+    "09 AM to 10 AM","10 AM to 11 AM","11 AM to 12 PM","12 PM to 01 PM","01 PM to 02 PM",
+    "02 PM to 03 PM","03 PM to 04 PM","04 PM to 05 PM","05 PM to 06 PM","06 PM to 07 PM",
+    "07 PM to 08 PM","08 PM to 09 PM","09 PM to 10 PM","10 PM to 11 PM","11 PM to 12 AM"];
+    return sortedDate;
+  }
+
+  processDate(selectedDate){
+    this.setState({
+      selectedDate: selectedDate,
+    },()=>{
+      fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
+    });
+  }
+
+  componentDidMount(){
+    fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
+  }
+
+ renderTableColumns(dateWiseData){
     let columns = [];
-    for(let [date,data] of Object.entries(dateWiseData)){
-      let all_data = [];
-      let keys = [];
-      for(let cat of Object.keys(data).sort()){
-        if (cat !== "created_at" &&
-          cat !== "updated_at" &&
-          cat !== "user"){
-          for(let key of Object.keys(data[cat]).sort()){
-            if(key !== 'id' && key !== 'user_ql'){
-              all_data.push(data[cat][key]);
-              keys.push(key);
-            }
-          }
+    for(let data of dateWiseData) {
+      let steps_data = [];
+      let status_data = [];
+      for(let slot of this.getSortKeysAccordingTime()){
+          steps_data.push(data['movement_consistency'][slot].steps);
+          status_data.push(data['movement_consistency'][slot].status);
         }
-      }
+      steps_data.push(data['movement_consistency'].active_hours);
+      steps_data.push(data['movement_consistency'].inactive_hours);
+      console.log(steps_data);
       columns.push(
         <Column 
-          header={<Cell>{date}</Cell>}
+          header={<Cell>Steps</Cell>}
               cell={props => (
                     <Cell {...props}>
-                      {all_data[props.rowIndex]}
+                      {steps_data[props.rowIndex]}
                     </Cell>
                   )}
               width={132}
         />
-      )
-      console.log(keys);
+      );
+      columns.push(
+        <Column 
+          header={<Cell>Status</Cell>}
+              cell={props => (
+                    <Cell {...props}>
+                      {status_data[props.rowIndex]}
+                    </Cell>
+                  )}
+              width={132}
+        />
+      );
     }
     return columns;
   }
 
-	render(){
-		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		let rowsCount = this.state.myTableData.length;
-				
-		return(
-			<div className="row justify-content-center">
-      <div>
-       <CalendarWidget onDaySelect={this.processDate}/>,
-      </div>
-			 <Table
-		        rowsCount={rowsCount}
-		        rowHeight={100}
-		        headerHeight={65}
-		        width={containerWidth}
-        		maxHeight={containerHeight}
-                touchScrollEnabled={true}
-                {...props}>
-		        <Column
-		          header={<Cell>Movement Consistency</Cell>}
-		          cell={props => (
-		            <Cell {...props}>
-		              {this.state.myTableData[props.rowIndex].name}
-		            </Cell>
-		          )}
-		          width={167}
-		          fixed={true}
-		        />
-		       
-      		</Table>
-			</div>
+render(){
+	const {height, width, containerHeight, containerWidth, ...props} = this.props;
+	let rowsCount = this.state.tableAttrColumn.length;
+			
+	return(
+		<div className="row justify-content-center">
+    <div>
+     <CalendarWidget onDaySelect={this.processDate}/>,
+    </div>
+		 <Table
+	        rowsCount={rowsCount}
+	        rowHeight={100}
+	        headerHeight={65}
+	        width={containerWidth}
+      		maxHeight={containerHeight}
+              touchScrollEnabled={true}
+              {...props}>
+	        <Column
+	          header={<Cell>Movement Consistency</Cell>}
+	          cell={props => (
+	            <Cell {...props}>
+	              {this.state.tableAttrColumn[props.rowIndex].name}
+	            </Cell>
+	          )}
+	          width={167}
+	          fixed={true}
+	        />
+	       {this.renderTableColumns(this.state.mc_data)}
+    		</Table>
+		</div>
 
-			);
+		);
 	}
 }
 export default Dimensions({

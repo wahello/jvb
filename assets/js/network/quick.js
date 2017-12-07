@@ -76,40 +76,20 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
     });
   }
 
-export default function movementConcictency(successmovement,errormovement){   
-  console.log('suresh'); 
-  return function(dispatch){
-      const URL=`/quicklook/users/movement_consistency`;
-      const config={
-       method:"get",
-       url:URL,
-       withCredentials: true
-      };
-      axios(config).then((response)=>{
-       successmovement(response);
-      }).catch(function(error){
-                errormovement(error);
-      });
-
-  }
-}
-export function movementDate(from_date,successmovement,errormovement){
-
+export function fetchMovementConsistency(fromDate, successmovement,errormovement){   
+  fromDate = moment(fromDate);
   const URL=`/quicklook/users/movement_consistency`;
-  from_date = moment(from_date);
   const config={
-    method:"get",
-    url:URL,
-    params:{
-      from_date:from_date.format("YYYY-MM-DD")
-    }
-  }
-    axios(config).then((response)=>{
-      successmovement(response);
-    }).catch((error) =>{
-      errormovement(error);
-
-    })
-  
-
+   method:"get",
+   params:{
+    from_date: fromDate.format('YYYY-MM-DD') 
+   },
+   url:URL,
+   withCredentials: true
+  };
+  axios(config).then((response)=>{
+   successmovement(response);
+  }).catch(function(error){
+    errormovement(error);
+  });
 }
