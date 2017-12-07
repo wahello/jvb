@@ -60,14 +60,17 @@ def meter_per_sec_to_pace_per_mile(mps):
 	Pace per mile means time (mm:ss) required to cover 1 mile
 	1 meter = 0.000621371 miles
 	'''
-	secs = round(1/(mps * 0.000621371))
-	mins = secs // 60
-	sec = int(secs % 60) 
-	if sec > 9:
-		min_sec_str = "{}:{}".format(mins,sec)
-	else:
-		min_sec_str = "{}:{:02d}".format(mins,sec)
-	return min_sec_str
+	try:
+		secs = round(1/(mps * 0.000621371))
+		mins = secs // 60
+		sec = int(secs % 60) 
+		if sec > 9:
+			min_sec_str = "{}:{}".format(mins,sec)
+		else:
+			min_sec_str = "{}:{:02d}".format(mins,sec)
+		return min_sec_str
+	except ZeroDivisionError:
+		return "0:0"
 
 def safe_sum(d, key):
 	if(d!=[]):
