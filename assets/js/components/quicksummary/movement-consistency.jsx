@@ -13,14 +13,14 @@ var ReactDOM = require('react-dom');
 
 
 class Movementquick extends Component{
-	constructor(props){
-		super(props);
+  constructor(props){
+    super(props);
     this.errorMCFetch = this.errorMCFetch.bind(this);
     this.successMCFetch = this.successMCFetch.bind(this);
     this.processDate = this.processDate.bind(this);
     this.renderTableColumns = this.renderTableColumns.bind(this);
 
-		 this.state = {
+     this.state = {
        tableAttrColumn: [
         {name: '12 AM - 01 AM'},
         {name: '01 AM - 02 AM'},
@@ -52,7 +52,7 @@ class Movementquick extends Component{
        mc_data:[],
        selectedDate: new Date()                      
       };
-	}
+  }
 
   errorMCFetch(error){
     const initial_data = [
@@ -235,38 +235,38 @@ class Movementquick extends Component{
   }
 
 render(){
-	const {height, width, containerHeight, containerWidth, ...props} = this.props;
-	let rowsCount = this.state.tableAttrColumn.length;
-			
-	return(
-		<div className="row justify-content-center">
+  const {height, width, containerHeight, containerWidth, ...props} = this.props;
+  let rowsCount = this.state.tableAttrColumn.length;
+      
+  return(
+    <div className="row justify-content-center">
     <div>
      <CalendarWidget onDaySelect={this.processDate}/>,
     </div>
-		 <Table
-	        rowsCount={rowsCount}
-	        rowHeight={100}
-	        headerHeight={65}
-	        width={containerWidth}
-      		maxHeight={containerHeight}
+     <Table
+          rowsCount={rowsCount}
+          rowHeight={100}
+          headerHeight={65}
+          width={containerWidth}
+          maxHeight={containerHeight}
               touchScrollEnabled={true}
               {...props}>
-	        <Column
-	          header={<Cell>Movement Consistency</Cell>}
-	          cell={props => (
-	            <Cell {...props}>
-	              {this.state.tableAttrColumn[props.rowIndex].name}
-	            </Cell>
-	          )}
-	          width={167}
-	          fixed={true}
-	        />
-	       {this.renderTableColumns(this.state.mc_data)}
-    		</Table>
-		</div>
+          <Column
+            header={<Cell>Movement Consistency</Cell>}
+            cell={props => (
+              <Cell {...props}>
+                {this.state.tableAttrColumn[props.rowIndex].name}
+              </Cell>
+            )}
+            width={167}
+            fixed={true}
+          />
+         {this.renderTableColumns(this.state.mc_data)}
+        </Table>
+    </div>
 
-		);
-	}
+    );
+  }
 }
 export default Dimensions({
   getHeight: function(element) {
@@ -277,4 +277,3 @@ export default Dimensions({
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);
-
