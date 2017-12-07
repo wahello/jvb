@@ -94,6 +94,7 @@ export default function movementConcictency(successmovement,errormovement){
   }
 }
 export function movementDate(from_date,successmovement,errormovement){
+
   const URL=`/quicklook/users/movement_consistency`;
   from_date = moment(from_date);
   const config={

@@ -272,6 +272,7 @@ class Quicklook extends Component{
        		}
 
 	successquick(data,start_dt,end_dt){
+	
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
 		for(let date of Object.keys(initial_state)){

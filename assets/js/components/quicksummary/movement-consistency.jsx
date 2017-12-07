@@ -23,6 +23,8 @@ class Movementquick extends Component{
     this.successmovement = this.successmovement.bind(this);
     this.processDate=this.processDate.bind(this);
     this.createStateInstance = this.createStateInstance.bind(this);
+    this.renderTableColumns = this.renderTableColumns.bind(this);
+
 		 this.state = {
        myTableData: [
         {name: '12AM - 01AM'},
@@ -158,8 +160,8 @@ class Movementquick extends Component{
                                
       };
 	}
-    createStateInstance(data,from_date){
-      var steps,status;
+    createStateInstance(data,from_date){       
+      var steps;
       let obj = {
         steps:data.steps,
         status:data.status,
@@ -168,7 +170,8 @@ class Movementquick extends Component{
     }
 
    successmovement(data,from_date){
-    console.log(data);
+    console.log(from_date);
+   console.log(data);
     this.setState({
       created_at:data.data.created_at,
       movement_consistency:{
@@ -207,8 +210,8 @@ class Movementquick extends Component{
   errormovement(error){
     console.log(error.message);
   }
-  processDate(date){
-  movementDate(date,this.successmovement,this.errormovement);
+  processDate(from_date){
+  movementDate(from_date,this.successmovement,this.errormovement);
 }
 componentDidMount(){
   var today= new Date();
@@ -216,16 +219,23 @@ componentDidMount(){
   movementConcictency(this.successmovement,this.errormovement)
 }
 
-renderTableColumns(dateWiseData,category,classes=""){
+ renderTableColumns(dateWiseData,category=undefined,classes=""){
     let columns = [];
     for(let [date,data] of Object.entries(dateWiseData)){
       let all_data = [];
-      for(let [key,value] of Object.entries(data[category])){
-        if(key !== 'id' && key !== 'user_ql'){
-          all_data.push(value);
+      let keys = [];
+      for(let cat of Object.keys(data).sort()){
+        if (cat !== "created_at" &&
+          cat !== "updated_at" &&
+          cat !== "user"){
+          for(let key of Object.keys(data[cat]).sort()){
+            if(key !== 'id' && key !== 'user_ql'){
+              all_data.push(data[cat][key]);
+              keys.push(key);
+            }
+          }
         }
       }
-
       columns.push(
         <Column 
           header={<Cell>{date}</Cell>}
@@ -234,12 +244,14 @@ renderTableColumns(dateWiseData,category,classes=""){
                       {all_data[props.rowIndex]}
                     </Cell>
                   )}
-              width={134}
+              width={132}
         />
       )
+      console.log(keys);
     }
     return columns;
   }
+
 	render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
@@ -267,18 +279,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		          width={167}
 		          fixed={true}
 		        />
-		         <Column
-		          header={<Cell>Steps</Cell>}
-              cell={<Cell data={this.state.movement_consistency}/>}
-		          width={167}
-		        />
-
-		         <Column
-		          header={<Cell>Status</Cell>}
-		          width={167}
-		         
-		        />
-			     
+		       
       		</Table>
 			</div>
 

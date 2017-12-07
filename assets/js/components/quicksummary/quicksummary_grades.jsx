@@ -29,14 +29,17 @@ import Dimensions from 'react-dimensions';
   }
 
 renderTableColumns(dateWiseData,category,classes=""){
+console.log(dateWiseData);
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){
-				if(key !== 'id' && key !== 'user_ql'){
+				if(key !== 'id' && key !== 'user_ql'){ 
 					all_data.push(value);
 				}
 			}
+
 			columns.push(
 				<Column 
 					header={<Cell>{date}</Cell>}
