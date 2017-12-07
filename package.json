@@ -34,6 +34,7 @@
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.10.1",
     "fixed-data-table-2": "^0.8.6",
+    "glamor": "^2.20.40",
     "imports-loader": "^0.7.1",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",

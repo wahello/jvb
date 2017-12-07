@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone,time
-from collections import OrderedDict,defaultdict
-import json, ast, pprint
+from collections import OrderedDict
+import json, ast
 import requests
 
 from django.db.models import Q
@@ -57,11 +57,16 @@ def sec_to_hours_min(seconds):
 
 def meter_per_sec_to_pace_per_mile(mps):
 	'''
-	Pace per mile means time (hh:mm) required to cover 1 mile
+	Pace per mile means time (mm:ss) required to cover 1 mile
 	1 meter = 0.000621371 miles
 	'''
 	secs = round(1/(mps * 0.000621371))
-	min_sec_str = "{}:{}".format(secs//60,(int(secs%60)))
+	mins = secs // 60
+	sec = int(secs % 60) 
+	if sec > 9:
+		min_sec_str = "{}:{}".format(mins,sec)
+	else:
+		min_sec_str = "{}:{:02d}".format(mins,sec)
 	return min_sec_str
 
 def safe_sum(d, key):
@@ -318,8 +323,9 @@ def fetch_weather_data(latitude,longitude,date):
 	'''
 	KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
 	EXCLUDE = ['currently','minutely','hourly','alerts','flags']
-	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}'.format(
-				KEY, latitude, longitude, date,",".join(EXCLUDE))
+	UNIT = 'si'
+	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}&units={}'.format(
+				KEY, latitude, longitude, date,",".join(EXCLUDE),UNIT)
 
 	try:
 		r = requests.get(URL)
@@ -474,8 +480,6 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
 
-	print("\n\nTodays Bedtime",today_bedtime)
-
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
@@ -531,24 +535,20 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, epochs_json):
+def cal_exercise_steps_total_steps(dailies_json, todays_activities, todays_manually_updated):
 	'''
 		Calculate non exercise steps
 	'''	
-
-	NON_EXERCISE_ACTIVITIES = ['WALKING','CASUAL_WALKING','SPEED_WALKING',
-							   'MOTORCYCLING','FLYING','HORSEBACK_RIDING'
-							   'SNOWMOBILING']
 	total_steps = 0
 	exercise_steps = 0
-
-	if epochs_json:
-		for dobj in epochs_json:
-			if dobj['activityType'] not in NON_EXERCISE_ACTIVITIES:
-				exercise_steps += dobj['steps']
+	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
+	if len(todays_activities):
+		for obj in todays_activities:
+			obj = manually_edited(obj)
+			exercise_steps += obj.get('steps',0)
 
 	if dailies_json:
-		total_steps = dailies_json[0]['steps']
+		total_steps = dailies_json[0].get('steps',0)
 
 	return (exercise_steps, total_steps)
 
@@ -783,8 +783,8 @@ def get_weather_data(todays_daily_strong,todays_activities,
 			"temperature":safe_get(todays_daily_strong,'outdoor_temperature',None),
 			"dewPoint":safe_get(todays_daily_strong,'dewpoint',None),
 			"humidity":safe_get(todays_daily_strong,'humidity',None),
-			"apparentTemperature":safe_get(todays_daily_strong,'apparent_temperature',None),
-			"windSpeed":safe_get(todays_daily_strong,'wind_speed',None)
+			"apparentTemperature":safe_get(todays_daily_strong,'temperature_feels_like',None),
+			"windSpeed":safe_get(todays_daily_strong,'wind',None)
 		}
 		return DATA
 	else:
@@ -845,10 +845,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Already parsed from json to python objects
 		weekly_manual_activities = get_weekly_data(manually_updated,current_date,last_seven_days_date)
-		print("\n\n")
-		print("last seven day_date", last_seven_days_date)
-		print("last seven day epoch", last_seven_days_date.replace(tzinfo=timezone.utc).timestamp())
-		pprint.pprint(weekly_manual_activities)
+		
 		todays_manually_updated = weekly_manual_activities.pop(current_date.strftime('%Y-%m-%d'))
 
 		# pull data for past 7 days (incuding today)
@@ -981,9 +978,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
 
 		# Alcohol
-		alcohol_calculated_data['alcohol_day'] = safe_get(todays_daily_strong,
-											"number_of_alcohol_consumed_yesterday","")
-
+		alcohol_today = safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday","")
+		alcohol_calculated_data['alcohol_day'] = '' if not alcohol_today else alcohol_today
 		# Calculation of grades
 
 		# Average sleep per night grade calculation
@@ -1011,7 +1007,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
 		exercise_steps, total_steps = cal_exercise_steps_total_steps(
-										  dailies_json,epochs_json)	
+					dailies_json,todays_activities_json,todays_manually_updated_json)	
 		# Have to fix this
 		steps_calculated_data['non_exercise_steps'] = abs(total_steps - exercise_steps)
 		steps_calculated_data['exercise_steps'] = exercise_steps
@@ -1034,6 +1030,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
+
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
 			update_helper(user_ql.grades_ql,grades_calculated_data)

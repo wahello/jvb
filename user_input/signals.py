@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 
 from .serializers import UserDailyInputSerializer
 from quicklook.tasks import generate_quicklook
 from .custom_signals import user_input_post_save,user_input_notify
+from .tasks import notify_admins_task
 
 @receiver(user_input_post_save, sender=UserDailyInputSerializer)
 def create_or_update_quicklook(sender, **kwargs):
@@ -20,40 +19,22 @@ def create_or_update_quicklook(sender, **kwargs):
 def notify_admins(sender,instance=None, created=False,**kwargs):
 	'''
 		Send email to all the admin users with the admin link to 
-		newly created instance
+		newly created instance or updated instance
 	'''
-	request = kwargs.get('request')
-	admin_users_email = [u.email for u in User.objects.filter(is_staff=True)]
-	info = (instance._meta.app_label, instance._meta.model_name)
-	instance_admin_url = request.build_absolute_uri('/').strip("/")+\
+	if instance:
+		request = kwargs.get('request')
+		admin_users_email = [u.email for u in User.objects.filter(is_staff=True)]
+		info = (instance._meta.app_label, instance._meta.model_name)
+		instance_admin_url = request.build_absolute_uri('/').strip("/")+\
 						 reverse('admin:%s_%s_change' % info, args=(instance.pk,))
-	message = """
-Hi there,
 
-User {} ({}) has {} user inputs for {}. Please click following link to access it -
+		instance_meta = {
+			'first_name':instance.user.first_name,
+			'last_name':instance.user.last_name,
+			'username':instance.user.username,
+			'created_at':instance.created_at.strftime("%b %d, %Y"),
+			'instance_url':instance_admin_url,
+			'created':created
+		}
 
-{}
-
-If clicking the link above doesn't work, please copy and paste the URL in a new browser
-window instead.
-
-Sincerely,
-
-JVB Health & Wellness   
- """
-	message = message.format(
-		instance.user.first_name+" "+instance.user.last_name,
-		instance.user.username,
-		"submitted" if created else "updated",
-		instance.created_at.strftime("%b %d, %Y"),
-		instance_admin_url
-	)
-
-	if admin_users_email:
-		send_mail(
-			subject="New User Input" if created else "User Input Updated",
-			message = message,
-			from_email = "saumyag@s7inc.co",
-			recipient_list = admin_users_email,
-			fail_silently = True  
-		)
+		notify_admins_task.delay(admin_users_email,instance_meta)

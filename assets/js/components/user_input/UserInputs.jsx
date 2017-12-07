@@ -41,8 +41,8 @@ class UserInputs extends React.Component{
         updating_form:false,
         submitting_form:false,
         calendarOpen:false,
-        checked:false,
-        checked1:false,
+        calories_item_check:false,
+        weather_check:false,
         infoButton:false,
         infoBtn:false,
         infoWorkout:false,
@@ -86,8 +86,8 @@ class UserInputs extends React.Component{
 
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
-        sleep_bedtime:moment(),
-        sleep_awake_time:moment(),
+        sleep_bedtime:null,
+        sleep_awake_time:null,
         awake_hours:'',
         awake_mins:'',
         sleep_comment:'',
@@ -131,6 +131,8 @@ class UserInputs extends React.Component{
       this.handleChangeDietModel = handlers.handleChangeDietModel.bind(this);
       this.handleChangeSmokeSubstance = handlers.handleChangeSmokeSubstance.bind(this);
       this.handleChangeAlcoholDrink = handlers.handleChangeAlcoholDrink.bind(this);
+      this.handleCaloriesItemCheck = handlers.handleCaloriesItemCheck.bind(this);
+      this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -160,8 +162,6 @@ class UserInputs extends React.Component{
       this.handleScroll = this.handleScroll.bind(this);
       this.toggleCalendar = this.toggleCalendar.bind(this);
       this.toggleEditForm = this.toggleEditForm.bind(this);
-      this.handleChecked = this.handleChecked.bind(this);
-      this.handleChecked1 = this.handleChecked1.bind(this);
       this.toggleInfo=this.toggleInfo.bind(this);
       this.toggleInfo2=this.toggleInfo2.bind(this);
       this.toggleInfoworkout=this.toggleInfoworkout.bind(this);
@@ -173,21 +173,41 @@ class UserInputs extends React.Component{
     onFetchSuccess(data,clone_form=undefined){
       const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                         'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+      const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
+                              'wind','dewpoint','humidity','weather_comment'];
       let other_diet = true;
+      let was_cloning = this.state.cloning_data;
+      let has_weather_data = false;
+      let has_calories_data = false;
+
       for(let diet of DIET_TYPE){
         if(data.data.optional_input.type_of_diet_eaten === diet)
           other_diet = false;
       }
-      let was_cloning = this.state.cloning_data;
-      let was_ckecked = this.state.checked1;
+      
+      for(let field of WEATHER_FIELDS){
+        if(!has_weather_data){
+          if((data.data.strong_input[field] != '') &&
+             (data.data.strong_input[field] !== undefined))
+            has_weather_data = true;
+        }
+      }
+
+      if((data.data.optional_input.calories_consumed_during_workout != '' &&
+          data.data.optional_input.calories_consumed_during_workout != undefined)||
+          (data.data.optional_input.food_ate_during_workout != '' && 
+           data.data.optional_input.food_ate_during_workout != undefined)){
+        has_calories_data = true;
+      }
+
       this.setState({
         fetched_user_input_created_at:data.data.created_at,
         update_form:clone_form,
         diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
         cloning_data:false,
         fetching_data:false,
-        checked1: true,
-        checked:true,
+        weather_check: has_weather_data,
+        calories_item_check:has_calories_data,
         editable: was_cloning ? true : false,
 
         workout:data.data.strong_input.workout,
@@ -443,17 +463,6 @@ handleScroll() {
       editable:!this.state.editable
     });
   }
-handleChecked(){
-  this.setState({
-    checked:!this.state.checked
-  })
-}
-handleChecked1(){
-  this.setState({
-    checked1:!this.state.checked1
-  })
-}
-
     render(){
 
         return(
@@ -1199,29 +1208,36 @@ handleChecked1(){
                           </FormGroup>
                         }
 
-                         { (this.state.workout === "yes" || this.state.workout === "") &&
-                         <FormGroup>
-                         
-                        <Label>1.11 I want to manually enter in weather information for my workout</Label>
-                        <div className="input1">
-                         <Label className="btn btn-secondary radio1">
-                        <Input
-                        type="checkbox"                                             
-                        onChange={this.handleChange}
-                        onClick={this.handleChecked1}
-                        >
-                        </Input>
-                        Hit me!
-                        </Label>
-                      
-                        </div>
-                         </FormGroup>
+                        { (this.state.workout === "yes" || this.state.workout === "") &&
+                            <FormGroup>  
+                              {this.state.editable &&
+                                <div className="input1">
+                                <Input
+                                className = "radio1"
+                                type="checkbox" 
+                                checked = {this.state.weather_check}                                            
+                                onClick={this.handleWeatherCheck}
+                                >
+                                </Input>
+                                <Label>1.11 I want to manually enter in weather information for my workout</Label>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div>
+                                <Label>1.11 I want to manually enter in weather information for my workout</Label>
+                                <div className="input">                             
+                                  <p>{this.state.weather_check?"yes":"no"}</p>
+                                </div>
+                                </div>
+                              }
+                            </FormGroup>
                         }
                          
-                        <Collapse isOpen={this.state.checked1}>
+                        <Collapse isOpen={this.state.weather_check}>
                          { (this.state.workout === "yes" || this.state.workout === "") &&                                                      
                          <FormGroup>                          
-                            <Label className="padding">1.11.1 What was the temperature (in fahrenheit degrees)
+                            <Label className="padding">1.11.1 What was the temperature (in degree celsius)
                              when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div>
@@ -1404,19 +1420,29 @@ handleChecked1(){
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                         <FormGroup>
-                         <div className="input1">
-                        <Input
-                        type="checkbox"
-                        onChange={this.handleChange}
-                        onClick={this.handleChecked}
-                        >
-                        </Input>
-                        <Label>I did a long workout and want to enter what I ate/calories consumed</Label>
-                        </div>
-                         </FormGroup>
+                          {this.state.editable &&
+                          <div className="input1">
+                          <Input
+                          type="checkbox"
+                          checked = {this.state.calories_item_check}
+                          onClick={this.handleCaloriesItemCheck}
+                          >
+                          </Input>
+                          <Label>I did a long workout and want to enter what I ate/calories consumed</Label>
+                          </div>
+                          }
+                          {!this.state.editable &&
+                            <div>
+                              <Label>I did a long workout and want to enter what I ate/calories consumed</Label>
+                              <div className="input">
+                                <p >{this.state.calories_item_check?"yes":"no"}</p>
+                              </div>
+                            </div>
+                          }
+                        </FormGroup>
                        }
 
-                        <Collapse isOpen={this.state.checked}>
+                        <Collapse isOpen={this.state.calories_item_check}>
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
@@ -1534,7 +1560,12 @@ handleChecked1(){
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.sleep_bedtime.format('MMMM Do YYYY, h:mm a')}</p>
+                                <p>
+                                  {
+                                    this.state.sleep_bedtime != null?
+                                    this.state.sleep_bedtime.format('MMMM Do YYYY, h:mm a'): ''
+                                  }
+                                </p>
                               </div>
                             }                          
                           </FormGroup>
@@ -1561,7 +1592,12 @@ handleChecked1(){
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.sleep_awake_time.format('MMMM Do YYYY, h:mm a')}</p>
+                                <p>
+                                  {
+                                    this.state.sleep_awake_time != null?
+                                    this.state.sleep_awake_time.format('MMMM Do YYYY, h:mm a'): ''
+                                  }
+                                </p>
                               </div>
                             }                          
                           </FormGroup>
