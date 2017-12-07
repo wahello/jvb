@@ -535,7 +535,7 @@ handleScroll() {
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-                                    <div className="toggler">
+                                    <div className="toggler" style={{color:"#103047"}}>
                                     <FontAwesome 
                                           name = "bars"
                                           size = "1x"
@@ -572,10 +572,11 @@ handleScroll() {
                                    </span>
                                    </span>
                                    <span className="btn2">
-                                   <Button  
+                                   <Button 
+                                   style={{backgroundColor:"#ed9507"}} 
                                       size="sm"
                                       onClick={this.toggleEditForm}
-                                      className="btn btn-info hidden-sm-up">
+                                      className="btn hidden-sm-up">
                                       {this.state.editable ? 'View Inputs' : 'Edit Form'}
                                    </Button>
                                    </span>
@@ -699,10 +700,11 @@ handleScroll() {
                           {this.state.editable &&
                                  <div className="row justify-content-center"> 
                                    <span id="btn1">
-                                       <Button  
+                                       <Button
+                                            style={{backgroundColor:"#ed9507",fontFamily: "futura-pt"}}   
                                             size="sm"
                                             onClick={this.fetchYesterdayData}
-                                            className="btn btn-info">
+                                            className="btn">
                                             Copy Yesterday’s Inputs
                                           </Button>
                                    </span>
@@ -1610,7 +1612,7 @@ handleScroll() {
                                 <div className="col-xs-6">
                                   <div className="input"> 
                                 <Input type="select" name="awake_hours"
-                                id="awake_hours"
+                                id="hours"
                                 className="form-control custom-select"
                                 value={this.state.awake_hours}
                                 onChange={this.handleChange}>
@@ -1623,7 +1625,7 @@ handleScroll() {
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
                                 <Input type="select" name="awake_mins"
-                                 id="awake_mins"
+                                 id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.awake_mins}
                                 onChange={this.handleChange}>
