@@ -501,7 +501,10 @@ onLogoutSuccess(response){
           <Link to='/'>
             <NavbarBrand 
               className="navbar-brand float-sm-left" 
-              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>HEALTH AND WELLNESS
+              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
+              <img className="img-fluid"
+               style={{maxWidth:"200px"}}
+               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
             </NavbarBrand>
           </Link>
           

@@ -219,7 +219,7 @@ componentDidMount(){
   movementConcictency(this.successmovement,this.errormovement)
 }
 
- renderTableColumns(dateWiseData,category=undefined,classes=""){
+  renderTableColumns(data,category=undefined,classes=""){
     let columns = [];
     for(let [date,data] of Object.entries(dateWiseData)){
       let all_data = [];
