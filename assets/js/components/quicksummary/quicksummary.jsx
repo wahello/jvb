@@ -510,7 +510,7 @@ onLogoutSuccess(response){
           
             <a 
             id="daterange"
-            style={{width:"110px",color:"white"}}
+            style={{width:"88px",color:"white"}}
             onClick={this.toggleDate} >Date Range</a>
           
 
@@ -558,9 +558,9 @@ onLogoutSuccess(response){
 						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
 						       
 						        <button
-						        						        
+						         style={{backgroundColor:"#ed9507"}} 					        
 						         type="submit"
-						         className="btn btn-block-lg btn-info"
+						         className="btn btn-block-lg"
 						         onClick={this.onSubmitDate} style={{width:"175px"}}>Submit</button>
 						         </div>
 
@@ -598,9 +598,10 @@ onLogoutSuccess(response){
                                   </span>  
 
                                    <span className="btn2">
-	                                  <Button						        
+	                                  <Button
+	                                  style={{backgroundColor:"#ed9507"}} 						        
 						         	   type="submit"
-						               className="btn btn-block-lg btn-info"
+						               className="btn btn-block-lg"
 						               onClick = {this.handleCreateQuicklook}>
 							               Create Quick Look Report
 								      </Button>
