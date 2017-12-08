@@ -63,6 +63,15 @@ MIDDLEWARE.insert(  # insert WhiteNoiseMiddleware right after SecurityMiddleware
 MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
     0, 'log_request_id.middleware.RequestIDMiddleware')
 
+MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
+    0, 'django.middleware.cache.UpdateCacheMiddleware')
+
+MIDDLEWARE.insert(  # insert WhiteNoiseMiddleware right after SecurityMiddleware
+    MIDDLEWARE.index('django.middleware.clickjacking.XFrameOptionsMiddleware') + 1,
+    'django.middleware.cache.FetchFromCacheMiddleware')
+
+
+
 LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
 LOG_REQUESTS = True
 
