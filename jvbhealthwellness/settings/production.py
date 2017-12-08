@@ -120,3 +120,17 @@ LOGGING = {
         },
     }
 }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://h:p66111d958aa92704fb0fba2e9fd54fe4536e81afd19510078eeeebc6a29e2243@ec2-34-198-168-102.compute-1.amazonaws.com:8339/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "app"
+    }
+}
+
+
