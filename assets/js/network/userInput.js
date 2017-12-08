@@ -1,7 +1,3 @@
-/*
-	Format of json data API is expecting
-*/
-
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
@@ -19,28 +15,41 @@ function formatJSON(data){
 		        "id": 1,
 		        "user_input": 18,
 		        "workout":"yes",
+		        "workout_type":"cardio",
+		        "workout_input_type":"strength",
 		        "work_out_easy_or_hard": "easy",
 		        "workout_effort_level": 5,
 		        "hard_portion_workout_effort_level": 8,
-		        "prcnt_processed_food_consumed_yesterday": 20,
+		        "prcnt_unprocessed_food_consumed_yesterday": 20,
 		        "list_of_unprocessed_food_consumed_yesterday": "some unprocessed food",
 		        "list_of_processed_food_consumed_yesterday": "some processed food",
 		        "number_of_alcohol_consumed_yesterday": 2.5,
 		        "alcohol_drink_consumed_list":"beer",
 		        "sleep_time_excluding_awake_time": "7:10",
+		        "sleep_bedtime": 2017-12-01T010:30, 
+			    "sleep_awake_time": 2017-12-02T06:30,
+			    "awake_time":0:30, 
 		        "sleep_comment":"Some sleep comment",
 		        "prescription_or_non_prescription_sleep_aids_last_night": "yes",
 		        "sleep_aid_taken": "some prescription",
 		        "smoke_any_substances_whatsoever": "yes",
 		        "smoked_substance": "cigarettes(7)",
-		        "medications_or_controlled_substances_yesterday": "yes",
-		        "medications_or_controlled_substances_taken": "some prescription"
-		    },
+		        "prescription_or_non_prescription_medication_yesterday": "yes",
+		        "prescription_or_non_prescription_medication_taken": "some prescription",
+		        "controlled_uncontrolled_substance":"yes",
+		        "indoor_temperature":"80",
+		        "outdoor_temperature":"85",
+		        "temperature_feels_like":"82",
+		        "wind":"6",
+		        "dewpoint":"18",
+		        "humidity":"61",
+		        "weather_comment":"Awesome weather"
+		    },	
 		    "encouraged_input": {
 		        "id": 1,
 		        "user_input": 18,
 		        "stress_level_yesterday": "medium",
-		        "pains_twings_during_or_after_your_workout": "yes",
+		        "pains_twings_during_or_after_your_workout": "yes", 
 		        "water_consumed_during_workout": 58,
 		        "workout_that_user_breathed_through_nose": 90,
 		        "pain_area": "right shins"
@@ -84,23 +93,35 @@ function formatJSON(data){
 		"optional_input":{}
 	};
 	json_data.strong_input['workout'] = data.workout;
+	json_data.strong_input['workout_type'] = data.workout_type;
+	json_data.strong_input['workout_input_type'] = data.workout_input_type;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
 	json_data.strong_input['hard_portion_workout_effort_level'] = data.workout_effort_hard_portion;
-	json_data.strong_input['prcnt_processed_food_consumed_yesterday'] = data.prcnt_processed_food;
+	json_data.strong_input['prcnt_unprocessed_food_consumed_yesterday'] = data.prcnt_processed_food;
 	json_data.strong_input['list_of_unprocessed_food_consumed_yesterday'] = data.unprocessed_food_list; 
 	json_data.strong_input['list_of_processed_food_consumed_yesterday'] =data.processed_food_list;
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
+	json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
+	json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
+	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;
 	json_data.strong_input['prescription_or_non_prescription_sleep_aids_last_night'] = data.prescription_sleep_aids; 
 	json_data.strong_input['smoke_any_substances_whatsoever'] = data.smoke_substances;
 	json_data.strong_input['smoked_substance'] = data.smoked_substance_list;
-	json_data.strong_input['medications_or_controlled_substances_yesterday'] = data.medications; 
-	json_data.strong_input['medications_or_controlled_substances_taken'] = data.medications_taken_list; 
-
+	json_data.strong_input['prescription_or_non_prescription_medication_yesterday'] = data.medications; 
+	json_data.strong_input['prescription_or_non_prescription_medication_taken'] = data.medications_taken_list; 
+	json_data.strong_input['controlled_uncontrolled_substance'] = data.controlled_uncontrolled_substance;
+	json_data.strong_input['indoor_temperature'] = data.indoor_temperature,
+	json_data.strong_input['outdoor_temperature'] = data.outdoor_temperature,
+	json_data.strong_input['temperature_feels_like'] = data.temperature_feels_like,
+	json_data.strong_input['wind'] = data.wind,
+	json_data.strong_input['dewpoint'] = data.dewpoint,
+	json_data.strong_input['humidity'] = data.humidity,
+	json_data.strong_input['weather_comment'] = data.weather_comment
 
 	json_data.encouraged_input['stress_level_yesterday'] = data.stress; 
 	json_data.encouraged_input['pains_twings_during_or_after_your_workout'] = data.pain; 

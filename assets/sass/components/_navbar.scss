@@ -7,33 +7,39 @@ html,body{/*have to mention html parent element other wise it wont show pic*/
 }
 
 .navbar{ /*this is a <nav> styling here bar element*/
-	background-color: #292C2E;
+	background-color: #103047;
 	border-bottom: 1px solid #dedede;
 	font-family: 'Alegreya Sans',sans-serif;
+	margin:-1px;
 }
 .navbar .nav .nav-item .nav-link { /* this is parrent to child like in <nav> we have .navbar in <ul> we have .nav in <li> we have 
 .nav-item in <img> we have .nav-link we are giving style to nav-link here  */
 color: #d1d1d1;
 }
 .navbar .nav .nav-item .nav-link:hover{
-	color: #292c2f;
-
+	color: #292c2f !important;
+	background-color:white;
 
 }
  .navbar .navbar-toggler { /*this is to color color than three lines in to white wich apper when it is in mobil*/
-	color:red !important;
+	color:white !important;
 	
 
 }
 .navbar-brand{
 	color:white !important;
+	padding:0px 0px 0px 0px !important;
+	margin-right:0 !important;
+
 }
 
 
 
  .navbar  .navbar-brand{
  	color: white;
- }  
+ } 
+  
+ 
  
 
 

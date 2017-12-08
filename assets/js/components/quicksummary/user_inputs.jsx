@@ -1,493 +1,129 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
-const User=(props)=>{
-	return(
+import {getInitialStateUserInput} from './initialStateUser';
+import {userInputDate} from '../../network/quick';
+import { Alert } from 'reactstrap';
 
-						<div className="quick3">
-						<Table className="quick4">
-						<tr className="quick8">
-						<th >
-						  <h5 >User Inputs</h5>
-						</th>
-						 	<th ><h5>17-09-2017</h5></th>
-							 <th ><h5>18-09-2017</h5></th>
-							 <th ><h5>19-09-2017</h5></th>
-							 <th ><h5>20-09-2017</h5></th>
-							 <th ><h5>21-09-2017</h5></th>
-							 <th ><h5>22-09-2017</h5></th>
-							 <th ><h5>23-09-2017</h5></th>
-							 </tr>
-						
-						<tbody>
-								<tr>
-								<td>Did You Workout Today?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
+ class User extends Component{
 
-								<tr>
-								<td>Was Your Workout Easy or Hard?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Was Your Workout Today Enjoyable?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Was Any Portion Of Your Workout Hard?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Was Your Average Effort Level For The Hard Part Of Your Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Did You Have Any Pain or Twinges During or After Your Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td> Where Did You Have Pain/Twinges?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Please Write Where You Have Pain/Twinges</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Water Consumed During Workout (Ounces)</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Tablespoons of Chia Seeds Consumed During Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td> What % of Your Workout Did you breathe in and out through Your nose?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Were You Fasted During Your Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Food Did You Eat Before Your Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>General Workout Comments</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td> Approximately How Many Calories Did You Consume During Your Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Specifically Did You Consume During Your Workout?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>How Much Time Did You Sleep Last Night (Excluding Awake Time)?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Sleep Comments</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Did You Take?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What % of The Food You Consumed Yesterday Was Unprocessed?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Unrocessed Food Were Consumed?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Processed Food List</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Unprocessed Food List</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Number of Alcohol Drinks Consumed Yesterday?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Did You Drink (Optional)?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Did You Smoke Any Substances Yesterday?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Did You Smoke Yesterday?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-								<tr>
-
-								<td>How Many Cigarettes You Have Smoked?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Other</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-
-								<tr>
-								<td>Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Did You Take?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Yesterday's Stress Level</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Are You Sick Today?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Please Tell Us Your Illness</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Weight (Pounds)</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Waist Size (Male)</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td> What Type Of Diet Do You Eat?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>What Did You Take?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>Did You Stand For 3 Hours or More Yesterday?</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>
-
-								<tr>
-								<td>General Comments</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								</tr>								
-						</tbody>
-						</Table>
-						</div>
-
-		);
+	constructor(props){
+	super(props);
+	this.renderTableColumns = this.renderTableColumns.bind(this);
+	this.state = {
+		columnAttributeName: [
+        {name: 'Pain area'},
+        {name: 'Pain and twinges during or after workout'},
+        {name: 'Stres level yesterday'},
+        {name: 'Water consumend during workout'}, 
+        {name: 'Percent workout breath through nose?'},
+        {name: 'Calories consumed during workout'},
+        {name: 'Chia seed consumed during workout'},
+        {name: 'Clothes size'}, 
+        {name: 'Fasted during workout?'},
+        {name: 'Food ate before workout?'},
+        {name: 'Food ate during workout'},
+		{name: 'General workout comments'},
+		{name: 'General comment'},
+		{name: 'Sick'},
+		{name: "Sickness Comments"},
+		{name: "Do you stand for three hours?"},
+		{name: "what type of diet you eat?"},
+		{name: "Waist size"},
+		{name: "Weight"},
+		{name: "Was your workout today enjoyable"},
+		{name: "What alcohol drink consumed"},
+		{name: "Did you take controlled or uncontrolled substance today?"},
+		{name: "Workout effort level of hard portion"},
+		{name: "What processed food you consumed yesterday?"},
+		{name: "What unprocessed food you consumed yesterday"},
+		{name: "Number of alcohol consumed yesterday"},
+		{name: "Percent of unprocessed food consumed yesterday"},
+		{name: "Prescription or non-prescription medication taken"},
+		{name: "What prescription or non-prescription medication taken yesterday?"},
+		{name: "Prescription or non-prescription sleep aids last night"},
+		{name: "Sleep aid taken last night"},
+		{name: "Sleep comments"},
+		{name: "Sleep time excluding awake time"},
+		{name: "Did you smoke any substances yesterday"},
+		{name: "Smoked substance"},
+		{name: "Was your workout easy or hard"},
+		{name: "Did you workout today?"},
+		{name: "Workout effort level"},
+		{name: "Workout type"}           
+      ],
+	};
+	
 }
-export default User;
+
+renderTableColumns(dateWiseData,category=undefined,classes=""){
+		let columns = [];
+		for(let [date,data] of Object.entries(dateWiseData)){
+			let all_data = [];
+			let keys = [];
+			for(let cat of Object.keys(data).sort()){
+					for(let key of Object.keys(data[cat]).sort()){
+						all_data.push(data[cat][key]);
+						keys.push(key);
+					}
+			}
+
+			columns.push(
+				<Column 
+					header={<Cell>{date}</Cell>}
+			        cell={props => (
+				            <Cell {...props}>
+				              {all_data[props.rowIndex]}
+				            </Cell>
+				          )}
+			        width={134}
+				/>
+			);
+		}
+		return columns;
+	}
+
+	render(){
+		const {height, width, containerHeight, containerWidth, ...props} = this.props;
+		let rowsCount = this.state.columnAttributeName.length;
+		return(
+			<div>
+			 <Table
+			 	className="responsive"
+		        rowsCount={rowsCount}
+		        rowHeight={100}
+		        headerHeight={50}
+		        width={containerWidth}
+        		height={containerHeight}
+        		touchScrollEnabled={true}
+        		{...props}>
+		        <Column
+		          header={<Cell>User Input</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.columnAttributeName[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={167}
+		          fixed={true}
+		        />
+			    {this.renderTableColumns(this.props.data)}
+      		</Table>
+			</div>
+
+			);
+	}
+}
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 217;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    return window.innerWidth - widthOffset;
+  }
+})(User);
+

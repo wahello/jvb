@@ -103,14 +103,21 @@ export function renderFasted(){
 
 export function renderPrescriptionMedication(){
 	if(this.state. medications === 'yes'){
-	 const updateState = function(val){
+	 const updateStateMedication = function(val){
 							  this.setState({
 						   medications_taken_list: val
-							  })}.bind(this);         
+							  })}.bind(this);
+
+	 const updateStateCtrlSubs = function(val){
+							  this.setState({
+						   controlled_uncontrolled_substance: val
+							  })}.bind(this);          
 	  return(
 		  <PrescriptionMedication
 		  medications_taken_list={this.state.medications_taken_list}
-		  updateState={updateState}
+		  controlled_uncontrolled_substance = {this.state.controlled_uncontrolled_substance}
+		  updateStateMedication={updateStateMedication}
+		  updateStateCtrlSubs={updateStateCtrlSubs}
 		  editable = {this.state.editable}
 		  />
 		);
@@ -203,7 +210,7 @@ export function renderCloneOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Copying yesterday user inputs ({yesterday.format('MMM D, YYYY')})</p>
+					<p>Copying yesterday data ({yesterday.format('MMM D, YYYY')})</p>
 				</div>
 			</div>
 		);
@@ -225,7 +232,7 @@ export function renderFetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching user inputs for {selected_date.format('MMM D, YYYY')}</p>
+					<p>Checking data for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);
@@ -247,7 +254,7 @@ export function renderUpdateOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Updating user inputs for {selected_date.format('MMM D, YYYY')}</p>
+					<p>Updating data for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);
@@ -269,7 +276,7 @@ export function renderSubmitOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Submitting user inputs for {selected_date.format('MMM D, YYYY')}</p>
+					<p>Submitting data for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
 		);

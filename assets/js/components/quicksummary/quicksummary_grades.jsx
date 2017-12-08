@@ -1,80 +1,97 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
-function renderTableRows(dateWiseData,category,field,classes=""){
-	let elements = [];
-	for(let [date,data] of Object.entries(dateWiseData)){
-		if(field === "created_at"){
-			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
-			);	
-		}else{
-			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
-			);
+ class Grades extends Component{
+
+	constructor(props){
+	super(props);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
+
+	 this.state = {
+      myTableData: [
+        {name: 'Overall Truth Grade'},
+        {name: 'Overall Truth Health Gpa'},
+        {name: 'Movement Non Exercise steps Grade'},
+        {name: 'Movement Consistency Grade'}, 
+        {name: 'Avg Sleep Per Night Grade'},
+        {name: 'Exercise Consistency Grade'},
+        {name: 'Overall Workout Grade'},
+        {name: 'Percentage of Unprocessed Food Grade'}, 
+        {name: 'Alcoholic Drink Per Week Grade'},
+        {name: 'Penalty'}              
+      ],
+    };
+  }
+
+renderTableColumns(dateWiseData,category,classes=""){
+console.log(dateWiseData);
+		let columns = [];
+		for(let [date,data] of Object.entries(dateWiseData)){
+
+			let all_data = [];
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){ 
+					all_data.push(value);
+				}
+			}
+
+			columns.push(
+				<Column 
+					header={<Cell>{date}</Cell>}
+			        cell={props => (
+				            <Cell {...props}>
+				              {all_data[props.rowIndex]}
+				            </Cell>
+				          )}
+			        width={134}
+				/>
+			)
 		}
+		return columns;
 	}
-	return elements;
-}
-
-
-const Grades = (props) => {
+	
+	render(){
+		const {height, width, containerHeight, containerWidth, ...props} = this.props;
+		let rowsCount = this.state.myTableData.length;
 		return(
-			
-			        <div className="quick3">
-			        <Table className="table table-responsive quick4">
-			       
-			           <tr className="quick8">
-			                <th >  
-							 <h5> Grades</h5>
-							</th>
-							{renderTableRows(props.data,"grades_ql","created_at")}							
-							</tr>
-							<tbody>
-							<tr>
-					        <td>Overall Truth Grade</td>
-					        {renderTableRows(props.data,"grades_ql","overall_truth_grade")}				             
-				         </tr>
-				         <tr className="quick9">
-					        <td>Overall Truth Health Gpa</td>
-					        {renderTableRows(props.data,"grades_ql","overall_truth_health_gpa")}				            
-				         </tr>
-				         <tr>
-					        <td>Movement Non Exercise Grade</td>
-					        {renderTableRows(props.data,"grades_ql","movement_non_exercise_grade")}				           
-				         </tr>
-
-				         <tr className="quick9">
-					        <td>Avg Sleep Per Night Grade</td>
-					        {renderTableRows(props.data,"grades_ql","avg_sleep_per_night_grade")}				           
-				         </tr>
-				         <tr>
-					        <td>Exercise Consistency Grade</td>
-					        {renderTableRows(props.data,"grades_ql","exercise_consistency_grade")}				           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Overall Workout Grade</td>
-					        {renderTableRows(props.data,"grades_ql","overall_workout_grade")}				           
-				         </tr>
-				         <tr>
-					        <td>percent NonProcessed Food Consumed Grade</td>
-					        {renderTableRows(props.data,"grades_ql","prcnt_non_processed_food_consumed_grade")}		            
-				         </tr>
-				          <tr className="quick9">
-					        <td>Alcoholic Drink Per Week Grade</td>
-					        {renderTableRows(props.data,"grades_ql","alcoholic_drink_per_week_grade")}				           
-				         </tr>
-				         <tr>
-					        <td>Penalty</td>
-					        {renderTableRows(props.data,"grades_ql","penalty")}				           
-				         </tr>
-				         </tbody>
-                          </Table>
-                         </div>
-                         
+			<div className="quick3">
+			 <Table
+			 	className="responsive"
+		        rowsCount={rowsCount}
+		        rowHeight={100}
+		        headerHeight={50}
+		        width={containerWidth}
+        		height={containerHeight}
+        		touchScrollEnabled={true}
+        		{...props}>
+		        <Column
+		          header={<Cell>Grades</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.myTableData[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={167}
+		          fixed={true}
+		        />
+			    {this.renderTableColumns(this.props.data,"grades_ql")}
+      		</Table>
+			</div>
 
 			);
+	}
 }
-export default Grades;
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 235;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    return window.innerWidth - widthOffset;
+  }
+})(Grades);

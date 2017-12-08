@@ -1,5 +1,6 @@
-import datetime
 import re
+import pprint
+from .custom_signals import user_input_post_save,user_input_notify
 
 from rest_framework import serializers
 
@@ -15,14 +16,14 @@ class DailyUserInputStrongSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
 
 	def validate(self, data):
-		prcnt_food = data['prcnt_processed_food_consumed_yesterday']
+		prcnt_food = data['prcnt_unprocessed_food_consumed_yesterday']
 		pattern = re.compile("(^\d{1,3}).*")
 		if prcnt_food and not pattern.match(prcnt_food):
 			raise serializers.ValidationError("not a valid percentage value")
 
 		if prcnt_food:
 			prcnt_food = pattern.match(prcnt_food).group(1)
-			data['prcnt_processed_food_consumed_yesterday'] = prcnt_food
+			data['prcnt_unprocessed_food_consumed_yesterday'] = prcnt_food
 		return data
 
 	class Meta:
@@ -129,7 +130,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		instance.save()
 			
 	def create(self, validated_data):
-		
+		# pprint.pprint(validated_data)
 		user = self.context['request'].user
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
@@ -154,6 +155,21 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# Goals.objects.create(user_input=user_input_obj,
 		# 								 **goals_data)
 
+		#sending signal to calculate quicklook
+		user_input_post_save.send(
+			sender=self.__class__,
+		 	request=self.context['request'],
+		 	from_date=validated_data['created_at'],
+		 	to_date=validated_data['created_at'])
+
+		# send signal to notify admins by sending email about 
+		# this newly created userinput 
+		user_input_notify.send(
+			sender=self.__class__,
+			request=self.context['request'],
+			instance = user_input_obj,
+			created=True)
+
 		return user_input_obj
 
 	def update(self,instance,validated_data):
@@ -177,4 +193,20 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		# goals_obj = instance.goals
 		# self._update_helper(goals_obj, goals_data)
+
+		#sending signal to calculate quicklook
+		user_input_post_save.send(
+			sender=self.__class__,
+		 	request=self.context['request'],
+		 	from_date=validated_data['created_at'],
+		 	to_date=validated_data['created_at'])
+
+		# send signal to notify admins by sending email about 
+		# update of this instance
+		user_input_notify.send(
+			sender=self.__class__,
+			request=self.context['request'],
+			instance = instance,
+			created=False)
+
 		return instance

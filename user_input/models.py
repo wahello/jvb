@@ -19,12 +19,12 @@ class CharMinValueValidator(BaseValidator):
     code = 'min_value'
 
     def compare(self, a, b):
-        if a == 'no workout today':
+        if a == 'i do not weigh myself today':
             return False
         return a < b
 
     def clean(self, x):
-        if x == 'no workout today':
+        if x == 'i do not weigh myself today':
             return x
 
         pattern = re.compile("(^\d{1,3}).*")
@@ -40,12 +40,12 @@ class CharMaxValueValidator(BaseValidator):
     code = 'max_value'
 
     def compare(self, a, b):
-        if a == 'no workout today':
+        if a == 'i do not weigh myself today':
             return False
         return a > b
 
     def clean(self, x):
-        if x == 'no workout today':
+        if x == 'i do not weigh myself today':
             return x
 
         pattern = re.compile("(^\d{1,3}).*")
@@ -71,7 +71,8 @@ class DailyUserInputStrong(models.Model):
     HARD = 'hard'
     NO_WORKOUT = 'no workout today'
     NOT_YET = 'not yet'
-
+    DECLINE = 'decline'
+ 
     WORK_OUT_EASY_OR_HARD_CHOICES = (
     ('','-'),
     (EASY,'Easy'),
@@ -96,10 +97,28 @@ class DailyUserInputStrong(models.Model):
         (NO,'No'),
     )
 
+    CTRL_SUBS_CHOICE = (
+        ('','-'),
+        (YES,'Yes'),
+        (NO,'No'),
+        (DECLINE,'I Decline')
+    )
+
     WORKOUT_DONE_CHOICES = (
         (YES,'Yes'),
         (NO,'No'),
         (NOT_YET,'Not Yet')
+    )
+
+    WORKOUT_TYPE_CHOICES = (
+        ('cardio','Cardio'),
+        ('strength','Strength'),
+        ('both','Both')
+    )
+
+    WORKOUT_INPUT_TYPE_CHOICES = (
+        ('cardio','Cardio'),
+        ('strength','Strength')
     )
 
     user_input = models.OneToOneField(UserDailyInput,related_name='strong_input')
@@ -107,6 +126,18 @@ class DailyUserInputStrong(models.Model):
         max_length=10,
         choices=WORKOUT_DONE_CHOICES,
         blank=True
+    )
+
+    workout_type = models.CharField(
+        max_length = 10,
+        choices = WORKOUT_TYPE_CHOICES,
+        blank = True
+    )
+
+    workout_input_type = models.CharField(
+        max_length = 10,
+        choices = WORKOUT_INPUT_TYPE_CHOICES,
+        blank = True
     )
 
     work_out_easy_or_hard = models.CharField(
@@ -124,7 +155,7 @@ class DailyUserInputStrong(models.Model):
         validators=[CharMinValueValidator(0),CharMaxValueValidator(10)],
         blank=True, null=True)
 
-    prcnt_processed_food_consumed_yesterday = models.CharField(
+    prcnt_unprocessed_food_consumed_yesterday = models.CharField(
         max_length=20,
         validators=[CharMinValueValidator(0),CharMaxValueValidator(100)],
         blank = True,null = True)
@@ -140,8 +171,10 @@ class DailyUserInputStrong(models.Model):
     alcohol_drink_consumed_list = models.TextField(blank=True)
 
     sleep_time_excluding_awake_time = models.CharField(max_length=10, blank = True)
-
-    sleep_comment = models.TextField(blank=True)
+    sleep_bedtime = models.DateTimeField(null=True,blank=True)
+    sleep_awake_time = models.DateTimeField(null=True,blank=True)
+    awake_time = models.CharField(null=True, max_length = 10, blank = True)
+    sleep_comment = models.TextField(null=True, blank=True)
 
     prescription_or_non_prescription_sleep_aids_last_night = models.CharField(
         max_length=4,choices=YN_CHOICE, blank = True)
@@ -153,10 +186,38 @@ class DailyUserInputStrong(models.Model):
 
     smoked_substance = models.TextField(blank=True)
 
-    medications_or_controlled_substances_yesterday= models.CharField(
+    prescription_or_non_prescription_medication_yesterday= models.CharField(
         max_length=4, choices=YN_CHOICE, blank = True)
 
-    medications_or_controlled_substances_taken = models.TextField(blank=True)
+    prescription_or_non_prescription_medication_taken = models.TextField(blank=True)
+    controlled_uncontrolled_substance = models.CharField(
+        max_length=4, choices=CTRL_SUBS_CHOICE, blank = True)
+
+    indoor_temperature = models.CharField(
+            validators = [CharMinValueValidator(-20),CharMaxValueValidator(120)],
+            max_length=10, blank=True)
+
+    outdoor_temperature = models.CharField(
+        validators = [CharMinValueValidator(-20),CharMaxValueValidator(120)],
+        max_length=10, blank=True)
+
+    temperature_feels_like = models.CharField(
+        validators = [CharMinValueValidator(-20),CharMaxValueValidator(120)],
+        max_length=10, blank=True)
+
+    wind = models.CharField(
+        validators=[CharMinValueValidator(0),CharMaxValueValidator(350)],
+        max_length=10, blank=True)
+
+    dewpoint = models.CharField(
+        validators = [CharMinValueValidator(-20),CharMaxValueValidator(120)],
+        max_length=10, blank=True)
+
+    humidity = models.CharField(
+        validators = [CharMinValueValidator(1),CharMaxValueValidator(100)],
+        max_length=10, blank=True)
+
+    weather_comment = models.TextField(blank=True)
     
 class DailyUserInputEncouraged(models.Model):
 
@@ -267,7 +328,7 @@ class DailyUserInputOptional(models.Model):
     general_Workout_Comments = models.TextField(blank=True )
 
     weight = models.CharField(
-        max_length=20,
+        max_length=50,
         validators = [CharMinValueValidator(30),CharMaxValueValidator(300)],
         blank=True, null=True)
 

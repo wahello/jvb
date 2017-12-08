@@ -2,6 +2,8 @@ import axiosRetry from 'axios-retry';
 import axios from 'axios';
 import Cookies from 'universal-cookie'; 
 
+import {saveLocalState,destroyLocalState} from '../components/localStorage';
+
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -40,7 +42,7 @@ export function errorHandler(dispatch, error, type){
 	}
 }
 
-export function loginUser(data, callback){
+export function loginUser(data, successCallback=undefined, errorCallback=undefined){
 	return function (dispatch){
 		const URL = '/api/users/login/';
 		const config = {
@@ -51,39 +53,72 @@ export function loginUser(data, callback){
 		};
 
 		axios(config).then((response) => {
-			// const cookie = new Cookies();
-			// cookie.set('auth_token', response.data.token, {path:'/'});
+			const auth_state = {
+					authenticated: true
+				};
+
+			saveLocalState(auth_state);
 			dispatch({
 				type: AUTH_USER,
 			});
-			callback();
+
+			if(successCallback !== undefined){
+				successCallback();
+			}else{
+				console.log("Successfully logged in!");
+			}
 		}).catch((error) => {
-			// errorHandler(dispatch, error, AUTH_ERROR);
-			console.log(error);
+			const auth_state = {
+					authenticated: false
+				};
+			saveLocalState(auth_state);
+			
+			if(errorCallback !== undefined){
+				errorCallback(error);
+			}else{
+				console.log(error.message);
+			}
 		});
 	}
 }
 
-export function logoutUser(){
+export function logoutUser(succesCallback=undefined,errorCallback=undefined){
 	return function(dispatch){
-		dispatch({
-			type: UNAUTH_USER
+		const URL = '/api/users/logout/';
+		const config = {
+			method: 'get',
+			url: URL,
+			withCredentials: true
+		};
+		axios(config).then((response) => {
+			const auth_state = {
+					authenticated: false
+				};
+			saveLocalState(auth_state);
+			dispatch({
+				type: UNAUTH_USER
+			});
+			if(succesCallback !== undefined){
+				succesCallback(response);
+			}else{
+				window.location.href = '/';
+			}
+		}).catch((error) => {
+			if(errorCallback !== undefined){
+				errorCallback(error);
+			}else{
+				console.log(error);
+			}
 		});
-		// cookie.remove('auth_token', {path: '/'});
-		window.location.href = '/';
 	}
 } 
 
 export function getGarminToken(){
 	return function(dispatch){
 		const URL = '/users/garmin_token/';
-		// const cookie = new Cookies();
 		const config = {
 			method: 'get',
 			url: URL,
-			// headers: {
-			// 	'Authorization': 'Token '+cookie.get('auth_token')
-			// }
 		};
 
 		axios(config).then((response) => {
@@ -111,4 +146,24 @@ export function getUserProfile(succesCallback=undefined){
 	}).catch((error) => {
 		console.log(error.message);
 	})
+}
+
+export function isLoggedIn(succesCallback=undefined,errorCallback=undefined){
+	const URL = '/api/users/status/';
+	const config = {
+		url:URL,
+		method:'get',
+		withCredentials:true
+	};
+	axios(config).then(function(response){
+		if(succesCallback !== undefined){
+			succesCallback(response);
+		}
+	}).catch((error) => {
+		if(errorCallback !== undefined){
+			errorCallback(error);
+		}else{
+			console.log(error.message);
+		}
+	});
 }

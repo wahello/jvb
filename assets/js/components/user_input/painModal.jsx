@@ -9,7 +9,7 @@ import {Button,FormGroup, Label, Input, FormText, className, Collapse} from 'rea
 const option=[	
 				{ value:"other",label:'Other'},
                 { value:"right knee",label:'Right knee'},
-                { value:'left knee',label:'Light knee'},
+                { value:'left knee',label:'Left knee'},
                 { value:"right ankle",label:'Right ankle'},
                 { value:"left ankle",label:'Left ankle'},
                 { value:"right foot",label:'Right foot'},
@@ -28,7 +28,14 @@ const option=[
                 { value:"upper back",label:'Upper back'},
                 { value:"mid back",label:'Mid back'},
                 { value:"lower back",label:'Lower back'},
-                { value:"groin",label:'Groin'}
+                { value:"groin",label:'Groin'},
+                { value:"left it band",label:'Left IT Band'},
+                { value:"right it band",label:'Right IT Band'},
+                { value:"left shoulder",label:'Left Shoulder'},
+                { value:"right shoulder",label:'Right Shoulder'},
+                { value:"left wrist",label:'Left Wrist'},
+                { value:"right wrist",label:'Right Wrist'}
+                
                 
 
 		];
@@ -43,7 +50,10 @@ export default class PainModal extends Component{
             "left hip":true,"right achilles":true,"left achilles":true,
             "right calf":true,"left calf":true,"right toes":true,
             "left toes":true,"neck":true,"upper back":true,
-            "mid back":true,"lower back":true,"other":true,"groin":true
+            "mid back":true,"lower back":true,"other":true,"groin":true,
+            "left it band":true,"right it band":true,"left shoulder":true,
+            "right shoulder":true,"left wrist":true,"right wrist":true,
+
 		}
 
 		let other_areas = [];
@@ -102,7 +112,6 @@ export default class PainModal extends Component{
 
     	  	this.setState({
     	  		pain_area: area,
-    	  		collapse:other_pain_areas.length ? true : false,
     	  		pain_area_to_show:pain_area_to_show,
     	  		other_pain_areas:other_pain_areas
     	  	});
@@ -185,7 +194,7 @@ export default class PainModal extends Component{
 							{this.props.editable &&
 								<div className="input1">
 									<Textarea
-									type="textarea"
+									style={{height:"500px !important"}}
 									className="form-control"
 									placeholder="Write in....."
 									rows="5" cols="5"

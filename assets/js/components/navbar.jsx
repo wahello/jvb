@@ -1,56 +1,75 @@
 import React from 'react';
 import { withRouter, Link } from 'react-router-dom';
-
 import {connect} from 'react-redux';
+import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-          } from 'reactstrap';
+        Button} from 'reactstrap';
 import PropTypes from 'prop-types';
 
-import { getGarminToken } from '../network/auth';
+import { getGarminToken,logoutUser} from '../network/auth';
 
 class NavbarMenu extends React.Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
-     //this.dropdownToggle = this.dropdownToggle.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     this.state = {
       isOpen: false
-      
-
-
     };
   }
+
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen,
      
     });
   }
+
+  onLogoutSuccess(response){
+    this.props.history.push("/#logout");
+  }
+
+  handleLogout(){
+    this.props.logoutUser(this.onLogoutSuccess);
+  }
+
   render() {
+    const {fix} = this.props;
     return (
-      <div>
-        <Navbar custom toggleable fixed="top" className="navbar navbar-expand-sm  navbar-fixed-top">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" right onClick={this.toggle} />
-          <NavbarBrand className="navbar-brand float-xs-right float-sm-left" id="navbarTogglerDemo" href="/">HEALTH AND WELLNESS</NavbarBrand>
+      <div className="container-fluid">
+        <Navbar toggleable 
+         fixed={fix ? 'top' : ''} 
+          className="navbar navbar-expand-sm navbar-inverse">
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
+           <FontAwesome 
+                 name = "bars"
+                 size = "1x"
+                                          
+             />
+            
+          </NavbarToggler>
+          <Link to='/'>
+            <NavbarBrand 
+              className="navbar-brand float-xs-right float-sm-left" 
+              id="navbarTogglerDemo">
+              <img className="img-fluid"
+               style={{maxWidth:"200px"}}
+               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+            </NavbarBrand>
+          </Link>
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
             <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-              <NavItem className="float-sm-right">
-                
-                 <NavLink href="/">Home</NavLink>
-                   {/* <Link to="/">Home</Link>*/}
-                   
+              <NavItem className="float-sm-right">  
+                <Link className="nav-link" to='/'>Home</Link>
               </NavItem>
-               <NavItem className="float-sm-right">
-                
-                
-                   <NavLink href="/">LogOut</NavLink>
-                
-              </NavItem>
-
-
-            
-              
+               <NavItem className="float-sm-right">                
+                   <NavLink  
+                   className="nav-link"                    
+                   onClick={this.handleLogout}>Log Out
+                    </NavLink>               
+              </NavItem>  
             </Nav>
           </Collapse>
         </Navbar>
@@ -66,7 +85,7 @@ function mapStateToProps(state){
   };
 }
 
-export default connect(mapStateToProps,{getGarminToken})(NavbarMenu);
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(NavbarMenu));
 
 Navbar.propTypes={
     fixed: PropTypes.string,

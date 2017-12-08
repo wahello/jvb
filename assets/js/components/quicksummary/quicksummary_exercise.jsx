@@ -1,228 +1,212 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
 
-function renderTableRows(dateWiseData,category,field,classes=""){
-	let elements = [];
+const attrVerboseName = {
+    workout_easy_hard: 'Workout Easy Hard',
+    workout_type: 'Workout Type',
+    workout_time: 'Workout Time',
+    workout_location: 'Workout Location',
+    workout_duration: 'Workout Duration',
+    maximum_elevation_workout: 'Maximum Elevation Workout',
+    minutes_walked_before_workout: 'Minutes Walked Before Workout',
+    distance_run: 'Distance (In Miles) - Run', 
+    distance_bike: 'Distance (in Miles) - Bike', 
+    distance_swim: 'Distance (in yards) - Swim', 
+    distance_other: 'Distance (in Miles) - Other',  
+    pace: 'Pace (minutes:seconds) (Running)',
+    avg_heartrate: 'Average Heartrate',
+    elevation_gain: 'Elevation Gain(feet)',
+    elevation_loss: 'Elevation Loss(feet)',  
+    effort_level: 'Effort Level',
+    dew_point: 'Dew Point (in °F)',
+    temperature: 'Temperature (in °F)',
+    humidity: 'Humidity (in %)',  
+    temperature_feels_like: 'Temperature Feels Like (in °F)',
+    wind: 'Wind (in miles per hour)',
+    hrr: 'HRR',
+    hrr_start_point: 'HRR Start Point',  
+    hrr_beats_lowered: 'HRR Beats Lowered',
+    sleep_resting_hr_last_night: 'Sleep Resting Hr Last Night',
+    vo2_max: 'Vo2 Max',
+    running_cadence: 'Running Cadence',
+    nose_breath_prcnt_workout: 'Percent Breath through Nose During Workout',
+    water_consumed_workout: 'Water Consumed during Workout',
+    chia_seeds_consumed_workout: 'Chia Seeds consumed during Workout',
+    fast_before_workout: 'Fast Before Workout', 
+    pain: 'Pain',
+    pain_area: 'Pain Area',
+    stress_level: 'Stress Level',
+    sick: 'Sick ', 
+    drug_consumed: 'Drug Consumed',
+    drug: 'Drug',
+    medication: 'Medication',
+    smoke_substance: 'Smoke Substance', 
+    exercise_fifteen_more: 'Exercise Fifteen More',
+    workout_elapsed_time: 'Workout Elapsed Time',
+    timewatch_paused_workout: 'TimeWatch Paused Workout',
+    exercise_consistency: 'Exercise Consistency',
+    workout_duration_grade: 'Workout Duration Grade',
+    workout_effortlvl_grade: 'Workout Effort Level Grade',
+    avg_heartrate_grade: 'Avg Heart Rate Grade',
+    overall_workout_grade: 'OverAll Workout Grade',
+    heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
+    fitness_age: 'Fitness Age',
+    workout_comment: 'Workout Comment'                    
+}
+
+class Exercise extends Component {
+constructor(props){
+	super(props);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
+     let cols = this.renderTableColumns(props.data,"exercise_reporting_ql");
+	 this.state = {
+      tableAttrColumn: cols[1],
+      columns:cols[0]
+    };
+  }
+componentWillReceiveProps(nextProps){
+    let cols = this.renderTableColumns(nextProps.data,"exercise_reporting_ql");
+     this.state = {
+      tableAttrColumn: cols[1],
+      columns:cols[0]
+    };
+}
+
+isEmpty(obj){
+    return Object.keys(obj).length === 0 && obj.constructor === Object
+}
+
+toFahrenheit(tempInCelcius){
+    return (tempInCelcius * 1.8) + 32;
+}
+
+renderTableColumns(dateWiseData,category,classes=""){
+	let columns = [];
+    let avgHrKeys =  [];
+    let keys = [];
+    let pushKeytoggle = true;
+
+    for(let [date,data] of Object.entries(dateWiseData)){
+        let avg_heartrate = data[category]['avg_heartrate'];
+        if(!this.isEmpty(JSON.parse(avg_heartrate))){
+            let avgHrJson = JSON.parse(avg_heartrate);
+            for(let act of Object.keys(avgHrJson).sort()){
+                if (avgHrJson[act] != 0){
+                    if(avgHrKeys.indexOf(act) < 0)
+                        avgHrKeys.push(act);
+                }
+            }
+        }
+    }
+
 	for(let [date,data] of Object.entries(dateWiseData)){
-		if(field === "created_at"){
-			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
-			);	
-		}else{
-			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
-			);
-		}
-	}
-	return elements;
-}
+        let all_data = [];
+        for(let [key,value] of Object.entries(data[category])){
+            if(key !== 'id' && key !== 'user_ql'){
+                if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
+                    let avgHrJson = JSON.parse(value);
+                    for(let act of avgHrKeys)
+                        all_data.push(avgHrJson[act]);
+                }
+                else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
+                    for(let act of avgHrKeys)
+                        all_data.push('-');
+                }
 
-const Exercise=(props)=> {
-	
-	return(
+                else if ((key == 'dew_point' && value === null) ||
+                         (key == 'temperature' && value === null) ||
+                         (key == 'humidity' && value === null)||
+                         (key == 'temperature_feels_like' && value === null) ||
+                         (key == 'wind' && value === null)){
+                    all_data.push('No GPS data');
+                }
+                else if((key == 'dew_point' && (value && value != '-')) ||
+                        (key == 'temperature' && (value && value != '-'))||
+                        (key == 'temperature_feels_like' && (value && value != '-'))){
+                    all_data.push(this.toFahrenheit(value).toFixed(2));
+                }
+                else
+                    all_data.push(value);
 
-						<div className="quick3">
-						<Table className="table table-responsive quick4">
-						
-						<tr className="quick8">
-						<th >
-						  <h5 >Exercise Reporting</h5>
-						</th>
-							 {renderTableRows(props.data,"exercise_reporting_ql","created_at")}
-						</tr>
-						
-						<tr>
-					        <td>WorkOut Easy Hard</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","workout_easy_hard")}
-				         </tr>
-				         <tr className="quick9">
-					        <td >Workout Type</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","workout_type")}
-				         </tr>
-				         <tr>
-					        <td>WorkOut Time</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","workout_time")}
-				         </tr>
-				         <tr className="quick9">
-					        <td>WorkOut Location</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","workout_location")}
-				         </tr>
-				         <tr>
-					        <td>WorkOut Duration</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","workout_duration")}
-				         </tr>
-				         <tr className="quick9">
-					        <td>Maximum Elevation Workout</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","maximum_elevation_workout")}
-				         </tr>
-				         <tr>
-					        <td>Minutes Walked Before Workout</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","minutes_walked_before_workout")}
-				         </tr>
-				         <tr className="quick9">
-					        <td>Distance</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","distance")}
-				         </tr>
-				         <tr>
-					        <td>Pace</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","pace")}
-				         </tr>
-				         <tr className="quick9">
-					        <td>Asvg Heartrate</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","avg_heartrate")}		
-				         </tr>
-				         <tr>
-					        <td>Elevation Gain</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","elevation_gain")}			
-				         </tr>
-				         <tr className="quick9">
-					        <td>Elevation Loss </td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","elevation_loss")}				       
-				         </tr>
-				         <tr>
-					        <td>Effort Level  </td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","effort_level")}				            
-				         </tr>
-				         <tr className="quick9">
-					        <td>Dsew Point </td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","dew_point")}				           
-				         </tr>
-				         <tr>
-					        <td>Temperature</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","temperature")}				          
-				         </tr>
-				         <tr className="quick9">
-					        <td>Humidity</td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","humidity")}				         
-				         </tr>
-				         <tr>
-					        <td>Tsemperature Feels Like </td>
-					         {renderTableRows(props.data,"exercise_reporting_ql","temperature_feels_like")}			           
-				         </tr>
-				         <tr className="quick9">
-					        <td>wind</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","wind")}		            
-				         </tr>
-				         <tr>
-					        <td>HRR</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","hrr")}				          
-				         </tr>
-				         <tr className="quick9">
-					        <td>HRR Start Point</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","hrr_start_point")}				           
-				         </tr>
+                if(pushKeytoggle)
+                    keys.push(key);
+            }
 
-				         <tr>
-					        <td>HRR Beats Lowered</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","hrr_beats_lowered")}				           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Sleep Resting Hr Last Nigh</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","sleep_resting_hr_last_night")}		            
-				         </tr>
-				         <tr>
-					        <td>Vo2 Max</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","vo2_max")}	            
-				         </tr>
-				         <tr className="quick9">
-					        <td>Rsunning Cadence</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","running_cadence")}				           
-				         </tr>
-				         <tr>
-					        <td>Nose Breath Prcnt Workout </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","nose_breath_prcnt_workout")}		            
-				         </tr>
-				         <tr className="quick9">
-					        <td>Water Consumed WorkOut </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","water_consumed_workout")}		            
-				         </tr>
-				         <tr>
-					        <td>Chia Seeds consumed WorkOut</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","chia_seeds_consumed_workout")}		           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Fast Before WorkOut</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","fast_before_workout")}	            
-				         </tr>
-				         <tr>
-					        <td>Pain </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","pain")}			        
-				         </tr>
-				         <tr className="quick9">
-					        <td>Pain Area  </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","pain_area")}				            
-				         </tr>
-				         <tr>
-					        <td>Stress Level </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","stress_level")}				           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Sicks </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","sick")}				            
-				         </tr>
-				         <tr>
-					        <td>Drug Consumed </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","drug_consumed")}				           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Drug </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","drug")}				           
-				         </tr>
-				         <tr>
-					        <td>Medication </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","medication")}				           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Smoke Substance </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","smoke_substance")}				           
-				         </tr>
-				         <tr>
-					        <td>Exercise Fifteen More </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","exercise_fifteen_more")}			            
-				         </tr>
-				         <tr className="quick9">
-					        <td>WorkOut Elapsed Time </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","workout_elapsed_time")}			            
-				         </tr>
-				         <tr>
-					        <td>TimeWatch Paused WorkOut </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","timewatch_paused_workout")}			            
-				         </tr>
-				         <tr className="quick9">
-					        <td>Exercise Consistency </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","exercise_consistency")}		           
-				         </tr>
-				         <tr>
-					        <td>WorkOut Duration Grade </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","workout_duration_grade")}			             
-				         </tr>
-				         <tr className="quick9">
-					        <td>WorkOut Effort Level Grade</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","workout_effortlvl_grade")}				            
-				         </tr>
-				         <tr>
-					        <td>Avg Heart Rate Grade</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","avg_heartrate_grade")}		             
-				         </tr>
-				          <tr className="quick9">
-					        <td>OverAll WorkOut Grade</td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","overall_workout_grade")}			             
-				         </tr>
-				         <tr>
-					        <td>Heart Rate Variability Grade </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","heartrate_variability_grade")}	             
-				         </tr>
-				         <tr className="quick9">
-					        <td>WorkOut Comment </td>
-					        {renderTableRows(props.data,"exercise_reporting_ql","workout_comment")}				            
-				         </tr>
-				         </Table>
-					</div>
-					
+        }
+
+		columns.push(
+			<Column 
+				header={<Cell>{date}</Cell>}
+		        cell={props => (
+			            <Cell {...props}>
+			              {all_data[props.rowIndex]}
+			            </Cell>
+			          )}
+		        width={134}
+			/>
 		);
-	
+        pushKeytoggle = false;
+	}
+    let tableAttrColumn = [];
+    for(let key of keys){
+        if(key == "avg_heartrate"){
+            for(let act of avgHrKeys){
+                let label = {name:attrVerboseName[key]+" "+act}
+                tableAttrColumn.push(label);
+            }
+        }
+        else{
+            let label = {name:attrVerboseName[key]};
+            tableAttrColumn.push(label);
+        }
+    }
+	return [columns,tableAttrColumn];
+}	
+
+	render(){
+        const {height, width, containerHeight, containerWidth, ...props} = this.props;
+		let rowsCount = this.state.tableAttrColumn.length;
+
+		return(
+			<div className="quick3"
+            >
+			 <Table
+		        rowsCount={rowsCount}
+		        rowHeight={100}
+		        headerHeight={50}
+		         width={containerWidth}
+                height={containerHeight}
+                touchScrollEnabled={true}
+                {...props}>
+		        <Column
+		          header={<Cell>Exercise Reporting</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.tableAttrColumn[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={167}
+		          fixed={true}
+		        />
+			    {this.state.columns}
+      		</Table>
+			</div>
+
+			);
+	}
 }
-export default Exercise;
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 235;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    return window.innerWidth - widthOffset;
+  }
+})(Exercise);

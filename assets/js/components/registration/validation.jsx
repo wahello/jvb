@@ -28,27 +28,23 @@ export function personal_validate(values){
 	const errors = {};
 
 	if(!values.first_name || values.first_name.length < 2){
-		errors.first_name = "Name must be atleast 2 character";
+		errors.first_name = "First name must be atleast 2 character";
 	}
 
 	if(!values.last_name || values.last_name.length < 2){
-		errors.last_name = "Name must be atleast 2 character";
-	}
-
-	if(values.first_name && values.first_name.length > 20){
-		errors.first_name = "Name must be less than 20 character";
-	}
-
-	if(values.last_name && values.last_name.length > 20){
-		errors.last_name = "Name must be less than 20 character";
+		errors.last_name = "Last name must be atleast 2 character";
 	}
 
 	if(!values.date_of_birth){
-		errors.date_of_birth = "Birthday is required";
+		errors.date_of_birth = "Date of birth is required";
 	}
 
-	if(!values.height){
-		errors.height = "Height is required";
+	if(!values.feet || values.feet === 'feet'){
+		errors.feet = "Feet is required";
+	}
+
+	if(!values.inches || values.inches === 'inches'){
+		errors.inches = "Inches is required";
 	}
 
 	if(!values.weight){

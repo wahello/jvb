@@ -11,7 +11,7 @@ export default class UnprocesedFoodModal extends Component{
 
 		this.state = {
 			collapse:true,
-			enter_food:(processed_food_list !== '' || unprocessed_food_list !== '') ? true : false,
+			enter_food:(unprocessed_food_list !== '') ? true : false,
 			unprocessed_food_list:unprocessed_food_list,
 			processed_food_list:processed_food_list
 		};
@@ -22,10 +22,10 @@ export default class UnprocesedFoodModal extends Component{
 	}
 
 	componentWillReceiveProps(nextProps) {
-  	  if(nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) {
+  	  if((nextProps.unprocessed_food_list !== this.props.unprocessed_food_list) ||
+  	  	 (nextProps.processed_food_list !== this.props.processed_food_list)) {
     	  	this.setState({
-    	  		enter_food:(nextProps.processed_food_list !== '' ||
-    	  				    nextProps.unprocessed_food_list !== '') ? true : false,
+    	  		enter_food:(nextProps.unprocessed_food_list !== '') ? true : false,
     	  		unprocessed_food_list:nextProps.unprocessed_food_list,
     	  		processed_food_list:nextProps.processed_food_list
     	  	});
@@ -43,7 +43,6 @@ export default class UnprocesedFoodModal extends Component{
 	}
 
 	onClickFoodList(event){
-		console
 			this.setState({
 				enter_food:!this.state.enter_food
 			});
@@ -58,25 +57,7 @@ export default class UnprocesedFoodModal extends Component{
 						<FormGroup>   
                             	{this.props.editable &&
                             		<div>
-                            		  <div className="d-flex justify-content-center">
-                            			<btn onClick={this.onClickFoodList} className="btn btn-info">I Want to Enter a List of all Foods I Consumed</btn>
-                            			</div>
-                            			<div className="unprocess_food">
-										<Collapse isOpen={this.state.enter_food}>
-										<div className="col-xs-5">
-											<Label>5.1 What Unprocessed Food Were Consumed?</Label>
-											<div className="input1">	
-					                            <Textarea 						                           
-						                            className="form-control" 
-						                            value={this.state.unprocessed_food_list}
-						                            name = "unprocessed_food_list"
-						                            rows="5" cols="5"
-						                            onChange={this.handleChange}
-						                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
-					                        </div>
-					                        </div>
-					                        <div className="col-xs-5">
-					                        <Label>5.2 What Processed Food Was Consumed?</Label>
+                            		 <Label>5.1 What Processed Food were Consumed?</Label>
 											<div className="input1">	
 					                            <Textarea 						                           
 						                            className="form-control" 
@@ -84,9 +65,36 @@ export default class UnprocesedFoodModal extends Component{
 						                            name="processed_food_list"
 						                            rows="5" cols="5"
 						                            onChange={this.handleChange}
-						                            placeholder="dairy,cheese,pasta,bread,white rice,etc..." />
+						                             />
 					                        </div>
+					                        <div className="unprocess_food">
+						                        <Input type="checkbox"
+					                           	onClick={this.onClickFoodList}
+					                           	checked={this.state.enter_food ? 'checked':''}
+					                           	/>                           		  
+		                            			 <Label id="text">I Want To Enter A List Of &nbsp;
+			                            			 <span style={{fontWeight:"bold"}}>
+						                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
+						                             </span> Foods I Consumed</Label>
+	                            			</div>
+                            			<div>
+										<Collapse isOpen={this.state.enter_food}>
+
+										<Label>5.2 What &nbsp;
+										 <span style={{fontWeight:"bold"}}>
+			                              	<span style={{textDecoration:"underline"}}>Un</span>processed?
+			                             </span> Food Were Consumed?</Label>
+											<div className="input1">	
+					                            <Textarea 						                           
+						                            className="form-control" 
+						                            value={this.state.unprocessed_food_list}
+						                            name = "unprocessed_food_list"
+						                            rows="5" cols="5"
+						                            onChange={this.handleChange}
+						                            />
 					                        </div>
+					                       
+					                        
 					                    </Collapse>
 					                    </div> 
 					                    </div>
@@ -94,10 +102,13 @@ export default class UnprocesedFoodModal extends Component{
 			                    {!this.props.editable &&
 	                             
 	                              <div className="input">
-	                              	<Label>5.1 What Unrocessed Food Were Consumed?</Label><br/>
-	                              	<Label>Processed Food List</Label>
+	                              	<Label>5.1 What Processed Food Were Consumed?</Label><br/>
+	                              	
 	                                <p>{this.state.processed_food_list}</p>
-	                                <Label>Unprocessed Food List</Label>
+	                                <Label>5.2 What &nbsp;
+	                                <span style={{fontWeight:"bold"}}>
+		                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
+		                             </span> Food Were Consumed?</Label>
 	                                <p >{this.state.unprocessed_food_list}</p>
 	                              </div>
 	                             

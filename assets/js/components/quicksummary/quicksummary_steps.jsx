@@ -1,65 +1,105 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
-function renderTableRows(dateWiseData,category,field,classes=""){
-	let elements = [];
-	for(let [date,data] of Object.entries(dateWiseData)){
-		if(field === "created_at"){
-			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
-			);	
-		}else{
-			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
-			);
+class Steps extends Component{
+
+	constructor(props){
+	super(props);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
+
+	 this.state = {
+      myTableData: [
+        {name: 'Non Exercise Steps'},
+        {name: 'Exercise Steps'},
+        {name: 'Total Steps'},
+        {name: 'Floor Climed'}, 
+        {name: 'Floor Decended'},
+        {name: 'Movement Consistency'}                     
+      ],
+    };
+  }
+
+renderTableColumns(dateWiseData,category,classes=""){
+		let columns = [];
+		for(let [date,data] of Object.entries(dateWiseData)){
+			let all_data = [];
+
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					if (key == 'movement_consistency'){
+                        let mc = value;
+                        if( mc != undefined && mc != "" && mc != "-"){
+                            mc = JSON.parse(mc);
+                            all_data.push(mc.inactive_hours);
+                        }
+                    }
+                    else{
+						all_data.push(value);
+                    }
+				}
+			}
+
+			columns.push(
+				<Column 
+					header={<Cell>{date}</Cell>}
+			        cell={props => (
+				            <Cell {...props}>
+				              {all_data[props.rowIndex]}
+				            </Cell>
+				          )}
+			        width={134}
+				/>
+			)
 		}
+		return columns;
 	}
-	return elements;
-}
 
-const Steps = (props) =>{
-	return(
-           
-            			  <div className="quick3">
-				         <Table className="table table-responsive quick4">
-				       
-				         <tr className="quick8">
-				         <th >
-						  <h5>Steps</h5>
-						  </th>
-						    {renderTableRows(props.data,"steps_ql","created_at")}							
-						  </tr>
-						 
-						 <tr>
-					        <td>Non Exercise Steps</td>
-					         {renderTableRows(props.data,"steps_ql","non_exercise_steps")}					           
-				         </tr>
-				         <tr className="quick9">
-					        <td >Exercise Steps</td>
-					         {renderTableRows(props.data,"steps_ql","exercise_steps")}					           
-				         </tr>
-				         <tr>
-					        <td>Total Steps</td>
-					         {renderTableRows(props.data,"steps_ql","total_steps")}					           
-				         </tr>
-				         <tr className="quick9">
-					        <td>Floor Climed</td>
-					         {renderTableRows(props.data,"steps_ql","floor_climed")}					            
-				         </tr>
-				         <tr>
-					        <td>Floor Decended</td>
-					         {renderTableRows(props.data,"steps_ql","floor_decended")}					           
-				         </tr>
-				         
-				         <tr className="quick9">
-					        <td>Movement Consistency</td>
-					         {renderTableRows(props.data,"steps_ql","movement_consistency")}					           
-				         </tr>
-                          </Table>
-                         </div>
-		);
+ render(){
+ 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
+		let rowsCount = this.state.myTableData.length;
+		return(
+			<div>
+			 <div className="quick3"
+			  >
+			 <Table
+		        rowsCount={rowsCount}
+		        rowHeight={100}
+		        headerHeight={50}
+		        width={containerWidth}
+        		height={containerHeight}
+        		touchScrollEnabled={true}
+        		{...props}>
+		        <Column
+		          header={<Cell>Steps</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.myTableData[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={167}
+		          fixed={true}
+		        />
+			    {this.renderTableColumns(this.props.data,"steps_ql")}
+      		</Table>
+			</div>
+			</div>
+
+			);
+	}
 
 }
-export default Steps;
+
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 235;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    return window.innerWidth - widthOffset;
+  }
+})(Steps);

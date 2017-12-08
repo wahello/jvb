@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { withRouter, Link } from 'react-router-dom';
+
 import { Container, Row, Col, Card,CardTitle, 
 		 CardHeader, CardBody, CardText, Progress } from 'reactstrap';
 import { ToastContainer, toast } from 'react-toastify';
@@ -29,11 +31,12 @@ class Register extends Component {
 			progress: this.state.progress + 33.33
 		});
 
-		//redirect to user newly created profile
+		//show success message and redirect to user newly created profile
 		toast.info(
-		"User Acount created successfully!",{
+		"User Account created successfully!",{
           className:"dark"
         });
+        this.props.history.push("/users/dashboard");
 	}
 
 	onRegisterFailure(error){
@@ -134,4 +137,4 @@ class Register extends Component {
 	}
 }
 
-export default Register;
+export default withRouter(Register);

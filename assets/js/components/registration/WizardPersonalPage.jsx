@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
@@ -7,102 +8,133 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 import {renderFieldFormGroup,renderSelectFeet, renderSelectInches} from './fieldRenderer';
 import { personal_validate } from './validation';
 
-const WizardPersonalPage = (props) => {
-	const { handleSubmit, previousPage, onSubmit } = props;
-	return(
-		<Form  onSubmit={handleSubmit(onSubmit)}>
-			<Row>
-				<Col className="form-item">
+class WizardPersonalPage extends Component{
 
-					<Field
-						name = "first_name"
-						type = "input"
-						label = "First Name"
-						placeholder = "John"
-						value=""
-						component = {renderFieldFormGroup}
-					/>
+	constructor(props){
+		super(props);
+		this.state = {
+			'feet_err':' ',
+			'inches_error':' '}
+		this.FeetError = this.FeetError.bind(this);
+		this.InchesError = this.InchesError.bind(this);
+	}
 
-					<Field
-						name = "last_name"
-						type = "input"
-						label = "Last Name"
-						placeholder = "Doe"
-						value=""
-						component = {renderFieldFormGroup}
-					/>
+	FeetError(err_msg){
+		this.setState({
+			feet_err:err_msg !== undefined ? err_msg : ' '
+		});
+	}
 
-					<Field
-						name = "date_of_birth"
-						type = "date"
-						label = "Date of Birth"
-						placeholder = "dd/mm/yyyy"
-						value=""
-						component = {renderFieldFormGroup}
-					/>
+	InchesError(err_msg){
+		this.setState({
+			inches_error:err_msg !== undefined ? err_msg : ' '
+		});
+	}
 
-					<FormGroup>
-						<Label>Height</Label>
-						<InputGroup>
-							<Field
-								name = "feet"
-								type = "select"
-								component = {renderSelectFeet}	
-							/>
-							&nbsp;&nbsp;
-							<Field
-								name = "inches"
-								type = "select"
-								component = {renderSelectInches}	
-							/>
-						</InputGroup>
-					</FormGroup>
+	render(){
+		const { handleSubmit, previousPage, onSubmit } = this.props;
+		return(
+			<Form  onSubmit={handleSubmit(onSubmit)}>
+				<Row>
+					<Col className="form-item">
 
-					<Field
-						name = "weight"
-						type = "number"
-						label = " Weight (in pounds)"
-						placeholder = "150"
-						value=""
-						component = {renderFieldFormGroup}
-					/>
+						<Field
+							name = "first_name"
+							type = "input"
+							label = "First Name"
+							placeholder = "John"
+							value=""
+							component = {renderFieldFormGroup}
+						/>
 
-					 <FormGroup>
-				          <Label className="custom-control custom-radio">
-				            	<Field 
-				            		className="custom-control-input"
-				            		name="gender" 
-				            		component="input" 
-				            		type="radio" 
-				            		value="M" 
-				            	/>
-				            	<span className="custom-control-indicator"></span>
-				            	<span className="custom-control-description">Male</span>
-				          </Label>
-				          <Label className="custom-control custom-radio">
-				            	<Field 
-				            		className="custom-control-input"
-				            		name="gender" 
-				            		component="input" 
-				            		type="radio" 
-				            		value="F" 
-				            	/>
-				            	<span className="custom-control-indicator"></span>
-				            	<span className="custom-control-description">Female</span>
-				          </Label>
-			        </FormGroup>
-			        <div className="f-footer">
-						<Button outline color="primary" onClick={previousPage}>
-							Previous
-						</Button>
-						<Button type="submit" outline color="primary" style={{float:'right'}}>
-							Next
-						</Button>
-					</div>
-				</Col>
-			</Row>
-		</Form>
-	);
+						<Field
+							name = "last_name"
+							type = "input"
+							label = "Last Name"
+							placeholder = "Doe"
+							value=""
+							component = {renderFieldFormGroup}
+						/>
+
+						<Field
+							name = "date_of_birth"
+							type = "date"
+							label = "Date of Birth"
+							placeholder = "dd/mm/yyyy"
+							value=""
+							component = {renderFieldFormGroup}
+						/>
+
+						<FormGroup>
+							<Label>Height</Label>
+							<InputGroup>
+								<Field
+									name = "feet"
+									type = "select"
+									component = {renderSelectFeet}
+									err_callback = {this.FeetError}	
+								/>
+								&nbsp;&nbsp;
+								<Field
+									name = "inches"
+									type = "select"
+									component = {renderSelectInches}	
+									err_callback = {this.InchesError}	
+								/>
+							</InputGroup>
+							<div style={{color:"red"}}>
+								{this.state.feet_err+" "+this.state.inches_error}
+							</div>
+
+						</FormGroup>
+
+						<Field
+							name = "weight"
+							type = "number"
+							label = " Weight (in pounds)"
+							placeholder = "150"
+							value=""
+							component = {renderFieldFormGroup}
+						/>
+
+						 <FormGroup>
+					          <Label className="custom-control custom-radio">
+					            	<Field 
+					            		className="custom-control-input"
+					            		name="gender" 
+					            		component="input" 
+					            		type="radio" 
+					            		value="M"
+					            	required 
+					            	/>
+					            	<span className="custom-control-indicator"></span>
+					            	<span className="custom-control-description">Male</span>
+					          </Label>
+					          <Label className="custom-control custom-radio">
+					            	<Field 
+					            		className="custom-control-input"
+					            		name="gender" 
+					            		component="input" 
+					            		type="radio" 
+					            		value="F" 
+					            	/>
+					            	<span className="custom-control-indicator"></span>
+					            	<span className="custom-control-description">Female</span>
+					          </Label>
+				        </FormGroup>
+				        <div className="f-footer">
+							<Button outline color="primary" onClick={previousPage}>
+								Previous
+							</Button>
+							<Button type="submit" outline color="primary" style={{float:'right'}}>
+								Next
+							</Button>
+						</div>
+					</Col>
+				</Row>
+			</Form>
+		);
+	}
 }
 
 export default reduxForm({

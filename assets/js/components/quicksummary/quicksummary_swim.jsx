@@ -1,45 +1,89 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
- function renderTableRows(dateWiseData,category,field,classes=""){
-	let elements = [];
-	for(let [date,data] of Object.entries(dateWiseData)){
-		if(field === "created_at"){
-			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
-			);	
-		}else{
-			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
-			);
+ class Swim extends Component{
+	constructor(props){
+	super(props);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
+
+	 this.state = {
+      myTableData: [
+        {name: 'pace per 100 yard'},
+        {name: 'Total Strokes'},                             
+      ],
+    };
+  }
+
+renderTableColumns(dateWiseData,category,classes=""){
+		let columns = [];
+		for(let [date,data] of Object.entries(dateWiseData)){
+
+			let all_data = [];
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					all_data.push(value);
+				}
+			}
+
+			columns.push(
+				<Column 
+					header={<Cell>{date}</Cell>}
+			        cell={props => (
+				            <Cell {...props}>
+				              {all_data[props.rowIndex]}
+				            </Cell>
+				          )}
+			        width={134}
+				/>
+			)
 		}
+		return columns;
 	}
-	return elements;
-}
 
-const Swim = (props) =>{
-	return(
-	 <div className="quick3">
 	
-	     <Table className="table table-responsive quick4">
-	          <tr className="quick8"> 
-	         	<th><h5>Swim Stats</h5></th>
-			    {renderTableRows(props.data,"swim_stats_ql","created_at")}
-			  </tr>
+ render(){
+ 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
+		let rowsCount = this.state.myTableData.length;
+		return(
+		
+			
+			 <Table
+		        rowsCount={rowsCount}
+		        rowHeight={100}
+		        headerHeight={50}
+		        width={containerWidth}
+        		height={containerHeight}
+        		touchScrollEnabled={true}
+        		{...props}>
+		        <Column
+		          header={<Cell>Swim Stats</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.myTableData[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={167}
+		          fixed={true}
+		        />
+			    {this.renderTableColumns(this.props.data,"swim_stats_ql")}
+      		</Table>
+		
+		
 
-			  <tr>
-		       	<td>Overall Truth Grade</td>
-		        {renderTableRows(props.data,"swim_stats_ql","pace_per_100_yard")}
-	          </tr>
-
-	          <tr className="quick9">
-		        <td>Total Strokes</td>
-		        {renderTableRows(props.data,"swim_stats_ql","total_strokes")}
-	          </tr>
-         </Table>
-         </div>
-	);
+			);
+	}
 }
-export default Swim;
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 395;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    return window.innerWidth - widthOffset;
+  }
+})(Swim);

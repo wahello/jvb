@@ -3,6 +3,12 @@ body{
 	height: 100%;
 	background-size: cover;
 	font-size:16px;
+	padding-top: 0px;
+}
+
+
+#body1{
+padding-top: 10px;
 }
 
 #user-inputs{
@@ -15,7 +21,8 @@ body{
  .head{
 	text-align: center;
 	padding:20px 0px  10px 37px ;
-	color: gray;
+	color: black;
+	font-family: futura-pt;
 }
 #user-inputs .user-inputs-form{
 	background-color:rgba(20,10,15,0.5);
@@ -34,6 +41,7 @@ margin-top: 46px;
 #user-inputs .user-inputs-form .padding{
 	padding: 10px;
 	margin-left: -10px;
+	font-family: Proxima-Nova;
 }
 // @media (min-width: 1024px) {
 // form.user-inputs-form.bootstrap_validator{
@@ -42,6 +50,11 @@ margin-top: 46px;
 // }
 
 @media (max-width: 1023px) {
+
+#body1{
+padding-top: 30px;
+}
+
    #user-inputs .user-inputs-form{
 	background-color:rgba(20,10,15,0.5);
 	border-radius: 20px;
@@ -53,25 +66,30 @@ margin-top: 46px;
 	.head{
 	text-align: center;
 	padding:20px 0px  10px 0px ;
-	color: gray;
+	color: black;
+	font-family: futura-pt;
 }
 
 	#navlink{
-	color:white;
+	color:#EAFFFF;
 	margin-top: 5px;
 	padding: 3px 6px;
     font-size: 16px;
+    font-family: futura-pt;
       }
 	.input{
 		padding:0px 17px;
+		font-family: futura-pt;
 	}
 	.input1{
 		padding:0px 17px 0px 23px;
+		font-family: futura-pt;
 	}
 	.nav1{
 		width: 100%;
 		 top:0; 
-		 left:0;	 
+		 left:0;
+		 right:0;	 
 	    z-index:100;
 	   	
 	}
@@ -117,6 +135,28 @@ margin-top: 46px;
 	width:125px;
 	color:#fff;
 	padding-left: 10px;
+	}
+	.toast-popup{
+	z-index: 101;
+	width:100%;
+	left:0;
+	right:0;
+	}
+	#text{
+	padding-left: 0px;
+	}
+	#calendar{
+		width:152px;
+		color:#fff;
+		padding-left: 5px;
+	}
+	.unprocess_food{
+	padding: 20px 20px 10px 43px;
+	}
+	.container-fluid{
+	padding-left: 1px;
+	padding-right: 1px;
+	padding-top: 0px;
 }
 }
 
@@ -125,19 +165,24 @@ margin-top: 46px;
 
 	.input{
 		padding:0px 17px;
+		font-family: futura-pt;
 	}
 	.input1{
 		padding:0px 17px 0px 23px;
+		font-family: futura-pt;
 	}
+	
 	#navlink{
-		color:white;
-		padding:3px 10px;
-		font-size: 16px;
+		color:#EAFFFF;
+		padding:3px 9px;
+		font-size: 17px;
+		font-family: futura-pt;
 	}
 	#navlink1{
-		color:white;
+		color:#EAFFFF;
 		padding:3px 0px;
-		font-size: 16px;
+		font-size: 17px;
+		font-family: futura-pt;
 	}
 
 	.nav1 {
@@ -145,6 +190,7 @@ margin-top: 46px;
 	  z-index:100;
 	  width: 100%;
 	  left: 0;
+	  right: 0;
 	  
 	}
 	
@@ -165,7 +211,7 @@ margin-top: 46px;
 	#hours,#minutes{
 		float: left;
 		margin-left: 10px;
-		width:44%;
+		width:45%;
 		position: relative;
 	}
 	
@@ -181,7 +227,7 @@ margin-top: 46px;
 	}
 	.btn2{
 		
-		padding: 4px 6px;
+		padding: 4px 0px;
 	}	
 	#padd{
 		padding-top:17px;
@@ -197,9 +243,11 @@ margin-top: 46px;
 	.radio1{
 		margin:0px 6px;
 		padding-left: 29px;
+		font-family: Proxima-Nova;
 	}
 	.radio2{
 		padding-left: 35px;
+		font-family: Proxima-Nova;
 	}
 	.work_hard{
 		padding-left: 33px;
@@ -226,13 +274,13 @@ margin-top: 46px;
 	text-align: center;
 }
 .unprocess_food{
-	padding-top: 15px;
+	padding: 20px 20px 10px 43px;
 }
 
 #calendar{
-	width:125px;
+	width:152px;
 	color:#fff;
-	padding-left: 20px;
+	padding-left: 5px;
 }
 .nav3{
 	padding:0px 0px 20px 0px;
@@ -240,4 +288,37 @@ margin-top: 46px;
 
 .toast-popup{
 	z-index: 101;
+}
+#text{
+padding-left: 0px;
+}
+.container-fluid{
+	padding-left: 1px;
+	padding-right: 1px;
+	padding-top: 0px;
+}
+.nav3 .navbar{
+background-color:#103047;
+}
+abbr{
+	background-color: white;
+}
+textarea.form-control{
+	min-height:100px !important;
+	max-height:1000px !important;
+}
+
+.react-datepicker__time-list{
+	padding:0px
+}
+.react-datepicker__time-container .react-datepicker__time 
+.react-datepicker__time-box ul.react-datepicker__time-list{
+	padding-right:0px;
+}
+#datepicker{
+	color:black;
+	padding:0.5rem 0.75rem;
+	border-radius:5px;
+	font-size:13px;
+	width:200px;
 }

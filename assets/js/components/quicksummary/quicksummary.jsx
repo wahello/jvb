@@ -1,14 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button,Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
+	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
+         NavbarBrand,Container } from "reactstrap";
 import axios from 'axios';
+import FontAwesome from "react-fontawesome";
+import CalendarWidget from 'react-calendar-widget';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
+import { withRouter, Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+
+import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
-import {fetchQuickLook}  from '../../network/quick';
-import {quicksummaryDate}  from '../../network/quick';
+import {getInitialStateUserInput} from './initialStateUser';
+import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
+import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/quick';
+
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
@@ -21,12 +31,14 @@ import Food from './quicksummary_food';
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
 import User from './user_inputs'; 
-import AllStats from './quicksummary_allstats'; 
+import AllStats1 from './quicksummary_allstats1';
+import Movementquick from './movement-consistency';
+
 
 
 axiosRetry(axios, { retries: 3});
 
-var CalendarWidget = require('react-calendar-widget');  
+
 var ReactDOM = require('react-dom');
 
 
@@ -37,23 +49,47 @@ class Quicklook extends Component{
 
 		this.successquick = this.successquick.bind(this);
 		this.errorquick = this.errorquick.bind(this);
+		this.userInputFetchSuccess = this.userInputFetchSuccess.bind(this);
+		this.userInputFetchFailure = this.userInputFetchFailure.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.onDismiss = this.onDismiss.bind(this);
 		this.updateDateState=this.updateDateState.bind(this);
 		this.onSubmitDate=this.onSubmitDate.bind(this);
 		this.handleChange=this.handleChange.bind(this);
-		
-		let initial_state = getInitialState(moment(new Date()));   
+		this.handleScroll = this.handleScroll.bind(this);
+		this.toggleCalendar=this.toggleCalendar.bind(this);
+		this.toggle = this.toggle.bind(this);
+		this.handleCreateQuicklook = this.handleCreateQuicklook.bind(this);
+		this.onQuicklookSuccess = this.onQuicklookSuccess.bind(this);
+		this.onQuicklookFailure = this.onQuicklookFailure.bind(this);
+		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
+		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
+
+
+		this.toggleDate=this.toggleDate.bind(this);
+	    this.toggleNav = this.toggleNav.bind(this);
+	    this.handleLogout = this.handleLogout.bind(this);
+	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);	
+
+		let initial_state = getInitialState(moment().subtract(7,'days'),
+											moment());   
 
 		this.state = {
-			today_date:moment(new Date()),
-			start_date:null,
-			end_date:null,
+			today_date:moment(),
+			start_date:moment().subtract(7,'days').toDate(),
+			end_date:moment().toDate(),
 			visible: true,
 			error:false,
-			data:initial_state,
-			activeTab : 'allstats'
-			
+			calendarOpen:false,
+			scrollingLock: false,
+			isOpen: false,
+			isOpen1:false,
+			activeTab : 'allstats1',
+			fetching_ql:false,
+			creating_ql:false,
+			dateRange:false,
+			userInputData:{},
+			data:initial_state
 		};
 	}
 
@@ -65,12 +101,12 @@ class Quicklook extends Component{
 			        user_ql: data.grades_ql.user_ql,
 			        overall_truth_grade: data.grades_ql.overall_truth_grade,
 			        overall_truth_health_gpa: data.grades_ql.overall_truth_health_gpa,
-			        movement_non_exercise_grade: data.grades_ql.movement_non_exercise_grade,   
+			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,   
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
 			        overall_workout_grade: data.grades_ql.overall_workout_grade,
-			        prcnt_non_processed_food_consumed_grade: data.grades_ql.prcnt_non_processed_food_consumed_grade,
+			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
 			        penalty:data.grades_ql.penalty		
 	    		},
@@ -85,7 +121,10 @@ class Quicklook extends Component{
 			        workout_duration: data.exercise_reporting_ql.workout_duration,
 			        maximum_elevation_workout:data.exercise_reporting_ql.maximum_elevation_workout,
 			        minutes_walked_before_workout:data.exercise_reporting_ql.minutes_walked_before_workout,
-			        distance:data.exercise_reporting_ql.distance,
+			        distance_run:data.exercise_reporting_ql.distance_run,
+			        distance_bike:data.exercise_reporting_ql.distance_bike,
+			        distance_swim:data.exercise_reporting_ql.distance_swim,
+			        distance_other:data.exercise_reporting_ql.distance_other,
 			        pace: data.exercise_reporting_ql.pace,
 			        avg_heartrate: data.exercise_reporting_ql.avg_heartrate,
 			        elevation_gain: data.exercise_reporting_ql.elevation_gain,
@@ -122,7 +161,8 @@ class Quicklook extends Component{
 			        workout_effortlvl_grade: data.exercise_reporting_ql.workout_effortlvl_grade,
 			        avg_heartrate_grade: data.exercise_reporting_ql.avg_heartrate_grade,
 			        overall_workout_grade: data.exercise_reporting_ql.overall_workout_grade,
-			        heartrate_variability_grade: data.exercise_reporting_ql.heartrate_variability_grade,
+			        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
+			        fitness_age:data.exercise_reporting_ql.fitness_age,
 			        workout_comment:data.exercise_reporting_ql.workout_comment
 			    },
 			    swim_stats_ql: {
@@ -180,13 +220,64 @@ class Quicklook extends Component{
              return properties;
        		}
 
+    updateUserInputDateState(data){
+       			var properties={
+					strong_input:{
+	                    workout:data.strong_input.workout,
+	                    workout_type:data.strong_input.workout_type,
+	                    work_out_easy_or_hard:data.strong_input.work_out_easy_or_hard,
+	                    workout_effort_level:data.strong_input.workout_effort_level,
+	                    hard_portion_workout_effort_level:data.strong_input.hard_portion_workout_effort_level,
+	                    prcnt_unprocessed_food_consumed_yesterday:data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
+	                    list_of_unprocessed_food_consumed_yesterday:data.strong_input.list_of_unprocessed_food_consumed_yesterday,
+	                    list_of_processed_food_consumed_yesterday:data.strong_input.list_of_processed_food_consumed_yesterday,
+	                    number_of_alcohol_consumed_yesterday:data.strong_input.number_of_alcohol_consumed_yesterday,
+	                    alcohol_drink_consumed_list:data.strong_input.alcohol_drink_consumed_list,
+	                    sleep_time_excluding_awake_time:data.strong_input.sleep_time_excluding_awake_time,
+	                    sleep_comment:data.strong_input.sleep_comment,
+	                    prescription_or_non_prescription_sleep_aids_last_night:data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
+	                    sleep_aid_taken:data.strong_input.sleep_aid_taken,
+	                    smoke_any_substances_whatsoever:data.strong_input.smoke_any_substances_whatsoever,
+	                    smoked_substance:data.strong_input.smoked_substance,
+	                    prescription_or_non_prescription_medication_yesterday:data.strong_input.prescription_or_non_prescription_medication_yesterday,
+	                    prescription_or_non_prescription_medication_taken:data.strong_input.prescription_or_non_prescription_medication_taken,
+	                    controlled_uncontrolled_substance:data.strong_input.controlled_uncontrolled_substance
+	                },
+	                encouraged_input:{
+	                      "stress_level_yesterday":data.encouraged_input.stress_level_yesterday,
+				    	  "pains_twings_during_or_after_your_workout":data.encouraged_input.pains_twings_during_or_after_your_workout,
+			        	  "pain_area":data.encouraged_input.pain_area,
+			        	  "water_consumed_during_workout":data.encouraged_input.water_consumed_during_workout,
+			        	  "workout_that_user_breathed_through_nose":data.encouraged_input.workout_that_user_breathed_through_nose
+	                },
+	                optional_input:{
+				          "chia_seeds_consumed_during_workout":data.optional_input.chia_seeds_consumed_during_workout,
+				    	  "fasted_during_workout":data.optional_input.fasted_during_workout,
+			              "food_ate_before_workout":data.optional_input.food_ate_before_workout,
+			              "calories_consumed_during_workout":data.optional_input.calories_consumed_during_workout,
+			              "food_ate_during_workout":data.optional_input.food_ate_during_workout,
+			              "workout_enjoyable":data.optional_input.workout_enjoyable,
+			              "general_Workout_Comments":data.optional_input.general_Workout_Comments,
+			              "weight":data.optional_input.weight,
+			       		  "waist_size":data.optional_input.waist_size,
+			       		  "clothes_size":data.optional_input.clothes_size,
+			       		  "sick":data.optional_input.sick,
+			              "sickness":data.optional_input.sickness,
+			              "stand_for_three_hours":data.optional_input.stand_for_three_hours,
+			              "type_of_diet_eaten":data.optional_input.type_of_diet_eaten,
+			       		  "general_comment":data.optional_input.general_comment
+	                }
+             };
+             return properties;
+       		}
+
 	successquick(data,start_dt,end_dt){
+	
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
 		for(let date of Object.keys(initial_state)){
 			dates.push(date);
 		} 
-
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
 		      	const date = dataitem.created_at;
@@ -195,14 +286,16 @@ class Quicklook extends Component{
 		      }
 		      this.setState({
 				data:initial_state,
-				visible:true,
-				error:false
+				visible:false,
+				fetching_ql:false,
+				error:true
 			});
 	     }
 	     else{
 	     		this.setState({
 				data:initial_state,
 				visible:true,
+				fetching_ql:false,
 				error:false
 			});
 	     }
@@ -211,26 +304,55 @@ class Quicklook extends Component{
 	errorquick(error){
 		console.log(error.message);
 		this.setState({
-			error:true
+			error:true,
+			fetching_ql:false
 		});
 	}
 
-	renderAlert(){
-
-		if (this.state.error){
-			
-			return(
-				 <Alert color="danger" isOpen={this.state.error} toggle={this.onDismiss}>
-					No Quicklook data is found!		       
-				</Alert>
-			);
+	userInputFetchSuccess(data){
+		let initial_state = getInitialStateUserInput(this.state.start_date,
+													 this.state.end_date);
+		if(data.data.length){
+			const dates = [];
+			for(let date of Object.keys(initial_state)){
+				dates.push(date);
+			} 
+		    if (data.data.length > 0){
+			 	 for(var dataitem of data.data){
+			      	const date = dataitem.created_at;
+			      	let obj = this.updateUserInputDateState(dataitem);
+			      	initial_state[date] = obj;
+			      }
+		     }
 		}
+		this.setState({
+			userInputData:initial_state
+		});
 	}
 
+	userInputFetchFailure(error){
+		let initial_state = getInitialStateUserInput(this.state.start_date,
+													 this.state.end_date);
+
+		this.setState({
+			userInputData:initial_state
+		});
+	}
+
+	
+
 	processDate(date){
-		let start_dt = moment(date);
-		let end_dt = moment(date).add(6,'days');
-		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
+		let end_dt = moment(date);
+		let start_dt = moment(date).subtract(7,'days');
+		this.setState({
+			start_date : start_dt.toDate(),
+			end_date : end_dt.toDate(),
+			fetching_ql:true
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
+						  this.userInputFetchFailure);
+		});
 	}
 
 	 handleChange(event){
@@ -244,15 +366,24 @@ class Quicklook extends Component{
   
   onSubmitDate(event){
   	event.preventDefault();
-  	let start_dt=moment(this.state.start_date);
-  	let end_dt=moment(this.state.end_date);
-  	quicksummaryDate(start_dt,end_dt,this.successquick,this.errorquick);
+  	let start_dt = moment(this.state.start_date);
+  	let end_dt = moment(this.state.end_date);
+  	this.setState({
+			start_date : start_dt.toDate(),
+			end_date : end_dt.toDate(),
+			fetching_ql:true
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
+						  this.userInputFetchFailure);
+		});
   }
 
 	componentDidMount(){
-		let start_dt = moment();
-		let end_dt = moment().add(6,'days');
-		quicksummaryDate(start_dt, end_dt, this.successquick,this.errorquick);
+		quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
+					  this.userInputFetchFailure);
+		 window.addEventListener('scroll', this.handleScroll);
 	}
 	onDismiss(){
 		this.setState(
@@ -268,9 +399,79 @@ class Quicklook extends Component{
        });
 	}
 
+	componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+}
+handleScroll() {
+
+  if (window.scrollY >= 72 && !this.state.scrollingLock) {
+    this.setState({
+      scrollingLock: true
+    });
+  } else if(window.scrollY < 72 && this.state.scrollingLock) {
+    this.setState({
+      scrollingLock: false
+    });
+  }
+}
+ toggleCalendar(){
+    this.setState({
+      calendarOpen:!this.state.calendarOpen
+    });
+  }
+ toggle() {
+    this.setState({
+      isOpen: !this.state.isOpen,
+     
+    });
+  }
+  toggleNav() {
+    this.setState({
+      isOpen1: !this.state.isOpen1,
+     
+    });
+  }
+ toggleDate(){
+    this.setState({
+      dateRange:!this.state.dateRange
+    });
+   }
+
+  onQuicklookSuccess(data,start_date,end_date){
+  	this.successquick(data,start_date,end_date);
+  	this.setState({
+  		creating_ql:false
+  	});
+  }
+
+  onQuicklookFailure(error){
+  	console.log(error.message);
+  	this.setState({
+  		creating_ql:false
+  	});
+  }
+
+  handleCreateQuicklook(){
+  	this.setState({
+  		creating_ql:true
+  	},function(){
+  		createQuicklook(this.state.start_date, this.state.end_date,
+  					this.onQuicklookSuccess, this.onQuicklookFailure);
+  	}.bind(this));
+  }
+onLogoutSuccess(response){
+    this.props.history.push("/#logout");
+  }
+
+  handleLogout(){
+    this.props.logoutUser(this.onLogoutSuccess);
+  }
+
+
 	render(){
+		const {fix} = this.props;
 		const {activeTab}=this.state;
-		const class_allstats=`nav-link ${activeTab === "allstats" ? 'active':''}`;
+		const class_allstats1=`nav-link ${activeTab === "allstats1" ? 'active':''}`;
 		const class_grade=`nav-link ${activeTab === "grade" ? 'active':''}`;
 		const class_swim=`nav-link ${activeTab === "swim" ? 'active':''}`;
 		const class_bike=`nav-link ${activeTab === "bike" ? 'active':''}`;
@@ -279,148 +480,276 @@ class Quicklook extends Component{
 		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
         const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
-         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;             
+        const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;
+        const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;             
 	return(
+		<div className="hori">
 		<div className="container-fluid">
-		<NavbarMenu/>
+		
+		 <Navbar toggleable 
+         fixed={fix ? 'top' : ''} 
+          className="navbar navbar-expand-sm navbar-inverse">
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
+           <FontAwesome 
+                 name = "bars"
+                 size = "1x"
+                                          
+             />
+
+          </NavbarToggler>
+
+          <Link to='/'>
+            <NavbarBrand 
+              className="navbar-brand float-sm-left" 
+              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
+              <img className="img-fluid"
+               style={{maxWidth:"200px"}}
+               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+            </NavbarBrand>
+          </Link>
+          
+            <a 
+            id="daterange"
+            style={{width:"88px",color:"white"}}
+            onClick={this.toggleDate} >Date Range</a>
+          
+
+          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>            
+              <NavItem className="float-sm-right">  
+                <Link className="nav-link" to='/'>Home</Link>
+              </NavItem>
+               <NavItem className="float-sm-right">                
+                   <NavLink  
+                   className="nav-link"                    
+                   onClick={this.handleLogout}>Log Out
+                    </NavLink>               
+              </NavItem>  
+            </Nav>
+          </Collapse>
+        </Navbar>
 	
-		           	
-					
-			<div className="col-lg-12 col-md-12 col-sm-12">  
-			<div className="quick">
-			        <div className="col-md-12 col-md-offset-2">
-                         <div className="row justify-content-center">
-						<div className="alert">
-							{this.renderAlert()}
-						</div>
-					 </div>
-                     </div>
-						 <div id="quick1" className="row ">
-			                 <h2>Quick Summary</h2>			                
-			             </div>
+		 					<Popover                         
+                            placement="bottom" 
+                            isOpen={this.state.dateRange}
+                            target="daterange" 
+                            toggle={this.toggleDate}>
+                              <PopoverBody>
+                                <div >
 
-			             <div className="row">
-			             <div className="col-sm-8 col-sm-offset-2">
-			             <div className="quick7">
-			             <ul className="nav nav-tabs" id="quick6">
-
-			             <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_allstats} value="allstats"
-						    		 onClick={this.activateTab.bind(this,"allstats")}>
-						    		All Stats
-						    		</a>
-						    		</div>
-						    </li>
-                              
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_grade} value="grade"
-						    		 onClick={this.activateTab.bind(this,"grade")}>
-						    		Grade
-						    		</a>
-						    		</div>
-						    </li>
-						   
-						    <li className="nav-item">
-						    		<div >
-						    		<a href="#" className={class_swim}  value="swim"
-						    		 onClick={this.activateTab.bind(this,"swim")}>
-						    		 Swim Stats
-						    		 </a>
-						    		 </div>
-						     </li>
-						    <li className="nav-item">
-						    		<div >
-						    		<a href="#" className={class_bike} value="bike"
-						    		 onClick={this.activateTab.bind(this,"bike")}>
-						    		 Bike Stats
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_steps}  value="steps"
-						    		 onClick={this.activateTab.bind(this,"steps")}>
-						    		 Steps
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_sleep}  value="sleep"
-						    		 onClick={this.activateTab.bind(this,"sleep")}>
-						    		 Sleep
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_food}  value="food"
-						    		 onClick={this.activateTab.bind(this,"food")}>
-						    		 Food
-						    		</a>
-						    		</div>
-						    </li>
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_alcohol} value="alcohol"
-						    		 onClick={this.activateTab.bind(this,"alcohol")}>
-						    		 Alcohol
-						    		 </a>
-						    		 </div>
-						    </li>
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_exercise} value="exercise"
-						    		 onClick={this.activateTab.bind(this,"exercise")}>
-						    		 Exercise Reporting
-						    		 </a>
-						    		 </div>
-						    </li>
-						    <li className="nav-item">
-						    		<div>
-						    		<a href="#" className={class_user} value="user"
-						    		 onClick={this.activateTab.bind(this,"user")}>
-						    		 User Inputs
-						    		 </a>
-						    		 </div>
-						    </li>
-						     
-						     
-						 </ul>
-			      		</div>
-			             </div>
-			             </div>
-                        
-			   <div id="quick2" className="row">
-			    <div className="col-sm-2 quick5">
-		            <CalendarWidget onDaySelect={this.processDate}/>,
-		            <div className="quick10">
-				           <Form>
-						        <FormGroup>
-						          <Label>Start Date</Label>
+				           <Form>				         				          
+						        <div style={{paddingBottom:"12px"}} className="justify-content-center">						      
+						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="start_date"
-						           value={this.state.start_date}
-						           onChange={this.handleChange}/>
-						        </FormGroup>
-						        <FormGroup>
-						          <Label for="examplePassword">End date</Label>
+						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+						           
+						        </div>
+						        <div id="date" className="justify-content-center">
+						       
+						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="end_date"
-						           value={this.state.end_date}
-						           onChange={this.handleChange}/>
-						        </FormGroup>
-						        <Button
+						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+						        
+						        </div>
+						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+						       
+						        <button
+						         style={{backgroundColor:"#ed9507"}} 					        
 						         type="submit"
-						         className="btn btn-block btn-info"
-						         onClick={this.onSubmitDate}>Submit</Button>
+						         className="btn btn-block-lg"
+						         onClick={this.onSubmitDate} style={{width:"175px"}}>Submit</button>
+						         </div>
+
 						   </Form>
 					</div>
-                    </div>
-                    <div className="col-sm-10">
-                    	{this.state.activeTab === "allstats" && <AllStats data={this.state.data}/>}
+                              </PopoverBody>
+                           </Popover> 		           									
+			<div className="quick">
+			 				
+			             <div id="nav3">
+			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
+						  <Navbar light toggleable className="navbar nav2">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+                                    <div className="toggler">
+                                    <FontAwesome 
+                                          name = "bars"
+                                          size = "1x"
+                                          
+                                        />
+                                    </div>
+                               </NavbarToggler> 
+                                  
+                                  <span id="calendar1" 
+                                  onClick={this.toggleCalendar}>
+                                  <span id="spa" >
+                                     <span id="navlink">
+                                        <FontAwesome 
+                                          name = "calendar"
+                                          size = "1x"
+                                          
+                                        />
+                                        </span>                                      
+                                  </span>                                  
+                                                                  
+                                  </span>  
+
+                                   <span className="btn2">
+	                                  <Button
+	                                  style={{backgroundColor:"#ed9507"}} 						        
+						         	   type="submit"
+						               className="btn btn-block-lg"
+						               onClick = {this.handleCreateQuicklook}>
+							               Create Quick Look Report
+								      </Button>
+                                   </span>
+                               <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
+                                  <Nav className="nav navbar-nav" navbar>
+                                          <NavItem>
+                                          <span id="spa">
+                                            <abbr id="abbri"  title="All Stats">
+                                              <NavLink  href="#" className={class_allstats1} value="allstats1"
+						    								 onClick={this.activateTab.bind(this,"allstats1")}>
+                                               All Stats
+                                              </NavLink>
+                                            </abbr>
+                                            </span>
+                                          </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Grades">
+                                            <NavLink href="#" className={class_grade} value="grade"
+						    						 onClick={this.activateTab.bind(this,"grade")}>
+                                             Grades
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                        </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
+                                            <NavLink  href="#" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>
+						    		 		Swim Stats
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                        </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Bike">
+                                            <NavLink href="#" className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>
+							    			 Bike Stats
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                        </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Steps">
+                                            <NavLink  href="#" className={class_steps}  value="steps"
+						    		 				  onClick={this.activateTab.bind(this,"steps")}>
+						    		 		Steps
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Sleep">
+                                            <NavLink href="#" className={class_sleep}  value="sleep"
+						    		 				 onClick={this.activateTab.bind(this,"sleep")}>
+						    				 Sleep 
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>  
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Food">
+                                            <NavLink href="#" className={class_food}  value="food"
+						    		 				 onClick={this.activateTab.bind(this,"food")}>
+						    		 		Food
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>  
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Alcohol">
+                                            <NavLink href="#" className={class_alcohol} value="alcohol"
+						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>
+						    		 		 Alcohol 
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>  
+
+                                        <NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Exercise Reporting">
+                                            <NavLink  href="#" className={class_exercise} value="exercise"
+						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
+						    		 		Exercise Reporting
+                                            </NavLink>                                           
+                                          </abbr>
+                                          </span>
+                                       </NavItem> 
+
+
+                                       	<NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="User Inputs">
+                                            <NavLink href="#" className={class_user} value="user"
+						    		 				onClick={this.activateTab.bind(this,"user")}>
+						    		 		 User Inputs 
+                                            </NavLink>                                           
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
+                                       	<NavItem>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="User Inputs">
+                                            <NavLink href="#" className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>
+						    		 		 Movement Consistency 
+                                            </NavLink>                                           
+                                          </abbr>
+                                          </span>
+                                       </NavItem>                                         									
+                                  </Nav>
+                                </Collapse>
+                                
+                                 
+                           </Navbar> 
+                           
+						 </div>
+			      		</div>
+			      			<Popover 
+                            placement="bottom" 
+                            isOpen={this.state.calendarOpen}
+                            target="calendar1" 
+                            toggle={this.toggleCalendar}>
+                              <PopoverBody>
+                                <CalendarWidget onDaySelect={this.processDate}/>
+                              </PopoverBody>
+                           </Popover> 
+                    	
+                    	<Container style={{maxWidth:"1245px"}}>                   	
+             		   <div className="row justify-content-center">
+                    	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
                     	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
                     	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
@@ -429,17 +758,34 @@ class Quicklook extends Component{
                     	{this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
                     	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
                     	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
-                    	{this.state.activeTab === "user" && <User data={this.state.data}/>}
-                    </div>
-					</div>
-					</div>
-                 
-				
-				</div>
-				  </div>
+                    	{this.state.activeTab === "user" &&
+	                    	 <User  data={this.state.userInputData}/>
+                    	}
+                    	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
+                    	
+                   
+			</div>
+
+					</Container>
 					
+					</div>
+					{this.renderQlFetchOverlay()}
+					{this.renderQlCreateOverlay()}
+				</div>
+				</div>
+				
 		
 	);
 	}
 }
-export default connect(null,{fetchQuickLook})(Quicklook);
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(Quicklook));
+Navbar.propTypes={
+    fixed: PropTypes.string,
+    color: PropTypes.string,
+}

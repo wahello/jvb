@@ -1,75 +1,103 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Table,Button} from "reactstrap";
+import {Button} from "reactstrap";
+import {Table, Column, Cell} from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
+import Dimensions from 'react-dimensions';
 
+ class Sleep extends Component{
+	constructor(props){
+	super(props);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
 
-function renderTableRows(dateWiseData,category,field,classes=""){
-	let elements = [];
-	for(let [date,data] of Object.entries(dateWiseData)){
-		if(field === "created_at"){
-			elements.push(
-				<th key={date} className={classes}><h5>{date}</h5></th>
-			);	
-		}else{
-			elements.push(
-				<th key={date} className={classes}><h5>{data[category][field]}</h5></th>
-			);
+	 this.state = {
+      myTableData: [
+        {name: 'Sleep per Wearable (excluding awake time)'},
+        {name: 'Sleep Per User Input (excluding awake time)'},
+        {name: 'Sleep Aid'},
+        {name: 'Sleep Bed Time'}, 
+        {name: 'Sleep Awake Time'},
+        {name: 'Deep Sleep'},
+        {name: 'Light Sleep'},
+        {name: 'Awake Time'},                       
+      ],
+    };
+  }
+
+renderTableColumns(dateWiseData,category,classes=""){
+		let columns = [];
+		for(let [date,data] of Object.entries(dateWiseData)){
+
+			let all_data = [];
+			for(let [key,value] of Object.entries(data[category])){
+				if(key !== 'id' && key !== 'user_ql'){
+					if(value !== '-' && value !== undefined && value !== "" &&
+						(key == 'deep_sleep' ||
+						key == 'light_sleep' ||
+						key == 'awake_time' ||
+						key == 'sleep_per_wearable')){
+						let hm = value.split(':');
+						let time_str = `${hm[0]} hour ${hm[1]} min`;
+						all_data.push(time_str);
+					}
+					else all_data.push(value);
+				}
+			}
+
+			columns.push(
+				<Column 
+					header={<Cell>{date}</Cell>}
+			        cell={props => (
+				            <Cell {...props}>
+				              {all_data[props.rowIndex]}
+				            </Cell>
+				          )}
+			        width={134}
+				/>
+			)
 		}
+		return columns;
 	}
-	return elements;
+
+	 render(){
+	 	const {height, width, containerHeight, containerWidth, ...props} = this.props;
+		let rowsCount = this.state.myTableData.length;
+		return(
+			<div className="quick3"
+			 >
+			 <Table
+		        rowsCount={rowsCount}
+		        rowHeight={100}
+		        headerHeight={50}
+		        width={containerWidth}
+        		height={containerHeight}
+        		touchScrollEnabled={true}
+        		{...props}>
+		        <Column
+		          header={<Cell>Sleep</Cell>}
+		          cell={props => (
+		            <Cell {...props}>
+		              {this.state.myTableData[props.rowIndex].name}
+		            </Cell>
+		          )}
+		          width={167}
+		          fixed={true}
+		        />
+			    {this.renderTableColumns(this.props.data,"sleep_ql")}
+      		</Table>
+			</div>
+
+			);
+	}
 }
 
-
-const Sleep = (props) =>{
-
-	        return(
-						  <div className="quick3">
-                          <Table className="table table-responsive quick4">
-                         
-				         <tr className="quick8">
-				         <th >
-						  <h5>Sleep</h5>
-						  </th>
-						   {renderTableRows(props.data,"sleep_ql","created_at")}
-						</tr>
-					
-						 <tr>
-					        <td>Sleep Per Wearable</td>
-					        {renderTableRows(props.data,"sleep_ql","sleep_per_wearable")}				          
-				         </tr>
-				         <tr className="quick9">
-					        <td>Sleep Per User Input</td>
-					        {renderTableRows(props.data,"sleep_ql","sleep_per_wearable")}				          
-				         </tr>
-				         <tr>
-					        <td>Sleep Aid</td>
-					        {renderTableRows(props.data,"sleep_ql","sleep_aid")}				         
-				         </tr>
-				         <tr className="quick9">
-					        <td>Sleep Bed Time</td>
-					        {renderTableRows(props.data,"sleep_ql","sleep_bed_time")}				            
-				         </tr>
-				         <tr>
-					        <td>Sleep Awake Time</td>
-					        {renderTableRows(props.data,"sleep_ql","sleep_awake_time")}				            
-				         </tr>
-				         
-				         <tr className="quick9">
-					        <td>Deep Sleep</td>
-					        {renderTableRows(props.data,"sleep_ql","deep_sleep")}
-				           </tr>
-				          <tr>
-					        <td>Light Sleep</td>
-					        {renderTableRows(props.data,"sleep_ql","light_sleep")}				            
-				         </tr>
-				          <tr className="quick9">
-					        <td>Awake Time</td>
-					        {renderTableRows(props.data,"sleep_ql","awake_time")}				           
-				         </tr>
-                          </Table>
-                          </div>
-
-		);
-}
-export default Sleep;
+export default Dimensions({
+  getHeight: function(element) {
+    return window.innerHeight - 235;
+  },
+  getWidth: function(element) {
+    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    return window.innerWidth - widthOffset;
+  }
+})(Sleep);

@@ -1,32 +1,31 @@
 import moment from 'moment';
 	
-export function getInitialState(start_dt, end_dt=undefined){
-	// expect moment objects
-	if (end_dt === undefined){
-		end_dt = new moment(start_dt).add(6,'days'); 
-	}
+export function getInitialState(start_dt, end_dt){
+	start_dt = moment(start_dt);
+	end_dt = moment(end_dt);
 	var initial_state = {};
-
-	initial_state[start_dt.format('YYYY-MM-DD')] = {}
+	initial_state[end_dt.format('YYYY-MM-DD')] = {};
 
 	var diff = end_dt.diff(start_dt, 'days');
+
+	let tmp_end_date = moment(end_dt);
 	for(var i=0; i<diff; i++){
-		var dt = start_dt.add(1,'days');
+		var dt = tmp_end_date.subtract(1,'days');
 		var current_dt = dt.format('YYYY-MM-DD');
 		initial_state[current_dt]={};
  	}
-	 	
+ 		 	
 	let blank_properties={
 		"created_at":'',	
 		"grades_ql":{
 			    "overall_truth_grade": '-',
 		        "overall_truth_health_gpa": '-',
-		        "movement_non_exercise_grade": '-',
+		        "movement_non_exercise_steps_grade": '-',
 		        "movement_consistency_grade": '-',
 		        "avg_sleep_per_night_grade": '-',
 		        "exercise_consistency_grade": '-',
 		        "overall_workout_grade": '-',
-		        "prcnt_non_processed_food_consumed_grade": '-',
+		        "prcnt_unprocessed_food_consumed_grade": '-',
 		        "alcoholic_drink_per_week_grade": '-',
 		        "penalty": '-'
 
@@ -39,9 +38,12 @@ export function getInitialState(start_dt, end_dt=undefined){
 	        "workout_duration": '-',
 	        "maximum_elevation_workout": '-',
 	        "minutes_walked_before_workout": '-',
-	        "distance": '-',
+	        "distance_run": '-',
+	        "distance_bike":'-',
+	        "distance_swim":'-',
+	        "distance_other":'-',
 	        "pace": '-',
-	        "avg_heartrate": '-',
+	        "avg_heartrate": '{}',
 	        "elevation_gain": '-',
 	        "elevation_loss": '-',
 	        "effort_level": '-',
@@ -76,7 +78,8 @@ export function getInitialState(start_dt, end_dt=undefined){
 	        "workout_effortlvl_grade": '-',
 	        "avg_heartrate_grade": '-',
 	        "overall_workout_grade": '-',
-	        "heartrate_variability_grade": '-',
+	        "heartrate_variability_stress": '-',
+	        "fitness_age":'-',
 	        "workout_comment": '-'
 	    },
 	    "swim_stats_ql": {    
@@ -116,55 +119,9 @@ export function getInitialState(start_dt, end_dt=undefined){
 	    },
 	    "alcohol_ql": {
 	        "alcohol_day": '-',
-	        "alcohol_week": '-'
-	    },
-	    "strong_input":{
-
-	    	"user_id":'-',
-	    	"workout":'-',
-	    	"workout_easy":'-',
-	    	"workout_effort":'-',
-            "workout_effort_hard_portion":'-',
-            "prcnt_processed_food":'-',
-	        "unprocessed_food_list":'-',
-	        "processed_food_list":'-',
-	        "alchol_consumed":'-',
-        	"alcohol_drink_consumed_list":'-',
-        	"sleep_hours_last_night":'-',
-	        "sleep_mins_last_night":'-',
-	        "sleep_comment":'-',
-	        "prescription_sleep_aids":'-',
-	        "sleep_aid_taken":'-',
-	        "smoke_substances":'-',
-	        "smoked_substance_list":'-',
-	        "medications":'-',
-	        "medications_taken_list":'-'
-
-	    },
-	    "encouraged_input":{
-	    	 "stress":'-',
-	    	 "pain":'-',
-        	 "pain_area":'-',
-        	 "water_consumed":'-',
-        	 "breath_nose":'-'
-	    },
-	    "optional_input":{
-	    	  "food_consumed":'-',
-	    	  "chia_seeds":'-',
-	    	  "fasted":'-',
-              "food_ate_before_workout":'-',
-              "calories":'-',
-              "calories_item":'-',
-              "workout_enjoyable":'-',
-              "workout_comment":'-',
-              "weight":'-',
-       		  "waist":'-',
-       		  "sick":'-',
-              "sickness":'-',
-              "stand":'-',
-              "diet_type":'-',
-       		  "general_comment":'-'
+	        "alcohol_week": '-' 
 	    }
+
 
 	};
 	for(const day of Object.keys(initial_state)){

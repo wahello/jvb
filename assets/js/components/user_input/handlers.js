@@ -7,30 +7,57 @@ export function handleChange(event){
   });
 }
 
+export function handleChangeSleepBedTime(date){
+  const name = event.target.name;
+  this.setState({
+      sleep_bedtime: date
+    });
+}
+
+export function handleChangeSleepAwakeTime(date){
+  const name = event.target.name;
+  this.setState({
+      sleep_awake_time: date
+    });
+}
+
+export function handleChangeWorkoutDone(event){
+  const value = event.target.value;
+  if(value === 'no' || value === 'not yet'){
+      this.setState({
+        workout:value,
+        workout_type:'',
+        workout_input_type:'',
+        workout_easy:'',
+        workout_effort:'',
+        workout_effort_hard_portion:'',
+        workout_enjoyable:'',
+        pain:'',
+        pain_area:'',
+        water_consumed:'',
+        breath_nose:'',
+        chia_seeds:'',
+        calories:'',
+        calories_item:'',
+        fasted:'', 
+        food_ate_before_workout:'',         
+        workout_comment:''
+    });
+  }else{
+    this.setState({
+      workout:value
+    });
+  }
+}
+
 export function handleChangeWorkout(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
-  if (value === "no workout today"){
-	this.setState({
-	  workout_easy:value,
-	  workout_effort:value,
-	  workout_effort_hard_portion:value,
-	  workout_enjoyable:value,
-	  pain:value,
-	  water_consumed:value,
-	  breath_nose:value,
-	  chia_seeds:value,
-	  calories:'No Workout Today',
-	  fasted:value,          
-	  calories_item:'No Workout Today',
-	  workout_comment:'No Workout Today'
-	});
-  }else{
-	  this.setState({
+
+  this.setState({
 	  workout_easy:value
 	});
-  }
 }
 
 export function handleChangeWorkoutEffort(event){
@@ -43,16 +70,19 @@ export function handleChangeWorkoutEffort(event){
   });
 }
 
-
-
 export function handleChangePain(event){
   const target = event.target;
   const value = target.value;
-  const name = target.name;
-
-  this.setState({
-	pain:value
-  });
+  if (value === 'no'){
+    this.setState({
+    	pain:value,
+      pain_area:''
+    });
+  }else{
+    this.setState({
+      pain:value
+    });
+  }
 }
 
 export function handleChangeProcessedFood(event){
@@ -119,8 +149,9 @@ export function handleChangePrescription(event){
   }else{
     this.setState({
       medications:value,
-      medications_taken_list:''
-    })
+      medications_taken_list:'',
+      controlled_uncontrolled_substance:''
+    });
   }
 }
 
@@ -188,5 +219,40 @@ export function handleChangeAlcoholDrink(event){
     this.setState({
       alchol_consumed:value
     });
+  }
+}
+
+export function handleCaloriesItemCheck(){
+  if(this.state.calories_item_check){
+    this.setState({
+      calories_item_check:!this.state.calories_item_check,
+      calories:'',
+      calories_item:''
+    });
+  }
+  else{
+    this.setState({
+      calories_item_check:!this.state.calories_item_check
+    });
+  }
+}
+
+export function handleWeatherCheck(){
+  if(this.state.weather_check){
+    this.setState({
+      weather_check:!this.state.weather_check,
+      indoor_temperature:'',
+      outdoor_temperature:'',
+      temperature_feels_like:'',
+      wind:'',
+      dewpoint:'',
+      humidity:'',
+      weather_comment:''
+    });
+  }
+  else{
+    this.setState({
+      weather_check:!this.state.weather_check
+    })
   }
 }
