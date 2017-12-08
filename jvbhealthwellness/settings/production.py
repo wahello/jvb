@@ -80,6 +80,9 @@ INSTALLED_APPS += ['opbeat.contrib.django']
 MIDDLEWARE.insert(  # insert OpbeatAPMMiddleware on the top
     0, 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware')
 
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
