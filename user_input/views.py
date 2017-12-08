@@ -13,57 +13,59 @@ from .models import UserDailyInput
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):
-	def enforce_csrf(self, request):
-		return
+    def enforce_csrf(self, request):
+        return
 
 class UserDailyInputView(generics.ListCreateAPIView):
 
-	'''
-		- Create the userDailyInput instance
-		- List all the userDailyInput instance
-		- If query parameters "to" and "from" are provided
-		  then filter the userDailyInput data for provided date interval
-		  and return the list
-	'''
-	authentication_classes = (CsrfExemptSessionAuthentication,)
-	permission_classes = (IsAuthenticated,)
-	serializer_class = UserDailyInputSerializer
+    '''
+        - Create the userDailyInput instance
+        - List all the userDailyInput instance
+        - If query parameters "to" and "from" are provided
+          then filter the userDailyInput data for provided date interval
+          and return the list
+    '''
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserDailyInputSerializer
 
-	def get_queryset(self):
-		user = self.request.user
-		start_dt = self.request.query_params.get('from',None)
-		end_dt = self.request.query_params.get('to',None)
+    def get_queryset(self):
+        user = self.request.user
+        start_dt = self.request.query_params.get('from',None)
+        end_dt = self.request.query_params.get('to',None)
 
-		if start_dt and end_dt:
-			return UserDailyInput.objects.filter(Q(created_at__gte=start_dt)&
-												 Q(created_at__lte=end_dt),
-												 user = user)
-		else:
-			return UserDailyInput.objects.all()
+        if start_dt and end_dt:
+            return UserDailyInput.objects.filter(Q(created_at__gte=start_dt)&
+                                                 Q(created_at__lte=end_dt),
+                                                 user = user)
+        else:
+            return UserDailyInput.objects.all()
 
 class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
-	'''
-		GET for getting particular model instance
-		PUT for updating particular model instance
-		DELETE for deleting particular model instance
-		
-		-displays only current user data not others (for now)
-		-search item based on provided date
-	'''
-	permission_classes = (IsAuthenticated,)
-	serializer_class = UserDailyInputSerializer
+    '''
+        GET for getting particular model instance
+        PUT for updating particular model instance
+        DELETE for deleting particular model instance
+        
+        -displays only current user data not others (for now)
+        -search item based on provided date
+    '''
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserDailyInputSerializer
 
-	def get_queryset(self):
-		user = self.request.user
-		qs = UserDailyInput.objects.filter(user=user)
-		return qs
+    def get_queryset(self):
+        user = self.request.user
+        qs = UserDailyInput.objects.filter(user=user)
+        return qs
 
-	def get_object(self):
-		qs = self.get_queryset()
-		if self.request.method == 'GET':
-			dt = self.request.GET.get('created_at')
-		if self.request.method == 'PUT':
-			dt = self.request.data.get('created_at')
-		print(dt)
-		obj = get_object_or_404(qs,created_at=dt)
-		return obj
+    def get_object(self):
+        qs = self.get_queryset()
+        if self.request.method == 'GET':
+            dt = self.request.GET.get('created_at')
+        if self.request.method == 'PUT':
+            dt = self.request.data.get('created_at')
+        qs = qs.filter(created_at=dt)
+        if qs.exists():
+            return qs[0]
+        else:
+            return None
