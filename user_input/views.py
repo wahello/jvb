@@ -65,10 +65,10 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
             dt = self.request.GET.get('created_at')
         if self.request.method == 'PUT':
             dt = self.request.data.get('created_at')
-        qs = qs.filter(created_at=dt)
-        if qs.exists():
-            return qs[0]
-        else:
+        try:
+            obj = qs.get(created_at=dt)
+            return obj
+        except UserDailyInput.DoesNotExist:
             return None
 
     def get(self,request, format=None):
