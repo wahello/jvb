@@ -73,6 +73,7 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self,request, format=None):
         user_input = self.get_object()
+        print("/n/nUSER INPUT:",user_input)
         if user_input:
             serializers = UserDailyInputSerializer(user_input)
             return Response(serializers.data)
