@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import NavbarMenu from '../navbar';
 
+import _ from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import Textarea from 'react-textarea-autosize';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -171,105 +172,110 @@ class UserInputs extends React.Component{
     }
     
     onFetchSuccess(data,clone_form=undefined){
-      const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                        'high carb','ketogenic diet','whole foods/mostly unprocessed'];
-      const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
-                              'wind','dewpoint','humidity','weather_comment'];
-      let other_diet = true;
-      let was_cloning = this.state.cloning_data;
-      let has_weather_data = false;
-      let has_calories_data = false;
 
-      for(let diet of DIET_TYPE){
-        if(data.data.optional_input.type_of_diet_eaten === diet)
-          other_diet = false;
-      }
-      
-      for(let field of WEATHER_FIELDS){
-        if(!has_weather_data){
-          if((data.data.strong_input[field] != '') &&
-             (data.data.strong_input[field] !== undefined))
-            has_weather_data = true;
+      if (_.isEmpty(data.data))
+        self.onFetchFailure(data);
+      else {
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+        const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
+                                'wind','dewpoint','humidity','weather_comment'];
+        let other_diet = true;
+        let was_cloning = this.state.cloning_data;
+        let has_weather_data = false;
+        let has_calories_data = false;
+
+        for(let diet of DIET_TYPE){
+          if(data.data.optional_input.type_of_diet_eaten === diet)
+            other_diet = false;
         }
+        
+        for(let field of WEATHER_FIELDS){
+          if(!has_weather_data){
+            if((data.data.strong_input[field] != '') &&
+               (data.data.strong_input[field] !== undefined))
+              has_weather_data = true;
+          }
+        }
+
+        if((data.data.optional_input.calories_consumed_during_workout != '' &&
+            data.data.optional_input.calories_consumed_during_workout != undefined)||
+            (data.data.optional_input.food_ate_during_workout != '' && 
+             data.data.optional_input.food_ate_during_workout != undefined)){
+          has_calories_data = true;
+        }
+
+        this.setState({
+          fetched_user_input_created_at:data.data.created_at,
+          update_form:clone_form,
+          diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+          cloning_data:false,
+          fetching_data:false,
+          weather_check: has_weather_data,
+          calories_item_check:has_calories_data,
+          editable: was_cloning ? true : false,
+
+          workout:data.data.strong_input.workout,
+          workout_type:data.data.strong_input.workout_type,
+          workout_input_type: data.data.strong_input.workout_input_type,
+          workout_easy:data.data.strong_input.work_out_easy_or_hard,
+          workout_enjoyable:data.data.optional_input.workout_enjoyable,
+          workout_effort:data.data.strong_input.workout_effort_level,
+          workout_effort_hard_portion:data.data.strong_input.hard_portion_workout_effort_level,
+          pain:data.data.encouraged_input.pains_twings_during_or_after_your_workout,
+          pain_area:data.data.encouraged_input.pain_area,
+          water_consumed:data.data.encouraged_input.water_consumed_during_workout,
+          chia_seeds:data.data.optional_input.chia_seeds_consumed_during_workout,
+          breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
+          prcnt_processed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
+          unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
+          processed_food_list:data.data.strong_input.list_of_processed_food_consumed_yesterday,
+          alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
+          alcohol_drink_consumed_list:data.data.strong_input.alcohol_drink_consumed_list,
+          stress:data.data.encouraged_input.stress_level_yesterday,
+          sick:data.data.optional_input.sick,
+          sickness:data.data.optional_input.sickness,
+          fasted:data.data.optional_input.fasted_during_workout,
+          food_ate_before_workout:data.data.optional_input.food_ate_before_workout,
+          workout_comment:data.data.optional_input.general_Workout_Comments,
+          calories:data.data.optional_input.calories_consumed_during_workout,
+          calories_item:data.data.optional_input.food_ate_during_workout,
+
+          indoor_temperature:data.data.strong_input.indoor_temperature,
+          outdoor_temperature:data.data.strong_input.outdoor_temperature,
+          temperature_feels_like:data.data.strong_input.temperature_feels_like,
+          wind:data.data.strong_input.wind,
+          dewpoint:data.data.strong_input.dewpoint,
+          humidity:data.data.strong_input.humidity,
+          weather_comment:data.data.strong_input.weather_comment,
+
+          sleep_hours_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0],
+          sleep_mins_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1],
+          sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
+          sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
+          awake_hours:data.data.strong_input.awake_time.split(':')[0],
+          awake_mins:data.data.strong_input.awake_time.split(':')[1],
+          sleep_comment:data.data.strong_input.sleep_comment,
+          prescription_sleep_aids:data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
+          sleep_aid_taken:data.data.strong_input.sleep_aid_taken,
+          smoke_substances:data.data.strong_input.smoke_any_substances_whatsoever,
+          smoked_substance_list:data.data.strong_input.smoked_substance,
+          medications:data.data.strong_input.prescription_or_non_prescription_medication_yesterday,
+          medications_taken_list:data.data.strong_input.prescription_or_non_prescription_medication_taken,
+          controlled_uncontrolled_substance:data.data.strong_input.controlled_uncontrolled_substance,
+          stand:data.data.optional_input.stand_for_three_hours,
+          food_consumed:data.data.optional_input.list_of_processed_food_consumed_yesterday,
+          weight:data.data.optional_input.weight,
+          waist:data.data.optional_input.waist_size,
+          clothes_size:data.data.optional_input.clothes_size,
+          heart_variability:data.data.optional_input.heart_rate_variability,
+          breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
+          breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
+          diet_type:data.data.optional_input.type_of_diet_eaten,
+          general_comment:data.data.optional_input.general_comment
+        });
+        window.scrollTo(0,0);
       }
-
-      if((data.data.optional_input.calories_consumed_during_workout != '' &&
-          data.data.optional_input.calories_consumed_during_workout != undefined)||
-          (data.data.optional_input.food_ate_during_workout != '' && 
-           data.data.optional_input.food_ate_during_workout != undefined)){
-        has_calories_data = true;
-      }
-
-      this.setState({
-        fetched_user_input_created_at:data.data.created_at,
-        update_form:clone_form,
-        diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
-        cloning_data:false,
-        fetching_data:false,
-        weather_check: has_weather_data,
-        calories_item_check:has_calories_data,
-        editable: was_cloning ? true : false,
-
-        workout:data.data.strong_input.workout,
-        workout_type:data.data.strong_input.workout_type,
-        workout_input_type: data.data.strong_input.workout_input_type,
-        workout_easy:data.data.strong_input.work_out_easy_or_hard,
-        workout_enjoyable:data.data.optional_input.workout_enjoyable,
-        workout_effort:data.data.strong_input.workout_effort_level,
-        workout_effort_hard_portion:data.data.strong_input.hard_portion_workout_effort_level,
-        pain:data.data.encouraged_input.pains_twings_during_or_after_your_workout,
-        pain_area:data.data.encouraged_input.pain_area,
-        water_consumed:data.data.encouraged_input.water_consumed_during_workout,
-        chia_seeds:data.data.optional_input.chia_seeds_consumed_during_workout,
-        breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
-        prcnt_processed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
-        unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
-        processed_food_list:data.data.strong_input.list_of_processed_food_consumed_yesterday,
-        alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
-        alcohol_drink_consumed_list:data.data.strong_input.alcohol_drink_consumed_list,
-        stress:data.data.encouraged_input.stress_level_yesterday,
-        sick:data.data.optional_input.sick,
-        sickness:data.data.optional_input.sickness,
-        fasted:data.data.optional_input.fasted_during_workout,
-        food_ate_before_workout:data.data.optional_input.food_ate_before_workout,
-        workout_comment:data.data.optional_input.general_Workout_Comments,
-        calories:data.data.optional_input.calories_consumed_during_workout,
-        calories_item:data.data.optional_input.food_ate_during_workout,
-
-        indoor_temperature:data.data.strong_input.indoor_temperature,
-        outdoor_temperature:data.data.strong_input.outdoor_temperature,
-        temperature_feels_like:data.data.strong_input.temperature_feels_like,
-        wind:data.data.strong_input.wind,
-        dewpoint:data.data.strong_input.dewpoint,
-        humidity:data.data.strong_input.humidity,
-        weather_comment:data.data.strong_input.weather_comment,
-
-        sleep_hours_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0],
-        sleep_mins_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1],
-        sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
-        sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
-        awake_hours:data.data.strong_input.awake_time.split(':')[0],
-        awake_mins:data.data.strong_input.awake_time.split(':')[1],
-        sleep_comment:data.data.strong_input.sleep_comment,
-        prescription_sleep_aids:data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
-        sleep_aid_taken:data.data.strong_input.sleep_aid_taken,
-        smoke_substances:data.data.strong_input.smoke_any_substances_whatsoever,
-        smoked_substance_list:data.data.strong_input.smoked_substance,
-        medications:data.data.strong_input.prescription_or_non_prescription_medication_yesterday,
-        medications_taken_list:data.data.strong_input.prescription_or_non_prescription_medication_taken,
-        controlled_uncontrolled_substance:data.data.strong_input.controlled_uncontrolled_substance,
-        stand:data.data.optional_input.stand_for_three_hours,
-        food_consumed:data.data.optional_input.list_of_processed_food_consumed_yesterday,
-        weight:data.data.optional_input.weight,
-        waist:data.data.optional_input.waist_size,
-        clothes_size:data.data.optional_input.clothes_size,
-        heart_variability:data.data.optional_input.heart_rate_variability,
-        breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
-        breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
-        diet_type:data.data.optional_input.type_of_diet_eaten,
-        general_comment:data.data.optional_input.general_comment
-      });
-      window.scrollTo(0,0);
     }
     
     onFetchFailure(error){
@@ -1540,6 +1546,7 @@ handleScroll() {
                             }                          
                           </FormGroup>
 
+                          {/*
                            <FormGroup>
                           
                             <Label className="padding">2.1 Sleep Bed Time</Label>
@@ -1645,6 +1652,7 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
+                        */}
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>

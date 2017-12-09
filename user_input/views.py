@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication 
 
@@ -69,3 +70,11 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
             return qs[0]
         else:
             return None
+
+    def get(self,request, format=None):
+        user_input = self.get_object()
+        if user_input:
+            serializers = UserDailyInputSerializer(user_input)
+            return Response(serializers.data)
+        else:
+            return Response({})
