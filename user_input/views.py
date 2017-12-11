@@ -64,6 +64,5 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
 			dt = self.request.GET.get('created_at')
 		if self.request.method == 'PUT':
 			dt = self.request.data.get('created_at')
-		print(dt)
 		obj = get_object_or_404(qs,created_at=dt)
 		return obj

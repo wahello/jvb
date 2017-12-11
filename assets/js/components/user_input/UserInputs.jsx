@@ -171,6 +171,7 @@ class UserInputs extends React.Component{
     }
     
     onFetchSuccess(data,clone_form=undefined){
+      console.log(data.data);
       const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                         'high carb','ketogenic diet','whole foods/mostly unprocessed'];
       const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
@@ -208,7 +209,7 @@ class UserInputs extends React.Component{
         fetching_data:false,
         weather_check: has_weather_data,
         calories_item_check:has_calories_data,
-        editable: was_cloning ? true : false,
+        editable: was_cloning?true:false,
 
         workout:data.data.strong_input.workout,
         workout_type:data.data.strong_input.workout_type,
