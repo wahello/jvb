@@ -725,6 +725,7 @@ def cal_overall_grade_gpa(grades):
 		Return tuple (overall grade, overall health gpa)
 	'''
 	GRADE_POINT = {'A':4,'B':3,'C':2,'D':1,'F':0}
+	grades = grades.copy()
 	grades.pop('overall_truth_grade')
 	grades.pop('overall_truth_health_gpa')
 	penalty = grades.pop('penalty')
@@ -807,9 +808,25 @@ def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
 	return (grade, point)
 
 def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
-	point_range = _get_avg_hr_points_range(age, workout_easy_hard)
-	if point_range:
-		pass
+	prange = _get_avg_hr_points_range(age, workout_easy_hard)
+	if prange and avg_heartrate:
+		if avg_heartrate >= prange[4].min and avg_heartrate <= prange[4].max:
+			grade = 'A'
+			point = 4
+		elif avg_heartrate >= prange[3].min and avg_heartrate <= prange[3].max:
+			grade = 'B'
+			point = 3
+		elif avg_heartrate >= prange[2].min and avg_heartrate <= prange[2].max:
+			grade = 'C'
+			point = 2
+		elif avg_heartrate >= prange[1].min and avg_heartrate <= prange[1].max:
+			grade = 'D'
+			point = 1
+		elif avg_heartrate <= prange[0].min or avg_heartrate >= prange[0].max:
+			grade = 'F'
+			point = 0
+		return (grade, point)
+	return None
 
 def get_avg_sleep_grade(daily_strong,current_date):
 	for q in daily_strong:
@@ -872,6 +889,10 @@ def get_workout_effort_grade(todays_daily_strong):
 		workout_effort_level = ''
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
+def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong):
+	filtered_activities = todays_activities.copy()
+	for act in todays_activities:
+		pass
 
 def get_weather_data(todays_daily_strong,todays_activities,
 					 todays_manually_updated, todays_date_epoch):
