@@ -508,6 +508,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 				time_interval = hour_start.strftime("%I %p")+" to "+hour_end.strftime("%I %p")
 
 				steps_in_interval = movement_consistency[time_interval].get('steps')
+				status = "sleeping"
 
 				if hour_start >= yesterday_bedtime:
 					if (datetime.combine(hour_start.date(),time(hour_start.hour)) <= today_awake_time):
