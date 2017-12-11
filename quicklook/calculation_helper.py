@@ -438,7 +438,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 			if 'running' in obj.get('activityType','').lower():
 				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
-				avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond")
+				avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond",0)
 				runs_count += 1
 
 			elif 'swimming' in obj.get('activityType','').lower():
