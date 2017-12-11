@@ -35,6 +35,9 @@ class Grades(models.Model):
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=1, blank=True)
 	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1, blank=True)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
+	workout_duration_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
+	workout_effortlvl_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
+	avg_exercise_hr_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
 	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES,
 															 max_length=1, blank=True)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone,time
-from collections import OrderedDict
+from collections import OrderedDict,namedtuple
 import json, ast
 import requests
 
@@ -469,6 +469,24 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 	return activity_stats
 
+def _get_avg_hr_points_range(age,workout_easy_hard):
+	Range = namedtuple('Range',['min','max'])
+	point_range  = {}
+	if workout_easy_hard == 'easy':
+		point_range[4] = Range(180-age+5-30, 180-age+5)
+		point_range[3] = Range(180-age+6, 180-age+9)
+		point_range[2] = Range(180-age+10, 180-age+13)
+		point_range[1] = Range(180-age+14,180-age+14)
+		point_range[0] = Range(180-age-31, 180-age+15)
+	elif workout_easy_hard == 'hard':
+		point_range[4] = Range(180-age+25, 180-age+59)
+		point_range[3] = Range(180-age+20, 180-age+24)
+		point_range[2] = Range(180-age+10, 180-age+19)
+		point_range[1] = Range(180-age+5,180-age+9)
+		point_range[0] = Range(180-age+4, 180-age+60)
+	else:
+		return None
+	return point_range
 
 def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	
@@ -730,6 +748,69 @@ def cal_penalty(is_smoke,is_ctrl_subs):
 	ctrl_subs_penalty = -3.1 if is_ctrl_subs == 'yes' else 0
 	return smoke_penalty + ctrl_subs_penalty
 
+def cal_workout_duration_grade(duration_in_min):
+	if duration_in_min >= 60:
+		grade = 'A'
+		point = 4
+	elif duration_in_min  >=30 and duration_in_min <= 59:
+		grade = 'B'
+		point = 3
+	elif duration_in_min >= 15 and duration_in_min <= 29:
+		grade = 'C'
+		point = 2
+	elif duration_in_min >= 1 and duration_in_min <= 14:
+		grade = 'D'
+		point = 1
+	elif duration_in_min < 1:
+		grade = 'F'
+		point = 0
+
+	return (grade, point)
+
+def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
+	grade = 'F'
+	point  = 0
+	if workout_easy_hard and effort_level:
+		if workout_easy_hard == 'easy':
+			if effort_level >= 1 and effort_level <= 4:
+				grade = 'A'
+				point = 4
+			elif effort_level == 5:
+				grade = 'B'
+				point = 3
+			elif effort_level >= 6 and effort_level <= 7:
+				grade = 'C'
+				point = 2
+			elif effort_level == 8:
+				grade = 'D'
+				point = 1
+			elif effort_level >= 9 and effort_level <= 10:
+				grade = 'F'
+				point = 0
+		elif workout_easy_hard == 'hard':
+			if effort_level >= 1 and effort_level <= 3:
+				grade = 'F'
+				point = 0
+			elif effort_level >= 4 and effort_level <= 5:
+				grade = 'D'
+				point = 1
+			elif effort_level == 6:
+				grade = 'C'
+				point = 2
+			elif effort_level == 7:
+				grade = 'B'
+				point = 3
+			elif effort_level >= 8 and effort_level <= 10:
+				grade = 'A'
+				point = 4
+
+	return (grade, point)
+
+def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
+	point_range = _get_avg_hr_points_range(age, workout_easy_hard)
+	if point_range:
+		pass
+
 def get_avg_sleep_grade(daily_strong,current_date):
 	for q in daily_strong:
 		if (q.user_input.created_at == current_date.date() and 
@@ -770,6 +851,27 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 	hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
 	grades = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
 	return grades 
+
+def get_workout_duration_grade(todays_activities):
+	'''
+		Returns a tuple having grade and point (grade, point)
+	'''
+	duration = 0
+	if todays_activities:
+		for act in todays_activities:
+			duration += act.get('durationInSeconds',0)
+	return cal_workout_duration_grade(duration//60)
+
+def get_workout_effort_grade(todays_daily_strong):
+	'''
+		Returns a tuple having grade and point (grade, point)
+	'''
+	workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
+	workout_effort_level = safe_get(todays_daily_strong,'workout_effort_level',-1)
+	if workout_effort_level == -1:
+		workout_effort_level = ''
+	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
+
 
 def get_weather_data(todays_daily_strong,todays_activities,
 					 todays_manually_updated, todays_date_epoch):
