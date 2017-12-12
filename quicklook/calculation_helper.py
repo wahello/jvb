@@ -124,13 +124,16 @@ def update_helper(instance,data_dict):
 def get_blank_model_fields(model):
 	if model == "grade":
 		fields = {
-			'overall_truth_grade':'',
-			'overall_truth_health_gpa':0,
+			'overall_health_grade':'',
+			'overall_health_gpa':0,
 			'movement_non_exercise_steps_grade':'' ,
 			'movement_consistency_grade': '' ,
 			'avg_sleep_per_night_grade':'',
 			'exercise_consistency_grade':'' ,
 			'overall_workout_grade':'',
+			'workout_duration_grade':'',
+			'workout_effortlvl_grade':'',
+			'avg_exercise_hr_grade':'',
 			'prcnt_unprocessed_food_consumed_grade':'',
 			'alcoholic_drink_per_week_grade':'' ,
 			'penalty':0
@@ -720,29 +723,39 @@ def cal_exercise_consistency_grade(workout_over_period, hr90_duration_15min, per
 	elif avg_point_week < 1:
 		return 'F' 
 	
-def cal_overall_grade_gpa(grades):
+def cal_overall_workout_grade(gpa):
 	'''
 		Return tuple (overall grade, overall health gpa)
 	'''
-	GRADE_POINT = {'A':4,'B':3,'C':2,'D':1,'F':0}
-	grades = grades.copy()
-	grades.pop('overall_truth_grade')
-	grades.pop('overall_truth_health_gpa')
-	penalty = grades.pop('penalty')
-	avg_points = (sum([GRADE_POINT[v] for v in grades.values()]) + penalty)/len(grades)
-	
-	if avg_points >= 3.4:
+	if gpa >= 3.4:
 		grade = 'A'
-	elif avg_points >= 3 and avg_points < 3.4:
+	elif gpa >= 3 and gpa < 3.4:
 		grade = 'B'
-	elif avg_points >= 2 and avg_points < 3:
+	elif gpa >= 2.5 and gpa < 3:
 		grade = 'C'
-	elif avg_points >= 1 and avg_points < 2:
+	elif gpa >= 2 and gpa < 2.5:
 		grade = 'D'
-	elif avg_points < 1:
+	elif gpa < 2:
 		grade = 'F'
 
-	return(grade, avg_points) 
+	return(grade, gpa)
+
+def cal_overall_grade(gpa):
+	'''
+		Return tuple (overall grade, overall health gpa)
+	'''
+	if gpa >= 3.4:
+		grade = 'A'
+	elif gpa >= 3 and gpa < 3.4:
+		grade = 'B'
+	elif gpa >= 2 and gpa < 3:
+		grade = 'C'
+	elif gpa >= 1 and gpa < 2:
+		grade = 'D'
+	elif gpa < 1:
+		grade = 'F'
+
+	return(grade, gpa)
 
 def cal_penalty(is_smoke,is_ctrl_subs):
 	smoke_penalty = -3.1 if is_smoke == 'yes' else 0
@@ -826,7 +839,7 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 			grade = 'F'
 			point = 0
 		return (grade, point)
-	return None
+	return (None, None)
 
 def get_avg_sleep_grade(daily_strong,current_date):
 	for q in daily_strong:
@@ -889,10 +902,63 @@ def get_workout_effort_grade(todays_daily_strong):
 		workout_effort_level = ''
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
-def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong):
+def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong,age):
 	filtered_activities = todays_activities.copy()
-	for act in todays_activities:
-		pass
+	total_duration = 0
+	for i,act in enumerate(todays_activities):
+		if not act.get('averageHeartRateInBeatsPerMinute',None):
+			filtered_activities.pop(i)
+		elif 'swimming' in act.get('activityType','').lower():
+			filtered_activities.pop(i)
+		elif act.get('activityType','') == 'STRENGTH_TRAINING':
+			filtered_activities.pop(i)
+		elif act.get('activityType','') == 'OTHER':
+			filtered_activities.pop(i)
+		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
+			filtered_activities.pop(i)
+		else:
+			total_duration += act.get('durationInSeconds',0)
+	if filtered_activities:
+		avg_hr = 0
+		for act in filtered_activities:
+			avg_hr += (act.get('durationInSeconds',0) / total_duration) *\
+					   act.get('averageHeartRateInBeatsPerMinute',0)
+		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
+		return cal_avg_exercise_heartrate_grade(avg_hr,workout_easy_hard,age)
+	else:
+		return (None, None)
+
+def get_overall_workout_grade(wout_duration_pt, wout_effortlvl_pt, avg_exercise_hr_pt):
+	if avg_exercise_hr_pt:
+		workout_avg_point = round(
+			(wout_duration_pt + wout_effortlvl_pt + avg_exercise_hr_pt)/3, 2)
+	else:
+		workout_avg_point = round(
+			(wout_duration_pt + wout_effortlvl_pt)/2, 2)
+
+	grade_pt = cal_overall_workout_grade(workout_avg_point)
+	return grade_pt
+
+def get_overall_grade(grades):
+	GRADES = {'A':4,'B':3,'C':2,'D':1,'F':0,'':0,'N/A':0}
+	non_exercise_step_grade = grades.get('movement_non_exercise_steps_grade')
+	movement_consistency_grade = grades.get('movement_consistency_grade')
+	avg_sleep_per_night_grade = grades.get('avg_sleep_per_night_grade')
+	exercise_consistency_grade = grades.get('exercise_consistency_grade')
+	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
+	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
+	overall_workout_grade = grades.get('overall_workout_grade')
+	penalty = grades.get('penalty')
+
+	gpa = round((GRADES[non_exercise_step_grade]+
+		   GRADES[movement_consistency_grade]+
+		   GRADES[avg_sleep_per_night_grade]+
+		   GRADES[exercise_consistency_grade]+
+		   GRADES[prcnt_unprocessed_food_grade]+
+		   GRADES[alcoholic_drink_per_week_grade]+
+		   GRADES[overall_workout_grade]+
+		   penalty) / 7,2)
+	return cal_overall_grade(gpa)
 
 def get_weather_data(todays_daily_strong,todays_activities,
 					 todays_manually_updated, todays_date_epoch):
@@ -1107,7 +1173,29 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Alcohol
 		alcohol_today = safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday","")
 		alcohol_calculated_data['alcohol_day'] = '' if not alcohol_today else alcohol_today
-		# Calculation of grades
+		
+		# **************************************CALCULATION OF GRADES**************************************
+		
+		# Workout duration grade calculation
+		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json)
+		grades_calculated_data['workout_duration_grade'] = workout_duration_grade_pts[0]
+
+		# Workout effort level grade calculation
+		workout_effortlvl_grade_pts = get_workout_effort_grade(todays_daily_strong)
+		grades_calculated_data['workout_effortlvl_grade'] = workout_effortlvl_grade_pts[0]
+
+		# Average exercise heartrate grade calculation
+		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
+									todays_daily_strong, user.profile.age())
+		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
+		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
+
+		# Overall workout grade calculation
+		overall_workout_grade_pt = get_overall_workout_grade(
+								workout_duration_grade_pts[1],
+								workout_effortlvl_grade_pts[1],
+								avg_exercise_hr_grade_pts[1])
+		grades_calculated_data['overall_workout_grade'] = overall_workout_grade_pt[0]
 
 		# Average sleep per night grade calculation
 		grades_calculated_data['avg_sleep_per_night_grade'] = get_avg_sleep_grade(todays_daily_strong, current_date)
@@ -1154,6 +1242,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 			safe_get(todays_daily_strong,"controlled_uncontrolled_substance","")
 		)
 		grades_calculated_data["penalty"] = penalty
+
+		# Overall Grade and Overall GPA calculation
+		overall_grade_pt = get_overall_grade(grades_calculated_data)
+		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
+		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
