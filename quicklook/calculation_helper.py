@@ -438,6 +438,9 @@ def get_activity_stats(activities_json,manually_updated_json):
 				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
 					obj.get('durationInSeconds',0) >= 900):
 					activity_stats['hr90_duration_15min'] = True
+				elif ('swimming' in obj.get('activityType').lower() and #HR is not required for swimming activities
+					  obj.get('durationInSeconds',0) >= 900):
+					activity_stats['hr90_duration_15min'] = True
 
 			if 'running' in obj.get('activityType','').lower():
 				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
@@ -661,7 +664,7 @@ def cal_unprocessed_food_grade(prcnt_food):
  	elif (prcnt_food < 50):
  		return 'F'
 
-def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
+def cal_alcohol_drink_grade(alcohol_drank_past_week, gender,period):
 	'''
 	Calculate Average alcohol dring a week and grade
 	return tuple (grade,average drink)
@@ -669,7 +672,7 @@ def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
 	alcohol_drank_past_week = ['21' if x == '20+' else x
 								for x in alcohol_drank_past_week]
 
-	drink_avg = sum(map(float,alcohol_drank_past_week))/7
+	drink_avg = (sum(map(float,alcohol_drank_past_week))/period)*7
 	grade = ''
 
 	if gender == 'M':
@@ -884,7 +887,7 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 		[q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
 		for q in daily_strong],
-		user.profile.gender)
+		user.profile.gender,7)
 	return alcohol_stats
 
 def get_exercise_consistency_grade(workout_over_period,weekly_activities,
