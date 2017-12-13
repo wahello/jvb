@@ -82,6 +82,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Cache configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

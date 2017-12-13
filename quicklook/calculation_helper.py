@@ -503,7 +503,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
-
+	
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
@@ -540,7 +540,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 					else:
 						status = "active" if data.get('steps') + steps_in_interval > 300 else "inactive"
 
-				if not status == "sleeping": 
+				if not status == "sleeping":
 					movement_consistency[time_interval]['steps']\
 						= steps_in_interval + data.get('steps')
 				else:
@@ -551,25 +551,42 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 		active_hours = 0
 		inactive_hours = 0
 		for interval,values in list(movement_consistency.items()):
+			hour_am_pm = interval.split('to')[0].split(' ')
+			if hour_am_pm[1] == 'PM' and int(hour_am_pm[0]) < 12:
+				hour_am_pm[0] = int(hour_am_pm[0]) + 12
+			elif hour_am_pm[1] == 'AM' and int(hour_am_pm[0]) == 12:
+				hour_am_pm[0] = 0
+			else:
+				hour_am_pm[0] = int(hour_am_pm[0])
+
+			hour_start = datetime.combine(today_awake_time.date(),time(hour_am_pm[0]))
+			if hour_start >= today_awake_time:
+				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
+					movement_consistency[interval]['status'] = 'sleeping'
+					movement_consistency[interval]['steps'] = 0
+				else:
+					if not movement_consistency[interval]['steps']:
+						movement_consistency[interval]['status'] = 'inactive'
+						movement_consistency[interval]['steps'] = 0
+
 			if values['status'] == 'active': 
 				active_hours += 1 
 			if values['status'] == 'inactive':
 				inactive_hours += 1
-			movement_consistency['active_hours'] = active_hours
-			movement_consistency['inactive_hours'] = inactive_hours
+
+		movement_consistency['active_hours'] = active_hours
+		movement_consistency['inactive_hours'] = inactive_hours
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, todays_activities, todays_manually_updated):
+def cal_exercise_steps_total_steps(dailies_json, todays_activities):
 	'''
-		Calculate non exercise steps
+		Calculate exercise steps
 	'''	
 	total_steps = 0
 	exercise_steps = 0
-	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
 	if len(todays_activities):
 		for obj in todays_activities:
-			obj = manually_edited(obj)
 			exercise_steps += obj.get('steps',0)
 
 	if dailies_json:
@@ -1221,8 +1238,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
-		exercise_steps, total_steps = cal_exercise_steps_total_steps(
-					dailies_json,todays_activities_json,todays_manually_updated_json)	
+		exercise_steps, total_steps = cal_exercise_steps_total_steps(dailies_json,todays_activities_json)	
 		# Have to fix this
 		steps_calculated_data['non_exercise_steps'] = abs(total_steps - exercise_steps)
 		steps_calculated_data['exercise_steps'] = exercise_steps
