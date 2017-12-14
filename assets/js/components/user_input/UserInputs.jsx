@@ -2,6 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import NavbarMenu from '../navbar';
 
+import { withRouter, Link } from 'react-router-dom';
+import {connect} from 'react-redux';
+
+import PropTypes from 'prop-types';
+
+import { getGarminToken,logoutUser} from '../../network/auth';
+
 import { ToastContainer, toast } from 'react-toastify';
 import Textarea from 'react-textarea-autosize';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -33,6 +40,7 @@ class UserInputs extends React.Component{
         update_form:false,
         editable:true,
         isOpen: false,
+        isOpen1:false,
         scrollingLock: false,
         gender:'M',
         diet_to_show:'',
@@ -168,6 +176,10 @@ class UserInputs extends React.Component{
       this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
+      this.toggle1 = this.toggle1.bind(this);
+
+      this.handleLogout = this.handleLogout.bind(this);
+      this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -398,6 +410,12 @@ createDropdown(start_num , end_num, step=1){
      
     });
   }
+   toggle1() {
+    this.setState({
+      isOpen1: !this.state.isOpen1,
+     
+    });
+  }
 
 componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
@@ -463,33 +481,75 @@ handleScroll() {
       editable:!this.state.editable
     });
   }
+   onLogoutSuccess(response){
+    this.props.history.push("/#logout");
+  }
+
+  handleLogout(){
+    this.props.logoutUser(this.onLogoutSuccess);
+  }
     render(){
+       const {fix} = this.props;
 
         return(
             <div>            
                            <div id="hambergar" className="container-fluid">
-                             <NavbarMenu fix={false} />
-                              </div>                              
-                              <div>
-                             <h2 className="head">Daily User Inputs Report 
-                              <span id="infobutton"
-                             onClick={this.toggleInfo} 
-                             style={{float:"right",paddingRight:"30px",color:"gray"}}>
-                             <a style={{color:"gray"}}> 
-                             <FontAwesome 
-                                          name = "info-circle"
-                                          size = "1x"                                      
-                                        
-                              />
-                              </a>
-                              </span> 
-                             </h2>
+                             <Navbar toggleable 
+                                 fixed={fix ? 'top' : ''} 
+                                  className="navbar navbar-expand-sm navbar-inverse">
+                                  <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} style={{paddingRight:"30px"}}>
+                                   <FontAwesome 
+                                         name = "bars"
+                                         size = "1x"
+                                                                  
+                                     />
+                                    
+                                  </NavbarToggler>
+                                  <Link to='/'>
+                                    <NavbarBrand 
+                                      className="navbar-brand float-xs-right float-sm-left" 
+                                      id="navbarTogglerDemo">
+                                      <img className="img-fluid"
+                                       id="navbarbrand"
+                                       src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+                                    </NavbarBrand>
+                                  </Link>
+                                  <span id="header">
+                                  <h2 className="head">Daily User Inputs 
+                                   <span id="infobutton"
+                                     onClick={this.toggleInfo}>
+                                     <a style={{color:"black" ,paddingLeft:"10px"}}> 
+                                     <FontAwesome 
+                                                  style={{color:"white",fontSize:"25px"}}
+                                                  name = "info-circle"
+                                                  size = "1x"                                      
+                                                
+                                      />
+                                      </a>
+                                  </span> 
                              
-                              </div>
+                             </h2>
 
+                                  </span>
+                                  <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
+                                    <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+                                      <NavItem className="float-sm-right">  
+                                        <Link id="logout" className="nav-link" to='/'>Home</Link>
+                                      </NavItem>
+                                       <NavItem className="float-sm-right">                
+                                           <NavLink
+                                           id="logout"  
+                                           className="nav-link"                    
+                                           onClick={this.handleLogout}>Log Out
+                                            </NavLink>               
+                                      </NavItem>  
+                                    </Nav>
+                                  </Collapse>
 
+                                </Navbar>
+                              </div>                                                        
                             <Popover
-                            style={{height:"220px",overflowY:"scroll"}} 
+                            id="popover"
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -573,11 +633,11 @@ handleScroll() {
                                    </span>
                                    <span className="btn2">
                                    <Button 
-                                   style={{backgroundColor:"#ed9507"}} 
+                                      id="nav-btn"
                                       size="sm"
                                       onClick={this.toggleEditForm}
                                       className="btn hidden-sm-up">
-                                      {this.state.editable ? 'View Inputs' : 'Edit Form'}
+                                      {this.state.editable ? 'VIEW INPUTS' : 'EDIT FORM'}
                                    </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
@@ -665,7 +725,8 @@ handleScroll() {
                            </Popover> 
 
                            <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                          id="popover"
+                          className="pop" 
                             placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
@@ -699,20 +760,20 @@ handleScroll() {
                           data-toggle="validator">
                           {this.state.editable &&
                                  <div className="row justify-content-center"> 
-                                   <span id="btn1">
+                                   <span>
                                        <Button
-                                            style={{backgroundColor:"#ed9507",fontFamily: "futura-pt"}}   
+                                            id="btn1"                                            
                                             size="sm"
                                             onClick={this.fetchYesterdayData}
                                             className="btn">
-                                            Copy Yesterday’s Inputs
+                                            COPY YESTERDAY'S INPUTS
                                           </Button>
                                    </span>
                                 </div>
                           }
 
                           <div id="workout">
-                          <h2><strong>Workout Inputs</strong></h2>
+                          <h3><strong>Workout Inputs</strong></h3>
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?
@@ -720,7 +781,7 @@ handleScroll() {
                              onClick={this.toggleInfoworkout} 
                              style={{float:"right",paddingLeft:"15px",color:"gray"}}>
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5e5e5e"}}
                                           name = "info-circle"
                                           size = "1.5x"                                      
                                         
@@ -730,20 +791,20 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input">                           
                               
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn radio1">
                                     <Input type="radio" 
                                     name="workout" 
                                     value="yes" 
                                     checked={this.state.workout === 'yes'}
                                     onChange={this.handleChangeWorkoutDone}/> Yes
                                   </Label>
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn radio1">
                                     <Input type="radio" name="workout" 
                                     value="no"
                                     checked={this.state.workout === 'no'}
                                     onChange={this.handleChangeWorkoutDone}/> No
                                   </Label>
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn radio1">
                                     <Input type="radio" 
                                     name="workout" 
                                     value="not yet"
@@ -761,7 +822,8 @@ handleScroll() {
                           </FormGroup>
 
                             <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                            id="popover"
+                            className="pop"
                             placement="right" 
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
@@ -796,7 +858,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                             
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5e5e5e"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -808,21 +870,21 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input">                           
                               
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn  radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="cardio" 
                                     checked={this.state.workout_type === 'cardio'}
                                     onChange={this.handleChange}/> Cardio
                                   </Label>
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn  radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="strength"
                                     checked={this.state.workout_type === 'strength'}
                                     onChange={this.handleChange}/> Strength
                                   </Label>
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn  radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="both"
@@ -843,8 +905,9 @@ handleScroll() {
                                     
                             }   
                              <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
-                            placement="right" 
+                           id="popover" 
+                            placement="right"
+                            className="pop" 
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
@@ -876,7 +939,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                             
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5e5e5e"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -888,7 +951,7 @@ handleScroll() {
                                  
 
                                      <div className="input">
-                                     <Label check className="btn btn-secondary radio1">
+                                     <Label check className="btn  radio1">
                                         <Input type="radio" name="workout_easy" 
                                         value="easy"
                                         checked={this.state.workout_easy === 'easy'}
@@ -896,7 +959,7 @@ handleScroll() {
                                         Easy
                                      </Label>
 
-                                     <Label check className="btn btn-secondary radio1">
+                                     <Label check className="btn  radio1">
                                        <Input type="radio" name="workout_easy"
                                             value="hard"
                                             checked={this.state.workout_easy === 'hard'}
@@ -916,8 +979,9 @@ handleScroll() {
                           }
 
                            <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
-                            placement="right" 
+                          id="popover" 
+                            placement="right"
+                            className="pop" 
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
@@ -962,7 +1026,7 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input">
 
-                                     <Label check className="btn btn-secondary radio1">
+                                     <Label check className="btn  radio1">
                                         <Input type="radio" name="workout_enjoyable" 
                                         value="yes"
                                         checked={this.state.workout_enjoyable === 'yes'}
@@ -970,7 +1034,7 @@ handleScroll() {
                                         Yes
                                      </Label>
 
-                                     <Label check className="btn btn-secondary radio1">
+                                     <Label check className="btn  radio1">
                                        <Input type="radio" name="workout_enjoyable" 
                                             value="no"
                                             checked={this.state.workout_enjoyable === 'no'}
@@ -994,6 +1058,7 @@ handleScroll() {
                                 { this.state.editable &&
                                   <div className="input">
                                       <Input 
+                                      id="placeholder"
                                       type="select" 
                                       className="custom-select form-control" 
                                       name="workout_effort"
@@ -1033,7 +1098,7 @@ handleScroll() {
                                 {this.state.editable &&
                                   <div className="input">
                                      
-                                       <Label check className="btn btn-secondary radio1">
+                                       <Label check className="btn  radio1">
                                       <Input type="radio" name="pain" 
                                       value="yes"
                                       checked={this.state.pain === 'yes'}
@@ -1041,7 +1106,7 @@ handleScroll() {
                                       Yes
                                    </Label>
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                      <Input type="radio" name="pain" 
                                           value="no"
                                           checked={this.state.pain === 'no'}
@@ -1069,7 +1134,8 @@ handleScroll() {
                             <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
                               { this.state.editable &&
                               <div className="input">
-                                  <Input type="select" 
+                                  <Input type="select"
+                                        id="placeholder" 
                                          className="custom-select form-control" 
                                          name="water_consumed"                                 
                                          value={this.state.water_consumed}
@@ -1096,7 +1162,8 @@ handleScroll() {
                             <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
                                 { this.state.editable &&
                                   <div className="input">
-                                      <Input 
+                                      <Input
+                                      id="placeholder" 
                                       type="select" 
                                       className="custom-select form-control" 
                                       name="chia_seeds"
@@ -1125,6 +1192,7 @@ handleScroll() {
                                   {this.state.editable &&
                                     <div className="input">
                                         <Input type="select"
+                                        id="placeholder"
                                          className="form-control custom-select" 
                                          name="breath_nose"                         
                                          value={this.state.breath_nose}
@@ -1153,7 +1221,7 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input">
                                   
-                                    <Label check className="btn btn-secondary radio1">
+                                    <Label check className="btn  radio1">
                                       <Input type="radio" name="fasted" 
                                       value="yes"
                                       checked={this.state.fasted === 'yes'}
@@ -1161,7 +1229,7 @@ handleScroll() {
                                       Yes
                                    </Label>
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                      <Input type="radio" name="fasted" 
                                           value="no"
                                           checked={this.state.fasted === 'no'}
@@ -1192,7 +1260,8 @@ handleScroll() {
                             </Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                     <Textarea name="workout_comment"                             
+                                     <Textarea name="workout_comment"
+                                     id="placeholder"                            
                                      placeholder="please leave a comment" 
                                      className="form-control"
                                      rows="5" cols="5" 
@@ -1227,7 +1296,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div>
-                                <Label>1.11 I want to manually enter in weather information for my workout</Label>
+                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout</Label>
                                 <div className="input">                             
                                   <p>{this.state.weather_check?"yes":"no"}</p>
                                 </div>
@@ -1245,7 +1314,9 @@ handleScroll() {
                               <div>
                                 <div className="col-xs-6">
                                   <div className="input"> 
-                                <Input type="select" name="indoor_temperature"
+                                <Input type="select" 
+                                id="placeholder"
+                                name="indoor_temperature"
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.indoor_temperature}
@@ -1258,7 +1329,9 @@ handleScroll() {
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
-                                <Input type="select" name="outdoor_temperature"
+                                <Input type="select"
+                                id="placeholder"
+                                 name="outdoor_temperature"
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.outdoor_temperature}
@@ -1288,7 +1361,8 @@ handleScroll() {
                             <Label className="padding">1.11.2 What was the dew point when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select" 
+                                  <Input type="select"
+                                  id="placeholder" 
                                      className="custom-select form-control"
                                      name="dewpoint"                                  
                                      value={this.state.dewpoint}
@@ -1316,6 +1390,7 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input1">
                                   <Input type="select" 
+                                    id="placeholder"
                                      className="custom-select form-control"
                                      name="humidity"                                  
                                      value={this.state.humidity}
@@ -1343,7 +1418,8 @@ handleScroll() {
                             <Label className="padding">1.11.4 What was the wind when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select" 
+                                  <Input type="select"
+                                  id="placeholder" 
                                      className="custom-select form-control"
                                      name="wind"                                  
                                      value={this.state.wind}
@@ -1371,7 +1447,8 @@ handleScroll() {
                             <Label className="padding">1.11.5 What was the Temperature Feels Like when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select" 
+                                  <Input type="select"
+                                    id="placeholder" 
                                      className="custom-select form-control"
                                      name="temperature_feels_like"                                  
                                      value={this.state.temperature_feels_like}
@@ -1400,6 +1477,7 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="weather_comment"
+                                 id="placeholder"
                                   rows="5" cols="5" 
                                   className="form-control" 
                                  value={this.state.weather_comment}
@@ -1454,7 +1532,8 @@ handleScroll() {
                             <Label className="padding">1.12 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                 <Input type="text" name="calories" 
+                                 <Input type="text" name="calories"
+                                 id="placeholder" 
                                  value={this.state.calories}
                                  onChange={this.handleChange}/>
                               </div>
@@ -1476,6 +1555,7 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"
+                                 id="placeholder"
                                   rows="5" cols="5" 
                                   className="form-control" 
                                  value={this.state.calories_item}
@@ -1495,7 +1575,7 @@ handleScroll() {
                       </div>
                      
                             <div id="sleep">
-                            <h2><strong>Sleep Input</strong></h2>
+                            <h3><strong>Sleep Input</strong></h3>
                          
                           
                             <FormGroup>
@@ -1505,7 +1585,9 @@ handleScroll() {
                               <div>
                                 <div className="col-xs-6">
                                   <div className="input"> 
-                                <Input type="select" name="sleep_hours_last_night"
+                                <Input type="select"
+                                id="placeholder"
+                                 name="sleep_hours_last_night"
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_last_night}
@@ -1518,7 +1600,9 @@ handleScroll() {
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
-                                <Input type="select" name="sleep_mins_last_night"
+                                <Input type="select" 
+                                id="placeholder"
+                                name="sleep_mins_last_night"
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.sleep_mins_last_night}
@@ -1611,7 +1695,9 @@ handleScroll() {
                               <div>
                                 <div className="col-xs-6">
                                   <div className="input"> 
-                                <Input type="select" name="awake_hours"
+                                <Input type="select" 
+                                id="placeholder"
+                                name="awake_hours"
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.awake_hours}
@@ -1624,7 +1710,9 @@ handleScroll() {
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
-                                <Input type="select" name="awake_mins"
+                                <Input type="select" 
+                                id="placeholder"
+                                name="awake_mins"
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.awake_mins}
@@ -1650,7 +1738,8 @@ handleScroll() {
                             <Label className="padding">3 Sleep Comments</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                     <Textarea name="sleep_comment" 
+                                     <Textarea name="sleep_comment"
+                                     id="placeholder" 
                                      placeholder="please leave a comment" 
                                      className="form-control"
                                      rows="5" cols="5" 
@@ -1671,7 +1760,7 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input1">
                                 
-                                     <Label check className="btn btn-secondary radio1">
+                                     <Label check className="btn  radio1">
                                       <Input type="radio" name="prescription_sleep_aids" 
                                       value="yes"
                                       checked={this.state.prescription_sleep_aids === 'yes'}
@@ -1679,7 +1768,7 @@ handleScroll() {
                                       Yes
                                    </Label>
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                      <Input type="radio" name="prescription_sleep_aids" 
                                           value="no"
                                           checked={this.state.prescription_sleep_aids === 'no'}
@@ -1702,7 +1791,7 @@ handleScroll() {
                           </div>
                         
                         <div id="food">
-                        <h2><strong>Nutrition and Lifestyle Inputs</strong></h2>
+                        <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
                           <FormGroup className="food">
                             
@@ -1715,7 +1804,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                            
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5e5e5e"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -1727,6 +1816,7 @@ handleScroll() {
                                 <div className="input1">
                                   <Input
                                   type="select" 
+                                  id="placeholder"
                                   className="form-control custom-select" 
                                   name="prcnt_processed_food"                            
                                   value={this.state.prcnt_processed_food}
@@ -1746,8 +1836,10 @@ handleScroll() {
                             {this.renderProcessedFoodModal()}
                             </FormGroup>
                           </FormGroup>
-                           <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                          <div >
+                           <Popover
+                           className="pop"                         
+                           id="popover" 
                             placement="right" 
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
@@ -1862,14 +1954,16 @@ handleScroll() {
 
                                </div>                      
                               </PopoverBody>
-                           </Popover>       
+                           </Popover> 
+                           </div>     
 
                           <FormGroup>
                                <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>
                                 {this.state.editable &&
                                   <div className="input1">
                                        <Input 
-                                       type="select" 
+                                       type="select"
+                                       id="placeholder" 
                                        className="custom-select form-control" 
                                        name="alchol_consumed"
                                        value={this.state.alchol_consumed}
@@ -1898,7 +1992,7 @@ handleScroll() {
                               <div className="input1">
                                   
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                       <Input type="radio" name="smoke_substances" 
                                       value="yes"
                                       checked={this.state.smoke_substances === 'yes'}
@@ -1906,7 +2000,7 @@ handleScroll() {
                                       Yes
                                    </Label>
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                      <Input type="radio" name="smoke_substances" 
                                           value="no"
                                           checked={this.state.smoke_substances === 'no'}
@@ -1934,15 +2028,16 @@ handleScroll() {
                                 {this.state.editable &&
                                   <div className="input1">
                                    
-                                     <Label check className="btn btn-secondary radio1">
-                                      <Input type="radio" name="medications" 
+                                     <Label check className="btn  radio1">
+                                      <Input type="radio" name="medications"
+                                      id="placeholder" 
                                       value="yes"
                                       checked={this.state.medications === 'yes'}
                                       onChange={this.handleChangePrescription}/>{' '}
                                       Yes
                                    </Label>
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                      <Input type="radio" name="medications" 
                                           value="no"
                                           checked={this.state.medications === 'no'}
@@ -1968,12 +2063,12 @@ handleScroll() {
                           </div>
 
                           <div id="stress">
-                           <h2><strong>Stress/Illness Inputs</strong></h2>
+                           <h3><strong>Stress/Illness Inputs</strong></h3>
                           <FormGroup>
                             <Label className="padding">9. Yesterday's Stress Level</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                 <Label check className="btn btn-secondary radio1">
+                                 <Label check className="btn  radio1">
                                     <Input type="radio" name="stress" 
                                     value="low"
                                     checked={this.state.stress === 'low'}
@@ -1981,14 +2076,14 @@ handleScroll() {
                                     Low
                                  </Label>
 
-                                 <Label check className="btn btn-secondary radio1">
+                                 <Label check className="btn  radio1">
                                    <Input type="radio" name="stress" 
                                         value="medium"
                                         checked={this.state.stress === 'medium'}
                                         onChange={this.handleChange}/>{' '}
                                       Medium
                                 </Label>
-                                 <Label check className="btn btn-secondary radio1">
+                                 <Label check className="btn  radio1">
                                    <Input type="radio" name="stress" 
                                         value="high"
                                         checked={this.state.stress === 'high'}
@@ -2011,7 +2106,7 @@ handleScroll() {
                               <div className="input1">
                                
 
-                                  <Label check className="btn btn-secondary radio1">
+                                  <Label check className="btn  radio1">
                                     <Input type="radio" name="sick" 
                                     value="yes"
                                     checked={this.state.sick === 'yes'}
@@ -2019,7 +2114,7 @@ handleScroll() {
                                     Yes
                                  </Label>
 
-                                 <Label check className="btn btn-secondary radio1">
+                                 <Label check className="btn  radio1">
                                    <Input type="radio" name="sick" 
                                         value="no"
                                         checked={this.state.sick === 'no'}
@@ -2047,12 +2142,13 @@ handleScroll() {
                           </div>
                          
                          <div id="daily">
-                          <h2><strong>Extra Inputs</strong></h2>
+                          <h3><strong>Extra Inputs</strong></h3>
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select" 
+                                  <Input type="select"
+                                  id="placeholder" 
                                      className="custom-select form-control"
                                      name="weight"                                  
                                      value={this.state.weight}
@@ -2079,7 +2175,8 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input 
-                                    type="text" 
+                                    type="text"
+                                    id="placeholder" 
                                     className="form-control" 
                                     placeholder="Between 20 - 60"
                                     name="waist"                               
@@ -2104,7 +2201,8 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input 
-                                    type="text" 
+                                    type="text"
+                                    id="placeholder" 
                                     className="form-control"
                                     placeholder="Between 0 - 16" 
                                     name="clothes_size"                                
@@ -2129,6 +2227,7 @@ handleScroll() {
                                     <div className="input1">
                                         <Input 
                                         type="select" 
+                                        id="placeholder"
                                         className="custom-select form-control" 
                                         name="diet_type"
                                         value={this.state.diet_to_show}
@@ -2165,7 +2264,7 @@ handleScroll() {
                                   
 
 
-                                    <Label check className="btn btn-secondary radio1">
+                                    <Label check className="btn  radio1">
                                       <Input type="radio" name="stand" 
                                       value="yes"
                                       checked={this.state.stand === 'yes'}
@@ -2173,7 +2272,7 @@ handleScroll() {
                                       Yes
                                    </Label>
 
-                                   <Label check className="btn btn-secondary radio1">
+                                   <Label check className="btn  radio1">
                                      <Input type="radio" name="stand" 
                                           value="no"
                                           checked={this.state.stand === 'no'}
@@ -2194,7 +2293,8 @@ handleScroll() {
                             <Label className="padding">15. General Comments</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                     <Textarea  name="general_comment" 
+                                     <Textarea  name="general_comment"
+                                     id="placeholder" 
                                      placeholder="please leave a comment" 
                                      className="form-control"
                                      rows="5" cols="5" 
@@ -2213,20 +2313,20 @@ handleScroll() {
 
                           { (!this.state.update_form && this.state.editable) &&
                             <Button 
-                              type="submit"
-                              color="info" 
-                              className="btn btn-block btn-primary">
-                                Submit
+                              id="btn1"
+                              type="submit" 
+                              className="btn btn-block">
+                                SUBMIT
                             </Button>
 
                           }
 
                           {(this.state.update_form && this.state.editable) &&
                             <Button 
-                              color="info" 
-                              className="btn btn-block btn-primary"
+                              id="btn1" 
+                              className="btn btn-block"
                               onClick={this.onUpdate}>
-                                Update
+                                UPDATE
                             </Button>
                           }
 
@@ -2255,4 +2355,15 @@ handleScroll() {
     }
 }
 
-export default UserInputs;
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(UserInputs));
+Navbar.propTypes={
+    fixed: PropTypes.string,
+    color: PropTypes.string,
+}
+

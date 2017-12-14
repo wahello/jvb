@@ -40,11 +40,12 @@ export default class AlcoholModal extends Component{
 			<div>
 				<Collapse isOpen={this.state.collapse}>				
 						<FormGroup>   
-                            <Label>6.1 What Did You Drink (Optional)?</Label>
+                            <Label className="LAbel">6.1 What Did You Drink (Optional)?</Label>
 
                             	{this.props.editable &&
 									<div className="input1">
-			                            <Textarea 				                            
+			                            <Textarea 
+			                            	id="placeholder"				                            
 				                            className="form-control" 
 				                            value={this.state.alcohol_drink_consumed_list}
 				                            rows="5" cols="5"

@@ -117,31 +117,31 @@ export default class SmokedSubstance extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>7.1 What Did You Smoke Yesterday?</Label>
+                            <Label className="LAbel">7.1 What Did You Smoke Yesterday?</Label>
 
                             {this.props.editable &&
 	                            <div className="input1">
-		                              <Label className="btn btn-secondary radio1">
+		                              <Label className="btn  radio1">
                                     <Input type="radio"
                                     name="smoked_substance_to_show"                                                                   
                                     value="cigarettes" 
                                     checked={this.state.smoked_substance_to_show === 'cigarettes'}
                                     onChange={this.handleChange}/> Cigarettes
                                   </Label>
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn  radio1">
                                     <Input type="radio" name="smoked_substance_to_show" 
                                     value="cigars"
                                     checked={this.state.smoked_substance_to_show === 'cigars'}
                                     onChange={this.handleChange}/> Cigars
                                   </Label>
-                                  <Label className="btn btn-secondary radio1">
+                                  <Label className="btn  radio1">
                                     <Input type="radio" 
                                     name="smoked_substance_to_show" 
                                     value="marijuana"
                                     checked={this.state.smoked_substance_to_show === 'marijuana'}
                                     onChange={this.handleChange}/>Marijuana
                                   </Label> 
-                                   <Label className="btn btn-secondary radio1">
+                                   <Label className="btn radio1">
                                     <Input type="radio" 
                                     name="smoked_substance_to_show" 
                                     value="other"
@@ -160,11 +160,12 @@ export default class SmokedSubstance extends Component{
 
                         <Collapse isOpen={this.state.collapseCigarettesCount}>
 							<FormGroup>
-								<Label>7.2 How Many Cigarettes You Have Smoked?</Label>
+								<Label className="LAbel">7.2 How Many Cigarettes You Have Smoked?</Label>
 
 								{this.props.editable &&
 									<div className="input1">
 										<Input 
+										id="placeholder"
 				                            type="select" 
 				                            className="custom-select form-control" 
 				                            value={this.state.cigarettes_count}
@@ -186,9 +187,10 @@ export default class SmokedSubstance extends Component{
 							<FormGroup>
 							{this.props.editable &&
 								<div>
-								<Label>7.2 Write in What You Smoked</Label>
+								<Label className="LAbel">7.2 Write in What You Smoked</Label>
 								<div className="input1">
-									<Textarea 		                           
+									<Textarea 
+									id="placeholder"		                           
 		                            className="form-control" 
 		                            rows="5" cols="5"
 		                            placeholder="Please type in..."

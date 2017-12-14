@@ -2,10 +2,27 @@ html,
 body{
 	height: 100%;
 	background-size: cover;
-	font-size:16px;
 	padding-top: 0px;
+	font-family: proxima-nova;
+	font-style: normal;
+	font-size: 18px;
+	color:#5e5e5e;
 }
 
+#placeholder{
+	font-family: proxima-nova;
+	font-style: normal;
+	font-size: 16px;
+	color:#5e5e5e;
+}
+#popover{
+	font-family: proxima-nova;
+	font-style: normal;
+	font-size: 16px;
+	color:#5e5e5e;
+	height:220px;
+	overflow-y: scroll; 
+}
 
 #body1{
 padding-top: 10px;
@@ -17,19 +34,27 @@ padding-top: 10px;
 	background-size: cover;
 	color: rgba(0,0,0,0.5);
 }
+#header{
+	padding-left: 250px;
+}
 
  .head{
-	text-align: center;
-	padding:20px 0px  10px 37px ;
-	color: black;
+
+	width: 355px;
+	text-align: center;	
+	color: white;
 	font-family: futura-pt;
+	font-style: normal;
+	font-size:30px;
+
+	
 }
 #user-inputs .user-inputs-form{
-	background-color:rgba(20,10,15,0.5);
+	background-color:#dddddd;
 	border-radius: 20px;
     padding: 6px;
     align-content: center;
-    color:white;
+    color:black;
 
 }
 #user-inputs .user-inputs-form input.form-control{
@@ -42,6 +67,9 @@ margin-top: 46px;
 	padding: 10px;
 	margin-left: -10px;
 	font-family: Proxima-Nova;
+	font-style: normal;
+	font-size: 18px;
+	color:#5e5e5e;
 }
 // @media (min-width: 1024px) {
 // form.user-inputs-form.bootstrap_validator{
@@ -54,21 +82,39 @@ margin-top: 46px;
 #body1{
 padding-top: 30px;
 }
-
+	#placeholder{
+		font-family: proxima-nova;
+		font-style: normal;
+		font-size: 16px;
+		color:#5e5e5e;
+	}
    #user-inputs .user-inputs-form{
-	background-color:rgba(20,10,15,0.5);
+	background-color:#dddddd;
 	border-radius: 20px;
     align-content: center;
     padding:6px;
 
 	}
-
-	.head{
+	#popover{
+	font-family: proxima-nova;
+	font-style: normal;
+	font-size: 16px;
+	color:#5e5e5e;
+	height:220px;
+	overflow-y: scroll;
+     }
+	.head{	
+	width: 216px;	
 	text-align: center;
-	padding:20px 0px  10px 0px ;
-	color: black;
+	color: white;
 	font-family: futura-pt;
+	font-size: large;
+	font-style: normal;
+	}
+	#header{
+	padding-left: 66px;
 }
+
 
 	#navlink{
 	color:#EAFFFF;
@@ -79,11 +125,17 @@ padding-top: 30px;
       }
 	.input{
 		padding:0px 17px;
-		font-family: futura-pt;
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
 	}
 	.input1{
 		padding:0px 17px 0px 23px;
-		font-family: futura-pt;
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
 	}
 	.nav1{
 		width: 100%;
@@ -103,13 +155,14 @@ padding-top: 30px;
 		color: white;
 		float: left;
 	}
-	strong{
-		color:#212F3D;
-		font-size:16px;
-	}
-	h2{
+	h3{
 		text-align:center;
 		padding-top:8px;
+		font-family: proxima-nova;
+		font-size: 20px;
+		font-style:normal;
+       color:#103047;
+
 	}
 	#hours,#minutes{
 		float: left;
@@ -158,18 +211,43 @@ padding-top: 30px;
 	padding-right: 1px;
 	padding-top: 0px;
 }
+#navbarbrand{
+	max-width: 200px;
+	margin-right: 35px;
+}
 }
 
+h3{
+		text-align:center;
+		padding-top:8px;
+		font-family: proxima-nova;
+		font-size: 20px;
+		font-style:normal;
+       color:#103047;
+	}
 
 
 
 	.input{
 		padding:0px 17px;
-		font-family: futura-pt;
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
 	}
 	.input1{
 		padding:0px 17px 0px 23px;
-		font-family: futura-pt;
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
+	}
+
+	.LAbel{		
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
 	}
 	
 	#navlink{
@@ -186,7 +264,7 @@ padding-top: 30px;
 	}
 
 	.nav1 {
-	  top:0; 
+	  top:0; 	
 	  z-index:100;
 	  width: 100%;
 	  left: 0;
@@ -194,15 +272,6 @@ padding-top: 30px;
 	  
 	}
 	
-
-	strong{
-		color:#212F3D;
-		font-size:16px;
-	}
-	h2{
-		text-align:center;
-		padding-top:8px;
-	}
 
 	.food h2{
 		text-align:center;
@@ -221,6 +290,15 @@ padding-top: 30px;
 		font-size:12px;
 		align-items: center;
 		text-align: center;
+	}
+	#btn1{
+		font-family:futura-pt;
+		background-color: rgb(237, 149, 7);
+		border-radius: 0px;
+		border-color: rgb(237, 149, 7);
+		height: 54px;
+		padding: 0px 20px;
+		font-size: 13px;
 	}
 	.btn1{
 		padding:0px 0px 0px 40px ;
@@ -241,13 +319,21 @@ padding-top: 30px;
 		text-decoration: none;
 	}
 	.radio1{
+		background-color: #f4f5f5;
 		margin:0px 6px;
 		padding-left: 29px;
 		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
 	}
 	.radio2{
+		background-color: #f4f5f5;
 		padding-left: 35px;
 		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 18px;
+		color:#5e5e5e;
 	}
 	.work_hard{
 		padding-left: 33px;
@@ -298,7 +384,7 @@ padding-left: 0px;
 	padding-top: 0px;
 }
 .nav3 .navbar{
-background-color:#103047;
+background-color:gray;
 }
 abbr{
 	background-color: white;
@@ -321,4 +407,26 @@ textarea.form-control{
 	border-radius:5px;
 	font-size:13px;
 	width:200px;
+}
+.container{
+	max-width:760px;
+}
+#navbarbrand{
+	max-width: 200px;
+}
+#nav-btn{
+	font-family:futura-pt;
+    background-color: rgb(237, 149, 7);
+	border-radius: 0px;
+	border-color: rgb(237, 149, 7);		
+	font-size: 12px;
+	height: 40px;
+}
+.pop{
+	z-index: 0 !important;
+}
+#logout{
+	font-family: proxima-nova;
+	font-style: normal;
+	font-size: 17px;
 }

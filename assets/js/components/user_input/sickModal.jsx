@@ -40,11 +40,12 @@ export default class SickModal extends Component{
 			<div>
 					<Collapse isOpen={this.state.collapse}>
 						<FormGroup>   
-                            <Label>10.1 Please Tell Us Your Illness</Label>
+                            <Label className="LAbel">10.1 Please Tell Us Your Illness</Label>
 
                               {this.props.editable &&
 	                           	  <div className="input1">
-		                            <Textarea			                           
+		                            <Textarea
+		                                id="placeholder"			                           
 			                            className="form-control" 
 			                            value={this.state.sickness}
 			                            rows="5" cols="5"

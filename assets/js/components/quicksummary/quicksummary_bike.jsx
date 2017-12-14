@@ -5,6 +5,8 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
+import { StyleSheet, css } from 'aphrodite';
+
 
  class Bike extends Component {
 
@@ -37,13 +39,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 			columns.push(
 				<Column 
-					header={<Cell>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props}>
+				            <Cell {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={134}
+			        width={200}
 				/>
 			)
 		}
@@ -66,9 +68,9 @@ render(){
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell>Bike Stats</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Bike Stats</Cell>}
 		          cell={props => (
-		            <Cell {...props}>
+		            <Cell {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
@@ -82,12 +84,29 @@ render(){
 			);
 	}
 }
+const styles = StyleSheet.create({
+  newTableHeader: {
+    color: '#111111',
+    fontSize: '18px',   
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  },
+  newTableBody:{
+    color: '#5e5e5e',
+    fontSize: '16px', 
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  }
+});
+
 export default Dimensions({
   getHeight: function(element) {
     return window.innerHeight - 235;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 3;
     return window.innerWidth - widthOffset;
   }
 })(Bike);

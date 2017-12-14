@@ -42,7 +42,8 @@ export default class FastedModal extends Component{
                             <Label>1.9.1 What Food Did You Eat Before Your Workout?</Label>
                             	{this.props.editable &&
 	                            	<div className="input1">
-			                            <Textarea 				                           
+			                            <Textarea 
+			                            	id="placeholder"				                           
 				                            className=" form-control" 				                            
 				                            rows={5} cols={5}
 				                            value={this.state.food_ate_before_workout}

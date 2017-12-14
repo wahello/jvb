@@ -22,7 +22,7 @@ import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/qui
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
-import Grades from './quicksummary_grades';
+import Grades from './quicksummary_grades'; 
 import Swim from './quicksummary_swim';
 import Bike from './quicksummary_bike';
 import Steps from './quicksummary_steps';
@@ -488,7 +488,7 @@ onLogoutSuccess(response){
 		
 		 <Navbar toggleable 
          fixed={fix ? 'top' : ''} 
-          className="navbar navbar-expand-sm navbar-inverse">
+          className="navbar navbar-expand-sm navbar-inverse nav6">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
            <FontAwesome 
                  name = "bars"
@@ -508,20 +508,22 @@ onLogoutSuccess(response){
             </NavbarBrand>
           </Link>
           
-            <a 
-            id="daterange"
-            style={{width:"88px",color:"white"}}
-            onClick={this.toggleDate} >Date Range</a>
+            
+
+            <span id="header">
+            <h2 className="head" id="head">Quick Look</h2>
+            </span>
           
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
             <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>            
               <NavItem className="float-sm-right">  
-                <Link className="nav-link" to='/'>Home</Link>
+                <Link id="logout"className="nav-link" to='/'>Home</Link>
               </NavItem>
                <NavItem className="float-sm-right">                
                    <NavLink  
-                   className="nav-link"                    
+                   className="nav-link"
+                   id="logout"                    
                    onClick={this.handleLogout}>Log Out
                     </NavLink>               
               </NavItem>  
@@ -558,6 +560,7 @@ onLogoutSuccess(response){
 						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
 						       
 						        <button
+						        id="nav-btn"
 						         style={{backgroundColor:"#ed9507"}} 					        
 						         type="submit"
 						         className="btn btn-block-lg"
@@ -572,7 +575,7 @@ onLogoutSuccess(response){
 			 				
 			             <div id="nav3">
 			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
-						  <Navbar light toggleable className="navbar nav2">
+						  <Navbar light toggleable className="navbar nav2 nav5">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
                                     <div className="toggler">
                                     <FontAwesome 
@@ -599,6 +602,7 @@ onLogoutSuccess(response){
 
                                    <span className="btn2">
 	                                  <Button
+	                                   id="nav-btn"
 	                                  style={{backgroundColor:"#ed9507"}} 						        
 						         	   type="submit"
 						               className="btn btn-block-lg"
@@ -607,11 +611,11 @@ onLogoutSuccess(response){
 								      </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
-                                  <Nav className="nav navbar-nav" navbar>
+                                  <Nav className="nav navbar-nav" navbar className="fonts">
                                           <NavItem>
                                           <span id="spa">
                                             <abbr id="abbri"  title="All Stats">
-                                              <NavLink  href="#" className={class_allstats1} value="allstats1"
+                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
 						    								 onClick={this.activateTab.bind(this,"allstats1")}>
                                                All Stats
                                               </NavLink>
@@ -622,7 +626,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Grades">
-                                            <NavLink href="#" className={class_grade} value="grade"
+                                            <NavLink id="headernames" href="#" className={class_grade} value="grade"
 						    						 onClick={this.activateTab.bind(this,"grade")}>
                                              Grades
                                             </NavLink>
@@ -633,7 +637,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
-                                            <NavLink  href="#" className={class_swim}  value="swim"
+                                            <NavLink id="headernames" href="#" className={class_swim}  value="swim"
 						    						 onClick={this.activateTab.bind(this,"swim")}>
 						    		 		Swim Stats
                                             </NavLink>
@@ -644,7 +648,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Bike">
-                                            <NavLink href="#" className={class_bike} value="bike"
+                                            <NavLink id="headernames" href="#" className={class_bike} value="bike"
 							    		 			onClick={this.activateTab.bind(this,"bike")}>
 							    			 Bike Stats
                                             </NavLink>
@@ -655,7 +659,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Steps">
-                                            <NavLink  href="#" className={class_steps}  value="steps"
+                                            <NavLink id="headernames" href="#" className={class_steps}  value="steps"
 						    		 				  onClick={this.activateTab.bind(this,"steps")}>
 						    		 		Steps
                                             </NavLink>
@@ -666,7 +670,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Sleep">
-                                            <NavLink href="#" className={class_sleep}  value="sleep"
+                                            <NavLink id="headernames" href="#" className={class_sleep}  value="sleep"
 						    		 				 onClick={this.activateTab.bind(this,"sleep")}>
 						    				 Sleep 
                                             </NavLink>
@@ -677,7 +681,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Food">
-                                            <NavLink href="#" className={class_food}  value="food"
+                                            <NavLink id="headernames" href="#" className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>
 						    		 		Food
                                             </NavLink>
@@ -688,7 +692,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Alcohol">
-                                            <NavLink href="#" className={class_alcohol} value="alcohol"
+                                            <NavLink id="headernames" href="#" className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>
 						    		 		 Alcohol 
                                             </NavLink>
@@ -699,7 +703,7 @@ onLogoutSuccess(response){
                                         <NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Exercise Reporting">
-                                            <NavLink  href="#" className={class_exercise} value="exercise"
+                                            <NavLink id="headernames" href="#" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
 						    		 		Exercise Reporting
                                             </NavLink>                                           
@@ -711,7 +715,7 @@ onLogoutSuccess(response){
                                        	<NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
-                                            <NavLink href="#" className={class_user} value="user"
+                                            <NavLink id="headernames" href="#" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>
 						    		 		 User Inputs 
                                             </NavLink>                                           
@@ -722,7 +726,7 @@ onLogoutSuccess(response){
                                        	<NavItem>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
-                                            <NavLink href="#" className={class_movement} value="movement"
+                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>
 						    		 		 Movement Consistency 
                                             </NavLink>                                           
@@ -731,8 +735,11 @@ onLogoutSuccess(response){
                                        </NavItem>                                         									
                                   </Nav>
                                 </Collapse>
-                                
-                                 
+                                <a 
+                                className="fonts"
+					            id="daterange"
+					            style={{width:"88px",color:"white"}}
+					            onClick={this.toggleDate} >Date Range</a>                                
                            </Navbar> 
                            
 						 </div>
@@ -747,7 +754,7 @@ onLogoutSuccess(response){
                               </PopoverBody>
                            </Popover> 
                     	
-                    	<Container style={{maxWidth:"1245px"}}>                   	
+                    	<Container style={{maxWidth:"1365px"}}>                   	
              		   <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
