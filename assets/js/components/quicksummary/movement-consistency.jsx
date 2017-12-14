@@ -5,6 +5,7 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
+import { StyleSheet, css } from 'aphrodite';
 
 import {fetchMovementConsistency} from '../../network/quick';
 var CalendarWidget = require('react-calendar-widget');  
@@ -210,9 +211,9 @@ class Movementquick extends Component{
       
       columns.push(
         <Column 
-          header={<Cell>Steps</Cell>}
+          header={<Cell className={css(styles.newTableHeader)}>Steps</Cell>}
               cell={props => (
-                    <Cell {...props}>
+                    <Cell {...props} className={css(styles.newTableBody)}>
                       {steps_data[props.rowIndex]}
                     </Cell>
                   )}
@@ -221,9 +222,9 @@ class Movementquick extends Component{
       );
       columns.push(
         <Column 
-          header={<Cell>Status</Cell>}
+          header={<Cell className={css(styles.newTableHeader)}>Status</Cell>}
               cell={props => (
-                    <Cell {...props}>
+                    <Cell {...props} className={css(styles.newTableBody)}>
                       {status_data[props.rowIndex]}
                     </Cell>
                   )}
@@ -252,9 +253,9 @@ render(){
               touchScrollEnabled={true}
               {...props}>
           <Column
-            header={<Cell>Movement Consistency</Cell>}
+            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency</Cell>}
             cell={props => (
-              <Cell {...props}>
+              <Cell {...props} className={css(styles.newTableBody)}>
                 {this.state.tableAttrColumn[props.rowIndex].name}
               </Cell>
             )}
@@ -268,12 +269,30 @@ render(){
     );
   }
 }
+
+const styles = StyleSheet.create({
+  newTableHeader: {
+    color: '#111111',
+    fontSize: '18px',   
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  },
+  newTableBody:{
+    color: '#5e5e5e',
+    fontSize: '16px', 
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  }
+});
+
 export default Dimensions({
   getHeight: function(element) {
     return window.innerHeight - 217;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :860;
+    var widthOffset = window.innerWidth < 1024 ? 0 :940;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);

@@ -46,7 +46,8 @@ export default class DietType extends Component{
 							    <Label>13.1 What Did You Take?</Label>
 							    	{ this.props.editable &&
 								    	<div className="input1">
-											<Textarea				                          
+											<Textarea
+											id="placeholder"				                          
 				                            className="form-control" 
 				                            value={this.state.diet_type}
 					                          onChange={this.handleChangeDiet}

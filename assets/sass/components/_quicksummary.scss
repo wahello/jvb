@@ -11,6 +11,24 @@ html,body{
 .hori{
 	overflow-x: hidden;
 }
+.nav5 .btn2{
+	margin-left: -20px;
+}
+.nav5 .navbar-toggler{
+	margin-left: -5px;
+}
+#calendar1 #navlink{
+	margin-left: -13px;
+}
+.navbar-brand img{
+	margin-right: 15px;
+}
+.nav6 .navbar-toggler{
+	margin-left: -50px;
+}
+#head{
+	font-size: larger;
+}
 }
 
 .nav2{
@@ -92,4 +110,20 @@ padding:0px 0px 5px 0px;
 #nav3 .navbar{
 background-color: #777777;
 }
-
+.fonts{
+	font-family: proxima-nova;
+		font-size: 18px;
+		font-style:normal;
+		 color:white;
+}
+#headernames{
+	color:white;
+}
+.tabs{
+        text-align:center;
+		padding-top:8px;
+		font-family: proxima-nova;
+		font-size: 20px;
+		font-style:normal;
+       color:#103047;
+       }

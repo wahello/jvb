@@ -38,10 +38,11 @@ export default class PrescriptionSleepAids extends Component{
 				
 					<Collapse isOpen={this.state.collapse}>
 							<FormGroup>
-							<Label>4.1 What Did You Take?</Label>
+							<Label className="LAbel">4.1 What Did You Take?</Label>
 							  {this.props.editable &&
 								  <div className="input1">
-									<Textarea 		                            
+									<Textarea
+									id="placeholder" 		                            
 		                            className="form-control"
 		                            rows="5" cols="5" 
 		                            value={this.state.sleep_aid_taken}

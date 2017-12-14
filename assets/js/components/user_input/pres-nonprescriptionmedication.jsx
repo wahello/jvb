@@ -64,10 +64,11 @@ export default class PrescriptionMedication extends Component{
 					<Collapse isOpen={this.state.collapse}>
 
 					<FormGroup>
-								<Label>8.1 What Did You Take?</Label>
+								<Label className="LAbel">8.1 What Did You Take?</Label>
 									{this.props.editable &&
 										<div className="input1">
-											<Textarea 				                           
+											<Textarea
+											id="placeholder" 				                           
 				                            className="form-control" 
 				                            value={this.state.medications_taken_list}
 				                            rows="5" cols="5"
@@ -85,11 +86,11 @@ export default class PrescriptionMedication extends Component{
 
 
 					<FormGroup check>
-					<Label>8.2 Did you take a controlled or uncontrolled 
+					<Label className="LAbel">8.2 Did you take a controlled or uncontrolled 
 					substance today (marijuana is not considered either)</Label>				
 					{this.props.editable &&
 						<div className="work_hard">
-							<Label check className="btn btn-secondary radio1">
+							<Label check className="btn  radio1">
 								<Input type="radio" name="controlled_uncontrolled_substance"
 									value="yes"
 								 	checked={this.state.controlled_uncontrolled_substance === 'yes'}
@@ -97,14 +98,14 @@ export default class PrescriptionMedication extends Component{
 								Yes
 							</Label>
 							&nbsp;
-							<Label check className="btn btn-secondary radio1">
+							<Label check className="btn  radio1">
 								<Input type="radio" name="controlled_uncontrolled_substance" 
 									value="no"
 									checked={this.state.controlled_uncontrolled_substance === 'no'}
 									onChange={this.handleChange}/> &nbsp;
 								No
 							</Label>
-							<Label check className="btn btn-secondary radio1">
+							<Label check className="btn radio1">
 								<Input type="radio" name="controlled_uncontrolled_substance" 
 									value="decline"
 									checked={this.state.controlled_uncontrolled_substance === 'decline'}

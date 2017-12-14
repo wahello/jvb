@@ -5,6 +5,7 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
+import { StyleSheet, css } from 'aphrodite';
 
 class Alcohol extends Component{
 
@@ -15,7 +16,7 @@ class Alcohol extends Component{
     this.state = {
       myTableData: [
         {name: 'Alcohol Per Day'},
-        {name: 'Alcohol Per Week'},       
+        {name: 'Average Alcohol Consumed per Week'},       
       ],
     };
   }
@@ -32,13 +33,13 @@ class Alcohol extends Component{
 
 			columns.push(
 				<Column 
-					header={<Cell>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props}>
+				            <Cell {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={134}
+			        width={200}
 				/>
 			)
 		}
@@ -59,9 +60,9 @@ class Alcohol extends Component{
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell>Alchohol</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Alchohol</Cell>}
 		          cell={props => (
-		            <Cell {...props}>
+		            <Cell {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
@@ -75,12 +76,36 @@ class Alcohol extends Component{
 			);
 	}
 }
+
+const styles = StyleSheet.create({
+  newTableHeader: {
+    color: '#111111',
+    fontSize: '18px',   
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  },
+  newTableBody:{
+    color: '#5e5e5e',
+    fontSize: '16px', 
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  }
+});
+
+
 export default Dimensions({
   getHeight: function(element) {
     return window.innerHeight - 395;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth <1024 ? 0 : 125;
+    var widthOffset = window.innerWidth <1024 ? 0 : 3;
     return window.innerWidth - widthOffset;
   }
 })(Alcohol);
+
+
+
+
+

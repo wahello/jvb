@@ -5,6 +5,7 @@ import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
+import { StyleSheet, css } from 'aphrodite';
 
 const attrVerboseName = {
     workout_easy_hard: 'Workout Easy Hard',
@@ -202,13 +203,13 @@ class AllStats1 extends Component{
 			columns.push(
 				<Column 
                 style={{wordWrap:"break-word"}}
-					header={<Cell>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props}>
+				            <Cell {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={135}
+			        width={200}
 
 
 				/>
@@ -251,13 +252,15 @@ class AllStats1 extends Component{
                
                 {...props}>
 		        <Column
-		          header={<Cell>All Stats</Cell>}
+                
+		          header={<Cell className={css(styles.newTableHeader)}>All Stats</Cell>}
 		          cell={props => (
-		            <Cell {...props}>
+		            <Cell {...props} className={css(styles.newTableBody)}>
 		              {this.state.tableAttrColumn[props.rowIndex].name}
+
 		            </Cell>
 		          )}
-		          width={167}
+		          width={200}
 		          fixed={true}
 
 
@@ -269,12 +272,31 @@ class AllStats1 extends Component{
 			);
 	}
 }
+
+const styles = StyleSheet.create({
+  newTableHeader: {
+    color: '#111111',
+    fontSize: '18px',   
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  },
+  newTableBody:{
+    color: '#5e5e5e',
+    fontSize: '16px', 
+    border: 'none',
+    fontFamily:'Proxima-Nova',
+    fontStyle:'normal'
+  }
+});
+
+
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 217;
+    return window.innerHeight - 158;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 : 125;
+    var widthOffset = window.innerWidth < 1024 ? 0 : 3;
     return window.innerWidth - widthOffset;
   }
 })(AllStats1);

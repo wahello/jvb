@@ -166,7 +166,7 @@ export default class PainModal extends Component{
 			<div>
 				<FormGroup>   
 
-                    <Label>1.5.1 Where Did You Have Pain/Twinges?</Label>
+                    <Label className="LAbel">1.5.1 Where Did You Have Pain/Twinges?</Label>
                     {this.props.editable &&
 						<div className="input1">
 		                    <Select
@@ -190,10 +190,11 @@ export default class PainModal extends Component{
 
 				<Collapse isOpen={this.state.collapse}>
 					<FormGroup>
-						<Label>1.5.1.1 Please Write Where You Have Pain/Twinges</Label>
+						<Label className="LAbel">1.5.1.1 Please Write Where You Have Pain/Twinges</Label>
 							{this.props.editable &&
 								<div className="input1">
 									<Textarea
+									id="placeholder"
 									style={{height:"500px !important"}}
 									className="form-control"
 									placeholder="Write in....."
