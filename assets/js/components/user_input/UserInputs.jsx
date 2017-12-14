@@ -2,13 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import NavbarMenu from '../navbar';
 
-import { withRouter, Link } from 'react-router-dom';
-import {connect} from 'react-redux';
-
-import PropTypes from 'prop-types';
-
-import { getGarminToken,logoutUser} from '../../network/auth';
-
+import _ from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import Textarea from 'react-textarea-autosize';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -40,7 +34,6 @@ class UserInputs extends React.Component{
         update_form:false,
         editable:true,
         isOpen: false,
-        isOpen1:false,
         scrollingLock: false,
         gender:'M',
         diet_to_show:'',
@@ -176,112 +169,115 @@ class UserInputs extends React.Component{
       this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
-      this.toggle1 = this.toggle1.bind(this);
-
-      this.handleLogout = this.handleLogout.bind(this);
-      this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
-      const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                        'high carb','ketogenic diet','whole foods/mostly unprocessed'];
-      const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
-                              'wind','dewpoint','humidity','weather_comment'];
-      let other_diet = true;
-      let was_cloning = this.state.cloning_data;
-      let has_weather_data = false;
-      let has_calories_data = false;
+      if (_.isEmpty(data.data))
+        self.onFetchFailure(data);
+      else {
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+        const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
+                                'wind','dewpoint','humidity','weather_comment'];
+        let other_diet = true;
+        let was_cloning = this.state.cloning_data;
+        let has_weather_data = false;
+        let has_calories_data = false;
+        let have_strong_input = data.data.strong_input?true:false;
+        let have_optional_input = data.data.optional_input?true:false;
+        let have_encouraged_input = data.data.encouraged_input?true:false;
 
-      for(let diet of DIET_TYPE){
-        if(data.data.optional_input.type_of_diet_eaten === diet)
-          other_diet = false;
-      }
-      
-      for(let field of WEATHER_FIELDS){
-        if(!has_weather_data){
-          if((data.data.strong_input[field] != '') &&
-             (data.data.strong_input[field] !== undefined))
-            has_weather_data = true;
+        for(let diet of DIET_TYPE){
+          if(data.data.optional_input.type_of_diet_eaten === diet)
+            other_diet = false;
         }
+        
+        for(let field of WEATHER_FIELDS){
+          if(!has_weather_data){
+            if((data.data.strong_input[field] != '') &&
+               (data.data.strong_input[field] !== undefined))
+              has_weather_data = true;
+          }
+        }
+
+        if((data.data.optional_input.calories_consumed_during_workout != '' &&
+            data.data.optional_input.calories_consumed_during_workout != undefined)||
+            (data.data.optional_input.food_ate_during_workout != '' && 
+             data.data.optional_input.food_ate_during_workout != undefined)){
+          has_calories_data = true;
+        }
+
+        this.setState({
+          fetched_user_input_created_at:data.data.created_at,
+          update_form:clone_form,
+          diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+          cloning_data:false,
+          fetching_data:false,
+          weather_check: has_weather_data,
+          calories_item_check:has_calories_data,
+          editable: was_cloning ? true : false,
+
+          workout:have_strong_input?data.data.strong_input.workout:'',
+          workout_type:have_strong_input?data.data.strong_input.workout_type:'',
+          workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
+          workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
+          workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
+          workout_effort:have_strong_input?data.data.strong_input.workout_effort_level:'',
+          workout_effort_hard_portion:have_strong_input?data.data.strong_input.hard_portion_workout_effort_level:'',
+          pain:have_encouraged_input?data.data.encouraged_input.pains_twings_during_or_after_your_workout:'',
+          pain_area:have_encouraged_input?data.data.encouraged_input.pain_area:'',
+          water_consumed:have_encouraged_input?data.data.encouraged_input.water_consumed_during_workout:'',
+          chia_seeds:have_optional_input?data.data.optional_input.chia_seeds_consumed_during_workout:'',
+          breath_nose:have_encouraged_input?data.data.encouraged_input.workout_that_user_breathed_through_nose:'',
+          prcnt_processed_food:have_strong_input?data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday:'',
+          unprocessed_food_list:have_strong_input?data.data.strong_input.list_of_unprocessed_food_consumed_yesterday:'',
+          processed_food_list:have_strong_input?data.data.strong_input.list_of_processed_food_consumed_yesterday:'',
+          alchol_consumed:have_strong_input?data.data.strong_input.number_of_alcohol_consumed_yesterday:'',
+          alcohol_drink_consumed_list:have_strong_input?data.data.strong_input.alcohol_drink_consumed_list:'',
+          stress:have_encouraged_input?data.data.encouraged_input.stress_level_yesterday:'',
+          sick:have_optional_input?data.data.optional_input.sick:'',
+          sickness:have_optional_input?data.data.optional_input.sickness:'',
+          fasted:have_optional_input?data.data.optional_input.fasted_during_workout:'',
+          food_ate_before_workout:have_optional_input?data.data.optional_input.food_ate_before_workout:'',
+          workout_comment:have_optional_input?data.data.optional_input.general_Workout_Comments:'',
+          calories:have_optional_input?data.data.optional_input.calories_consumed_during_workout:'',
+          calories_item:have_optional_input?data.data.optional_input.food_ate_during_workout:'',
+
+          indoor_temperature:have_strong_input?data.data.strong_input.indoor_temperature:'',
+          outdoor_temperature:have_strong_input?data.data.strong_input.outdoor_temperature:'',
+          temperature_feels_like:have_strong_input?data.data.strong_input.temperature_feels_like:'',
+          wind:have_strong_input?data.data.strong_input.wind:'',
+          dewpoint:have_strong_input?data.data.strong_input.dewpoint:'',
+          humidity:have_strong_input?data.data.strong_input.humidity:'',
+          weather_comment:have_strong_input?data.data.strong_input.weather_comment:'',
+
+          sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
+          sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
+          // sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
+          // sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
+          // awake_hours:data.data.strong_input.awake_time.split(':')[0],
+          // awake_mins:data.data.strong_input.awake_time.split(':')[1],
+          sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
+          prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
+          sleep_aid_taken:have_strong_input?data.data.strong_input.sleep_aid_taken:'',
+          smoke_substances:have_strong_input?data.data.strong_input.smoke_any_substances_whatsoever:'',
+          smoked_substance_list:have_strong_input?data.data.strong_input.smoked_substance:'',
+          medications:have_strong_input?data.data.strong_input.prescription_or_non_prescription_medication_yesterday:'',
+          medications_taken_list:have_strong_input?data.data.strong_input.prescription_or_non_prescription_medication_taken:'',
+          controlled_uncontrolled_substance:have_strong_input?data.data.strong_input.controlled_uncontrolled_substance:'',
+          stand:have_optional_input?data.data.optional_input.stand_for_three_hours:'',
+          food_consumed:have_optional_input?data.data.optional_input.list_of_processed_food_consumed_yesterday:'',
+          weight:have_optional_input?data.data.optional_input.weight:'',
+          waist:have_optional_input?data.data.optional_input.waist_size:'',
+          clothes_size:have_optional_input?data.data.optional_input.clothes_size:'',
+          heart_variability:have_optional_input?data.data.optional_input.heart_rate_variability:'',
+          breath_sleep:have_optional_input?data.data.optional_input.percent_breath_nose_last_night:'',
+          breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
+          diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
+          general_comment:have_optional_input?data.data.optional_input.general_comment:''
+        });
+        window.scrollTo(0,0);
       }
-
-      if((data.data.optional_input.calories_consumed_during_workout != '' &&
-          data.data.optional_input.calories_consumed_during_workout != undefined)||
-          (data.data.optional_input.food_ate_during_workout != '' && 
-           data.data.optional_input.food_ate_during_workout != undefined)){
-        has_calories_data = true;
-      }
-
-      this.setState({
-        fetched_user_input_created_at:data.data.created_at,
-        update_form:clone_form,
-        diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
-        cloning_data:false,
-        fetching_data:false,
-        weather_check: has_weather_data,
-        calories_item_check:has_calories_data,
-        editable: was_cloning ? true : false,
-
-        workout:data.data.strong_input.workout,
-        workout_type:data.data.strong_input.workout_type,
-        workout_input_type: data.data.strong_input.workout_input_type,
-        workout_easy:data.data.strong_input.work_out_easy_or_hard,
-        workout_enjoyable:data.data.optional_input.workout_enjoyable,
-        workout_effort:data.data.strong_input.workout_effort_level,
-        workout_effort_hard_portion:data.data.strong_input.hard_portion_workout_effort_level,
-        pain:data.data.encouraged_input.pains_twings_during_or_after_your_workout,
-        pain_area:data.data.encouraged_input.pain_area,
-        water_consumed:data.data.encouraged_input.water_consumed_during_workout,
-        chia_seeds:data.data.optional_input.chia_seeds_consumed_during_workout,
-        breath_nose:data.data.encouraged_input.workout_that_user_breathed_through_nose,
-        prcnt_processed_food:data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday,
-        unprocessed_food_list:data.data.strong_input.list_of_unprocessed_food_consumed_yesterday,
-        processed_food_list:data.data.strong_input.list_of_processed_food_consumed_yesterday,
-        alchol_consumed:data.data.strong_input.number_of_alcohol_consumed_yesterday,
-        alcohol_drink_consumed_list:data.data.strong_input.alcohol_drink_consumed_list,
-        stress:data.data.encouraged_input.stress_level_yesterday,
-        sick:data.data.optional_input.sick,
-        sickness:data.data.optional_input.sickness,
-        fasted:data.data.optional_input.fasted_during_workout,
-        food_ate_before_workout:data.data.optional_input.food_ate_before_workout,
-        workout_comment:data.data.optional_input.general_Workout_Comments,
-        calories:data.data.optional_input.calories_consumed_during_workout,
-        calories_item:data.data.optional_input.food_ate_during_workout,
-
-        indoor_temperature:data.data.strong_input.indoor_temperature,
-        outdoor_temperature:data.data.strong_input.outdoor_temperature,
-        temperature_feels_like:data.data.strong_input.temperature_feels_like,
-        wind:data.data.strong_input.wind,
-        dewpoint:data.data.strong_input.dewpoint,
-        humidity:data.data.strong_input.humidity,
-        weather_comment:data.data.strong_input.weather_comment,
-
-        sleep_hours_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0],
-        sleep_mins_last_night:data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1],
-        sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
-        sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
-        awake_hours:data.data.strong_input.awake_time.split(':')[0],
-        awake_mins:data.data.strong_input.awake_time.split(':')[1],
-        sleep_comment:data.data.strong_input.sleep_comment,
-        prescription_sleep_aids:data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night,
-        sleep_aid_taken:data.data.strong_input.sleep_aid_taken,
-        smoke_substances:data.data.strong_input.smoke_any_substances_whatsoever,
-        smoked_substance_list:data.data.strong_input.smoked_substance,
-        medications:data.data.strong_input.prescription_or_non_prescription_medication_yesterday,
-        medications_taken_list:data.data.strong_input.prescription_or_non_prescription_medication_taken,
-        controlled_uncontrolled_substance:data.data.strong_input.controlled_uncontrolled_substance,
-        stand:data.data.optional_input.stand_for_three_hours,
-        food_consumed:data.data.optional_input.list_of_processed_food_consumed_yesterday,
-        weight:data.data.optional_input.weight,
-        waist:data.data.optional_input.waist_size,
-        clothes_size:data.data.optional_input.clothes_size,
-        heart_variability:data.data.optional_input.heart_rate_variability,
-        breath_sleep:data.data.optional_input.percent_breath_nose_last_night,
-        breath_day:data.data.optional_input.percent_breath_nose_all_day_not_exercising,
-        diet_type:data.data.optional_input.type_of_diet_eaten,
-        general_comment:data.data.optional_input.general_comment
-      });
-      window.scrollTo(0,0);
     }
     
     onFetchFailure(error){
@@ -410,12 +406,6 @@ createDropdown(start_num , end_num, step=1){
      
     });
   }
-   toggle1() {
-    this.setState({
-      isOpen1: !this.state.isOpen1,
-     
-    });
-  }
 
 componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
@@ -481,75 +471,33 @@ handleScroll() {
       editable:!this.state.editable
     });
   }
-   onLogoutSuccess(response){
-    this.props.history.push("/#logout");
-  }
-
-  handleLogout(){
-    this.props.logoutUser(this.onLogoutSuccess);
-  }
     render(){
-       const {fix} = this.props;
 
         return(
             <div>            
                            <div id="hambergar" className="container-fluid">
-                             <Navbar toggleable 
-                                 fixed={fix ? 'top' : ''} 
-                                  className="navbar navbar-expand-sm navbar-inverse">
-                                  <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} style={{paddingRight:"30px"}}>
-                                   <FontAwesome 
-                                         name = "bars"
-                                         size = "1x"
-                                                                  
-                                     />
-                                    
-                                  </NavbarToggler>
-                                  <Link to='/'>
-                                    <NavbarBrand 
-                                      className="navbar-brand float-xs-right float-sm-left" 
-                                      id="navbarTogglerDemo">
-                                      <img className="img-fluid"
-                                       id="navbarbrand"
-                                       src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-                                    </NavbarBrand>
-                                  </Link>
-                                  <span id="header">
-                                  <h2 className="head">Daily User Inputs 
-                                   <span id="infobutton"
-                                     onClick={this.toggleInfo}>
-                                     <a style={{color:"black" ,paddingLeft:"10px"}}> 
-                                     <FontAwesome 
-                                                  style={{color:"white",fontSize:"25px"}}
-                                                  name = "info-circle"
-                                                  size = "1x"                                      
-                                                
-                                      />
-                                      </a>
-                                  </span> 
-                             
+                             <NavbarMenu fix={false} />
+                              </div>                              
+                              <div>
+                             <h2 className="head">Daily User Inputs Report 
+                              <span id="infobutton"
+                             onClick={this.toggleInfo} 
+                             style={{float:"right",paddingRight:"30px",color:"gray"}}>
+                             <a style={{color:"gray"}}> 
+                             <FontAwesome 
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                              </a>
+                              </span> 
                              </h2>
+                             
+                              </div>
 
-                                  </span>
-                                  <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
-                                    <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-                                      <NavItem className="float-sm-right">  
-                                        <Link id="logout" className="nav-link" to='/'>Home</Link>
-                                      </NavItem>
-                                       <NavItem className="float-sm-right">                
-                                           <NavLink
-                                           id="logout"  
-                                           className="nav-link"                    
-                                           onClick={this.handleLogout}>Log Out
-                                            </NavLink>               
-                                      </NavItem>  
-                                    </Nav>
-                                  </Collapse>
 
-                                </Navbar>
-                              </div>                                                        
                             <Popover
-                            id="popover"
+                            style={{height:"220px",overflowY:"scroll"}} 
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -633,11 +581,11 @@ handleScroll() {
                                    </span>
                                    <span className="btn2">
                                    <Button 
-                                      id="nav-btn"
+                                   style={{backgroundColor:"#ed9507"}} 
                                       size="sm"
                                       onClick={this.toggleEditForm}
                                       className="btn hidden-sm-up">
-                                      {this.state.editable ? 'VIEW INPUTS' : 'EDIT FORM'}
+                                      {this.state.editable ? 'View Inputs' : 'Edit Form'}
                                    </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
@@ -725,8 +673,7 @@ handleScroll() {
                            </Popover> 
 
                            <Popover 
-                          id="popover"
-                          className="pop" 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
@@ -760,20 +707,20 @@ handleScroll() {
                           data-toggle="validator">
                           {this.state.editable &&
                                  <div className="row justify-content-center"> 
-                                   <span>
+                                   <span id="btn1">
                                        <Button
-                                            id="btn1"                                            
+                                            style={{backgroundColor:"#ed9507",fontFamily: "futura-pt"}}   
                                             size="sm"
                                             onClick={this.fetchYesterdayData}
                                             className="btn">
-                                            COPY YESTERDAY'S INPUTS
+                                            Copy Yesterday’s Inputs
                                           </Button>
                                    </span>
                                 </div>
                           }
 
                           <div id="workout">
-                          <h3><strong>Workout Inputs</strong></h3>
+                          <h2><strong>Workout Inputs</strong></h2>
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?
@@ -781,7 +728,7 @@ handleScroll() {
                              onClick={this.toggleInfoworkout} 
                              style={{float:"right",paddingLeft:"15px",color:"gray"}}>
                              <FontAwesome 
-                                          style={{color:"#5e5e5e"}}
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1.5x"                                      
                                         
@@ -791,20 +738,20 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input">                           
                               
-                                  <Label className="btn radio1">
+                                  <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout" 
                                     value="yes" 
                                     checked={this.state.workout === 'yes'}
                                     onChange={this.handleChangeWorkoutDone}/> Yes
                                   </Label>
-                                  <Label className="btn radio1">
+                                  <Label className="btn btn-secondary radio1">
                                     <Input type="radio" name="workout" 
                                     value="no"
                                     checked={this.state.workout === 'no'}
                                     onChange={this.handleChangeWorkoutDone}/> No
                                   </Label>
-                                  <Label className="btn radio1">
+                                  <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout" 
                                     value="not yet"
@@ -822,8 +769,7 @@ handleScroll() {
                           </FormGroup>
 
                             <Popover 
-                            id="popover"
-                            className="pop"
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
@@ -852,13 +798,12 @@ handleScroll() {
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
-
                              <span id="workouttypeinfo"
                              onClick={this.toggleInfoworkoutType} 
                              style={{paddingLeft:"15px",color:"gray"}}>
                             
                              <FontAwesome 
-                                          style={{color:"#5e5e5e"}}
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -866,25 +811,24 @@ handleScroll() {
                             
                               </span>
                             </Label>
-
                             {this.state.editable &&
                               <div className="input">                           
                               
-                                  <Label className="btn  radio1">
+                                  <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="cardio" 
                                     checked={this.state.workout_type === 'cardio'}
                                     onChange={this.handleChange}/> Cardio
                                   </Label>
-                                  <Label className="btn  radio1">
+                                  <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="strength"
                                     checked={this.state.workout_type === 'strength'}
                                     onChange={this.handleChange}/> Strength
                                   </Label>
-                                  <Label className="btn  radio1">
+                                  <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="both"
@@ -893,7 +837,6 @@ handleScroll() {
                                   </Label>
                                 </div>
                               }
-
                            
                               {!this.state.editable && 
                                 <div className="input">
@@ -901,13 +844,11 @@ handleScroll() {
                                 </div>
                               }
                                </FormGroup>
-
                                     
                             }   
                              <Popover 
-                           id="popover" 
-                            placement="right"
-                            className="pop" 
+                           style={{height:"220px",overflowY:"scroll"}} 
+                            placement="right" 
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
@@ -939,7 +880,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                             
                              <FontAwesome 
-                                          style={{color:"#5e5e5e"}}
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -949,17 +890,15 @@ handleScroll() {
                                 </Label>
                                 {this.state.editable && 
                                  
-
                                      <div className="input">
-                                     <Label check className="btn  radio1">
+                                     <Label check className="btn btn-secondary radio1">
                                         <Input type="radio" name="workout_easy" 
                                         value="easy"
                                         checked={this.state.workout_easy === 'easy'}
                                         onChange={this.handleChangeWorkout}/>{' '}
                                         Easy
                                      </Label>
-
-                                     <Label check className="btn  radio1">
+                                     <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="workout_easy"
                                             value="hard"
                                             checked={this.state.workout_easy === 'hard'}
@@ -979,9 +918,8 @@ handleScroll() {
                           }
 
                            <Popover 
-                          id="popover" 
-                            placement="right"
-                            className="pop" 
+                           style={{height:"220px",overflowY:"scroll"}} 
+                            placement="right" 
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
@@ -1025,16 +963,14 @@ handleScroll() {
                               <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
                               {this.state.editable &&
                                 <div className="input">
-
-                                     <Label check className="btn  radio1">
+                                     <Label check className="btn btn-secondary radio1">
                                         <Input type="radio" name="workout_enjoyable" 
                                         value="yes"
                                         checked={this.state.workout_enjoyable === 'yes'}
                                         onChange={this.handleChange}/>{' '}
                                         Yes
                                      </Label>
-
-                                     <Label check className="btn  radio1">
+                                     <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="workout_enjoyable" 
                                             value="no"
                                             checked={this.state.workout_enjoyable === 'no'}
@@ -1058,7 +994,6 @@ handleScroll() {
                                 { this.state.editable &&
                                   <div className="input">
                                       <Input 
-                                      id="placeholder"
                                       type="select" 
                                       className="custom-select form-control" 
                                       name="workout_effort"
@@ -1098,15 +1033,14 @@ handleScroll() {
                                 {this.state.editable &&
                                   <div className="input">
                                      
-                                       <Label check className="btn  radio1">
+                                       <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="pain" 
                                       value="yes"
                                       checked={this.state.pain === 'yes'}
                                       onChange={this.handleChangePain}/>{' '}
                                       Yes
                                    </Label>
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="pain" 
                                           value="no"
                                           checked={this.state.pain === 'no'}
@@ -1134,8 +1068,7 @@ handleScroll() {
                             <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
                               { this.state.editable &&
                               <div className="input">
-                                  <Input type="select"
-                                        id="placeholder" 
+                                  <Input type="select" 
                                          className="custom-select form-control" 
                                          name="water_consumed"                                 
                                          value={this.state.water_consumed}
@@ -1162,8 +1095,7 @@ handleScroll() {
                             <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
                                 { this.state.editable &&
                                   <div className="input">
-                                      <Input
-                                      id="placeholder" 
+                                      <Input 
                                       type="select" 
                                       className="custom-select form-control" 
                                       name="chia_seeds"
@@ -1192,7 +1124,6 @@ handleScroll() {
                                   {this.state.editable &&
                                     <div className="input">
                                         <Input type="select"
-                                        id="placeholder"
                                          className="form-control custom-select" 
                                          name="breath_nose"                         
                                          value={this.state.breath_nose}
@@ -1209,7 +1140,6 @@ handleScroll() {
                                     </div>
                                   }
                             </FormGroup>
-
                           }
 
                            
@@ -1221,15 +1151,14 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input">
                                   
-                                    <Label check className="btn  radio1">
+                                    <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="fasted" 
                                       value="yes"
                                       checked={this.state.fasted === 'yes'}
                                       onChange={this.handleChangeFasted}/>{' '}
                                       Yes
                                    </Label>
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="fasted" 
                                           value="no"
                                           checked={this.state.fasted === 'no'}
@@ -1260,8 +1189,7 @@ handleScroll() {
                             </Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                     <Textarea name="workout_comment"
-                                     id="placeholder"                            
+                                     <Textarea name="workout_comment"                             
                                      placeholder="please leave a comment" 
                                      className="form-control"
                                      rows="5" cols="5" 
@@ -1269,7 +1197,6 @@ handleScroll() {
                                      onChange={this.handleChange}></Textarea>
                                 </div>
                               }
-
                               {
                                 !this.state.editable &&
                                 <div className="input">                             
@@ -1296,7 +1223,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div>
-                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout</Label>
+                                <Label>1.11 I want to manually enter in weather information for my workout</Label>
                                 <div className="input">                             
                                   <p>{this.state.weather_check?"yes":"no"}</p>
                                 </div>
@@ -1314,9 +1241,7 @@ handleScroll() {
                               <div>
                                 <div className="col-xs-6">
                                   <div className="input"> 
-                                <Input type="select" 
-                                id="placeholder"
-                                name="indoor_temperature"
+                                <Input type="select" name="indoor_temperature"
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.indoor_temperature}
@@ -1329,9 +1254,7 @@ handleScroll() {
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
-                                <Input type="select"
-                                id="placeholder"
-                                 name="outdoor_temperature"
+                                <Input type="select" name="outdoor_temperature"
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.outdoor_temperature}
@@ -1355,14 +1278,11 @@ handleScroll() {
                         }
 
                          { (this.state.workout === "yes" || this.state.workout === "") &&  
-
-
                           <FormGroup>
                             <Label className="padding">1.11.2 What was the dew point when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select"
-                                  id="placeholder" 
+                                  <Input type="select" 
                                      className="custom-select form-control"
                                      name="dewpoint"                                  
                                      value={this.state.dewpoint}
@@ -1379,18 +1299,14 @@ handleScroll() {
                               </div>
                             }
                           </FormGroup> 
-
-
                        }
 
                         { (this.state.workout === "yes" || this.state.workout === "") && 
-
                         <FormGroup>
                             <Label className="padding">1.11.3  What was the humidity when I did my workout (get from weather apps)? </Label>
                             {this.state.editable &&
                               <div className="input1">
                                   <Input type="select" 
-                                    id="placeholder"
                                      className="custom-select form-control"
                                      name="humidity"                                  
                                      value={this.state.humidity}
@@ -1407,19 +1323,14 @@ handleScroll() {
                               </div>
                             }
                           </FormGroup>  
-
-
                         }
 
                          { (this.state.workout === "yes" || this.state.workout === "") &&  
-
-
                           <FormGroup>
                             <Label className="padding">1.11.4 What was the wind when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select"
-                                  id="placeholder" 
+                                  <Input type="select" 
                                      className="custom-select form-control"
                                      name="wind"                                  
                                      value={this.state.wind}
@@ -1436,19 +1347,14 @@ handleScroll() {
                               </div>
                             }
                           </FormGroup> 
-
-
                        }
 
                         { (this.state.workout === "yes" || this.state.workout === "") &&  
-
-
                           <FormGroup>
                             <Label className="padding">1.11.5 What was the Temperature Feels Like when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select"
-                                    id="placeholder" 
+                                  <Input type="select" 
                                      className="custom-select form-control"
                                      name="temperature_feels_like"                                  
                                      value={this.state.temperature_feels_like}
@@ -1465,19 +1371,15 @@ handleScroll() {
                               </div>
                             }
                           </FormGroup> 
-
-
                        }
 
 
                          { (this.state.workout === "yes" || this.state.workout === "") &&
-
                           <FormGroup>      
                             <Label className="padding">1.11.6  Weather Comments (allow the user to enter text with comments)</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="weather_comment"
-                                 id="placeholder"
                                   rows="5" cols="5" 
                                   className="form-control" 
                                  value={this.state.weather_comment}
@@ -1491,7 +1393,6 @@ handleScroll() {
                               </div>
                             }
                           </FormGroup>   
-
                        }
                        </Collapse>
                      
@@ -1526,14 +1427,12 @@ handleScroll() {
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
-
                             
                           <FormGroup>      
                             <Label className="padding">1.12 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                 <Input type="text" name="calories"
-                                 id="placeholder" 
+                                 <Input type="text" name="calories" 
                                  value={this.state.calories}
                                  onChange={this.handleChange}/>
                               </div>
@@ -1555,7 +1454,6 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"
-                                 id="placeholder"
                                   rows="5" cols="5" 
                                   className="form-control" 
                                  value={this.state.calories_item}
@@ -1575,7 +1473,7 @@ handleScroll() {
                       </div>
                      
                             <div id="sleep">
-                            <h3><strong>Sleep Input</strong></h3>
+                            <h2><strong>Sleep Input</strong></h2>
                          
                           
                             <FormGroup>
@@ -1585,9 +1483,7 @@ handleScroll() {
                               <div>
                                 <div className="col-xs-6">
                                   <div className="input"> 
-                                <Input type="select"
-                                id="placeholder"
-                                 name="sleep_hours_last_night"
+                                <Input type="select" name="sleep_hours_last_night"
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_last_night}
@@ -1600,9 +1496,7 @@ handleScroll() {
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
-                                <Input type="select" 
-                                id="placeholder"
-                                name="sleep_mins_last_night"
+                                <Input type="select" name="sleep_mins_last_night"
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.sleep_mins_last_night}
@@ -1624,6 +1518,7 @@ handleScroll() {
                             }                          
                           </FormGroup>
 
+                          {/*
                            <FormGroup>
                           
                             <Label className="padding">2.1 Sleep Bed Time</Label>
@@ -1655,7 +1550,6 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-
                            <FormGroup>
                           
                             <Label className="padding">2.2 Sleep Awake Time</Label>
@@ -1687,7 +1581,6 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-
                            <FormGroup>
                           
                             <Label className="padding">2.3 Awake Time</Label>
@@ -1695,9 +1588,7 @@ handleScroll() {
                               <div>
                                 <div className="col-xs-6">
                                   <div className="input"> 
-                                <Input type="select" 
-                                id="placeholder"
-                                name="awake_hours"
+                                <Input type="select" name="awake_hours"
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.awake_hours}
@@ -1710,9 +1601,7 @@ handleScroll() {
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input">
-                                <Input type="select" 
-                                id="placeholder"
-                                name="awake_mins"
+                                <Input type="select" name="awake_mins"
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.awake_mins}
@@ -1733,13 +1622,13 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
+                        */}
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                     <Textarea name="sleep_comment"
-                                     id="placeholder" 
+                                     <Textarea name="sleep_comment" 
                                      placeholder="please leave a comment" 
                                      className="form-control"
                                      rows="5" cols="5" 
@@ -1760,22 +1649,20 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input1">
                                 
-                                     <Label check className="btn  radio1">
+                                     <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="prescription_sleep_aids" 
                                       value="yes"
                                       checked={this.state.prescription_sleep_aids === 'yes'}
                                       onChange={this.handleChangeSleepAids}/>{' '}
                                       Yes
                                    </Label>
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="prescription_sleep_aids" 
                                           value="no"
                                           checked={this.state.prescription_sleep_aids === 'no'}
                                           onChange={this.handleChangeSleepAids}/>{' '}
                                         No
                                   </Label>
-
                                 </div>
                               }
                               {
@@ -1791,7 +1678,7 @@ handleScroll() {
                           </div>
                         
                         <div id="food">
-                        <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
+                        <h2><strong>Nutrition and Lifestyle Inputs</strong></h2>
                         
                           <FormGroup className="food">
                             
@@ -1804,7 +1691,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                            
                              <FontAwesome 
-                                          style={{color:"#5e5e5e"}}
+                                          style={{color:"white"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -1816,7 +1703,6 @@ handleScroll() {
                                 <div className="input1">
                                   <Input
                                   type="select" 
-                                  id="placeholder"
                                   className="form-control custom-select" 
                                   name="prcnt_processed_food"                            
                                   value={this.state.prcnt_processed_food}
@@ -1836,10 +1722,8 @@ handleScroll() {
                             {this.renderProcessedFoodModal()}
                             </FormGroup>
                           </FormGroup>
-                          <div >
-                           <Popover
-                           className="pop"                         
-                           id="popover" 
+                           <Popover 
+                           style={{height:"220px",overflowY:"scroll"}} 
                             placement="right" 
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
@@ -1954,16 +1838,14 @@ handleScroll() {
 
                                </div>                      
                               </PopoverBody>
-                           </Popover> 
-                           </div>     
+                           </Popover>       
 
                           <FormGroup>
                                <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>
                                 {this.state.editable &&
                                   <div className="input1">
                                        <Input 
-                                       type="select"
-                                       id="placeholder" 
+                                       type="select" 
                                        className="custom-select form-control" 
                                        name="alchol_consumed"
                                        value={this.state.alchol_consumed}
@@ -1991,24 +1873,20 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input1">
                                   
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="smoke_substances" 
                                       value="yes"
                                       checked={this.state.smoke_substances === 'yes'}
                                       onChange={this.handleChangeSmokeSubstance}/>{' '}
                                       Yes
                                    </Label>
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="smoke_substances" 
                                           value="no"
                                           checked={this.state.smoke_substances === 'no'}
                                           onChange={this.handleChangeSmokeSubstance}/>{' '}
                                         No
                                   </Label>
-
-
                               </div>
                             }
                             {
@@ -2028,24 +1906,20 @@ handleScroll() {
                                 {this.state.editable &&
                                   <div className="input1">
                                    
-                                     <Label check className="btn  radio1">
-                                      <Input type="radio" name="medications"
-                                      id="placeholder" 
+                                     <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="medications" 
                                       value="yes"
                                       checked={this.state.medications === 'yes'}
                                       onChange={this.handleChangePrescription}/>{' '}
                                       Yes
                                    </Label>
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="medications" 
                                           value="no"
                                           checked={this.state.medications === 'no'}
                                           onChange={this.handleChangePrescription}/>{' '}
                                         No
                                   </Label>
-
-
                                   </div>
                                 }
                                 {
@@ -2063,27 +1937,26 @@ handleScroll() {
                           </div>
 
                           <div id="stress">
-                           <h3><strong>Stress/Illness Inputs</strong></h3>
+                           <h2><strong>Stress/Illness Inputs</strong></h2>
                           <FormGroup>
                             <Label className="padding">9. Yesterday's Stress Level</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                 <Label check className="btn  radio1">
+                                 <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="stress" 
                                     value="low"
                                     checked={this.state.stress === 'low'}
                                     onChange={this.handleChange}/>{' '}
                                     Low
                                  </Label>
-
-                                 <Label check className="btn  radio1">
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stress" 
                                         value="medium"
                                         checked={this.state.stress === 'medium'}
                                         onChange={this.handleChange}/>{' '}
                                       Medium
                                 </Label>
-                                 <Label check className="btn  radio1">
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stress" 
                                         value="high"
                                         checked={this.state.stress === 'high'}
@@ -2105,24 +1978,20 @@ handleScroll() {
                             {this.state.editable &&
                               <div className="input1">
                                
-
-                                  <Label check className="btn  radio1">
+                                  <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="sick" 
                                     value="yes"
                                     checked={this.state.sick === 'yes'}
                                     onChange={this.handleChangeSick}/>{' '}
                                     Yes
                                  </Label>
-
-                                 <Label check className="btn  radio1">
+                                 <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="sick" 
                                         value="no"
                                         checked={this.state.sick === 'no'}
                                         onChange={this.handleChangeSick}/>{' '}
                                       No
                                 </Label>
-
-
                               </div>
                             }
                             {
@@ -2142,13 +2011,12 @@ handleScroll() {
                           </div>
                          
                          <div id="daily">
-                          <h3><strong>Extra Inputs</strong></h3>
+                          <h2><strong>Extra Inputs</strong></h2>
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                  <Input type="select"
-                                  id="placeholder" 
+                                  <Input type="select" 
                                      className="custom-select form-control"
                                      name="weight"                                  
                                      value={this.state.weight}
@@ -2175,8 +2043,7 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input 
-                                    type="text"
-                                    id="placeholder" 
+                                    type="text" 
                                     className="form-control" 
                                     placeholder="Between 20 - 60"
                                     name="waist"                               
@@ -2197,12 +2064,10 @@ handleScroll() {
                           { this.state.gender === 'F' &&
                             <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
-
                               {this.state.editable &&
                                 <div className="input1">
                                   <Input 
-                                    type="text"
-                                    id="placeholder" 
+                                    type="text" 
                                     className="form-control"
                                     placeholder="Between 0 - 16" 
                                     name="clothes_size"                                
@@ -2227,7 +2092,6 @@ handleScroll() {
                                     <div className="input1">
                                         <Input 
                                         type="select" 
-                                        id="placeholder"
                                         className="custom-select form-control" 
                                         name="diet_type"
                                         value={this.state.diet_to_show}
@@ -2262,17 +2126,14 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input1">
                                   
-
-
-                                    <Label check className="btn  radio1">
+                                    <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="stand" 
                                       value="yes"
                                       checked={this.state.stand === 'yes'}
                                       onChange={this.handleChange}/>{' '}
                                       Yes
                                    </Label>
-
-                                   <Label check className="btn  radio1">
+                                   <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="stand" 
                                           value="no"
                                           checked={this.state.stand === 'no'}
@@ -2293,8 +2154,7 @@ handleScroll() {
                             <Label className="padding">15. General Comments</Label>
                               {this.state.editable &&
                                 <div className="input1">
-                                     <Textarea  name="general_comment"
-                                     id="placeholder" 
+                                     <Textarea  name="general_comment" 
                                      placeholder="please leave a comment" 
                                      className="form-control"
                                      rows="5" cols="5" 
@@ -2313,20 +2173,19 @@ handleScroll() {
 
                           { (!this.state.update_form && this.state.editable) &&
                             <Button 
-                              id="btn1"
-                              type="submit" 
-                              className="btn btn-block">
-                                SUBMIT
+                              type="submit"
+                              color="info" 
+                              className="btn btn-block btn-primary">
+                                Submit
                             </Button>
-
                           }
 
                           {(this.state.update_form && this.state.editable) &&
                             <Button 
-                              id="btn1" 
-                              className="btn btn-block"
+                              color="info" 
+                              className="btn btn-block btn-primary"
                               onClick={this.onUpdate}>
-                                UPDATE
+                                Update
                             </Button>
                           }
 
@@ -2355,15 +2214,4 @@ handleScroll() {
     }
 }
 
-function mapStateToProps(state){
-  return {
-    errorMessage: state.garmin_auth.error,
-    message : state.garmin_auth.message
-  };
-}
-export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(UserInputs));
-Navbar.propTypes={
-    fixed: PropTypes.string,
-    color: PropTypes.string,
-}
-
+export default UserInputs;

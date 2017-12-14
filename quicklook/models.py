@@ -24,20 +24,24 @@ class Grades(models.Model):
 		('C','C'),
 		('D','D'),
 		('F','F'),
+		('N/A','N/A')
 	)
 
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "grades_ql")
-	overall_truth_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
-	overall_truth_health_gpa = models.FloatField(blank=True,null=True)
+	overall_health_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	overall_health_gpa = models.FloatField(blank=True,null=True)
 	movement_non_exercise_steps_grade = models.CharField(choices=GRADE_CHOICES,
-														 max_length=1,blank=True)
-	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1, blank=True)
-	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=1, blank=True)
-	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=1, blank=True)
-	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
+														 max_length=3,blank=True)
+	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
+	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
+	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
+	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	workout_duration_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	workout_effortlvl_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	avg_exercise_hr_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
 	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES,
-															 max_length=1, blank=True)
-	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
+															 max_length=3, blank=True)
+	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
 	penalty = models.FloatField(blank=True, null=True)
 
 class ExerciseAndReporting(models.Model):
@@ -60,14 +64,6 @@ class ExerciseAndReporting(models.Model):
 	CS = 'controlled substances'
 	ID = 'illicit drugs'
 	SA = 'sleep aids'
-
-	GRADE_CHOICES = (
-		('A','A'),
-		('B','B'),
-		('C','C'),
-		('D','D'),
-		('F','F'),
-	)
 
 	STRESS_LEVEL_CHOICES =  (
         ( Low,'low'),
@@ -167,10 +163,6 @@ class ExerciseAndReporting(models.Model):
 
 	exercise_consistency = models.FloatField(validators=[MinValueValidator(0),MaxValueValidator(7)],
 											 blank=True,null=True)
-	workout_duration_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
-	workout_effortlvl_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
-	avg_heartrate_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
-	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=1,blank=True)
 	heartrate_variability_stress =  models.IntegerField(blank=True,null=True)
 	fitness_age = models.IntegerField(blank=True,null=True)
 	workout_comment = models.TextField(blank=True)
@@ -229,19 +221,11 @@ class Sleep(models.Model):
 	# awake_time = models.TimeField()
 
 class Food(models.Model):
-	GRADE_CHOICES = (
-		('A','A'),
-		('B','B'),
-		('C','C'),
-		('D','D'),
-		('F','F'),
-	)
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "food_ql")
 	prcnt_non_processed_food = models.FloatField(validators=[
 		MinValueValidator(0),MaxValueValidator(100)],
 		blank=True,null=True)
-	prcnt_non_processed_food_grade = models.CharField(choices=GRADE_CHOICES,max_length=1,
-													  blank=True)
+
 	non_processed_food = models.TextField(blank=True)
 
 	# choices are not provided, will be choice field in the future

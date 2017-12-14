@@ -99,13 +99,16 @@ class Quicklook extends Component{
 				grades_ql: {
 			        id: data.grades_ql.id,
 			        user_ql: data.grades_ql.user_ql,
-			        overall_truth_grade: data.grades_ql.overall_truth_grade,
-			        overall_truth_health_gpa: data.grades_ql.overall_truth_health_gpa,
+			        overall_health_grade: data.grades_ql.overall_health_grade,
+			        overall_health_gpa: data.grades_ql.overall_health_gpa,
 			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,   
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
 			        overall_workout_grade: data.grades_ql.overall_workout_grade,
+			        workout_duration_grade: data.grades_ql.workout_duration_grade,
+			        workout_effortlvl_grade: data.grades_ql.workout_effortlvl_grade,
+			        avg_exercise_hr_grade: data.grades_ql.avg_exercise_hr_grade,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
 			        penalty:data.grades_ql.penalty		
@@ -157,10 +160,6 @@ class Quicklook extends Component{
 			        workout_elapsed_time: data.exercise_reporting_ql.workout_elapsed_time,
 			        timewatch_paused_workout: data.exercise_reporting_ql.timewatch_paused_workout,
 			        exercise_consistency:data.exercise_reporting_ql.exercise_consistency,
-			        workout_duration_grade: data.exercise_reporting_ql.workout_duration_grade,
-			        workout_effortlvl_grade: data.exercise_reporting_ql.workout_effortlvl_grade,
-			        avg_heartrate_grade: data.exercise_reporting_ql.avg_heartrate_grade,
-			        overall_workout_grade: data.exercise_reporting_ql.overall_workout_grade,
 			        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
 			        fitness_age:data.exercise_reporting_ql.fitness_age,
 			        workout_comment:data.exercise_reporting_ql.workout_comment
@@ -206,7 +205,6 @@ class Quicklook extends Component{
 			        id: data.food_ql.id,
 			        user_ql: data.food_ql.user_ql,
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        prcnt_non_processed_food_grade: data.food_ql.prcnt_non_processed_food_grade,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },

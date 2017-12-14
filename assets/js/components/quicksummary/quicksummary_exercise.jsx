@@ -52,10 +52,6 @@ const attrVerboseName = {
     workout_elapsed_time: 'Workout Elapsed Time',
     timewatch_paused_workout: 'TimeWatch Paused Workout',
     exercise_consistency: 'Exercise Consistency',
-    workout_duration_grade: 'Workout Duration Grade',
-    workout_effortlvl_grade: 'Workout Effort Level Grade',
-    avg_heartrate_grade: 'Avg Heart Rate Grade',
-    overall_workout_grade: 'OverAll Workout Grade',
     heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
     fitness_age: 'Fitness Age',
     workout_comment: 'Workout Comment'                    

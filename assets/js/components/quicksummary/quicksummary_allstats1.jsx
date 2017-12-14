@@ -22,7 +22,6 @@ class AllStats1 extends Component{
         {name: 'Avg Speed (MPH) Bike'},        
         {name: 'Asvg Speed Per Mile'},
         {name: 'Average Heartrate'},
-        {name: 'Avg Heart Rate Grade'},
         {name: 'Chia Seeds consumed during Workout'},
         {name: 'Dew Point'},
         {name: 'Distance (in Miles) - Bike'},
@@ -47,7 +46,6 @@ class AllStats1 extends Component{
         {name: 'Medication'},
         {name: 'Minutes Walked Before Workout'},
         {name: 'Percent Breath through Nose During Workout'},
-        {name: 'OverAll Workout Grade'},
         {name: 'Pace (minutes:seconds) (Running)'},
         {name: 'Pain'},
         {name: 'Pain Area'},
@@ -64,9 +62,7 @@ class AllStats1 extends Component{
         {name: 'Wind'},
         {name: 'Workout Comment'},
         {name: 'Workout Duration'},
-        {name: 'Workout Duration Grade'},
         {name: 'Workout Easy Hard'},
-        {name: 'Workout Effort Level Grade'},
         {name: 'Workout Elapsed Time'},
         {name: 'Workout Location'},
         {name: 'Workout Time'},
@@ -74,17 +70,19 @@ class AllStats1 extends Component{
         {name: 'Diet Type'},
         {name: 'Non Processed Food'}, 
         {name: 'Percentage of Unprocessed Food'},
-        {name: 'Percentage Non Processed Food Grade'},
         {name: 'Alcoholic Drink Per Week Grade'},
+        {name: 'Average Exercise Heartrate Grade'},
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Exercise Consistency Grade'},
         {name: 'Movement Consistency Grade'},
         {name: 'Movement Non Exercise steps Grade'},
-        {name: 'Overall Truth Grade'},
-        {name: 'Overall Truth Health Gpa'},
+        {name: 'Overall Health Gpa'},
+        {name: 'Overall Health Grade'},
         {name: 'Overall Workout Grade'},
         {name: 'Penalty'},
-        {name: 'percent NonProcessed Food Consumed Grade'},
+        {name: 'Percentage of Unprocessed Food Grade'},
+        {name: 'Workout Duration Grade'},
+        {name: 'Workout Effort Level Grade'},
         {name: 'Awake Time'},
         {name: 'Deep Sleep'},
         {name: 'Light Sleep'},
@@ -153,6 +151,7 @@ class AllStats1 extends Component{
 
 				/>
 			);
+            console.log(keys);
 		}
 		return columns;
 	}

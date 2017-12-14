@@ -63,6 +63,15 @@ MIDDLEWARE.insert(  # insert WhiteNoiseMiddleware right after SecurityMiddleware
 MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
     0, 'log_request_id.middleware.RequestIDMiddleware')
 
+# MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
+#     0, 'django.middleware.cache.UpdateCacheMiddleware')
+
+# MIDDLEWARE.insert(  # insert WhiteNoiseMiddleware right after SecurityMiddleware
+#     MIDDLEWARE.index('django.middleware.clickjacking.XFrameOptionsMiddleware') + 1,
+#     'django.middleware.cache.FetchFromCacheMiddleware')
+
+
+
 LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
 LOG_REQUESTS = True
 
@@ -70,6 +79,9 @@ LOG_REQUESTS = True
 INSTALLED_APPS += ['opbeat.contrib.django']
 MIDDLEWARE.insert(  # insert OpbeatAPMMiddleware on the top
     0, 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware')
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  
 
 LOGGING = {
     'version': 1,
@@ -124,3 +136,17 @@ LOGGING = {
         },
     }
 }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://h:p66111d958aa92704fb0fba2e9fd54fe4536e81afd19510078eeeebc6a29e2243@ec2-34-198-168-102.compute-1.amazonaws.com:8339/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "app"
+    }
+}
+
+

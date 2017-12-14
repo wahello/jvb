@@ -37,4 +37,4 @@ def notify_admins(sender,instance=None, created=False,**kwargs):
 			'created':created
 		}
 
-		notify_admins_task.delay(admin_users_email,instance_meta)
+		# notify_admins_task.delay(admin_users_email,instance_meta)

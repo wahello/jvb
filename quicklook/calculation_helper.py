@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone,time
-from collections import OrderedDict
+from collections import OrderedDict,namedtuple
 import json, ast
 import requests
 
@@ -43,7 +43,7 @@ def get_activities():
 	'BOATING','CROSS_COUNTRY_SKIING','DRIVING_GENERAL','FLYING','GOLF','HORSEBACK_RIDING',
 	'INLINE_SKATING','MOUNTAINEERING','PADDLING','RESORT_SKIING_SNOWBOARDING','ROWING',
 	'SAILING','SKATE_SKIING','SKATING','SNOWMOBILING','SNOW_SHOE','STAND_UP_PADDLEBOARDING',
-	'WHITEWATER_RAFTING_KAYAKING']
+	'WHITEWATER_RAFTING_KAYAKING','FLOOR_CLIMBING']
 	return activities
 
 def str_to_datetime(str_date):
@@ -124,13 +124,16 @@ def update_helper(instance,data_dict):
 def get_blank_model_fields(model):
 	if model == "grade":
 		fields = {
-			'overall_truth_grade':'',
-			'overall_truth_health_gpa':0,
+			'overall_health_grade':'',
+			'overall_health_gpa':0,
 			'movement_non_exercise_steps_grade':'' ,
 			'movement_consistency_grade': '' ,
 			'avg_sleep_per_night_grade':'',
 			'exercise_consistency_grade':'' ,
 			'overall_workout_grade':'',
+			'workout_duration_grade':'',
+			'workout_effortlvl_grade':'',
+			'avg_exercise_hr_grade':'',
 			'prcnt_unprocessed_food_consumed_grade':'',
 			'alcoholic_drink_per_week_grade':'' ,
 			'penalty':0
@@ -183,10 +186,6 @@ def get_blank_model_fields(model):
 			'workout_elapsed_time': '',
 			'timewatch_paused_workout': '',
 			'exercise_consistency':0,
-			'workout_duration_grade': '',
-			'workout_effortlvl_grade': '',
-			'avg_heartrate_grade': '',
-			'overall_workout_grade': '',
 			'heartrate_variability_stress': '',
 			'fitness_age':'',
 			'workout_comment':''
@@ -236,7 +235,6 @@ def get_blank_model_fields(model):
 	elif model == "food":
 		fields = {
 			'prcnt_non_processed_food':0,
-			'prcnt_non_processed_food_grade': '',
 			'non_processed_food': '',
 			'diet_type':'',
 		}
@@ -435,10 +433,13 @@ def get_activity_stats(activities_json,manually_updated_json):
 				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
 					obj.get('durationInSeconds',0) >= 900):
 					activity_stats['hr90_duration_15min'] = True
+				elif ('swimming' in obj.get('activityType').lower() and #HR is not required for swimming activities
+					  obj.get('durationInSeconds',0) >= 900):
+					activity_stats['hr90_duration_15min'] = True
 
 			if 'running' in obj.get('activityType','').lower():
 				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
-				avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond")
+				avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond",0)
 				runs_count += 1
 
 			elif 'swimming' in obj.get('activityType','').lower():
@@ -469,6 +470,24 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 	return activity_stats
 
+def _get_avg_hr_points_range(age,workout_easy_hard):
+	Range = namedtuple('Range',['min','max'])
+	point_range  = {}
+	if workout_easy_hard == 'easy':
+		point_range[4] = Range(180-age+5-30, 180-age+5)
+		point_range[3] = Range(180-age+6, 180-age+9)
+		point_range[2] = Range(180-age+10, 180-age+13)
+		point_range[1] = Range(180-age+14,180-age+14)
+		point_range[0] = Range(180-age-31, 180-age+15)
+	elif workout_easy_hard == 'hard':
+		point_range[4] = Range(180-age+25, 180-age+59)
+		point_range[3] = Range(180-age+20, 180-age+24)
+		point_range[2] = Range(180-age+10, 180-age+19)
+		point_range[1] = Range(180-age+5,180-age+9)
+		point_range[0] = Range(180-age+4, 180-age+60)
+	else:
+		return None
+	return point_range
 
 def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	
@@ -482,7 +501,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
-
+	
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
@@ -508,6 +527,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 				time_interval = hour_start.strftime("%I %p")+" to "+hour_end.strftime("%I %p")
 
 				steps_in_interval = movement_consistency[time_interval].get('steps')
+				status = "sleeping"
 
 				if hour_start >= yesterday_bedtime:
 					if (datetime.combine(hour_start.date(),time(hour_start.hour)) <= today_awake_time):
@@ -518,7 +538,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 					else:
 						status = "active" if data.get('steps') + steps_in_interval > 300 else "inactive"
 
-				if not status == "sleeping": 
+				if not status == "sleeping":
 					movement_consistency[time_interval]['steps']\
 						= steps_in_interval + data.get('steps')
 				else:
@@ -529,25 +549,42 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 		active_hours = 0
 		inactive_hours = 0
 		for interval,values in list(movement_consistency.items()):
+			hour_am_pm = interval.split('to')[0].split(' ')
+			if hour_am_pm[1] == 'PM' and int(hour_am_pm[0]) < 12:
+				hour_am_pm[0] = int(hour_am_pm[0]) + 12
+			elif hour_am_pm[1] == 'AM' and int(hour_am_pm[0]) == 12:
+				hour_am_pm[0] = 0
+			else:
+				hour_am_pm[0] = int(hour_am_pm[0])
+
+			hour_start = datetime.combine(today_awake_time.date(),time(hour_am_pm[0]))
+			if hour_start >= today_awake_time:
+				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
+					movement_consistency[interval]['status'] = 'sleeping'
+					movement_consistency[interval]['steps'] = 0
+				else:
+					if not movement_consistency[interval]['steps']:
+						movement_consistency[interval]['status'] = 'inactive'
+						movement_consistency[interval]['steps'] = 0
+
 			if values['status'] == 'active': 
 				active_hours += 1 
 			if values['status'] == 'inactive':
 				inactive_hours += 1
-			movement_consistency['active_hours'] = active_hours
-			movement_consistency['inactive_hours'] = inactive_hours
+
+		movement_consistency['active_hours'] = active_hours
+		movement_consistency['inactive_hours'] = inactive_hours
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, todays_activities, todays_manually_updated):
+def cal_exercise_steps_total_steps(dailies_json, todays_activities):
 	'''
-		Calculate non exercise steps
+		Calculate exercise steps
 	'''	
 	total_steps = 0
 	exercise_steps = 0
-	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
 	if len(todays_activities):
 		for obj in todays_activities:
-			obj = manually_edited(obj)
 			exercise_steps += obj.get('steps',0)
 
 	if dailies_json:
@@ -622,7 +659,7 @@ def cal_unprocessed_food_grade(prcnt_food):
  	elif (prcnt_food < 50):
  		return 'F'
 
-def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
+def cal_alcohol_drink_grade(alcohol_drank_past_week, gender,period):
 	'''
 	Calculate Average alcohol dring a week and grade
 	return tuple (grade,average drink)
@@ -630,7 +667,7 @@ def cal_alcohol_drink_grade(alcohol_drank_past_week, gender):
 	alcohol_drank_past_week = ['21' if x == '20+' else x
 								for x in alcohol_drank_past_week]
 
-	drink_avg = sum(map(float,alcohol_drank_past_week))/7
+	drink_avg = (sum(map(float,alcohol_drank_past_week))/period)*7
 	grade = ''
 
 	if gender == 'M':
@@ -701,33 +738,123 @@ def cal_exercise_consistency_grade(workout_over_period, hr90_duration_15min, per
 	elif avg_point_week < 1:
 		return 'F' 
 	
-def cal_overall_grade_gpa(grades):
+def cal_overall_workout_grade(gpa):
 	'''
 		Return tuple (overall grade, overall health gpa)
 	'''
-	GRADE_POINT = {'A':4,'B':3,'C':2,'D':1,'F':0}
-	grades.pop('overall_truth_grade')
-	grades.pop('overall_truth_health_gpa')
-	penalty = grades.pop('penalty')
-	avg_points = (sum([GRADE_POINT[v] for v in grades.values()]) + penalty)/len(grades)
-	
-	if avg_points >= 3.4:
+	if gpa >= 3.4:
 		grade = 'A'
-	elif avg_points >= 3 and avg_points < 3.4:
+	elif gpa >= 3 and gpa < 3.4:
 		grade = 'B'
-	elif avg_points >= 2 and avg_points < 3:
+	elif gpa >= 2.5 and gpa < 3:
 		grade = 'C'
-	elif avg_points >= 1 and avg_points < 2:
+	elif gpa >= 2 and gpa < 2.5:
 		grade = 'D'
-	elif avg_points < 1:
+	elif gpa < 2:
 		grade = 'F'
 
-	return(grade, avg_points) 
+	return(grade, gpa)
+
+def cal_overall_grade(gpa):
+	'''
+		Return tuple (overall grade, overall health gpa)
+	'''
+	if gpa >= 3.4:
+		grade = 'A'
+	elif gpa >= 3 and gpa < 3.4:
+		grade = 'B'
+	elif gpa >= 2 and gpa < 3:
+		grade = 'C'
+	elif gpa >= 1 and gpa < 2:
+		grade = 'D'
+	elif gpa < 1:
+		grade = 'F'
+
+	return(grade, gpa)
 
 def cal_penalty(is_smoke,is_ctrl_subs):
 	smoke_penalty = -3.1 if is_smoke == 'yes' else 0
 	ctrl_subs_penalty = -3.1 if is_ctrl_subs == 'yes' else 0
 	return smoke_penalty + ctrl_subs_penalty
+
+def cal_workout_duration_grade(duration_in_min):
+	if duration_in_min >= 60:
+		grade = 'A'
+		point = 4
+	elif duration_in_min  >=30 and duration_in_min <= 59:
+		grade = 'B'
+		point = 3
+	elif duration_in_min >= 15 and duration_in_min <= 29:
+		grade = 'C'
+		point = 2
+	elif duration_in_min >= 1 and duration_in_min <= 14:
+		grade = 'D'
+		point = 1
+	elif duration_in_min < 1:
+		grade = 'F'
+		point = 0
+
+	return (grade, point)
+
+def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
+	grade = 'F'
+	point  = 0
+	if workout_easy_hard and effort_level:
+		if workout_easy_hard == 'easy':
+			if effort_level >= 1 and effort_level <= 4:
+				grade = 'A'
+				point = 4
+			elif effort_level == 5:
+				grade = 'B'
+				point = 3
+			elif effort_level >= 6 and effort_level <= 7:
+				grade = 'C'
+				point = 2
+			elif effort_level == 8:
+				grade = 'D'
+				point = 1
+			elif effort_level >= 9 and effort_level <= 10:
+				grade = 'F'
+				point = 0
+		elif workout_easy_hard == 'hard':
+			if effort_level >= 1 and effort_level <= 3:
+				grade = 'F'
+				point = 0
+			elif effort_level >= 4 and effort_level <= 5:
+				grade = 'D'
+				point = 1
+			elif effort_level == 6:
+				grade = 'C'
+				point = 2
+			elif effort_level == 7:
+				grade = 'B'
+				point = 3
+			elif effort_level >= 8 and effort_level <= 10:
+				grade = 'A'
+				point = 4
+
+	return (grade, point)
+
+def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
+	prange = _get_avg_hr_points_range(age, workout_easy_hard)
+	if prange and avg_heartrate:
+		if avg_heartrate >= prange[4].min and avg_heartrate <= prange[4].max:
+			grade = 'A'
+			point = 4
+		elif avg_heartrate >= prange[3].min and avg_heartrate <= prange[3].max:
+			grade = 'B'
+			point = 3
+		elif avg_heartrate >= prange[2].min and avg_heartrate <= prange[2].max:
+			grade = 'C'
+			point = 2
+		elif avg_heartrate >= prange[1].min and avg_heartrate <= prange[1].max:
+			grade = 'D'
+			point = 1
+		elif avg_heartrate <= prange[0].min or avg_heartrate >= prange[0].max:
+			grade = 'F'
+			point = 0
+		return (grade, point)
+	return (None, None)
 
 def get_avg_sleep_grade(daily_strong,current_date):
 	for q in daily_strong:
@@ -755,7 +882,7 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 		[q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
 		for q in daily_strong],
-		user.profile.gender)
+		user.profile.gender,7)
 	return alcohol_stats
 
 def get_exercise_consistency_grade(workout_over_period,weekly_activities,
@@ -769,6 +896,84 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 	hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
 	grades = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
 	return grades 
+
+def get_workout_duration_grade(todays_activities):
+	'''
+		Returns a tuple having grade and point (grade, point)
+	'''
+	duration = 0
+	if todays_activities:
+		for act in todays_activities:
+			duration += act.get('durationInSeconds',0)
+	return cal_workout_duration_grade(duration//60)
+
+def get_workout_effort_grade(todays_daily_strong):
+	'''
+		Returns a tuple having grade and point (grade, point)
+	'''
+	workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
+	workout_effort_level = safe_get(todays_daily_strong,'workout_effort_level',-1)
+	if workout_effort_level == -1:
+		workout_effort_level = ''
+	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
+
+def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong,age):
+	filtered_activities = todays_activities.copy()
+	total_duration = 0
+	for i,act in enumerate(todays_activities):
+		if not act.get('averageHeartRateInBeatsPerMinute',None):
+			filtered_activities.pop(i)
+		elif 'swimming' in act.get('activityType','').lower():
+			filtered_activities.pop(i)
+		elif act.get('activityType','') == 'STRENGTH_TRAINING':
+			filtered_activities.pop(i)
+		elif act.get('activityType','') == 'OTHER':
+			filtered_activities.pop(i)
+		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
+			filtered_activities.pop(i)
+		else:
+			total_duration += act.get('durationInSeconds',0)
+	if filtered_activities:
+		avg_hr = 0
+		for act in filtered_activities:
+			avg_hr += (act.get('durationInSeconds',0) / total_duration) *\
+					   act.get('averageHeartRateInBeatsPerMinute',0)
+		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
+		return cal_avg_exercise_heartrate_grade(avg_hr,workout_easy_hard,age)
+	else:
+		return (None, None)
+
+def get_overall_workout_grade(wout_duration_pt, wout_effortlvl_pt, avg_exercise_hr_pt):
+	if avg_exercise_hr_pt:
+		workout_avg_point = round(
+			(wout_duration_pt + wout_effortlvl_pt + avg_exercise_hr_pt)/3, 2)
+	else:
+		workout_avg_point = round(
+			(wout_duration_pt + wout_effortlvl_pt)/2, 2)
+
+	grade_pt = cal_overall_workout_grade(workout_avg_point)
+	return grade_pt
+
+def get_overall_grade(grades):
+	GRADES = {'A':4,'B':3,'C':2,'D':1,'F':0,'':0,'N/A':0}
+	non_exercise_step_grade = grades.get('movement_non_exercise_steps_grade')
+	movement_consistency_grade = grades.get('movement_consistency_grade')
+	avg_sleep_per_night_grade = grades.get('avg_sleep_per_night_grade')
+	exercise_consistency_grade = grades.get('exercise_consistency_grade')
+	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
+	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
+	overall_workout_grade = grades.get('overall_workout_grade')
+	penalty = grades.get('penalty')
+
+	gpa = round((GRADES[non_exercise_step_grade]+
+		   GRADES[movement_consistency_grade]+
+		   GRADES[avg_sleep_per_night_grade]+
+		   GRADES[exercise_consistency_grade]+
+		   GRADES[prcnt_unprocessed_food_grade]+
+		   GRADES[alcoholic_drink_per_week_grade]+
+		   GRADES[overall_workout_grade]+
+		   penalty) / 7,2)
+	return cal_overall_grade(gpa)
 
 def get_weather_data(todays_daily_strong,todays_activities,
 					 todays_manually_updated, todays_date_epoch):
@@ -983,7 +1188,29 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Alcohol
 		alcohol_today = safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday","")
 		alcohol_calculated_data['alcohol_day'] = '' if not alcohol_today else alcohol_today
-		# Calculation of grades
+		
+		# **************************************CALCULATION OF GRADES**************************************
+		
+		# Workout duration grade calculation
+		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json)
+		grades_calculated_data['workout_duration_grade'] = workout_duration_grade_pts[0]
+
+		# Workout effort level grade calculation
+		workout_effortlvl_grade_pts = get_workout_effort_grade(todays_daily_strong)
+		grades_calculated_data['workout_effortlvl_grade'] = workout_effortlvl_grade_pts[0]
+
+		# Average exercise heartrate grade calculation
+		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
+									todays_daily_strong, user.profile.age())
+		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
+		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
+
+		# Overall workout grade calculation
+		overall_workout_grade_pt = get_overall_workout_grade(
+								workout_duration_grade_pts[1],
+								workout_effortlvl_grade_pts[1],
+								avg_exercise_hr_grade_pts[1])
+		grades_calculated_data['overall_workout_grade'] = overall_workout_grade_pt[0]
 
 		# Average sleep per night grade calculation
 		grades_calculated_data['avg_sleep_per_night_grade'] = get_avg_sleep_grade(todays_daily_strong, current_date)
@@ -991,8 +1218,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Unprocessed food grade calculation 
 		grade  = get_unprocessed_food_grade(todays_daily_strong, current_date)
 		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
-		food_calculated_data['prcnt_non_processed_food_grade'] = grade
-
+	
 		# Alcohol drink consumed grade and avg alcohol per week
 		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
@@ -1009,8 +1235,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
-		exercise_steps, total_steps = cal_exercise_steps_total_steps(
-					dailies_json,todays_activities_json,todays_manually_updated_json)	
+		exercise_steps, total_steps = cal_exercise_steps_total_steps(dailies_json,todays_activities_json)	
 		# Have to fix this
 		steps_calculated_data['non_exercise_steps'] = abs(total_steps - exercise_steps)
 		steps_calculated_data['exercise_steps'] = exercise_steps
@@ -1030,6 +1255,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 			safe_get(todays_daily_strong,"controlled_uncontrolled_substance","")
 		)
 		grades_calculated_data["penalty"] = penalty
+
+		# Overall Grade and Overall GPA calculation
+		overall_grade_pt = get_overall_grade(grades_calculated_data)
+		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
+		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
