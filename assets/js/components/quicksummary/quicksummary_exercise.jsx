@@ -104,35 +104,33 @@ renderTableColumns(dateWiseData,category,classes=""){
 	for(let [date,data] of Object.entries(dateWiseData)){
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-            if(key !== 'id' && key !== 'user_ql'){
-                if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
-                    let avgHrJson = JSON.parse(value);
-                    for(let act of avgHrKeys)
-                        all_data.push(avgHrJson[act]);
-                }
-                else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
-                    for(let act of avgHrKeys)
-                        all_data.push('-');
-                }
-
-                else if ((key == 'dew_point' && value === null) ||
-                         (key == 'temperature' && value === null) ||
-                         (key == 'humidity' && value === null)||
-                         (key == 'temperature_feels_like' && value === null) ||
-                         (key == 'wind' && value === null)){
-                    all_data.push('No GPS data');
-                }
-                else if((key == 'dew_point' && (value && value != '-')) ||
-                        (key == 'temperature' && (value && value != '-'))||
-                        (key == 'temperature_feels_like' && (value && value != '-'))){
-                    all_data.push(this.toFahrenheit(value).toFixed(2));
-                }
-                else
-                    all_data.push(value);
-
-                if(pushKeytoggle)
-                    keys.push(key);
+            if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
+                let avgHrJson = JSON.parse(value);
+                for(let act of avgHrKeys)
+                    all_data.push(avgHrJson[act]);
             }
+            else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
+                for(let act of avgHrKeys)
+                    all_data.push('-');
+            }
+
+            else if ((key == 'dew_point' && value === null) ||
+                     (key == 'temperature' && value === null) ||
+                     (key == 'humidity' && value === null)||
+                     (key == 'temperature_feels_like' && value === null) ||
+                     (key == 'wind' && value === null)){
+                all_data.push('No GPS data');
+            }
+            else if((key == 'dew_point' && (value && value != '-')) ||
+                    (key == 'temperature' && (value && value != '-'))||
+                    (key == 'temperature_feels_like' && (value && value != '-'))){
+                all_data.push(this.toFahrenheit(value).toFixed(2));
+            }
+            else
+                all_data.push(value);
+
+            if(pushKeytoggle)
+                keys.push(key);
 
         }
 
