@@ -33,10 +33,10 @@ class Dashboard extends Component {
 				<div>
 				      <div className="row">
                         <div className="col-sm-6 col-sm-offset-3 social-login" style={{marginTop:"80px"}}>
-                          <h3>Link's</h3>
+                          <h3>Links</h3>
                           <div className="social-login-buttons">
       
-                             <Link to='/userinputs'>userinputs</Link><br/>
+                             <Link to='/userinputs'>User Inputs</Link><br/>
                              {/*<Link to='/nes'>NES Graph</Link><br/>*/}
                               {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
                               {/*<Link to='/overallgrade'>Over All Grade</Link><br/>*/}

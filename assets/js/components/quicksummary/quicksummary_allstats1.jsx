@@ -98,7 +98,7 @@ const attrVerboseName = {
     total_strokes: 'Total Strokes',
 
     alcohol_day: 'Alcohol Per Day',
-    alcohol_week: 'Alcohol Per Week', 
+    alcohol_week: 'Average Alcohol Consumed per Week', 
 }
 
 class AllStats1 extends Component{
