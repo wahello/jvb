@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import NavbarMenu from '../navbar';
-
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import { withRouter, Link } from 'react-router-dom';
 import _ from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import Textarea from 'react-textarea-autosize';
@@ -21,6 +23,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import * as handlers from './handlers';
 import * as renderers from './renderers';
 
+import { getGarminToken,logoutUser} from '../../network/auth';
+
+
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
@@ -34,6 +39,7 @@ class UserInputs extends React.Component{
         update_form:false,
         editable:true,
         isOpen: false,
+        isOpen1: false,
         scrollingLock: false,
         gender:'M',
         diet_to_show:'',
@@ -169,6 +175,10 @@ class UserInputs extends React.Component{
       this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
+
+    this.toggle1 = this.toggle1.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
     
     onFetchSuccess(data,clone_form=undefined){
@@ -406,7 +416,20 @@ createDropdown(start_num , end_num, step=1){
      
     });
   }
+ toggle1() {
+    this.setState({
+      isOpen1: !this.state.isOpen1,
+     
+    });
+  }
 
+  onLogoutSuccess(response){
+    this.props.history.push("/#logout");
+  }
+
+  handleLogout(){
+    this.props.logoutUser(this.onLogoutSuccess);
+  }
 componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
 }
@@ -472,18 +495,42 @@ handleScroll() {
     });
   }
     render(){
+       const {fix} = this.props;
 
         return(
             <div>            
                            <div id="hambergar" className="container-fluid">
-                             <NavbarMenu fix={false} />
-                              </div>                              
-                              <div>
-                             <h2 className="head">Daily User Inputs Report 
-                              <span id="infobutton"
-                             onClick={this.toggleInfo} 
-                             style={{float:"right",paddingRight:"30px",color:"gray"}}>
-                             <a style={{color:"gray"}}> 
+
+                            <Navbar toggleable 
+         fixed={fix ? 'top' : ''} 
+          className="navbar navbar-expand-sm navbar-inverse nav6">
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} >
+           <FontAwesome 
+                 name = "bars"
+                 size = "1x"
+                                          
+             />
+
+          </NavbarToggler>
+
+          <Link to='/'>
+            <NavbarBrand 
+              className="navbar-brand float-sm-left" 
+              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
+              <img className="img-fluid"
+               style={{maxWidth:"200px"}}
+               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+            </NavbarBrand>
+          </Link>
+          
+            
+
+            <div id="header">
+              <h2 className="head">Daily User Inputs Report 
+              <span id="infobutton"
+              onClick={this.toggleInfo} 
+              style={{float:"right",paddingRight:"30px",color:"white"}}>
+              <a style={{color:"white",fontSize:"21px",marginLeft:"3px"}}> 
                              <FontAwesome 
                                           name = "info-circle"
                                           size = "1x"                                      
@@ -494,6 +541,30 @@ handleScroll() {
                              </h2>
                              
                               </div>
+
+          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>            
+              <NavItem className="float-sm-right">  
+                <Link id="logout"className="nav-link" to='/'>Home</Link>
+              </NavItem>
+               <NavItem className="float-sm-right">                
+                   <NavLink  
+                   className="nav-link"
+                   id="logout"                    
+                   onClick={this.handleLogout}>Log Out
+                    </NavLink>               
+              </NavItem>  
+            </Nav>
+          </Collapse>
+        </Navbar>
+        </div>
+
+
+
+
+                           
+                                                           
+                             
 
 
                             <Popover
@@ -581,7 +652,7 @@ handleScroll() {
                                    </span>
                                    <span className="btn2">
                                    <Button 
-                                   style={{backgroundColor:"#ed9507"}} 
+                                   id="nav-btn"
                                       size="sm"
                                       onClick={this.toggleEditForm}
                                       className="btn hidden-sm-up">
@@ -707,9 +778,9 @@ handleScroll() {
                           data-toggle="validator">
                           {this.state.editable &&
                                  <div className="row justify-content-center"> 
-                                   <span id="btn1">
+                                   <span >
                                        <Button
-                                            style={{backgroundColor:"#ed9507",fontFamily: "futura-pt"}}   
+                                           id="btn1"
                                             size="sm"
                                             onClick={this.fetchYesterdayData}
                                             className="btn">
@@ -720,7 +791,7 @@ handleScroll() {
                           }
 
                           <div id="workout">
-                          <h2><strong>Workout Inputs</strong></h2>
+                          <h3><strong>Workout Inputs</strong></h3>
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?
@@ -1217,7 +1288,7 @@ handleScroll() {
                                 onClick={this.handleWeatherCheck}
                                 >
                                 </Input>
-                                <Label>1.11 I want to manually enter in weather information for my workout</Label>
+                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout</Label>
                                 </div>
                               }
                               {
@@ -1473,7 +1544,7 @@ handleScroll() {
                       </div>
                      
                             <div id="sleep">
-                            <h2><strong>Sleep Input</strong></h2>
+                            <h3><strong>Sleep Input</strong></h3>
                          
                           
                             <FormGroup>
@@ -1678,7 +1749,7 @@ handleScroll() {
                           </div>
                         
                         <div id="food">
-                        <h2><strong>Nutrition and Lifestyle Inputs</strong></h2>
+                        <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
                           <FormGroup className="food">
                             
@@ -1937,7 +2008,7 @@ handleScroll() {
                           </div>
 
                           <div id="stress">
-                           <h2><strong>Stress/Illness Inputs</strong></h2>
+                           <h3><strong>Stress/Illness Inputs</strong></h3>
                           <FormGroup>
                             <Label className="padding">9. Yesterday's Stress Level</Label>
                               {this.state.editable &&
@@ -2011,7 +2082,7 @@ handleScroll() {
                           </div>
                          
                          <div id="daily">
-                          <h2><strong>Extra Inputs</strong></h2>
+                          <h3><strong>Extra Inputs</strong></h3>
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>
                             {this.state.editable &&
@@ -2172,7 +2243,8 @@ handleScroll() {
                           </div>
 
                           { (!this.state.update_form && this.state.editable) &&
-                            <Button 
+                            <Button
+                              id="btn1" 
                               type="submit"
                               color="info" 
                               className="btn btn-block btn-primary">
@@ -2182,7 +2254,7 @@ handleScroll() {
 
                           {(this.state.update_form && this.state.editable) &&
                             <Button 
-                              color="info" 
+                              id="btn1"
                               className="btn btn-block btn-primary"
                               onClick={this.onUpdate}>
                                 Update
@@ -2214,4 +2286,17 @@ handleScroll() {
     }
 }
 
-export default UserInputs;
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(UserInputs));
+
+Navbar.propTypes={
+    fixed: PropTypes.string,
+    color: PropTypes.string,
+}
+
