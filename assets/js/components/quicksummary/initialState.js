@@ -18,13 +18,16 @@ export function getInitialState(start_dt, end_dt){
 	let blank_properties={
 		"created_at":'',	
 		"grades_ql":{
-			    "overall_truth_grade": '-',
-		        "overall_truth_health_gpa": '-',
+			    "overall_health_grade": '-',
+		        "overall_health_gpa": '-',
 		        "movement_non_exercise_steps_grade": '-',
 		        "movement_consistency_grade": '-',
 		        "avg_sleep_per_night_grade": '-',
 		        "exercise_consistency_grade": '-',
 		        "overall_workout_grade": '-',
+		        "workout_duration_grade":'-',
+		        "workout_effortlvl_grade":'-',
+		        "avg_exercise_hr_grade":'-',
 		        "prcnt_unprocessed_food_consumed_grade": '-',
 		        "alcoholic_drink_per_week_grade": '-',
 		        "penalty": '-'
@@ -74,10 +77,6 @@ export function getInitialState(start_dt, end_dt){
 	        "workout_elapsed_time": '-',
 	        "timewatch_paused_workout": '-',
 	        "exercise_consistency":'-',
-	        "workout_duration_grade": '-',
-	        "workout_effortlvl_grade": '-',
-	        "avg_heartrate_grade": '-',
-	        "overall_workout_grade": '-',
 	        "heartrate_variability_stress": '-',
 	        "fitness_age":'-',
 	        "workout_comment": '-'
@@ -113,7 +112,6 @@ export function getInitialState(start_dt, end_dt){
 	    },
 	    "food_ql": {
 	        "prcnt_non_processed_food": '-',
-	        "prcnt_non_processed_food_grade": '-',
 	        "non_processed_food": '-',
 	        "diet_type": '-'
 	    },

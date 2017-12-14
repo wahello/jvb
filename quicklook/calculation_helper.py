@@ -186,10 +186,6 @@ def get_blank_model_fields(model):
 			'workout_elapsed_time': '',
 			'timewatch_paused_workout': '',
 			'exercise_consistency':0,
-			'workout_duration_grade': '',
-			'workout_effortlvl_grade': '',
-			'avg_heartrate_grade': '',
-			'overall_workout_grade': '',
 			'heartrate_variability_stress': '',
 			'fitness_age':'',
 			'workout_comment':''
@@ -239,7 +235,6 @@ def get_blank_model_fields(model):
 	elif model == "food":
 		fields = {
 			'prcnt_non_processed_food':0,
-			'prcnt_non_processed_food_grade': '',
 			'non_processed_food': '',
 			'diet_type':'',
 		}
@@ -1223,8 +1218,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Unprocessed food grade calculation 
 		grade  = get_unprocessed_food_grade(todays_daily_strong, current_date)
 		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
-		food_calculated_data['prcnt_non_processed_food_grade'] = grade
-
+	
 		# Alcohol drink consumed grade and avg alcohol per week
 		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade

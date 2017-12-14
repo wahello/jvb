@@ -14,13 +14,16 @@ import Dimensions from 'react-dimensions';
 
 	 this.state = {
       myTableData: [
-        {name: 'Overall Truth Grade'},
-        {name: 'Overall Truth Health Gpa'},
+        {name: 'Overall Health Grade'},
+        {name: 'Overall Health Gpa'},
         {name: 'Movement Non Exercise steps Grade'},
         {name: 'Movement Consistency Grade'}, 
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Exercise Consistency Grade'},
         {name: 'Overall Workout Grade'},
+        {name: 'Workout Duration Grade'},
+        {name: 'Workout Effort Level Grade'},
+        {name: 'Average Exercise Heartrate Grade'},
         {name: 'Percentage of Unprocessed Food Grade'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
         {name: 'Penalty'}              
