@@ -168,6 +168,10 @@ class AllStats1 extends Component{
                                 mc = JSON.parse(mc);
                                 all_data.push(mc.inactive_hours);
                             }
+                            else{
+                                all_data.push({value:'-',
+                                               style:{}});
+                            }
                         }
                         else if(value !== '-' && value !== undefined && 
                            value !== "" && (key == 'deep_sleep' ||
@@ -175,32 +179,37 @@ class AllStats1 extends Component{
                             key == 'sleep_per_wearable')){
                             let hm = value.split(':');
                             let time_str = `${hm[0]} hour ${hm[1]} min`;
-                            all_data.push(time_str);
+                            all_data.push({value:time_str,
+                                          style:{}});
                         }
                         else if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
                             let avgHrJson = JSON.parse(value);
                             for(let act of avgHrKeys)
-                                all_data.push(avgHrJson[act]);
+                                all_data.push({value:avgHrJson[act],
+                                               style:{}});
                         }
                         else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
                             for(let act of avgHrKeys)
-                                all_data.push('-');
+                                all_data.push({value:'-',
+                                               style:{}});
                         }
                         else if ((key == 'dew_point' && value === null) ||
                                  (key == 'temperature' && value === null) ||
                                  (key == 'humidity' && value === null)||
                                  (key == 'temperature_feels_like' && value === null) ||
                                  (key == 'wind' && value === null)){
-                            all_data.push('No GPS data');
+                            all_data.push({value:'No GPS Data',
+                                           style:{}});
                         }
                         else if((key == 'dew_point' && (value && value != '-')) ||
                                 (key == 'temperature' && (value && value != '-'))||
                                 (key == 'temperature_feels_like' && (value && value != '-'))){
-                            all_data.push(this.toFahrenheit(value).toFixed(2));
+                            all_data.push({value:this.toFahrenheit(value).toFixed(2),
+                                           style:{}});
                         }
                         else{
 							all_data.push({value:value,
-                                          style:obj[value]});
+                                           style:obj[value]});
                         }
 
                         if(pushKeytoggle)
