@@ -562,7 +562,7 @@ onLogoutSuccess(response){
 						         style={{backgroundColor:"#ed9507"}} 					        
 						         type="submit"
 						         className="btn btn-block-lg"
-						         onClick={this.onSubmitDate} style={{width:"175px"}}>Submit</button>
+						         onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
 						         </div>
 
 						   </Form>

@@ -89,6 +89,13 @@ renderTableColumns(dateWiseData,category,classes=""){
     let keys = [];
     let pushKeytoggle = true;
 
+     const obj = {
+        A: { background: 'green', color: 'white' },
+        B: { background: 'green', color: 'white' },
+        C: { background: 'yellow' },
+        F: { background: 'red', color: 'white' }
+    };
+
     for(let [date,data] of Object.entries(dateWiseData)){
         let avg_heartrate = data[category]['avg_heartrate'];
         if(!this.isEmpty(JSON.parse(avg_heartrate))){
@@ -129,7 +136,8 @@ renderTableColumns(dateWiseData,category,classes=""){
                     all_data.push(this.toFahrenheit(value).toFixed(2));
                 }
                 else
-                    all_data.push(value);
+                    all_data.push({value:value,
+                        style:obj[value]});
 
                 if(pushKeytoggle)
                     keys.push(key);
@@ -141,8 +149,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 			<Column 
 				header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 		        cell={props => (
-			            <Cell {...props} className={css(styles.newTableBody)}>
-			              {all_data[props.rowIndex]}
+			            <Cell style={all_data[props.rowIndex].style} {...props} className={css(styles.newTableBody)}>
+			              {all_data[props.rowIndex].value}
 			            </Cell>
 			          )}
 		        width={200}
@@ -201,6 +209,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 const styles = StyleSheet.create({
   newTableHeader: {
+    textAlign:'center',
     color: '#111111',
     fontSize: '18px',   
     border: 'none',
@@ -208,6 +217,7 @@ const styles = StyleSheet.create({
     fontStyle:'normal'
   },
   newTableBody:{
+    textAlign:'center',
     color: '#5e5e5e',
     fontSize: '16px', 
     border: 'none',

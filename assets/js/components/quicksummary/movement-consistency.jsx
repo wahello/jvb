@@ -272,6 +272,7 @@ render(){
 
 const styles = StyleSheet.create({
   newTableHeader: {
+    textAlign:'center',
     color: '#111111',
     fontSize: '18px',   
     border: 'none',
@@ -279,6 +280,7 @@ const styles = StyleSheet.create({
     fontStyle:'normal'
   },
   newTableBody:{
+    textAlign:'center',
     color: '#5e5e5e',
     fontSize: '16px', 
     border: 'none',
@@ -289,7 +291,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 217;
+    return window.innerHeight - 192;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 :940;

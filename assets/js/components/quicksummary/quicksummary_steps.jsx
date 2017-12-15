@@ -96,6 +96,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 }
 const styles = StyleSheet.create({
   newTableHeader: {
+  	textAlign:'center',
     color: '#111111',
     fontSize: '18px',   
     border: 'none',
@@ -103,6 +104,7 @@ const styles = StyleSheet.create({
     fontStyle:'normal'
   },
   newTableBody:{
+  	textAlign:'center',
     color: '#5e5e5e',
     fontSize: '16px', 
     border: 'none',

@@ -35,7 +35,7 @@ padding-top: 10px;
 	color: rgba(0,0,0,0.5);
 }
 #header{
-	padding-left: 250px;
+	padding-left: 280px;
 }
 
  .head{
@@ -45,7 +45,7 @@ padding-top: 10px;
 	color: white;
 	font-family: futura-pt;
 	font-style: normal;
-	font-size:30px;
+	font-size:29px;
 
 	
 }
@@ -68,7 +68,7 @@ margin-top: 46px;
 	margin-left: -10px;
 	font-family: Proxima-Nova;
 	font-style: normal;
-	font-size: 18px;
+	font-size: 16px;
 	color:#5e5e5e;
 }
 // @media (min-width: 1024px) {
@@ -104,7 +104,7 @@ padding-top: 30px;
 	overflow-y: scroll;
      }
 	.head{	
-	width: 216px;	
+	width: 233px;	
 	text-align: center;
 	color: white;
 	font-family: futura-pt;
@@ -215,6 +215,11 @@ padding-top: 30px;
 	max-width: 200px;
 	margin-right: 35px;
 }
+.infoBtn{
+	color: white;
+	font-size:17px;
+	margin-left: 5px;
+}
 }
 
 h3{
@@ -246,7 +251,7 @@ h3{
 	.LAbel{		
 		font-family: Proxima-Nova;
 		font-style: normal;
-		font-size: 18px;
+		font-size: 16px;
 		color:#5e5e5e;
 	}
 	
@@ -298,7 +303,7 @@ h3{
 		border-color: rgb(237, 149, 7);
 		height: 54px;
 		padding: 0px 20px;
-		font-size: 13px;
+		font-size: 14px;
 	}
 	.btn1{
 		padding:0px 0px 0px 40px ;
@@ -324,15 +329,19 @@ h3{
 		padding-left: 29px;
 		font-family: Proxima-Nova;
 		font-style: normal;
-		font-size: 18px;
+		font-size: 16px;
 		color:#5e5e5e;
+		border-collapse: collapse;
+	    border-color: #f4f5f5;
 	}
 	.radio2{
+		border-color: #f4f5f5; 
+		border-collapse: collapse;
 		background-color: #f4f5f5;
 		padding-left: 35px;
 		font-family: Proxima-Nova;
 		font-style: normal;
-		font-size: 18px;
+		font-size: 16px;
 		color:#5e5e5e;
 	}
 	.work_hard{
@@ -419,8 +428,9 @@ textarea.form-control{
     background-color: rgb(237, 149, 7);
 	border-radius: 0px;
 	border-color: rgb(237, 149, 7);		
-	font-size: 12px;
+	font-size: 13px;
 	height: 40px;
+	color: white;
 }
 .pop{
 	z-index: 0 !important;
@@ -429,4 +439,10 @@ textarea.form-control{
 	font-family: proxima-nova;
 	font-style: normal;
 	font-size: 17px;
+}
+
+.infoBtn{
+	color: white;
+	font-size: 21px;
+	margin-left: 7px;
 }

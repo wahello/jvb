@@ -33,31 +33,44 @@ import { StyleSheet, css } from 'aphrodite';
   }
 
 renderTableColumns(dateWiseData,category,classes=""){
-console.log(dateWiseData);
-		let columns = [];
-		for(let [date,data] of Object.entries(dateWiseData)){
+    console.log(dateWiseData);
+    let columns = [];
 
-			let all_data = [];
-			for(let [key,value] of Object.entries(data[category])){
-				if(key !== 'id' && key !== 'user_ql'){ 
-					all_data.push(value);
-				}
-			}
+    const obj = {
+        A: { background: 'green', color: 'black' },
+        B: { background: 'green', color: 'black' },
+        C: { background: 'yellow', color:'black' },
+        D: { background: 'yellow', color:'black' },
+        F: { background: 'red', color: 'black' }
+    };
 
-			columns.push(
-				<Column 
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
-			        cell={props => (
-				            <Cell {...props} className={css(styles.newTableBody)}>
-				              {all_data[props.rowIndex]}
-				            </Cell>
-				          )}
-			        width={200}
-				/>
-			)
-		}
-		return columns;
-	}
+    for(let [date,data] of Object.entries(dateWiseData)){
+
+        let all_data = [];
+        for(let [key,value] of Object.entries(data[category])){
+            if(key !== 'id' && key !== 'user_ql'){
+                all_data.push({
+                    value: value,
+                    style: obj[value]
+                });
+            }
+        }
+
+        columns.push(
+            <Column
+                header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+                cell={props => (
+                    <Cell style={all_data[props.rowIndex].style} {...props} className={css(styles.newTableBody)}>
+                        {all_data[props.rowIndex].value}
+                    </Cell>
+                )}
+                width={134}
+            />
+        )
+    }
+    return columns;
+}
+
 	
 	render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
@@ -92,6 +105,7 @@ console.log(dateWiseData);
 }
 const styles = StyleSheet.create({
   newTableHeader: {
+    textAlign:'center',
     color: '#111111',
     fontSize: '18px',   
     border: 'none',
@@ -99,7 +113,8 @@ const styles = StyleSheet.create({
     fontStyle:'normal'
   },
   newTableBody:{
-    color: '#5e5e5e',
+    textAlign:'center',
+    
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',

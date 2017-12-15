@@ -499,9 +499,9 @@ handleScroll() {
 
         return(
             <div>            
-                           <div id="hambergar" className="container-fluid">
+        <div id="hambergar" className="container-fluid">
 
-                            <Navbar toggleable 
+        <Navbar toggleable 
          fixed={fix ? 'top' : ''} 
           className="navbar navbar-expand-sm navbar-inverse nav6">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} >
@@ -526,11 +526,11 @@ handleScroll() {
             
 
             <div id="header">
-              <h2 className="head">Daily User Inputs Report 
+              <h2 className="head">Daily User Inputs 
               <span id="infobutton"
-              onClick={this.toggleInfo} 
-              style={{float:"right",paddingRight:"30px",color:"white"}}>
-              <a style={{color:"white",fontSize:"21px",marginLeft:"3px"}}> 
+              onClick={this.toggleInfo}                   
+              >
+              <a  className="infoBtn"> 
                              <FontAwesome 
                                           name = "info-circle"
                                           size = "1x"                                      
@@ -799,7 +799,7 @@ handleScroll() {
                              onClick={this.toggleInfoworkout} 
                              style={{float:"right",paddingLeft:"15px",color:"gray"}}>
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5E5E5E"}}
                                           name = "info-circle"
                                           size = "1.5x"                                      
                                         
@@ -874,7 +874,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                             
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5E5E5E"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -951,7 +951,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                             
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5E5E5E"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         
@@ -1294,7 +1294,7 @@ handleScroll() {
                               {
                                 !this.state.editable &&
                                 <div>
-                                <Label>1.11 I want to manually enter in weather information for my workout</Label>
+                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout</Label>
                                 <div className="input">                             
                                   <p>{this.state.weather_check?"yes":"no"}</p>
                                 </div>
@@ -1480,12 +1480,12 @@ handleScroll() {
                           onClick={this.handleCaloriesItemCheck}
                           >
                           </Input>
-                          <Label>I did a long workout and want to enter what I ate/calories consumed</Label>
+                          <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
                           </div>
                           }
                           {!this.state.editable &&
                             <div>
-                              <Label>I did a long workout and want to enter what I ate/calories consumed</Label>
+                              <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
                               <div className="input">
                                 <p >{this.state.calories_item_check?"yes":"no"}</p>
                               </div>
@@ -1762,7 +1762,7 @@ handleScroll() {
                              style={{paddingLeft:"15px",color:"gray"}}>
                            
                              <FontAwesome 
-                                          style={{color:"white"}}
+                                          style={{color:"#5E5E5E"}}
                                           name = "info-circle"
                                           size = "1x"                                      
                                         

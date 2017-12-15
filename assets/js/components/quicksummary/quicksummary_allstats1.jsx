@@ -105,6 +105,13 @@ class AllStats1 extends Component{
 
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
+         const obj = {
+        A: { background: 'green', color: 'black' },
+        B: { background: 'green', color: 'black' },
+        C: { background: 'yellow', color: 'black'},
+        D: { background: 'yellow', color: 'black'},
+        F: { background: 'red', color: 'black' }
+    };
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
 			let keys = [];
@@ -130,7 +137,8 @@ class AllStats1 extends Component{
                                 all_data.push(time_str);
                             }
                             else{
-    							all_data.push(data[cat][key]);
+    							all_data.push({key:data[cat][key],
+                                                    style:obj[data[cat][key]]});
                             }
                             keys.push(key);
 						}
@@ -142,8 +150,8 @@ class AllStats1 extends Component{
                 style={{wordWrap:"break-word"}}
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props} className={css(styles.newTableBody)}>
-				              {all_data[props.rowIndex]}
+				            <Cell style={all_data[props.rowIndex].style} {...props} className={css(styles.newTableBody)}>
+				              {all_data[props.rowIndex].key}
 				            </Cell>
 				          )}
 			        width={200}
@@ -196,6 +204,7 @@ class AllStats1 extends Component{
 
 const styles = StyleSheet.create({
   newTableHeader: {
+    textAlign:'center',
     color: '#111111',
     fontSize: '18px',   
     border: 'none',
@@ -203,7 +212,7 @@ const styles = StyleSheet.create({
     fontStyle:'normal'
   },
   newTableBody:{
-    color: '#5e5e5e',
+    textAlign:'center',   
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',

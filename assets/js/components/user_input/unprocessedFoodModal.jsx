@@ -81,7 +81,7 @@ export default class UnprocesedFoodModal extends Component{
                             			<div>
 										<Collapse isOpen={this.state.enter_food}>
 
-										<Label>5.2 What &nbsp;
+										<Label className="LAbel">5.2 What &nbsp;
 										 <span style={{fontWeight:"bold"}}>
 			                              	<span style={{textDecoration:"underline"}}>Un</span>processed?
 			                             </span> Food Were Consumed?</Label>
@@ -104,7 +104,7 @@ export default class UnprocesedFoodModal extends Component{
 			                    {!this.props.editable &&
 	                             
 	                              <div className="input">
-	                              	<Label>5.1 What Processed Food Were Consumed?</Label><br/>
+	                              	<Label className="LAbel">5.1 What Processed Food Were Consumed?</Label><br/>
 	                              	
 	                                <p>{this.state.processed_food_list}</p>
 	                                <Label>5.2 What &nbsp;
