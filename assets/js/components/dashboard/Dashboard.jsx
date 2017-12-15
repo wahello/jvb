@@ -46,7 +46,7 @@ class Dashboard extends Component {
                                <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
                                <a href='/users/request_token'>Garmin Health Connect</a><br/>
                                <a href='/users/connect_request_token'>Garmin Connect</a><br/>
-                               <Link to='/quicksummary'>Quick Look</Link><br/>
+                               <Link to='/quicksummary'>Raw Data</Link><br/>
                               {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 
                           </div>

@@ -61,6 +61,10 @@ export function personal_validate(values){
 export function goals_validate(values){
 	const errors = {};
 
+	if(!values.terms_conditions){
+		errors.terms_conditions = "Please accept terms and conditions";
+	}
+
 	if(!values.sleep_goal){
 		errors.sleep_goal = "Sleep goal is required";
 	}

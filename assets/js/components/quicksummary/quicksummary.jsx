@@ -493,7 +493,7 @@ onLogoutSuccess(response){
             
 
             <span id="header">
-            <h2 className="head" id="head">Quick Look</h2>
+            <h2 className="head" id="head">Raw Data</h2>
             </span>
           
 
@@ -589,7 +589,7 @@ onLogoutSuccess(response){
 						         	   type="submit"
 						               className="btn btn-block-lg"
 						               onClick = {this.handleCreateQuicklook}>
-							               Create Quick Look Report
+							               Create Raw Data Report
 								      </Button>
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>

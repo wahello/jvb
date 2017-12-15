@@ -63,7 +63,7 @@ render(){
 								  	component="input" 
 							   />
 							  <span className="custom-control-indicator"></span>
-							  <span className="custom-control-description">I accept <span><a href="#" onClick={this.toggle}>Terms and Conditions</a></span></span>
+							  <span className="custom-control-description">I Agree To The <span><a href="#" onClick={this.toggle}>Terms and Conditions</a></span></span>
 						</Label>
 
 						<Modal isOpen={this.state.modal} toggle={this.toggle}>
