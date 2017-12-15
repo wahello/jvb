@@ -246,7 +246,7 @@ render(){
     </div>
      <Table
           rowsCount={rowsCount}
-          rowHeight={100}
+          rowHeight={65}
           headerHeight={65}
           width={containerWidth}
           maxHeight={containerHeight}

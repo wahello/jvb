@@ -58,7 +58,7 @@ render(){
 			 >
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={100}
+		        rowHeight={65}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 330;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

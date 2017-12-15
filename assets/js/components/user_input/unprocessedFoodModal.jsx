@@ -73,7 +73,7 @@ export default class UnprocesedFoodModal extends Component{
 					                           	onClick={this.onClickFoodList}
 					                           	checked={this.state.enter_food ? 'checked':''}
 					                           	/>                           		  
-		                            			 <Label id="text">I Want To Enter A List Of &nbsp;
+		                            			 <Label id="text" className="LAbel">I Want To Enter A List Of &nbsp;
 			                            			 <span style={{fontWeight:"bold"}}>
 						                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
 						                             </span> Foods I Consumed</Label>

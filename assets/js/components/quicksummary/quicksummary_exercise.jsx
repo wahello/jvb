@@ -172,7 +172,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             >
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={100}
+		        rowHeight={65}
 		        headerHeight={50}
 		         width={containerWidth}
                 height={containerHeight}

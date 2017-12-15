@@ -258,7 +258,7 @@ class AllStats1 extends Component{
 			<div>
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={100}
+		        rowHeight={65}
 		        headerHeight={50}
 		        width={containerWidth}
         		maxHeight={containerHeight}

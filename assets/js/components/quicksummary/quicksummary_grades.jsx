@@ -64,7 +64,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                         {all_data[props.rowIndex].value}
                     </Cell>
                 )}
-                width={134}
+               width={200}
             />
         )
     }
@@ -80,7 +80,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 			 <Table
 			 	className="responsive"
 		        rowsCount={rowsCount}
-		        rowHeight={100}
+		        rowHeight={65}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
@@ -93,7 +93,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={200}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"grades_ql")}
