@@ -97,8 +97,6 @@ class Quicklook extends Component{
        			var properties={
        			created_at:data.created_at,
 				grades_ql: {
-			        id: data.grades_ql.id,
-			        user_ql: data.grades_ql.user_ql,
 			        overall_health_grade: data.grades_ql.overall_health_grade,
 			        overall_health_gpa: data.grades_ql.overall_health_gpa,
 			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,   
@@ -115,8 +113,6 @@ class Quicklook extends Component{
 	    		},
 
 			    exercise_reporting_ql: {
-			        id:data.exercise_reporting_ql.id,
-			        user_ql: data.exercise_reporting_ql.user_ql,
 			        workout_easy_hard: data.exercise_reporting_ql.workout_easy_hard,
 			        workout_type:data.exercise_reporting_ql.workout_type,
 			        workout_time: data.exercise_reporting_ql.workout_time,
@@ -165,22 +161,16 @@ class Quicklook extends Component{
 			        workout_comment:data.exercise_reporting_ql.workout_comment
 			    },
 			    swim_stats_ql: {
-			        id: data.swim_stats_ql.id,
-			        user_ql: data.swim_stats_ql.user_ql,
 			        pace_per_100_yard: data.swim_stats_ql.pace_per_100_yard,
 			        total_strokes: data.swim_stats_ql.total_strokes
 			    },
 			     "bike_stats_ql": {
-			        id: data.bike_stats_ql.id,
-			        user_ql: data.bike_stats_ql.user_ql,
 			        avg_speed: data.bike_stats_ql.avg_speed,
 			        avg_power: data.bike_stats_ql.avg_power,
 			        avg_speed_per_mile: data.bike_stats_ql.avg_speed_per_mile,
 			        avg_cadence: data.bike_stats_ql.avg_cadence
 			    },
 			    "steps_ql": {
-			        "id": data.steps_ql.id,
-			        "user_ql": data.steps_ql.user_ql,
 			        "non_exercise_steps": data.steps_ql.non_exercise_steps,
 			        "exercise_steps": data.steps_ql.exercise_steps,
 			        "total_steps": data.steps_ql.total_steps,
@@ -190,8 +180,6 @@ class Quicklook extends Component{
 			    },
 
 			    sleep_ql: {
-			        id: data.sleep_ql.id,
-			        user_ql: data.sleep_ql.user_ql,
 			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable,
 			        sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			        sleep_aid: data.sleep_ql.sleep_aid,
@@ -202,15 +190,11 @@ class Quicklook extends Component{
 			        awake_time: data.sleep_ql.awake_time   
 			    },
 			    food_ql: {
-			        id: data.food_ql.id,
-			        user_ql: data.food_ql.user_ql,
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },
 			    alcohol_ql: {
-			        id: data.alcohol_ql.id,
-			        user_ql: data.alcohol_ql.user_ql,
 			        alcohol_day: data.alcohol_ql.alcohol_day,
 			        alcohol_week: data.alcohol_ql.alcohol_week
 			    }

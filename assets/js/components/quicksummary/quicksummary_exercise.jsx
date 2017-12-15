@@ -89,13 +89,6 @@ renderTableColumns(dateWiseData,category,classes=""){
     let keys = [];
     let pushKeytoggle = true;
 
-     const obj = {
-        A: { background: 'green', color: 'white' },
-        B: { background: 'green', color: 'white' },
-        C: { background: 'yellow' },
-        F: { background: 'red', color: 'white' }
-    };
-
     for(let [date,data] of Object.entries(dateWiseData)){
         let avg_heartrate = data[category]['avg_heartrate'];
         if(!this.isEmpty(JSON.parse(avg_heartrate))){
@@ -112,36 +105,32 @@ renderTableColumns(dateWiseData,category,classes=""){
 	for(let [date,data] of Object.entries(dateWiseData)){
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-            if(key !== 'id' && key !== 'user_ql'){
-                if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
-                    let avgHrJson = JSON.parse(value);
-                    for(let act of avgHrKeys)
-                        all_data.push(avgHrJson[act]);
-                }
-                else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
-                    for(let act of avgHrKeys)
-                        all_data.push('-');
-                }
-
-                else if ((key == 'dew_point' && value === null) ||
-                         (key == 'temperature' && value === null) ||
-                         (key == 'humidity' && value === null)||
-                         (key == 'temperature_feels_like' && value === null) ||
-                         (key == 'wind' && value === null)){
-                    all_data.push('No GPS data');
-                }
-                else if((key == 'dew_point' && (value && value != '-')) ||
-                        (key == 'temperature' && (value && value != '-'))||
-                        (key == 'temperature_feels_like' && (value && value != '-'))){
-                    all_data.push(this.toFahrenheit(value).toFixed(2));
-                }
-                else
-                    all_data.push({value:value,
-                        style:obj[value]});
-
-                if(pushKeytoggle)
-                    keys.push(key);
+            if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
+                let avgHrJson = JSON.parse(value);
+                for(let act of avgHrKeys)
+                    all_data.push(avgHrJson[act]);
             }
+            else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
+                for(let act of avgHrKeys)
+                    all_data.push('-');
+            }
+            else if ((key == 'dew_point' && value === null) ||
+                     (key == 'temperature' && value === null) ||
+                     (key == 'humidity' && value === null)||
+                     (key == 'temperature_feels_like' && value === null) ||
+                     (key == 'wind' && value === null)){
+                all_data.push('No GPS data');
+            }
+            else if((key == 'dew_point' && (value && value != '-')) ||
+                    (key == 'temperature' && (value && value != '-'))||
+                    (key == 'temperature_feels_like' && (value && value != '-'))){
+                all_data.push(this.toFahrenheit(value).toFixed(2));
+            }
+            else
+                all_data.push(value);
+
+            if(pushKeytoggle)
+                keys.push(key);
 
         }
 
@@ -149,8 +138,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 			<Column 
 				header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 		        cell={props => (
-			            <Cell style={all_data[props.rowIndex].style} {...props} className={css(styles.newTableBody)}>
-			              {all_data[props.rowIndex].value}
+			            <Cell  {...props} className={css(styles.newTableBody)}>
+			              {all_data[props.rowIndex]}
 			            </Cell>
 			          )}
 		        width={200}
