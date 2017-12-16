@@ -986,13 +986,19 @@ def get_weather_data(todays_daily_strong,todays_activities,
 	   safe_get(todays_daily_strong,'wind_speed','')):
 		manual_weather = True
 
+	temperature = safe_get(todays_daily_strong,'outdoor_temperature',None)
+	dewPoint = safe_get(todays_daily_strong,'dewpoint',None)
+	humidity = safe_get(todays_daily_strong,'humidity',None)
+	apparentTemperature = safe_get(todays_daily_strong,'temperature_feels_like',None)
+	windSpeed = safe_get(todays_daily_strong,'wind',None)
+
 	if manual_weather:
 		DATA = {
-			"temperature":safe_get(todays_daily_strong,'outdoor_temperature',None),
-			"dewPoint":safe_get(todays_daily_strong,'dewpoint',None),
-			"humidity":safe_get(todays_daily_strong,'humidity',None),
-			"apparentTemperature":safe_get(todays_daily_strong,'temperature_feels_like',None),
-			"windSpeed":safe_get(todays_daily_strong,'wind',None)
+			"temperature":float(temperature) if temperature else None,
+			"dewPoint":float(dewPoint) if dewPoint else None,
+			"humidity":float(humidity) if humidity else None,
+			"apparentTemperature":float(apparentTemperature) if apparentTemperature else None,
+			"windSpeed":float(windSpeed) if windSpeed else None
 		}
 		return DATA
 	else:
