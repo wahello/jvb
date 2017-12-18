@@ -557,16 +557,7 @@ handleScroll() {
             </Nav>
           </Collapse>
         </Navbar>
-        </div>
-
-
-
-
-                           
-                                                           
-                             
-
-
+        </div>                                                                                    
                             <Popover
                             style={{height:"220px",overflowY:"scroll"}} 
                             placement="bottom" 
@@ -661,7 +652,7 @@ handleScroll() {
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar>
-                                          <NavItem>
+                                          <NavItem onClick={this.toggle}>
                                           <span id="spa">
                                             <abbr id="abbri"  title="Workout Inputs">
                                               <NavLink id="navlink" href="#workout">
@@ -674,7 +665,7 @@ handleScroll() {
                                             </span>
                                           </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Sleep Inputs">
                                             <NavLink id="navlink" href="#sleep">
@@ -687,7 +678,7 @@ handleScroll() {
                                           </span>
                                         </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
                                             <NavLink id="navlink" href="#food">
@@ -700,7 +691,7 @@ handleScroll() {
                                           </span>
                                         </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Stress/Illness Inputs">
                                             <NavLink id="navlink" href="#stress">
@@ -713,7 +704,7 @@ handleScroll() {
                                           </span>
                                         </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Extra Inputs">
                                             <NavLink id="navlink" href="#daily">
@@ -778,7 +769,7 @@ handleScroll() {
                           data-toggle="validator">
                           {this.state.editable &&
                                  <div className="row justify-content-center"> 
-                                   <span >
+                                   <span className="button1">
                                        <Button
                                            id="btn1"
                                             size="sm"
@@ -794,18 +785,15 @@ handleScroll() {
                           <h3><strong>Workout Inputs</strong></h3>
 
                            <FormGroup>   
-                            <Label className="padding">1. Did You Workout Today?
-                             <span id="workoutinfo"
-                             onClick={this.toggleInfoworkout} 
-                             style={{float:"right",paddingLeft:"15px",color:"gray"}}>
-                             <FontAwesome 
-                                          style={{color:"#5E5E5E"}}
-                                          name = "info-circle"
-                                          size = "1.5x"                                      
-                                        
-                              />
+                            <Label className="padding">1. Did You Workout Today?</Label>
+                             <span id="workoutinfo">
+                            <Button
+                            className="btn infobtn"
+                            id="infobtn1"
+                            onClick={this.toggleInfoworkout}
+                            >Why do we ask this question?</Button>
                               </span>
-                            </Label>
+                            
                             {this.state.editable &&
                               <div className="input">                           
                               
@@ -840,7 +828,8 @@ handleScroll() {
                           </FormGroup>
 
                             <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                            className="pop"
+                            id="popover" 
                             placement="right" 
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
@@ -869,16 +858,15 @@ handleScroll() {
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
-                             <span id="workouttypeinfo"
-                             onClick={this.toggleInfoworkoutType} 
-                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <span id="workouttypeinfo"                             
+                             >
                             
-                             <FontAwesome 
-                                          style={{color:"#5E5E5E"}}
-                                          name = "info-circle"
-                                          size = "1x"                                      
+                             <Button 
+                             onClick={this.toggleInfoworkoutType} 
+                              className="btn infobtn"
+                              id="infobtn1"                                  
                                         
-                              />
+                              >Why do we ask this question?</Button>
                             
                               </span>
                             </Label>
@@ -918,7 +906,8 @@ handleScroll() {
                                     
                             }   
                              <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                          id="popover"
+                          className="pop" 
                             placement="right" 
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
@@ -946,16 +935,13 @@ handleScroll() {
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
                                 <Label className="padding">1.2 Was Your Workout Easy or Hard?
-                                <span id="easyorhard"
-                             onClick={this.toggleEasyorHard} 
-                             style={{paddingLeft:"15px",color:"gray"}}>
+                                <span id="easyorhard">
                             
-                             <FontAwesome 
-                                          style={{color:"#5E5E5E"}}
-                                          name = "info-circle"
-                                          size = "1x"                                      
-                                        
-                              />
+                             <Button
+                                className="btn infobtn"
+                                id="infobtn1"
+                                onClick={this.toggleEasyorHard} 
+                              >Why do we ask this question?</Button>
                           
                               </span>
                                 </Label>
@@ -989,7 +975,8 @@ handleScroll() {
                           }
 
                            <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                          id="popover"
+                          className="pop"
                             placement="right" 
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
@@ -1758,15 +1745,12 @@ handleScroll() {
                               <span style={{textDecoration:"underline"}}>Un</span>processed?
                              </span>
                              <span id="unprocessedinfo"
-                             onClick={this.toggleUnprocessedInfo} 
-                             style={{paddingLeft:"15px",color:"gray"}}>
-                           
-                             <FontAwesome 
-                                          style={{color:"#5E5E5E"}}
-                                          name = "info-circle"
-                                          size = "1x"                                      
-                                        
-                              />
+                            >                           
+                             <Button 
+                            className="btn infobtn"
+                            id="infobtn1"
+                            onClick={this.toggleUnprocessedInfo} 
+                              >Why do we ask this question?</Button>
                         
                               </span>
                              </Label>
@@ -1794,7 +1778,8 @@ handleScroll() {
                             </FormGroup>
                           </FormGroup>
                            <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                           id="popover" 
+                           className="pop"
                             placement="right" 
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
@@ -2244,6 +2229,7 @@ handleScroll() {
 
                           { (!this.state.update_form && this.state.editable) &&
                             <Button
+                            style={{borderRadius:"8px"}}
                               id="btn1" 
                               type="submit"
                               color="info" 
@@ -2254,6 +2240,7 @@ handleScroll() {
 
                           {(this.state.update_form && this.state.editable) &&
                             <Button 
+                             style={{borderRadius:"8px"}}
                               id="btn1"
                               className="btn btn-block btn-primary"
                               onClick={this.onUpdate}>

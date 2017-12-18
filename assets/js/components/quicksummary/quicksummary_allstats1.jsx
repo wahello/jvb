@@ -53,7 +53,8 @@ const attrVerboseName = {
     exercise_consistency: 'Exercise Consistency',
     heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
     fitness_age: 'Fitness Age',
-    workout_comment: 'Workout Comment',
+    workout_comment: 'General Workout Comment',
+    general_comment:'Genaral comment',
 
     overall_health_grade: 'Overall Health Grade',
     overall_health_gpa: 'Overall Health Gpa',
