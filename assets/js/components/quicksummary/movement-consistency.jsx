@@ -47,8 +47,10 @@ class Movementquick extends Component{
         {name: '09 PM - 10 PM'},
         {name: '10 PM - 11 PM'},
         {name: '11 PM - 12 AM'},
-        {name: 'Active-Hours'},
-        {name: 'Inactive-Hours'},              
+        {name: 'Active Hours'},
+        {name: 'Inactive Hours'},
+        {name: 'Sleeping Hours'},
+        {name: 'Total Steps'}              
        ],
        mc_data:[],
        selectedDate: new Date()                      
@@ -157,7 +159,9 @@ class Movementquick extends Component{
             status:'-'
            }, 
            active_hours:'-',
-           inactive_hours:'-'
+           inactive_hours:'-',
+           sleeping_hours:'-',
+           total_steps:'-'
          }
       }
     ];
@@ -208,6 +212,8 @@ class Movementquick extends Component{
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
+      steps_data.push(data['movement_consistency'].sleeping_hours);
+      steps_data.push(data['movement_consistency'].total_steps);
       
       columns.push(
         <Column 

@@ -27,7 +27,7 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 
 import {userDailyInputSend,userDailyInputFetch,
-        userDailyInputUpdate} from '../../network/userInput';
+        userDailyInputUpdate,userDailyInputRecentFetch} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
@@ -189,6 +189,7 @@ class UserInputs extends React.Component{
       this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
+      this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -197,7 +198,7 @@ class UserInputs extends React.Component{
     
     onFetchSuccess(data,clone_form=undefined){
       if (_.isEmpty(data.data))
-        self.onFetchFailure(data);
+        userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       else {
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
@@ -303,7 +304,46 @@ class UserInputs extends React.Component{
         window.scrollTo(0,0);
       }
     }
-    
+
+    onFetchRecentSuccess(data){
+      if(!_.isEmpty(data.data)){
+        const initial_state = this.getInitialState();
+        let have_strong_input = data.data.strong_input?true:false;
+        let have_optional_input = data.data.optional_input?true:false;
+        let have_encouraged_input = data.data.encouraged_input?true:false;
+        let other_diet = true;
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+        for(let diet of DIET_TYPE){
+          if(data.data.optional_input.type_of_diet_eaten === diet)
+            other_diet = false;
+        }
+
+        this.setState(
+          {...initial_state,
+          prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
+          sleep_aid_taken:have_strong_input?data.data.strong_input.sleep_aid_taken:'',
+          smoke_substances:have_strong_input?data.data.strong_input.smoke_any_substances_whatsoever:'',
+          smoked_substance_list:have_strong_input?data.data.strong_input.smoked_substance:'',
+          medications:have_strong_input?data.data.strong_input.prescription_or_non_prescription_medication_yesterday:'',
+          medications_taken_list:have_strong_input?data.data.strong_input.prescription_or_non_prescription_medication_taken:'',
+          controlled_uncontrolled_substance:have_strong_input?data.data.strong_input.controlled_uncontrolled_substance:'',
+          stress:have_encouraged_input?data.data.encouraged_input.stress_level_yesterday:'',
+          sick:have_optional_input?data.data.optional_input.sick:'',
+          sickness:have_optional_input?data.data.optional_input.sickness:'',
+          waist:have_optional_input?data.data.optional_input.waist_size:'',
+          clothes_size:have_optional_input?data.data.optional_input.clothes_size:'',
+          diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
+          diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+          selected_date:this.state.selected_date,
+          gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
+      }else{
+        this.onFetchFailure(data)
+      }
+    }
+
     onFetchFailure(error){
       const initial_state = this.getInitialState();
       this.setState(

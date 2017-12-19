@@ -1,5 +1,6 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import moment from 'moment';
 
 axiosRetry(axios, { retries: 3}); 
 
@@ -79,8 +80,6 @@ function formatJSON(data){
 		    }
 	}
 	*/
-
-	console.log(data)
 	const d = data.selected_date.getDate();
     const m = data.selected_date.getMonth()+1;
     const y = data.selected_date.getFullYear();
@@ -215,6 +214,24 @@ export function userDailyInputUpdate(data,successCallback=undefined, errorCallba
 		}
 	}).catch((error) => {
 		console.log(error.message);
+		if(errorCallback != undefined){
+			errorCallback(error);
+		}
+	});
+}
+
+export function userDailyInputRecentFetch(successCallback=undefined, errorCallback=undefined){
+	const URL = 'users/daily_input/item/recent/';
+	const config = {
+		url : URL,
+		method: 'get',
+		withCredentials: true
+	};
+	axios(config).then(function(response){
+		if(successCallback != undefined){
+			successCallback(response);
+		}
+	}).catch((error) => {
 		if(errorCallback != undefined){
 			errorCallback(error);
 		}
