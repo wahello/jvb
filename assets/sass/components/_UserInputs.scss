@@ -60,7 +60,7 @@ padding-top: 10px;
 #user-inputs .user-inputs-form input.form-control{
 	height: 28px;
 }
-#user-inputs .user-inputs-form button {
+#user-inputs .user-inputs-form .button1{
 margin-top: 46px;
 }
 #user-inputs .user-inputs-form .padding{
@@ -219,6 +219,14 @@ padding-top: 30px;
 	color: white;
 	font-size:17px;
 	margin-left: 5px;
+}
+#infobtn1{
+	font-family:futura-pt;
+		background-color: rgb(237, 149, 7);
+		border-radius: 0px;
+		border-color: rgb(237, 149, 7);
+		height: 30px;
+		font-size: 8px;
 }
 }
 
@@ -445,4 +453,12 @@ textarea.form-control{
 	color: white;
 	font-size: 21px;
 	margin-left: 7px;
+}
+.infobtn{
+	    font-family:futura-pt;
+		background-color: rgb(237, 149, 7);
+		border-radius: 0px;
+		border-color: rgb(237, 149, 7);
+		height: 40px;
+		font-size: 14px;
 }

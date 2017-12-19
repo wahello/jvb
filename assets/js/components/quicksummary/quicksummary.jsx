@@ -549,9 +549,9 @@ onLogoutSuccess(response){
 						         onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
 						         </div>
 
-						   </Form>
-					</div>
-                              </PopoverBody>
+						  		 </Form>
+							</div>
+                           </PopoverBody>
                            </Popover> 		           									
 			<div className="quick">
 			 				
@@ -594,7 +594,7 @@ onLogoutSuccess(response){
                                    </span>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
-                                          <NavItem>
+                                          <NavItem onClick={this.toggle}>
                                           <span id="spa">
                                             <abbr id="abbri"  title="All Stats">
                                               <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
@@ -605,7 +605,7 @@ onLogoutSuccess(response){
                                             </span>
                                           </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Grades">
                                             <NavLink id="headernames" href="#" className={class_grade} value="grade"
@@ -616,7 +616,7 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
                                             <NavLink id="headernames" href="#" className={class_swim}  value="swim"
@@ -627,7 +627,7 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Bike">
                                             <NavLink id="headernames" href="#" className={class_bike} value="bike"
@@ -638,7 +638,7 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Steps">
                                             <NavLink id="headernames" href="#" className={class_steps}  value="steps"
@@ -649,7 +649,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Sleep">
                                             <NavLink id="headernames" href="#" className={class_sleep}  value="sleep"
@@ -660,7 +660,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>  
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Food">
                                             <NavLink id="headernames" href="#" className={class_food}  value="food"
@@ -671,7 +671,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>  
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Alcohol">
                                             <NavLink id="headernames" href="#" className={class_alcohol} value="alcohol"
@@ -682,7 +682,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>  
 
-                                        <NavItem>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Exercise Reporting">
                                             <NavLink id="headernames" href="#" className={class_exercise} value="exercise"
@@ -694,7 +694,7 @@ onLogoutSuccess(response){
                                        </NavItem> 
 
 
-                                       	<NavItem>
+                                       	<NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
                                             <NavLink id="headernames" href="#" className={class_user} value="user"
@@ -705,7 +705,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                       	<NavItem>
+                                       	<NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
                                             <NavLink id="headernames" href="#" className={class_movement} value="movement"
@@ -714,7 +714,15 @@ onLogoutSuccess(response){
                                             </NavLink>                                           
                                           </abbr>
                                           </span>
-                                       </NavItem>                                         									
+                                       </NavItem>
+
+                                       	<NavItem onClick={this.toggle}>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="User Inputs">
+                                            <Button id="nav-btn" className="btn">Print</Button>                                          
+                                          </abbr>
+                                          </span>
+                                       </NavItem>                                          									
                                   </Nav>
                                 </Collapse>
                                 <a 
