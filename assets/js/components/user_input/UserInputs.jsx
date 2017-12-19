@@ -79,9 +79,21 @@ class UserInputs extends React.Component{
         sickness:'',
         fasted:'',
         food_ate_before_workout:'',
+        food_ate_before_nothing:'',
         workout_comment:'',
         calories:'',
         calories_item:'',
+
+        measured_hr:'',
+        hr_down_99:'',
+        time_to_99_min:'',
+        time_to_99_sec:'',
+        hr_level:'',
+        lowest_hr_first_minute:'',
+        lowest_hr_during_hrr:'',
+        time_to_lowest_point_min:'',
+        time_to_lowest_point_sec:'',
+
 
         indoor_temperature:'',
         outdoor_temperature:'',
@@ -140,6 +152,7 @@ class UserInputs extends React.Component{
       this.handleChangeAlcoholDrink = handlers.handleChangeAlcoholDrink.bind(this);
       this.handleCaloriesItemCheck = handlers.handleCaloriesItemCheck.bind(this);
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
+      this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -155,6 +168,7 @@ class UserInputs extends React.Component{
       this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
+      this.renderHrr = renderers.renderHrr.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -1237,6 +1251,37 @@ handleScroll() {
                           </FormGroup>
                         }
 
+                         { (this.state.workout == "yes" || this.state.workout == "") &&
+                            this.state.workout_type !== "strength" &&
+                            this.state.workout_input_type !== "strength" &&
+                            this.state.fasted == "yes" &&
+                           <FormGroup>
+                            <Label className="padding">1.9.1 What Food Did You Eat Before Your Workout? </Label>
+                              {this.state.editable &&
+                                <div className="input">
+                                    <Input 
+                                        type="select" 
+                                        className="custom-select form-control" 
+                                        name="diet_type"
+                                        value={this.state.food_ate_before_nothing}
+                                        onChange={this.handleChange}>
+                                                <option value="nothing">Nothing</option>
+                                                                                                                                                                                                                          
+                                      </Input>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.fasted}</p>
+                                </div>
+                              }
+                               <FormGroup id="padd">
+                                 {this.renderFasted()}
+                               </FormGroup>
+                          </FormGroup>
+                        }
+
                         { (this.state.workout === "yes" || this.state.workout === "") &&     
                           <FormGroup>      
                             <Label className="padding">
@@ -1454,6 +1499,40 @@ handleScroll() {
                        }
                        </Collapse>
                      
+                        { (this.state.workout == "yes" || this.state.workout == "") &&
+                          <FormGroup>   
+                              <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
+                              information button for instructions about how to record this)?</Label>
+                              {this.state.editable &&
+                                <div className="input">
+                                     <Label check className="btn btn-secondary radio1">
+                                        <Input type="radio" name="measured_hr" 
+                                        value="yes"
+                                        checked={this.state.measured_hr === 'yes'}
+                                        onChange={this.handleChangeHrr}/>{' '}
+                                        Yes
+                                     </Label>
+                                     <Label check className="btn btn-secondary radio1">
+                                       <Input type="radio" name="measured_hr" 
+                                            value="no"
+                                            checked={this.state.measured_hr === 'no'}
+                                            onChange={this.handleChangeHrr}/>{' '}
+                                          No
+                                    </Label>
+                                </div>  
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.measured_hr}</p>
+                                </div>
+                              }
+                               <FormGroup id="padd"> 
+                            {this.renderHrr()}
+                            </FormGroup>
+                          </FormGroup>
+                        }
+
 
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
