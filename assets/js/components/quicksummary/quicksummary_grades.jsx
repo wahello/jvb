@@ -35,13 +35,12 @@ import { StyleSheet, css } from 'aphrodite';
 renderTableColumns(dateWiseData,category,classes=""){
     console.log(dateWiseData);
     let columns = [];
-
     const obj = {
-        A: { background: 'green', color: 'black' },
+        A: { background: 'green', color: 'black', height:'auto' },
         B: { background: 'green', color: 'black' },
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
-        F: { background: 'red', color: 'black' }
+        F: { background: 'red', color: 'black' },
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -85,6 +84,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
+                
         		{...props}>
 		        <Column
 		          header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}

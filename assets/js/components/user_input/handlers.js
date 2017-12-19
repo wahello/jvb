@@ -120,7 +120,26 @@ export function handleChangeSick(event){
     })
   }
 }
+export function handleChangeHrr(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
 
+  if(value === 'yes'){
+    this.setState({
+    heart_rate:value
+    });
+  }else{
+    this.setState({
+      heart_rate:value,
+      heart_rate_go_down:'',
+      heart_rate_minutes:'',
+      heart_rate_seconds:'',
+      heart_rate_level:'',
+      heart_rate_recovery:'',
+          })
+  }
+}
 export function handleChangeSleepAids(event){
   const target = event.target;
   const value = target.value;

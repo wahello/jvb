@@ -13,6 +13,7 @@ import FastedModal from './fastedModal';
 import DietType from './diettype';
 import SmokedSubstance from './smokedSubstance';
 import AlcoholModal from './alcoholModal';
+import Hrr from './HRR';
 
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" && 
@@ -157,7 +158,22 @@ export function renderPainSick(){
 		 );
   }
 }
+export function renderHrr(){
+  if(this.state.heart_rate === 'yes'){
+	 const updateState = function(val){
+						  this.setState({
+						  heart_rate_go_down: val
+						  })}.bind(this); 
 
+	 return(
+		  <Hrr
+			heart_rate_go_down={this.state.heart_rate_go_down}
+			updateState={updateState}
+			editable = {this.state.editable}
+		  />
+		 );
+  }
+}
 export function renderSmokeSubstance(){
   if (this.state.smoke_substances === 'yes'){
 
