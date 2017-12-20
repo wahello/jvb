@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
+    fontStyle:'normal',
   }
 });
 

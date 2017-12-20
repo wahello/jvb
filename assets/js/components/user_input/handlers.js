@@ -127,16 +127,19 @@ export function handleChangeHrr(event){
 
   if(value === 'yes'){
     this.setState({
-    heart_rate:value
+    measured_hr:value
     });
   }else{
     this.setState({
-      heart_rate:value,
-      heart_rate_go_down:'',
-      heart_rate_minutes:'',
-      heart_rate_seconds:'',
-      heart_rate_level:'',
-      heart_rate_recovery:'',
+      measured_hr:value,
+      hr_down_99:'',
+      time_to_99_min:'',
+      time_to_99_sec:'',
+      hr_level:'',
+      lowest_hr_first_minute:'',
+      lowest_hr_during_hrr:'',
+      time_to_lowest_point_min:'',
+      time_to_lowest_point_sec:'',
           })
   }
 }

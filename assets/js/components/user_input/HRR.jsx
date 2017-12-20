@@ -6,18 +6,24 @@ import Textarea from 'react-textarea-autosize';
 export default class Hrr extends Component{
 	constructor(props){
 		super(props);
-		const heart_rate_go_down = this.props.heart_rate_go_down;
-		const heart_rate_minutes = this.props.heart_rate_minutes;
-		const heart_rate_seconds = this.props.heart_rate_seconds;
-		const heart_rate_level = this.heart_rate_level;
-		const heart_rate_recovery = this.heart_rate_recovery;
+		const hr_down_99 = this.props.hr_down_99;
+		const time_to_99_min = this.props.time_to_99_min;
+		const time_to_99_sec = this.props.time_to_99_sec;
+		const hr_level = this.hr_level;
+		const lowest_hr_first_minute = this.lowest_hr_first_minute;
+		const lowest_hr_during_hrr = this.lowest_hr_during_hrr;
+		const time_to_lowest_point_min = this.time_to_lowest_point_min;
+		const time_to_lowest_point_sec = this.time_to_lowest_point_sec;
 		this.state = {
 			collapse:true,
-			heart_rate_go_down:heart_rate_go_down,
-			heart_rate_minutes:heart_rate_minutes,
-			heart_rate_seconds:heart_rate_seconds,
-			heart_rate_level:heart_rate_level,
-			heart_rate_recovery:heart_rate_recovery,
+			hr_down_99:hr_down_99,
+			time_to_99_min:time_to_99_min,
+			time_to_99_sec:time_to_99_sec,
+			hr_level:hr_level,
+			lowest_hr_first_minute:lowest_hr_first_minute,
+			lowest_hr_during_hrr:lowest_hr_during_hrr,
+			time_to_lowest_point_min:time_to_lowest_point_min,
+			time_to_lowest_point_sec:time_to_lowest_point_sec,
 		};
 		
 		this.handleChange = this.handleChange.bind(this);
@@ -25,18 +31,24 @@ export default class Hrr extends Component{
 		
 	}
 	componentWillReceiveProps(nextProps) {
-  	  if((nextProps.heart_rate_go_down !== this.props.heart_rate_go_down) ||
-  	  	  (nextProps.heart_rate_minutes !== this.props.heart_rate_minutes) ||
-  	  	  (nextProps.heart_rate_seconds !== this.props.heart_rate_seconds) ||
-  	  	  (nextProps.heart_rate_level !== this.props.heart_rate_level) ||
-  	  	  (nextProps.heart_rate_recovery !== this.props.heart_rate_recovery)
+  	  if((nextProps.hr_down_99 !== this.props.hr_down_99) ||
+  	  	  (nextProps.time_to_99_min !== this.props.time_to_99_min) ||
+  	  	  (nextProps.time_to_99_sec !== this.props.time_to_99_sec) ||
+  	  	  (nextProps.hr_level !== this.props.hr_level) ||
+  	  	  (nextProps.lowest_hr_first_minute !== this.props.lowest_hr_first_minute) ||
+  	  	  (nextProps.lowest_hr_during_hrr !== this.props.lowest_hr_during_hrr) ||
+  	  	  (nextProps.time_to_lowest_point_min != this.props.time_to_lowest_point_min) ||
+  	  	  (nextProps.time_to_lowest_point_sec != this.props.time_to_lowest_point_sec)
   	  	  ){
     	  	this.setState({
-    	  		heart_rate_go_down:nextProps.heart_rate_go_down,
-    	  		heart_rate_minutes:nextProps.heart_rate_minutes,
-    	  		heart_rate_seconds:nextProps.heart_rate_seconds,
-    	  		heart_rate_level:nextProps.heart_rate_level,
-    	  		heart_rate_recovery:nextProps.heart_rate_recovery,
+    	  		hr_down_99:nextProps.hr_down_99,
+    	  		time_to_99_min:nextProps.time_to_99_min,
+    	  		time_to_99_sec:nextProps.time_to_99_sec,
+    	  		hr_level:nextProps.hr_level,
+    	  		lowest_hr_first_minute:nextProps.lowest_hr_first_minute,
+    	  		lowest_hr_during_hrr:nextProps.lowest_hr_during_hrr,
+    	  		time_to_lowest_point_min:nextProps.time_to_lowest_point_min,
+    	  		time_to_lowest_point_sec:nextProps.time_to_lowest_point_sec,
     	  	});
     	}
   	}
@@ -73,15 +85,15 @@ export default class Hrr extends Component{
 	                            <div className="input1">
 		                              <Label className="btn  radio1">
                                     <Input type="radio"
-                                    name="heart_rate_go_down"                                                                   
+                                    name="hr_down_99"                                                                   
                                     value="heart_yes" 
-                                    checked={this.state.heart_rate_go_down === 'heart_yes'}
+                                    checked={this.state.hr_down_99 === 'heart_yes'}
                                     onChange={this.handleChange}/> Yes
                                   </Label>
                                   <Label className="btn  radio1">
-                                    <Input type="radio" name="heart_rate_go_down" 
+                                    <Input type="radio" name="hr_down_99" 
                                     value="heart_no"
-                                    checked={this.state.heart_rate_go_down === 'heart_no'}
+                                    checked={this.state.hr_down_99 === 'heart_no'}
                                     onChange={this.handleChange}/> No
                                   </Label>
 	                            </div> 
@@ -89,7 +101,7 @@ export default class Hrr extends Component{
 	                        {
 	                          !this.props.editable &&
 	                          <div className="input">
-	                            <p>{this.state.heart_rate_go_down}</p>
+	                            <p>{this.state.hr_down_99}</p>
 	                          </div>
 	                        }
                           </FormGroup>
@@ -97,7 +109,7 @@ export default class Hrr extends Component{
 
 
 					
-						
+						 { (this.state.hr_down_99 == "heart_yes" || this.state.hr_down_99 == "") &&
                           <FormGroup>   
                             <Label className="LAbel">1.12.2 How long did it take for your heart rate to get to 99 bpm?</Label>
 
@@ -105,10 +117,10 @@ export default class Hrr extends Component{
 	                           	  <div className="input1">
 		                             <div className="col-xs-6">
                                   <div className="input1"> 
-                                <Input type="select" name="heart_rate_minutes"
+                                <Input type="select" name="time_to_99_min"
                                 id="hours"
                                 className="form-control custom-select"
-                                value={this.state.heart_rate_minutes}
+                                value={this.state.time_to_99_min}
                                 onChange={this.handleChange}>
                                  <option key="minutes" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59)}                        
@@ -118,10 +130,10 @@ export default class Hrr extends Component{
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input1">
-                                <Input type="select" name="heart_rate_seconds"
+                                <Input type="select" name="time_to_99_sec"
                                  id="minutes"
                                 className="form-control custom-select "
-                                value={this.state.heart_rate_seconds}
+                                value={this.state.time_to_99_sec}
                                 onChange={this.handleChange}>
                                  <option key="seconds" value="">Seconds</option>
                                 {this.createSleepDropdown(0,59,true)}                        
@@ -133,13 +145,15 @@ export default class Hrr extends Component{
 			                   {
 	                              !this.props.editable &&
 	                              <div className="input1">
-                              {(this.state.heart_rate_minutes && this.state.heart_rate_seconds) &&
-                                <p>{this.state.heart_rate_minutes} minutes {this.state.heart_rate_seconds} seconds</p>
+                              {(this.state.time_to_99_min && this.state.time_to_99_sec) &&
+                                <p>{this.state.time_to_99_min} minutes {this.state.time_to_99_sec} seconds</p>
                               }
                               </div>
 	                           }
                           </FormGroup> 
+                      }
                      
+                     { (this.state.hr_down_99 == "heart_yes" || this.state.hr_down_99 == "") &&
                      <FormGroup>
 						<Label className="padding">1.12.3 What was your heart rate level when you started your heart rate recovery file?</Label>
 						{this.props.editable &&
@@ -148,7 +162,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_level}
+	                        value={this.state.hr_level}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -158,11 +172,13 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_level}</p>
+                            <p>{this.state.hr_level}</p>
                           </div>
                         }
 					</FormGroup>
+				}
 
+				{ (this.state.hr_down_99 == "heart_yes" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.4 In the first minute of your heart rate recovery file, what was your lowest heart rate?</Label>
 						{this.props.editable &&
@@ -171,7 +187,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_recovery}
+	                        value={this.state.lowest_hr_first_minute}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -181,11 +197,13 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_recovery}</p>
+                            <p>{this.state.lowest_hr_first_minute}</p>
                           </div>
                         }
 					</FormGroup>
+				}
 
+				{ (this.state.hr_down_99 == "heart_yes" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.5 Based on your HRR inputs, your heart rate recovery today</Label>
 						{this.props.editable &&
@@ -194,7 +212,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_recovery}
+	                        value={this.state.lowest_hr_first_minute}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -204,12 +222,12 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_recovery}</p>
+                            <p>{this.state.lowest_hr_first_minute}</p>
                           </div>
                         }
 					</FormGroup>
-
-
+				}
+				{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.6 What is the lowest point your heart rate got to during your heart rate recovery?</Label>
 						{this.props.editable &&
@@ -218,7 +236,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_recovery}
+	                        value={this.state.lowest_hr_during_hrr}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -228,11 +246,13 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_recovery}</p>
+                            <p>{this.state.lowest_hr_during_hrr}</p>
                           </div>
                         }
 					</FormGroup>
+				}
 
+				{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
 					<FormGroup>   
                             <Label className="LAbel">1.12.7 How long did it take for your heart rate to get to the lowest point?</Label>
 
@@ -240,10 +260,10 @@ export default class Hrr extends Component{
 	                           	  <div className="input1">
 		                             <div className="col-xs-6">
                                   <div className="input1"> 
-                                <Input type="select" name="heart_rate_minutes"
+                                <Input type="select" name="time_to_lowest_point_min"
                                 id="hours"
                                 className="form-control custom-select"
-                                value={this.state.heart_rate_minutes}
+                                value={this.state.time_to_lowest_point_min}
                                 onChange={this.handleChange}>
                                  <option key="minutes" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59)}                        
@@ -253,10 +273,10 @@ export default class Hrr extends Component{
                               
                                 <div className="col-xs-6 justify-content-right">
                                <div className="input1">
-                                <Input type="select" name="heart_rate_seconds"
+                                <Input type="select" name="time_to_lowest_point_sec"
                                  id="minutes"
                                 className="form-control custom-select "
-                                value={this.state.heart_rate_seconds}
+                                value={this.state.time_to_lowest_point_sec}
                                 onChange={this.handleChange}>
                                  <option key="seconds" value="">Seconds</option>
                                 {this.createSleepDropdown(0,59,true)}                        
@@ -268,13 +288,14 @@ export default class Hrr extends Component{
 			                   {
 	                              !this.props.editable &&
 	                              <div className="input1">
-                              {(this.state.heart_rate_minutes && this.state.heart_rate_seconds) &&
-                                <p>{this.state.heart_rate_minutes} minutes {this.state.heart_rate_seconds} seconds</p>
+                              {(this.state.time_to_lowest_point_min && this.state.time_to_lowest_point_sec) &&
+                                <p>{this.state.time_to_lowest_point_min} minutes {this.state.time_to_lowest_point_sec} seconds</p>
                               }
                               </div>
 	                           }
                           </FormGroup> 
-
+                      }
+                      	{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
                            <FormGroup>
 						<Label className="padding">1.12.8 What was your heart rate level when you started your heart rate recovery file?</Label>
 						{this.props.editable &&
@@ -283,7 +304,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_recovery}
+	                        value={this.state.hr_level}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -293,11 +314,12 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_recovery}</p>
+                            <p>{this.state.hr_level}</p>
                           </div>
                         }
 					</FormGroup>
-
+				}
+				{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.9 In the first minute of your heart rate recovery file, what was your lowest heart rate?</Label>
 						{this.props.editable &&
@@ -306,7 +328,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_recovery}
+	                        value={this.state.lowest_hr_first_minute}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -316,11 +338,12 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_recovery}</p>
+                            <p>{this.state.lowest_hr_first_minute}</p>
                           </div>
                         }
 					</FormGroup>
-
+				}
+				{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.10 Based on your HRR inputs, your heart rate recovery today</Label>
 						{this.props.editable &&
@@ -329,7 +352,7 @@ export default class Hrr extends Component{
 							id="placeholder" 
 	                        type="select" 
 	                        className="form-control custom-select" 
-	                        value={this.state.heart_rate_recovery}
+	                        value={this.state.lowest_hr_first_minute}
 	                        onChange={this.handleChange} >
 	                         <option key="select" value="">Select</option>
                              {this.createSleepDropdown(70,220,true)}                             
@@ -339,10 +362,12 @@ export default class Hrr extends Component{
                        {
                           !this.props.editable &&
                           <div className="input">
-                            <p>{this.state.heart_rate_recovery}</p>
+                            <p>{this.state.lowest_hr_first_minute}</p>
                           </div>
                         }
 					</FormGroup>
+				}
+				
 
 
 

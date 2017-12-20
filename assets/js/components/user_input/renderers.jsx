@@ -159,15 +159,15 @@ export function renderPainSick(){
   }
 }
 export function renderHrr(){
-  if(this.state.heart_rate === 'yes'){
+  if(this.state.measured_hr === 'yes'){
 	 const updateState = function(val){
 						  this.setState({
-						  heart_rate_go_down: val
+						  hr_down_99: val
 						  })}.bind(this); 
 
 	 return(
 		  <Hrr
-			heart_rate_go_down={this.state.heart_rate_go_down}
+			hr_down_99={this.state.hr_down_99}
 			updateState={updateState}
 			editable = {this.state.editable}
 		  />
