@@ -276,6 +276,18 @@ class UserInputs extends React.Component{
           humidity:have_strong_input?data.data.strong_input.humidity:'',
           weather_comment:have_strong_input?data.data.strong_input.weather_comment:'',
 
+
+          measured_hr:have_strong_input?data.data.strong_input.measured_hr:'',
+          hr_down_99:have_strong_input?data.data.strong_input.hr_down_99:'',
+          time_to_99_min:have_strong_input?data.data.strong_input.time_to_99_min.split(':')[0]:'',
+          time_to_99_sec:have_strong_input?data.data.strong_input.time_to_99_sec.split(':')[1]:'',
+          hr_level:have_strong_input?data.data.strong_input.hr_level:'',
+          lowest_hr_first_minute:have_strong_input?data.data.strong_input.lowest_hr_first_minute:'',
+          lowest_hr_during_hrr:have_strong_input?data.data.strong_input.lowest_hr_during_hrr:'',
+          time_to_lowest_point_min:have_strong_input?data.data.strong_input.time_to_lowest_point_min.split(':')[0]:'',
+          time_to_lowest_point_sec:have_strong_input?data.data.strong_input.time_to_lowest_point_sec.split(':')[1]:'',
+
+
           sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
           sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
           // sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
@@ -813,7 +825,7 @@ handleScroll() {
                               </PopoverBody>
                            </Popover>                                                        
                
-                <Container id="user-inputs">                          
+                <Container id="user-inputs" >                          
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
                         <Form 
