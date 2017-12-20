@@ -270,22 +270,22 @@ class DailyUserInputEncouraged(models.Model):
     pain_area = models.TextField(blank=True)
 
     # HRR fields
-    # measured_hr = models.CharField(choices = YN_CHOICE, max_length = 4, blank=True)
-    # hr_down_99 = models.CharField(choices = YN_CHOICE, max_length = 4, blank=True)
-    # time_to_99 = models.CharField(max_length=10, blank = True)
-    # hr_level = models.CharField(
-    #     max_length=10,
-    #     validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
-    #     blank = True)
-    # lowest_hr_first_minute = models.CharField(
-    #     max_length=10,
-    #     validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
-    #     blank = True)
-    # lowest_hr_during_hrr = models.CharField(
-    #     max_length=10,
-    #     validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
-    #     blank = True)
-    # time_to_lowest_point = models.CharField(max_length=10, blank = True)
+    measured_hr = models.CharField(choices = YN_CHOICE, max_length = 4, blank=True)
+    hr_down_99 = models.CharField(choices = YN_CHOICE, max_length = 4, blank=True)
+    time_to_99 = models.CharField(max_length=10, blank = True)
+    hr_level = models.CharField(
+        max_length=10,
+        validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
+        blank = True)
+    lowest_hr_first_minute = models.CharField(
+        max_length=10,
+        validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
+        blank = True)
+    lowest_hr_during_hrr = models.CharField(
+        max_length=10,
+        validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
+        blank = True)
+    time_to_lowest_point = models.CharField(max_length=10, blank = True)
 
 class DailyUserInputOptional(models.Model):
 

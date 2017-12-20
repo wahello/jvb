@@ -1606,7 +1606,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                             
                           <FormGroup>      
-                            <Label className="padding">1.12 Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.13 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Input type="text" name="calories" 
@@ -1627,7 +1627,7 @@ handleScroll() {
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                           <FormGroup>      
-                            <Label className="padding">1.13 What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.14 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"

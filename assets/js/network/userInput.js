@@ -53,7 +53,14 @@ function formatJSON(data){
 		        "pains_twings_during_or_after_your_workout": "yes", 
 		        "water_consumed_during_workout": 58,
 		        "workout_that_user_breathed_through_nose": 90,
-		        "pain_area": "right shins"
+		        "pain_area": "right shins",
+		        "measured_hr":"yes",
+				"hr_down_99":"yes",
+				"time_to_99":"1:06",
+				"hr_level":"90",
+				"lowest_hr_first_minute":"80",
+				"lowest_hr_during_hrr":"76",
+				"time_to_lowest_point":"0:52"
 		    },
 		    "optional_input": {
 		        "id": 1,
@@ -127,6 +134,13 @@ function formatJSON(data){
 	json_data.encouraged_input['water_consumed_during_workout'] = data.water_consumed; 
 	json_data.encouraged_input['workout_that_user_breathed_through_nose'] = data.breath_nose; 
 	json_data.encouraged_input['pain_area'] = data.pain_area; 
+	json_data.encouraged_input['measured_hr'] = data.measured_hr;
+	json_data.encouraged_input['hr_down_99'] = data.hr_down_99;
+	json_data.encouraged_input['time_to_99'] = data.time_to_99_min+":"+data.time_to_99_sec;
+	json_data.encouraged_input['hr_level'] = data.hr_level;
+	json_data.encouraged_input['lowest_hr_first_minute'] = data.lowest_hr_first_minute;
+	json_data.encouraged_input['lowest_hr_during_hrr'] = data.lowest_hr_during_hrr;
+	json_data.encouraged_input['time_to_lowest_point'] = data.time_to_lowest_point_min+":"+data.time_to_lowest_point_sec;
 
 	json_data.optional_input['list_of_processed_food_consumed_yesterday'] = data.food_consumed; 
 	json_data.optional_input['chia_seeds_consumed_during_workout'] = data.chia_seeds; 
