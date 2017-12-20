@@ -533,6 +533,11 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
+
+	# If user slept after midnight and again went to bed after next midnight
+	# In that case we have same yesterday_bedtime and today_bedtime 
+	if today_bedtime and today_bedtime <= today_awake_time:
+		today_bedtime = None
 	
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
@@ -958,21 +963,23 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong,age):
-	filtered_activities = todays_activities.copy()
+	filtered_activities = []
 	total_duration = 0
 	for i,act in enumerate(todays_activities):
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
-			filtered_activities.pop(i)
+			pass
 		elif 'swimming' in act.get('activityType','').lower():
-			filtered_activities.pop(i)
+			pass
 		elif act.get('activityType','') == 'STRENGTH_TRAINING':
-			filtered_activities.pop(i)
+			pass
 		elif act.get('activityType','') == 'OTHER':
-			filtered_activities.pop(i)
+			pass
 		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
-			filtered_activities.pop(i)
+			pass
 		else:
+			filtered_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
+
 	if filtered_activities:
 		avg_hr = 0
 		for act in filtered_activities:
