@@ -16,6 +16,8 @@ export default class Hrr extends Component{
 		const time_to_lowest_point_sec = this.time_to_lowest_point_sec;
 		this.state = {
 			collapse:true,
+			 modal: false,
+			 modal1:false,
 			hr_down_99:hr_down_99,
 			time_to_99_min:time_to_99_min,
 			time_to_99_sec:time_to_99_sec,
@@ -28,6 +30,8 @@ export default class Hrr extends Component{
 		
 		this.handleChange = this.handleChange.bind(this);
 		this.createSleepDropdown=this.createSleepDropdown.bind(this);
+		this.toggle = this.toggle.bind(this);
+		this.toggle1 = this.toggle1.bind(this);
 		
 	}
 	componentWillReceiveProps(nextProps) {
@@ -73,7 +77,16 @@ export default class Hrr extends Component{
     }
     return elements;
   }
-
+toggle() {
+    this.setState({
+      modal: !this.state.modal
+    });
+  }
+  toggle1() {
+    this.setState({
+      modal: !this.state.modal1
+    });
+  }
 	render(){
 
 		return(
@@ -181,52 +194,37 @@ export default class Hrr extends Component{
 				{ (this.state.hr_down_99 == "heart_yes" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.4 In the first minute of your heart rate recovery file, what was your lowest heart rate?</Label>
-						{this.props.editable &&
+						
 						<div className="input1">
-							<Input
-							id="placeholder" 
-	                        type="select" 
-	                        className="form-control custom-select" 
-	                        value={this.state.lowest_hr_first_minute}
-	                        onChange={this.handleChange} >
-	                         <option key="select" value="">Select</option>
-                             {this.createSleepDropdown(70,220,true)}                             
-	                        </Input>
+							 <Button color="danger" onClick={this.toggle}>Hit me!</Button>
                         </div>
-                       }
-                       {
-                          !this.props.editable &&
-                          <div className="input">
-                            <p>{this.state.lowest_hr_first_minute}</p>
-                          </div>
-                        }
+                      
 					</FormGroup>
-				}
 
-				{ (this.state.hr_down_99 == "heart_yes" || this.state.hr_down_99 == "") &&
-					 <FormGroup>
-						<Label className="padding">1.12.5 Based on your HRR inputs, your heart rate recovery today</Label>
-						{this.props.editable &&
-						<div className="input1">
-							<Input
-							id="placeholder" 
-	                        type="select" 
-	                        className="form-control custom-select" 
-	                        value={this.state.lowest_hr_first_minute}
-	                        onChange={this.handleChange} >
-	                         <option key="select" value="">Select</option>
-                             {this.createSleepDropdown(70,220,true)}                             
-	                        </Input>
-                        </div>
-                       }
-                       {
-                          !this.props.editable &&
-                          <div className="input">
-                            <p>{this.state.lowest_hr_first_minute}</p>
-                          </div>
-                        }
-					</FormGroup>
 				}
+				 <div>
+			       
+			        <Modal isOpen={this.state.modal} toggle={this.toggle}>
+			         <ModalBody>
+			         <table className="table-responsive">
+			         <thead>
+			         <th>HRR Time to 99</th>
+			         <th>Heart Rate Highest Point in First Minute </th>
+			         <th>Number of heart rate beats recovered in the first Minute</th>
+			         <th>Lowest heart rate point in your heart rate recovery recording</th>
+			         </thead>
+			         <tbody>
+			         <td>1:30</td>
+			         <td>150</td>
+			         <td>25</td>
+			         <td>56</td>
+			         </tbody>
+			         </table>
+			          </ModalBody>
+			        </Modal>
+			      </div>
+
+				
 				{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.6 What is the lowest point your heart rate got to during your heart rate recovery?</Label>
@@ -346,32 +344,35 @@ export default class Hrr extends Component{
 				{ (this.state.hr_down_99 == "heart_no" || this.state.hr_down_99 == "") &&
 					 <FormGroup>
 						<Label className="padding">1.12.10 Based on your HRR inputs, your heart rate recovery today</Label>
-						{this.props.editable &&
+						
 						<div className="input1">
-							<Input
-							id="placeholder" 
-	                        type="select" 
-	                        className="form-control custom-select" 
-	                        value={this.state.lowest_hr_first_minute}
-	                        onChange={this.handleChange} >
-	                         <option key="select" value="">Select</option>
-                             {this.createSleepDropdown(70,220,true)}                             
-	                        </Input>
+							 <Button color="danger" onClick={this.toggle1}>Hit me!</Button>
                         </div>
-                       }
-                       {
-                          !this.props.editable &&
-                          <div className="input">
-                            <p>{this.state.lowest_hr_first_minute}</p>
-                          </div>
-                        }
+                      
+                       
 					</FormGroup>
 				}
-				
-
-
-
-
+				 <div>
+			       
+			        <Modal isOpen={this.state.modal1} toggle={this.toggle1}>
+			         <ModalBody>
+			         <table className="table-responsive">
+			         <thead>
+			         <th>HRR Time to 99</th>
+			         <th>Heart Rate Highest Point in First Minute </th>
+			         <th>Number of heart rate beats recovered in the first Minute</th>
+			         <th>Lowest heart rate point in your heart rate recovery recording</th>
+			         </thead>
+			         <tbody>
+			         <td>1:30</td>
+			         <td>150</td>
+			         <td>25</td>
+			         <td>56</td>
+			         </tbody>
+			         </table>
+			          </ModalBody>
+			        </Modal>
+			      </div>
 			</div>
 
 		);
