@@ -533,6 +533,11 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
+
+	# If user slept after midnight and again went to bed after next midnight
+	# In that case we have same yesterday_bedtime and today_bedtime 
+	if today_bedtime and today_bedtime <= today_awake_time:
+		today_bedtime = None
 	
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
