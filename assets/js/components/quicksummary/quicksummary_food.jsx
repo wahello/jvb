@@ -17,7 +17,6 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.state = {
       myTableData: [
         {name: 'Percentage of Unprocessed Food'},
-        {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Non Processed Food'},
         {name: 'Diet Type'},       
       ],
