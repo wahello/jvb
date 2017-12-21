@@ -36,7 +36,7 @@ renderTableColumns(dateWiseData,category,classes=""){
     console.log(dateWiseData);
     let columns = [];
     const obj = {
-        A: { background: 'green', color: 'black', height:'auto' },
+        A: { background: 'green', color: 'black'},
         B: { background: 'green', color: 'black' },
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },

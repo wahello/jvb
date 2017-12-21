@@ -7,7 +7,7 @@ body{
 	font-style: normal;
 	font-size: 18px;
 	color:#5e5e5e;
-	
+
 }
 
 #placeholder{
@@ -36,7 +36,7 @@ padding-top: 10px;
 	color: rgba(0,0,0,0.5);
 }
 #header{
-	padding-left: 280px;
+	padding-left: 360px;
 }
 
  .head{
@@ -79,9 +79,16 @@ margin-top: 46px;
 // }
 
 @media (max-width: 1023px) {
+	table,tbody,th,td,tr{
+		width:100px;
+		font-size: 8px;
+	}
 #body1{
 padding-top: 30px;
 }
+.form-control {
+    font-size: 14px;
+  }
 	#placeholder{
 		font-family: proxima-nova;
 		font-style: normal;
@@ -128,14 +135,14 @@ padding-top: 30px;
 		padding:0px 17px;
 		font-family: Proxima-Nova;
 		font-style: normal;
-		font-size: 18px;
+		 font-size: 14px;
 		color:#5e5e5e;
 	}
 	.input1{
 		padding:0px 17px 0px 23px;
 		font-family: Proxima-Nova;
 		font-style: normal;
-		font-size: 18px;
+		 font-size: 14px;
 		color:#5e5e5e;
 	}
 	.nav1{
@@ -221,6 +228,10 @@ padding-top: 30px;
 	font-size:17px;
 	margin-left: 5px;
 }
+input, textarea {
+    font-size: initial;
+}
+
 }
 
 h3{

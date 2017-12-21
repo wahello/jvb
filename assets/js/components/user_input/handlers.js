@@ -185,7 +185,7 @@ export function handleChangeFasted(event){
   if(value === 'yes'){
     this.setState({
   	  fasted:value,
-      food_ate_before_workout:''
+      food_ate_before_workout:'Nothing'
     });
   }else{
     this.setState({

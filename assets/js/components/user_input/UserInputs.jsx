@@ -79,7 +79,6 @@ class UserInputs extends React.Component{
         sickness:'',
         fasted:'',
         food_ate_before_workout:'',
-        food_ate_before_nothing:'',
         workout_comment:'',
         calories:'',
         calories_item:'',
@@ -625,7 +624,8 @@ handleScroll() {
         </Navbar>
         </div>                                                                                    
                             <Popover
-                            style={{height:"220px",overflowY:"scroll"}} 
+                            id="popover" 
+                          
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -801,7 +801,7 @@ handleScroll() {
                            </Popover> 
 
                            <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                          id="popover" 
                             placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
@@ -1304,35 +1304,11 @@ handleScroll() {
                                   <p>{this.state.fasted}</p>
                                 </div>
                               }
-                               <FormGroup id="padd">
-                                 {this.renderFasted()}
-                               </FormGroup>
-                          </FormGroup>
-                        }
-
-                         { (this.state.workout == "yes" || this.state.workout == "") &&
-                            this.state.workout_type !== "strength" &&
-                            this.state.workout_input_type !== "strength" &&
-                            this.state.fasted == "yes" &&
-                           <FormGroup>
-                            <Label className="padding">1.9.1 What Food Did You Eat Before Your Workout? </Label>
-                              {this.state.editable &&
-                                <div className="input">
-                                    <Input 
-                                        type="select" 
-                                        className="custom-select form-control" 
-                                        name="diet_type"
-                                        value={this.state.food_ate_before_nothing}
-                                        onChange={this.handleChange}>
-                                                <option value="nothing">Nothing</option>
-                                                                                                                                                                                                                          
-                                      </Input>
-                                </div>
-                              }
                               {
-                                !this.state.editable &&
-                                <div className="input">
-                                  <p>{this.state.fasted}</p>
+                                !this.state.editable && this.state.fasted == 'yes' &&
+                                <div>
+                                  <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
+                                  <p>{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
                                 </div>
                               }
                                <FormGroup id="padd">
@@ -1909,7 +1885,7 @@ handleScroll() {
                                 </div>
                               }
                               {
-                                !this.state.editable &&
+                                !this.state.editable && 
                                 <div className="input">
                                   <p>{this.state.prcnt_processed_food}</p>
                                 </div>

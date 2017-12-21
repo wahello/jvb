@@ -744,7 +744,7 @@ onLogoutSuccess(response){
                               </PopoverBody>
                            </Popover> 
                     	
-                    	<Container style={{maxWidth:"1365px"}}>                   	
+                    	<Container style={{maxWidth:"1565px"}}>                   	
              		   <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
