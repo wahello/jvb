@@ -252,18 +252,15 @@ toggle() {
                           <div className="input">
                             <p>{this.state.lowest_hr_first_minute}</p>
                           </div>
-                        }
-						<div className="input1">
-							 <Button color="danger" onClick={this.toggle}>Hit me!</Button>
-                        </div>
-                      
+                        }						                      
 					</FormGroup>
 
 				}
-				 <div>
-			       
-			        <Modal isOpen={this.state.modal} toggle={this.toggle}>
-			         <ModalBody>
+
+				{ (this.state.hr_down_99 == "yes") &&
+				  (this.state.lowest_hr_first_minute >= "70") &&
+
+				 <div  className="input1">			       			       			    
 			         <table className="table-responsive">
 			         <thead>
 			         <th>HRR Time to 99</th>
@@ -277,10 +274,9 @@ toggle() {
 			         <td>25</td>
 			         <td>56</td>
 			         </tbody>
-			         </table>
-			          </ModalBody>
-			        </Modal>
+			         </table>    
 			      </div>
+			  }
 
 				
 				{ (this.state.hr_down_99 == "no") &&
@@ -405,20 +401,9 @@ toggle() {
 					</FormGroup>
 				}
 				{ (this.state.hr_down_99 == "no") &&
-					 <FormGroup>
-						<Label className="padding">1.12.10 Based on your HRR inputs, your heart rate recovery today</Label>
-						
-						<div className="input1">
-							 <Button color="danger" onClick={this.toggle1}>Hit me!</Button>
-                        </div>
-                      
-                       
-					</FormGroup>
-				}
-				 <div>
-			       
-			        <Modal isOpen={this.state.modal1} toggle={this.toggle1}>
-			         <ModalBody>
+				  (this.state.lowest_hr_first_minute >= "70") &&
+				<FormGroup>
+				 <div className="input1">			       			       			         
 			         <table className="table-responsive">
 			         <thead>
 			         <th>HRR Time to 99</th>
@@ -432,10 +417,10 @@ toggle() {
 			         <td>25</td>
 			         <td>56</td>
 			         </tbody>
-			         </table>
-			          </ModalBody>
-			        </Modal>
+			         </table>			         
 			      </div>
+			      </FormGroup>
+			  }
 			</div>
 
 		);
