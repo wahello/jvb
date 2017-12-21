@@ -502,11 +502,11 @@ componentWillUnmount() {
 
 handleScroll() {
 
-  if (window.scrollY >= 300 && !this.state.scrollingLock) {
+  if (window.scrollY >= 200 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 300 && this.state.scrollingLock) {
+  } else if(window.scrollY < 200 && this.state.scrollingLock) {
     this.setState({
       scrollingLock: false
     });
@@ -852,12 +852,15 @@ handleScroll() {
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
-                             <span id="workoutinfo">
-                            <Button
-                            className="btn infobtn"
-                            id="infobtn1"
-                            onClick={this.toggleInfoworkout}
-                            >Why do we ask this question?</Button>
+                             <span id="workoutinfo"
+                             onClick={this.toggleInfoworkout} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
                               </span>
                             
                             {this.state.editable &&
@@ -924,15 +927,16 @@ handleScroll() {
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
-                             <span id="workouttypeinfo"                             
-                             >
-                            
-                             <Button 
+                             <span id="workouttypeinfo"
                              onClick={this.toggleInfoworkoutType} 
-                              className="btn infobtn"
-                              id="infobtn1"                                  
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                            
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
                                         
-                              >Why do we ask this question?</Button>
+                              />
                             
                               </span>
                             </Label>
@@ -1001,13 +1005,16 @@ handleScroll() {
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
                                 <Label className="padding">1.2 Was Your Workout Easy or Hard?
-                                <span id="easyorhard">
+                                <span id="easyorhard"
+                             onClick={this.toggleEasyorHard} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
                             
-                             <Button
-                                className="btn infobtn"
-                                id="infobtn1"
-                                onClick={this.toggleEasyorHard} 
-                              >Why do we ask this question?</Button>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
                           
                               </span>
                                 </Label>
@@ -1875,13 +1882,16 @@ handleScroll() {
                              <span style={{fontWeight:"bold"}}>
                               <span style={{textDecoration:"underline"}}>Un</span>processed?
                              </span>
-                             <span id="unprocessedinfo"
-                            >                           
-                             <Button 
-                            className="btn infobtn"
-                            id="infobtn1"
-                            onClick={this.toggleUnprocessedInfo} 
-                              >Why do we ask this question?</Button>
+                              <span id="unprocessedinfo"
+                             onClick={this.toggleUnprocessedInfo} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                           
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
                         
                               </span>
                              </Label>

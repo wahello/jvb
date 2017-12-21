@@ -7,6 +7,7 @@ body{
 	font-style: normal;
 	font-size: 18px;
 	color:#5e5e5e;
+	
 }
 
 #placeholder{
@@ -219,14 +220,6 @@ padding-top: 30px;
 	color: white;
 	font-size:17px;
 	margin-left: 5px;
-}
-#infobtn1{
-	font-family:futura-pt;
-		background-color: rgb(237, 149, 7);
-		border-radius: 0px;
-		border-color: rgb(237, 149, 7);
-		height: 30px;
-		font-size: 8px;
 }
 }
 
@@ -454,14 +447,7 @@ textarea.form-control{
 	font-size: 21px;
 	margin-left: 7px;
 }
-.infobtn{
-	    font-family:futura-pt;
-		background-color: rgb(237, 149, 7);
-		border-radius: 0px;
-		border-color: rgb(237, 149, 7);
-		height: 40px;
-		font-size: 14px;
-}
+
 table,tbody,thead,tr,td,th{
 	border: 1px solid black;
 	text-align: center;
