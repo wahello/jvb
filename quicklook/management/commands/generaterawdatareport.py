@@ -3,6 +3,7 @@ from datetime import datetime,timedelta
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 
+from garmin.models import UserGarminDataSleep
 from quicklook.tasks import generate_quicklook
 
 class Command(BaseCommand):
@@ -25,13 +26,22 @@ class Command(BaseCommand):
 		flags = {
 			'email':('email','-e','--email',2),
 			'all':('all','-a','--all',1),
-			'duration':('duration','-d','--duration',5),
-			'yesterday':('yesterday','-y','--yesterday',4),
-			'week':('week','-w','--week',3),
-			'month':('month','-m','--month',2),
-			'year':('year','-Y','--year',1)
+			'duration':('duration','-d','--duration',6),
+			'yesterday':('yesterday','-y','--yesterday',5),
+			'week':('week','-w','--week',4),
+			'month':('month','-m','--month',3),
+			'year':('year','-Y','--year',2),
+			'origin':('origin','-o','--origin',1)
 		}
 		return flags
+
+	def _get_origin_date(self, user):
+		last_record = UserGarminDataSleep.objects.filter(user = user).order_by('id')
+		if last_record.exists():
+			start_time = datetime.utcfromtimestamp(last_record[0].start_time_in_seconds)
+			return start_time
+		else:
+			return None
 
 	def _validate_options(self,options):
 		no_flags = True
@@ -129,6 +139,14 @@ class Command(BaseCommand):
 			help = 'Create report for last 365 days (not including today)'
 		)
 
+		parser.add_argument(
+			flags.get('origin')[2],
+			flags.get('origin')[1],
+			action ='store_true',
+			dest = flags.get('origin')[0],
+			help = 'Create report from date of first health data received (including today)'
+		)
+
 	def handle(self, *args, **options):
 		if self._validate_options(options):
 			today = datetime.now().date()
@@ -163,8 +181,28 @@ class Command(BaseCommand):
 				emails = [e for e in options['email']]
 				user_qs = User.objects.filter(email__in = emails)
 				for user in user_qs:
+					self.stdout.write(self.style.WARNING('\nCreating Raw data report for user "%s"' % user.username))
+					if self.date_range_flag == 'origin':
+						date_of_oldest_record = self._get_origin_date(user)
+						if date_of_oldest_record:
+							from_date = date_of_oldest_record.strftime("%Y-%m-%d")
+							to_date = datetime.now().strftime("%Y-%m-%d")
+							generate_quicklook(user.id,from_date,to_date)
+						else:
+							self.stdout.write(self.style.ERROR('\nNo health record found for user "%s"' % user.username))
+						continue
 					generate_quicklook(user.id,from_date,to_date)
 			else:
 				user_qs = User.objects.all()
 				for user in user_qs:
+					self.stdout.write(self.style.WARNING('\nCreating Raw data report for user "%s"' % user.username))
+					if self.date_range_flag == 'origin':
+						date_of_oldest_record = self._get_origin_date(user)
+						if date_of_oldest_record:
+							from_date = date_of_oldest_record.strftime("%Y-%m-%d")
+							to_date = datetime.now().strftime("%Y-%m-%d")
+							generate_quicklook(user.id,from_date,to_date)
+						else:
+							self.stdout.write(self.style.ERROR('\nNo health record found for user "%s"' % user.username))
+						continue
 					generate_quicklook(user.id,from_date,to_date)

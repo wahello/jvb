@@ -277,15 +277,15 @@ class UserInputs extends React.Component{
           weather_comment:have_strong_input?data.data.strong_input.weather_comment:'',
 
 
-          measured_hr:have_strong_input?data.data.strong_input.measured_hr:'',
-          hr_down_99:have_strong_input?data.data.strong_input.hr_down_99:'',
-          time_to_99_min:have_strong_input?data.data.strong_input.time_to_99_min.split(':')[0]:'',
-          time_to_99_sec:have_strong_input?data.data.strong_input.time_to_99_sec.split(':')[1]:'',
-          hr_level:have_strong_input?data.data.strong_input.hr_level:'',
-          lowest_hr_first_minute:have_strong_input?data.data.strong_input.lowest_hr_first_minute:'',
-          lowest_hr_during_hrr:have_strong_input?data.data.strong_input.lowest_hr_during_hrr:'',
-          time_to_lowest_point_min:have_strong_input?data.data.strong_input.time_to_lowest_point_min.split(':')[0]:'',
-          time_to_lowest_point_sec:have_strong_input?data.data.strong_input.time_to_lowest_point_sec.split(':')[1]:'',
+          measured_hr:have_encouraged_input?data.data.encouraged_input.measured_hr:'',
+          hr_down_99:have_encouraged_input?data.data.encouraged_input.hr_down_99:'',
+          time_to_99_min:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[0]:'',
+          time_to_99_sec:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[1]:'',
+          hr_level:have_encouraged_input?data.data.encouraged_input.hr_level:'',
+          lowest_hr_first_minute:have_encouraged_input?data.data.encouraged_input.lowest_hr_first_minute:'',
+          lowest_hr_during_hrr:have_encouraged_input?data.data.encouraged_input.lowest_hr_during_hrr:'',
+          time_to_lowest_point_min:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
+          time_to_lowest_point_sec:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
 
 
           sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
@@ -1625,7 +1625,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                             
                           <FormGroup>      
-                            <Label className="padding">1.12 Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.13 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Input type="text" name="calories" 
@@ -1646,7 +1646,7 @@ handleScroll() {
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                           <FormGroup>      
-                            <Label className="padding">1.13 What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.14 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"

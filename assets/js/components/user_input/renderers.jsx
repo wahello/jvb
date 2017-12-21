@@ -146,7 +146,7 @@ export function renderPainSick(){
   if(this.state.sick === 'yes'){
 	 const updateState = function(val){
 						  this.setState({
-						  sickness: val
+						  	sickness: val
 						  })}.bind(this); 
 
 	 return(
@@ -160,14 +160,20 @@ export function renderPainSick(){
 }
 export function renderHrr(){
   if(this.state.measured_hr === 'yes'){
-	 const updateState = function(val){
-						  this.setState({
-						  hr_down_99: val
-						  })}.bind(this); 
+	 const updateState = function(state_val_obj){
+						  this.setState({...state_val_obj})
+						}.bind(this);
 
 	 return(
 		  <Hrr
-			hr_down_99={this.state.hr_down_99}
+			hr_down_99 = {this.state.hr_down_99}
+	        time_to_99_min =  {this.state.time_to_99_min}
+	        time_to_99_sec = {this.state.time_to_99_sec}
+	        hr_level = {this.state.hr_level}
+	        lowest_hr_first_minute = {this.state.lowest_hr_first_minute}
+	        lowest_hr_during_hrr = {this.state.lowest_hr_during_hrr}
+	        time_to_lowest_point_min = {this.state.time_to_lowest_point_min}
+	        time_to_lowest_point_sec = {this.state.time_to_lowest_point_sec}
 			updateState={updateState}
 			editable = {this.state.editable}
 		  />
