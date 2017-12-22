@@ -567,8 +567,7 @@ onLogoutSuccess(response){
 							</div>
                            </PopoverBody>
                            </Popover> 		           									
-			<div className="quick">
-			 				
+			
 			             <div id="nav3">
 			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
 						  <Navbar light toggleable className="navbar nav2 nav5">
@@ -758,7 +757,7 @@ onLogoutSuccess(response){
                               </PopoverBody>
                            </Popover> 
                     	
-                    	<Container style={{maxWidth:"1565px"}}>                   	
+                    	<Container style={{maxWidth:"1600px"}}>                   	
              		   <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
@@ -783,7 +782,7 @@ onLogoutSuccess(response){
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
 				</div>
-				</div>
+				
 				
 		
 	);

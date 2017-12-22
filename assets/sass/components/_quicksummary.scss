@@ -34,9 +34,9 @@ html,body{
 .nav2{
 	  top:0; 
 	  z-index:100;
-	  width: 100%;
 	  left: 0;
-	  right: 0;	  
+	  right: 0;
+	  border-radius: 0px;	  
 	}
 
 #quick1{
@@ -130,4 +130,7 @@ background-color: #777777;
 
    .fixedDataTableCellGroupLayout_cellGroup{
    	min-height:70px !important;
+   }
+   .navbar{
+   	border-radius: 0px;
    }

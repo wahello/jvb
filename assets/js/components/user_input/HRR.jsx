@@ -274,7 +274,8 @@ toggle() {
 			         <td>{this.state.hr_level - this.state.lowest_hr_first_minute}</td>
 			         <td>{this.state.lowest_hr_first_minute}</td>
 			         </tbody>
-			         </table>    
+			         </table>
+			         <p style={{paddingTop:'10px',fontWeight:'bold'}}>*.Add text below the box “If any of your HRR stats are incorrect, please edit your user inputs above</p>    
 			      </div>
 			  }
 
@@ -417,7 +418,8 @@ toggle() {
 			         <td>{this.state.hr_level - this.state.lowest_hr_first_minute}</td>
 			         <td>{this.state.lowest_hr_during_hrr}</td>
 			         </tbody>
-			         </table>			         
+			         </table>
+			         <p style={{paddingTop:'10px',fontWeight:'bold'}}>*.Add text below the box “If any of your HRR stats are incorrect, please edit your user inputs above</p>			         
 			      </div>
 			      </FormGroup>
 			  }
