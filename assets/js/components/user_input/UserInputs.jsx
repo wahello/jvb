@@ -1306,9 +1306,10 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.fasted == 'yes' &&
-                                <div>
+
+                                <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
-                                  <p>{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
+                                  <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
                                 </div>
                               }
                                <FormGroup id="padd">

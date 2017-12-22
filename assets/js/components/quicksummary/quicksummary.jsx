@@ -723,7 +723,7 @@ onLogoutSuccess(response){
 
                                        	<NavItem onClick={this.toggle}>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="User Inputs">
+                                          <abbr  id="abbri">
                                             <Button id="nav-btn" className="btn">Print</Button>                                          
                                           </abbr>
                                           </span>
