@@ -35,13 +35,12 @@ import { StyleSheet, css } from 'aphrodite';
 renderTableColumns(dateWiseData,category,classes=""){
     console.log(dateWiseData);
     let columns = [];
-
     const obj = {
-        A: { background: 'green', color: 'black' },
+        A: { background: 'green', color: 'black'},
         B: { background: 'green', color: 'black' },
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
-        F: { background: 'red', color: 'black' }
+        F: { background: 'red', color: 'black' },
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -60,7 +59,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             <Column
                 header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
                 cell={props => (
-                    <Cell style={all_data[props.rowIndex].style} {...props} className={css(styles.newTableBody)}>
+                    <Cell style={all_data[props.rowIndex].style}  {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
                         {all_data[props.rowIndex].value}
                     </Cell>
                 )}
@@ -85,11 +84,12 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
+                
         		{...props}>
 		        <Column
 		          header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
 		          cell={props => (
-		            <Cell {...props} className={css(styles.newTableBody)}>
+		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}

@@ -334,7 +334,7 @@ def fetch_weather_data(latitude,longitude,date):
 	except:
 		return {}
 
-def get_sleep_stats(sleeps_json,str_dt=True):
+def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True):
 	# If str_dt is True then string reperesentation of sleep and awake
 	# time is returned otherwise datetime Object or None if no sleep data.
 
@@ -352,21 +352,48 @@ def get_sleep_stats(sleeps_json,str_dt=True):
 		"sleep_per_wearable":''
 	}
 
-	for obj in sleeps_json:
-		if obj.get('validation',None) == 'AUTO_MANUAL':
-			recent_auto_manual = obj
-			break
-		elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
-			recent_auto_final = obj
-		elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
-			recent_auto_tentative = obj
+	if yesterday_sleep_data:
+		for obj in yesterday_sleep_data:
+			start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0) +
+													   obj.get('startTimeOffsetInSeconds',0))
+			next_day_midnight = datetime.combine((start_time+timedelta(days=1)).date(),time(0))
+			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
+			if end_time > next_day_midnight:
+				if obj.get('validation',None) == 'AUTO_MANUAL':
+					recent_auto_manual = obj
+					break
+				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
+					recent_auto_final = obj
+				elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
+					recent_auto_tentative = obj
 
-	if recent_auto_manual:
-		target_sleep_data = recent_auto_manual
-	elif recent_auto_final:
-		target_sleep_data = recent_auto_final
-	else:
-		target_sleep_data = recent_auto_tentative
+		if recent_auto_manual:
+			target_sleep_data = recent_auto_manual
+		elif recent_auto_final:
+			target_sleep_data = recent_auto_final
+		else:
+			target_sleep_data = recent_auto_tentative
+
+	if not target_sleep_data:
+		for obj in today_sleep_data[::-1]:
+			start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0) +
+													   obj.get('startTimeOffsetInSeconds',0))
+			midnight = datetime.combine(start_time.date(),time(0))
+			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
+			if start_time >= midnight:
+				if obj.get('validation',None) == 'AUTO_MANUAL':
+					recent_auto_manual = obj
+					break
+				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
+					recent_auto_final = obj
+				elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
+					recent_auto_tentative = obj
+		if recent_auto_manual:
+			target_sleep_data = recent_auto_manual
+		elif recent_auto_final:
+			target_sleep_data = recent_auto_final
+		else:
+			target_sleep_data = recent_auto_tentative
 
 	if target_sleep_data:
 		sleep_stats['deep_sleep'] = sec_to_hours_min(
@@ -415,6 +442,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
+	max_duration = 0
 
 	if len(activities_json):
 		runs_count = 0
@@ -425,9 +453,13 @@ def get_activity_stats(activities_json,manually_updated_json):
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj.get('activityType','')]['count'] += 1
 
-			if not (activity_stats['latitude'] and activity_stats['longitude']):
-				activity_stats['latitude'] = obj.get('startingLatitudeInDegree',None)
-				activity_stats['longitude'] = obj.get('startingLongitudeInDegree',None)
+			# capture lat and lon of activity with maximum duration
+			if (obj.get('durationInSeconds',0) >= max_duration) or \
+			   (not activity_stats['latitude'] or not activity_stats['longitude']):
+				if obj.get('startingLatitudeInDegree',None) or obj.get('startingLongitudeInDegree',None):
+					activity_stats['latitude'] = obj.get('startingLatitudeInDegree',None)
+					activity_stats['longitude'] = obj.get('startingLongitudeInDegree',None)
+					max_duration = obj.get('durationInSeconds',0)
 
 			if not activity_stats['hr90_duration_15min']:
 				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
@@ -495,12 +527,17 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 		Calculate the movement consistency summary
 	'''
 	movement_consistency = OrderedDict()
-	sleep_stats = get_sleep_stats(sleeps_json,str_dt=False)
-	sleeps_today_stats = get_sleep_stats(sleeps_today_json,str_dt=False)
+	sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,str_dt=False)
+	sleeps_today_stats = get_sleep_stats(None,sleeps_today_json[::-1],str_dt=False)
 
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
+
+	# If user slept after midnight and again went to bed after next midnight
+	# In that case we have same yesterday_bedtime and today_bedtime 
+	if today_bedtime and today_bedtime <= today_awake_time:
+		today_bedtime = None
 	
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
@@ -529,25 +566,23 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 				steps_in_interval = movement_consistency[time_interval].get('steps')
 				status = "sleeping"
 
-				if hour_start >= yesterday_bedtime:
-					if (datetime.combine(hour_start.date(),time(hour_start.hour)) <= today_awake_time):
-						status = "sleeping"
-					elif(today_bedtime and 
-						( hour_start >= datetime.combine(hour_start.date(),time(today_bedtime.hour)))):
-						status = "sleeping"
-					else:
-						status = "active" if data.get('steps') + steps_in_interval > 300 else "inactive"
-
-				if not status == "sleeping":
-					movement_consistency[time_interval]['steps']\
-						= steps_in_interval + data.get('steps')
+				if (hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+					datetime.combine(hour_start.date(),time(hour_start.hour)) <= today_awake_time):
+					status = "sleeping"
+				elif(hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+						today_bedtime and 
+						(hour_start >= datetime.combine(hour_start.date(),time(today_bedtime.hour)))):
+					status = "sleeping"
 				else:
-					movement_consistency[time_interval]['steps'] = 0
+					status = "active" if data.get('steps') + steps_in_interval > 300 else "inactive"
 
+				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
 
 		active_hours = 0
 		inactive_hours = 0
+		total_steps = 0
+		sleeping_hours = 0
 		for interval,values in list(movement_consistency.items()):
 			hour_am_pm = interval.split('to')[0].split(' ')
 			if hour_am_pm[1] == 'PM' and int(hour_am_pm[0]) < 12:
@@ -558,10 +593,15 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 				hour_am_pm[0] = int(hour_am_pm[0])
 
 			hour_start = datetime.combine(today_awake_time.date(),time(hour_am_pm[0]))
-			if hour_start >= today_awake_time:
+			if hour_start < datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)):
+				if(movement_consistency[interval]['status'] == 'sleeping' and  
+					not movement_consistency[interval]['steps']):
+					movement_consistency[interval]['status'] = 'inactive'
+					movement_consistency[interval]['steps'] = 0
+
+			elif hour_start >= today_awake_time:
 				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
 					movement_consistency[interval]['status'] = 'sleeping'
-					movement_consistency[interval]['steps'] = 0
 				else:
 					if not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
@@ -569,11 +609,16 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 
 			if values['status'] == 'active': 
 				active_hours += 1 
-			if values['status'] == 'inactive':
+			elif values['status'] == 'inactive':
 				inactive_hours += 1
+			elif values['status'] == 'sleeping':
+				sleeping_hours += 1
+			total_steps += values['steps']
 
 		movement_consistency['active_hours'] = active_hours
 		movement_consistency['inactive_hours'] = inactive_hours
+		movement_consistency['sleeping_hours'] = sleeping_hours
+		movement_consistency['total_steps'] = total_steps
 
 		return movement_consistency
 
@@ -918,21 +963,23 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong,age):
-	filtered_activities = todays_activities.copy()
+	filtered_activities = []
 	total_duration = 0
 	for i,act in enumerate(todays_activities):
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
-			filtered_activities.pop(i)
+			pass
 		elif 'swimming' in act.get('activityType','').lower():
-			filtered_activities.pop(i)
+			pass
 		elif act.get('activityType','') == 'STRENGTH_TRAINING':
-			filtered_activities.pop(i)
+			pass
 		elif act.get('activityType','') == 'OTHER':
-			filtered_activities.pop(i)
+			pass
 		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
-			filtered_activities.pop(i)
+			pass
 		else:
+			filtered_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
+
 	if filtered_activities:
 		avg_hr = 0
 		for act in filtered_activities:
@@ -986,13 +1033,19 @@ def get_weather_data(todays_daily_strong,todays_activities,
 	   safe_get(todays_daily_strong,'wind_speed','')):
 		manual_weather = True
 
+	temperature = safe_get(todays_daily_strong,'outdoor_temperature',None)
+	dewPoint = safe_get(todays_daily_strong,'dewpoint',None)
+	humidity = safe_get(todays_daily_strong,'humidity',None)
+	apparentTemperature = safe_get(todays_daily_strong,'temperature_feels_like',None)
+	windSpeed = safe_get(todays_daily_strong,'wind',None)
+
 	if manual_weather:
 		DATA = {
-			"temperature":safe_get(todays_daily_strong,'outdoor_temperature',None),
-			"dewPoint":safe_get(todays_daily_strong,'dewpoint',None),
-			"humidity":safe_get(todays_daily_strong,'humidity',None),
-			"apparentTemperature":safe_get(todays_daily_strong,'temperature_feels_like',None),
-			"windSpeed":safe_get(todays_daily_strong,'wind',None)
+			"temperature":float(temperature) if temperature else None,
+			"dewPoint":float(dewPoint) if dewPoint else None,
+			"humidity":float(humidity) if humidity else None,
+			"apparentTemperature":float(apparentTemperature) if apparentTemperature else None,
+			"windSpeed":float(windSpeed) if windSpeed else None
 		}
 		return DATA
 	else:
@@ -1168,7 +1221,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
 
 		# Sleeps
-		sleep_stats = get_sleep_stats(sleeps_json)
+		sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json)
 		sleeps_calculated_data['sleep_aid'] = safe_get(todays_daily_strong,
 					 "prescription_or_non_prescription_sleep_aids_last_night", "")
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']

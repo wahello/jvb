@@ -120,7 +120,29 @@ export function handleChangeSick(event){
     })
   }
 }
+export function handleChangeHrr(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
 
+  if(value === 'yes'){
+    this.setState({
+    measured_hr:value
+    });
+  }else{
+    this.setState({
+      measured_hr:value,
+      hr_down_99:'',
+      time_to_99_min:'',
+      time_to_99_sec:'',
+      hr_level:'',
+      lowest_hr_first_minute:'',
+      lowest_hr_during_hrr:'',
+      time_to_lowest_point_min:'',
+      time_to_lowest_point_sec:'',
+          })
+  }
+}
 export function handleChangeSleepAids(event){
   const target = event.target;
   const value = target.value;
@@ -163,7 +185,7 @@ export function handleChangeFasted(event){
   if(value === 'yes'){
     this.setState({
   	  fasted:value,
-      food_ate_before_workout:''
+      food_ate_before_workout:'Nothing'
     });
   }else{
     this.setState({

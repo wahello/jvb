@@ -15,12 +15,13 @@ class Steps extends Component{
 
 	 this.state = {
       myTableData: [
+       {name: 'Movement Consistency'},
         {name: 'Non Exercise Steps'},
         {name: 'Exercise Steps'},
         {name: 'Total Steps'},
-        {name: 'Floor Climed'}, 
-        {name: 'Floor Decended'},
-        {name: 'Movement Consistency'}                     
+        {name: 'Floors Climed'}, 
+        {name: 'Floors Decended'},
+                           
       ],
     };
   }
@@ -28,6 +29,7 @@ class Steps extends Component{
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
+			console.log(dateWiseData);
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
@@ -38,8 +40,10 @@ renderTableColumns(dateWiseData,category,classes=""){
                             mc = JSON.parse(mc);
                             all_data.push(mc.inactive_hours);
                         }
+
                     }
                     else{
+                    	
 						all_data.push(value);
                     }
 				}
@@ -49,7 +53,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props} className={css(styles.newTableBody)}>
+				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
@@ -78,7 +82,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		        <Column
 		          header={<Cell className={css(styles.newTableHeader)}>Steps</Cell>}
 		          cell={props => (
-		            <Cell {...props} className={css(styles.newTableBody)}>
+		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}

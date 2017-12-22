@@ -1,9 +1,7 @@
-from datetime import datetime
-
-from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication 
@@ -76,5 +74,20 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
         if user_input:
             serializers = UserDailyInputSerializer(user_input)
             return Response(serializers.data)
+        else:
+            return Response({})
+
+class UserDailyInputLatestItemView(APIView):
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = UserDailyInput.objects.filter(user=user).order_by('-created_at')
+        return qs 
+
+    def get(self, request, format="json"):
+        qs = self.get_queryset()
+        if qs.exists():
+            serializer = UserDailyInputSerializer(qs[0])
+            return Response(serializer.data)
         else:
             return Response({})

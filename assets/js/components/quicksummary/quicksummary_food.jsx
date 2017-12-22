@@ -17,7 +17,6 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.state = {
       myTableData: [
         {name: 'Percentage of Unprocessed Food'},
-        {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Non Processed Food'},
         {name: 'Diet Type'},       
       ],
@@ -39,7 +38,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props} className={css(styles.newTableBody)}>
+				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
@@ -58,7 +57,7 @@ render(){
 			 >
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={65}
+		        rowHeight={68}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
@@ -67,7 +66,7 @@ render(){
 		        <Column
 		          header={<Cell className={css(styles.newTableHeader)}>Food</Cell>}
 		          cell={props => (
-		            <Cell {...props} className={css(styles.newTableBody)}>
+		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
@@ -106,7 +105,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 330;
+    return window.innerHeight - 410;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

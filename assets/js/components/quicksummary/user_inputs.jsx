@@ -17,9 +17,16 @@ import { Alert } from 'reactstrap';
 	this.renderTableColumns = this.renderTableColumns.bind(this);
 	this.state = {
 		columnAttributeName: [
+		{name: 'Heart rate down to 99'},
+		{name: 'Heart rare level'},
+		{name: 'Lowest heart rate during HRR'},
+		{name: 'Lowest heart rate in first minute of HRR activity file'},
+		{name: 'Did you measured HRR?'},
         {name: 'Pain area'},
         {name: 'Pain and twinges during or after workout'},
         {name: 'Stres level yesterday'},
+        {name: 'How long did it take for your heart rate to get to 99 bpm?'},
+        {name: 'In the first minute of your heart rate recovery file, what was your lowest heart rate?'},
         {name: 'Water consumend during workout'}, 
         {name: 'Percent workout breath through nose?'},
         {name: 'Calories consumed during workout'},
@@ -39,10 +46,14 @@ import { Alert } from 'reactstrap';
 		{name: "Was your workout today enjoyable"},
 		{name: "What alcohol drink consumed"},
 		{name: "Did you take controlled or uncontrolled substance today?"},
+		{name: "Dewpoint"},
 		{name: "Workout effort level of hard portion"},
+		{name: "Humidity"},
+		{name: "Indoor Temperature"},
 		{name: "What processed food you consumed yesterday?"},
 		{name: "What unprocessed food you consumed yesterday"},
 		{name: "Number of alcohol consumed yesterday"},
+		{name: "Outdoor temperature"},
 		{name: "Percent of unprocessed food consumed yesterday"},
 		{name: "Prescription or non-prescription medication taken"},
 		{name: "What prescription or non-prescription medication taken yesterday?"},
@@ -52,6 +63,9 @@ import { Alert } from 'reactstrap';
 		{name: "Sleep time excluding awake time"},
 		{name: "Did you smoke any substances yesterday"},
 		{name: "Smoked substance"},
+		{name: "Temperature feels like"},
+		{name: "Weather Comment"},
+		{name: "Wind"},
 		{name: "Was your workout easy or hard"},
 		{name: "Did you workout today?"},
 		{name: "Workout effort level"},
@@ -68,6 +82,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			let keys = [];
 			for(let cat of Object.keys(data).sort()){
 					for(let key of Object.keys(data[cat]).sort()){
+
 						all_data.push(data[cat][key]);
 						keys.push(key);
 					}
@@ -77,7 +92,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props} className={css(styles.newTableBody)}>
+				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
@@ -105,7 +120,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 		        <Column
 		          header={<Cell className={css(styles.newTableHeader)}>User Input</Cell>}
 		          cell={props => (
-		            <Cell {...props} className={css(styles.newTableBody)}>
+		            <Cell {...{'title':this.state.columnAttributeName[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.columnAttributeName[props.rowIndex].name}
 		            </Cell>
 		          )}

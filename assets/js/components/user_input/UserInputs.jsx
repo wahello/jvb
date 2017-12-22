@@ -27,7 +27,7 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 
 import {userDailyInputSend,userDailyInputFetch,
-        userDailyInputUpdate} from '../../network/userInput';
+        userDailyInputUpdate,userDailyInputRecentFetch} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
@@ -82,6 +82,17 @@ class UserInputs extends React.Component{
         workout_comment:'',
         calories:'',
         calories_item:'',
+
+        measured_hr:'',
+        hr_down_99:'',
+        time_to_99_min:'',
+        time_to_99_sec:'',
+        hr_level:'',
+        lowest_hr_first_minute:'',
+        lowest_hr_during_hrr:'',
+        time_to_lowest_point_min:'',
+        time_to_lowest_point_sec:'',
+
 
         indoor_temperature:'',
         outdoor_temperature:'',
@@ -140,6 +151,7 @@ class UserInputs extends React.Component{
       this.handleChangeAlcoholDrink = handlers.handleChangeAlcoholDrink.bind(this);
       this.handleCaloriesItemCheck = handlers.handleCaloriesItemCheck.bind(this);
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
+      this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -155,6 +167,7 @@ class UserInputs extends React.Component{
       this.renderFetchOverlay = renderers.renderFetchOverlay.bind(this);
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
+      this.renderHrr = renderers.renderHrr.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -175,6 +188,7 @@ class UserInputs extends React.Component{
       this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
+      this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -183,7 +197,7 @@ class UserInputs extends React.Component{
     
     onFetchSuccess(data,clone_form=undefined){
       if (_.isEmpty(data.data))
-        self.onFetchFailure(data);
+        userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       else {
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
@@ -240,7 +254,7 @@ class UserInputs extends React.Component{
           chia_seeds:have_optional_input?data.data.optional_input.chia_seeds_consumed_during_workout:'',
           breath_nose:have_encouraged_input?data.data.encouraged_input.workout_that_user_breathed_through_nose:'',
           prcnt_processed_food:have_strong_input?data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday:'',
-          unprocessed_food_list:have_strong_input?data.data.strong_input.list_of_unprocessed_food_consumed_yesterday:'',
+          unprocessed_food_list:have_strong_input?data.data.strong_input.list_of_unprocessed_food_consumed_yesterday:'',                
           processed_food_list:have_strong_input?data.data.strong_input.list_of_processed_food_consumed_yesterday:'',
           alchol_consumed:have_strong_input?data.data.strong_input.number_of_alcohol_consumed_yesterday:'',
           alcohol_drink_consumed_list:have_strong_input?data.data.strong_input.alcohol_drink_consumed_list:'',
@@ -260,6 +274,18 @@ class UserInputs extends React.Component{
           dewpoint:have_strong_input?data.data.strong_input.dewpoint:'',
           humidity:have_strong_input?data.data.strong_input.humidity:'',
           weather_comment:have_strong_input?data.data.strong_input.weather_comment:'',
+
+
+          measured_hr:have_encouraged_input?data.data.encouraged_input.measured_hr:'',
+          hr_down_99:have_encouraged_input?data.data.encouraged_input.hr_down_99:'',
+          time_to_99_min:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[0]:'',
+          time_to_99_sec:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[1]:'',
+          hr_level:have_encouraged_input?data.data.encouraged_input.hr_level:'',
+          lowest_hr_first_minute:have_encouraged_input?data.data.encouraged_input.lowest_hr_first_minute:'',
+          lowest_hr_during_hrr:have_encouraged_input?data.data.encouraged_input.lowest_hr_during_hrr:'',
+          time_to_lowest_point_min:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
+          time_to_lowest_point_sec:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
+
 
           sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
           sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
@@ -289,7 +315,46 @@ class UserInputs extends React.Component{
         window.scrollTo(0,0);
       }
     }
-    
+
+    onFetchRecentSuccess(data){
+      if(!_.isEmpty(data.data)){
+        const initial_state = this.getInitialState();
+        let have_strong_input = data.data.strong_input?true:false;
+        let have_optional_input = data.data.optional_input?true:false;
+        let have_encouraged_input = data.data.encouraged_input?true:false;
+        let other_diet = true;
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+        for(let diet of DIET_TYPE){
+          if(data.data.optional_input.type_of_diet_eaten === diet)
+            other_diet = false;
+        }
+
+        this.setState(
+          {...initial_state,
+          prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
+          sleep_aid_taken:have_strong_input?data.data.strong_input.sleep_aid_taken:'',
+          smoke_substances:have_strong_input?data.data.strong_input.smoke_any_substances_whatsoever:'',
+          smoked_substance_list:have_strong_input?data.data.strong_input.smoked_substance:'',
+          medications:have_strong_input?data.data.strong_input.prescription_or_non_prescription_medication_yesterday:'',
+          medications_taken_list:have_strong_input?data.data.strong_input.prescription_or_non_prescription_medication_taken:'',
+          controlled_uncontrolled_substance:have_strong_input?data.data.strong_input.controlled_uncontrolled_substance:'',
+          stress:have_encouraged_input?data.data.encouraged_input.stress_level_yesterday:'',
+          sick:have_optional_input?data.data.optional_input.sick:'',
+          sickness:have_optional_input?data.data.optional_input.sickness:'',
+          waist:have_optional_input?data.data.optional_input.waist_size:'',
+          clothes_size:have_optional_input?data.data.optional_input.clothes_size:'',
+          diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
+          diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+          selected_date:this.state.selected_date,
+          gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
+      }else{
+        this.onFetchFailure(data)
+      }
+    }
+
     onFetchFailure(error){
       const initial_state = this.getInitialState();
       this.setState(
@@ -436,11 +501,11 @@ componentWillUnmount() {
 
 handleScroll() {
 
-  if (window.scrollY >= 300 && !this.state.scrollingLock) {
+  if (window.scrollY >= 200 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 300 && this.state.scrollingLock) {
+  } else if(window.scrollY < 200 && this.state.scrollingLock) {                                               
     this.setState({
       scrollingLock: false
     });
@@ -559,7 +624,8 @@ handleScroll() {
         </Navbar>
         </div>                                                                                    
                             <Popover
-                            style={{height:"220px",overflowY:"scroll"}} 
+                            id="popover" 
+                          
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -735,7 +801,7 @@ handleScroll() {
                            </Popover> 
 
                            <Popover 
-                           style={{height:"220px",overflowY:"scroll"}} 
+                          id="popover" 
                             placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
@@ -759,7 +825,7 @@ handleScroll() {
                               </PopoverBody>
                            </Popover>                                                        
                
-                <Container id="user-inputs">                          
+                <Container id="user-inputs" >                          
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
                         <Form 
@@ -786,12 +852,15 @@ handleScroll() {
 
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
-                             <span id="workoutinfo">
-                            <Button
-                            className="btn infobtn"
-                            id="infobtn1"
-                            onClick={this.toggleInfoworkout}
-                            >Why do we ask this question?</Button>
+                             <span id="workoutinfo"
+                             onClick={this.toggleInfoworkout} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
                               </span>
                             
                             {this.state.editable &&
@@ -858,15 +927,16 @@ handleScroll() {
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
-                             <span id="workouttypeinfo"                             
-                             >
-                            
-                             <Button 
+                             <span id="workouttypeinfo"
                              onClick={this.toggleInfoworkoutType} 
-                              className="btn infobtn"
-                              id="infobtn1"                                  
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                            
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
                                         
-                              >Why do we ask this question?</Button>
+                              />
                             
                               </span>
                             </Label>
@@ -935,13 +1005,16 @@ handleScroll() {
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
                                 <Label className="padding">1.2 Was Your Workout Easy or Hard?
-                                <span id="easyorhard">
+                                <span id="easyorhard"
+                             onClick={this.toggleEasyorHard} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
                             
-                             <Button
-                                className="btn infobtn"
-                                id="infobtn1"
-                                onClick={this.toggleEasyorHard} 
-                              >Why do we ask this question?</Button>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
                           
                               </span>
                                 </Label>
@@ -1131,7 +1204,7 @@ handleScroll() {
                                          name="water_consumed"                                 
                                          value={this.state.water_consumed}
                                          onChange={this.handleChange}>
-                                         <option key="select"value="">select</option>                                   
+                                         <option key="select"value="">select</option>                            
                                          {this.createDropdown(0,250)}
                                   </Input>
                               </div>
@@ -1229,6 +1302,14 @@ handleScroll() {
                                 !this.state.editable &&
                                 <div className="input">
                                   <p>{this.state.fasted}</p>
+                                </div>
+                              }
+                              {
+                                !this.state.editable && this.state.fasted == 'yes' &&
+
+                                <div >
+                                  <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
+                                  <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
                                 </div>
                               }
                                <FormGroup id="padd">
@@ -1454,6 +1535,40 @@ handleScroll() {
                        }
                        </Collapse>
                      
+                        { (this.state.workout == "yes" || this.state.workout == "") &&
+                          <FormGroup>   
+                              <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
+                              information button for instructions about how to record this)?</Label>
+                              {this.state.editable &&
+                                <div className="input">
+                                     <Label check className="btn btn-secondary radio1">
+                                        <Input type="radio" name="measured_hr" 
+                                        value="yes"
+                                        checked={this.state.measured_hr === 'yes'}
+                                        onChange={this.handleChangeHrr}/>{' '}
+                                        Yes
+                                     </Label>
+                                     <Label check className="btn btn-secondary radio1">
+                                       <Input type="radio" name="measured_hr" 
+                                            value="no"
+                                            checked={this.state.measured_hr === 'no'}
+                                            onChange={this.handleChangeHrr}/>{' '}
+                                          No
+                                    </Label>
+                                </div>  
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.measured_hr}</p>
+                                </div>
+                              }
+                               <FormGroup id="padd"> 
+                            {this.renderHrr()}
+                            </FormGroup>
+                          </FormGroup>
+                        }
+
 
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
@@ -1470,14 +1585,15 @@ handleScroll() {
                           <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
                           </div>
                           }
+                         
                           {!this.state.editable &&
                             <div>
                               <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
                               <div className="input">
-                                <p >{this.state.calories_item_check?"yes":"no"}</p>
+                                <p >{ this.state.calories_item_check?"yes":"no"}</p>
                               </div>
                             </div>
-                          }
+                          }                    
                         </FormGroup>
                        }
 
@@ -1487,7 +1603,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                             
                           <FormGroup>      
-                            <Label className="padding">1.12 Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.13 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Input type="text" name="calories" 
@@ -1496,9 +1612,9 @@ handleScroll() {
                               </div>
                             }
                             {
-                              !this.state.editable &&
+                              !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories}</p>
+                                <p>{this.state.calories?this.state.calories:"Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -1508,7 +1624,7 @@ handleScroll() {
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                           <FormGroup>      
-                            <Label className="padding">1.13 What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.14 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"
@@ -1521,7 +1637,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item}</p>
+                                <p >{this.state.calories_item?this.state.calories_item:'Not Entered'}</p>
                               </div>
                             }
                           </FormGroup>
@@ -1744,13 +1860,16 @@ handleScroll() {
                              <span style={{fontWeight:"bold"}}>
                               <span style={{textDecoration:"underline"}}>Un</span>processed?
                              </span>
-                             <span id="unprocessedinfo"
-                            >                           
-                             <Button 
-                            className="btn infobtn"
-                            id="infobtn1"
-                            onClick={this.toggleUnprocessedInfo} 
-                              >Why do we ask this question?</Button>
+                              <span id="unprocessedinfo"
+                             onClick={this.toggleUnprocessedInfo} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                           
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
                         
                               </span>
                              </Label>
@@ -1768,7 +1887,7 @@ handleScroll() {
                                 </div>
                               }
                               {
-                                !this.state.editable &&
+                                !this.state.editable && 
                                 <div className="input">
                                   <p>{this.state.prcnt_processed_food}</p>
                                 </div>

@@ -318,7 +318,7 @@ def export_users_xls(request):
         row_num += 1
         for i, key in enumerate(columns6):
             ws.write(i1 + i + 1, row_num - a + 1, row[key],base_style)
-			
+
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
     columns7 = ['alcohol_day', 'alcohol_week']
