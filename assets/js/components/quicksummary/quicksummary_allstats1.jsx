@@ -223,7 +223,7 @@ class AllStats1 extends Component{
                 style={{wordWrap:"break-word"}}
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell style={all_data[props.rowIndex].style} {...props} className={css(styles.newTableBody)}>
+				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
@@ -272,7 +272,7 @@ class AllStats1 extends Component{
                 
 		          header={<Cell className={css(styles.newTableHeader)}>All Stats</Cell>}
 		          cell={props => (
-		            <Cell {...props} className={css(styles.newTableBody)}>
+		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.tableAttrColumn[props.rowIndex].name}
 
 		            </Cell>

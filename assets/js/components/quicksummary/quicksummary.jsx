@@ -592,6 +592,11 @@ onLogoutSuccess(response){
 							               Create Raw Data Report
 								      </Button>
                                    </span>
+                                    <a 
+                                className="fonts"
+					            id="daterange"
+					            style={{width:"88px",color:"white"}}
+					            onClick={this.toggleDate} >Date Range</a>  
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
                                           <NavItem onClick={this.toggle}>
@@ -724,12 +729,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>                                          									
                                   </Nav>
-                                </Collapse>
-                                <a 
-                                className="fonts"
-					            id="daterange"
-					            style={{width:"88px",color:"white"}}
-					            onClick={this.toggleDate} >Date Range</a>                                
+                                </Collapse>                              
                            </Navbar> 
                            
 						 </div>

@@ -254,7 +254,7 @@ class UserInputs extends React.Component{
           chia_seeds:have_optional_input?data.data.optional_input.chia_seeds_consumed_during_workout:'',
           breath_nose:have_encouraged_input?data.data.encouraged_input.workout_that_user_breathed_through_nose:'',
           prcnt_processed_food:have_strong_input?data.data.strong_input.prcnt_unprocessed_food_consumed_yesterday:'',
-          unprocessed_food_list:have_strong_input?data.data.strong_input.list_of_unprocessed_food_consumed_yesterday:'',
+          unprocessed_food_list:have_strong_input?data.data.strong_input.list_of_unprocessed_food_consumed_yesterday:'',                
           processed_food_list:have_strong_input?data.data.strong_input.list_of_processed_food_consumed_yesterday:'',
           alchol_consumed:have_strong_input?data.data.strong_input.number_of_alcohol_consumed_yesterday:'',
           alcohol_drink_consumed_list:have_strong_input?data.data.strong_input.alcohol_drink_consumed_list:'',
@@ -505,7 +505,7 @@ handleScroll() {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 200 && this.state.scrollingLock) {
+  } else if(window.scrollY < 200 && this.state.scrollingLock) {                                               
     this.setState({
       scrollingLock: false
     });
@@ -1204,7 +1204,7 @@ handleScroll() {
                                          name="water_consumed"                                 
                                          value={this.state.water_consumed}
                                          onChange={this.handleChange}>
-                                         <option key="select"value="">select</option>                                   
+                                         <option key="select"value="">select</option>                            
                                          {this.createDropdown(0,250)}
                                   </Input>
                               </div>
@@ -1584,14 +1584,15 @@ handleScroll() {
                           <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
                           </div>
                           }
+                         
                           {!this.state.editable &&
                             <div>
                               <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
                               <div className="input">
-                                <p >{this.state.calories_item_check?"yes":"no"}</p>
+                                <p >{ this.state.calories_item_check?"yes":"no"}</p>
                               </div>
                             </div>
-                          }
+                          }                    
                         </FormGroup>
                        }
 
@@ -1610,9 +1611,9 @@ handleScroll() {
                               </div>
                             }
                             {
-                              !this.state.editable &&
+                              !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories}</p>
+                                <p>{this.state.calories?this.state.calories:"Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -1635,7 +1636,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item}</p>
+                                <p >{this.state.calories_item?this.state.calories_item:'Not Entered'}</p>
                               </div>
                             }
                           </FormGroup>
