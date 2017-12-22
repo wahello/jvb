@@ -41,7 +41,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...props} className={css(styles.newTableBody)}>
+				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
@@ -70,7 +70,7 @@ render(){
 		        <Column
 		          header={<Cell className={css(styles.newTableHeader)}>Bike Stats</Cell>}
 		          cell={props => (
-		            <Cell {...props} className={css(styles.newTableBody)}>
+		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
