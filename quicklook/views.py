@@ -238,8 +238,9 @@ def export_users_xls(request):
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
 		ws.write(col_num1, row_num, columns[col_num], font_style)
-	rows = Grades.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-								'-user_ql__created_at').values()
+	rows = Grades.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	for row in rows:
 		row_num += 1
 		for i,key in enumerate(columns):
@@ -255,8 +256,9 @@ def export_users_xls(request):
 	for col_num1 in range(len(columns1)):
 			col_num2 = col_num2 + 1
 			ws.write(col_num2 , row_num - a  , columns1[col_num1],font_style)
-	rows1 = SwimStats.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-									'-user_ql__created_at').values()
+	rows1 = SwimStats.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	a = len(rows)
 	print(a)
 	i1 = 17
@@ -275,8 +277,9 @@ def export_users_xls(request):
 	for col_num in range(len(columns3)):
 		col_num2 = col_num2 + 1
 		ws.write(col_num2, row_num - a, columns3[col_num],font_style)
-	rows2 = BikeStats.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-									'-user_ql__created_at').values()
+	rows2 = BikeStats.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	a = len(rows) + len(rows1)
 	i1 = 21
 	for row in rows2:
@@ -294,8 +297,9 @@ def export_users_xls(request):
 	for col_num in range(len(columns4)):
 		 col_num2 = col_num2 + 1
 		 ws.write(col_num2,row_num - a, columns4[col_num], font_style)
-	rows3 = Steps.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-								'-user_ql__created_at').values()
+	rows3 = Steps.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	i1 = 27
 	a = len(rows) + len(rows1) + len(rows2)
 	for row in rows3:
@@ -317,8 +321,9 @@ def export_users_xls(request):
 	for col_num in range(len(columns5)):
 		col_num2 = col_num2 + 1
 		ws.write(col_num2, row_num - a , columns5[col_num], font_style)
-	rows4 = Sleep.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-								'-user_ql__created_at').values()
+	rows4 = Sleep.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	i1 = 35
 	for row in rows4:
 		row_num += 1
@@ -336,8 +341,9 @@ def export_users_xls(request):
 		col_num2 = col_num2 + 1
 		ws.write(col_num2, row_num - a, columns6[col_num],font_style)
 	i1 = 45
-	rows5 = Food.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-								'-user_ql__created_at').values()
+	rows5 = Food.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	for row in rows5:
 		row_num += 1
 		for i, key in enumerate(columns6):
@@ -353,8 +359,9 @@ def export_users_xls(request):
 	for col_num in range(len(columns7)):
 		   col_num2 = col_num2 + 1
 		   ws.write(col_num2, row_num - a, columns7[col_num], font_style)
-	rows6 = Alcohol.objects.filter(user_ql__created_at__range=(from_date, to_date)).order_by(
-									'-user_ql__created_at').values()
+	rows6 = Alcohol.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	i1 = 50
 	for row in rows6:
 		row_num += 1
