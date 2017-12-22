@@ -17,7 +17,7 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
-import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/quick';
+import {quicksummaryDate,userInputDate,createQuicklook,downloadExcel}  from '../../network/quick';
 
 
 import NavbarMenu from '../navbar';
@@ -64,7 +64,7 @@ class Quicklook extends Component{
 		this.onQuicklookFailure = this.onQuicklookFailure.bind(this);
 		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
-
+		this.handleDownloadExcel = this.handleDownloadExcel.bind(this);
 
 		this.toggleDate=this.toggleDate.bind(this);
 	    this.toggleNav = this.toggleNav.bind(this);
@@ -449,6 +449,10 @@ onLogoutSuccess(response){
     this.props.logoutUser(this.onLogoutSuccess);
   }
 
+  handleDownloadExcel(){
+    downloadExcel(this.state.start_date, this.state.end_date);
+  }
+
 
 	render(){
 		const {fix} = this.props;
@@ -719,7 +723,11 @@ onLogoutSuccess(response){
                                        	<NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
-                                            <Button id="nav-btn" className="btn">Print</Button>                                          
+                                          <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
+                                           <button id="nav-btn" classname="btn">
+                                             Print
+                                           </button>
+                                          </a>
                                           </abbr>
                                           </span>
                                        </NavItem>                                          									

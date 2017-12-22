@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
+from quicklook.views import export_users_xls
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('Summary.urls')),
+    # url(r'^print/',export_users_xls),
 ]
