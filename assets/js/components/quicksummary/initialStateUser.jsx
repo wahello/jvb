@@ -35,15 +35,29 @@ export function getInitialStateUserInput(start_dt, end_dt){
 	        "smoked_substance":'-',
 	        "prescription_or_non_prescription_medication_yesterday":'-',
 	        "prescription_or_non_prescription_medication_taken":'-',
-	        "controlled_uncontrolled_substance":"-"
-
+	        "controlled_uncontrolled_substance":"-",
+	        "indoor_temperature":"-",
+	        "outdoor_temperature":"-",
+	        "temperature_feels_like":"-",
+	        "wind":"-",
+	        "dewpoint":"-",
+	        "humidity":"-",
+	        "weather_comment":"-"
 	    },
 	    "encouraged_input":{
 	    	 "stress_level_yesterday":'-',
 	    	 "pains_twings_during_or_after_your_workout":'-',
         	 "pain_area":'-',
         	 "water_consumed_during_workout":'-',
-        	 "workout_that_user_breathed_through_nose":'-'
+        	 "workout_that_user_breathed_through_nose":'-',
+        	 "measured_hr":"-",
+        	 "hr_down_99":"-",
+        	 "time_to_99":"-",
+       		 "hr_level":"-",
+       		 "lowest_hr_first_minute":"-",
+       		 "lowest_hr_during_hrr":"-",
+       		 "time_to_lowest_point":"-"
+
 	    },
 	    "optional_input":{
 	    	  "chia_seeds_consumed_during_workout":'-',

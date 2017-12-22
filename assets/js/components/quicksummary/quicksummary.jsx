@@ -223,14 +223,28 @@ class Quicklook extends Component{
 	                    smoked_substance:data.strong_input.smoked_substance,
 	                    prescription_or_non_prescription_medication_yesterday:data.strong_input.prescription_or_non_prescription_medication_yesterday,
 	                    prescription_or_non_prescription_medication_taken:data.strong_input.prescription_or_non_prescription_medication_taken,
-	                    controlled_uncontrolled_substance:data.strong_input.controlled_uncontrolled_substance
+	                    controlled_uncontrolled_substance:data.strong_input.controlled_uncontrolled_substance,
+	                	indoor_temperature:data.strong_input.indoor_temperature,
+				        outdoor_temperature:data.strong_input.outdoor_temperature,
+				        temperature_feels_like:data.strong_input.temperature_feels_like,
+				        wind:data.strong_input.wind,
+				        dewpoint:data.strong_input.dewpoint,
+				        humidity:data.strong_input.humidity,
+				        weather_comment:data.strong_input.weather_comment
 	                },
 	                encouraged_input:{
 	                      "stress_level_yesterday":data.encouraged_input.stress_level_yesterday,
 				    	  "pains_twings_during_or_after_your_workout":data.encouraged_input.pains_twings_during_or_after_your_workout,
 			        	  "pain_area":data.encouraged_input.pain_area,
 			        	  "water_consumed_during_workout":data.encouraged_input.water_consumed_during_workout,
-			        	  "workout_that_user_breathed_through_nose":data.encouraged_input.workout_that_user_breathed_through_nose
+			        	  "workout_that_user_breathed_through_nose":data.encouraged_input.workout_that_user_breathed_through_nose,
+	                	  "measured_hr":data.encouraged_input.measured_hr,
+			        	  "hr_down_99":data.encouraged_input.hr_down_99,
+			        	  "time_to_99":data.encouraged_input.time_to_99,
+			       		  "hr_level":data.encouraged_input.hr_level,
+			       		  "lowest_hr_first_minute":data.encouraged_input.lowest_hr_first_minute,
+			       		  "lowest_hr_during_hrr":data.encouraged_input.lowest_hr_during_hrr,
+			       		  "time_to_lowest_point":data.encouraged_input.time_to_lowest_point
 	                },
 	                optional_input:{
 				          "chia_seeds_consumed_during_workout":data.optional_input.chia_seeds_consumed_during_workout,
