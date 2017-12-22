@@ -105,7 +105,7 @@ export default class Hrr extends Component{
 	    }
 	}
 
-	 createSleepDropdown(start_num , end_num, mins=false, step=1){
+createSleepDropdown(start_num , end_num, mins=false, step=1){
     let elements = [];
     let i = start_num;
     while(i<=end_num){
@@ -263,16 +263,16 @@ toggle() {
 				 <div  className="input1">			       			       			    
 			         <table className="table-responsive">
 			         <thead>
-			         <th>HRR Time to 99</th>
-			         <th>Heart Rate Highest Point in First Minute </th>
-			         <th>Number of heart rate beats recovered in the first Minute</th>
+			         <th>HRR time to 99</th>
+			         <th>Heart rate starting point</th>
+			         <th>Number of heart beats recovered in the first minute</th>
 			         <th>Lowest heart rate point in your heart rate recovery recording</th>
 			         </thead>
 			         <tbody>
-			         <td>1:30</td>
-			         <td>150</td>
-			         <td>25</td>
-			         <td>56</td>
+			         <td>{this.state.time_to_99_min + ":" + this.state.time_to_99_sec}</td>
+			         <td>{this.state.hr_level}</td>
+			         <td>{this.state.hr_level - this.state.lowest_hr_first_minute}</td>
+			         <td>{this.state.lowest_hr_first_minute}</td>
 			         </tbody>
 			         </table>    
 			      </div>
@@ -407,15 +407,15 @@ toggle() {
 			         <table className="table-responsive">
 			         <thead>
 			         <th>HRR Time to 99</th>
-			         <th>Heart Rate Highest Point in First Minute </th>
-			         <th>Number of heart rate beats recovered in the first Minute</th>
-			         <th>Lowest heart rate point in your heart rate recovery recording</th>
+			         <th>Heart rate starting point</th>
+			         <th>Number of heart beats recovered in the first minute</th>
+			         <th>Lowest heart rate point during your heart rate recovery recording</th>
 			         </thead>
 			         <tbody>
-			         <td>1:30</td>
-			         <td>150</td>
-			         <td>25</td>
-			         <td>56</td>
+			         <td>Never</td>
+			         <td>{this.state.hr_level}</td>
+			         <td>{this.state.hr_level - this.state.lowest_hr_first_minute}</td>
+			         <td>{this.state.lowest_hr_during_hrr}</td>
 			         </tbody>
 			         </table>			         
 			      </div>

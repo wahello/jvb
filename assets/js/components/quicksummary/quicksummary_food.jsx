@@ -17,7 +17,6 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.state = {
       myTableData: [
         {name: 'Percentage of Unprocessed Food'},
-        {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Non Processed Food'},
         {name: 'Diet Type'},       
       ],
@@ -106,7 +105,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 330;
+    return window.innerHeight - 410;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;
