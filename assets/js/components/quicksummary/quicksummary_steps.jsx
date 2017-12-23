@@ -15,13 +15,12 @@ class Steps extends Component{
 
 	 this.state = {
       myTableData: [
-       {name: 'Movement Consistency'},
         {name: 'Non Exercise Steps'},
         {name: 'Exercise Steps'},
         {name: 'Total Steps'},
         {name: 'Floors Climed'}, 
         {name: 'Floors Decended'},
-                           
+        {name: 'Movement Consistency'}
       ],
     };
   }
@@ -29,10 +28,10 @@ class Steps extends Component{
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
-			console.log(dateWiseData);
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
+				console.log(key);
 				if(key !== 'id' && key !== 'user_ql'){
 					if (key == 'movement_consistency'){
                         let mc = value;

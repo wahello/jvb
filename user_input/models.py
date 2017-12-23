@@ -258,12 +258,12 @@ class DailyUserInputEncouraged(models.Model):
     water_consumed_during_workout = models.CharField(
         max_length=20,
         validators=[CharMinValueValidator(0),CharMaxValueValidator(250)],
-        blank = True)
+        blank = True,null=True)
 
     workout_that_user_breathed_through_nose = models.CharField(
         max_length=20,
         validators=[CharMinValueValidator(0),CharMaxValueValidator(100)],
-        blank = True)
+        blank = True, null=True)
     
     # expect comma separated one or more body areas 
     # (right foot, left foot, right shins, left shins,no workout today) 
