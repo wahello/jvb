@@ -56,6 +56,7 @@ class UserInputs extends React.Component{
         infoWorkoutType:false,
         unprocessedInfo:false,
         easyorhardInfo:false,
+        fastedInfo:false,
 
         workout:'',
         workout_type:'',
@@ -188,6 +189,7 @@ class UserInputs extends React.Component{
       this.toggleInfoworkoutType=this.toggleInfoworkoutType.bind(this);
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
+      this.toggleFasted=this.toggleFasted.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
@@ -548,11 +550,18 @@ handleScroll() {
     });
    }
 
-   toggleEasyorHard(){
+   toggleFasted(){
+    this.setState({
+     fastedInfo:!this.state.fastedInfo
+    });
+   }
+
+    toggleEasyorHard(){
     this.setState({
       easyorhardInfo:!this.state.easyorhardInfo
     });
    }
+
 
   toggleEditForm(){
     this.setState({
@@ -1278,7 +1287,21 @@ handleScroll() {
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
-                            <Label className="padding">1.9 Were You Fasted During Your Workout? </Label>
+                            <Label className="padding">1.9 Were You Fasted During Your Workout? 
+
+                            <span id="fast"
+                             onClick={this.toggleFasted} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                            
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                            
+                              </span>
+                            </Label>
                               {this.state.editable &&
                                 <div className="input">
                                   
@@ -1317,6 +1340,29 @@ handleScroll() {
                                </FormGroup>
                           </FormGroup>
                         }
+
+                        <Popover 
+                          id="popover"
+                          className="pop"
+                            placement="right" 
+                            isOpen={this.state.fastedInfo}
+                            target="fast" 
+                            toggle={this.toggleFasted}>
+                              <PopoverBody>
+                               <div>
+                                Did you eat anything 5 hours or less before your workout? If “Yes”,
+                                then you were not fasted and you should answer “No” to this question. Otherwise,
+                                answer “Yes”, which means you did not eat at least 5 hours before your workout.
+                                 </div>
+
+
+                               <div style={{paddingTop:"15px"}}>
+                                  Some experts believe that exercising fasted may increase fat burning while exercising.
+                               </div>                            
+                              </PopoverBody>
+                           </Popover> 
+
+
 
                         { (this.state.workout === "yes" || this.state.workout === "") &&     
                           <FormGroup>      

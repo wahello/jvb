@@ -29,7 +29,7 @@ class Steps extends Component{
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
-			console.log(dateWiseData);
+			
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
@@ -40,14 +40,16 @@ renderTableColumns(dateWiseData,category,classes=""){
                             mc = JSON.parse(mc);
                             all_data.push(mc.inactive_hours);
                         }
-
                     }
                     else{
                     	
 						all_data.push(value);
                     }
+
 				}
+
 			}
+
 
 			columns.push(
 				<Column 
