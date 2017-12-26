@@ -35,4 +35,6 @@ urlpatterns = [
 
 	url(r'^users/ql_calculation$',calculation_views.QuicklookCalculationView.as_view(),
 		name="quicklookcalculations"),
+
+    url(r'^print/excel$',views.export_users_xls,name="Exceldata"),
 ]

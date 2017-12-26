@@ -8,6 +8,7 @@ from garmin import urls as garminUrls
 from garmin import views as garmin_views
 from quicklook import urls as quicklookUrls
 
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^password_reset/$', auth_views.PasswordResetView.as_view(),

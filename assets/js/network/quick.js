@@ -93,3 +93,49 @@ export function fetchMovementConsistency(fromDate, successmovement,errormovement
     errormovement(error);
   });
 }
+
+//export function DateRange(startDate,endDate,successquick, errorquick){
+//	  startDate = moment(startDate);
+//    endDate = moment(endDate);
+//    const URL = `quicklook/users/data`;
+//    const config = {
+//      method: "get",
+//      params:{
+//        to: endDate.format('YYYY-MM-DD'),
+//        from: startDate.format('YYYY-MM-DD')
+//      },
+//      url: URL,
+//      withCredentials: true
+//    };
+//     axios(config).then((response) => {
+//       successquick(response,startDate,endDate);
+//     }).catch(function (error){
+//       errorquick(error);
+//    });
+//  }
+
+export function downloadExcel(startDate,endDate,successPrint=undefined, errorPrint=undefined){
+	startDate = moment(startDate);
+    endDate = moment(endDate);
+    const URL = `/quicklook/print/excel`;
+    const config = {
+      method: "get",
+      params:{
+        to_date: endDate.format('YYYY-MM-DD'),
+        from_date: startDate.format('YYYY-MM-DD')
+      },
+      url: URL,
+      withCredentials: true
+    };
+     axios(config).then((response) => {
+       if(successPrint !== undefined)
+            successPrint(response);
+       else
+          console.log("file is ready to download");
+     }).catch(function (error){
+       if(errorPrint !== undefined)
+            errorPrint(error);
+       else
+          console.log(error.message);
+    });
+  }

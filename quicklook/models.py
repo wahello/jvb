@@ -17,7 +17,7 @@ class UserQuickLook(models.Model):
 	class Meta:
 		unique_together = ("user", "created_at")
 
-class Grades(models.Model):
+class Grades(models.Model,):
 	GRADE_CHOICES = (
 		('A','A'),
 		('B','B'),

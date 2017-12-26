@@ -22,15 +22,15 @@ import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/qui
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
-import Grades from './quicksummary_grades'; 
+import Grades from './quicksummary_grades';
 import Swim from './quicksummary_swim';
 import Bike from './quicksummary_bike';
 import Steps from './quicksummary_steps';
 import Sleep from './quicksummary_sleep';
-import Food from './quicksummary_food';  
+import Food from './quicksummary_food';
 import Alcohol from './quicksummary_alocohol';
 import Exercise from './quicksummary_exercise';
-import User from './user_inputs'; 
+import User from './user_inputs';
 import AllStats1 from './quicksummary_allstats1';
 import Movementquick from './movement-consistency';
 
@@ -69,10 +69,10 @@ class Quicklook extends Component{
 		this.toggleDate=this.toggleDate.bind(this);
 	    this.toggleNav = this.toggleNav.bind(this);
 	    this.handleLogout = this.handleLogout.bind(this);
-	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);	
+	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
 
 		let initial_state = getInitialState(moment().subtract(7,'days'),
-											moment());   
+											moment());
 
 		this.state = {
 			today_date:moment(),
@@ -99,7 +99,7 @@ class Quicklook extends Component{
 				grades_ql: {
 			        overall_health_grade: data.grades_ql.overall_health_grade,
 			        overall_health_gpa: data.grades_ql.overall_health_gpa,
-			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,   
+			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
@@ -109,7 +109,7 @@ class Quicklook extends Component{
 			        avg_exercise_hr_grade: data.grades_ql.avg_exercise_hr_grade,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
-			        penalty:data.grades_ql.penalty		
+			        penalty:data.grades_ql.penalty
 	    		},
 
 			    exercise_reporting_ql: {
@@ -132,7 +132,7 @@ class Quicklook extends Component{
 			        dew_point: data.exercise_reporting_ql.dew_point,
 			        temperature: data.exercise_reporting_ql.temperature,
 			        humidity: data.exercise_reporting_ql.humidity,
-			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,  
+			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,
 			        wind:data.exercise_reporting_ql.wind,
 			        hrr: data.exercise_reporting_ql.hrr,
 			        hrr_start_point: data.exercise_reporting_ql.hrr_start_point,
@@ -187,7 +187,7 @@ class Quicklook extends Component{
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 			        deep_sleep: data.sleep_ql.deep_sleep,
 			        light_sleep: data.sleep_ql.light_sleep,
-			        awake_time: data.sleep_ql.awake_time   
+			        awake_time: data.sleep_ql.awake_time
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
@@ -268,12 +268,12 @@ class Quicklook extends Component{
        		}
 
 	successquick(data,start_dt,end_dt){
-	
+
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
 		for(let date of Object.keys(initial_state)){
 			dates.push(date);
-		} 
+		}
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
 		      	const date = dataitem.created_at;
@@ -312,7 +312,7 @@ class Quicklook extends Component{
 			const dates = [];
 			for(let date of Object.keys(initial_state)){
 				dates.push(date);
-			} 
+			}
 		    if (data.data.length > 0){
 			 	 for(var dataitem of data.data){
 			      	const date = dataitem.created_at;
@@ -335,7 +335,7 @@ class Quicklook extends Component{
 		});
 	}
 
-	
+
 
 	processDate(date){
 		let end_dt = moment(date);
@@ -358,8 +358,8 @@ class Quicklook extends Component{
       this.setState({
         [name]: value
       });
-    }	
-  
+    }
+
   onSubmitDate(event){
   	event.preventDefault();
   	let start_dt = moment(this.state.start_date);
@@ -418,13 +418,13 @@ handleScroll() {
  toggle() {
     this.setState({
       isOpen: !this.state.isOpen,
-     
+
     });
   }
   toggleNav() {
     this.setState({
       isOpen1: !this.state.isOpen1,
-     
+
     });
   }
  toggleDate(){
@@ -475,89 +475,89 @@ onLogoutSuccess(response){
 		const class_sleep=`nav-link ${activeTab === "sleep" ? 'active':''}`;
 		const class_food=`nav-link ${activeTab === "food" ? 'active':''}`;
         const class_alcohol=`nav-link ${activeTab === "alcohol" ? 'active':''}`;
-        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`; 
+        const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;
-        const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;             
+        const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;
 	return(
 		<div className="hori">
 		<div className="container-fluid">
-		
-		 <Navbar toggleable 
-         fixed={fix ? 'top' : ''} 
+
+		 <Navbar toggleable
+         fixed={fix ? 'top' : ''}
           className="navbar navbar-expand-sm navbar-inverse nav6">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
-           <FontAwesome 
+           <FontAwesome
                  name = "bars"
                  size = "1x"
-                                          
+
              />
 
           </NavbarToggler>
 
           <Link to='/'>
-            <NavbarBrand 
-              className="navbar-brand float-sm-left" 
+            <NavbarBrand
+              className="navbar-brand float-sm-left"
               id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
               <img className="img-fluid"
                style={{maxWidth:"200px"}}
                src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
             </NavbarBrand>
           </Link>
-          
-            
+
+
 
             <span id="header">
             <h2 className="head" id="head">Raw Data</h2>
             </span>
-          
+
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
-            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>            
-              <NavItem className="float-sm-right">  
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+              <NavItem className="float-sm-right">
                 <Link id="logout"className="nav-link" to='/'>Home</Link>
               </NavItem>
-               <NavItem className="float-sm-right">                
-                   <NavLink  
+               <NavItem className="float-sm-right">
+                   <NavLink
                    className="nav-link"
-                   id="logout"                    
+                   id="logout"
                    onClick={this.handleLogout}>Log Out
-                    </NavLink>               
-              </NavItem>  
+                    </NavLink>
+              </NavItem>
             </Nav>
           </Collapse>
         </Navbar>
-	
-		 					<Popover                         
-                            placement="bottom" 
+
+		 					<Popover
+                            placement="bottom"
                             isOpen={this.state.dateRange}
-                            target="daterange" 
+                            target="daterange"
                             toggle={this.toggleDate}>
                               <PopoverBody>
                                 <div >
 
-				           <Form>				         				          
-						        <div style={{paddingBottom:"12px"}} className="justify-content-center">						      
+				           <Form>
+						        <div style={{paddingBottom:"12px"}} className="justify-content-center">
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="start_date"
 						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-						           
+
 						        </div>
 						        <div id="date" className="justify-content-center">
-						       
+
 						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="end_date"
 						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-						        
+
 						        </div>
 						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
-						       
+
 						        <button
 						        id="nav-btn"
-						         style={{backgroundColor:"#ed9507"}} 					        
+						         style={{backgroundColor:"#ed9507"}}
 						         type="submit"
 						         className="btn btn-block-lg"
 						         onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
@@ -566,50 +566,50 @@ onLogoutSuccess(response){
 						  		 </Form>
 							</div>
                            </PopoverBody>
-                           </Popover> 		           									
-			
+                           </Popover>
+
 			             <div id="nav3">
-			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>			         
+			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
 						  <Navbar light toggleable className="navbar nav2 nav5">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
                                     <div className="toggler">
-                                    <FontAwesome 
+                                    <FontAwesome
                                           name = "bars"
                                           size = "1x"
-                                          
+
                                         />
                                     </div>
-                               </NavbarToggler> 
-                                  
-                                  <span id="calendar1" 
+                               </NavbarToggler>
+
+                                  <span id="calendar1"
                                   onClick={this.toggleCalendar}>
                                   <span id="spa" >
                                      <span id="navlink">
-                                        <FontAwesome 
+                                        <FontAwesome
                                           name = "calendar"
                                           size = "1x"
-                                          
+
                                         />
-                                        </span>                                      
-                                  </span>                                  
-                                                                  
-                                  </span>  
+                                        </span>
+                                  </span>
+
+                                  </span>
 
                                    <span className="btn2">
 	                                  <Button
 	                                   id="nav-btn"
-	                                  style={{backgroundColor:"#ed9507"}} 						        
+	                                  style={{backgroundColor:"#ed9507"}}
 						         	   type="submit"
 						               className="btn btn-block-lg"
 						               onClick = {this.handleCreateQuicklook}>
 							               Create Raw Data Report
 								      </Button>
                                    </span>
-                                    <a 
+                                    <a
                                 className="fonts"
 					            id="daterange"
 					            style={{width:"88px",color:"white"}}
-					            onClick={this.toggleDate} >Date Range</a>  
+					            onClick={this.toggleDate} >Date Range</a>
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
                                           <NavItem onClick={this.toggle}>
@@ -672,11 +672,11 @@ onLogoutSuccess(response){
                                           <abbr  id="abbri"  title="Sleep">
                                             <NavLink id="headernames" href="#" className={class_sleep}  value="sleep"
 						    		 				 onClick={this.activateTab.bind(this,"sleep")}>
-						    				 Sleep 
+						    				 Sleep
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>  
+                                       </NavItem>
 
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
@@ -687,18 +687,18 @@ onLogoutSuccess(response){
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>  
+                                       </NavItem>
 
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Alcohol">
                                             <NavLink id="headernames" href="#" className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>
-						    		 		 Alcohol 
+						    		 		 Alcohol
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>  
+                                       </NavItem>
 
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
@@ -706,10 +706,10 @@ onLogoutSuccess(response){
                                             <NavLink id="headernames" href="#" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
 						    		 		Exercise Reporting
-                                            </NavLink>                                           
+                                            </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem> 
+                                       </NavItem>
 
 
                                        	<NavItem onClick={this.toggle}>
@@ -717,8 +717,8 @@ onLogoutSuccess(response){
                                           <abbr  id="abbri"  title="User Inputs">
                                             <NavLink id="headernames" href="#" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>
-						    		 		 User Inputs 
-                                            </NavLink>                                           
+						    		 		 User Inputs
+                                            </NavLink>
                                           </abbr>
                                           </span>
                                        </NavItem>
@@ -728,8 +728,8 @@ onLogoutSuccess(response){
                                           <abbr  id="abbri"  title="User Inputs">
                                             <NavLink id="headernames" href="#" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>
-						    		 		 Movement Consistency 
-                                            </NavLink>                                           
+						    		 		 Movement Consistency
+                                            </NavLink>
                                           </abbr>
                                           </span>
                                        </NavItem>
@@ -737,27 +737,29 @@ onLogoutSuccess(response){
                                        	<NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri">
-                                            <Button id="nav-btn" className="btn">Print</Button>                                          
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
+                                            <Button id="nav-btn" className="btn">Print</Button>
+                                           </a>
                                           </abbr>
                                           </span>
-                                       </NavItem>                                          									
+                                       </NavItem>
                                   </Nav>
-                                </Collapse>                              
-                           </Navbar> 
-                           
+                                </Collapse>
+                           </Navbar>
+
 						 </div>
 			      		</div>
-			      			<Popover 
-                            placement="bottom" 
+			      			<Popover
+                            placement="bottom"
                             isOpen={this.state.calendarOpen}
-                            target="calendar1" 
+                            target="calendar1"
                             toggle={this.toggleCalendar}>
                               <PopoverBody>
                                 <CalendarWidget onDaySelect={this.processDate}/>
                               </PopoverBody>
-                           </Popover> 
-                    	
-                    	<Container style={{maxWidth:"1600px"}}>                   	
+                           </Popover>
+
+                    	<Container style={{maxWidth:"1600px"}}>
              		   <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
@@ -772,19 +774,19 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
-                    	
-                   
+
+
 			</div>
 
 					</Container>
-					
+
 					</div>
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
 				</div>
-				
-				
-		
+
+
+
 	);
 	}
 }
