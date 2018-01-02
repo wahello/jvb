@@ -18,7 +18,7 @@ import { Alert } from 'reactstrap';
 	this.state = {
 		columnAttributeName: [
 		{name: 'Heart rate down to 99'},
-		{name: 'Heart rare level'},
+		{name: 'Heart Rate level'},
 		{name: 'Lowest heart rate during HRR'},
 		{name: 'Lowest heart rate in first minute of HRR activity file'},
 		{name: 'Did you measured HRR?'},
@@ -28,7 +28,7 @@ import { Alert } from 'reactstrap';
         {name: 'How long did it take for your heart rate to get to 99 bpm?'},
         {name: 'In the first minute of your heart rate recovery file, what was your lowest heart rate?'},
         {name: 'Water consumend during workout'}, 
-        {name: 'Percent workout breath through nose?'},
+        {name: 'Percent workout breathe through nose?'},
         {name: 'Calories consumed during workout'},
         {name: 'Chia seed consumed during workout'},
         {name: 'Clothes size'}, 
@@ -48,8 +48,7 @@ import { Alert } from 'reactstrap';
 		{name: "Did you take controlled or uncontrolled substance today?"},
 		{name: "Dewpoint"},
 		{name: "Workout effort level of hard portion"},
-		{name: "Humidity"},
-		{name: "Indoor Temperature"},
+  		{name: "Indoor Temperature"},
 		{name: "What processed food you consumed yesterday?"},
 		{name: "What unprocessed food you consumed yesterday"},
 		{name: "Number of alcohol consumed yesterday"},

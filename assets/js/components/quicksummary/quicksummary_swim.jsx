@@ -11,7 +11,7 @@ import { StyleSheet, css } from 'aphrodite';
  class Swim extends Component{
 	constructor(props){
 	super(props);
-	 this.renderTableColumns = this.renderTableColumns.bind(this);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);   
 
 	 this.state = {
       myTableData: [
@@ -49,7 +49,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 	
  render(){
- 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
+ 		const {height, width, containerHeight, containerWidth, ...props} = this.props;    
 		let rowsCount = this.state.myTableData.length;
 		return(
 		
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 460;
+    return window.innerHeight - 537;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

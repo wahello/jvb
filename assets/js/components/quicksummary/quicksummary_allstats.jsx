@@ -4,7 +4,7 @@ import {Field, reduxForm } from 'redux-form';
 import {Table,Button} from "reactstrap";
 import Grades from './quicksummary_grades';
 import Swim from './quicksummary_swim';
-import Bike from './quicksummary_bike';
+import Bike from './quicksummary_bike'; 
 import Steps from './quicksummary_steps';
 import Sleep from './quicksummary_sleep';
 import Food from './quicksummary_food';  

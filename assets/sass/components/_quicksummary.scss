@@ -1,5 +1,5 @@
 html,body{
-	font-size: 16px;	
+	font-size: 16px;      	
 }
 
 .quick{
@@ -8,23 +8,23 @@ html,body{
 
 @media (max-width: 1023px){
 
-.hori{
-	overflow-x: hidden;
+.hori{        
+	overflow-x: hidden;               
 }
-.nav5 .btn2{
-	margin-left: -20px;
+.nav5 .btn2{         
+	margin-left: -20px;                 
 }
-.nav5 .navbar-toggler{
-	margin-left: -5px;
+.nav5 .navbar-toggler{            
+	margin-left: -5px;             
 }
-#calendar1 #navlink{
-	margin-left: -13px;
+#calendar1 #navlink{                              
+	margin-left: -13px;      
 }
-.navbar-brand img{
-	margin-right: 15px;
+.navbar-brand img{     
+	margin-right: 15px;         
 }
 .nav6 .navbar-toggler{
-	margin-left: -50px;
+	margin-left: -50px;      
 }
 #head{
 	font-size: larger;
@@ -81,39 +81,39 @@ html,body{
 
 }
 .quick10{
-	padding: 15px 15px 15px 0px;
+	padding: 15px 15px 15px 0px;     
 }
 #examplestartdate{
 	padding: 8px;
 	align-items: center;
 }
-#exampleenddate{
-	padding: 8px;
-	align-items: center;
+#exampleenddate{                        
+	padding: 8px;                  
+	align-items: center;                   
 }
-.alert{
+.alert{                 
 	width:60%;
-	text-align: center;
-	font-size: 16px;
-	padding: 10px;
-
+	text-align: center;                      
+	font-size: 16px;                  
+	padding: 10px;                   
+    
 }
-#calendar1{
-	padding:10px 15px 10px 10px;
+#calendar1{    
+	padding:10px 15px 10px 10px;    
 	color:white;
 
 }
 #nav3{
-padding:0px 0px 5px 0px;
+padding:0px 0px 5px 0px;     
 }
 
 #nav3 .navbar{
-background-color: #777777;
+background-color: #777777;      
 }
 .fonts{
-	font-family: proxima-nova;
+	font-family: proxima-nova;        
 		font-size: 18px;
-		font-style:normal;
+		font-style:normal;      
 		 color:white;
 }
 #headernames{
@@ -122,15 +122,15 @@ background-color: #777777;
 .tabs{
         text-align:center;
 		padding-top:8px;
-		font-family: proxima-nova;
-		font-size: 20px;
-		font-style:normal;
-       color:#103047;
+		font-family: proxima-nova;  
+		font-size: 20px;   
+		font-style:normal;   
+       color:#103047;    
        }
 
-   .fixedDataTableCellGroupLayout_cellGroup{
-   	min-height:70px !important;
+   .fixedDataTableCellGroupLayout_cellGroup{    
+   	min-height:70px !important;     
    }
-   .navbar{
+   .navbar{                     
    	border-radius: 0px;
    }

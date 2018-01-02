@@ -26,6 +26,7 @@ class Steps extends Component{
   }
 
 renderTableColumns(dateWiseData,category,classes=""){
+	
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
@@ -45,8 +46,9 @@ renderTableColumns(dateWiseData,category,classes=""){
                     	
 						all_data.push(value);
                     }
-				}
+                    console.log(all_data);
 			}
+
 
 			columns.push(
 				<Column 
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 275;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;
