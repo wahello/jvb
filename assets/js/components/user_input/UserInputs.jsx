@@ -57,6 +57,15 @@ class UserInputs extends React.Component{
         unprocessedInfo:false,
         easyorhardInfo:false,
         fastedInfo:false,
+        breatheInfo:false,
+        chaiseedsInfo:false,
+        waterInfo:false,
+        painInfo:false,
+        workoutlevelInfo:false,
+        enjoybleInfo:false,
+        hrrInfo:false,
+        wetherInfo:false,
+        commentInfo:false,
 
         workout:'',
         workout_type:'',
@@ -190,6 +199,15 @@ class UserInputs extends React.Component{
       this.toggleUnprocessedInfo=this.toggleUnprocessedInfo.bind(this);
       this.toggleEasyorHard=this.toggleEasyorHard.bind(this);
       this.toggleFasted=this.toggleFasted.bind(this);
+      this.toggleBreathe=this.toggleBreathe.bind(this);
+      this.toggleChaiseeds=this.toggleChaiseeds.bind(this);
+      this.toggleWater=this.toggleWater.bind(this);
+      this.togglePain=this.togglePain.bind(this);
+      this.toggleWorkoutLevel=this.toggleWorkoutLevel.bind(this);
+      this.toggleEnjoyble=this.toggleEnjoyble.bind(this);
+      this.toggleHrr=this.toggleHrr.bind(this);
+      this.toggleWeather=this.toggleWeather.bind(this);
+      this.toggleComment=this.toggleComment.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
@@ -211,7 +229,7 @@ class UserInputs extends React.Component{
         let has_calories_data = false;
         let have_strong_input = data.data.strong_input?true:false;
         let have_optional_input = data.data.optional_input?true:false;
-        let have_encouraged_input = data.data.encouraged_input?true:false;
+        let have_encouraged_input = data.data.encouraged_input?true:false; 
 
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
@@ -562,7 +580,53 @@ handleScroll() {
     });
    }
 
+   toggleBreathe(){
+    this.setState({
+      breatheInfo:!this.state.breatheInfo
+    });
+   }
+  toggleChaiseeds(){
+      this.setState({
+        chaiseedsInfo:!this.state.chaiseedsInfo
+      });
+     }
+     toggleWater(){
+      this.setState({
+        waterInfo:!this.state.waterInfo
+      });
+     }
+     togglePain(){
+      this.setState({
+        painInfo:!this.state.painInfo
+      });
+     }
+      toggleWorkoutLevel(){
+      this.setState({
+        workoutlevelInfo:!this.state.workoutlevelInfo
+      });
+     }
 
+   toggleEnjoyble(){
+      this.setState({
+        enjoybleInfo:!this.state.enjoybleInfo
+      });
+     }
+     toggleHrr(){
+      this.setState({
+        hrrInfo:!this.state.hrrInfo
+      });
+     }
+     toggleWeather(){
+      this.setState({
+        weatherInfo:!this.state.weatherInfo
+      });
+     }
+
+     toggleComment(){
+      this.setState({
+        commentInfo:!this.state.commentInfo
+      });
+     }
   toggleEditForm(){
     this.setState({
       editable:!this.state.editable
@@ -1100,7 +1164,18 @@ handleScroll() {
 
                         { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>   
-                              <Label className="padding">1.3 Was Your Workout Today Enjoyable?</Label>
+                              <Label className="padding">1.3 Was Your Workout Today Enjoyable?
+                              <span id="enjoyble"
+                             onClick={this.toggleEnjoyble} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </span>  
+                              </Label>
                               {this.state.editable &&
                                 <div className="input">
                                      <Label check className="btn btn-secondary radio1">
@@ -1127,10 +1202,38 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
+                         <Popover 
+                                    className="pop"
+                                    id="popover" 
+                                    placement="right" 
+                                    isOpen={this.state.enjoybleInfo}
+                                    target="enjoyble" 
+                                    toggle={this.toggleEnjoyble}>
+                                      <PopoverBody>
+                                       <div>
+                                        We encourage people to enjoy their workouts! When they do,
+                                        they tend to exercise more frequently and don’t dread doing it.
+                                         If you do not find your exercise enjoyable, you may be working out too hard! Slow down,
+                                          breathe in and out through your nose, and enjoy exercising easier. It has many benefits!
+                                           One can get faster, fitter, and leaner by exercising easier.
+                                         </div>                                                   
+                                      </PopoverBody>
+                                   </Popover> 
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             <FormGroup>   
-                              <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)</Label>
+                              <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)
+                               <span id="workoutlevel"
+                             onClick={this.toggleWorkoutLevel} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </span>  
+                              </Label>
                                 { this.state.editable &&
                                   <div className="input">
                                       <Input 
@@ -1165,11 +1268,41 @@ handleScroll() {
                             </FormGroup>
                           }
               
-                  
+                           <Popover 
+                                    className="pop"
+                                    id="popover" 
+                                    placement="right" 
+                                    isOpen={this.state.workoutlevelInfo}
+                                    target="workoutlevel" 
+                                    toggle={this.toggleWorkoutLevel}>
+                                      <PopoverBody>
+                                       <div>
+                                         As a general guideline, an effort level of 1-2 is super easy,
+                                         barely moving. A 3-4 is an effort level that gets your heart rate up
+                                         that you can sustain for a very long time (like a “forever pace”).
+                                         You should be able to speak easily at this level and it shouldn’t be hard.
+                                          A 5-6-7 is harder and it is much harder to hold this effort level for a long time.
+                                          A 7-8 is hard work, it is hard to talk while exercising, and you would have to work
+                                          very hard to hold this pace for a long time. A 9 is very hard and you can’t hold this
+                                          pace very long. A 10 is an all-out effort.
+                                         </div>                                                   
+                                      </PopoverBody>
+                                   </Popover> 
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>
-                            <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?</Label>
+                            <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?
+                             <span id="pain"
+                             onClick={this.togglePain} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </span>  
+                            </Label>
                                 {this.state.editable &&
                                   <div className="input">
                                      
@@ -1201,11 +1334,48 @@ handleScroll() {
                           </FormGroup>
                           }
 
+                          <Popover 
+                            className="pop"
+                            id="popover" 
+                            placement="right" 
+                            isOpen={this.state.painInfo}
+                            target="pain" 
+                            toggle={this.togglePain}>
+                              <PopoverBody>
+                               <div>
+                            Enter any twinges/pains here. Be honest. Staying healthy is critical to fitness.
+                            We track all twinges and injuries so (1) you can get a picture of what is bothering 
+                            you over time and (2) you can figure out why you have pain/twinges so you can fix the
+                            root of the problem in order for you to (hopefully) stay injury free in the future.
+                            Often strength training and/or wearing custom orthotics can help keep us injury free
+                            (although custom orthotics usually require 2-3 adjustments to dial them in). It often
+                            takes weeks or months for injuries to appear, and once they do, they are hard to shake.
+                            Our rule: NEVER run when you have an injury. If it doesn’t hurt to walk, you can run or
+                            do other exercise. If it hurts after a few initial twinges, STOP and do another form of
+                            exercise that doesn’t hurt. The bike, elliptical, swimming, and perhaps even stair climbing
+                            might be good substitutes for running while injured. The most important thing is to get your
+                            heart rate up most days without PAIN!
+                                 </div>                                                   
+                              </PopoverBody>
+                           </Popover> 
+
+
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                           <FormGroup>    
-                            <Label className="padding">1.6 Water Consumed During Workout (Ounces)</Label>
+                            <Label className="padding">1.6 Water Consumed During Workout (Ounces)
+                             <span id="water"
+                             onClick={this.toggleWater} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </span>   
+                            </Label>
                               { this.state.editable &&
                               <div className="input">
                                   <Input type="select" 
@@ -1226,13 +1396,51 @@ handleScroll() {
                             }
                           </FormGroup>
                         }
+                         <Popover 
+                            className="pop"
+                            id="popover" 
+                            placement="right" 
+                            isOpen={this.state.waterInfo}
+                            target="water" 
+                            toggle={this.toggleWater}>
+                              <PopoverBody>
+                               <div>
+                             Indicate how many ounces of water you consumed during your workout.
+                             We encourage you to drink water when thirsty during your workouts
+                             (don’t drink if not thirsty as drinking too much can have negative
+                             consequences on your health). We carry a 20 ounce water bottle for
+                             all of our runs/workouts (there are many bottles that have handles
+                             on them that are great and barely noticeable once you get used to them).
+                             Staying hydrated to critical to health. When we become dehydrated, our
+                             blood gets thicker, and when our blood get thicker, our heart and
+                             cardiovascular system has to work harder to pump the blood through
+                             our body. When this happens, our heart rate goes up! As heart rate
+                             training is a critical part of our program, we want to keep it as 
+                             low as possible during all workouts (easy or hard). Therefore, stay
+                             hydrated to keep your heart rate down. We encourage you to stay hydrated
+                             throughout the day also. Drink when thirsty and make sure not to drink
+                             too much (which can also have negative ramifications on your health).
+                                 </div>                                                   
+                              </PopoverBody>
+                           </Popover> 
 
                           
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&    
                           <FormGroup>      
-                            <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?</Label>
+                            <Label className="padding">1.7 Tablespoons of Chia Seeds Consumed During Workout?
+                             <span id="chaiseeds"
+                             onClick={this.toggleChaiseeds} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </span>   
+                            </Label>
                                 { this.state.editable &&
                                   <div className="input">
                                       <Input 
@@ -1255,12 +1463,53 @@ handleScroll() {
                           </FormGroup>
                         }
 
+                        <Popover 
+                            className="pop"
+                            id="popover" 
+                            placement="right" 
+                            isOpen={this.state.chaiseedsInfo}
+                            target="chaiseeds" 
+                            toggle={this.toggleChaiseeds}>
+                              <PopoverBody>
+                               <div>
+                              We encourage everybody to consume chia seeds during their workout,                               
+                              particularly runners and triathletes that do workouts/races longer
+                              than 2 hours. We recommend 2-3 tablespoons of chia seeds in your 20
+                              ounce water bottle. TIP: make sure to measure this amount, otherwise
+                              you will put too much in your bottle and as a result the chia seeds
+                              will become too thick in your bottle and almost undrinkable.
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                               Chia seeds are super healthy for us. They are a great source of healthy omega-3 fatty acids                          
+                               carbohydrates, protein, fiber, antioxidants, and calcium, to name a few benefits.
+                               They also provide endurance athletes with unprocessed calories, which can provide
+                               much needed energy during races (and can easily be carried in a fanny pack or race
+                               belt to replace chia seeds consumed throughout the race). Chia seeds become gelatinous
+                               when sitting in water after a few minutes and really don’t taste like anything. We encourage
+                               you to put chia seeds in your water bottle for every workout to get used to using them so
+                               that you can use them easily on race day. 3 tablespoons of chia seeds is 150 calories!
+                               </div>                             
+                              </PopoverBody>
+                           </Popover> 
+
                         
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&  
                             <FormGroup>
-                              <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?</Label>
+                              <Label className="padding">1.8 What % of Your Workout Did you breathe in and out through Your nose?
+                              <span id="breathe"
+                             onClick={this.toggleBreathe} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1.5x"                                      
+                                        
+                              />
+                              </span>                              
+                              </Label>
                                   {this.state.editable &&
                                     <div className="input">
                                         <Input type="select"
@@ -1281,7 +1530,41 @@ handleScroll() {
                                   }
                             </FormGroup>
                           }
+                           <Popover 
+                            className="pop"
+                            id="popover" 
+                            placement="right" 
+                            isOpen={this.state.breatheInfo}
+                            target="breathe" 
+                            toggle={this.toggleBreathe}>
+                              <PopoverBody>
+                               <div>
+                               We encourage you to breathe in and out of your nose as much as possible.
+                               Indicate what percent of your workout that you breathed in and out of your nose.
+                               Nose breathing has many benefits, including but not limited to (1) increasing the
+                               production of nitric oxide, which expands blood vessels and increases blood flow;
+                               (2) lowering heart rate and breath rate while exercising when compared to mouth breathing;
+                               (3) shorter recovery times and better endurance than mouth breathing exercise;
+                               (4) driving oxygen more efficiently into the lower lobes of the lungs rather than
+                               staying in the upper lobes, as with mouth breathing. With nose breathing, all five
+                               lobes of the lungs are used to breathe rather than just the upper two; (5) helping
+                               to remove more waste (CO2) from our body; (6) regulating our pace (usually slowing
+                               us down) so that over time we can get faster by going slower; (7) helping to lose
+                               weight, improve overall health , wellness, and overall athletic performance
+                                 </div>
 
+                               <div style={{paddingTop:"15px"}}>
+                               Often, people say to us “there’s no way I can breathe in and out of my nose when exercising,
+                               I can’t even do it when I’m not exercising!” or “I have cysts (or other blockages or a deviated
+                               septum) or other ailments in my nose/sinuses, no way I can breathe 100% in and out of my nose”.
+                               Our response “try, and over time it will get easier.  If you can’t breathe in and out of your nose,
+                               then slow down!!  If this doesn’t work, you may need to blow your nose and/or blow some snot rockets
+                               from your nose while exercising.  Eventually, you will be able to do it (if you BELIEVE)!  If you don’t
+                               BELIEVE, you will NEVER be able to do it.  The benefits are vast to nose breathing, including getting
+                               much faster as an athlete”
+                               </div>                             
+                              </PopoverBody>
+                           </Popover>       
                            
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
@@ -1371,6 +1654,18 @@ handleScroll() {
                                 this.state.workout_input_type === 'strength')?
                                '1.10 General Strength Comments/What Strength Sets Did You Do?':
                                '1.10 General Workout Comments'}
+                                <span id="general"
+                             onClick={this.toggleComment} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                            
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                            
+                              </span>                              
                             </Label>
                               {this.state.editable &&
                                 <div className="input1">
@@ -1391,6 +1686,24 @@ handleScroll() {
                           </FormGroup>
                         }
 
+                        <Popover 
+                          id="popover"
+                          className="pop"
+                            placement="right" 
+                            isOpen={this.state.commentInfo}
+                            target="general" 
+                            toggle={this.toggleComment}>
+                              <PopoverBody>
+                               <div>
+                               Enter any comments about your workout here, including but not limited to how you felt,
+                                pain/twinges, things you want to remember later, whether you worked out with somebody,
+                                 whether you talked during your workout, to explain something (for example, why your effort
+                                  level was harder or easier, why your pace was faster or slower, why you didn’t nose breathe
+                                   as much, why you didn’t drink water), etc.
+                                 </div>                                                       
+                              </PopoverBody>
+                           </Popover> 
+
                         { (this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>  
                               {this.state.editable &&
@@ -1402,11 +1715,26 @@ handleScroll() {
                                 onClick={this.handleWeatherCheck}
                                 >
                                 </Input>
-                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout</Label>
+                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout
+                                 <span id="wether"
+                             onClick={this.toggleWeather} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                            
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                            
+                              </span>
+                                </Label>
                                 </div>
                               }
+                               
                               {
                                 !this.state.editable &&
+                                (this.state.workout === "yes" || this.state.workout === "") &&
                                 <div>
                                 <Label className="LAbel">1.11 I want to manually enter in weather information for my workout</Label>
                                 <div className="input">                             
@@ -1415,7 +1743,38 @@ handleScroll() {
                                 </div>
                               }
                             </FormGroup>
-                        }
+                          }
+                      
+                      
+
+                         <Popover 
+                          id="popover"
+                          className="pop"
+                            placement="right" 
+                            isOpen={this.state.weatherInfo}
+                            target="wether" 
+                            toggle={this.toggleWeather}>
+                              <PopoverBody>
+                               <div>
+                               We encourage all users to enter weather information after each workout.
+                               We track weather because it can have a HUGE impact on performance. We encourage
+                               people to keep their heart rate in an EASY aerobic zone most of the time, even
+                               when the dew point/temperature/humidity is high, which means slowing in hot weather.
+                               So, people slow down a lot in the summer to keep their heart rate in range. The higher
+                               the dew point, the more we have to slow down. In the fall when the dew point is lower,
+                               we get faster at the same heart rate level if we have been good about slowing down in 
+                               hot weather. It seems counter-intuitive to go slower to get faster, but it works! Your
+                               body will become heat acclimated and thrive when it cools down. On our site, you will
+                               be able to see your historical performance relative to your weather stats if you enter them consistently.
+                                 </div>
+
+
+                               <div style={{paddingTop:"15px"}}>
+                                  We ask that you report your outdoor stats (temperature, humidity, dew point) even for indoor workouts,
+                                  as things like humidity and dew point seep inside too.
+                               </div>                            
+                              </PopoverBody>
+                           </Popover> 
                          
                         <Collapse isOpen={this.state.weather_check}>
                          { (this.state.workout === "yes" || this.state.workout === "") &&                                                      
@@ -1584,7 +1943,20 @@ handleScroll() {
                         { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>   
                               <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
-                              information button for instructions about how to record this)?</Label>
+                              information button for instructions about how to record this)?
+                               <span id="hrr"
+                             onClick={this.toggleHrr} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                            
+                             <FontAwesome 
+                                          style={{color:"#5E5E5E"}}
+                                          name = "info-circle"
+                                          size = "1x"                                      
+                                        
+                              />
+                            
+                              </span>
+                              </Label>
                               {this.state.editable &&
                                 <div className="input">
                                      <Label check className="btn btn-secondary radio1">
@@ -1615,6 +1987,40 @@ handleScroll() {
                           </FormGroup>
                         }
 
+                         <Popover 
+                            className="pop"
+                            id="popover" 
+                            placement="right" 
+                            isOpen={this.state.hrrInfo}
+                            target="hrr" 
+                            toggle={this.toggleHrr}>
+                              <PopoverBody>
+                               <div>
+                                HRR: Heart Rate Recovery Tracking after an aerobic workout (you do not need to do HRR after strength,
+                                a swim, or other non-aerobic exercise). We find that heart recovery is one of the truest indications
+                                of one's fitness level. As a result, we encourage all of our users to track their heart rate recovery.
+                                To do this, as soon as you finish your workout, stop your watch or wearable device, save the workout file,
+                                and then immediately start a new workout file and stand still for 1 minute (we encourage you to put your
+                                hands on your knees during first minute to try to get your heart rate to go down as quickly as possible).
+                                If your heart rate is close to getting below 99, you may want to stand still until it gets below 99. If you
+                                get stiff and/or have cramps/spasms, move/walk around easily. Don't obsess/be anxious about your HR going
+                                down (if you do this, it won't recovery as quickly). Let your HRR file run EITHER (1) for one minute if your
+                                heart rate gets to 99 or lower in the first minute OR (2) to whenever your heart rate level gets to 99. SO,
+                                YOU WILL ALWAYS RUN YOUR HRR FILE FOR AT LEAST ONE MINUTE. Watches/Wearable devices often spin for 5-10 seconds
+                                between finishing a workout and starting a new workout file, so do your best to start your HRR file as quickly
+                                as possible.
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                              WHY DO WE LOOK AT HRR? We are looking to see how quickly your heart rate recovers after aerobic exercise.
+                              When you have completed your heart rate recovery, stop your watch/wearable device and post the file and go
+                              in and rename it "HRR" and select “Other” as the workout type. We are trying to analyze 2 things: (1) How
+                              many beats your heart recovers in the first minute (cardiologists look at this to assess heart health),
+                              and (2) how long your heart rate takes to get to 99 (below 100). Based on your HRR results, we can make
+                              exercise recommendations to help you achieve your goals.
+                               </div>                             
+                              </PopoverBody>
+                           </Popover>       
 
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&

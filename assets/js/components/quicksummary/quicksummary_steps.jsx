@@ -27,26 +27,20 @@ class Steps extends Component{
   }
 
 renderTableColumns(dateWiseData,category,classes=""){
+	
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
 			
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
-				if(key !== 'id' && key !== 'user_ql'){
-					if (key == 'movement_consistency'){
-                        let mc = value;
-                        if( mc != undefined && mc != "" && mc != "-"){
-                            mc = JSON.parse(mc);
-                            all_data.push(mc.inactive_hours);
-                        }
+				if(key !== 'id' && key !== 'user_ql'){				                    	
+						all_data.push(value
+						);
                     }
-                    else{
-                    	
-						all_data.push(value);
-                    }
+                    console.log(all_data);
 
-				}
+				
 
 			}
 
@@ -121,7 +115,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 275;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

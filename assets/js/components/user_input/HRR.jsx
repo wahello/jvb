@@ -243,7 +243,7 @@ toggle() {
 		                        value={this.state.lowest_hr_first_minute}
 		                        onChange={this.handleChange} >
 		                         <option key="select" value="">Select</option>
-	                             {this.createSleepDropdown(70,220,true)}                             
+	                             {this.createSleepDropdown(60,220,true)}                             
 	                        </Input>
                         </div>
                        }

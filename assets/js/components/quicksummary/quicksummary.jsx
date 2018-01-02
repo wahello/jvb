@@ -171,12 +171,13 @@ class Quicklook extends Component{
 			        avg_cadence: data.bike_stats_ql.avg_cadence
 			    },
 			    "steps_ql": {
+			    	"movement_consistency": data.steps_ql.movement_consistency,
 			        "non_exercise_steps": data.steps_ql.non_exercise_steps,
 			        "exercise_steps": data.steps_ql.exercise_steps,
 			        "total_steps": data.steps_ql.total_steps,
 			        "floor_climed": data.steps_ql.floor_climed,
 			        "floor_decended": data.steps_ql.floor_decended,
-			        "movement_consistency": data.steps_ql.movement_consistency
+			       
 			    },
 
 			    sleep_ql: {

@@ -223,7 +223,7 @@ class Movementquick extends Component{
                       {steps_data[props.rowIndex]}
                     </Cell>
                   )}
-              width={132}
+              width={110}
         />
       );
       columns.push(
@@ -234,7 +234,7 @@ class Movementquick extends Component{
                       {status_data[props.rowIndex]}
                     </Cell>
                   )}
-              width={132}
+              width={110}
         />
       );
     }
@@ -265,7 +265,7 @@ render(){
                 {this.state.tableAttrColumn[props.rowIndex].name}
               </Cell>
             )}
-            width={167}
+            width={130}
             fixed={true}
           />
          {this.renderTableColumns(this.state.mc_data)}
@@ -300,7 +300,7 @@ export default Dimensions({
     return window.innerHeight - 192;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :940;
+    var widthOffset = window.innerWidth < 1024 ? 0 :1150;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);
