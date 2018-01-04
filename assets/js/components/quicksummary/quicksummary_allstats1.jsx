@@ -189,7 +189,7 @@ class AllStats1 extends Component{
                                 all_data.push({value:avgHrJson[act],
                                                style:{}});
                         }
-                        else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){
+                        else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){     
                             for(let act of avgHrKeys)
                                 all_data.push({value:'-',
                                                style:{}});
@@ -202,26 +202,26 @@ class AllStats1 extends Component{
                             all_data.push({value:'No GPS Data',
                                            style:{}});
                         }
-                        else if((key == 'dew_point' && (value && value != '-')) ||
-                                (key == 'temperature' && (value && value != '-'))||
-                                (key == 'temperature_feels_like' && (value && value != '-'))){
-                            all_data.push({value:this.toFahrenheit(value).toFixed(2),
-                                           style:{}});
+                        else if((key == 'dew_point' && (value && value != '-')) ||       
+                                (key == 'temperature' && (value && value != '-'))||    
+                                (key == 'temperature_feels_like' && (value && value != '-'))){   
+                            all_data.push({value:this.toFahrenheit(value).toFixed(2),   
+                                           style:{}});    
                         }
                         else{
-							all_data.push({value:value,
-                                           style:obj[value]});
+							all_data.push({value:value,   
+                                           style:obj[value]});     
                         }
 
-                        if(pushKeytoggle)
-                            keys.push(key);
+                        if(pushKeytoggle)    
+                            keys.push(key);   
 					}
 				}
 			}
 			columns.push(
 				<Column 
-                style={{wordWrap:"break-word"}}
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+                style={{wordWrap:"break-word"}}      
+					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}     
 			        cell={props => (
 				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex].value}
@@ -237,9 +237,9 @@ class AllStats1 extends Component{
 
         let tableAttrColumn = [];
         for(let key of keys){
-            if(key == "avg_heartrate"){
-                for(let act of avgHrKeys){
-                    let label = {name:attrVerboseName[key]+" "+act}
+            if(key == "avg_heartrate"){      
+                for(let act of avgHrKeys){   
+                    let label = {name:attrVerboseName[key]+" "+act}   
                     tableAttrColumn.push(label);
                 }
             }
@@ -252,18 +252,18 @@ class AllStats1 extends Component{
 	}
 
 	render(){
-		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		let rowsCount = this.state.tableAttrColumn.length;
+		const {height, width, containerHeight, containerWidth, ...props} = this.props;    
+		let rowsCount = this.state.tableAttrColumn.length;     
 				
 		return(
 			<div>
 			 <Table
-		        rowsCount={rowsCount}
-		        rowHeight={65}
-		        headerHeight={50}
-		        width={containerWidth}
+		        rowsCount={rowsCount}    
+		        rowHeight={65}  
+		        headerHeight={50}   
+		        width={containerWidth}    
         		maxHeight={containerHeight}
-                touchScrollEnabled={true}
+                touchScrollEnabled={true}      
             
          
                
@@ -282,39 +282,39 @@ class AllStats1 extends Component{
 
 
 		        />
-			    {this.state.columns}   
-      		</Table>
+			    {this.state.columns}              
+      		</Table>   
 			</div>
 
 			);
 	}
 }
 
-const styles = StyleSheet.create({
-  newTableHeader: {
-    textAlign:'center',
+const styles = StyleSheet.create({         
+  newTableHeader: {    
+    textAlign:'center',     
     color: '#111111',
     fontSize: '18px',   
     border: 'none',
-    fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
+    fontFamily:'Proxima-Nova',                     
+    fontStyle:'normal'                    
   },
   newTableBody:{
     textAlign:'center',   
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',
-    fontStyle:'normal',
+    fontStyle:'normal',     
   }
 });
 
 
-export default Dimensions({
+export default Dimensions({  
   getHeight: function(element) {
     return window.innerHeight - 158;
   },
-  getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 : 5;
-    return window.innerWidth - widthOffset;
+  getWidth: function(element) {     
+    var widthOffset = window.innerWidth < 1024 ? 0 : 5;     
+    return window.innerWidth - widthOffset;    
   }
-})(AllStats1);
+})(AllStats1);               

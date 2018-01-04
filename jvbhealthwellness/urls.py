@@ -11,6 +11,7 @@ from quicklook import urls as quicklookUrls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    # url(r'^su/', include('django_su.urls')),
     url(r'^password_reset/$', auth_views.PasswordResetView.as_view(),
                               name='password_reset'),
 

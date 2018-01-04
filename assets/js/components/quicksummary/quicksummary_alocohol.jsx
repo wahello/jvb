@@ -25,7 +25,7 @@ class Alcohol extends Component{
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
-			for(let [key,value] of Object.entries(data[category])){
+			for(let [key,value] of Object.entries(data[category])){   
 				if(key !== 'id' && key !== 'user_ql'){
 					all_data.push(value);
 				}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 460;
+    return window.innerHeight - 530;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth <1024 ? 0 : 3;
