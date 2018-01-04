@@ -6,6 +6,7 @@ import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
+import NumberFormat from 'react-number-format';
 
  class Grades extends Component{
 
@@ -47,6 +48,10 @@ renderTableColumns(dateWiseData,category,classes=""){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
+            console.log(value);
+    //           var num = 18;
+    // var n = num.toFixed(2)
+    // document.write( n);
             if(key !== 'id' && key !== 'user_ql'){
                 all_data.push({
                     value: value,

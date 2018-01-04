@@ -97,10 +97,8 @@ export function getInitialState(start_dt, end_dt){
 	        "exercise_steps": '-',
 	        "total_steps": '-',
 	        "floor_climed": '-',
-	        "floor_decended": '-',
-	        
+	        "floor_decended": '-'
 	    },
-
 	    "sleep_ql": {
 	        "sleep_per_wearable": '-',
 	        "sleep_per_user_input": '-',
