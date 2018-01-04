@@ -76,10 +76,9 @@ class Register extends Component {
 							<Card className="form-card">
 								<CardHeader className="text-center">
 									<div className="img-fluid">
-										<img src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157"
-											 alt="jvb-logo"
-											 height="100"
-											 width="100" 
+										<img  src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"
+										
+											 
 										/>
 									</div>
 									<div className="f-progress">

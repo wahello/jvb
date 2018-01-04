@@ -8,7 +8,9 @@ import {renderFieldFormGroup} from './fieldRenderer';
 import { account_validate } from './validation';
 
 const WizardAccountPage = (props) => {
-	const { handleSubmit, onSubmit } = props;
+	const { handleSubmit, onSubmit, value  } = props;
+
+	
 	
 	return(
 		<Form onSubmit={handleSubmit(onSubmit)} >
@@ -35,8 +37,11 @@ const WizardAccountPage = (props) => {
 						type = "password"
 						label = "Password"
 						placeholder = ""
+						value =""
 						component = {renderFieldFormGroup}
+						
 					/>
+					<div></div>
 
 					<Field
 						name = "re_password"

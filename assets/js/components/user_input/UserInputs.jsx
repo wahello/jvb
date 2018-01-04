@@ -264,7 +264,7 @@ class UserInputs extends React.Component{
           fasted:have_optional_input?data.data.optional_input.fasted_during_workout:'',
           food_ate_before_workout:have_optional_input?data.data.optional_input.food_ate_before_workout:'',
           workout_comment:have_optional_input?data.data.optional_input.general_Workout_Comments:'',
-          calories:have_optional_input?data.data.optional_input.calories_consumed_during_workout:'',
+          calories:have_optional_input? data.data.optional_input.calories_consumed_during_workout: '',
           calories_item:have_optional_input?data.data.optional_input.food_ate_during_workout:'',
 
           indoor_temperature:have_strong_input?data.data.strong_input.indoor_temperature:'',
@@ -1614,7 +1614,7 @@ handleScroll() {
                             {
                               !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories?this.state.calories:"Not Entered"}</p>
+                                <p>{this.state.calories === null ?this.state.calories : this.state.calories="NotEntered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -1637,7 +1637,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item?this.state.calories_item:'Not Entered'}</p>
+                                <p >{this.state.calories_item ?this.state.calories_item:this.state.calories_item="NotEntered"}</p>
                               </div>
                             }
                           </FormGroup>

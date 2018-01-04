@@ -92,12 +92,13 @@ export function getInitialState(start_dt, end_dt){
 	        "avg_cadence": '-',
 	    },
 	    "steps_ql": {
+	    	 "movement_consistency": '-',
 	        "non_exercise_steps": '-',
 	        "exercise_steps": '-',
 	        "total_steps": '-',
 	        "floor_climed": '-',
 	        "floor_decended": '-',
-	        "movement_consistency": '-',
+	       
 	    },
 
 	    "sleep_ql": {

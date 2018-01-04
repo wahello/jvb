@@ -5,7 +5,7 @@ import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Container,InputGroup} from 'reactstrap';
 
-import {renderFieldFormGroup,renderSelectFeet, renderSelectInches} from './fieldRenderer';
+import {renderFieldFormGroup,renderSelectFeet, renderSelectInches,renderSelectPounds} from './fieldRenderer';
 import { personal_validate } from './validation';
 
 class WizardPersonalPage extends Component{
@@ -14,9 +14,13 @@ class WizardPersonalPage extends Component{
 		super(props);
 		this.state = {
 			'feet_err':' ',
-			'inches_error':' '}
+			'inches_error':' ',
+            'weight_error':' ' 
+		}
 		this.FeetError = this.FeetError.bind(this);
 		this.InchesError = this.InchesError.bind(this);
+		this.WeightError = this.WeightError.bind(this);
+
 	}
 
 	FeetError(err_msg){
@@ -28,6 +32,11 @@ class WizardPersonalPage extends Component{
 	InchesError(err_msg){
 		this.setState({
 			inches_error:err_msg !== undefined ? err_msg : ' '
+		});
+	}
+	WeightError(err_msg){
+		this.setState({
+			weight_error:err_msg !== undefined ? err_msg : ' '
 		});
 	}
 
@@ -87,15 +96,21 @@ class WizardPersonalPage extends Component{
 							</div>
 
 						</FormGroup>
-
-						<Field
-							name = "weight"
-							type = "number"
-							label = " Weight (in pounds)"
-							placeholder = "150"
-							value=""
-							component = {renderFieldFormGroup}
-						/>
+						<FormGroup>
+						<label>Weight(in pounds)</label>
+                           <Field
+									name = "weight"
+									type = "select"
+									component = {renderSelectPounds}	
+									err_callback = {this.WeightError}	
+								/>
+ 
+                            <div style={{color:"red"}}>
+								{this.state.weight_error}
+							</div>
+                        </FormGroup>   
+                           
+						
 
 						 <FormGroup>
 					          <Label className="custom-control custom-radio">

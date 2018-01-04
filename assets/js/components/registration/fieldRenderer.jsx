@@ -66,3 +66,50 @@ export function renderSelectInches(field){
 			</Input>
 	);
 }
+
+export function renderSelectPounds(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name}
+				required 
+				{...field.input}>
+				<option value="weight">weight</option> 
+				{createDropdown(40,500)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+export function renderSelectHours(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name}
+				required 
+				{...field.input}>
+				<option value="Hours">Hours</option> 
+				{createDropdown(0,24)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+export function renderSelectMinutes(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name}
+				required 
+				{...field.input}>
+				<option value="Minutes">Minutes</option> 
+				{createDropdown(0,59)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+

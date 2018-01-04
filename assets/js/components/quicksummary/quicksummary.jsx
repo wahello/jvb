@@ -171,12 +171,13 @@ class Quicklook extends Component{
 			        avg_cadence: data.bike_stats_ql.avg_cadence
 			    },
 			    "steps_ql": {
+			    	"movement_consistency": data.steps_ql.movement_consistency,
 			        "non_exercise_steps": data.steps_ql.non_exercise_steps,
 			        "exercise_steps": data.steps_ql.exercise_steps,
 			        "total_steps": data.steps_ql.total_steps,
 			        "floor_climed": data.steps_ql.floor_climed,
 			        "floor_decended": data.steps_ql.floor_decended,
-			        "movement_consistency": data.steps_ql.movement_consistency
+			        
 			    },
 
 			    sleep_ql: {
@@ -494,7 +495,7 @@ onLogoutSuccess(response){
 
           </NavbarToggler>
 
-          <Link to='/'>
+          <Link to='/' >
             <NavbarBrand
               className="navbar-brand float-sm-left"
               id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
@@ -628,6 +629,11 @@ onLogoutSuccess(response){
                                           <abbr  id="abbri"  title="Grades">
                                             <NavLink id="headernames" href="#" className={class_grade} value="grade"
 						    						 onClick={this.activateTab.bind(this,"grade")}>
+
+
+
+
+
                                              Grades
                                             </NavLink>
                                           </abbr>
