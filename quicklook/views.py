@@ -226,9 +226,6 @@ def export_users_xls(request):
 	ws.col(0).width = int(40 * 260)
 	for d in range(1,256,1):
 		ws.col(d).width = int(10 * 260)
-
-	# ws.row(4).width_mismatch = True
-	# ws.row(0).width = int (24 * 260)
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	style = xlwt.XFStyle()
@@ -246,12 +243,18 @@ def export_users_xls(request):
 			   'avg_exercise_hr_grade','prcnt_unprocessed_food_consumed_grade','alcoholic_drink_per_week_grade',
 			   'penalty']
 	current_date = to_date
-	created = UserQuickLook.objects.filter(created_at__isnull=False).values()
+	created1 = list(UserQuickLook.objects.filter(created_at__isnull=False).values())
+	date2 = []
+	# for created2 in created1:
+	for i,key3 in enumerate(created1):
+			date2.append(key3['created_at'])
 	r = 0
+	date1 = []
 	if to_date and from_date :
 		while (current_date >= from_date):
 			r = r + 1
 			ws.write(0,r,current_date,style)
+			date1.append(current_date)
 			current_date -= timedelta(days = 1)
 
 	ws.write(0,0,"All Stats")
@@ -263,11 +266,22 @@ def export_users_xls(request):
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-
+	# rowss = Grades.objects.filter(
+	# 	user_ql__created_at__range=(created_at, to_date))
+	# print(rowss)
+	rowss = UserQuickLook.objects.values('created_at')
+	count = 0
+	i = 0
+	print(date1)
+	print(date2)
 	for row in rows:
+		count = count + 1
 		row_num += 1
-		inv_map = {v: k for k, v in row.items()}
-		for i,key in enumerate(columns):
+		if set(date2).intersection(date1):
+			count = count + 1
+			# row_num += 1
+			inv_map = {v: k for k, v in row.items()}
+			for i,key in enumerate(columns):
 				if row[key] == 'A':
 					ws.write(i+3,row_num, row[key],ab_style)
 				elif row[key] == 'B':
@@ -280,6 +294,11 @@ def export_users_xls(request):
 					ws.write(i+3,row_num, row[key],f_style)
 				else:
 					ws.write(i+3,row_num, row[key],base_style)
+		else:
+			ws.write(i+3+count,row_num, 'NO Data',base_style)
+			row_num += 1
+
+
 
 
 	# Swim status

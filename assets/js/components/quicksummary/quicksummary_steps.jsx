@@ -64,6 +64,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		}
 		return columns;
 	}
+}
 
  render(){
  		const {height, width, containerHeight, containerWidth, ...props} = this.props;
