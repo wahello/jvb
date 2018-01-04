@@ -58,8 +58,10 @@ renderTableColumns(dateWiseData,category,classes=""){
 				/>
 			)
 		}
+
 		
 	return columns;
+
 }
 
  render(){

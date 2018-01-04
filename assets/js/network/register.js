@@ -9,9 +9,12 @@ class RegisterNetwork {
 
 	register(post_data, callback=undefined, err_callback=undefined){
 		post_data['height'] = post_data['feet']+"'"+post_data['inches']+"\"";
+		post_data['sleep_goals'] = post_data['sleep_hours']+":"+post_data['sleep_minutes'];
 		
 		delete post_data['feet'];
 		delete post_data['inches'];
+		delete post_data['sleep_hours'];
+		delete post_data['sleep_minutes'];
 		delete post_data['goals'];
 
 		const URL = "/api/users/";

@@ -27,6 +27,7 @@ ADMINS = (
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    # 'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -103,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'registration.authentication.EmailAuthBackend',
+    # 'django_su.backends.SuBackend',
 )
 
 LANGUAGE_CODE = 'en-us'

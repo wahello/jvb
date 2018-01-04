@@ -47,9 +47,11 @@ export function personal_validate(values){
 		errors.inches = "Inches is required";
 	}
 
-	if(!values.weight){
-		errors.weight = "Weight is required";
+	if(!values.weight || values.weight === 'weight'){
+		errors.weight = "weight is required";
 	}
+
+	
 
 	if(!values.gender){
 		errors.gender = "Gender is required";
@@ -69,9 +71,15 @@ export function goals_validate(values){
 		errors.sleep_goal = "Sleep goal is required";
 	}
 
-	if(values.sleep_goal && values.sleep_goals > 24){
-		errors.sleep_goal = "Sleep goal should be less than 24";
+	if(!values.sleep_hours || values.sleep_hours === 'Hours'){
+		errors.sleep_hours = "Hours is required";
 	}
+
+	if(!values.sleep_minutes || values.sleep_minutes === 'Minutes'){
+		errors.sleep_minutes = "Minutes is required";
+	}
+
+	
 
 	return errors;
 }

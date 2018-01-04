@@ -5882,6 +5882,7 @@ button.close {
   outline: 0;
 }
 .modal.fade .modal-dialog {
+   width:134% !important;
   -webkit-transition: -webkit-transform .3s ease-out;
        -o-transition:      -o-transform .3s ease-out;
           transition:         transform .3s ease-out;
@@ -5891,6 +5892,7 @@ button.close {
           transform: translate(0, -25%);
 }
 .modal.in .modal-dialog {
+  
   -webkit-transform: translate(0, 0);
       -ms-transform: translate(0, 0);
        -o-transform: translate(0, 0);
@@ -5906,8 +5908,9 @@ button.close {
   margin: 10px;
 }
 .modal-content {
-  position: relative;
-  background-color: #fff;
+width: 136% !important;
+    position: relative;
+  background-color: red;
   -webkit-background-clip: padding-box;
           background-clip: padding-box;
   border: 1px solid #999;
@@ -5916,6 +5919,8 @@ button.close {
   outline: 0;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
           box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+         
+          right:66px !important;
 }
 .modal-backdrop {
   position: fixed;
@@ -5979,6 +5984,7 @@ button.close {
   .modal-content {
     -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
             box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+            width: 134px !important;
   }
   .modal-sm {
     width: 300px;

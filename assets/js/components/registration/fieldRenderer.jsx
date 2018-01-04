@@ -24,11 +24,12 @@ export function renderFieldFormGroup(field){
 	);
 }
 
-function createDropdown(start_num , end_num, step=1){
+function createDropdown(start_num , end_num, mins=false, step=1){
 	let elements = [];
 	let i = start_num;
 	while(i<=end_num){
-		elements.push(<option key={i} value={i}>{i}</option>);
+		let j = (mins && i < 10) ? "0"+i : i;
+		elements.push(<option key={j} value={j}>{j}</option>);
 		i=i+step;
 	}
 	return elements;
@@ -66,3 +67,50 @@ export function renderSelectInches(field){
 			</Input>
 	);
 }
+
+export function renderSelectPounds(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name}
+				required 
+				{...field.input}>
+				<option value="weight">weight</option> 
+				{createDropdown(40,500)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+export function renderSelectHours(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name}
+				required 
+				{...field.input}>
+				<option value="Hours">Hours</option> 
+				{createDropdown(0,24)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+export function renderSelectMinutes(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name}
+				required 
+				{...field.input}>
+				<option value="Minutes">Minutes</option> 
+				{createDropdown(0,59,true)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+
