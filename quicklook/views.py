@@ -548,9 +548,10 @@ def export_users_xls(request):
 		row_num += 1
 		for i, key in enumerate(columns):
 			if(key == 'movement_consistency' and row[key]):
-				ws4.write(i1+i+1,row_num , ast.literal_eval(row[key])['inactive_hours'],base_style)
+				ws4.write(i+2,row_num , ast.literal_eval(row[key])['inactive_hours'],base_style)
 			else:
-				ws4.write(i1+i+1,row_num , row[key],base_style)
+				ws4.write(i+2,row_num , row[key],base_style)
+
 	# sleep stats sheet
 	ws5.set_panes_frozen(True)
 	ws5.set_horz_split_pos(1)
