@@ -257,12 +257,12 @@ def export_users_xls(request):
 			date1.append(current_date)
 			current_date -= timedelta(days = 1)
 
-	ws.write(0,0,"All Stats")
-	ws.write(2,0,"Grades")
+	ws.write(0,0,"All Stats",font_style)
+	ws.write(2,0,"Grades",font_style)
 	col_num1 = 2
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws.write(col_num1, row_num, columns[col_num], font_style)
+		ws.write(col_num1, row_num, columns[col_num], base_style)
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -272,8 +272,6 @@ def export_users_xls(request):
 	rowss = UserQuickLook.objects.values('created_at')
 	count = 0
 	i = 0
-	print(date1)
-	print(date2)
 	for row in rows:
 		count = count + 1
 		row_num += 1
@@ -305,12 +303,12 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns1 = ['pace_per_100_yard','total_strokes']
-	ws.write(17, 0, "Swim_Status")
+	ws.write(17, 0, "Swim_Status",font_style)
 	col_num2 = 17
 	a = len(rows)
 	for col_num1 in range(len(columns1)):
 			col_num2 = col_num2 + 1
-			ws.write(col_num2 , row_num - a  , columns1[col_num1],font_style)
+			ws.write(col_num2 , row_num - a  , columns1[col_num1],base_style)
 	rows1 = SwimStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -325,12 +323,12 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns3 = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
-	ws.write(21, 0, "Bike_Status")
+	ws.write(21, 0, "Bike_Status",font_style)
 	col_num2 = 21
 	a = len(rows) + len(rows1)
 	for col_num in range(len(columns3)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a, columns3[col_num],font_style)
+		ws.write(col_num2, row_num - a, columns3[col_num],base_style)
 	rows2 = BikeStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -345,12 +343,12 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns4 = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','floor_decended','movement_consistency']
-	ws.write(27, 0, "Steps")
+	ws.write(27, 0, "Steps",font_style)
 	col_num2 = 27
 	a = len(rows) + len(rows1) + len(rows2)
 	for col_num in range(len(columns4)):
 		 col_num2 = col_num2 + 1
-		 ws.write(col_num2,row_num - a, columns4[col_num], font_style)
+		 ws.write(col_num2,row_num - a, columns4[col_num], base_style)
 	rows3 = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -369,12 +367,12 @@ def export_users_xls(request):
 	font_style.font.bold = True
 	columns5 = ['sleep_per_wearable', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
-	ws.write(35, 0, "Sleep")
+	ws.write(35, 0, "Sleep",font_style)
 	col_num2 = 35
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3)
 	for col_num in range(len(columns5)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a , columns5[col_num], font_style)
+		ws.write(col_num2, row_num - a , columns5[col_num], base_style)
 	rows4 = Sleep.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -388,12 +386,12 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns6 = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
-	ws.write(45, 0, "Food")
+	ws.write(45, 0, "Food",font_style)
 	col_num2 = 45
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4)
 	for col_num in range(len(columns6)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a, columns6[col_num],font_style)
+		ws.write(col_num2, row_num - a, columns6[col_num],base_style)
 	i1 = 45
 	rows5 = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
@@ -407,12 +405,12 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns7 = ['alcohol_day', 'alcohol_week']
-	ws.write(50, 0, "Alcohol")
+	ws.write(50, 0, "Alcohol",font_style)
 	col_num2 = 50
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4) + len(rows5)
 	for col_num in range(len(columns7)):
 		   col_num2 = col_num2 + 1
-		   ws.write(col_num2, row_num - a, columns7[col_num], font_style)
+		   ws.write(col_num2, row_num - a, columns7[col_num], base_style)
 	rows6 = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -440,12 +438,12 @@ def export_users_xls(request):
 			r = r + 1
 			ws1.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws1.write(0, 0, "Grades")
+	ws1.write(0, 0, "Grades",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws1.write(col_num1, row_num, columns[col_num], font_style)
+		ws1.write(col_num1, row_num, columns[col_num], base_style)
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -480,12 +478,12 @@ def export_users_xls(request):
 			r = r + 1
 			ws2.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws2.write(0, 0, "Swim Stats")
+	ws2.write(0, 0, "Swim Stats",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws2.write(col_num1, row_num, columns[col_num], font_style)
+		ws2.write(col_num1, row_num, columns[col_num], base_style)
 	rows = SwimStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -508,12 +506,12 @@ def export_users_xls(request):
 			r = r + 1
 			ws3.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws3.write(0, 0, "Bike Stats")
+	ws3.write(0, 0, "Bike Stats",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws3.write(col_num1, row_num, columns[col_num], font_style)
+		ws3.write(col_num1, row_num, columns[col_num], base_style)
 	rows = BikeStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -537,19 +535,22 @@ def export_users_xls(request):
 			r = r + 1
 			ws4.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws4.write(0, 0, "Steps")
+	ws4.write(0, 0, "Steps",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws4.write(col_num1, row_num, columns[col_num], font_style)
+		ws4.write(col_num1, row_num, columns[col_num], base_style)
 	rows = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
 	for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			ws4.write(i + 2, row_num, row[key], base_style)
+			if(key == 'movement_consistency' and row[key]):
+				ws4.write(i1+i+1,row_num , ast.literal_eval(row[key])['inactive_hours'],base_style)
+			else:
+				ws4.write(i1+i+1,row_num , row[key],base_style)
 	# sleep stats sheet
 	ws5.set_panes_frozen(True)
 	ws5.set_horz_split_pos(1)
@@ -566,12 +567,12 @@ def export_users_xls(request):
 			r = r + 1
 			ws5.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws5.write(0, 0, "Sleep")
+	ws5.write(0, 0, "Sleep",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws5.write(col_num1, row_num, columns[col_num], font_style)
+		ws5.write(col_num1, row_num, columns[col_num], base_style)
 	rows = Sleep.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -594,12 +595,12 @@ def export_users_xls(request):
 			r = r + 1
 			ws6.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws6.write(0, 0, "Food")
+	ws6.write(0, 0, "Food",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws6.write(col_num1, row_num, columns[col_num], font_style)
+		ws6.write(col_num1, row_num, columns[col_num], base_style)
 	rows = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -622,12 +623,12 @@ def export_users_xls(request):
 			r = r + 1
 			ws7.write(0, r, current_date, style)
 			current_date -= timedelta(days=1)
-	ws7.write(0, 0, "Alcohol")
+	ws7.write(0, 0, "Alcohol",font_style)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns)):
 		col_num1 = col_num1 + 1
-		ws7.write(col_num1, row_num, columns[col_num], font_style)
+		ws7.write(col_num1, row_num, columns[col_num], base_style)
 	rows = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
