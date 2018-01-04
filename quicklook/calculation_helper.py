@@ -43,7 +43,7 @@ def get_activities():
 	'BOATING','CROSS_COUNTRY_SKIING','DRIVING_GENERAL','FLYING','GOLF','HORSEBACK_RIDING',
 	'INLINE_SKATING','MOUNTAINEERING','PADDLING','RESORT_SKIING_SNOWBOARDING','ROWING',
 	'SAILING','SKATE_SKIING','SKATING','SNOWMOBILING','SNOW_SHOE','STAND_UP_PADDLEBOARDING',
-	'WHITEWATER_RAFTING_KAYAKING','FLOOR_CLIMBING']
+	'WHITEWATER_RAFTING_KAYAKING','FLOOR_CLIMBING','YOGA']
 	return activities
 
 def str_to_datetime(str_date):
@@ -381,19 +381,19 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 			midnight = datetime.combine(start_time.date(),time(0))
 			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
 			if start_time >= midnight:
-				if obj.get('validation',None) == 'AUTO_MANUAL':
-					recent_auto_manual = obj
+				if not target_sleep_data:
+					# most earliest record of the day at start of loop
+					target_sleep_data = obj
+
+				if (obj.get('validation',None) == 'AUTO_MANUAL' and
+					obj.get('startTimeInSeconds',0) == target_sleep_data.get('startTimeInSeconds',0)):
+					target_sleep_data = obj
 					break
-				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
-					recent_auto_final = obj
-				elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
-					recent_auto_tentative = obj
-		if recent_auto_manual:
-			target_sleep_data = recent_auto_manual
-		elif recent_auto_final:
-			target_sleep_data = recent_auto_final
-		else:
-			target_sleep_data = recent_auto_tentative
+
+				elif (obj.get('validation',None) == 'AUTO_FINAL' and
+					  obj.get('startTimeInSeconds',0) == target_sleep_data.get('startTimeInSeconds',0) and
+					  target_sleep_data.get('validation',None) == 'AUTO_TENTATIVE'):
+					target_sleep_data = obj
 
 	if target_sleep_data:
 		sleep_stats['deep_sleep'] = sec_to_hours_min(
@@ -438,7 +438,8 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"longitude":None
 	}
 
-	activities_hr = {act:{"hr":0,"count":0} for act in get_activities()}
+	# activities_hr = {act:{"hr":0,"count":0} for act in get_activities()}
+	activities_hr = {}
 
 	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
@@ -449,9 +450,16 @@ def get_activity_stats(activities_json,manually_updated_json):
 		avg_run_speed_mps = 0
 		for obj in activities_json:
 			obj = manually_edited(obj)
-			activities_hr[obj.get('activityType','')]['hr'] += obj.get(
+			obj_act = obj.get('activityType')
+
+			if not activities_hr.get(obj_act, None):
+				activities_hr[obj_act] = {}
+				activities_hr[obj_act]['hr'] = 0
+				activities_hr[obj_act]['count'] = 0
+
+			activities_hr[obj_act]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
-			activities_hr[obj.get('activityType','')]['count'] += 1
+			activities_hr[obj_act]['count'] += 1
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -1257,7 +1265,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 									todays_daily_strong, user.profile.age())
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
-
 		# Overall workout grade calculation
 		overall_workout_grade_pt = get_overall_workout_grade(
 								workout_duration_grade_pts[1],
