@@ -36,6 +36,7 @@ class AlcoholInline(admin.StackedInline):
 
 class UserQuickLookAdmin(admin.ModelAdmin):
 	list_display=('user','created_at', 'updated_at')
+	ordering = ('-created_at',)
 	list_filter = ('created_at','updated_at',)
 	save_on_top = True
 	search_fields = ('user__username','user__email','user__first_name',
