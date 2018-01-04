@@ -15,24 +15,22 @@ class Steps extends Component{
 
 	 this.state = {
       myTableData: [
+	    {name: 'Movement Consistency'},
         {name: 'Non Exercise Steps'},
         {name: 'Exercise Steps'},
         {name: 'Total Steps'},
         {name: 'Floors Climed'}, 
-        {name: 'Floors Decended'},
-        {name: 'Movement Consistency'}
+        {name: 'Floors Decended'}
       ],
     };
   }
 
 renderTableColumns(dateWiseData,category,classes=""){
-	
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
-				console.log(key);
 				if(key !== 'id' && key !== 'user_ql'){
 					if (key == 'movement_consistency'){
                         let mc = value;
@@ -43,12 +41,10 @@ renderTableColumns(dateWiseData,category,classes=""){
 
                     }
                     else{
-                    	
 						all_data.push(value);
                     }
-                    console.log(all_data);
+				}
 			}
-
 
 			columns.push(
 				<Column 
@@ -62,8 +58,9 @@ renderTableColumns(dateWiseData,category,classes=""){
 				/>
 			)
 		}
-		return columns;
-	}
+		
+	return columns;
+}
 
  render(){
  		const {height, width, containerHeight, containerWidth, ...props} = this.props;
