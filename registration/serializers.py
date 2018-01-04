@@ -31,8 +31,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Profile
 		fields = ('id','username','email','password','first_name','last_name',
-				  'gender','height','weight','date_of_birth','goals','created_at',
-				  'updated_at')
+				  'gender','height','weight','date_of_birth','sleep_goals','goals',
+				  'created_at','updated_at')
 		extra_kwargs = {
 			'password': {'write_only': True}
 		}
@@ -54,6 +54,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.height = validated_data.get('height', instance.height)
 		instance.weight = validated_data.get('weight', instance.weight)
 		instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
+		instance.sleep_goals = validated_data.get('sleep_goals',instance.sleep_goals)
 		instance.goals = validated_data.get('goals',instance.goals)
 		instance.save()
 		return instance
