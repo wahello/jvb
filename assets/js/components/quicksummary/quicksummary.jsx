@@ -508,8 +508,14 @@ onLogoutSuccess(response){
 
 
             <span id="header">
-            <h2 className="head" id="head">Raw Data</h2>
+            <h2 className="head" id="head">Raw Data
+             <a  
+					            id="daterange"
+					            style={{width:"254px",color:"white",fontSize:"16px",paddingLeft:"15px"}}
+					            onClick={this.toggleDate} >Date Range</a>
+            </h2>
             </span>
+             
 
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
@@ -595,22 +601,15 @@ onLogoutSuccess(response){
                                   </span>
 
                                   </span>
-
-                                   <span className="btn2">
-	                                  <Button
-	                                   id="nav-btn"
-	                                  style={{backgroundColor:"#ed9507"}}
-						         	   type="submit"
-						               className="btn btn-block-lg"
-						               onClick = {this.handleCreateQuicklook}>
-							               Create Raw Data Report
-								      </Button>
-                                   </span>
-                                    <a
-                                className="fonts"
-					            id="daterange"
-					            style={{width:"88px",color:"white"}}
-					            onClick={this.toggleDate} >Date Range</a>
+                                  <span id="spa">
+                                          <abbr  id="abbri">
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
+                                            <Button id="nav-btn" className="btn">Print</Button>
+                                           </a>
+                                          </abbr>
+                                          </span>
+                                  
+                                    
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
                                           <NavItem onClick={this.toggle}>
@@ -735,17 +734,21 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                       	<NavItem onClick={this.toggle}>
-                                        <span id="spa">
-                                          <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
-                                            <Button id="nav-btn" className="btn">Print</Button>
-                                           </a>
-                                          </abbr>
-                                          </span>
-                                       </NavItem>
+                                       
+                                       
                                   </Nav>
                                 </Collapse>
+
+                                         <span className="btn2">
+	                                  <Button
+	                                   id="nav-btn"
+	                                  style={{backgroundColor:"#ed9507"}}
+						         	   type="submit"
+						               className="btn btn-block-lg"
+						               onClick = {this.handleCreateQuicklook}>
+							               Create Raw Data Report
+								      </Button>
+                                   </span>
                            </Navbar>
 
 						 </div>

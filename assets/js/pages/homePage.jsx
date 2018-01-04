@@ -23,6 +23,7 @@ import GarminDataPage from '../components/GarminData';
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
 import Quicklook from '../components/quicksummary/quicksummary';
 import Movement from '../components/movement_consistency';
+import DashboardSummary from '../components/dashboard_summary';
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -55,6 +56,7 @@ function initializeLocalState(){
 					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
 					<Route path='/quicksummary' component={RequireAuth(Quicklook)} />
+					<Route path='/dashboard_summary' component={RequireAuth(DashboardSummary)} />					
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 
 			    </Switch>
