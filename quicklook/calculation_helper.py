@@ -214,7 +214,6 @@ def get_blank_model_fields(model):
 			 'exercise_steps': 0,
 			 'total_steps': 0,
 			 'floor_climed':0,
-			 'floor_decended':0,
 			 'movement_consistency':'',
 		}
 		return fields
@@ -555,8 +554,8 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 		next_day = data_date_midnight + timedelta(days=1)
 		td_hour = timedelta(hours=1)
 		while(data_date_midnight < next_day):
-			end_hour = data_date_midnight + td_hour
-			time_interval = data_date_midnight.strftime("%I %p")+" to "+end_hour.strftime("%I %p")
+			end_hour = data_date_midnight + timedelta(minutes=59)
+			time_interval = data_date_midnight.strftime("%I:%M %p")+" to "+end_hour.strftime("%I:%M %p")
 			movement_consistency[time_interval] = {
 				"steps":0,
 				"status":"sleeping"
@@ -566,10 +565,8 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 		for data in epochs_json:
 			if data.get('intensity') != 'SEDENTARY': 
 				start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
-				td = timedelta(hours=1)
 				hour_start = datetime.utcfromtimestamp(start_time)
-				hour_end = (datetime.utcfromtimestamp(start_time)+td)
-				time_interval = hour_start.strftime("%I %p")+" to "+hour_end.strftime("%I %p")
+				time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
 
 				steps_in_interval = movement_consistency[time_interval].get('steps')
 				status = "sleeping"
@@ -592,15 +589,16 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 		total_steps = 0
 		sleeping_hours = 0
 		for interval,values in list(movement_consistency.items()):
-			hour_am_pm = interval.split('to')[0].split(' ')
-			if hour_am_pm[1] == 'PM' and int(hour_am_pm[0]) < 12:
-				hour_am_pm[0] = int(hour_am_pm[0]) + 12
-			elif hour_am_pm[1] == 'AM' and int(hour_am_pm[0]) == 12:
-				hour_am_pm[0] = 0
+			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
+			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
+			if am_or_pm == 'PM' and int(hour) < 12:
+				hour = int(hour) + 12
+			elif am_or_pm == 'AM' and int(hour) == 12:
+				hour = 0
 			else:
-				hour_am_pm[0] = int(hour_am_pm[0])
+				hour = int(hour)
 
-			hour_start = datetime.combine(today_awake_time.date(),time(hour_am_pm[0]))
+			hour_start = datetime.combine(today_awake_time.date(),time(hour))
 			if hour_start < datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)):
 				if(movement_consistency[interval]['status'] == 'sleeping' and  
 					not movement_consistency[interval]['steps']):
@@ -825,10 +823,11 @@ def cal_overall_grade(gpa):
 
 	return(grade, gpa)
 
-def cal_penalty(is_smoke,is_ctrl_subs):
+def cal_penalty(is_smoke,is_ctrl_subs,is_sleep_aid):
 	smoke_penalty = -3.1 if is_smoke == 'yes' else 0
 	ctrl_subs_penalty = -3.1 if is_ctrl_subs == 'yes' else 0
-	return smoke_penalty + ctrl_subs_penalty
+	sleep_aid_penalty = -2 if is_sleep_aid == 'yes' else 0
+	return smoke_penalty + ctrl_subs_penalty + sleep_aid_penalty
 
 def cal_workout_duration_grade(duration_in_min):
 	if duration_in_min >= 60:
@@ -1312,9 +1311,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Penalty calculation
 		penalty = cal_penalty(
 			safe_get(todays_daily_strong,"smoke_any_substances_whatsoever",""),
-			safe_get(todays_daily_strong,"controlled_uncontrolled_substance","")
+			safe_get(todays_daily_strong,"controlled_uncontrolled_substance",""),
+			safe_get(todays_daily_strong, "prescription_or_non_prescription_sleep_aids_last_night","")
 		)
 		grades_calculated_data["penalty"] = penalty
+
+		# sleep Aid Penalty
+		sleep_aid_taken = safe_get(todays_daily_strong,
+			"prescription_or_non_prescription_sleep_aids_last_night","")
+		grades_calculated_data["sleep_aid_penalty"] = -2 if sleep_aid_taken == 'yes' else 0
 
 		# Overall Grade and Overall GPA calculation
 		overall_grade_pt = get_overall_grade(grades_calculated_data)

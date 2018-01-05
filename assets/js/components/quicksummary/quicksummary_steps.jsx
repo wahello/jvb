@@ -19,8 +19,7 @@ class Steps extends Component{
         {name: 'Non Exercise Steps'},
         {name: 'Exercise Steps'},
         {name: 'Total Steps'},
-        {name: 'Floors Climed'}, 
-        {name: 'Floors Decended'}
+        {name: 'Floors Climed'}
       ],
     };
   }

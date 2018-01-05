@@ -22,7 +22,8 @@ import { StyleSheet, css } from 'aphrodite';
         {name: 'Sleep Awake Time'},
         {name: 'Deep Sleep'},
         {name: 'Light Sleep'},
-        {name: 'Awake Time'},                       
+        {name: 'Awake Time'},
+        {name: 'Sleep Aid Penalty'}                       
       ],
     };
   }
