@@ -109,6 +109,7 @@ class Quicklook extends Component{
 			        avg_exercise_hr_grade: data.grades_ql.avg_exercise_hr_grade,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
+			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        penalty:data.grades_ql.penalty
 	    		},
 
@@ -176,7 +177,6 @@ class Quicklook extends Component{
 			        "exercise_steps": data.steps_ql.exercise_steps,
 			        "total_steps": data.steps_ql.total_steps,
 			        "floor_climed": data.steps_ql.floor_climed,
-			        "floor_decended": data.steps_ql.floor_decended
 			    },
 			    sleep_ql: {
 			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable,
@@ -186,7 +186,8 @@ class Quicklook extends Component{
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 			        deep_sleep: data.sleep_ql.deep_sleep,
 			        light_sleep: data.sleep_ql.light_sleep,
-			        awake_time: data.sleep_ql.awake_time
+			        awake_time: data.sleep_ql.awake_time,
+			        sleep_aid_penalty: data.grades_ql.sleep_aid_penalty
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,

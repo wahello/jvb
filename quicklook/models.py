@@ -42,6 +42,7 @@ class Grades(models.Model,):
 	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES,
 															 max_length=3, blank=True)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	sleep_aid_penalty = models.FloatField(blank=True, null=True)
 	penalty = models.FloatField(blank=True, null=True)
 
 class ExerciseAndReporting(models.Model):
@@ -185,7 +186,6 @@ class Steps(models.Model):
 	exercise_steps = models.PositiveIntegerField(blank=True,null=True)
 	total_steps = models.PositiveIntegerField(blank=True,null=True)
 	floor_climed = models.PositiveIntegerField(blank=True,null=True)
-	floor_decended = models.PositiveIntegerField(blank=True,null=True)
 	movement_consistency = models.TextField(blank=True)
 
 class Sleep(models.Model):
