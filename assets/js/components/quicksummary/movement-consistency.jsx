@@ -25,7 +25,7 @@ class Movementquick extends Component{
        tableAttrColumn: [
         {name: '12:00 AM - 12:59 AM'},
         {name: '01:00 AM - 01:59 AM'},
-        {name: '02:00 AM - 03:59 AM'}, 
+        {name: '02:00 AM - 02:59 AM'}, 
         {name: '03:00 AM - 03:59 AM'},
         {name: '04:00 AM - 04:59 AM'},        
         {name: '05:00 AM - 05:59 AM'},

@@ -209,7 +209,7 @@ def export_users_xls(request):
 	response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_download_name)
 
 	wb = xlwt.Workbook(encoding='utf-8')
-	ws = wb.add_sheet('All Status')
+	ws = wb.add_sheet('All Stats')
 	ws1 = wb.add_sheet('Grades')
 	ws2 = wb.add_sheet('Swim Stats')
 	ws3 = wb.add_sheet('Bike Stats')
@@ -241,7 +241,7 @@ def export_users_xls(request):
 			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
 			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
 			   'avg_exercise_hr_grade','prcnt_unprocessed_food_consumed_grade','alcoholic_drink_per_week_grade',
-			   'penalty']
+			   'sleep_aid_penalty','penalty']
 	current_date = to_date
 	created1 = list(UserQuickLook.objects.filter(created_at__isnull=False).values())
 	date2 = []
@@ -342,7 +342,7 @@ def export_users_xls(request):
 	# Steps
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
-	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
+	columns4 = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','movement_consistency']
 	ws.write(27, 0, "Steps",font_style)
 	col_num2 = 27
 	a = len(rows) + len(rows1) + len(rows2)
@@ -430,7 +430,7 @@ def export_users_xls(request):
 			   'movement_consistency_grade', 'avg_sleep_per_night_grade', 'exercise_consistency_grade',
 			   'overall_workout_grade', 'workout_duration_grade', 'workout_effortlvl_grade',
 			   'avg_exercise_hr_grade', 'prcnt_unprocessed_food_consumed_grade', 'alcoholic_drink_per_week_grade',
-			   'penalty']
+			   'sleep_aid_penalty','penalty']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -449,7 +449,6 @@ def export_users_xls(request):
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
 	for row in rows:
 		row_num += 1
-		inv_map = {v: k for k, v in row.items()}
 		for i,key in enumerate(columns):
 				if row[key] == 'A':
 					ws1.write(i+2,row_num, row[key],ab_style)
@@ -526,7 +525,7 @@ def export_users_xls(request):
 	ws4.col(0).width = int(40 * 260)
 	for d in range(1, 256, 1):
 		ws4.col(d).width = int(10 * 260)
-	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
+	columns = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','movement_consistency']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -637,4 +636,4 @@ def export_users_xls(request):
 		for i, key in enumerate(columns):
 			ws7.write(i + 2, row_num, row[key], base_style)
 	wb.save(response)
-	return response
+return response
