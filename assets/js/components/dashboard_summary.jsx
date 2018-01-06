@@ -7,6 +7,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button} from 'reactstrap';
 import PropTypes from 'prop-types';
 
+
 import { getGarminToken,logoutUser} from '../network/auth';
  class DashboardSummary extends Component{
 constructor(props){
@@ -93,12 +94,12 @@ constructor(props){
 
 			<div className="col-sm-12 col-md-12 col-lg-12 padding">
 			<div className="row">
-			<div className="col-md-6">
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
-        <thead>
+			<div className="col-md-6 tablecenter">
+			<div className="table-responsive"> 
+   		 <table className="table table-bordered zui-table">
+         <thead>
             <tr>
-                <th>Overall Health Grade</th>
+                <th className="headcol">Overall Health Grade</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -108,7 +109,7 @@ constructor(props){
         </thead>
         <tbody>
             <tr>
-                <td>Total GPA Points</td>
+                <td className="headcol">Total GPA Points</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -116,7 +117,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>Overall Health GPA</td>
+                <td className="headcol">Overall Health GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -124,7 +125,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>Rank against other users</td>
+                <td className="headcol">Rank against other users</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -132,7 +133,7 @@ constructor(props){
                 <td></td>
             </tr>
              <tr>
-                <td>Overall Health GPA</td>
+                <td className="headcol">Overall Health GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -145,8 +146,8 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -208,9 +209,9 @@ constructor(props){
 </div>
 
 <div className="row padding">
-			<div className="col-md-6">
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="col-md-6 tablecenter">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
              
                 <tr>
@@ -262,8 +263,8 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
          <thead>
            
                 <tr>
@@ -317,9 +318,9 @@ constructor(props){
 </div>
 
 <div className="row padding">
-			<div className="col-md-6">
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="col-md-6 tablecenter">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -371,9 +372,8 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<h3>Nutrition</h3>
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -426,9 +426,9 @@ constructor(props){
 
 </div>
 <div className="row padding">
-			<div className="col-md-6">
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="col-md-6 tablecenter">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -529,9 +529,8 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-<h3>Alcohol</h3>
-			<div class="table-responsive"> 
-    <table class="table table-bordered">
+			<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -580,10 +579,9 @@ constructor(props){
         </tbody>
     </table>
 </div>
-</div>
-<div className="row">
-<div class="table-responsive"> 
-    <table class="table table-bordered">
+<div className="padding">
+<div className="table-responsive"> 
+    <table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -633,10 +631,14 @@ constructor(props){
     </table>
 </div>
 </div>
+</div>
+
 
 </div>
-			</div>
-			</div>
+</div>
+
+</div>		
+			
 			)
 	}
 }
