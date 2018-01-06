@@ -342,7 +342,7 @@ def export_users_xls(request):
 	# Steps
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
-	columns4 = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','movement_consistency']
+	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	ws.write(27, 0, "Steps",font_style)
 	col_num2 = 27
 	a = len(rows) + len(rows1) + len(rows2)
@@ -526,7 +526,7 @@ def export_users_xls(request):
 	ws4.col(0).width = int(40 * 260)
 	for d in range(1, 256, 1):
 		ws4.col(d).width = int(10 * 260)
-	columns = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','movement_consistency']
+	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
