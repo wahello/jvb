@@ -14,8 +14,8 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
     const config = {
       method: "get",
       params:{
-        to: endDate.format('YYYY-MM-DD'),
-        from: startDate.format('YYYY-MM-DD') 
+        to: endDate.format('MMM-DD-YYYY'),
+        from: startDate.format('MMM-DD-YYYY') 
       },
       url: URL,
       withCredentials: true
@@ -94,26 +94,6 @@ export function fetchMovementConsistency(fromDate, successmovement,errormovement
   });
 }
 
-//export function DateRange(startDate,endDate,successquick, errorquick){
-//	  startDate = moment(startDate);
-//    endDate = moment(endDate);
-//    const URL = `quicklook/users/data`;
-//    const config = {
-//      method: "get",
-//      params:{
-//        to: endDate.format('YYYY-MM-DD'),
-//        from: startDate.format('YYYY-MM-DD')
-//      },
-//      url: URL,
-//      withCredentials: true
-//    };
-//     axios(config).then((response) => {
-//       successquick(response,startDate,endDate);
-//     }).catch(function (error){
-//       errorquick(error);
-//    });
-//  }
-
 export function downloadExcel(startDate,endDate,successPrint=undefined, errorPrint=undefined){
 	startDate = moment(startDate);
     endDate = moment(endDate);
@@ -121,8 +101,8 @@ export function downloadExcel(startDate,endDate,successPrint=undefined, errorPri
     const config = {
       method: "get",
       params:{
-        to_date: endDate.format('YYYY-MM-DD'),
-        from_date: startDate.format('YYYY-MM-DD')
+        to_date: endDate.format('MMM-DD-YYYY'),
+        from_date: startDate.format('MMM-DD-YYYY')
       },
       url: URL,
       withCredentials: true

@@ -166,6 +166,6 @@ LOGGING = {
 }
 REQUEST_LOGGING_DISABLE_COLORIZE = True
 
-SU_LOGIN_REDIRECT_URL = "/userinputs"
+SU_LOGIN_REDIRECT_URL = "/dashboard_summary"
 
 SU_LOGOUT_REDIRECT_URL = "/su/login/"
