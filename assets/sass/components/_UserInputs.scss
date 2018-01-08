@@ -21,8 +21,7 @@ body{
 	font-style: normal;
 	font-size: 16px;
 	color:#5e5e5e;
-	height:220px;
-	overflow-y: scroll; 
+	width: 100%;
 }
 
 #body1{
@@ -461,4 +460,9 @@ textarea.form-control{
 	border: 1px solid #5e5e5e;
 	text-align: center;
 	
+}
+.modalcontent{
+	margin-left: 20px;
+	margin-right: 20px;
+	font-size: 18px;
 }

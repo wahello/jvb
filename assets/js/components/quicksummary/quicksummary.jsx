@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
 	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
-         NavbarBrand,Container } from "reactstrap";
+         NavbarBrand,Container,ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem  } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
@@ -68,6 +68,7 @@ class Quicklook extends Component{
 
 		this.toggleDate=this.toggleDate.bind(this);
 	    this.toggleNav = this.toggleNav.bind(this);
+	    this.toggleDropdown = this.toggleDropdown.bind(this);
 	    this.handleLogout = this.handleLogout.bind(this);
 	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
 
@@ -78,6 +79,7 @@ class Quicklook extends Component{
 			today_date:moment(),
 			start_date:moment().subtract(7,'days').toDate(),
 			end_date:moment().toDate(),
+			selected_date:new Date(),
 			visible: true,
 			error:false,
 			calendarOpen:false,
@@ -88,6 +90,7 @@ class Quicklook extends Component{
 			fetching_ql:false,
 			creating_ql:false,
 			dateRange:false,
+			dropdownOpen: false,
 			userInputData:{},
 			data:initial_state
 		};
@@ -281,6 +284,7 @@ class Quicklook extends Component{
 		      	initial_state[date] = obj;
 		      }
 		      this.setState({
+		      	 selected_date:this.state.selected_date,
 				data:initial_state,
 				visible:false,
 				fetching_ql:false,
@@ -289,6 +293,7 @@ class Quicklook extends Component{
 	     }
 	     else{
 	     		this.setState({
+	     			 selected_date:this.state.selected_date,
 				data:initial_state,
 				visible:true,
 				fetching_ql:false,
@@ -322,7 +327,8 @@ class Quicklook extends Component{
 		     }
 		}
 		this.setState({
-			userInputData:initial_state
+			userInputData:initial_state,
+			 selected_date:this.state.selected_date,
 		});
 	}
 
@@ -331,7 +337,8 @@ class Quicklook extends Component{
 													 this.state.end_date);
 
 		this.setState({
-			userInputData:initial_state
+			userInputData:initial_state,
+			 selected_date:this.state.selected_date, 
 		});
 	}
 
@@ -341,6 +348,7 @@ class Quicklook extends Component{
 		let end_dt = moment(date);
 		let start_dt = moment(date).subtract(7,'days');
 		this.setState({
+			selected_date:date,
 			start_date : start_dt.toDate(),
 			end_date : end_dt.toDate(),
 			fetching_ql:true
@@ -367,6 +375,7 @@ class Quicklook extends Component{
   	this.setState({
 			start_date : start_dt.toDate(),
 			end_date : end_dt.toDate(),
+			dateRange:!this.state.dateRange,
 			fetching_ql:true
 		},()=>{
 			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
@@ -432,7 +441,11 @@ handleScroll() {
       dateRange:!this.state.dateRange
     });
    }
-
+ toggleDropdown() {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen
+    });
+  }
   onQuicklookSuccess(data,start_date,end_date){
   	this.successquick(data,start_date,end_date);
   	this.setState({
@@ -543,7 +556,7 @@ onLogoutSuccess(response){
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="start_date"
-						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
+						           value={moment(this.state.start_date).format('MM-DD-YY')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 
 						        </div>
@@ -552,7 +565,7 @@ onLogoutSuccess(response){
 						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="end_date"
-						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
+						           value={moment(this.state.end_date).format('MM-DD-YY')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 
 						        </div>
@@ -594,6 +607,9 @@ onLogoutSuccess(response){
 
                                         />
                                         </span>
+                                         <span id="navlink">
+                                      {moment(this.state.selected_date).format('MMMM D, YYYY')}
+                                      </span> 
                                   </span>
 
                                   </span>
@@ -604,10 +620,13 @@ onLogoutSuccess(response){
                                            </a>
                                           </abbr>
                                           </span>
-                                   <a  
-					            id="daterange"
-					            style={{width:"150px",color:"white",fontSize:"16px",paddingLeft:"15px"}}
-					            onClick={this.toggleDate} >Date Range</a>
+
+		                                    <Button
+		                                        className="daterange-btn btn"		                         
+									            id="daterange"
+									            style={{color:"white",fontSize:"12px"}}
+									            onClick={this.toggleDate} >Date Range
+									        </Button>
                                     
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
@@ -689,7 +708,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                       	<NavItem onClick={this.toggle}>
+                                       	<NavItem onClick={this.toggle} className="userinputs">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
                                             <NavLink id="headernames" href="#" className={class_user} value="user"
@@ -700,7 +719,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                          <NavItem onClick={this.toggle}>
+                                          <NavItem onClick={this.toggle} className="allstats">
                                           <span id="spa">
                                             <abbr id="abbri"  title="All Stats">
                                               <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
@@ -711,7 +730,7 @@ onLogoutSuccess(response){
                                             </span>
                                           </NavItem>
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="swimstats">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
                                             <NavLink id="headernames" href="#" className={class_swim}  value="swim"
@@ -722,7 +741,7 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem>
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="bikestats">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Bike">
                                             <NavLink id="headernames" href="#" className={class_bike} value="bike"
@@ -731,20 +750,31 @@ onLogoutSuccess(response){
                                             </NavLink>
                                           </abbr>
                                           </span>
+                                        </NavItem> 
+
+                                       <span className="dropbutton">
+                                          <NavItem onClick={this.toggle}>
+                                        <span id="spa">
+                                        <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+									        <DropdownToggle caret>
+									          More
+									        </DropdownToggle>
+									        <DropdownMenu>
+									          <DropdownItem style={{paddingLeft:"30px"}} className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>
+							    			 Bike Stats
+                                            </DropdownItem>
+									          <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
+									          <DropdownItem style={{paddingLeft:"30px"}} id="dropallstats"  className={class_allstats1} value="allstats1"
+						    								 onClick={this.activateTab.bind(this,"allstats1")}>All Stats</DropdownItem>
+									          <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
+						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
+									        </DropdownMenu>
+									    </ButtonDropdown>
+                                        </span>
                                         </NavItem>
-
-                                       
-
-                                       
-
-                                       
-                                       
-                                       
-
-                                       
-                                       
-
-                                       
+                                        </span>
                                        
                                   </Nav>
                                 </Collapse>
