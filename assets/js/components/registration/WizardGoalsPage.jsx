@@ -13,16 +13,26 @@ class WizardGoalsPage extends Component{
 		 this.state = {
 		 	 'hr_error':' ' ,
 		 	  'minute_error':' ' ,
+		 	
+      score: 'null',
       modal: false,
        nestedModal: false,
        nestedModalsubmit:false
     };
+
+
+
+
+
 this.hrError = this.hrError.bind(this);
 this.MinuteError = this.MinuteError.bind(this);
     this.toggle = this.toggle.bind(this);
      this.toggleNested = this.toggleNested.bind(this);
       this.toggleSubmit = this.toggleSubmit.bind(this);
 	}
+
+
+
 
 	hrError(err_msg){
 		this.setState({
@@ -67,7 +77,7 @@ render(){
 						<Label className="custom-control custom-checkbox">
 							  <Field 
 								  	className="custom-control-input"
-								  	name="goals"
+								  	name="sleep_goal"
 								  	type="checkbox"
 								  	value="Maintain overall health"
 								  	required
@@ -101,6 +111,8 @@ render(){
 								{this.state.hr_error+" "+this.state.minute_error}
 							</div>
 					        </FormGroup>
+
+					        
 					<Label className="custom-control custom-checkbox">
 							  <Field 
 								  	className="custom-control-input"
@@ -254,7 +266,7 @@ render(){
 						<Button outline color="primary" onClick={previousPage}>
 							Previous
 						</Button>
-						<Button type="submit" outline color="primary"  style={{float:'right'}}>
+						<Button type="submit" outline color="primary" onClick={this.toggleSubmit}  style={{float:'right'}}>
 							Submit
 						</Button>
 

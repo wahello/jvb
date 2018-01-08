@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
@@ -7,10 +7,56 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 import {renderFieldFormGroup} from './fieldRenderer';
 import { account_validate } from './validation';
 
-const WizardAccountPage = (props) => {
-	const { handleSubmit, onSubmit, value  } = props;
+
+
+
+class WizardAccountPage extends Component{
+	
+
+constructor(props){
+		super(props);
+		 this.state = {
+		 	 
+		 	  type: 'input'
+     
+    };
+
+
+
+ this.showHide = this.showHide.bind(this);
+    this.passwordStrength = this.passwordStrength.bind(this); 
+
+	}
+
+
+
+ showHide(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      type: this.state.type === 'input' ? 'password' : 'input'
+    })  
+  }
+  
+  passwordStrength(e){
+    if(e.target.value === ''){
+      this.setState({
+        score: 'null'
+      })
+    }
+    else{
+      var pw = XYZ(e.target.value);
+      this.setState({
+        score: pw.score
+      });      
+    }
+
+  }
 
 	
+
+	render(){
+	const { handleSubmit, onSubmit } = this.props;
 	
 	return(
 		<Form onSubmit={handleSubmit(onSubmit)} >
@@ -24,6 +70,7 @@ const WizardAccountPage = (props) => {
 						component = {renderFieldFormGroup}
 					/>
 
+
 					<Field
 						name = "email"
 						type = "email"
@@ -32,17 +79,34 @@ const WizardAccountPage = (props) => {
 						component = {renderFieldFormGroup}
 					/>
 
-					<Field
-						name = "password"
-						type = "password"
-						label = "Password"
-						placeholder = ""
-						value =""
-						component = {renderFieldFormGroup}
-						
-					/>
-					<div></div>
 
+                    <FormGroup >
+
+
+
+<Row >
+
+
+                         <Col xs="12" sm="9"  >
+                    <Field 
+						name = "password"
+						 type={this.state.type}
+						label="Password"
+						placeholder = " "
+						onChange={this.passwordStrength}
+						component = {renderFieldFormGroup}
+					/>
+
+            </Col>
+              <Col xs="12" sm="3" style={{paddingLeft:'2px',marginTop:'11%'}}>
+                       <Button onClick={this.showHide}>
+								{this.state.type === 'input' ? 'Hide' : 'Show'}
+							</Button>
+
+
+ </Col>
+                    
+			</Row>		</FormGroup>
 					<Field
 						name = "re_password"
 						type = "password"
@@ -58,7 +122,7 @@ const WizardAccountPage = (props) => {
 			</Row>
 		</Form>
 	);
-	
+	}
 }
 
 export default reduxForm({

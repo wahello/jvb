@@ -68,8 +68,9 @@ class WizardPersonalPage extends Component{
 						<Field
 							name = "date_of_birth"
 							type = "date"
+							dateFormat="MM/DD/YYYY"
 							label = "Date of Birth"
-							placeholder = "dd/mm/yyyy"
+							placeholder = "mm/dd/yyyy"
 							value=""
 							component = {renderFieldFormGroup}
 						/>
@@ -97,7 +98,7 @@ class WizardPersonalPage extends Component{
 
 						</FormGroup>
 						<FormGroup>
-						<label>Weight(in pounds)</label>
+						<label>Weight&nbsp;&nbsp;(in pounds)</label>
                            <Field
 									name = "weight"
 									type = "select"
