@@ -696,14 +696,14 @@ handleScroll() {
           </Collapse>
         </Navbar>
         </div>                                                                                    
-                            <Popover
+                            <Modal
                             id="popover" 
                           
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                 <div>
                                   <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
                                   to your results and our hope is that you will make healthier
@@ -736,8 +736,8 @@ handleScroll() {
                                      frequently, and have (far) better training results than those that don’t report
                                       their results, to name a few benefits.</div>
                                 </div>
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
                                   
                            
                         <div className="nav3">
@@ -873,13 +873,13 @@ handleScroll() {
                               </PopoverBody>
                            </Popover> 
 
-                           <Popover 
+                           <Modal 
                           id="popover" 
                             placement="bottom" 
                             isOpen={this.state.infoBtn}
                             target="info2" 
                             toggle={this.toggleInfo2}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                  Use the calendar to select the date you want to enter your inputs for.  The calendar defaults to today,
                                  but if you need to enter your inputs for another date, you can select any date by clicking the calendar
@@ -895,8 +895,8 @@ handleScroll() {
                                enter “Chocolate Bar” in for question 5.1 for your reporting for tomorrow and update question 5,
                                “What % of the food you ate yesterday was unprocessed” to reflect eating the chocolate bar.
                                </div>
-                              </PopoverBody>
-                           </Popover>                                                        
+                              </ModalBody>
+                           </Modal>                                                        
                
                 <Container id="user-inputs" >                          
                     <div className="row justify-content-center">
@@ -969,14 +969,14 @@ handleScroll() {
                            
                           </FormGroup>
 
-                            <Popover 
+                            <Modal 
                             className="pop"
                             id="popover" 
                             placement="right" 
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
                             toggle={this.toggleInfoworkout}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                 If you worked out (exercised) today, select “Yes”, and
                                  then answer the questions related to your workout that follow.
@@ -994,8 +994,8 @@ handleScroll() {
                                to “No”.  You can go back or forward to any date by clicking the calendar at the top of the inputs
                                page and selecting any date you would like to enter information for.
                                </div>
-                              </PopoverBody>
-                           </Popover>       
+                              </ModalBody>
+                           </Modal>       
                           
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
@@ -1048,14 +1048,14 @@ handleScroll() {
                                </FormGroup>
                                     
                             }   
-                             <Popover 
+                             <Modal 
                           id="popover"
                           className="pop" 
                             placement="right" 
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                User can select “Cardio”, “Strength” or “Both”.
                                  </div>
@@ -1072,8 +1072,8 @@ handleScroll() {
                               limited to squats, lunges, planks, push ups, clamshells, bridges, step ups, jumps, balancing
                               exercises, pull ups, etc.  
                                </div>
-                              </PopoverBody>
-                           </Popover>                         
+                              </ModalBody>
+                           </Modal>                         
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
@@ -1120,14 +1120,14 @@ handleScroll() {
                               </FormGroup> 
                           }
 
-                           <Popover 
+                           <Modal 
                           id="popover"
                           className="pop"
                             placement="right" 
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                               User should indicate whether the workout was easy or hard.
                               We will correlate your answer to this question to your perceived
@@ -1158,8 +1158,8 @@ handleScroll() {
                                of your workout, and/or your workout was generally difficult,
                                select Hard as the answer to this question.  
                                </div>
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
 
 
                         { (this.state.workout == "yes" || this.state.workout == "") &&
@@ -1202,14 +1202,14 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                         <Popover 
+                         <Modal 
                                     className="pop"
                                     id="popover" 
                                     placement="right" 
                                     isOpen={this.state.enjoybleInfo}
                                     target="enjoyble" 
                                     toggle={this.toggleEnjoyble}>
-                                      <PopoverBody>
+                                      <ModalBody className="modalcontent">
                                        <div>
                                         We encourage people to enjoy their workouts! When they do,
                                         they tend to exercise more frequently and don’t dread doing it.
@@ -1217,8 +1217,8 @@ handleScroll() {
                                           breathe in and out through your nose, and enjoy exercising easier. It has many benefits!
                                            One can get faster, fitter, and leaner by exercising easier.
                                          </div>                                                   
-                                      </PopoverBody>
-                                   </Popover> 
+                                      </ModalBody>
+                                   </Modal> 
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             <FormGroup>   
@@ -1268,14 +1268,14 @@ handleScroll() {
                             </FormGroup>
                           }
               
-                           <Popover 
+                           <Modal 
                                     className="pop"
                                     id="popover" 
                                     placement="right" 
                                     isOpen={this.state.workoutlevelInfo}
                                     target="workoutlevel" 
                                     toggle={this.toggleWorkoutLevel}>
-                                      <PopoverBody>
+                                      <ModalBody className="modalcontent">
                                        <div>
                                          As a general guideline, an effort level of 1-2 is super easy,
                                          barely moving. A 3-4 is an effort level that gets your heart rate up
@@ -1286,8 +1286,8 @@ handleScroll() {
                                           very hard to hold this pace for a long time. A 9 is very hard and you can’t hold this
                                           pace very long. A 10 is an all-out effort.
                                          </div>                                                   
-                                      </PopoverBody>
-                                   </Popover> 
+                                      </ModalBody>
+                                   </Modal> 
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>
@@ -1334,14 +1334,14 @@ handleScroll() {
                           </FormGroup>
                           }
 
-                          <Popover 
+                          <Modal 
                             className="pop"
                             id="popover" 
                             placement="right" 
                             isOpen={this.state.painInfo}
                             target="pain" 
                             toggle={this.togglePain}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                             Enter any twinges/pains here. Be honest. Staying healthy is critical to fitness.
                             We track all twinges and injuries so (1) you can get a picture of what is bothering 
@@ -1356,8 +1356,8 @@ handleScroll() {
                             might be good substitutes for running while injured. The most important thing is to get your
                             heart rate up most days without PAIN!
                                  </div>                                                   
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
 
 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
@@ -1396,14 +1396,14 @@ handleScroll() {
                             }
                           </FormGroup>
                         }
-                         <Popover 
+                         <Modal 
                             className="pop"
                             id="popover" 
                             placement="right" 
                             isOpen={this.state.waterInfo}
                             target="water" 
                             toggle={this.toggleWater}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                              Indicate how many ounces of water you consumed during your workout.
                              We encourage you to drink water when thirsty during your workouts
@@ -1421,8 +1421,8 @@ handleScroll() {
                              throughout the day also. Drink when thirsty and make sure not to drink
                              too much (which can also have negative ramifications on your health).
                                  </div>                                                   
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
 
                           
                           { (this.state.workout == "yes" || this.state.workout == "") &&
@@ -1463,14 +1463,14 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                        <Popover 
+                        <Modal 
                             className="pop"
                             id="popover" 
                             placement="right" 
                             isOpen={this.state.chaiseedsInfo}
                             target="chaiseeds" 
                             toggle={this.toggleChaiseeds}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                               We encourage everybody to consume chia seeds during their workout,                               
                               particularly runners and triathletes that do workouts/races longer
@@ -1490,8 +1490,8 @@ handleScroll() {
                                you to put chia seeds in your water bottle for every workout to get used to using them so
                                that you can use them easily on race day. 3 tablespoons of chia seeds is 150 calories!
                                </div>                             
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
 
                         
                           { (this.state.workout == "yes" || this.state.workout == "") &&
@@ -1530,14 +1530,14 @@ handleScroll() {
                                   }
                             </FormGroup>
                           }
-                           <Popover 
+                           <Modal 
                             className="pop"
                             id="popover" 
                             placement="right" 
                             isOpen={this.state.breatheInfo}
                             target="breathe" 
                             toggle={this.toggleBreathe}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                We encourage you to breathe in and out of your nose as much as possible.
                                Indicate what percent of your workout that you breathed in and out of your nose.
@@ -1563,8 +1563,8 @@ handleScroll() {
                                BELIEVE, you will NEVER be able to do it.  The benefits are vast to nose breathing, including getting
                                much faster as an athlete”
                                </div>                             
-                              </PopoverBody>
-                           </Popover>       
+                              </ModalBody>
+                           </Modal>       
                            
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
@@ -1624,14 +1624,14 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                        <Popover 
+                        <Modal 
                           id="popover"
                           className="pop"
                             placement="right" 
                             isOpen={this.state.fastedInfo}
                             target="fast" 
                             toggle={this.toggleFasted}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                 Did you eat anything 5 hours or less before your workout? If “Yes”,
                                 then you were not fasted and you should answer “No” to this question. Otherwise,
@@ -1642,8 +1642,8 @@ handleScroll() {
                                <div style={{paddingTop:"15px"}}>
                                   Some experts believe that exercising fasted may increase fat burning while exercising.
                                </div>                            
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
 
 
 
@@ -1686,14 +1686,14 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                        <Popover 
+                        <Modal 
                           id="popover"
                           className="pop"
                             placement="right" 
                             isOpen={this.state.commentInfo}
                             target="general" 
                             toggle={this.toggleComment}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                Enter any comments about your workout here, including but not limited to how you felt,
                                 pain/twinges, things you want to remember later, whether you worked out with somebody,
@@ -1701,8 +1701,8 @@ handleScroll() {
                                   level was harder or easier, why your pace was faster or slower, why you didn’t nose breathe
                                    as much, why you didn’t drink water), etc.
                                  </div>                                                       
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
 
                         { (this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>  
@@ -1747,14 +1747,14 @@ handleScroll() {
                       
                       
 
-                         <Popover 
+                         <Modal 
                           id="popover"
                           className="pop"
                             placement="right" 
                             isOpen={this.state.weatherInfo}
                             target="wether" 
                             toggle={this.toggleWeather}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                We encourage all users to enter weather information after each workout.
                                We track weather because it can have a HUGE impact on performance. We encourage
@@ -1773,8 +1773,8 @@ handleScroll() {
                                   We ask that you report your outdoor stats (temperature, humidity, dew point) even for indoor workouts,
                                   as things like humidity and dew point seep inside too.
                                </div>                            
-                              </PopoverBody>
-                           </Popover> 
+                              </ModalBody>
+                           </Modal> 
                          
                         <Collapse isOpen={this.state.weather_check}>
                          { (this.state.workout === "yes" || this.state.workout === "") &&                                                      
@@ -1987,14 +1987,14 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         <Popover 
+                         <Modal 
                             className="pop"
                             id="popover" 
                             placement="right" 
                             isOpen={this.state.hrrInfo}
                             target="hrr" 
                             toggle={this.toggleHrr}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                 HRR: Heart Rate Recovery Tracking after an aerobic workout (you do not need to do HRR after strength,
                                 a swim, or other non-aerobic exercise). We find that heart recovery is one of the truest indications
@@ -2019,8 +2019,8 @@ handleScroll() {
                               and (2) how long your heart rate takes to get to 99 (below 100). Based on your HRR results, we can make
                               exercise recommendations to help you achieve your goals.
                                </div>                             
-                              </PopoverBody>
-                           </Popover>       
+                              </ModalBody>
+                           </Modal>       
 
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
@@ -2348,14 +2348,14 @@ handleScroll() {
                             {this.renderProcessedFoodModal()}
                             </FormGroup>
                           </FormGroup>
-                           <Popover 
+                           <Modal
                            id="popover" 
                            className="pop"
                             placement="right" 
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
                             toggle={this.toggleUnprocessedInfo}>
-                              <PopoverBody>
+                              <ModalBody className="modalcontent">
                                <div>
                                We encourage people to eat as much unprocessed food as possible and if you
                                do eat processed foods, try and have the higher quality processed foods that
@@ -2464,8 +2464,8 @@ handleScroll() {
                                     ingredients, you know there is a lot of sugar and you should avoid the food in most instances.
 
                                </div>                      
-                              </PopoverBody>
-                           </Popover>       
+                              </ModalBody>
+                           </Modal>       
 
                           <FormGroup>
                                <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>

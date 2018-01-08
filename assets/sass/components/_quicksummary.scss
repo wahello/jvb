@@ -131,3 +131,46 @@ background-color: #777777;
    .navbar{                     
    	border-radius: 0px;
    }
+.daterange-btn{
+	font-family:futura-pt;
+    background-color: rgb(237, 149, 7);
+	border-radius: 0px;
+	border-color: rgb(237, 149, 7);		
+	font-size: 13px;
+	height: 40px;
+	color: white;
+}
+.dropbutton{
+	display:none;
+}
+
+@media (max-width:1500px){
+	.dropbutton{
+		display: inline;
+	}
+	.bikestats{
+		display:none;
+	}
+	.swimstats{
+		display: none;
+	}
+	.allstats{
+		display:none;
+	}
+	#dropuser{
+		display:none;
+	}
+}
+
+@media (max-width: 1100px){
+	.dropbutton{
+		display: inline;
+	}	
+	.userinputs{
+		display: none;
+	}
+	#dropuser{
+		display:inline;
+	}
+	
+}

@@ -18,7 +18,7 @@ export function renderQlFetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching Quicklooks from {start_date.format('MMM D, YYYY')} to {end_date.format('MMM D, YYYY')}  </p>
+					<p>Fetching Raw Data from {start_date.format('MMMM D, YYYY')} to {end_date.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
@@ -41,7 +41,7 @@ export function renderQlCreateOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Creating Quicklooks from {start_date.format('MMM D, YYYY')} to {end_date.format('MMM D, YYYY')}  </p>
+					<p>Creating Raw Data from {start_date.format('MMMM D, YYYY')} to {end_date.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
