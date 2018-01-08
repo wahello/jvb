@@ -69,7 +69,8 @@ const attrVerboseName = {
     prcnt_unprocessed_food_consumed_grade: 'Percentage of Unprocessed Food Grade',
     alcoholic_drink_per_week_grade: 'Alcoholic Drink Per Week Grade',
     sleep_aid_penalty:'Sleep Aid Penalty',
-    penalty: 'Penalty',
+    ctrl_subs_penalty:'Control Substance Penalty',
+    smoke_penalty:'Smoke Penalty',
 
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time)',
     sleep_per_user_input: 'Sleep Per User Input (excluding awake time)',
@@ -178,9 +179,9 @@ class AllStats1 extends Component{
                         else if(value !== '-' && value !== undefined && 
                            value !== "" && (key == 'deep_sleep' ||
                             key == 'light_sleep' || key == 'awake_time' ||
-                            key == 'sleep_per_wearable')){
-                            let hm = value.split(':');
-                            let time_str = `${hm[0]} hour ${hm[1]} min`;
+                            key == 'sleep_per_wearable' || key == 'workout_duration')){
+                            let hms = value.split(':');
+                            let time_str = `${hms[0]} hour ${hms[1]} min ${hms[2]} sec`;
                             all_data.push({value:time_str,
                                           style:{}});
                         }

@@ -50,10 +50,12 @@ def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
 
-def sec_to_hours_min(seconds):
+def sec_to_hours_min_sec(seconds):
 	seconds = int(seconds)
-	hour_min_str = "{}:{}".format(seconds//3600,(int((seconds/60)%60)))
-	return hour_min_str
+	m,s = divmod(seconds,60)
+	h,m = divmod(m,60)
+	hour_min_sec_str = "{}:{}:{}".format(h,m,s)
+	return hour_min_sec_str
 
 def meter_per_sec_to_pace_per_mile(mps):
 	'''
@@ -136,7 +138,9 @@ def get_blank_model_fields(model):
 			'avg_exercise_hr_grade':'',
 			'prcnt_unprocessed_food_consumed_grade':'',
 			'alcoholic_drink_per_week_grade':'' ,
-			'penalty':0
+			'sleep_aid_penalty':0,
+			'ctrl_subs_penalty':0,
+			'smoke_penalty':0,
 		}
 		return fields
 
@@ -246,19 +250,33 @@ def get_blank_model_fields(model):
 		}
 		return fields
 
-def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None):
+def get_garmin_model_data(model,user,start_epoch, end_epoch, order_by=None, filter_dup=False):
+
+	def filter_duplicate(qs):
+		filtered_qs = []
+		seen_summaries = {}
+		for summary in qs:
+			if not seen_summaries.get(summary.summary_id,None):
+				seen_summaries[summary.summary_id] = True
+				filtered_qs.append(summary)
+		return filtered_qs
+
 	if order_by:
-		data = [q.data for q in model.objects.filter(
-			Q(start_time_in_seconds__gte = start_epoch) &
-			Q(start_time_in_seconds__lt = end_epoch),
-			user = user).order_by(order_by)]
-		return data
+		summaries = model.objects.filter(
+				Q(start_time_in_seconds__gte = start_epoch) &
+				Q(start_time_in_seconds__lt = end_epoch),
+				user = user).order_by(order_by)
+		if filter_dup:
+			summaries = filter_duplicate(summaries)
+		return [q.data for q in summaries]
 	else:
-		data = [q.data for q in model.objects.filter(
+		summaries = model.objects.filter(
 			Q(start_time_in_seconds__gte = start_epoch)&
 			Q(start_time_in_seconds__lt = end_epoch),
-			user = user)]
-		return data
+			user = user)
+		if filter_dup:
+			summaries = filter_duplicate(summaries)
+		return [q.data for q in summaries]
 
 def get_weekly_data(data,to_date,from_date):
 	'''
@@ -395,11 +413,11 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 					target_sleep_data = obj
 
 	if target_sleep_data:
-		sleep_stats['deep_sleep'] = sec_to_hours_min(
+		sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
 									target_sleep_data.get('deepSleepDurationInSeconds'))
-		sleep_stats['light_sleep'] = sec_to_hours_min(
+		sleep_stats['light_sleep'] = sec_to_hours_min_sec(
 									target_sleep_data.get('lightSleepDurationInSeconds'))
-		sleep_stats['awake_time'] = sec_to_hours_min(
+		sleep_stats['awake_time'] = sec_to_hours_min_sec(
 									target_sleep_data.get('awakeDurationInSeconds'))
 		bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
 											 target_sleep_data.get('startTimeOffsetInSeconds'))
@@ -408,7 +426,7 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 											   target_sleep_data.get('durationInSeconds'))
 		sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
 							 - target_sleep_data.get('awakeDurationInSeconds',0)
-		sleep_stats['sleep_per_wearable'] = sec_to_hours_min(sleep_per_wearable)
+		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable)
 		if str_dt:
 			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
 			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
@@ -430,6 +448,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"distance_bike_miles": 0,
 		"distance_swim_yards": 0,
 		"distance_other_miles": 0,
+		"total_duration":0,
 		"pace":'',
 		"avg_heartrate":json.dumps({}),
 		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
@@ -459,6 +478,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 			activities_hr[obj_act]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj_act]['count'] += 1
+			activity_stats['total_duration'] += obj.get('durationInSeconds',0)
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -827,7 +847,12 @@ def cal_penalty(is_smoke,is_ctrl_subs,is_sleep_aid):
 	smoke_penalty = -3.1 if is_smoke == 'yes' else 0
 	ctrl_subs_penalty = -3.1 if is_ctrl_subs == 'yes' else 0
 	sleep_aid_penalty = -2 if is_sleep_aid == 'yes' else 0
-	return smoke_penalty + ctrl_subs_penalty + sleep_aid_penalty
+	penalties = {
+		"smoke_penalty":smoke_penalty,
+		"ctrl_subs_penalty":ctrl_subs_penalty,
+		"sleep_aid_penalty": sleep_aid_penalty
+	}
+	return penalties
 
 def cal_workout_duration_grade(duration_in_min):
 	if duration_in_min >= 60:
@@ -890,6 +915,7 @@ def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
 def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 	prange = _get_avg_hr_points_range(age, workout_easy_hard)
 	if prange and avg_heartrate:
+		grade,point = 'F',0
 		if avg_heartrate >= prange[4].min and avg_heartrate <= prange[4].max:
 			grade = 'A'
 			point = 4
@@ -949,13 +975,17 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 	grades = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
 	return grades 
 
-def get_workout_duration_grade(todays_activities):
+def get_workout_duration_grade(todays_activities, todays_manually_updated):
 	'''
 		Returns a tuple having grade and point (grade, point)
 	'''
 	duration = 0
+	# If same summary is edited manually then give it more preference.
+	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
+
 	if todays_activities:
 		for act in todays_activities:
+			act = manually_edited(act)
 			duration += act.get('durationInSeconds',0)
 	return cal_workout_duration_grade(duration//60)
 
@@ -969,10 +999,14 @@ def get_workout_effort_grade(todays_daily_strong):
 		workout_effort_level = ''
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
-def get_average_exercise_heartrate_grade(todays_activities,todays_daily_strong,age):
+def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
+										 todays_daily_strong,age):
 	filtered_activities = []
 	total_duration = 0
+	# If same summary is edited manually then give it more preference.
+	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
 	for i,act in enumerate(todays_activities):
+		act = manually_edited(act)
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
 			pass
 		elif 'swimming' in act.get('activityType','').lower():
@@ -1017,7 +1051,9 @@ def get_overall_grade(grades):
 	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
 	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
 	overall_workout_grade = grades.get('overall_workout_grade')
-	penalty = grades.get('penalty')
+	penalty = grades.get('sleep_aid_penalty')+\
+				grades.get('ctrl_subs_penalty')+\
+				grades.get('smoke_penalty')
 
 	gpa = round((GRADES[non_exercise_step_grade]+
 		   GRADES[movement_consistency_grade]+
@@ -1093,23 +1129,25 @@ def create_quick_look(user,from_date=None,to_date=None):
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
 
-		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch)
+		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch,
+										order_by ='-id',filter_dup = True)
 
 		# Get sleep data for yesterday
 		sleeps = get_garmin_model_data(UserGarminDataSleep,
 									   user,start_epoch-86400,end_epoch-86400,
-									   '-id')
+									   order_by = '-id')
 		sleeps_today = get_garmin_model_data(UserGarminDataSleep,
-											user, start_epoch,end_epoch,'-id')
-
+											user, start_epoch,end_epoch,order_by = '-id')
+ 
 		dailies = get_garmin_model_data(UserGarminDataDaily,user,
 										start_epoch,end_epoch,
-										'-start_time_duration_in_seconds')
+										order_by = '-start_time_duration_in_seconds')
 		stress = get_garmin_model_data(UserGarminDataStressDetails,user,start_epoch,end_epoch)
 
 		# pull data for past 7 days (including today)
 		manually_updated = get_garmin_model_data(UserGarminDataManuallyUpdated,user,
-			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch)
+			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch,
+			order_by = '-id', filter_dup = True)
 
 		# Already parsed from json to python objects
 		weekly_manual_activities = get_weekly_data(manually_updated,current_date,last_seven_days_date)
@@ -1118,7 +1156,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# pull data for past 7 days (incuding today)
 		activities = get_garmin_model_data(UserGarminDataActivity,user,
-			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch)
+			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch,
+			order_by = '-id', filter_dup = True)
 
 		# Already parsed from json to python objects
 		weekly_activities = get_weekly_data(activities,current_date,last_seven_days_date)
@@ -1183,6 +1222,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['distance_other'] = activity_stats['distance_other_miles']
 		exercise_calculated_data['pace'] = activity_stats['pace']
 		exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
+		exercise_calculated_data['workout_duration'] = sec_to_hours_min_sec(activity_stats['total_duration'])
 
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(todays_activities_json,
@@ -1252,7 +1292,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# **************************************CALCULATION OF GRADES**************************************
 		
 		# Workout duration grade calculation
-		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json)
+		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json,
+																 todays_manually_updated_json)
 		grades_calculated_data['workout_duration_grade'] = workout_duration_grade_pts[0]
 
 		# Workout effort level grade calculation
@@ -1261,7 +1302,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Average exercise heartrate grade calculation
 		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
-									todays_daily_strong, user.profile.age())
+									todays_manually_updated_json,todays_daily_strong, user.profile.age())
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		# Overall workout grade calculation
@@ -1309,17 +1350,14 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
 
 		# Penalty calculation
-		penalty = cal_penalty(
+		penalties = cal_penalty(
 			safe_get(todays_daily_strong,"smoke_any_substances_whatsoever",""),
 			safe_get(todays_daily_strong,"controlled_uncontrolled_substance",""),
 			safe_get(todays_daily_strong, "prescription_or_non_prescription_sleep_aids_last_night","")
 		)
-		grades_calculated_data["penalty"] = penalty
-
-		# sleep Aid Penalty
-		sleep_aid_taken = safe_get(todays_daily_strong,
-			"prescription_or_non_prescription_sleep_aids_last_night","")
-		grades_calculated_data["sleep_aid_penalty"] = -2 if sleep_aid_taken == 'yes' else 0
+		grades_calculated_data["sleep_aid_penalty"] = penalties['sleep_aid_penalty']
+		grades_calculated_data['ctrl_subs_penalty'] = penalties['ctrl_subs_penalty']
+		grades_calculated_data['smoke_penalty'] = penalties['smoke_penalty']
 
 		# Overall Grade and Overall GPA calculation
 		overall_grade_pt = get_overall_grade(grades_calculated_data)
