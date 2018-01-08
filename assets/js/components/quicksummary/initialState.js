@@ -31,8 +31,8 @@ export function getInitialState(start_dt, end_dt){
 		        "prcnt_unprocessed_food_consumed_grade": '-',
 		        "alcoholic_drink_per_week_grade": '-',
 		        "sleep_aid_penalty":'-',
-		        "penalty": '-'
-
+		        "ctrl_subs_penalty":'-',
+		        "smoke_penalty":'-'
 		},
 		"exercise_reporting_ql": {
 	        "workout_easy_hard": '-',

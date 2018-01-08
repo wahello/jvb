@@ -110,7 +110,8 @@ class Quicklook extends Component{
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
 			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
-			        penalty:data.grades_ql.penalty
+			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
+			        smoke_penalty:data.grades_ql.smoke_penalty
 	    		},
 
 			    exercise_reporting_ql: {
