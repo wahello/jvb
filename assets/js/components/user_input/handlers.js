@@ -41,7 +41,23 @@ export function handleChangeWorkoutDone(event){
         calories_item:'',
         fasted:'', 
         food_ate_before_workout:'',         
-        workout_comment:''
+        workout_comment:'',
+        measured_hr:'',
+        hr_down_99:'',
+        time_to_99_min:'',
+        time_to_99_sec:'',
+        hr_level:'',
+        lowest_hr_first_minute:'',
+        lowest_hr_during_hrr:'',
+        time_to_lowest_point_min:'',
+        time_to_lowest_point_sec:'',
+        indoor_temperature:'',
+        outdoor_temperature:'',
+        temperature_feels_like:'',
+        wind:'',
+        dewpoint:'',
+        humidity:'',
+        weather_comment:''
     });
   }else{
     this.setState({

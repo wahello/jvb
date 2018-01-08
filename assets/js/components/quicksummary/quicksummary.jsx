@@ -109,6 +109,7 @@ class Quicklook extends Component{
 			        avg_exercise_hr_grade: data.grades_ql.avg_exercise_hr_grade,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
+			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        penalty:data.grades_ql.penalty
 	    		},
 
@@ -176,7 +177,6 @@ class Quicklook extends Component{
 			        "exercise_steps": data.steps_ql.exercise_steps,
 			        "total_steps": data.steps_ql.total_steps,
 			        "floor_climed": data.steps_ql.floor_climed,
-			        "floor_decended": data.steps_ql.floor_decended
 			    },
 			    sleep_ql: {
 			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable,
@@ -186,7 +186,8 @@ class Quicklook extends Component{
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 			        deep_sleep: data.sleep_ql.deep_sleep,
 			        light_sleep: data.sleep_ql.light_sleep,
-			        awake_time: data.sleep_ql.awake_time
+			        awake_time: data.sleep_ql.awake_time,
+			        sleep_aid_penalty: data.grades_ql.sleep_aid_penalty
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
@@ -506,8 +507,11 @@ onLogoutSuccess(response){
 
 
             <span id="header">
-            <h2 className="head" id="head">Raw Data</h2>
+            <h2 className="head" id="head">Raw Data
+            
+            </h2>
             </span>
+             
 
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
@@ -593,74 +597,32 @@ onLogoutSuccess(response){
                                   </span>
 
                                   </span>
-
-                                   <span className="btn2">
-	                                  <Button
-	                                   id="nav-btn"
-	                                  style={{backgroundColor:"#ed9507"}}
-						         	   type="submit"
-						               className="btn btn-block-lg"
-						               onClick = {this.handleCreateQuicklook}>
-							               Create Raw Data Report
-								      </Button>
-                                   </span>
-                                    <a
-                                className="fonts"
+                                  <span id="spa">
+                                          <abbr  id="abbri">
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
+                                            <Button id="nav-btn" className="btn">Print</Button>
+                                           </a>
+                                          </abbr>
+                                          </span>
+                                   <a  
 					            id="daterange"
-					            style={{width:"88px",color:"white"}}
+					            style={{width:"150px",color:"white",fontSize:"16px",paddingLeft:"15px"}}
 					            onClick={this.toggleDate} >Date Range</a>
+                                    
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
-                                          <NavItem onClick={this.toggle}>
-                                          <span id="spa">
-                                            <abbr id="abbri"  title="All Stats">
-                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
-						    								 onClick={this.activateTab.bind(this,"allstats1")}>
-                                               All Stats
-                                              </NavLink>
-                                            </abbr>
-                                            </span>
-                                          </NavItem>
-
-                                        <NavItem onClick={this.toggle}>
+                                  			 <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Grades">
                                             <NavLink id="headernames" href="#" className={class_grade} value="grade"
 						    						 onClick={this.activateTab.bind(this,"grade")}>
-
-
-
-
-
                                              Grades
                                             </NavLink>
                                           </abbr>
                                           </span>
                                         </NavItem>
 
-                                        <NavItem onClick={this.toggle}>
-                                        <span id="spa">
-                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
-                                            <NavLink id="headernames" href="#" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>
-						    		 		Swim Stats
-                                            </NavLink>
-                                          </abbr>
-                                          </span>
-                                        </NavItem>
-
-                                        <NavItem onClick={this.toggle}>
-                                        <span id="spa">
-                                          <abbr  id="abbri"  title="Bike">
-                                            <NavLink id="headernames" href="#" className={class_bike} value="bike"
-							    		 			onClick={this.activateTab.bind(this,"bike")}>
-							    			 Bike Stats
-                                            </NavLink>
-                                          </abbr>
-                                          </span>
-                                        </NavItem>
-
-                                        <NavItem onClick={this.toggle}>
+                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Steps">
                                             <NavLink id="headernames" href="#" className={class_steps}  value="steps"
@@ -670,6 +632,18 @@ onLogoutSuccess(response){
                                           </abbr>
                                           </span>
                                        </NavItem>
+
+                                       	<NavItem onClick={this.toggle}>
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="User Inputs">
+                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>
+						    		 		 Movement Consistency
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
 
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
@@ -715,7 +689,6 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-
                                        	<NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="User Inputs">
@@ -727,28 +700,65 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                       	<NavItem onClick={this.toggle}>
+                                          <NavItem onClick={this.toggle}>
+                                          <span id="spa">
+                                            <abbr id="abbri"  title="All Stats">
+                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
+						    								 onClick={this.activateTab.bind(this,"allstats1")}>
+                                               All Stats
+                                              </NavLink>
+                                            </abbr>
+                                            </span>
+                                          </NavItem>
+
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="User Inputs">
-                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
-						    		 				onClick={this.activateTab.bind(this,"movement")}>
-						    		 		 Movement Consistency
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
+                                            <NavLink id="headernames" href="#" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>
+						    		 		Swim Stats
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>
+                                        </NavItem>
 
-                                       	<NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle}>
                                         <span id="spa">
-                                          <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
-                                            <Button id="nav-btn" className="btn">Print</Button>
-                                           </a>
+                                          <abbr  id="abbri"  title="Bike">
+                                            <NavLink id="headernames" href="#" className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>
+							    			 Bike Stats
+                                            </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>
+                                        </NavItem>
+
+                                       
+
+                                       
+
+                                       
+                                       
+                                       
+
+                                       
+                                       
+
+                                       
+                                       
                                   </Nav>
                                 </Collapse>
+
+                                         <span className="btn2">
+	                                  <Button
+	                                   id="nav-btn"
+	                                  style={{backgroundColor:"#ed9507"}}
+						         	   type="submit"
+						               className="btn btn-block-lg"
+						               onClick = {this.handleCreateQuicklook}>
+							               Create Raw Data Report
+								      </Button>
+                                   </span>
                            </Navbar>
 
 						 </div>

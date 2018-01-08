@@ -19,8 +19,7 @@ class Steps extends Component{
         {name: 'Non Exercise Steps'},
         {name: 'Exercise Steps'},
         {name: 'Total Steps'},
-        {name: 'Floors Climed'}, 
-        {name: 'Floors Decended'}
+        {name: 'Floors Climed'}
       ],
     };
   }
@@ -31,18 +30,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
-				if(key !== 'id' && key !== 'user_ql'){
-					if (key == 'movement_consistency'){
-                        let mc = value;
-                        if( mc != undefined && mc != "" && mc != "-"){
-                            mc = JSON.parse(mc);
-                            all_data.push(mc.inactive_hours);
-                        }
-
-                    }
-                    else{
-						all_data.push(value);
-                    }
+				if(key !== 'id' && key !== 'user_ql'){                  
+						all_data.push(value);                  
 				}
 			}
 

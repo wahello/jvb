@@ -73,16 +73,14 @@ margin-top: 46px;
 	color:#5e5e5e;
 }
 // @media (min-width: 1024px) {
+
 // form.user-inputs-form.bootstrap_validator{
 //     margin-left: 180px;
 // }
 // }
 
 @media (max-width: 1023px) {
-	table,tbody,th,td,tr{
-		width:100px;
-		font-size: 8px;
-	}
+	
 #body1{
 padding-top: 30px;
 }
@@ -462,5 +460,5 @@ textarea.form-control{
 .input1 thead,tr,td,th{
 	border: 1px solid #5e5e5e;
 	text-align: center;
-	width: 30px;
+	
 }

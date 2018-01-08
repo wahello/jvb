@@ -120,10 +120,11 @@ render(){
 								  	type="checkbox"
 								  	value=""
 								  	required
+								  	onClick={this.toggle}
 								  	component="input" 
 							   />
 							  <span className="custom-control-indicator"></span>
-							  <span className="custom-control-description">I Agree To The <span><a href="#" onClick={this.toggle}>Terms and Conditions</a></span></span>
+							  <span className="custom-control-description">I Agree To The Terms and Conditions</span>
 						</Label>
 
 						<Modal isOpen={this.state.modal} toggle={this.toggle} style={{ maxWidth: '52%' }}>

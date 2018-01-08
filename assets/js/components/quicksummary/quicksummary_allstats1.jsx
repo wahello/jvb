@@ -68,6 +68,7 @@ const attrVerboseName = {
     avg_exercise_hr_grade:'Average Exercise Heartrate Grade',
     prcnt_unprocessed_food_consumed_grade: 'Percentage of Unprocessed Food Grade',
     alcoholic_drink_per_week_grade: 'Alcoholic Drink Per Week Grade',
+    sleep_aid_penalty:'Sleep Aid Penalty',
     penalty: 'Penalty',
 
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time)',
@@ -83,7 +84,6 @@ const attrVerboseName = {
     exercise_steps: 'Exercise Steps',
     total_steps: 'Total Steps',
     floor_climed: 'Floor Climed',
-    floor_decended: 'Floor Decended',
     movement_consistency: 'Movement Consistency',
 
     avg_speed: 'Avg Speed (MPH) Bike',
@@ -167,7 +167,8 @@ class AllStats1 extends Component{
                             let mc = value;
                             if( mc != undefined && mc != "" && mc != "-"){
                                 mc = JSON.parse(mc);
-                                all_data.push(mc.inactive_hours);
+                                all_data.push({value:mc.inactive_hours,
+                                               style:{}});
                             }
                             else{
                                 all_data.push({value:'-',

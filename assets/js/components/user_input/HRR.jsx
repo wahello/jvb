@@ -258,10 +258,10 @@ toggle() {
 				}
 
 				{ (this.state.hr_down_99 == "yes") &&
-				  (this.state.lowest_hr_first_minute >= "70") &&
+				  (this.state.lowest_hr_first_minute >= "60") &&
 
-				 <div  className="input1">			       			       			    
-			         <table className="table-responsive">
+				 <div  className="table-responsive input1">			       			       			    
+			         <table className="table table-bordered">
 			         <thead>
 			         <th>HRR time to 99</th>
 			         <th>Heart rate starting point</th>
@@ -404,8 +404,8 @@ toggle() {
 				{ (this.state.hr_down_99 == "no") &&
 				  (this.state.lowest_hr_first_minute >= "70") &&
 				<FormGroup>
-				 <div className="input1">			       			       			         
-			         <table className="table-responsive">
+				 <div className="table-responsive input1">			       			       			         
+			         <table className="table table-bordered">
 			         <thead>
 			         <th>HRR Time to 99</th>
 			         <th>Heart rate starting point</th>

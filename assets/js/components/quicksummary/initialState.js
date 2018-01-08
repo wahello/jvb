@@ -30,6 +30,7 @@ export function getInitialState(start_dt, end_dt){
 		        "avg_exercise_hr_grade":'-',
 		        "prcnt_unprocessed_food_consumed_grade": '-',
 		        "alcoholic_drink_per_week_grade": '-',
+		        "sleep_aid_penalty":'-',
 		        "penalty": '-'
 
 		},
@@ -96,8 +97,7 @@ export function getInitialState(start_dt, end_dt){
 	        "non_exercise_steps": '-',
 	        "exercise_steps": '-',
 	        "total_steps": '-',
-	        "floor_climed": '-',
-	        "floor_decended": '-'
+	        "floor_climed": '-'
 	    },
 	    "sleep_ql": {
 	        "sleep_per_wearable": '-',
@@ -107,7 +107,8 @@ export function getInitialState(start_dt, end_dt){
 	        "sleep_awake_time": '-',
 	        "deep_sleep": '-',
 	        "light_sleep": '-',
-	        "awake_time": '-'
+	        "awake_time": '-',
+	        "sleep_aid_penalty":'-'
 	    },
 	    "food_ql": {
 	        "prcnt_non_processed_food": '-',
