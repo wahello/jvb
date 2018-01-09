@@ -112,7 +112,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			 <Table
 			 	className="responsive"
 		        rowsCount={rowsCount}
-		        rowHeight={65}
+		        rowHeight={80}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
@@ -125,7 +125,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 		              {this.state.columnAttributeName[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={220}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data)}

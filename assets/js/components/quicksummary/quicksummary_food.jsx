@@ -16,7 +16,7 @@ import { StyleSheet, css } from 'aphrodite';
 
 	 this.state = {
       myTableData: [
-        {name: 'Percentage of Unprocessed Food'},
+        {name: '% Non Processed Food'},
         {name: 'Non Processed Food'},
         {name: 'Diet Type'},       
       ],
@@ -29,8 +29,17 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){
+
 				if(key !== 'id' && key !== 'user_ql'){
-					all_data.push(value);
+					if(key === 'prcnt_non_processed_food'){
+						if(value !=='-' && value !==0){
+											
+						all_data.push(value+'%');
+							
+					}
+					else all_data.push(value);
+					}
+					else all_data.push(value);
 				}
 			}
 
@@ -105,7 +114,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 460;
+    return window.innerHeight - 410;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

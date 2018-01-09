@@ -16,6 +16,7 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.state = {
       myTableData: [
         {name: 'Sleep per Wearable (excluding awake time)'},
+         {name: 'Sleep Comments'},
         {name: 'Sleep Per User Input (excluding awake time)'},
         {name: 'Sleep Aid'},
         {name: 'Sleep Bed Time'}, 
@@ -84,7 +85,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={200}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"sleep_ql")}

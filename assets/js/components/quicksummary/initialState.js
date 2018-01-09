@@ -101,6 +101,7 @@ export function getInitialState(start_dt, end_dt){
 	    },
 	    "sleep_ql": {
 	        "sleep_per_wearable": '-',
+	        "sleep_comments": '-',
 	        "sleep_per_user_input": '-',
 	        "sleep_aid": '-',
 	        "sleep_bed_time": '-',

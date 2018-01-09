@@ -184,6 +184,7 @@ class Quicklook extends Component{
 			    },
 			    sleep_ql: {
 			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable,
+			         sleep_comments: data.sleep_ql.sleep_comments,
 			        sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			        sleep_aid: data.sleep_ql.sleep_aid,
 			        sleep_bed_time: data.sleep_ql.sleep_bed_time,

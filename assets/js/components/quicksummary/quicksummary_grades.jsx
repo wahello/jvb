@@ -50,15 +50,31 @@ renderTableColumns(dateWiseData,category,classes=""){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-            console.log(value);
+            console.log(key);
     //           var num = 18;
     // var n = num.toFixed(2)
     // document.write( n);
             if(key !== 'id' && key !== 'user_ql'){
+            if(key === 'overall_health_gpa'){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
+             else {
                 all_data.push({
                     value: value,
                     style: obj[value]
                 });
+            }
             }
         }
 
