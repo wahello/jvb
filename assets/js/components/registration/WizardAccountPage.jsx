@@ -88,8 +88,7 @@ constructor(props){
 
 
                          <Col xs="12" sm="9"  >
-                         <FontIcon style={{ width: 24, height: 24, padding: '12px 16px 0px 0px'}} className="fa fa-eye" />
-                    <Field 
+                                            <Field 
 						name = "password"
 						 type={this.state.type}
 						label="Password"
