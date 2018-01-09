@@ -32,7 +32,7 @@ JVB Health & Wellness
 		send_mail(
 			subject="New User Input" if instance_meta['created'] else "User Input Updated",
 			message = message,
-			from_email = "saumyag@s7inc.co",
+			from_email = "info@jvbwellness.com",
 			recipient_list = admin_users_email,
 			fail_silently = True  
 		)

@@ -309,8 +309,8 @@ class UserInputs extends React.Component{
 
           sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
           sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
-          sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
-          sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
+          sleep_bedtime:data.data.strong_input.sleep_bedtime? moment(data.data.strong_input.sleep_bedtime):null,
+          sleep_awake_time:data.data.strong_input.sleep_awake_time ? moment(data.data.strong_input.sleep_awake_time):null,
           awake_hours:data.data.strong_input.awake_time.split(':')[0],
           awake_mins:data.data.strong_input.awake_time.split(':')[1],
           sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
