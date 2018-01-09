@@ -107,8 +107,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = UserDailyInput
-		fields = ('user','created_at','updated_at','strong_input','encouraged_input',
-				  'optional_input')
+		fields = ('user','created_at','updated_at','timezone','strong_input',
+					'encouraged_input','optional_input')
 		
 		# fields = ('user','created_at','updated_at','strong_input','encouraged_input',
 		# 		  'optional_input','third_source_input','goals')

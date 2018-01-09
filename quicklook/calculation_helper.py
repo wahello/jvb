@@ -1277,6 +1277,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
+		sleeps_calculated_data['sleep_per_user_input'] = safe_get(todays_daily_strong,
+														'sleep_time_excluding_awake_time','')
 
 		# Food
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,

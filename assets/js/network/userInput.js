@@ -1,6 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
+import 'moment-timezone';
 
 axiosRetry(axios, { retries: 3}); 
 
@@ -12,6 +13,7 @@ function formatJSON(data){
 		    "user": 1,
 		    "created_at": "2017-10-04",
 		    "updated_at": "2017-10-04T18:25:23.129221Z",
+		    "timezone": "America/New_York",
 		    "strong_input": {
 		        "id": 1,
 		        "user_input": 18,
@@ -94,6 +96,7 @@ function formatJSON(data){
 
 	let json_data = {
 		"created_at":created_at,
+		"timezone":moment.tz.guess(),
 		"strong_input":{},   
 		"encouraged_input":{},
 		"optional_input":{}

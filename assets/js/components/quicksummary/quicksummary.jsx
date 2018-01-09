@@ -280,12 +280,12 @@ class Quicklook extends Component{
 		}
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
-		      	const date = dataitem.created_at;
+		      	const date = moment(dataitem.created_at).format('MM-DD-YY');
 		      	let obj = this.updateDateState(dataitem);
 		      	initial_state[date] = obj;
 		      }
 		      this.setState({
-		      	 selected_date:this.state.selected_date,
+		      	selected_date:this.state.selected_date,
 				data:initial_state,
 				visible:false,
 				fetching_ql:false,
@@ -321,7 +321,7 @@ class Quicklook extends Component{
 			}
 		    if (data.data.length > 0){
 			 	 for(var dataitem of data.data){
-			      	const date = dataitem.created_at;
+			      	const date = moment(dataitem.created_at).format('MM-DD-YY');
 			      	let obj = this.updateUserInputDateState(dataitem);
 			      	initial_state[date] = obj;
 			      }
@@ -557,7 +557,7 @@ onLogoutSuccess(response){
 						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="start_date"
-						           value={moment(this.state.start_date).format('MM-DD-YY')}
+						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 
 						        </div>
@@ -566,7 +566,7 @@ onLogoutSuccess(response){
 						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
 						          <Input type="date"
 						           name="end_date"
-						           value={moment(this.state.end_date).format('MM-DD-YY')}
+						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
 						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 
 						        </div>
