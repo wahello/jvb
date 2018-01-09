@@ -309,10 +309,10 @@ class UserInputs extends React.Component{
 
           sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
           sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
-          // sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
-          // sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
-          // awake_hours:data.data.strong_input.awake_time.split(':')[0],
-          // awake_mins:data.data.strong_input.awake_time.split(':')[1],
+          sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
+          sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
+          awake_hours:data.data.strong_input.awake_time.split(':')[0],
+          awake_mins:data.data.strong_input.awake_time.split(':')[1],
           sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
           prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
           sleep_aid_taken:have_strong_input?data.data.strong_input.sleep_aid_taken:'',
@@ -2144,7 +2144,6 @@ handleScroll() {
                             }                          
                           </FormGroup>
 
-                          {/*
                            <FormGroup>
                           
                             <Label className="padding">2.1 Sleep Bed Time</Label>
@@ -2248,7 +2247,6 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-                        */}
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>

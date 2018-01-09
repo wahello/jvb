@@ -58,6 +58,7 @@ class UserDailyInput(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateField()
     updated_at = models.DateTimeField(auto_now=True)
+    timezone = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         dtime = str(self.created_at)
