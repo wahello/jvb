@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication 
 
-from .serializers import UserDailyInputSerializer
+from user_input.serializers import UserDailyInputSerializer
 
-from .models import UserDailyInput
+from user_input.models import UserDailyInput
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):
