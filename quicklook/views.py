@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import ast
 import xlwt
+from xlwt import easyxf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -231,6 +232,7 @@ def export_users_xls(request):
 	style = xlwt.XFStyle()
 	style.num_format_str = 'MM-D-YY'
 	base_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left")
+	# perc_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left ;num_format_str : '0%'")
 	f_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour red;")
 	ab_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour green;")
 	cd_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour yellow;")
@@ -404,13 +406,17 @@ def export_users_xls(request):
 		col_num2 = col_num2 + 1
 		ws.write(col_num2, row_num - a, columns6W[col_num],base_style)
 	i1 = 45
+	style_percent = easyxf(num_format_str='0.00%')
 	rows5 = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	for row in rows5:
 		row_num += 1
 		for i, key in enumerate(columns6):
-			ws.write(i1 + i + 1, row_num - a, row[key],base_style)
+			if key == 'prcnt_non_processed_food':
+				ws.write(i1 + i + 1, row_num - a, str(int(row[key]))+ '%')
+			else:
+				ws.write(i1 + i + 1, row_num - a, row[key],base_style)
 
 	#Alcohol
 	font_style = xlwt.XFStyle()
@@ -645,7 +651,10 @@ def export_users_xls(request):
 	for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			ws6.write(i + 2, row_num, row[key], base_style)
+			if key == 'prcnt_non_processed_food':
+				ws6.write(i + 2, row_num, str(int(row[key])) + '%')
+			else:
+				ws6.write(i + 2, row_num, row[key], base_style)
 	# Alcohol sheet
 	ws7.set_panes_frozen(True)
 	ws7.set_horz_split_pos(1)
