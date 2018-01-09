@@ -88,7 +88,7 @@ constructor(props){
 
 
                          <Col xs="12" sm="9"  >
-                    <Field 
+                                            <Field 
 						name = "password"
 						 type={this.state.type}
 						label="Password"

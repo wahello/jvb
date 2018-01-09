@@ -50,11 +50,18 @@ def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
 
-def sec_to_hours_min_sec(seconds):
+def sec_to_hours_min_sec(seconds,include_sec = True):
 	seconds = int(seconds)
 	m,s = divmod(seconds,60)
 	h,m = divmod(m,60)
-	hour_min_sec_str = "{}:{}:{}".format(h,m,s)
+	if s < 10:
+		s = "{:02d}".format(s)
+	if m < 10:
+		m = "{:02d}".format(m) 
+	if include_sec:
+		hour_min_sec_str = "{}:{}:{}".format(h,m,s)
+	else:
+		hour_min_sec_str = "{}:{}".format(h,m)
 	return hour_min_sec_str
 
 def meter_per_sec_to_pace_per_mile(mps):
@@ -414,11 +421,14 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 
 	if target_sleep_data:
 		sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('deepSleepDurationInSeconds'))
+									target_sleep_data.get('deepSleepDurationInSeconds'),
+									include_sec=False)
 		sleep_stats['light_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('lightSleepDurationInSeconds'))
+									target_sleep_data.get('lightSleepDurationInSeconds'),
+									include_sec=False)
 		sleep_stats['awake_time'] = sec_to_hours_min_sec(
-									target_sleep_data.get('awakeDurationInSeconds'))
+									target_sleep_data.get('awakeDurationInSeconds'),
+									include_sec=False)
 		bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
 											 target_sleep_data.get('startTimeOffsetInSeconds'))
 		awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
@@ -426,7 +436,7 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 											   target_sleep_data.get('durationInSeconds'))
 		sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
 							 - target_sleep_data.get('awakeDurationInSeconds',0)
-		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable)
+		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
 		if str_dt:
 			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
 			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")

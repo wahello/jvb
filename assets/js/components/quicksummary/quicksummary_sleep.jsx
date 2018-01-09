@@ -41,8 +41,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 						key == 'light_sleep' ||
 						key == 'awake_time' ||
 						key == 'sleep_per_wearable')){
-						let hms = value.split(':');
-						let time_str = `${hms[0]} hour ${hms[1]} min ${hms[2]} sec`;
+						let hm = value.split(':');
+						let time_str = `${hm[0]} hour ${hm[1]} min`;
 						all_data.push(time_str);
 					}
 					else all_data.push(value);
