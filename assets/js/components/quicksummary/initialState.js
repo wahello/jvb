@@ -4,14 +4,14 @@ export function getInitialState(start_dt, end_dt){
 	start_dt = moment(start_dt);
 	end_dt = moment(end_dt);
 	var initial_state = {};
-	initial_state[end_dt.format('YYYY-MM-DD')] = {};
+	initial_state[end_dt.format('MM-DD-YY')] = {};
 
 	var diff = end_dt.diff(start_dt, 'days');
 
 	let tmp_end_date = moment(end_dt);
 	for(var i=0; i<diff; i++){
 		var dt = tmp_end_date.subtract(1,'days');
-		var current_dt = dt.format('YYYY-MM-DD');
+		var current_dt = dt.format('MM-DD-YY');
 		initial_state[current_dt]={};
  	}
  		 	
@@ -31,8 +31,8 @@ export function getInitialState(start_dt, end_dt){
 		        "prcnt_unprocessed_food_consumed_grade": '-',
 		        "alcoholic_drink_per_week_grade": '-',
 		        "sleep_aid_penalty":'-',
-		        "penalty": '-'
-
+		        "ctrl_subs_penalty":'-',
+		        "smoke_penalty":'-'
 		},
 		"exercise_reporting_ql": {
 	        "workout_easy_hard": '-',

@@ -126,6 +126,11 @@ renderTableColumns(dateWiseData,category,classes=""){
                     (key == 'temperature_feels_like' && (value && value != '-'))){
                 all_data.push(this.toFahrenheit(value).toFixed(2));
             }
+            else if(key == 'workout_duration' && value && (value != '-' && value != '')){
+                let hms = value.split(':');
+                let time_str = `${hms[0]} hour ${hms[1]} min ${hms[2]} sec`;
+                all_data.push(time_str);
+            }
             else
                 all_data.push(value);
 

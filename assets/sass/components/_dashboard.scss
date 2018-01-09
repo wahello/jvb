@@ -1,10 +1,8 @@
+body{
+	overflow-x: hidden !important;
+}
 .padding{
 	padding-top: 7px;
-}
-.dashboard h3{
-	text-align: left;
-	align-items: center;
-	border-collapse: collapse;
 }
 .dashboard table,th,tr,td{
 	border-collapse: collapse;
@@ -14,4 +12,14 @@
 
 .tablecenter{
 	padding-top: 14px;
+}
+.createbutton{
+		font-family:futura-pt;
+		background-color: rgb(237, 149, 7);
+		border-radius: 0px;
+		border-color: rgb(237, 149, 7);
+		height: 49px;
+		padding: 0px 20px;
+		font-size: 14px;
+
 }

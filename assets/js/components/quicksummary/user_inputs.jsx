@@ -48,6 +48,7 @@ import { Alert } from 'reactstrap';
 		{name: "Did you take controlled or uncontrolled substance today?"},
 		{name: "Dewpoint"},
 		{name: "Workout effort level of hard portion"},
+		{name: "Humidity"},
   		{name: "Indoor Temperature"},
 		{name: "What processed food you consumed yesterday?"},
 		{name: "What unprocessed food you consumed yesterday"},
@@ -98,6 +99,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			        width={200}
 				/>
 			);
+			console.log(keys);
 		}
 		return columns;
 	}

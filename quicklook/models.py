@@ -43,7 +43,8 @@ class Grades(models.Model,):
 															 max_length=3, blank=True)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
 	sleep_aid_penalty = models.FloatField(blank=True, null=True)
-	penalty = models.FloatField(blank=True, null=True)
+	ctrl_subs_penalty = models.FloatField(blank=True, null=True)
+	smoke_penalty = models.FloatField(blank=True, null=True)
 
 class ExerciseAndReporting(models.Model):
 	Low = 'low'

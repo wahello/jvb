@@ -29,7 +29,8 @@ import NumberFormat from 'react-number-format';
         {name: 'Percentage of Unprocessed Food Grade'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
         {name: 'Sleep Aid Penalty'},
-        {name: 'Penalty'}              
+        {name: 'Control Substance Penalty'},
+        {name: 'Smoke Penalty'}              
       ],
     };
   }

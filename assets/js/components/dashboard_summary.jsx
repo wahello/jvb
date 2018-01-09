@@ -91,15 +91,18 @@ constructor(props){
         </Navbar>
 
       </div>                 
-
+            <div className="row justify-content-center ">
+            <Button className="btn createbutton">Create PDF</Button>
+            </div>
 			<div className="col-sm-12 col-md-12 col-lg-12 padding">
 			<div className="row">
-			<div className="col-md-6 tablecenter">
+			<div className="col-md-6">
 			<div className="table-responsive"> 
    		 <table className="table table-bordered zui-table">
          <thead>
             <tr>
                 <th className="headcol">Overall Health Grade</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -146,76 +149,13 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<div className="table-responsive"> 
-    <table className="table table-bordered">
-        <thead>
-            <tr>
-                
-                <th>Non Exercise Steps</th>
-                <th>Today</th>
-                <th>Yesterday</th>
-                <th>Avg Last 7 Days</th>
-                <th>Avg Last 30 Days</th>
-                <th>Avg Year to Date</th>
-            
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Non Exercise Steps(NES)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-               <td>Rank against other users</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Movement-Non Exercise Steps Grade</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-            	<td>Non Exercise Steps GPA</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-             <tr>
-            	<td>Total Steps</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-</div>
-
-</div>
-
-<div className="row padding">
-			<div className="col-md-6 tablecenter">
-			<div className="table-responsive"> 
+	<div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
              
                 <tr>
                 <th>Sleep Per Night(excluding awake time)</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -232,9 +172,11 @@ constructor(props){
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
             <tr>
                <td>Rank against other users</td>
+               <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -248,9 +190,81 @@ constructor(props){
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
             <tr>
-            	<td>Overall Sleep GPA</td>
+                <td>Overall Sleep GPA</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>		
+</div>
+
+</div>
+
+<div className="row padding">
+			<div className="col-md-6">
+<div className="table-responsive"> 
+    <table className="table table-bordered">
+        <thead>
+            <tr>
+                
+                <th>Non Exercise Steps</th>
+                <th>Custom Date Range</th>
+                <th>Today</th>
+                <th>Yesterday</th>
+                <th>Avg Last 7 Days</th>
+                <th>Avg Last 30 Days</th>
+                <th>Avg Year to Date</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Non Exercise Steps</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+               <td>Rank against other users</td>
+               <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Movement-Non Exercise Steps Grade</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Non Exercise Steps GPA</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+             <tr>
+                <td>Total Steps</td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -269,6 +283,7 @@ constructor(props){
            
                 <tr>
                 <th>Movement Consistency</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -318,13 +333,14 @@ constructor(props){
 </div>
 
 <div className="row padding">
-			<div className="col-md-6 tablecenter">
-			<div className="table-responsive"> 
+			<div className="col-md-6">
+<div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
             <tr>
                 
-                <th>Exercise Consistency</th>
+                <th>Alcohol</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -335,7 +351,7 @@ constructor(props){
         </thead>
         <tbody>
             <tr>
-                <td>Avg # of Days Exercised/Week</td>
+                <td>Average Drinks Per Week (7 Days)</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -351,7 +367,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>Exercise Consistency Grade</td>
+                <td>Alcoholic drinks per week Grade</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -359,7 +375,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-            	<td>Exercise Consistency GPA</td>
+                <td>Alcoholic drinks per week GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -372,12 +388,13 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<div className="table-responsive"> 
+<div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
             <tr>
                 
-                <th>Nutrition</th>
+                <th>Other Stats</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -388,7 +405,7 @@ constructor(props){
         </thead>
         <tbody>
             <tr>
-                <td>% Unprocessed Food of the volume of food consum</td>
+                <td>HRR (time to 99)</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -396,7 +413,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-               <td>Rank against other users</td>
+               <td>HRR (heart beats lowered in 1st minute)</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -404,7 +421,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>% Non Processed Food Consumed Grade</td>
+                <td>HRR (higest heart rate in 1st minute)</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -412,7 +429,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-            	<td>% Non Processed Food Consumed GPA</td>
+                <td>HRR (lowest heart rate point)</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -426,13 +443,14 @@ constructor(props){
 
 </div>
 <div className="row padding">
-			<div className="col-md-6 tablecenter">
+			<div className="col-md-6">
 			<div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
             <tr>
                 
                 <th>Exercise Stats</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -529,12 +547,13 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<div className="table-responsive"> 
+	<div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
             <tr>
                 
-                <th>Alcohol</th>
+                <th>Exercise Consistency</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -545,7 +564,7 @@ constructor(props){
         </thead>
         <tbody>
             <tr>
-                <td>Average Drinks Per Week (7 Days)</td>
+                <td>Avg # of Days Exercised/Week</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -561,7 +580,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>Alcoholic drinks per week Grade</td>
+                <td>Exercise Consistency Grade</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -569,7 +588,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-            	<td>Alcoholic drinks per week GPA</td>
+                <td>Exercise Consistency GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -578,14 +597,15 @@ constructor(props){
             </tr>
         </tbody>
     </table>
-</div>
+</div>		
 <div className="padding">
-<div className="table-responsive"> 
+            <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
             <tr>
                 
-                <th>Other Stats</th>
+                <th>Nutrition</th>
+                <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -596,7 +616,7 @@ constructor(props){
         </thead>
         <tbody>
             <tr>
-                <td>HRR (time to 99)</td>
+                <td>% of Unprocessed Food Consumed</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -604,7 +624,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-               <td>HRR (heart beats lowered in 1st minute)</td>
+               <td>Rank against other users</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -612,7 +632,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>HRR (higest heart rate in 1st minute)</td>
+                <td>% Non Processed Food Consumed Grade</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -620,7 +640,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-            	<td>HRR (lowest heart rate point)</td>
+                <td>% Non Processed Food Consumed GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
