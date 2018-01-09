@@ -16,6 +16,7 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.state = {
       myTableData: [
         {name: 'Sleep per Wearable (excluding awake time)'},
+         {name: 'Sleep Comments'},
         {name: 'Sleep Per User Input (excluding awake time)'},
         {name: 'Sleep Aid'},
         {name: 'Sleep Bed Time'}, 
@@ -41,7 +42,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 						key == 'awake_time' ||
 						key == 'sleep_per_wearable')){
 						let hm = value.split(':');
-						let time_str = `${hm[0]} hour ${hm[1]} min`;
+						let time_str = `${hm[0]} : ${hm[1]} `;
 						all_data.push(time_str);
 					}
 					else all_data.push(value);
@@ -84,7 +85,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={200}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"sleep_ql")}

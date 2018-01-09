@@ -72,6 +72,7 @@ const attrVerboseName = {
     penalty: 'Penalty',
 
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time)',
+     sleep_comments:'Sleep Comments',
     sleep_per_user_input: 'Sleep Per User Input (excluding awake time)',
     sleep_aid: 'Sleep Aid',
     sleep_bed_time: 'Sleep Bed Time',
@@ -91,7 +92,7 @@ const attrVerboseName = {
     avg_speed_per_mile: 'Asvg Speed Per Mile',
     avg_cadence: 'Avg Cadence Bike',
 
-    prcnt_non_processed_food: 'Percentage of Unprocessed Food',
+    prcnt_non_processed_food: '% Non Processed Food',
     non_processed_food: 'Non Processed Food',
     diet_type: 'Diet Type',
 

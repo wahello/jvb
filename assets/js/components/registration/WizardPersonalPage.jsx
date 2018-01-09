@@ -67,8 +67,8 @@ class WizardPersonalPage extends Component{
 
 						<Field
 							name = "date_of_birth"
-							type = "date"
-							dateFormat="MM/DD/YYYY"
+							type = "datepicker"
+							dateFormat="mm/dd/yyyy"
 							label = "Date of Birth"
 							placeholder = "mm/dd/yyyy"
 							value=""
