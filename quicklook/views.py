@@ -233,9 +233,9 @@ def export_users_xls(request):
 	style.num_format_str = 'MM-D-YY'
 	base_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left")
 	# perc_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left ;num_format_str : '0%'")
-	f_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour red;")
-	ab_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour green;")
-	cd_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour yellow;")
+	f_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour red;")
+	ab_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour green;")
+	cd_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour yellow;")
 
 	#All Status
 	# Grades
@@ -351,6 +351,7 @@ def export_users_xls(request):
 	# Steps
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
+	style_percent = easyxf("num_format_str:'#,##0'")
 	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed']
 	ws.write(28, 0, "Steps",font_style)
@@ -368,9 +369,9 @@ def export_users_xls(request):
 		row_num += 1
 		for i,key in enumerate(columns4):
 			if(key == 'movement_consistency' and row[key]):
-				ws.write(i1+i+1,row_num - a, ast.literal_eval(row[key])['inactive_hours'],base_style)
+				ws.write(i1+i+1,row_num - a, ast.literal_eval(row[key])['inactive_hours'],style_percent)
 			else:
-				ws.write(i1+i+1,row_num - a, row[key],base_style)
+				ws.write(i1+i+1,row_num - a, row[key],style_percent)
 
 	# Sleep
 	font_style = xlwt.XFStyle()
@@ -406,7 +407,6 @@ def export_users_xls(request):
 		col_num2 = col_num2 + 1
 		ws.write(col_num2, row_num - a, columns6W[col_num],base_style)
 	i1 = 45
-	style_percent = easyxf(num_format_str='0.00%')
 	rows5 = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
