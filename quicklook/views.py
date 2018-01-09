@@ -203,8 +203,8 @@ def export_users_xls(request):
 		request.user.username,from_date,to_date
 	)
 
-	to_date = datetime.strptime(to_date, "%m-%d-%Y").date()
-	from_date = datetime.strptime(from_date, "%m-%d-%Y").date()
+	to_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+	from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
 	response = HttpResponse(content_type='application/ms-excel')
 	response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_download_name)
 
@@ -241,12 +241,12 @@ def export_users_xls(request):
 			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
 			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
 			   'avg_exercise_hr_grade','prcnt_unprocessed_food_consumed_grade','alcoholic_drink_per_week_grade',
-			   'sleep_aid_penalty','penalty']
+			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
 	columnsw = ['Overall Health Grade','Overall Health Gpa','Movement Non Exercise Steps Grade',
 			   'Movement Consistency Grade','Avg Sleep Per Night Grade','Exercise Consistency Grade',
 			   'Overall Workout Grade','Workout Duration Grade','Workout Effort Level Grade',
 			   'Average Exercise Heartrate Grade','Percentage of Unprocessed Food Grade','Alcoholic Drink Per Week Grade',
-			   'Sleep Aid Penalty','Penalty']
+			   'Sleep Aid Penalty','Control Substance Penalty','Smoke Penalty']
 	current_date = to_date
 	created1 = list(UserQuickLook.objects.filter(created_at__isnull=False).values())
 	date2 = []
@@ -262,7 +262,7 @@ def export_users_xls(request):
 			date1.append(current_date)
 			current_date -= timedelta(days = 1)
 
-	ws.write(0,0,"All Stats()",font_style)
+	ws.write(0,0,"All Stats(month-day-year)",font_style)
 	ws.write(2,0,"Grades",font_style)
 	col_num1 = 2
 	for col_num in range(len(columnsw)):
@@ -438,11 +438,11 @@ def export_users_xls(request):
 	ws1.col(0).width = int(40 * 260)
 	for d in range(1, 256, 1):
 		ws1.col(d).width = int(10 * 260)
-	columns = ['overall_health_grade', 'overall_health_gpa', 'movement_non_exercise_steps_grade',
-			   'movement_consistency_grade', 'avg_sleep_per_night_grade', 'exercise_consistency_grade',
-			   'overall_workout_grade', 'workout_duration_grade', 'workout_effortlvl_grade',
-			   'avg_exercise_hr_grade', 'prcnt_unprocessed_food_consumed_grade', 'alcoholic_drink_per_week_grade',
-			   'sleep_aid_penalty','penalty']
+	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade',
+			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
+			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
+			   'avg_exercise_hr_grade','prcnt_unprocessed_food_consumed_grade','alcoholic_drink_per_week_grade',
+			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -554,13 +554,40 @@ def export_users_xls(request):
 	rows = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
-	for row in rows:
+	rowsg = Grades.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
+	for a1,b1 in zip(rows,rowsg):
+		# print (a1,b1)
+	# for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			if(key == 'movement_consistency' and row[key]):
-				ws4.write(i+2,row_num , ast.literal_eval(row[key])['inactive_hours'],base_style)
-			else:
-				ws4.write(i+2,row_num , row[key],base_style)
+			# if(key == 'movement_consistency' and row[key]):
+			# 	ws4.write(i+2,row_num , ast.literal_eval(a1[key])['inactive_hours'],base_style)
+			# else:
+			# 	ws4.write(i+2,row_num , row[key],base_style)
+				if i == 1 and b1['movement_non_exercise_steps_grade'] == 'A':
+					ws4.write(i + 2, row_num, a1[key], ab_style)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'B':
+					ws4.write(i + 2, row_num, a1[key], ab_style)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'C':
+					ws4.write(i + 2, row_num, a1[key], cd_style)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'D':
+					ws4.write(i + 2, row_num, a1[key], cd_style)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'F':
+					ws4.write(i + 2, row_num, a1[key], f_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], ab_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], ab_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], cd_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], cd_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], f_style)
+				else:
+					ws4.write(i + 2, row_num, a1[key], base_style)
 
 	# sleep stats sheet
 	ws5.set_panes_frozen(True)
@@ -646,14 +673,10 @@ def export_users_xls(request):
 	rowsg = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	alcohol_choices = Grades._meta.get_field('alcoholic_drink_per_week_grade')
-	print(alcohol_choices)
 	rowg = []
 	for a,b in zip (rows,rowsg):
 		# print(a,b)
 
-	# for rowg in rowsg:
-	# 	for row in rows:
 			row_num += 1
 
 			for i, key in enumerate(columns):
