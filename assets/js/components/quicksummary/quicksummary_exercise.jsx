@@ -13,7 +13,7 @@ const attrVerboseName = {
     workout_type: 'Workout Type',
     workout_time: 'Workout Time',
     workout_location: 'Workout Location',
-    workout_duration: 'Workout Duration',
+    workout_duration: 'Workout Duration (hh:mm:ss)',
     maximum_elevation_workout: 'Maximum Elevation Workout',
     minutes_walked_before_workout: 'Minutes Walked Before Workout',
     distance_run: 'Distance (In Miles) - Run', 
