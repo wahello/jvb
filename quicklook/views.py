@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import ast
 import xlwt
+from xlwt import easyxf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -198,7 +199,7 @@ class SleepListView(generics.ListCreateAPIView):
 def export_users_xls(request):
 	to_date = request.GET.get('to_date',None)
 	from_date = request.GET.get('from_date', None)
-
+	print(to_date)
 	file_download_name = '{}_raw_data_{}_to_{}.xls'.format(
 		request.user.username,from_date,to_date
 	)
@@ -229,11 +230,12 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	style = xlwt.XFStyle()
-	style.num_format_str = 'YYYY-MM-D'
+	style.num_format_str = 'MM-D-YY'
 	base_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left")
-	f_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour red;")
-	ab_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour green;")
-	cd_style = xlwt.easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour yellow;")
+	# perc_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left ;num_format_str : '0%'")
+	f_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour red;")
+	ab_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour green;")
+	cd_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour yellow;")
 
 	#All Status
 	# Grades
@@ -241,7 +243,12 @@ def export_users_xls(request):
 			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
 			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
 			   'avg_exercise_hr_grade','prcnt_unprocessed_food_consumed_grade','alcoholic_drink_per_week_grade',
-			   'sleep_aid_penalty','penalty']
+			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
+	columnsw = ['Overall Health Grade','Overall Health Gpa','Movement Non Exercise Steps Grade',
+			   'Movement Consistency Grade','Avg Sleep Per Night Grade','Exercise Consistency Grade',
+			   'Overall Workout Grade','Workout Duration Grade','Workout Effort Level Grade',
+			   'Average Exercise Heartrate Grade','Percentage of Unprocessed Food Grade','Alcoholic Drink Per Week Grade',
+			   'Sleep Aid Penalty','Control Substance Penalty','Smoke Penalty']
 	current_date = to_date
 	created1 = list(UserQuickLook.objects.filter(created_at__isnull=False).values())
 	date2 = []
@@ -257,12 +264,12 @@ def export_users_xls(request):
 			date1.append(current_date)
 			current_date -= timedelta(days = 1)
 
-	ws.write(0,0,"All Stats",font_style)
+	ws.write(0,0,"All Stats(month-day-year)",font_style)
 	ws.write(2,0,"Grades",font_style)
 	col_num1 = 2
-	for col_num in range(len(columns)):
+	for col_num in range(len(columnsw)):
 		col_num1 = col_num1 + 1
-		ws.write(col_num1, row_num, columns[col_num], base_style)
+		ws.write(col_num1, row_num, columnsw[col_num], base_style)
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -303,17 +310,18 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns1 = ['pace_per_100_yard','total_strokes']
-	ws.write(17, 0, "Swim_Status",font_style)
-	col_num2 = 17
+	columns1W = ['Pace Per 100 Yard','Total Strokes']
+	ws.write(19, 0, "Swim_Status",font_style)
+	col_num2 = 19
 	a = len(rows)
-	for col_num1 in range(len(columns1)):
+	for col_num1 in range(len(columns1W)):
 			col_num2 = col_num2 + 1
-			ws.write(col_num2 , row_num - a  , columns1[col_num1],base_style)
+			ws.write(col_num2 , row_num - a  , columns1W[col_num1],base_style)
 	rows1 = SwimStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	a = len(rows)
-	i1 = 17
+	i1 = 19
 	for row in rows1:
 		row_num += 1
 		for i,key in enumerate(columns1):
@@ -323,17 +331,18 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns3 = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
-	ws.write(21, 0, "Bike_Status",font_style)
-	col_num2 = 21
+	columns3W = ['Avg Speed (MPH) Bike', 'Avg Power Bike','Avg_Speed Per Mile','Avg Cadence Bike']
+	ws.write(23, 0, "Bike_Status",font_style)
+	col_num2 = 23
 	a = len(rows) + len(rows1)
-	for col_num in range(len(columns3)):
+	for col_num in range(len(columns3W)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a, columns3[col_num],base_style)
+		ws.write(col_num2, row_num - a, columns3W[col_num],base_style)
 	rows2 = BikeStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	a = len(rows) + len(rows1)
-	i1 = 21
+	i1 = 23
 	for row in rows2:
 		row_num += 1
 		for i,key in enumerate(columns3):
@@ -342,41 +351,49 @@ def export_users_xls(request):
 	# Steps
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
-	columns4 = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','movement_consistency']
-	ws.write(27, 0, "Steps",font_style)
-	col_num2 = 27
+	font_style1 = xlwt.XFStyle()
+	font_style1.num_format_str='#,##0'
+	alignment = xlwt.Alignment()
+	alignment.horz = xlwt.Alignment.HORZ_LEFT
+	font_style1.alignment = alignment
+	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
+	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed']
+	ws.write(29, 0, "Steps",font_style)
+	col_num2 = 29
 	a = len(rows) + len(rows1) + len(rows2)
-	for col_num in range(len(columns4)):
+	for col_num in range(len(columns4W)):
 		 col_num2 = col_num2 + 1
-		 ws.write(col_num2,row_num - a, columns4[col_num], base_style)
+		 ws.write(col_num2,row_num - a, columns4W[col_num], base_style)
 	rows3 = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	i1 = 27
+	i1 = 29
 	a = len(rows) + len(rows1) + len(rows2)
 	for row in rows3:
 		row_num += 1
 		for i,key in enumerate(columns4):
 			if(key == 'movement_consistency' and row[key]):
-				ws.write(i1+i+1,row_num - a, ast.literal_eval(row[key])['inactive_hours'],base_style)
+				ws.write(i1+i+1,row_num - a, ast.literal_eval(row[key])['inactive_hours'],font_style1)
 			else:
-				ws.write(i1+i+1,row_num - a, row[key],base_style)
+				ws.write(i1+i+1,row_num - a, row[key],font_style1)
 
 	# Sleep
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns5 = ['sleep_per_wearable', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
-	ws.write(35, 0, "Sleep",font_style)
-	col_num2 = 35
+	columns5W = ['Sleep per Wearable (excluding awake time)', 'Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
+			   'Deep Sleep','Light Sleep','Awake Time']
+	ws.write(36, 0, "Sleep",font_style)
+	col_num2 = 36
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3)
-	for col_num in range(len(columns5)):
+	for col_num in range(len(columns5W)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a , columns5[col_num], base_style)
+		ws.write(col_num2, row_num - a , columns5W[col_num], base_style)
 	rows4 = Sleep.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	i1 = 35
+	i1 = 36
 	for row in rows4:
 		row_num += 1
 		for i, key in enumerate(columns5):
@@ -386,35 +403,40 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns6 = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
-	ws.write(45, 0, "Food",font_style)
-	col_num2 = 45
+	columns6W = ['Percentage of Unprocessed Food', 'Non Processed Food', 'Diet Type']
+	ws.write(46, 0, "Food",font_style)
+	col_num2 = 46
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4)
-	for col_num in range(len(columns6)):
+	for col_num in range(len(columns6W)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a, columns6[col_num],base_style)
-	i1 = 45
+		ws.write(col_num2, row_num - a, columns6W[col_num],base_style)
+	i1 = 46
 	rows5 = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	for row in rows5:
 		row_num += 1
 		for i, key in enumerate(columns6):
-			ws.write(i1 + i + 1, row_num - a, row[key],base_style)
+			if key == 'prcnt_non_processed_food':
+				ws.write(i1 + i + 1, row_num - a, str(int(row[key]))+ '%')
+			else:
+				ws.write(i1 + i + 1, row_num - a, row[key],base_style)
 
 	#Alcohol
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns7 = ['alcohol_day', 'alcohol_week']
-	ws.write(50, 0, "Alcohol",font_style)
-	col_num2 = 50
+	columns7W = ['Alcohol Per Day', 'Average Alcohol Consumed per Week']
+	ws.write(51, 0, "Alcohol",font_style)
+	col_num2 = 51
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4) + len(rows5)
-	for col_num in range(len(columns7)):
+	for col_num in range(len(columns7W)):
 		   col_num2 = col_num2 + 1
-		   ws.write(col_num2, row_num - a, columns7[col_num], base_style)
+		   ws.write(col_num2, row_num - a, columns7W[col_num], base_style)
 	rows6 = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	i1 = 50
+	i1 = 51
 	for row in rows6:
 		row_num += 1
 		for i, key in enumerate(columns7):
@@ -426,11 +448,11 @@ def export_users_xls(request):
 	ws1.col(0).width = int(40 * 260)
 	for d in range(1, 256, 1):
 		ws1.col(d).width = int(10 * 260)
-	columns = ['overall_health_grade', 'overall_health_gpa', 'movement_non_exercise_steps_grade',
-			   'movement_consistency_grade', 'avg_sleep_per_night_grade', 'exercise_consistency_grade',
-			   'overall_workout_grade', 'workout_duration_grade', 'workout_effortlvl_grade',
-			   'avg_exercise_hr_grade', 'prcnt_unprocessed_food_consumed_grade', 'alcoholic_drink_per_week_grade',
-			   'sleep_aid_penalty','penalty']
+	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade',
+			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
+			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
+			   'avg_exercise_hr_grade','prcnt_unprocessed_food_consumed_grade','alcoholic_drink_per_week_grade',
+			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -441,9 +463,9 @@ def export_users_xls(request):
 	ws1.write(0, 0, "Grades",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columnsw)):
 		col_num1 = col_num1 + 1
-		ws1.write(col_num1, row_num, columns[col_num], base_style)
+		ws1.write(col_num1, row_num, columnsw[col_num], base_style)
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -480,9 +502,9 @@ def export_users_xls(request):
 	ws2.write(0, 0, "Swim Stats",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columns1W)):
 		col_num1 = col_num1 + 1
-		ws2.write(col_num1, row_num, columns[col_num], base_style)
+		ws2.write(col_num1, row_num, columns1W[col_num], base_style)
 	rows = SwimStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -508,9 +530,9 @@ def export_users_xls(request):
 	ws3.write(0, 0, "Bike Stats",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columns3W)):
 		col_num1 = col_num1 + 1
-		ws3.write(col_num1, row_num, columns[col_num], base_style)
+		ws3.write(col_num1, row_num, columns3W[col_num], base_style)
 	rows = BikeStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -525,7 +547,7 @@ def export_users_xls(request):
 	ws4.col(0).width = int(40 * 260)
 	for d in range(1, 256, 1):
 		ws4.col(d).width = int(10 * 260)
-	columns = ['non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed','movement_consistency']
+	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -536,19 +558,78 @@ def export_users_xls(request):
 	ws4.write(0, 0, "Steps",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columns4W)):
 		col_num1 = col_num1 + 1
-		ws4.write(col_num1, row_num, columns[col_num], base_style)
+		ws4.write(col_num1, row_num, columns4W[col_num], base_style)
 	rows = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
-	for row in rows:
+	rowsg = Grades.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
+	font_style = xlwt.XFStyle()
+	font_style.num_format_str='#,##0'
+	alignment = xlwt.Alignment()
+	alignment.horz = xlwt.Alignment.HORZ_LEFT
+	font_style.alignment = alignment
+	pattern = xlwt.Pattern()
+	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+	pattern.pattern_fore_colour = 17
+	font_style.pattern = pattern
+	font_style1 = xlwt.XFStyle()
+	font_style1.num_format_str='#,##0'
+	alignment = xlwt.Alignment()
+	alignment.horz = xlwt.Alignment.HORZ_LEFT
+	font_style1.alignment = alignment
+	pattern = xlwt.Pattern()
+	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+	pattern.pattern_fore_colour = 5
+	font_style1.pattern = pattern
+	font_style2 = xlwt.XFStyle()
+	font_style2.num_format_str='#,##0'
+	alignment = xlwt.Alignment()
+	alignment.horz = xlwt.Alignment.HORZ_LEFT
+	font_style2.alignment = alignment
+	pattern = xlwt.Pattern()
+	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+	pattern.pattern_fore_colour = 2
+	font_style2.pattern = pattern
+	font_style3 = xlwt.XFStyle()
+	font_style3.num_format_str='#,##0'
+	alignment = xlwt.Alignment()
+	alignment.horz = xlwt.Alignment.HORZ_LEFT
+	font_style3.alignment = alignment
+	for a1,b1 in zip(rows,rowsg):
+		# print (a1,b1)
+	# for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			if(key == 'movement_consistency' and row[key]):
-				ws4.write(i+2,row_num , ast.literal_eval(row[key])['inactive_hours'],base_style)
-			else:
-				ws4.write(i+2,row_num , row[key],base_style)
+			# if(key == 'movement_consistency' and row[key]):
+			# 	ws4.write(i+2,row_num , ast.literal_eval(a1[key])['inactive_hours'],base_style)
+			# else:
+			# 	ws4.write(i+2,row_num , row[key],base_style)
+				if i == 1 and b1['movement_non_exercise_steps_grade'] == 'A':
+					ws4.write(i + 2, row_num, a1[key], font_style)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'B':
+					ws4.write(i + 2, row_num, a1[key], font_style)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'C':
+					ws4.write(i + 2, row_num, a1[key], font_style1)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'D':
+					ws4.write(i + 2, row_num, a1[key], font_style1)
+				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'F':
+					ws4.write(i + 2, row_num, a1[key], font_style2)
+				elif i == 0 and b1['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style)
+				elif i == 0 and b1['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style1)
+				elif i == 0 and b1['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style1)
+				elif i == 0 and b1['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and a1[key]:
+					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style2)
+				else:
+					ws4.write(i + 2, row_num, a1[key], font_style3)
 
 	# sleep stats sheet
 	ws5.set_panes_frozen(True)
@@ -569,16 +650,30 @@ def export_users_xls(request):
 	ws5.write(0, 0, "Sleep",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columns5W)):
 		col_num1 = col_num1 + 1
-		ws5.write(col_num1, row_num, columns[col_num], base_style)
+		ws5.write(col_num1, row_num, columns5W[col_num], base_style)
 	rows = Sleep.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
-	for row in rows:
+	rowsg = Grades.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
+	for a2,b2 in zip (rows,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns):
-			ws5.write(i + 2, row_num, row[key], base_style)
+				if i == 1 and b2['avg_sleep_per_night_grade'] == 'A':
+					ws5.write(i + 2, row_num, a2[key], ab_style)
+				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'B':
+					ws5.write(i + 2, row_num, a2[key], ab_style)
+				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'C':
+					ws5.write(i + 2, row_num, a2[key], cd_style)
+				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'D':
+					ws5.write(i + 2, row_num, a2[key], cd_style)
+				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'F':
+					ws5.write(i + 2, row_num, a2[key], f_style)
+				else:
+					ws5.write(i + 2, row_num, a2[key], base_style)
 	# Food sheet
 	ws6.set_panes_frozen(True)
 	ws6.set_horz_split_pos(1)
@@ -597,16 +692,19 @@ def export_users_xls(request):
 	ws6.write(0, 0, "Food",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columns6W)):
 		col_num1 = col_num1 + 1
-		ws6.write(col_num1, row_num, columns[col_num], base_style)
+		ws6.write(col_num1, row_num, columns6W[col_num], base_style)
 	rows = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
 	for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			ws6.write(i + 2, row_num, row[key], base_style)
+			if key == 'prcnt_non_processed_food':
+				ws6.write(i + 2, row_num, str(int(row[key])) + '%')
+			else:
+				ws6.write(i + 2, row_num, row[key], base_style)
 	# Alcohol sheet
 	ws7.set_panes_frozen(True)
 	ws7.set_horz_split_pos(1)
@@ -625,15 +723,36 @@ def export_users_xls(request):
 	ws7.write(0, 0, "Alcohol",font_style)
 	col_num1 = 1
 	row_num = 0
-	for col_num in range(len(columns)):
+	for col_num in range(len(columns7W)):
 		col_num1 = col_num1 + 1
-		ws7.write(col_num1, row_num, columns[col_num], base_style)
+		ws7.write(col_num1, row_num, columns7W[col_num], base_style)
 	rows = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
-	for row in rows:
-		row_num += 1
-		for i, key in enumerate(columns):
-			ws7.write(i + 2, row_num, row[key], base_style)
+	rowsg = Grades.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at').values()
+	rowg = []
+	for a,b in zip (rows,rowsg):
+		# print(a,b)
+
+			row_num += 1
+
+			for i, key in enumerate(columns):
+
+				if i == 1 and b['alcoholic_drink_per_week_grade'] == 'A':
+					ws7.write(i + 2, row_num, a[key], ab_style)
+				elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'B':
+					ws7.write(i + 2, row_num, a[key], ab_style)
+				elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'C':
+					ws7.write(i + 2, row_num, a[key], cd_style)
+				elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'D':
+					ws7.write(i + 2, row_num, a[key], cd_style)
+				elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'F':
+					ws7.write(i + 2, row_num, a[key], f_style)
+				else:
+					ws7.write(i + 2, row_num, a[key], base_style)
+		
+
 	wb.save(response)
 	return response
