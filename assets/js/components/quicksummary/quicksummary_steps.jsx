@@ -36,6 +36,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 	                    if( mc != undefined && mc != "" && mc != "-"){
 	                        mc = JSON.parse(mc);
 	                        all_data.push(mc.inactive_hours);
+	                	}else{
+	                		all_data.push('-')
 	                	}
 	            	}
 	                else{
