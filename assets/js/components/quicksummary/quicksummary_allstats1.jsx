@@ -146,6 +146,7 @@ class AllStats1 extends Component{
         let pushKeytoggle = true;
 
         for(let [date,data] of Object.entries(dateWiseData)){
+
             let avg_heartrate = data['exercise_reporting_ql']['avg_heartrate'];
             if(!this.isEmpty(JSON.parse(avg_heartrate))){
                 let avgHrJson = JSON.parse(avg_heartrate);
@@ -177,15 +178,47 @@ class AllStats1 extends Component{
                                                style:{}});
                             }
                         }
+
+
+
+                       
+                        // else if(value !== '-' && value !== 0 && (key == 'prcnt_non_processed_food' )){
+                        //      all_data.push(value);
+                        // }
+
+                //           else if(key === 'prcnt_non_processed_food' && (value !=='-' && value !==0)){
+                            
+                                            
+                //         all_data.push(value+'%');
+                            
+                    
+                // }
+                       else if(key === 'overall_health_gpa'){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
+
+
                         else if(value !== '-' && value !== undefined && 
                            value !== "" && (key == 'deep_sleep' ||
                             key == 'light_sleep' || key == 'awake_time' ||
                             key == 'sleep_per_wearable' || key == 'workout_duration')){
-                            let hm = value.split(':');
-                            let time_str = `${hm[0]} hour ${hm[1]} min`;
+                            let hms = value.split(':');
+                            let time_str = `${hms[0]} : ${hms[1]} : ${hms[2]} `;
                             all_data.push({value:time_str,
                                           style:{}});
                         }
+
                         else if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
                             let avgHrJson = JSON.parse(value);
                             for(let act of avgHrKeys)
@@ -211,8 +244,17 @@ class AllStats1 extends Component{
                             all_data.push({value:this.toFahrenheit(value).toFixed(2),   
                                            style:{}});    
                         }
+                       
                         else{
-							all_data.push({value:value,   
+                        value += '';
+                        var x = value.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                            all_data.push({value:x1 + x2,   
                                            style:obj[value]});     
                         }
 
@@ -314,7 +356,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({  
   getHeight: function(element) {
-    return window.innerHeight - 158;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {     
     var widthOffset = window.innerWidth < 1024 ? 0 : 5;     

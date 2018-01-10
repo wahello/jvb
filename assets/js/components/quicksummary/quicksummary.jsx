@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
 	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
-         NavbarBrand,Container,ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem  } from "reactstrap";
+         NavbarBrand,Container,Dropdown, DropdownToggle, DropdownMenu, DropdownItem  } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
@@ -39,7 +39,7 @@ import Movementquick from './movement-consistency';
 axiosRetry(axios, { retries: 3});
 
 
-var ReactDOM = require('react-dom');
+var ReactDOM = require('react-dom'); 
 
 
 class Quicklook extends Component{
@@ -609,12 +609,17 @@ onLogoutSuccess(response){
 
                                         />
                                         </span>
-                                         <span id="navlink">
+                                        {/*
+                                       <span id="navlink">
                                       {moment(this.state.selected_date).format('MMMM D, YYYY')}
-                                      </span> 
+                                      </span> */}
                                   </span>
 
                                   </span>
+
+                                   <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
+									         {moment(this.state.start_date).format('MMMM D, YYYY')}- {moment(this.state.end_date).format('MMMM D, YYYY')}
+									        </span>
                                   <span id="spa">
                                           <abbr  id="abbri">
                                            <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
@@ -623,12 +628,14 @@ onLogoutSuccess(response){
                                           </abbr>
                                           </span>
 
+                                          	{/*
 		                                    <Button
 		                                        className="daterange-btn btn"		                         
 									            id="daterange"
 									            style={{color:"white",fontSize:"12px"}}
 									            onClick={this.toggleDate} >Date Range
-									        </Button>
+									        </Button>*/}
+									       
                                     
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
@@ -677,7 +684,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="food">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Food">
                                             <NavLink id="headernames" href="#" className={class_food}  value="food"
@@ -688,7 +695,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="alcohol">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Alcohol">
                                             <NavLink id="headernames" href="#" className={class_alcohol} value="alcohol"
@@ -699,7 +706,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="exercise">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Exercise Reporting">
                                             <NavLink id="headernames" href="#" className={class_exercise} value="exercise"
@@ -755,10 +762,10 @@ onLogoutSuccess(response){
                                         </NavItem> 
 
                                        <span className="dropbutton">
-                                          <NavItem onClick={this.toggle}>
+                                         
                                         <span id="spa">
-                                        <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-									        <DropdownToggle caret>
+                                        <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"13px"}}>
 									          More
 									        </DropdownToggle>
 									        <DropdownMenu>
@@ -772,10 +779,16 @@ onLogoutSuccess(response){
 						    								 onClick={this.activateTab.bind(this,"allstats1")}>All Stats</DropdownItem>
 									          <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
+						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
+									          <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
+						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
+									          <DropdownItem style={{paddingLeft:"30px"}} id="dropfood"  className={class_food}  value="food"
+						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 									        </DropdownMenu>
-									    </ButtonDropdown>
+									    </Dropdown>
                                         </span>
-                                        </NavItem>
+                                        
                                         </span>
                                        
                                   </Nav>
