@@ -6,7 +6,7 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 
 import {renderFieldFormGroup} from './fieldRenderer';
 import { account_validate } from './validation';
-
+import PasswordMask from 'react-password-mask';
 
 
 
@@ -16,45 +16,30 @@ class WizardAccountPage extends Component{
 constructor(props){
 		super(props);
 		 this.state = {
-		 	 
-		 	  type: 'password'
-     
+		 	  password_type: 'password',
+		 	  re_password_type: 'password'
     };
-
-
-
- this.showHide = this.showHide.bind(this);
-    this.passwordStrength = this.passwordStrength.bind(this); 
-
+	 this.showHidePassword = this.showHidePassword.bind(this);
+	 this.showHideRePassword = this.showHideRePassword.bind(this);
 	}
 
 
 
- showHide(e){
+ showHidePassword(e){
     e.preventDefault();
     e.stopPropagation();
     this.setState({
-      type: this.state.type === 'password' ? 'input' : 'password'
+      password_type: this.state.password_type === 'password' ? 'input' : 'password'
+    })  
+  }
+   showHideRePassword(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      re_password_type: this.state.re_password_type === 'password' ? 'input' : 'password'
     })  
   }
   
-  passwordStrength(e){
-    if(e.target.value === ''){
-      this.setState({
-        score: 'null'
-      })
-    }
-    else{
-      var pw = XYZ(e.target.value);
-      this.setState({
-        score: pw.score
-      });      
-    }
-
-  }
-
-	
-
 	render(){
 	const { handleSubmit, onSubmit } = this.props;
 	
@@ -62,6 +47,7 @@ constructor(props){
 		<Form onSubmit={handleSubmit(onSubmit)} >
 			<Row>
 				<Col className="form-item">
+
 					<Field
 						name = "username"
 						type = "text"
@@ -82,41 +68,45 @@ constructor(props){
 
                     <FormGroup >
 
-
-
-<Row >
-
-
-
-                     <Col xs="12" sm="9">
+                 
+                     <Row >
+                     <Col xs="12" sm="12">
                     <Field 
-                    	style={{borderRadius:"0px"}}
+                    	style={{borderRadius:"0px",position:"relative"}}
 
 						name = "password"
-						 type={this.state.type}
+						type={this.state.password_type}
 						label="Password"
 						placeholder = " "
-						onChange={this.passwordStrength}
 						component = {renderFieldFormGroup}
 					/>
+                      <a onClick={this.showHidePassword} color="link" style={{ color:"black" , position:"absolute", top:"40px", right:"30px"}}>
+								{this.state.password_type === 'input' ?
+								 <span ><i  className="fa fa-eye-slash" aria-hidden="true"></i></span> :
+								 <i className="fa fa-eye" aria-hidden="true"></i>}
+							</a>  
 
-            </Col>
-              <Col xs="12" sm="3" style={{marginTop:'10%',marginLeft:"-78px"}}>
-                       <Button onClick={this.showHide} style={{padding:"12px 15px",borderRadius:"0px"}}>
-								{this.state.type === 'input' ? <span ><i  className="fa fa-eye-slash" aria-hidden="true"></i></span> : <i className="fa fa-eye" aria-hidden="true"></i>}
-							</Button>
-
-
- </Col>
-                    
-			</Row>		</FormGroup>
+                   </Col> 
+			</Row>	
+				</FormGroup>
+				 <FormGroup >
+				 <Row >
+                     <Col xs="12" sm="12">
 					<Field
 						name = "re_password"
-						type = "password"
+						type = {this.state.re_password_type}
 						label = "Re-Password"
 						placeholder = ""
 						component = {renderFieldFormGroup}
 					/>
+                        <a onClick={this.showHideRePassword} color="link" style={{ color:"black" , position:"absolute", top:"40px", right:"30px"}}>
+								{this.state.re_password_type === 'input' ?
+								 <span ><i className="fa fa-eye-slash" aria-hidden="true"></i></span> :
+								 <i className="fa fa-eye" aria-hidden="true"></i>}
+							</a>  
+							  </Col> 
+			</Row>	
+				</FormGroup>
 
 					<div className="f-footer">
 						<Button type="submit" outline color="primary">Next</Button>
