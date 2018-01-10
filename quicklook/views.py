@@ -317,7 +317,7 @@ def export_users_xls(request):
 	font_style.font.bold = True
 	columns1 = ['pace_per_100_yard','total_strokes']
 	columns1W = ['Pace Per 100 Yard','Total Strokes']
-	ws.write(19, 0, "Swim_Status",font_style)
+	ws.write(19, 0, "Swim Stats",font_style)
 	col_num2 = 19
 	a = len(rows)
 	for col_num1 in range(len(columns1W)):
@@ -338,7 +338,7 @@ def export_users_xls(request):
 	font_style.font.bold = True
 	columns3 = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	columns3W = ['Avg Speed (MPH) Bike', 'Avg Power Bike','Avg_Speed Per Mile','Avg Cadence Bike']
-	ws.write(23, 0, "Bike_Status",font_style)
+	ws.write(23, 0, "Bike Stats",font_style)
 	col_num2 = 23
 	a = len(rows) + len(rows1)
 	for col_num in range(len(columns3W)):
@@ -436,8 +436,8 @@ def export_users_xls(request):
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
 	columns5 = ['sleep_per_wearable', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
-			   'deep_sleep','light_sleep','awake_time']
-	columns5W = ['Sleep per Wearable (excluding awake time)', 'Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
+			   'deep_sleep','light_sleep','awake_time','sleep_comments']
+	columns5W = ['Sleep per Wearable (excluding awake time)','Sleep Comments','Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
 			   'Deep Sleep','Light Sleep','Awake Time']
 	ws.write(36, 0, "Sleep",font_style)
 	col_num2 = 36
@@ -456,15 +456,15 @@ def export_users_xls(request):
 	for m,n in zip(rows4,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns5):
-				if i == 1 and n['avg_sleep_per_night_grade'] == 'A':
+				if i == 2 and n['avg_sleep_per_night_grade'] == 'A':
 					ws.write(i1 + i + 1, row_num - a, m[key], ab_style)
-				elif i == 1 and n['avg_sleep_per_night_grade'] == 'B':
+				elif i == 2 and n['avg_sleep_per_night_grade'] == 'B':
 					ws.write(i1 + i + 1, row_num - a, m[key], ab_style)
-				elif i == 1 and n['avg_sleep_per_night_grade'] == 'C':
+				elif i == 2 and n['avg_sleep_per_night_grade'] == 'C':
 					ws.write(i1 + i + 1, row_num - a, m[key], cd_style)
-				elif i == 1 and n['avg_sleep_per_night_grade'] == 'D':
+				elif i == 2 and n['avg_sleep_per_night_grade'] == 'D':
 					ws.write(i1 + i + 1, row_num - a, m[key], cd_style)
-				elif i == 1 and n['avg_sleep_per_night_grade'] == 'F':
+				elif i == 2 and n['avg_sleep_per_night_grade'] == 'F':
 					ws.write(i1 + i + 1, row_num - a, m[key], f_style)
 				else:
 					ws.write(i1 + i + 1, row_num - a, m[key], base_style)
@@ -473,13 +473,13 @@ def export_users_xls(request):
 	font_style.font.bold = True
 	columns6 = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
 	columns6W = ['Percentage of Unprocessed Food', 'Non Processed Food', 'Diet Type']
-	ws.write(46, 0, "Food",font_style)
-	col_num2 = 46
+	ws.write(47, 0, "Food",font_style)
+	col_num2 = 47
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4)
 	for col_num in range(len(columns6W)):
 		col_num2 = col_num2 + 1
 		ws.write(col_num2, row_num - a, columns6W[col_num],base_style)
-	i1 = 46
+	i1 = 47
 	rows5 = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -496,8 +496,8 @@ def export_users_xls(request):
 	font_style.font.bold = True
 	columns7 = ['alcohol_day', 'alcohol_week']
 	columns7W = ['Alcohol Per Day', 'Average Alcohol Consumed per Week']
-	ws.write(51, 0, "Alcohol",font_style)
-	col_num2 = 51
+	ws.write(52, 0, "Alcohol",font_style)
+	col_num2 = 52
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4) + len(rows5)
 	for col_num in range(len(columns7W)):
 		   col_num2 = col_num2 + 1
@@ -505,7 +505,7 @@ def export_users_xls(request):
 	rows6 = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	i1 = 51
+	i1 = 52
 	for e,f in zip(rows6,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns7):
