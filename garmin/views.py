@@ -242,7 +242,7 @@ class fetchGarminBackFillData(APIView):
 
     access_token = request.user.garmin_token.token
     access_token_secret = request.user.garmin_token.token_secret
-
+    # data_of_joined = User.objects.filter('date_joined')
     if access_token and access_token_secret:
       service = OAuth1Service(
             consumer_key = conskey,
@@ -257,4 +257,5 @@ class fetchGarminBackFillData(APIView):
         'uploadStartTimeInSeconds': startDateTimeInSeconds,
         'uploadEndTimeInSeconds':startDateTimeInSeconds-7776000
       }
+      print(data)
     
