@@ -279,14 +279,7 @@ render(){
 							Submit
 						</Button>
 
-                         <Modal isOpen={this.state.nestedModalsubmit} toggle={this.toggleSubmit} onClosed={this.state.closeAll ? this.toggle : undefined}>
-              <ModalHeader>“Your Registration was Successful.”</ModalHeader>
-             
-              <ModalFooter>
-                <Button color="primary" onClick={this.toggleSubmit}>OK</Button>
-               
-              </ModalFooter>
-            </Modal>
+                        
 
 					</div>
 				</Col>

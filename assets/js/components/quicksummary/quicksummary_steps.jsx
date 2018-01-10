@@ -30,6 +30,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
+				console.log(key);
 				if(key !== 'id' && key !== 'user_ql'){  
 					if (key == 'movement_consistency'){
 	                    let mc = value;
