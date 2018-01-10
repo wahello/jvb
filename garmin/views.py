@@ -225,6 +225,18 @@ class fetchGarminBackFillData(APIView):
   fetch data from db for specified date, otherwise
   pull directly from api and display raw data
   '''
+  DATA_TYPES = {
+        "DAILY_SUMMARIES":"dailies",
+        "ACTIVITY_SUMMARIES":"activities",
+        "MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
+        "EPOCH_SUMMARIES":"epochs",
+        "SLEEP_SUMMARIES":"sleeps",
+        "BODY_COMPOSITION":"bodyComps",
+        "STRESS_DETAILS":"stressDetails",
+        "MOVEMENT_IQ":"moveiq",
+        "USER_METRICS":"userMetrics"
+      }
+
   def get(self, request, format="json"):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connect.garmin.com/oauthConfirm'
@@ -242,7 +254,8 @@ class fetchGarminBackFillData(APIView):
 
     access_token = request.user.garmin_token.token
     access_token_secret = request.user.garmin_token.token_secret
-    # data_of_joined = User.objects.filter('date_joined')
+    User_Reg_Date = request.user.date_joined
+    startDateTimeInSeconds = ("Unix Timestamp: ",(time.mktime(User_Reg_Date.timetuple())))
     if access_token and access_token_secret:
       service = OAuth1Service(
             consumer_key = conskey,
@@ -257,5 +270,18 @@ class fetchGarminBackFillData(APIView):
         'uploadStartTimeInSeconds': startDateTimeInSeconds,
         'uploadEndTimeInSeconds':startDateTimeInSeconds-7776000
       }
-      print(data)
+      utput_dict = {}
+      ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/backfill/{}'
+
+      for dtype in self.DATA_TYPES.values():
+
+        URL = ROOT_URL.format(dtype)
+        pull = True
+        if pull:
+          # pull from api and store in db
+          r = sess.get(URL, header_auth=True, params=data)
+          print("\n\n",r.json())
+
+
+
     

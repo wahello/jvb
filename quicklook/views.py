@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import ast
 import xlwt
+import time
 from xlwt import easyxf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -208,8 +209,11 @@ def export_users_xls(request):
 	from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
 	response = HttpResponse(content_type='application/ms-excel')
 	response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_download_name)
-	date_of_joined = User.objects.only('date_joined')
-	print(date_of_joined)
+	# date_of_joined = User.objects.values_list(request.user.date_joined)
+	# print(date_of_joined)
+	aaa = request.user.date_joined
+	print(aaa)
+	print("Unix Timestamp: ",(time.mktime(aaa.timetuple())))
 	wb = xlwt.Workbook(encoding='utf-8')
 	ws = wb.add_sheet('All Stats')
 	ws1 = wb.add_sheet('Grades')
@@ -503,7 +507,6 @@ def export_users_xls(request):
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	i1 = 51
 	for e,f in zip(rows6,rowsg):
-		print(e)
 		row_num += 1
 		for i, key in enumerate(columns7):
 			if i == 1 and f['alcoholic_drink_per_week_grade'] == 'A':
