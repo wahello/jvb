@@ -11,7 +11,7 @@ body{
 }
 
 .tablecenter{
-	padding-top: 14px;
+	overflow-x: hidden;
 }
 .createbutton{
 		font-family:futura-pt;
@@ -22,4 +22,9 @@ body{
 		padding: 0px 20px;
 		font-size: 14px;
 
+}
+@media (max-width: 1023px){
+	.tablecenter{
+	overflow-x: scroll;
+}
 }

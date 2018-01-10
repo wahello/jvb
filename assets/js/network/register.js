@@ -10,7 +10,9 @@ class RegisterNetwork {
 	register(post_data, callback=undefined, err_callback=undefined){
 		post_data['height'] = post_data['feet']+"'"+post_data['inches']+"\"";
 		post_data['sleep_goals'] = post_data['sleep_hours']+":"+post_data['sleep_minutes'];
-		
+		let date_of_birth = post_data['date_of_birth'].split("/");
+		let new_date_of_birth =date_of_birth[2]+"-"+date_of_birth[0]+"-"+date_of_birth[1];
+		post_data['date_of_birth']=new_date_of_birth;
 		delete post_data['feet'];
 		delete post_data['inches'];
 		delete post_data['sleep_hours'];
