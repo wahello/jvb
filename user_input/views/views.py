@@ -78,7 +78,7 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
             return Response({})
 
 class UserDailyInputLatestItemView(APIView):
-
+    permission_classes = (IsAuthenticated,)
     def get_queryset(self):
         user = self.request.user
         qs = UserDailyInput.objects.filter(user=user).order_by('-created_at')
