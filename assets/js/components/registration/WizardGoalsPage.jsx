@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter, Link } from 'react-router-dom';
 import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,InputGroup,
 		 Row, Col, Container,Modal, ModalHeader, ModalBody,ModalFooter} from 'reactstrap';
@@ -16,6 +17,7 @@ class WizardGoalsPage extends Component{
 		 	
       score: 'null',
       modal: false,
+      backdrop:'static',
        nestedModal: false,
        nestedModalsubmit:false
     };
@@ -29,6 +31,7 @@ this.MinuteError = this.MinuteError.bind(this);
     this.toggle = this.toggle.bind(this);
      this.toggleNested = this.toggleNested.bind(this);
       this.toggleSubmit = this.toggleSubmit.bind(this);
+      this.onDisagreeTerms =this.onDisagreeTerms.bind(this);
 	}
 
 
@@ -60,6 +63,10 @@ this.MinuteError = this.MinuteError.bind(this);
       nestedModalsubmit: !this.state.nestedModalsubmit,
       closeAll: false
     });
+  }
+
+  onDisagreeTerms(){
+ 		this.props.history.push("/");
   }
 
 render(){
@@ -127,7 +134,7 @@ render(){
 							  <span className="custom-control-description">I Agree To The Terms and Conditions</span>
 						</Label>
 
-						<Modal isOpen={this.state.modal} toggle={this.toggle} style={{ maxWidth: '52%' }}>
+						<Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
 				          <ModalHeader>
                          
 				          <p style={{fontSize:'36px', fontWeight:'bold'}}>Terms of Services</p></ModalHeader>
@@ -248,9 +255,10 @@ render(){
 				            
                                    <Modal isOpen={this.state.nestedModal} toggle={this.toggleNested} onClosed={this.state.closeAll ? this.toggle : undefined}>
               
-              <ModalBody> “You Can Not Register For This Site Without Agreeing to our Terms and Conditions”</ModalBody>
+              <ModalBody> You have selected not to agree with our Terms and Conditions, do you want to continue?</ModalBody>
               <ModalFooter>
-                <Button color="primary" onClick={this.toggleNested}>OK</Button>
+                <Button color="primary" onClick={this.toggleNested}>Yes</Button>
+                <Button color="primary" onClick={this.onDisagreeTerms}>No</Button>
                 
               </ModalFooter>
             </Modal>
@@ -294,5 +302,5 @@ export default reduxForm({
 	forceUnregisterOnMount: true,
 	validate: goals_validate
 })(
-	connect(null,{})(WizardGoalsPage)
+	connect(null,{})(withRouter(WizardGoalsPage))
 );

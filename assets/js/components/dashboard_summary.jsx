@@ -98,10 +98,10 @@ constructor(props){
 			<div className="row">
 			<div className="col-md-6">
 			<div className="table-responsive"> 
-   		 <table className="table table-bordered zui-table">
+   		 <table className="table table-bordered">
          <thead>
             <tr>
-                <th className="headcol">Overall Health Grade</th>
+                <th >Overall Health Grade</th>
                 <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
@@ -112,7 +112,7 @@ constructor(props){
         </thead>
         <tbody>
             <tr>
-                <td className="headcol">Total GPA Points</td>
+                <td >Total GPA Points</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -120,7 +120,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td className="headcol">Overall Health GPA</td>
+                <td >Overall Health GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -128,7 +128,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td className="headcol">Rank against other users</td>
+                <td >Rank against other users</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -136,7 +136,7 @@ constructor(props){
                 <td></td>
             </tr>
              <tr>
-                <td className="headcol">Overall Health GPA</td>
+                <td>Overall Health GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -149,8 +149,8 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-	<div className="table-responsive"> 
-    <table className="table table-bordered">
+	<div className="table-responsive tablecenter"> 
+    <table className="table table-bordered ">
         <thead>
              
                 <tr>
@@ -444,7 +444,7 @@ constructor(props){
 </div>
 <div className="row padding">
 			<div className="col-md-6">
-			<div className="table-responsive"> 
+			<div className="table-responsive tablecenter"> 
     <table className="table table-bordered">
         <thead>
             <tr>
@@ -547,7 +547,7 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-	<div className="table-responsive"> 
+	<div className="table-responsive tablecenter"> 
     <table className="table table-bordered">
         <thead>
             <tr>
