@@ -26,6 +26,7 @@ html,body{
 #head{
 	font-size: larger;
 }
+
 }
 
 .nav2{
@@ -141,10 +142,10 @@ background-color: #777777;
 	color: white;
 }
 .dropbutton{
-	display:none;
+	background-color: #777777;
 }
 
-@media (max-width:1500px){
+@media (max-width:2024px){
 	.dropbutton{
 		display: inline;
 	}
@@ -157,20 +158,70 @@ background-color: #777777;
 	.allstats{
 		display:none;
 	}
-	#dropuser{
-		display:none;
+	.userinputs{
+		display: none;
 	}
+	#dropexercise{
+		display: none;
+	}
+	#dropalcohol{
+		display: none;
+	}
+	#dropfood{
+		display: none;
+	}
+	
 }
 
 @media (max-width: 1100px){
 	.dropbutton{
 		display: inline;
-	}	
-	.userinputs{
+	}
+	.exercise{
 		display: none;
 	}
-	#dropuser{
+	.alcohol{
+		display: none;
+	}
+	.food{
+		display: none;
+	}
+
+	#dropexercise{
 		display:inline;
 	}
-	
+	#dropalcohol{
+		display: inline;
+	}
+	#dropfood{
+		display: inline;
+	}
+
+}
+@media (max-width: 800px){
+	.dropbutton{
+		display: none;
+	}
+	.bikestats{
+		display:inline;
+	}
+	.swimstats{
+		display: inline;
+	}
+	.allstats{
+		display:inline;
+	}
+	.userinputs{
+		display: inline;
+	}
+	.exercise{
+		display: inline;
+	}
+	.alcohol{
+		display: inline;
+	}
+	.food{
+		display: inline;
+	}
+
 }
