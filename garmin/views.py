@@ -218,3 +218,43 @@ def connect_receive_token(request):
                                        token_secret=access_token_secret)
 
     return redirect('/service_connect')
+
+class fetchGarminBackFillData(APIView):
+
+  '''
+  fetch data from db for specified date, otherwise
+  pull directly from api and display raw data
+  '''
+  def get(self, request, format="json"):
+    req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
+    authurl = 'http://connect.garmin.com/oauthConfirm'
+    acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
+    conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
+    conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
+
+    # start_date = '2017-09-13'
+    y,m,d = map(int,request.GET.get('start_date').split('-'))
+
+    start_date_dt = datetime(y,m,d,0,0,0)
+
+    startDateTimeInSeconds = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
+    user = request.user
+
+    access_token = request.user.garmin_token.token
+    access_token_secret = request.user.garmin_token.token_secret
+
+    if access_token and access_token_secret:
+      service = OAuth1Service(
+            consumer_key = conskey,
+            consumer_secret = conssec,
+            request_token_url = req_url,
+            access_token_url = acc_url,
+            authorize_url = authurl,
+            )
+      sess = service.get_session((access_token, access_token_secret))
+
+      data = {
+        'uploadStartTimeInSeconds': startDateTimeInSeconds,
+        'uploadEndTimeInSeconds':startDateTimeInSeconds-7776000
+      }
+    
