@@ -21,7 +21,7 @@ class Register extends Component {
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onRegisterSuccess = this.onRegisterSuccess.bind(this);
 		this.state = {
-			page:2,
+			page:1,
 			progress:20
 		};
 	}

@@ -254,3 +254,25 @@ export function userDailyInputRecentFetch(successCallback=undefined, errorCallba
 		}
 	});
 }
+
+export function fetchGarminData(date, successCallback=undefined, errorCallback=undefined){
+	date = moment(date)
+	const URL = 'users/daily_input/garmin_data/';
+	const config = {
+		url : URL,
+		method: 'get',
+		params:{
+			"date":date.format('YYYY-MM-DD')
+		},
+		withCredentials: true
+	};
+	axios(config).then(function(response){
+		if(successCallback != undefined){
+			successCallback(response);
+		}
+	}).catch((error) => {
+		if(errorCallback != undefined){
+			errorCallback(error);
+		}
+	});
+}

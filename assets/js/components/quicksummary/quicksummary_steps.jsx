@@ -31,17 +31,24 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 			for(let [key,value] of Object.entries(data[category])){
 				if(key !== 'id' && key !== 'user_ql'){  
-
-				value += '';
-             	var x = value.split('.');
-            	var x1 = x[0];
-	            var x2 = x.length > 1 ? '.' + x[1] : '';
-	            var rgx = /(\d+)(\d{3})/;
-	            while (rgx.test(x1)) {
-		        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-	            }
-	               
-			    all_data.push(x1 + x2);                  
+					if (key == 'movement_consistency'){
+	                    let mc = value;
+	                    if( mc != undefined && mc != "" && mc != "-"){
+	                        mc = JSON.parse(mc);
+	                        all_data.push(mc.inactive_hours);
+	                	}
+	            	}
+	                else{
+						value += '';
+		             	var x = value.split('.');
+		            	var x1 = x[0];
+			            var x2 = x.length > 1 ? '.' + x[1] : '';
+			            var rgx = /(\d+)(\d{3})/;
+			            while (rgx.test(x1)) {
+				        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+			            }
+					    all_data.push(x1 + x2);                  
+					}
 				}
 			}
 

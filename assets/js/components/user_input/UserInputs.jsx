@@ -27,7 +27,8 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 
 import {userDailyInputSend,userDailyInputFetch,
-        userDailyInputUpdate,userDailyInputRecentFetch} from '../../network/userInput';
+        userDailyInputUpdate,userDailyInputRecentFetch,
+        fetchGarminData} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
@@ -209,6 +210,8 @@ class UserInputs extends React.Component{
       this.toggleWeather=this.toggleWeather.bind(this);
       this.toggleComment=this.toggleComment.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
+      this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
+      this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -216,8 +219,9 @@ class UserInputs extends React.Component{
     }
     
     onFetchSuccess(data,clone_form=undefined){
-      if (_.isEmpty(data.data))
+      if (_.isEmpty(data.data)){
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
+      }
       else {
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
@@ -309,8 +313,8 @@ class UserInputs extends React.Component{
 
           sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
           sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
-          sleep_bedtime:moment(data.data.strong_input.sleep_bedtime),
-          sleep_awake_time:moment(data.data.strong_input.sleep_awake_time),
+          sleep_bedtime:data.data.strong_input.sleep_bedtime? moment(data.data.strong_input.sleep_bedtime):null,
+          sleep_awake_time:data.data.strong_input.sleep_awake_time ? moment(data.data.strong_input.sleep_awake_time):null,
           awake_hours:data.data.strong_input.awake_time.split(':')[0],
           awake_mins:data.data.strong_input.awake_time.split(':')[1],
           sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
@@ -368,11 +372,26 @@ class UserInputs extends React.Component{
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
+          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
         this.onFetchFailure(data)
       }
+    }
+
+    onFetchGarminSuccess(data){
+      console.log(data);
+      this.setState({
+        sleep_bedtime:data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null,
+        sleep_awake_time:data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null,
+        awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
+        awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:''
+      });
+    }
+
+    onFetchGarminFailure(error){
+      console.log(error);
     }
 
     onFetchFailure(error){
@@ -627,11 +646,29 @@ handleScroll() {
         commentInfo:!this.state.commentInfo
       });
      }
-  toggleEditForm(){
-    this.setState({
-      editable:!this.state.editable
-    });
-  }
+    toggleEditForm(){
+       this.setState({
+         editable:!this.state.editable
+       });
+    }
+
+    getTotalSleep(){
+      let sleep_bedtime = this.state.sleep_bedtime;
+      let sleep_awake_time = this.state.sleep_awake_time;
+      let awake_hours = this.state.awake_hours?this.state.awake_hours:0;
+      let awake_mins = this.state.awake_mins?this.state.awake_mins:0;
+      let awake_time_in_mins = awake_hours*60 + awake_mins;
+      if(sleep_bedtime && sleep_awake_time){
+        let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
+        let hours = Math.floor(diff/60);
+        let mins = diff % 60;
+        if(mins < 10)
+          mins = `0${mins}`;
+        return hours+":"+mins;
+      }else
+        return '';
+    }
+
     render(){
        const {fix} = this.props;
 
@@ -2247,6 +2284,10 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
+                          <div>
+                          <Label className="padding">Total Sleep From Wearable Device (excluding awake time):</Label>
+                          {this.getTotalSleep()}
+                          </div>
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>
