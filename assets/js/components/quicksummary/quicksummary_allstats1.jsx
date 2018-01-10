@@ -207,7 +207,7 @@ class AllStats1 extends Component{
                s = minus + s;
                all_data.push({value: s});
             }
-            
+
 
                         else if(value !== '-' && value !== undefined && 
                            value !== "" && (key == 'deep_sleep' ||
@@ -244,6 +244,7 @@ class AllStats1 extends Component{
                             all_data.push({value:this.toFahrenheit(value).toFixed(2),   
                                            style:{}});    
                         }
+                       
                         else{
                         value += '';
                         var x = value.split('.');
