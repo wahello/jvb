@@ -1,6 +1,6 @@
 import re
 import urllib
-
+import time
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.core.mail import EmailMessage
@@ -225,6 +225,18 @@ class fetchGarminBackFillData(APIView):
   fetch data from db for specified date, otherwise
   pull directly from api and display raw data
   '''
+  DATA_TYPES = {
+        "DAILY_SUMMARIES":"dailies",
+        "ACTIVITY_SUMMARIES":"activities",
+        "MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
+        "EPOCH_SUMMARIES":"epochs",
+        "SLEEP_SUMMARIES":"sleeps",
+        "BODY_COMPOSITION":"bodyComps",
+        "STRESS_DETAILS":"stressDetails",
+        "MOVEMENT_IQ":"moveiq",
+        "USER_METRICS":"userMetrics"
+      }
+
   def get(self, request, format="json"):
     req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
     authurl = 'http://connect.garmin.com/oauthConfirm'
@@ -233,16 +245,17 @@ class fetchGarminBackFillData(APIView):
     conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
 
     # start_date = '2017-09-13'
-    y,m,d = map(int,request.GET.get('start_date').split('-'))
+    # y,m,d = map(int,request.GET.get('start_date').split('-'))
 
-    start_date_dt = datetime(y,m,d,0,0,0)
+    # start_date_dt = datetime(y,m,d,0,0,0)
 
-    startDateTimeInSeconds = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
+    # startDateTimeInSeconds = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
     user = request.user
 
     access_token = request.user.garmin_token.token
     access_token_secret = request.user.garmin_token.token_secret
-    # data_of_joined = User.objects.filter('date_joined')
+    User_Reg_Date = request.user.date_joined
+    startDateTimeInSeconds = (time.mktime(User_Reg_Date.timetuple()))
     if access_token and access_token_secret:
       service = OAuth1Service(
             consumer_key = conskey,
@@ -254,8 +267,19 @@ class fetchGarminBackFillData(APIView):
       sess = service.get_session((access_token, access_token_secret))
 
       data = {
-        'uploadStartTimeInSeconds': startDateTimeInSeconds,
-        'uploadEndTimeInSeconds':startDateTimeInSeconds-7776000
+        'summaryStartTimeInSeconds': startDateTimeInSeconds,
+        'summaryEndTimeInSeconds': startDateTimeInSeconds-7776000
       }
-      print(data)
+    
+      ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/backfill/{}'
+
+      for dtype in self.DATA_TYPES.values():
+
+        URL = ROOT_URL.format(dtype)
+        r = sess.get(URL, header_auth=True, params=data)
+        print("\n\n",r.json())
+        return Response(status = status.HTTP_200_OK)
+
+
+
     
