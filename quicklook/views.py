@@ -740,15 +740,15 @@ def export_users_xls(request):
 	for a2,b2 in zip (rows,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns):
-				if i == 1 and b2['avg_sleep_per_night_grade'] == 'A':
+				if i == 2 and b2['avg_sleep_per_night_grade'] == 'A':
 					ws5.write(i + 2, row_num, a2[key], ab_style)
-				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'B':
+				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'B':
 					ws5.write(i + 2, row_num, a2[key], ab_style)
-				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'C':
+				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'C':
 					ws5.write(i + 2, row_num, a2[key], cd_style)
-				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'D':
+				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'D':
 					ws5.write(i + 2, row_num, a2[key], cd_style)
-				elif i == 1 and b2['avg_sleep_per_night_grade'] == 'F':
+				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'F':
 					ws5.write(i + 2, row_num, a2[key], f_style)
 				else:
 					ws5.write(i + 2, row_num, a2[key], base_style)
