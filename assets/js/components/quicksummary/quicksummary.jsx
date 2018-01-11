@@ -630,7 +630,7 @@ onLogoutSuccess(response){
 									        </span>
                                  		 <span id="spa">
                                           <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
                                             <Button id="nav-btn" className="btn">Print</Button>
                                            </a>
                                           </abbr>

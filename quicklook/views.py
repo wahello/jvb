@@ -201,12 +201,16 @@ class SleepListView(generics.ListCreateAPIView):
 def export_users_xls(request):
 	to_date = request.GET.get('to_date',None)
 	from_date = request.GET.get('from_date', None)
+
+	to_date = datetime.strptime(to_date, "%m-%d-%Y").date()
+	from_date = datetime.strptime(from_date, "%m-%d-%Y").date()
+
 	file_download_name = '{}_raw_data_{}_to_{}.xls'.format(
-		request.user.username,from_date,to_date
+		request.user.username,
+		from_date.strftime("%b %d, %Y"),
+		to_date.strftime("%b %d, %Y")
 	)
 
-	to_date = datetime.strptime(to_date, "%Y-%m-%d").date()
-	from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
 	response = HttpResponse(content_type='application/ms-excel')
 	response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_download_name)
 	# date_of_joined = User.objects.values_list(request.user.date_joined)
