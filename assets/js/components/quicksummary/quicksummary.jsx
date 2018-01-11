@@ -184,7 +184,7 @@ class Quicklook extends Component{
 			    },
 			    sleep_ql: {
 			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable,
-			        sleep_comments: data.sleep_ql.sleep_comments,
+			         sleep_comments: data.sleep_ql.sleep_comments,
 			        sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			        sleep_aid: data.sleep_ql.sleep_aid,
 			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
@@ -618,7 +618,7 @@ onLogoutSuccess(response){
                                   </span>
 
                                    <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
-									         {moment(this.state.start_date).format('MMMM D, YYYY')} - {moment(this.state.end_date).format('MMMM D, YYYY')}
+									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 									        </span>
 									        <span className="date_range_btn">
 									         <Button
