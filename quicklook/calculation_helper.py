@@ -239,6 +239,7 @@ def get_blank_model_fields(model):
 			'deep_sleep': 0,
 			'light_sleep': 0,
 			'awake_time': 0,
+			'sleep_comments':''
 		}
 		return fields
 
@@ -1289,6 +1290,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
 		sleeps_calculated_data['sleep_per_user_input'] = safe_get(todays_daily_strong,
 														'sleep_time_excluding_awake_time','')
+		comment = safe_get(todays_daily_strong,"sleep_comment",'')
+		sleeps_calculated_data['sleep_comments'] = comment if comment else ''
 
 		# Food
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,
