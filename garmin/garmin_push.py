@@ -114,7 +114,7 @@ def store_garmin_health_push(data):
 	acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
 	conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
 	conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
-
+	print(data)
 	dtype = list(data.keys())[0]
 	MODEL_TYPES = _get_model_types()
 	for obj in data.get(dtype):
