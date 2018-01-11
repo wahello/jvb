@@ -367,7 +367,7 @@ def export_users_xls(request):
 	alignment.horz = xlwt.Alignment.HORZ_LEFT
 	font_style1.alignment = alignment
 	font_style4 = xlwt.XFStyle()
-	font_style.num_format_str='#,##0'
+	font_style4.num_format_str='#,##0'
 	alignment = xlwt.Alignment()
 	alignment.horz = xlwt.Alignment.HORZ_LEFT
 	font_style4.alignment = alignment
@@ -649,7 +649,7 @@ def export_users_xls(request):
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
 	font_style4 = xlwt.XFStyle()
-	font_style.num_format_str='#,##0'
+	font_style4.num_format_str='#,##0'
 	alignment = xlwt.Alignment()
 	alignment.horz = xlwt.Alignment.HORZ_LEFT
 	font_style4.alignment = alignment
