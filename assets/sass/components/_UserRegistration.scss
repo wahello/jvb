@@ -97,3 +97,31 @@ html,body {
 	color: #888;
 	margin-bottom: 20px;
 }
+.custom-checkbox .custom-control-indicator {
+    border-radius: 0.25rem;
+   
+    border-color: green;
+}
+.custom-control-indicator {
+    position: absolute;
+    top: 0.25rem;
+    left: 0;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #ddd;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 50% 50%;
+    }
+
+.custom-radio .custom-control-indicator{
+	border-radius: 50%;
+	background-color: gray;
+	border-color: green;
+}
