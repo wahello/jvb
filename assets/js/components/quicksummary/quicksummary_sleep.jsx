@@ -15,15 +15,15 @@ import { StyleSheet, css } from 'aphrodite';
 
 	 this.state = {
       myTableData: [
-        {name: 'Sleep per Wearable (excluding awake time)'},
-         {name: 'Sleep Comments'},
-        {name: 'Sleep Per User Input (excluding awake time)'},
+        {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
+        {name: 'Sleep Comments'},
+        {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
         {name: 'Sleep Aid'},
         {name: 'Sleep Bed Time'}, 
         {name: 'Sleep Awake Time'},
-        {name: 'Deep Sleep'},
-        {name: 'Light Sleep'},
-        {name: 'Awake Time'},
+        {name: 'Deep Sleep (hh:mm)'},
+        {name: 'Light Sleep (hh:mm)'},
+        {name: 'Awake Time (hh:mm)'},
         {name: 'Sleep Aid Penalty'}                       
       ],
     };
@@ -42,7 +42,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 						key == 'awake_time' ||
 						key == 'sleep_per_wearable')){
 						let hm = value.split(':');
-						let time_str = `${hm[0]} : ${hm[1]}`;
+						let time_str = `${hm[0]}:${hm[1]}`;
 						all_data.push(time_str);
 					}
 					else all_data.push(value);

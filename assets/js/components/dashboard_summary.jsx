@@ -277,24 +277,24 @@ constructor(props){
 </div>
 
 <div className="col-md-6">
-			<div className="table-responsive"> 
+<div className="table-responsive"> 
     <table className="table table-bordered">
-         <thead>
-           
-                <tr>
-                <th>Movement Consistency</th>
+        <thead>
+            <tr>
+                
+                <th>Nutrition</th>
                 <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
                 <th>Avg Last 30 Days</th>
                 <th>Avg Year to Date</th>
+            
             </tr>
-           
         </thead>
         <tbody>
             <tr>
-                <td>Movement Consistency Score</td>
+                <td>% of Unprocessed Food Consumed</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -310,7 +310,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>Movement Consistency Grade</td>
+                <td>% Non Processed Food Consumed Grade</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -318,7 +318,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-            	<td>Movement Consistency GPA</td>
+                <td>% Non Processed Food Consumed GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -328,6 +328,9 @@ constructor(props){
         </tbody>
     </table>
 </div>
+
+
+
 </div>
 
 </div>
@@ -599,24 +602,24 @@ constructor(props){
     </table>
 </div>		
 <div className="padding">
-            <div className="table-responsive"> 
+   <div className="table-responsive"> 
     <table className="table table-bordered">
-        <thead>
-            <tr>
-                
-                <th>Nutrition</th>
+         <thead>
+           
+                <tr>
+                <th>Movement Consistency</th>
                 <th>Custom Date Range</th>
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
                 <th>Avg Last 30 Days</th>
                 <th>Avg Year to Date</th>
-            
             </tr>
+           
         </thead>
         <tbody>
             <tr>
-                <td>% of Unprocessed Food Consumed</td>
+                <td>Movement Consistency Score</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -632,7 +635,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>% Non Processed Food Consumed Grade</td>
+                <td>Movement Consistency Grade</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -640,7 +643,7 @@ constructor(props){
                 <td></td>
             </tr>
             <tr>
-                <td>% Non Processed Food Consumed GPA</td>
+                <td>Movement Consistency GPA</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -650,6 +653,7 @@ constructor(props){
         </tbody>
     </table>
 </div>
+         
 </div>
 </div>
 

@@ -25,6 +25,7 @@ django-redis==4.8.0
 django-request-logging==0.5.2
 django-rest-api==0.1.5
 django-rest-framework==0.1.0
+django-su==0.6.0
 django-webpack-loader==0.5.0
 django.js-vinta==0.8.2.dev2
 djangorestframework==3.6.3

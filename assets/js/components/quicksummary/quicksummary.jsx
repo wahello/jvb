@@ -618,25 +618,23 @@ onLogoutSuccess(response){
                                   </span>
 
                                    <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
-									         {moment(this.state.start_date).format('MMMM D, YYYY')}- {moment(this.state.end_date).format('MMMM D, YYYY')}
+									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 									        </span>
-                                  <span id="spa">
-                                          <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('YYYY-MM-DD')}&to_date=${moment(this.state.end_date).format('YYYY-MM-DD')}`}>
-                                            <Button id="nav-btn" className="btn">Print</Button>
-                                           </a>
-                                          </abbr>
-                                          </span>
-
-                                          	{/*
-		                                    <Button
+									        <span className="date_range_btn">
+									         <Button
 		                                        className="daterange-btn btn"		                         
 									            id="daterange"
 									            style={{color:"white",fontSize:"12px"}}
 									            onClick={this.toggleDate} >Date Range
-									        </Button>*/}
-									       
-                                    
+									        </Button>
+									        </span>
+                                 		 <span id="spa">
+                                          <abbr  id="abbri">
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
+                                            <Button id="nav-btn" className="btn">Print</Button>
+                                           </a>
+                                          </abbr>
+                                          </span>                                    
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
                                   			 <NavItem onClick={this.toggle}>
@@ -663,7 +661,7 @@ onLogoutSuccess(response){
 
                                        	<NavItem onClick={this.toggle}>
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="User Inputs">
+                                          <abbr  id="abbri"  title="Movement Consistency">
                                             <NavLink id="headernames" href="#" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>
 						    		 		 Movement Consistency
@@ -813,8 +811,8 @@ onLogoutSuccess(response){
                             isOpen={this.state.calendarOpen}
                             target="calendar1"
                             toggle={this.toggleCalendar}>
-                              <PopoverBody>
-                                <CalendarWidget onDaySelect={this.processDate}/>
+                              <PopoverBody className="calendar2">
+                                <CalendarWidget  onDaySelect={this.processDate}/>
                               </PopoverBody>
                            </Popover>
 
