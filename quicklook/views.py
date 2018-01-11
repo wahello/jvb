@@ -435,8 +435,8 @@ def export_users_xls(request):
 	# Sleep
 	font_style = xlwt.XFStyle()
 	font_style.font.bold = True
-	columns5 = ['sleep_per_wearable', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
-			   'deep_sleep','light_sleep','awake_time','sleep_comments']
+	columns5 = ['sleep_per_wearable','sleep_comments', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
+			   'deep_sleep','light_sleep','awake_time']
 	columns5W = ['Sleep per Wearable (excluding awake time)','Sleep Comments','Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
 			   'Deep Sleep','Light Sleep','Awake Time']
 	ws.write(36, 0, "Sleep",font_style)
@@ -715,7 +715,7 @@ def export_users_xls(request):
 	ws5.col(0).width = int(40 * 260)
 	for d in range(1, 256, 1):
 		ws5.col(d).width = int(10 * 260)
-	columns = ['sleep_per_wearable', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time',
+	columns = ['sleep_per_wearable', 'sleep_comments','sleep_per_user_input', 'sleep_aid', 'sleep_bed_time',
 			   'sleep_awake_time','deep_sleep','light_sleep','awake_time']
 	current_date = to_date
 	r = 0
