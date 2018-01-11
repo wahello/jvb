@@ -2234,7 +2234,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>
+                                <p >
                                   {
                                     this.state.sleep_awake_time != null?
                                     this.state.sleep_awake_time.format('MMMM Do YYYY, h:mm a'): ''
@@ -2284,7 +2284,7 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-                          <div>
+                          <div className="input padding">
                           <Label className="padding">Total Sleep From Wearable Device (excluding awake time):</Label>
                           {this.getTotalSleep()}
                           </div>
