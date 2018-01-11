@@ -15,7 +15,7 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
       method: "get",
       params:{
         to: endDate.format('YYYY-MM-DD'),
-        from: startDate.format('YYYY-M-DD') 
+        from: startDate.format('YYYY-MM-DD') 
       },
       url: URL,
       withCredentials: true
@@ -101,8 +101,8 @@ export function downloadExcel(startDate,endDate,successPrint=undefined, errorPri
     const config = {
       method: "get",
       params:{
-        to_date: endDate.format('YYYY-MM-DD'),
-        from_date: startDate.format('YYYY-MM-DD')
+        to_date: endDate.format('MM-DD-YYYY'),
+        from_date: startDate.format('MM-DD-YYYY')
       },
       url: URL,
       withCredentials: true
