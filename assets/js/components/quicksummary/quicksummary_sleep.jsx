@@ -85,7 +85,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={250}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"sleep_ql")}

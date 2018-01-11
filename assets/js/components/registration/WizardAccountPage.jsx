@@ -80,7 +80,7 @@ constructor(props){
 						placeholder = " "
 						component = {renderFieldFormGroup}
 					/>
-                      <a onClick={this.showHidePassword} color="link" style={{ color:"black" , position:"absolute", top:"40px", right:"30px"}}>
+                      <a onClick={this.showHidePassword} color="link" style={{ color:"#535559" , position:"absolute", top:"40px", right:"30px"}}>
 								{this.state.password_type === 'input' ?
 								 <span ><i  className="fa fa-eye-slash" aria-hidden="true"></i></span> :
 								 <i className="fa fa-eye" aria-hidden="true"></i>}
@@ -99,7 +99,7 @@ constructor(props){
 						placeholder = ""
 						component = {renderFieldFormGroup}
 					/>
-                        <a onClick={this.showHideRePassword} color="link" style={{ color:"black" , position:"absolute", top:"40px", right:"30px"}}>
+                        <a onClick={this.showHideRePassword} color="link" style={{ color:"#535559" , position:"absolute", top:"40px", right:"30px"}}>
 								{this.state.re_password_type === 'input' ?
 								 <span ><i className="fa fa-eye-slash" aria-hidden="true"></i></span> :
 								 <i className="fa fa-eye" aria-hidden="true"></i>}
