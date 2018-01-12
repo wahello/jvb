@@ -115,25 +115,25 @@ class WizardPersonalPage extends Component{
 						 <FormGroup>
 					          <Label className="custom-control custom-radio">
 					            	<Field 
-					            		className="custom-control-input"
+					            		className="custom-control-input custom-radio custom-control-indicator"
 					            		name="gender" 
 					            		component="input" 
 					            		type="radio" 
 					            		value="M"
 					            	required 
 					            	/>
-					            	<span className="custom-control-indicator"></span>
+					            	<span className="custom-control-indicator custom-radio custom-control-indicator"></span>
 					            	<span className="custom-control-description">Male</span>
 					          </Label>
 					          <Label className="custom-control custom-radio">
 					            	<Field 
-					            		className="custom-control-input"
+					            		className="custom-control-input custom-radio custom-control-indicator"
 					            		name="gender" 
 					            		component="input" 
 					            		type="radio" 
 					            		value="F" 
 					            	/>
-					            	<span className="custom-control-indicator"></span>
+					            	<span className="custom-control-indicator custom-radio custom-control-indicator"></span>
 					            	<span className="custom-control-description">Female</span>
 					          </Label>
 				        </FormGroup>
