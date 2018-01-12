@@ -82,15 +82,15 @@ render(){
 					</FormGroup>	
 						
 						<Label className="custom-control custom-checkbox">
-							  <Field 
-								  	className="custom-control-input"
+							  <Field
+								  	className="custom-control-input custom-checkbox custom-control-indicator"
 								  	name="sleep_goal"
 								  	type="checkbox"
 								  	value="Maintain overall health"
 								  	required
 								  	component="input" 
 							   />
-							  <span className="custom-control-indicator"></span>
+							  <span className="custom-control-indicator custom-checkbox"></span>
 							  <span className="custom-control-description">Maintain Overall health</span>
 						</Label>
 					
@@ -122,7 +122,7 @@ render(){
 					        
 					<Label className="custom-control custom-checkbox">
 							  <Field 
-								  	className="custom-control-input"
+								  	className="custom-control-input custom-checkbox custom-control-indicator"
 								  	name="terms_conditions"
 								  	type="checkbox"
 								  	value=""
@@ -130,7 +130,7 @@ render(){
 								  	onClick={this.toggle}
 								  	component="input" 
 							   />
-							  <span className="custom-control-indicator"></span>
+							  <span className="custom-control-indicator custom-checkbox"></span>
 							  <span className="custom-control-description">I Agree To The Terms and Conditions</span>
 						</Label>
 
