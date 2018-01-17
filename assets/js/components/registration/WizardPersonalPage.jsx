@@ -5,7 +5,7 @@ import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Container,InputGroup} from 'reactstrap';
 
-import {renderFieldFormGroup,renderSelectFeet, renderSelectInches,renderSelectPounds} from './fieldRenderer';
+import {renderFieldFormGroup,renderSelectFeet, renderSelectInches,renderSelectPounds,renderSelectMonth,renderSelectDate,renderSelectYear} from './fieldRenderer';
 import { personal_validate } from './validation';
 
 class WizardPersonalPage extends Component{
@@ -15,11 +15,17 @@ class WizardPersonalPage extends Component{
 		this.state = {
 			'feet_err':' ',
 			'inches_error':' ',
-            'weight_error':' ' 
+            'weight_error':' ' ,
+            'monthError':' ',
+            'dateError':' ',
+            'yearError':' '
 		}
 		this.FeetError = this.FeetError.bind(this);
 		this.InchesError = this.InchesError.bind(this);
 		this.WeightError = this.WeightError.bind(this);
+		this.monthError = this.monthError.bind(this);
+		this.dateError = this.dateError.bind(this);
+		this.yearError = this.yearError.bind(this);
 
 	}
 
@@ -37,6 +43,22 @@ class WizardPersonalPage extends Component{
 	WeightError(err_msg){
 		this.setState({
 			weight_error:err_msg !== undefined ? err_msg : ' '
+		});
+	}
+	monthError(err_msg){
+		this.setState({
+			monthError:err_msg !== undefined ? err_msg : ' '
+		});
+	}
+
+	dateError(err_msg){
+		this.setState({
+			dateError:err_msg !== undefined ? err_msg : ' '
+		});
+	}
+	yearError(err_msg){
+		this.setState({
+			yearError:err_msg !== undefined ? err_msg : ' '
 		});
 	}
 
@@ -65,14 +87,36 @@ class WizardPersonalPage extends Component{
 							component = {renderFieldFormGroup}
 						/>
 
-						<Field
-							name = "date_of_birth"
-							type = "input"
-							label = "Date of Birth"
-							placeholder = "mm/dd/yyyy"
-							value=""
-							component = {renderFieldFormGroup}
-						/>
+						
+						<FormGroup>
+							<Label>Date of Birth</Label>
+							<InputGroup>
+								<Field
+									name = "dob_month"
+									type = "select"
+									component = {renderSelectMonth}
+									err_callback = {this.monthError}	
+								/>
+								&nbsp;
+								<Field
+									name = "dob_day"
+									type = "select"
+									component = {renderSelectDate}	
+									err_callback = {this.dateError}	
+								/>
+								&nbsp;
+								<Field
+									name = "dob_year"
+									type = "select"
+									component = {renderSelectYear}	
+									err_callback = {this.yearError}	
+								/>
+							</InputGroup>
+							<div style={{color:"red"}}>
+								{this.state.monthError+" "+this.state.dateError+" "+this.state.yearError}
+							</div>
+
+						</FormGroup>
 
 						<FormGroup>
 							<Label>Height</Label>

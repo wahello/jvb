@@ -326,14 +326,21 @@ def extract_weather_data(data):
 		"windSpeed":None
 	}
 
-	if data:
+	if data and data.get('daily',None):
 		data = data['daily']['data'][0]
-		DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
-		DATA['dewPoint'] = data['dewPoint']
-		DATA['humidity'] = round(data['humidity'] * 100,2)
-		DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
-									  data['apparentTemperatureMax'])/2, 2)
-		DATA['windSpeed'] = data['windSpeed']
+		if data.get('temperatureMin',None) and data.get('temperatureMax',None):
+			DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
+
+		DATA['dewPoint'] = data.get('dewPoint',None)
+
+		if data.get('humidity',None):
+			DATA['humidity'] = round(data['humidity'] * 100,2)
+
+		if data.get('apparentTemperatureMin',None) and data.get('apparentTemperatureMax',None):
+			DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
+										  data['apparentTemperatureMax'])/2, 2)
+			
+		DATA['windSpeed'] = data.get('windSpeed',None)
 
 	return DATA
 

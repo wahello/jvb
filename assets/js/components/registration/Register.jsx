@@ -11,6 +11,8 @@ import RegisterNetwork from '../../network/register';
 import WizardAccountPage from './WizardAccountPage';
 import WizardPersonalPage from './WizardPersonalPage';
 import WizardGoalsPage from './WizardGoalsPage';
+import { Collapse,Navbar,NavbarToggler,NavbarBrand,Nav,NavItem,NavLink,UncontrolledDropdown,
+	     DropdownToggle,DropdownMenu,DropdownItem } from 'reactstrap';
 
 class Register extends Component {
 
@@ -20,12 +22,18 @@ class Register extends Component {
 		this.previousPage = this.previousPage.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onRegisterSuccess = this.onRegisterSuccess.bind(this);
+		 this.toggle = this.toggle.bind(this);
 		this.state = {
 			page:1,
-			progress:20
+			progress:20,
+			 isOpen: false
 		};
 	}
-
+toggle() {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
+  }
 	onRegisterSuccess(response){
 		this.setState({
 			progress: this.state.progress + 33.33
@@ -69,18 +77,35 @@ class Register extends Component {
 		const class_goals = `f-cp-icon ${page === 3 ? 'active':''}`;
 
 		return(
-			<div className="form-container">
+			<div>
+			 <Navbar color="faded" light expand="md"  >
+          <NavbarBrand > <img className="img-fluid"
+               style={{maxWidth:"200px"}}
+               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+            </NavbarBrand>
+
+             <span id="Registration_header">
+            <h2 className="head" id="head">Registration
+            
+            </h2>
+            </span>
+          <NavbarToggler onClick={this.toggle} />
+          <Collapse isOpen={this.state.isOpen} navbar>
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+              <NavItem className="float-sm-right">
+                <Link id="logout"className="nav-link" to='/'>Home</Link>
+              </NavItem>
+              
+            </Nav>
+          </Collapse>
+        </Navbar>
+			<div className="form-container" id="form_margin">
 				<Container className="h-100" id="reg-form">
 					<Row className="justify-content-center align-items-center h-100">
 						<Col md="6" className="h-100">
 							<Card className="form-card">
 								<CardHeader className="text-center">
-									<div className="img-fluid">
-										<img  src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"
-										
-											 
-										/>
-									</div>
+									
 									<div className="f-progress">
 										<Progress 
 											className="f-progress-bar" 
@@ -131,6 +156,7 @@ class Register extends Component {
 					newestOnTop={false}
 					closeOnClick
 				/>
+			</div>
 			</div>
 		);
 	}

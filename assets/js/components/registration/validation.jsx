@@ -17,10 +17,7 @@ export function account_validate(values){
 		errors.password = "Password is too weak";
 	}
 
-	if(!values.re_password ||
-		values.re_password !== values.password){
-		errors.re_password = "Password doesn't match";
-	}
+	
 	return errors;
 }
 
@@ -35,8 +32,16 @@ export function personal_validate(values){
 		errors.last_name = "Last name must be atleast 2 character";
 	}
 
-	if(!values.date_of_birth){
-		errors.date_of_birth = "Date of birth is required";
+	if(!values.dob_month || values.dob_month === 'dob_month'){
+		errors.dob_month = "month  required";
+	}
+
+	if(!values.dob_day || values.dob_day === 'dob_day'){
+		errors.dob_day = "date required";
+	}
+
+	if(!values.day_year || values.day_year === 'day_year'){
+		errors.day_year = "year  required";
 	}
 
 	if(!values.feet || values.feet === 'feet'){
