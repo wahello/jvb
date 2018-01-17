@@ -58,3 +58,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.goals = validated_data.get('goals',instance.goals)
 		instance.save()
 		return instance
+
+	def linktotc(self,validated_data):
+		user_data = validated_data.pop('user')
+		user = User.objects.create_user(**user_data)
+		termsconditions = TermsConditions.objects.create(user=user,**validated_data)
+		return termsconditions
