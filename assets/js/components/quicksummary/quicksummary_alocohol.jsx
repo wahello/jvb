@@ -60,7 +60,7 @@ class Alcohol extends Component{
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Alchohol</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Alcohol</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 500;
+    return window.innerHeight - 400;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth <1024 ? 0 : 3;

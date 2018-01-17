@@ -88,7 +88,7 @@ render(){
 								  	type="checkbox"
 								  	value="Maintain overall health"
 								  	required
-								  	component="input" 
+								  	component="input" style={{borderClor:"red !important"}}
 							   />
 							  <span className="custom-control-indicator"></span>
 							  <span className="custom-control-description">Maintain Overall health</span>
@@ -119,25 +119,16 @@ render(){
 							</div>
 					        </FormGroup>
 
-					        
-					<Label className="custom-control custom-checkbox">
-							  <Field 
-								  	className="custom-control-input"
-								  	name="terms_conditions"
-								  	type="checkbox"
-								  	value=""
-								  	required
-								  	onClick={this.toggle}
-								  	component="input" 
-							   />
-							  <span className="custom-control-indicator"></span>
-							  <span className="custom-control-description">I Agree To The Terms and Conditions</span>
-						</Label>
+					
 
 						<Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
+				         
 				          <ModalHeader>
                          
-				          <p style={{fontSize:'36px', fontWeight:'bold'}}>Terms of Services</p></ModalHeader>
+				          <div style={{fontSize:'36px', fontWeight:'bold'}}>Terms of Services</div>
+				          </ModalHeader>
+
+
 				          <ModalBody style={{marginLeft:'20px', marginRight:'20px;' }}>
 				            <p style={{fontWeight:'bold' ,fontSize:'20px'}}>ACCEPTANCE OF TERMS</p>
 				            <p style={{marginLeft:'52px'}}>JVB Health & Wellness LLC ("JVB Health & Wellness") provides websites, apps, services, and a platform, (referred to collectively hereafter as "the Services") subject to the following Terms of Use ("Terms"). By using the Services in any way, you are agreeing to comply with these Terms. You are not permitted to use the Services if you object to any part of these Terms or our Privacy Policy.</p>
@@ -265,7 +256,7 @@ render(){
 
                                
 				            </div>
-				            <div><Button color="success" onClick={this.toggle}> I Agree to the Terms and Conditions</Button>				            
+				            <div><Button  type="submit" color="success" onClick={handleSubmit(onSubmit)}> I Agree to the Terms and Conditions</Button>				            
 				          </div>
 				          </ModalFooter>
 				        </Modal>
@@ -275,7 +266,7 @@ render(){
 						<Button outline color="primary" onClick={previousPage}>
 							Previous
 						</Button>
-						<Button type="submit" outline color="primary" onClick={this.toggleSubmit}  style={{float:'right'}}>
+						<Button outline color="primary" onClick={this.toggle}  style={{float:'right'}}>
 							Submit
 						</Button>
 

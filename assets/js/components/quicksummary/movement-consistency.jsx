@@ -236,7 +236,7 @@ class Movementquick extends Component{
                       {status_data[props.rowIndex]}
                     </Cell>
                   )}
-              width={110}
+              width={1000}
         />
       );
     }
