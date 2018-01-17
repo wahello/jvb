@@ -89,25 +89,7 @@ constructor(props){
                    </Col> 
 			</Row>	
 				</FormGroup>
-				 <FormGroup >
-				 <Row >
-                     <Col xs="12" sm="12">
-					<Field
-						name = "re_password"
-						type = {this.state.re_password_type}
-						label = "Re-Password"
-						placeholder = ""
-						component = {renderFieldFormGroup}
-					/>
-                        <a onClick={this.showHideRePassword} color="link" style={{ color:"#535559" , position:"absolute", top:"40px", right:"30px"}}>
-								{this.state.re_password_type === 'input' ?
-								 <span ><i className="fa fa-eye-slash" aria-hidden="true"></i></span> :
-								 <i className="fa fa-eye" aria-hidden="true"></i>}
-							</a>  
-							  </Col> 
-			</Row>	
-				</FormGroup>
-
+				
 					<div className="f-footer">
 						<Button type="submit" outline color="primary">Next</Button>
 					</div>

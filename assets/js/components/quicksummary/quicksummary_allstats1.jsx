@@ -75,7 +75,7 @@ const attrVerboseName = {
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time) (hh:mm)',
     sleep_comments:'Sleep Comments',
     sleep_per_user_input: 'Sleep Per User Input (excluding awake time) (hh:mm)',
-    sleep_aid: 'Sleep Aid',
+    sleep_aid: 'Sleep Aid taken?',
     sleep_bed_time: 'Sleep Bed Time',
     sleep_awake_time: 'Sleep Awake Time',
     deep_sleep: 'Deep Sleep (hh:mm)',
