@@ -82,15 +82,15 @@ render(){
 					</FormGroup>	
 						
 						<Label className="custom-control custom-checkbox">
-							  <Field 
-								  	className="custom-control-input"
+							  <Field
+								  	className="custom-control-input custom-checkbox custom-control-indicator"
 								  	name="sleep_goal"
 								  	type="checkbox"
 								  	value="Maintain overall health"
 								  	required
 								  	component="input" style={{borderClor:"red !important"}}
 							   />
-							  <span className="custom-control-indicator"></span>
+							  <span className="custom-control-indicator custom-checkbox"></span>
 							  <span className="custom-control-description">Maintain Overall health</span>
 						</Label>
 					
@@ -119,7 +119,7 @@ render(){
 							</div>
 					        </FormGroup>
 
-					
+
 
 						<Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
 				         
