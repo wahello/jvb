@@ -120,19 +120,7 @@ render(){
 					        </FormGroup>
 
 					        
-					<Label className="custom-control custom-checkbox">
-							  <Field 
-								  	className="custom-control-input custom-checkbox custom-control-indicator"
-								  	name="terms_conditions"
-								  	type="checkbox"
-								  	value=""
-								  	required
-								  	onClick={this.toggle}
-								  	component="input" 
-							   />
-							  <span className="custom-control-indicator custom-checkbox"></span>
-							  <span className="custom-control-description">I Agree To The Terms and Conditions</span>
-						</Label>
+					
 
 						<Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
 				          <ModalHeader>
@@ -265,7 +253,7 @@ render(){
 
                                
 				            </div>
-				            <div><Button color="success" onClick={this.toggle}> I Agree to the Terms and Conditions</Button>				            
+				            <div><Button type="submit" color="success" onClick={onSubmit}> I Agree to the Terms and Conditions</Button>				            
 				          </div>
 				          </ModalFooter>
 				        </Modal>
@@ -275,7 +263,7 @@ render(){
 						<Button outline color="primary" onClick={previousPage}>
 							Previous
 						</Button>
-						<Button type="submit" outline color="primary" onClick={this.toggleSubmit}  style={{float:'right'}}>
+						<Button  outline color="primary" onClick={this.toggle}  style={{float:'right'}}>
 							Submit
 						</Button>
 

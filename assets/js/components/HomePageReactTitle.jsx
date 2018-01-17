@@ -3,11 +3,14 @@ import { connect } from 'react-redux';
 import { Field, reduxForm} from 'redux-form';
 import { withRouter, Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, FormGroup,
-         Label, Input, FormText } from 'reactstrap';
+         Label, Input, FormText,Collapse, Navbar, NavbarToggler, 
+         NavbarBrand, Nav, NavItem, NavLink,
+       } from 'reactstrap';
 import { ToastContainer, toast } from 'react-toastify';
-
+import FontAwesome from "react-fontawesome";
 import { loginUser } from '../network/auth';
 import {loadLocalState,saveLocalState} from './localStorage';
+import NavbarMenu from './navbar';
 
 
 class HomePageReactTitle extends Component {
@@ -76,10 +79,32 @@ class HomePageReactTitle extends Component {
   }
 
   render(){
+     const {fix} = this.props;
     const { handleSubmit} = this.props;
 
     return (
        <div className="top-content">
+           <Navbar toggleable 
+         fixed={fix ? 'top' : ''} 
+          className="navbar navbar-expand-sm navbar-inverse">
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
+           <FontAwesome 
+                 name = "bars"
+                 size = "1x"
+                                          
+             />
+            
+          </NavbarToggler>
+          <Link to='/'>
+            <NavbarBrand 
+              className="navbar-brand float-xs-right float-sm-left" 
+              id="navbarTogglerDemo">
+              <img className="img-fluid"
+               style={{maxWidth:"200px"}}
+               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+            </NavbarBrand>
+          </Link>
+        </Navbar>
             <div className="inner-bg">
           	<Container>
               <div>
@@ -89,10 +114,6 @@ class HomePageReactTitle extends Component {
                          <div className="row">
                                   <div className="col-sm-6 col-sm-offset-3 form-box">
                                     <div className="d-flex justify-content-center">
-
-                                        <img className="img-fluid"
-                                         src="https://static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/591e1eb0414fb533af1850a6/1495146161157" alt="JVB"/>
-
                                       </div>
 
                                       <div className="form-bo">
