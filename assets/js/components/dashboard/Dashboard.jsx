@@ -49,6 +49,7 @@ class Dashboard extends Component {
                                <Link to='/quicksummary'>Raw Data</Link><br/>
                                 <Link to='/dashboard_summary'>Summary Dashboard</Link><br/>
                               {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
+                              {/* <Link to=' '>Set up Links to Garmin</Link><br/>*/}
 
                           </div>
                         </div>

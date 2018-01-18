@@ -100,16 +100,17 @@ export function getInitialState(start_dt, end_dt){
 	        "floor_climed": '-'
 	    },
 	    "sleep_ql": {
-	        "sleep_per_wearable": '-',
-	        "sleep_comments": '-',
-	        "sleep_per_user_input": '-',
-	        "sleep_aid": '-',
-	        "sleep_bed_time": '-',
-	        "sleep_awake_time": '-',
-	        "deep_sleep": '-',
-	        "light_sleep": '-',
-	        "awake_time": '-',
-	        "sleep_aid_penalty":'-'
+	    	  "sleep_per_user_input": '-',
+	    	   "sleep_comments": '-',
+	           "sleep_aid": '-',
+	    	   "sleep_aid_penalty":'-',
+	           "sleep_per_wearable": '-',
+	           "sleep_bed_time": '-',
+	           "sleep_awake_time": '-',
+	           "deep_sleep": '-',
+	           "light_sleep": '-',
+	           "awake_time": '-'
+	       
 	    },
 	    "food_ql": {
 	        "prcnt_non_processed_food": '-',
