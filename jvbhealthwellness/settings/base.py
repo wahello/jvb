@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'registration',
     'garmin',
     'quicklook',
+    'progress_analyzer',
 ]
 
 MIDDLEWARE = [

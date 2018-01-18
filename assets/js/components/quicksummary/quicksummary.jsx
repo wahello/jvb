@@ -183,16 +183,17 @@ class Quicklook extends Component{
 			        "floor_climed": data.steps_ql.floor_climed,
 			    },
 			    sleep_ql: {
-			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable,
-			         sleep_comments: data.sleep_ql.sleep_comments,
-			        sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
-			        sleep_aid: data.sleep_ql.sleep_aid,
-			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
+			    	 sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
+			    	  sleep_comments: data.sleep_ql.sleep_comments,
+			    	   sleep_aid: data.sleep_ql.sleep_aid,
+			    	    sleep_aid_penalty: data.grades_ql.sleep_aid_penalty,
+			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
+			       sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 			        deep_sleep: data.sleep_ql.deep_sleep,
 			        light_sleep: data.sleep_ql.light_sleep,
-			        awake_time: data.sleep_ql.awake_time,
-			        sleep_aid_penalty: data.grades_ql.sleep_aid_penalty
+			        awake_time: data.sleep_ql.awake_time
+			       
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,

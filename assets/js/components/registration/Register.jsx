@@ -7,7 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import RegisterNetwork from '../../network/register';
-
+import NavbarMenu from '../navbar';
 import WizardAccountPage from './WizardAccountPage';
 import WizardPersonalPage from './WizardPersonalPage';
 import WizardGoalsPage from './WizardGoalsPage';
