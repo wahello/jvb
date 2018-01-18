@@ -68,7 +68,7 @@ constructor(props){
 
 
             <span id="header">
-            <h2 className="head" id="head">Summary Dashboard
+            <h2 className="head" id="head">Progress Analyzer
             </h2>
             </span>
              
