@@ -39,11 +39,11 @@ acceptTerms(){
   render() {
     return (
       <div>
-        <Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
+        <Modal id="modal_stye" isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
 				         
-				          <ModalHeader>
+				          <ModalHeader >
                          
-				          <div style={{fontSize:'25px', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
+				          <div  id="main_heading" style={{fontSize:'25px', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
 				          </ModalHeader>
 
 
