@@ -1,1 +1,3 @@
-{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/WORK/JVB/healthtracker/assets/bundles/main.js"},{"name":"0.76b0021a61d57402508c.hot-update.js","publicPath":"http://localhost:3000/assets/bundles/0.76b0021a61d57402508c.hot-update.js","path":"/home/normsoftware/WORK/JVB/healthtracker/assets/bundles/0.76b0021a61d57402508c.hot-update.js"}]}}
+
+{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/atuls7inc/projects/S7inc/jvbhealth/healthtracker/assets/bundles/main.js"}]}}
+
