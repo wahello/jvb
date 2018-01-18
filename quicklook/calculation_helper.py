@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone,time
 from collections import OrderedDict,namedtuple
-import json, ast
+import json, ast, pytz
 import requests
 
 from django.db.models import Q
@@ -15,7 +15,8 @@ from garmin.models import UserGarminDataEpoch,\
           UserGarminDataMetrics,\
           UserGarminDataMoveIQ
 
-from user_input.models import DailyUserInputStrong,\
+from user_input.models import UserDailyInput,\
+					DailyUserInputStrong,\
 					DailyUserInputEncouraged,\
 					DailyUserInputOptional
 
@@ -366,7 +367,9 @@ def fetch_weather_data(latitude,longitude,date):
 	except:
 		return {}
 
-def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True):
+def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
+					user_input_bedtime = None, user_input_awake_time = None,
+					user_input_timezone = None,str_dt = True):
 	# If str_dt is True then string reperesentation of sleep and awake
 	# time is returned otherwise datetime Object or None if no sleep data.
 
@@ -374,6 +377,10 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 	recent_auto_final = None
 	recent_auto_tentative = None
 	target_sleep_data = None
+
+	user_submitted_sleep = False
+	local_user_input_bedtime = None
+	local_user_input_awake_time = None
 
 	sleep_stats = {
 		"deep_sleep": '',
@@ -383,6 +390,17 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 		"sleep_awake_time": '',
 		"sleep_per_wearable":''
 	}
+
+	if user_input_bedtime and user_input_awake_time and user_input_timezone:
+		# If manual sleep bedtime last night and awake time is submitted then we'll
+		# user this sleep bedtime time and awake time. We'll convert these time in
+		# timezone from where user input was submitted by user
+
+		user_submitted_sleep = True
+		target_tz = pytz.timezone(user_input_timezone)
+		local_user_input_bedtime = user_input_bedtime.astimezone(target_tz)
+		local_user_input_awake_time = user_input_awake_time.astimezone(target_tz)
+
 
 	if yesterday_sleep_data:
 		for obj in yesterday_sleep_data:
@@ -437,11 +455,32 @@ def get_sleep_stats(yesterday_sleep_data=None,today_sleep_data=None,str_dt=True)
 		sleep_stats['awake_time'] = sec_to_hours_min_sec(
 									target_sleep_data.get('awakeDurationInSeconds'),
 									include_sec=False)
-		bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
-											 target_sleep_data.get('startTimeOffsetInSeconds'))
-		awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
-											   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-											   target_sleep_data.get('durationInSeconds'))
+
+		if yesterday_sleep_data and user_submitted_sleep:
+			# Here trying to get bedtime last night and awake time. If user submitted
+			# manual bedtime and awake time then, we'll use that timezone aware bedtime 
+			# and awake time and get the naive datetime object
+			bed_time = local_user_input_bedtime.replace(tzinfo = None)
+			awake_time = local_user_input_awake_time.replace(tzinfo = None)
+
+		elif (not yesterday_sleep_data and today_sleep_data and user_input_timezone):
+			# Here trying to get todays bedtime, we'll assume that sleep data was recorded
+			# in same timezone as of user input submitted by user today. Thus we'll convert 
+			# bedtime and awake time in same timezone and get the naive datetime object
+			target_tz = pytz.timezone(user_input_timezone)
+			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
+						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
+			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+						target_sleep_data.get('startTimeInSeconds')+
+						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+
+		else:
+			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
+												 target_sleep_data.get('startTimeOffsetInSeconds'))
+			awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+												   target_sleep_data.get('durationInSeconds'))
+
 		sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
 							 - target_sleep_data.get('awakeDurationInSeconds',0)
 		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
@@ -566,14 +605,21 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 		return None
 	return point_range
 
-def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
+def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
+					user_input_bedtime = None, user_input_awake_time = None,
+					user_input_timezone = None):
 	
 	'''
 		Calculate the movement consistency summary
 	'''
 	movement_consistency = OrderedDict()
-	sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,str_dt=False)
-	sleeps_today_stats = get_sleep_stats(None,sleeps_today_json[::-1],str_dt=False)
+	sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,
+		user_input_bedtime = user_input_bedtime,
+		user_input_awake_time = user_input_awake_time,
+		user_input_timezone = user_input_timezone ,str_dt=False)
+
+	sleeps_today_stats = get_sleep_stats(None,sleeps_today_json[::-1],
+		user_input_timezone = user_input_timezone,str_dt=False)
 
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
@@ -609,8 +655,11 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 				steps_in_interval = movement_consistency[time_interval].get('steps')
 				status = "sleeping"
 
+				# ex 6:00 PM, not 6:32 PM
+				hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
+
 				if (hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-					datetime.combine(hour_start.date(),time(hour_start.hour)) <= today_awake_time):
+					hour_start_zero_min <= today_awake_time):
 					status = "sleeping"
 				elif(hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
 						today_bedtime and 
@@ -635,7 +684,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json):
 				hour = 0
 			else:
 				hour = int(hour)
-
+				
 			hour_start = datetime.combine(today_awake_time.date(),time(hour))
 			if hour_start < datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)):
 				if(movement_consistency[interval]['status'] == 'sleeping' and  
@@ -1191,19 +1240,30 @@ def create_quick_look(user,from_date=None,to_date=None):
 			Q(user_input__created_at__lte = current_date),
 			user_input__user = user).order_by('user_input__created_at'))
 
+		try:
+			todays_user_input = UserDailyInput.objects.select_related(
+				'strong_input','encouraged_input','optional_input').get(
+				created_at = current_date,user=user)
+		except UserDailyInput.DoesNotExist:
+			todays_user_input = None
+
 		todays_daily_strong = []
 		for i,q in enumerate(daily_strong):
 			if q.user_input.created_at == current_date.date():
 				todays_daily_strong.append(daily_strong.pop(i))
 				break
 
-		daily_encouraged = DailyUserInputEncouraged.objects.filter(
-			user_input__user = user,
-			user_input__created_at = current_date)
+		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
+		# 	user_input__user = user,
+		# 	user_input__created_at = current_date)
 
-		daily_optional = DailyUserInputOptional.objects.filter(
-			user_input__user = user,
-			user_input__created_at = current_date)
+		# daily_optional = DailyUserInputOptional.objects.filter(
+		# 	user_input__user = user,
+		# 	user_input__created_at = current_date)
+
+		daily_encouraged = [todays_user_input.encouraged_input if todays_user_input else None]
+
+		daily_optional = [todays_user_input.optional_input if todays_user_input else None]
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		todays_activities_json = todays_activities
@@ -1286,7 +1346,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
 
 		# Sleeps
-		sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json)
+		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)
+		user_input_awake_time = safe_get(todays_daily_strong,"sleep_awake_time",None)
+		user_input_timezone = todays_user_input.timezone if todays_user_input else None
+
+		sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,
+									  user_input_bedtime = user_input_bedtime,
+									  user_input_awake_time = user_input_awake_time,
+									  user_input_timezone = user_input_timezone)
+
 		sleeps_calculated_data['sleep_aid'] = safe_get(todays_daily_strong,
 					 "prescription_or_non_prescription_sleep_aids_last_night", "")
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
@@ -1348,7 +1416,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Movement consistency and movement consistency grade calculation
 		movement_consistency_summary = cal_movement_consistency_summary(epochs_json,sleeps_json,
-																		sleeps_today_json)
+										sleeps_today_json,
+										user_input_bedtime = user_input_bedtime,
+									  	user_input_awake_time = user_input_awake_time,
+									  	user_input_timezone = user_input_timezone)
 		if movement_consistency_summary:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
 			inactive_hours = movement_consistency_summary.get("inactive_hours")

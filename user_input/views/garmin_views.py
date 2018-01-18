@@ -15,7 +15,6 @@ class GarminData(APIView):
 	permission_classes = (IsAuthenticated,)
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)
-		print(request.query_params)
 		if target_date:
 			current_date = str_to_datetime(target_date)
 			yesterday_date = current_date - timedelta(days=1)
