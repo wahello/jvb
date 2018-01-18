@@ -69,13 +69,13 @@ const attrVerboseName = {
     prcnt_unprocessed_food_consumed_grade: 'Percentage of Unprocessed Food Grade',
     alcoholic_drink_per_week_grade: 'Alcoholic Drink Per Week Grade',
     sleep_aid_penalty:'Sleep Aid Penalty',
-    ctrl_subs_penalty:'Control Substance Penalty',
-    smoke_penalty:'Smoke Penalty',
+    ctrl_subs_penalty:'Controlled Substance Penalty',
+    smoke_penalty:'Smoking Penalty',
 
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time) (hh:mm)',
     sleep_comments:'Sleep Comments',
     sleep_per_user_input: 'Sleep Per User Input (excluding awake time) (hh:mm)',
-    sleep_aid: 'Sleep Aid',
+    sleep_aid: 'Sleep Aid taken?',
     sleep_bed_time: 'Sleep Bed Time',
     sleep_awake_time: 'Sleep Awake Time',
     deep_sleep: 'Deep Sleep (hh:mm)',
@@ -84,7 +84,7 @@ const attrVerboseName = {
 
     non_exercise_steps: 'Non Exercise Steps',
     exercise_steps: 'Exercise Steps',
-    total_steps: 'Total Steps',
+    total_steps: 'Total Steps *Total Steps on this chart may differ slightly from overall steps',
     floor_climed: 'Floor Climed',
     movement_consistency: 'Movement Consistency',
 

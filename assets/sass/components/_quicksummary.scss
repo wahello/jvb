@@ -134,12 +134,15 @@ background-color: #777777;
    }
 .daterange-btn{
 	font-family:futura-pt;
-    background-color: rgb(237, 149, 7);
+    background-color:#40E0D0;
 	border-radius: 0px;
-	border-color: rgb(237, 149, 7);		
+	border-color:#40E0D0;		
 	font-size: 13px;
 	height: 40px;
 	color: white;
+}
+.daterange-btn:hover{
+	background-color: #40E0D0;
 }
 .dropbutton{
 	background-color: #777777;

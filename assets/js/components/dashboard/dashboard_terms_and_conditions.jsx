@@ -1,127 +1,51 @@
-import React, { Component } from 'react';
+import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import {Field, reduxForm } from 'redux-form';
-import { Form, Label, Button, Input, FormText, FormGroup,InputGroup,
-		 Row, Col, Container,Modal, ModalHeader, ModalBody,ModalFooter} from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-import { goals_validate } from './validation';
-import {renderSelectHours,renderSelectMinutes} from './fieldRenderer';
 
-class WizardGoalsPage extends Component{
-	constructor(props){
-		super(props);
-		 this.state = {
-		 	 'hr_error':' ' ,
-		 	  'minute_error':' ' ,
-		 	
-      score: 'null',
+
+class Popup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       modal: false,
-      backdrop:'static',
-       nestedModal: false,
-       nestedModalsubmit:false
+      backdrop:"static",
+      terms_conditions:false,
+      nestedModal:false,
     };
 
-
-
-
-
-this.hrError = this.hrError.bind(this);
-this.MinuteError = this.MinuteError.bind(this);
     this.toggle = this.toggle.bind(this);
-     this.toggleNested = this.toggleNested.bind(this);
-      this.toggleSubmit = this.toggleSubmit.bind(this);
-      this.onDisagreeTerms =this.onDisagreeTerms.bind(this);
-	}
+    this.toggleNested = this.toggleNested.bind(this);
+    this.toggleTerms = this.toggleTerms.bind(this);
+    
+  }
 
-
-
-
-	hrError(err_msg){
-		this.setState({
-			hr_error:err_msg !== undefined ? err_msg : ' '
-		});
-	}
-	MinuteError(err_msg){
-		this.setState({
-			minute_error:err_msg !== undefined ? err_msg : ' '
-		});
-	}
-	toggle() {
+  toggle() {
     this.setState({
       modal: !this.state.modal
     });
   }
-  toggleNested() {
+   toggleNested() {
     this.setState({
       nestedModal: !this.state.nestedModal,
       closeAll: false
     });
   }
-   toggleSubmit() {
-    this.setState({
-      nestedModalsubmit: !this.state.nestedModalsubmit,
-      closeAll: false
-    });
-  }
-
-  onDisagreeTerms(){
- 		this.props.history.push("/");
-  }
-
-render(){
-	const { handleSubmit, previousPage, onSubmit } = this.props;
-	return(
-		<Form onSubmit={handleSubmit(onSubmit)} >
-			<Row>
-				<Col className="form-item">
-
-					
-					<FormGroup>
-						<h3>Tell us your goals</h3>
-					</FormGroup>	
-						
-						<Label className="custom-control custom-checkbox">
-							  <Field
-								  	className="custom-control-input custom-checkbox custom-control-indicator"
-								  	name="sleep_goal"
-								  	type="checkbox"
-								  	value="Maintain overall health"
-								  	required
-								  	component="input" style={{borderClor:"red !important"}}
-							   />
-							  <span className="custom-control-indicator custom-checkbox"></span>
-							  <span className="custom-control-description">Maintain Overall health</span>
-						</Label>
-					
-					
-                                <FormGroup>
-                                <Label>Daily Sleep Goals (in hours and minutes)</Label>
-                                <InputGroup>
-                                <Field
-									name = "sleep_hours"
-									type = "select"
-									label = ""
-									component = {renderSelectHours}	
-									err_callback = {this.hrError}	
-								/>&nbsp;&nbsp;&nbsp;
-								<Field
-									name = "sleep_minutes"
-									type = "select"
-									label = "Daily Sleep Goals (in hours and minutes)"
-									component = {renderSelectMinutes}	
-									err_callback = {this.MinuteError}	
-								/>
-								
-							</InputGroup>
-							<div style={{color:"red"}}>
-								{this.state.hr_error+" "+this.state.minute_error}
-							</div>
-					        </FormGroup>
+toggleTerms(){
+	this.setState({
+      terms_conditions:true,
+      modal:false,
+	});
+}
 
 
-
-						<Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
+  render() {
+    return (
+      <div>
+        <Button color="danger" onClick={this.toggle}>{this.props.buttonLabel}</Button>
+        <Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
 				         
 				          <ModalHeader>
                          
@@ -242,49 +166,19 @@ render(){
 				          </ModalBody>
 				          <ModalFooter>
 				          <div style={{float:'left'}}>
-				          <Button color="danger" onClick={this.toggleNested}> I DO NOT Agree to the Terms and Conditions</Button> 
-				            
-                                   <Modal isOpen={this.state.nestedModal} toggle={this.toggleNested} onClosed={this.state.closeAll ? this.toggle : undefined}>
-              
-              <ModalBody> You have selected not to agree with our Terms and Conditions, do you want to continue?</ModalBody>
-              <ModalFooter>
-                <Button color="primary" onClick={this.toggleNested}>Yes</Button>
-                <Button color="primary" onClick={this.onDisagreeTerms}>No</Button>
-                
-              </ModalFooter>
-            </Modal>
+				          <Button color="danger" onClick={this.toggle}> I DO NOT Agree to the Terms and Conditions</Button>
+                          </div>
 
-                               
-				            </div>
-				            <div><Button  type="submit" color="success" onClick={handleSubmit(onSubmit)}> I Agree to the Terms and Conditions</Button>				            
-				          </div>
-				          </ModalFooter>
-				        </Modal>
 
-						
-					<div className="f-footer">
-						<Button outline color="primary" onClick={previousPage}>
-							Previous
-						</Button>
-						<Button outline color="primary" onClick={this.toggle}  style={{float:'right'}}>
-							Submit
-						</Button>
+						   <div>
+						 	<Button  color="success" onClick={this.toggleTerms}> I Agree to the Terms and Conditions</Button>				            
+						   </div>
+						     </ModalFooter>
+						     </Modal>
 
-                        
-
-					</div>
-				</Col>
-			</Row>
-		</Form>
-	);
-}
+      </div>
+    );
+  }
 }
 
-export default reduxForm({
-	form: 'register',
-	destroyOnUnmount: false,
-	forceUnregisterOnMount: true,
-	validate: goals_validate
-})(
-	connect(null,{})(withRouter(WizardGoalsPage))
-);
+export default Popup;

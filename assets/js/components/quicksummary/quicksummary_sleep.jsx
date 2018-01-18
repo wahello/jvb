@@ -15,16 +15,16 @@ import { StyleSheet, css } from 'aphrodite';
 
 	 this.state = {
       myTableData: [
-        {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
-        {name: 'Sleep Comments'},
-        {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
-        {name: 'Sleep Aid'},
-        {name: 'Sleep Bed Time'}, 
-        {name: 'Sleep Awake Time'},
-        {name: 'Deep Sleep (hh:mm)'},
-        {name: 'Light Sleep (hh:mm)'},
-        {name: 'Awake Time (hh:mm)'},
-        {name: 'Sleep Aid Penalty'}                       
+          {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
+          {name: 'Sleep Comments'},
+          {name: 'Sleep Aid taken?'},
+          {name: 'Sleep Aid Penalty'} ,
+          {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
+          {name: 'Sleep Bed Time'}, 
+          {name: 'Sleep Awake Time'},
+          {name: 'Deep Sleep (hh:mm)'},
+          {name: 'Light Sleep (hh:mm)'},
+          {name: 'Awake Time (hh:mm)'}                     
       ],
     };
   }

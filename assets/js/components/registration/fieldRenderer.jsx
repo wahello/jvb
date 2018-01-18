@@ -114,3 +114,51 @@ export function renderSelectMinutes(field){
 	);
 }
 
+export function renderSelectMonth(field){
+	console.log(field);
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name} 
+				required
+				{...field.input}>
+				<option value="month">month</option> 
+				{createDropdown(1,12)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+export function renderSelectDate(field){
+	console.log(field);
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name} 
+				required
+				{...field.input}>
+				<option value="date">date</option> 
+				{createDropdown(1,31)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
+export function renderSelectYear(field){
+	console.log(field);
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	return(
+			<Input 
+				type={field.type} 
+				name={field.input.name} 
+				required
+				{...field.input}>
+				<option value="year">year</option> 
+				{createDropdown(1930,2018)}
+				{touched ? field.err_callback(error) : field.err_callback('')}
+			</Input>
+	);
+}
