@@ -207,15 +207,12 @@ def export_users_xls(request):
 	to_date = datetime.strptime(to_date, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date, "%m-%d-%Y").date()
 
-	file_download_name = '{}_raw_data_{}_to_{}.xls'.format(
-		request.user.username,
-		from_date.strftime("%b %d, %Y"),
-		to_date.strftime("%b %d, %Y")
-	)
-
+	filename1 = '{}_raw_data_{}_to_{}.xlsx'.format(request.user.username,
+		from_date.strftime('%b %d, %Y'),to_date.strftime('%b %d, %Y'))
+	filename = 'dileep.xlsx'
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-	response['Content-Disposition'] = "attachment; filename=file_download_name.xlsx"
-	book = Workbook(response, {'in_memory': True})
+	response['Content-Disposition'] = "attachment; filename=%s " 
+	book = Workbook(response,{'in_memory': True})
 	sheet1 = book.add_worksheet('All Stats')
 	sheet2 = book.add_worksheet('Grades')
 	sheet3 = book.add_worksheet('Steps')
@@ -389,10 +386,10 @@ def export_users_xls(request):
 					sheet1.write(i1+i+1,row_num - a, g[key], format)
 	#Sleep
 
-	columns5 = ['sleep_per_wearable','sleep_comments', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
+	columns5 = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
-	columns5W = ['Sleep per Wearable (excluding awake time)','Sleep Comments','Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
-			   'Deep Sleep','Light Sleep','Awake Time']
+	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 'Sleep per Wearable (excluding awake time)',
+	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep (hh:mm)','Light Sleep (hh:mm)','Awake Time (hh:mm)']
 	sheet1.write(36, 0, "Sleep")
 	col_num2 = 36
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3)
