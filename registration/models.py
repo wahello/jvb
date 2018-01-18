@@ -63,6 +63,8 @@ class Profile(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True)
 
+    terms_conditions = models.BooleanField(default=False)
+
     def __str__(self):
         return self.user.username
 
@@ -84,3 +86,20 @@ class Profile(models.Model):
 
     class Meta:
         ordering = ('created_at',)
+
+class TermsConditionsText(models.Model):
+    context = models.TextField()
+    version = models.CharField(max_length=50,unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.version
+
+class TermsConditions(models.Model):
+    user = models.OneToOneField(User,related_name = 'terms')
+    terms_conditions_version = models.ForeignKey('TermsConditionsText',on_delete=models.CASCADE)
+    accepted_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
