@@ -335,8 +335,12 @@ class UserInputs extends React.Component{
           breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
+        },()=>{
+          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          } 
+          window.scrollTo(0,0);
         });
-        window.scrollTo(0,0);
       }
     }
 
@@ -655,8 +659,8 @@ handleScroll() {
     getTotalSleep(){
       let sleep_bedtime = this.state.sleep_bedtime;
       let sleep_awake_time = this.state.sleep_awake_time;
-      let awake_hours = this.state.awake_hours?this.state.awake_hours:0;
-      let awake_mins = this.state.awake_mins?this.state.awake_mins:0;
+      let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
+      let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
       let awake_time_in_mins = awake_hours*60 + awake_mins;
       if(sleep_bedtime && sleep_awake_time){
         let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
@@ -678,7 +682,7 @@ handleScroll() {
 
         <Navbar toggleable 
          fixed={fix ? 'top' : ''} 
-          className="navbar navbar-expand-sm navbar-inverse nav6">
+          className="navbar navbar-expand-sm navbar-inverse ">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} >
            <FontAwesome 
                  name = "bars"

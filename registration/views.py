@@ -76,8 +76,9 @@ class AccepteTermsCondition(APIView):
 	def post(self, request, format="json"):
 		if request.data.get("terms_conditions",None):
 			request.user.profile.terms_conditions = True
-			request.user.save()
+			request.user.profile.save()
 			terms = TermsConditionsText.objects.get(version='1.0')
+			
 			TermsConditions.objects.create(user=request.user,
 					terms_conditions_version=terms)
 			return Response(status=status.HTTP_200_OK)
