@@ -61,7 +61,6 @@ class Dashboard extends Component {
 								<Link to='/dashboard_summary'>Progress Analyzer</Link><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 							  {this.renderTCPopup()}
-
 						  </div>
 						</div>
 					</div>
