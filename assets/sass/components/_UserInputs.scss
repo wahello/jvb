@@ -35,7 +35,7 @@ padding-top: 10px;
 	color: rgba(0,0,0,0.5);
 }
 #header{
-	margin-left:20%;
+	margin-left:24%;
 }
 #Registration_header{
 	margin-left:20%;
@@ -123,7 +123,7 @@ padding-top: 30px;
 	font-style: normal;
 	}
 	#header{
-	padding-left: 66px;
+	margin-left:16%;
 }
 
 
@@ -210,9 +210,13 @@ padding-top: 30px;
 	padding-left: 0px;
 	}
 	#calendar{
-		width:152px;
+		width:101px;
 		color:#fff;
 		padding-left: 5px;
+		margin-left: -10px;
+	}
+	#info2{
+		margin-left: -15px;
 	}
 	.unprocess_food{
 	padding: 20px 20px 10px 43px;
@@ -475,4 +479,9 @@ textarea.form-control{
 #sleep_wearable{
 	border:1px solid black;
 	margin-top: 30px;
+}
+@media (max-width: 1010px){
+	#nav-btn{
+		font-size: 12px;
+	}
 }

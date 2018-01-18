@@ -678,7 +678,7 @@ handleScroll() {
 
         <Navbar toggleable 
          fixed={fix ? 'top' : ''} 
-          className="navbar navbar-expand-sm navbar-inverse nav6">
+          className="navbar navbar-expand-sm navbar-inverse ">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} >
            <FontAwesome 
                  name = "bars"
