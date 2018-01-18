@@ -42,7 +42,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		validated_data['goals'] = Profile.GOALS_CHOICE[0][1]
 		profile = Profile.objects.create(user=user,**validated_data)
 		if validated_data['terms_conditions']:
-			terms = TermsConditionsText.objects.get(version='1.0.0.3')
+			terms = TermsConditionsText.objects.get(version='1.0')
 			TermsConditions.objects.create(user=user,
 				terms_conditions_version=terms)
 		return profile
