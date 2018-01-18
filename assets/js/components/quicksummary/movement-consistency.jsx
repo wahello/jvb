@@ -236,7 +236,7 @@ class Movementquick extends Component{
                       {status_data[props.rowIndex]}
                     </Cell>
                   )}
-              width={1000}
+              width={110}
         />
       );
     }
@@ -302,7 +302,7 @@ export default Dimensions({
     return window.innerHeight - 192;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :1150;
+    var widthOffset = window.innerWidth < 1024 ? 0 :1000;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);

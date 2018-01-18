@@ -207,15 +207,11 @@ def export_users_xls(request):
 	to_date = datetime.strptime(to_date, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date, "%m-%d-%Y").date()
 
-	file_download_name = '{}_raw_data_{}_to_{}.xls'.format(
-		request.user.username,
-		from_date.strftime("%b %d, %Y"),
-		to_date.strftime("%b %d, %Y")
-	)
-
+	filename = '{}_raw_data_{}_to_{}.xlsx'.format(request.user.username,
+		from_date.strftime('%b_%d_%Y'),to_date.strftime('%b_%d_%Y'))
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-	response['Content-Disposition'] = "attachment; filename=file_download_name.xlsx"
-	book = Workbook(response, {'in_memory': True})
+	response['Content-Disposition'] = "attachment; filename={}".format(filename) 
+	book = Workbook(response,{'in_memory': True})
 	sheet1 = book.add_worksheet('All Stats')
 	sheet2 = book.add_worksheet('Grades')
 	sheet3 = book.add_worksheet('Steps')
@@ -245,6 +241,8 @@ def export_users_xls(request):
 	sheet9.set_column('A:A',35)
 	sheet1.repeat_rows(0)
 	sheet1.repeat_columns(0)
+	sheet1.set_row(38, 150)
+
 	date_format = book.add_format({'num_format': 'm-d-yy'})
 	current_date = to_date
 	r = 0
@@ -272,11 +270,11 @@ def export_users_xls(request):
 			   'Average Exercise Heartrate Grade','Percentage of Unprocessed Food Grade','Alcoholic Drink Per Week Grade',
 			   'Sleep Aid Penalty','Control Substance Penalty','Smoke Penalty']
 	created1 = list(UserQuickLook.objects.filter(created_at__isnull=False).values())
-	
+	bold = book.add_format({'bold': True})
 	r = 0
 	row_num = 0
 	sheet1.write(0,0,"All Stats(month-day-year)")
-	sheet1.write(2,0,"Grades")
+	sheet1.write(2,0,"Grades",bold)
 	col_num1 = 2
 	for col_num in range(len(columnsw)):
 		col_num1 = col_num1 + 1
@@ -313,7 +311,7 @@ def export_users_xls(request):
 
 	columns1 = ['pace_per_100_yard','total_strokes']
 	columns1W = ['Pace Per 100 Yard','Total Strokes']
-	sheet1.write(19, 0, "Swim Stats")
+	sheet1.write(19, 0, "Swim Stats",bold)
 	col_num2 = 19
 	a = len(rows)
 	for col_num1 in range(len(columns1W)):
@@ -332,7 +330,7 @@ def export_users_xls(request):
 	# Bike
 	columns3 = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	columns3W = ['Avg Speed (MPH) Bike', 'Avg Power Bike','Avg_Speed Per Mile','Avg Cadence Bike']
-	sheet1.write(23, 0, "Bike Stats")
+	sheet1.write(23, 0, "Bike Stats",bold)
 	col_num2 = 23
 	a = len(rows) + len(rows1)
 	for col_num in range(len(columns3W)):
@@ -351,7 +349,7 @@ def export_users_xls(request):
 
 	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed']
-	sheet1.write(29, 0, "Steps")
+	sheet1.write(29, 0, "Steps",bold)
 	col_num2 = 29
 	a = len(rows) + len(rows1) + len(rows2)
 	for col_num in range(len(columns4W)):
@@ -389,11 +387,11 @@ def export_users_xls(request):
 					sheet1.write(i1+i+1,row_num - a, g[key], format)
 	#Sleep
 
-	columns5 = ['sleep_per_wearable','sleep_comments', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
+	columns5 = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
-	columns5W = ['Sleep per Wearable (excluding awake time)','Sleep Comments','Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
-			   'Deep Sleep','Light Sleep','Awake Time']
-	sheet1.write(36, 0, "Sleep")
+	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 'Sleep per Wearable (excluding awake time)',
+	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep (hh:mm)','Light Sleep (hh:mm)','Awake Time (hh:mm)']
+	sheet1.write(36, 0, "Sleep",bold)
 	col_num2 = 36
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3)
 	for col_num in range(len(columns5W)):
@@ -403,26 +401,33 @@ def export_users_xls(request):
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	i1 = 36
+	format2 = book.add_format()
+	format2.set_align('top')
+	format2.set_text_wrap()
+
+	format2.set_shrink()
 	for m,n in zip(rows4,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns5):
-				if i == 2 and n['avg_sleep_per_night_grade'] == 'A':
+				if i == 3 and n['avg_sleep_per_night_grade'] == 'A':
 					sheet1.write(i1 + i + 1, row_num - a, m[key], format_green)
-				elif i == 2 and n['avg_sleep_per_night_grade'] == 'B':
+				elif i == 3 and n['avg_sleep_per_night_grade'] == 'B':
 					sheet1.write(i1 + i + 1, row_num - a, m[key], format_green)
-				elif i == 2 and n['avg_sleep_per_night_grade'] == 'C':
+				elif i == 3 and n['avg_sleep_per_night_grade'] == 'C':
 					sheet1.write(i1 + i + 1, row_num - a, m[key], format_yellow)
-				elif i == 2 and n['avg_sleep_per_night_grade'] == 'D':
+				elif i == 3 and n['avg_sleep_per_night_grade'] == 'D':
 					sheet1.write(i1 + i + 1, row_num - a, m[key], format_yellow)
-				elif i == 2 and n['avg_sleep_per_night_grade'] == 'F':
+				elif i == 3 and n['avg_sleep_per_night_grade'] == 'F':
 					sheet1.write(i1 + i + 1, row_num - a, m[key], format_red)
+				elif i == 1:
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format2)
 				else:
 					sheet1.write(i1 + i + 1, row_num - a, m[key], format)
 	# Food
 
 	columns6 = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
 	columns6W = ['Percentage of Unprocessed Food', 'Non Processed Food', 'Diet Type']
-	sheet1.write(47, 0, "Food")
+	sheet1.write(47, 0, "Food",bold)
 	col_num2 = 47
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4)
 	for col_num in range(len(columns6W)):
@@ -452,7 +457,7 @@ def export_users_xls(request):
 
 	columns7 = ['alcohol_day', 'alcohol_week']
 	columns7W = ['Alcohol Per Day', 'Average Alcohol Consumed per Week']
-	sheet1.write(52, 0, "Alcohol")
+	sheet1.write(52, 0, "Alcohol",bold)
 	col_num2 = 52
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4) + len(rows5)
 	for col_num in range(len(columns7W)):
@@ -479,7 +484,8 @@ def export_users_xls(request):
 				sheet1.write(i1 + i + 1, row_num - a, e[key],format)
 
 	#Grades sheet
-
+	sheet2.repeat_rows(0)
+	sheet2.repeat_columns(0)
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade',
 			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
 			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
@@ -492,7 +498,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet2	.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet2.write(0, 0, "Grades")
+	sheet2.write(0, 0, "Grades",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columnsw)):
@@ -517,7 +523,8 @@ def export_users_xls(request):
 				else:
 					sheet2.write(i+2,row_num, row[key],format)
 	#Swim Stats sheet
-
+	sheet8.repeat_rows(0)
+	sheet8.repeat_columns(0)
 	columns = ['pace_per_100_yard', 'total_strokes']
 	current_date = to_date
 	r = 0
@@ -526,7 +533,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet8.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet8.write(0, 0, "Swim Stats")
+	sheet8.write(0, 0, "Swim Stats",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns1W)):
@@ -540,7 +547,8 @@ def export_users_xls(request):
 		for i, key in enumerate(columns):
 			sheet8.write(i + 2, row_num, row[key],format)
 	# Bike stats sheet
-
+	sheet9.repeat_rows(0)
+	sheet9.repeat_columns(0)
 	columns = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	current_date = to_date
 	r = 0
@@ -549,7 +557,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet9.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet9.write(0, 0, "Bike Stats")
+	sheet9.write(0, 0, "Bike Stats",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns3W)):
@@ -564,7 +572,8 @@ def export_users_xls(request):
 	 		sheet9.write(i + 2, row_num, row[key], format)
 
 	# steps stats sheet
-
+	sheet3.repeat_rows(0)
+	sheet3.repeat_columns(0)
 	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	current_date = to_date
 	r = 0
@@ -573,7 +582,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet3.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet3.write(0, 0, "Steps")
+	sheet3.write(0, 0, "Steps",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns4W)):
@@ -610,9 +619,10 @@ def export_users_xls(request):
 					sheet3.write(i + 2, row_num, a1[key], format)
 
 	# sleep stats sheet
-
-	columns = ['sleep_per_wearable', 'sleep_comments','sleep_per_user_input', 'sleep_aid', 'sleep_bed_time',
-			   'sleep_awake_time','deep_sleep','light_sleep','awake_time']
+	sheet4.repeat_rows(0)
+	sheet4.repeat_columns(0)
+	columns = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
+			   'deep_sleep','light_sleep','awake_time']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -620,7 +630,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet4.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet4.write(0, 0, "Sleep")
+	sheet4.write(0, 0, "Sleep",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns5W)):
@@ -640,22 +650,23 @@ def export_users_xls(request):
 	for a2,b2 in zip (rows,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns):
-				if i == 2 and b2['avg_sleep_per_night_grade'] == 'A':
+				if i == 3 and b2['avg_sleep_per_night_grade'] == 'A':
 					sheet4.write(i + 2, row_num, a2[key],format_green)
-				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'B':
+				elif i == 3 and b2['avg_sleep_per_night_grade'] == 'B':
 					sheet4.write(i + 2, row_num, a2[key],format_green)
-				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'C':
+				elif i == 3 and b2['avg_sleep_per_night_grade'] == 'C':
 					sheet4.write(i + 2, row_num, a2[key], format_yellow)
-				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'D':
+				elif i == 3 and b2['avg_sleep_per_night_grade'] == 'D':
 					sheet4.write(i + 2, row_num, a2[key], format_yellow)
-				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'F':
+				elif i == 3 and b2['avg_sleep_per_night_grade'] == 'F':
 					sheet4.write(i + 2, row_num, a2[key], format_red)
 				elif i == 1:
 					sheet4.write(i + 2, row_num, a2[key],format2)
 				else:
 					sheet4.write(i + 2, row_num, a2[key],format)
 	# Food sheet
-
+	sheet5.repeat_rows(0)
+	sheet5.repeat_columns(0)
 	columns = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
 	current_date = to_date
 	r = 0
@@ -664,7 +675,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet5.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet5.write(0, 0, "Food",)
+	sheet5.write(0, 0, "Food",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns6W)):
@@ -692,7 +703,8 @@ def export_users_xls(request):
 			else:
 				sheet5.write(i + 2, row_num, j[key], format2)
 	# Alcohol sheet
-
+	sheet6.repeat_rows(0)
+	sheet6.repeat_columns(0)
 	columns = ['alcohol_day', 'alcohol_week']
 	current_date = to_date
 	r = 0
@@ -701,7 +713,7 @@ def export_users_xls(request):
 			r = r + 1
 			sheet6.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	sheet6.write(0, 0, "Alcohol")
+	sheet6.write(0, 0, "Alcohol",bold)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns7W)):
