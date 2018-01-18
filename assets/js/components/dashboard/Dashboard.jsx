@@ -33,9 +33,9 @@ class Dashboard extends Component {
 		console.log(error.message);
 	}
 
-	componentDidMount(){
-		getTermsConditionStatus(this.onTCStatusSuccess, this.onTCStatusFailure)
-	}
+	// componentDidMount(){
+	// 	getTermsConditionStatus(this.onTCStatusSuccess, this.onTCStatusFailure)
+	// }
 	
 	render(){
 		return (
@@ -60,7 +60,7 @@ class Dashboard extends Component {
 							   <Link to='/quicksummary'>Raw Data</Link><br/>
 								<Link to='/dashboard_summary'>Progress Analyzer</Link><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
-							  {this.renderTCPopup()}
+							  {/*this.renderTCPopup()*/}
 						  </div>
 						</div>
 					</div>

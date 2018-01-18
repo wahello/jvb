@@ -282,7 +282,7 @@ class Quicklook extends Component{
 		}
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
-		      	const date = moment(dataitem.created_at).format('MM-DD-YY');
+		      	const date = moment(dataitem.created_at).format('M-D-YY');
 		      	let obj = this.updateDateState(dataitem);
 		      	initial_state[date] = obj;
 		      }
@@ -323,7 +323,7 @@ class Quicklook extends Component{
 			}
 		    if (data.data.length > 0){
 			 	 for(var dataitem of data.data){
-			      	const date = moment(dataitem.created_at).format('MM-DD-YY');
+			      	const date = moment(dataitem.created_at).format('M-D-YY');
 			      	let obj = this.updateUserInputDateState(dataitem);
 			      	initial_state[date] = obj;
 			      }
