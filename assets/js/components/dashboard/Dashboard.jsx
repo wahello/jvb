@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { fetchGarminData } from '../../network/garminOperations';
 import { Link } from 'react-router-dom';
 import NavbarMenu from '../navbar';
-import Popup from './dashboard_terms_and_conditions';
+import TCPopup from './dashboard_terms_and_conditions';
 
 class Dashboard extends Component {
 
@@ -50,7 +50,7 @@ class Dashboard extends Component {
                                <Link to='/quicksummary'>Raw Data</Link><br/>
                                 <Link to='/dashboard_summary'>Progress Analyzer</Link><br/>
                               {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
-                              <Popup/>
+                              <TCPopup/>
 
                           </div>
                         </div>

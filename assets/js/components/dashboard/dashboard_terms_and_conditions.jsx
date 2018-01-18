@@ -6,7 +6,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 
 
-class Popup extends React.Component {
+class TCPopup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -181,4 +181,4 @@ toggleTerms(){
   }
 }
 
-export default Popup;
+export default TCPopup;
