@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from .models import Profile
+from .models import Profile,TermsConditionsText,TermsConditions
 
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -32,7 +32,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		model = Profile
 		fields = ('id','username','email','password','first_name','last_name',
 				  'gender','height','weight','date_of_birth','sleep_goals','goals',
-				  'created_at','updated_at')
+				  'created_at','updated_at','terms_conditions')
 		extra_kwargs = {
 			'password': {'write_only': True}
 		}
@@ -40,8 +40,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		user_data = validated_data.pop('user')
 		user = User.objects.create_user(**user_data)
 		validated_data['goals'] = Profile.GOALS_CHOICE[0][1]
-		
 		profile = Profile.objects.create(user=user,**validated_data)
+		if validated_data['terms_conditions']:
+			terms = TermsConditionsText.objects.get(version='1.0.0.3')
+			TermsConditions.objects.create(user=user,
+				terms_conditions_version=terms)
 		return profile
 
 	def update(self, instance, validated_data):
