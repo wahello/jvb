@@ -3,53 +3,47 @@ import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import {Field, reduxForm } from 'redux-form';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import {acceptTermsCondition} from '../../network/dashboard';
 
-
-
-class Popup extends React.Component {
+class TCPopup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      modal: false,
+      modal: true,
       backdrop:"static",
-      terms_conditions:false,
       nestedModal:false,
+      terms_condition_accepted:false
     };
 
     this.toggle = this.toggle.bind(this);
-    this.toggleNested = this.toggleNested.bind(this);
-    this.toggleTerms = this.toggleTerms.bind(this);
+    this.acceptTerms = this.acceptTerms.bind(this);
     
   }
 
-  toggle() {
-    this.setState({
-      modal: !this.state.modal
-    });
-  }
-   toggleNested() {
-    this.setState({
-      nestedModal: !this.state.nestedModal,
-      closeAll: false
-    });
-  }
-toggleTerms(){
+toggle() {
+  this.setState({
+    modal: !this.state.modal
+  });
+}
+
+acceptTerms(){
 	this.setState({
-      terms_conditions:true,
       modal:false,
-	});
+      terms_condition_accepted:true
+	},function(){
+    acceptTermsCondition(this.state.terms_condition_accepted); 
+  });
 }
 
 
   render() {
     return (
       <div>
-        <Button color="danger" onClick={this.toggle}>{this.props.buttonLabel}</Button>
         <Modal isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
 				         
 				          <ModalHeader>
                          
-				          <div style={{fontSize:'36px', fontWeight:'bold'}}>Terms of Services</div>
+				          <div style={{fontSize:'25px', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
 				          </ModalHeader>
 
 
@@ -171,7 +165,7 @@ toggleTerms(){
 
 
 						   <div>
-						 	<Button  color="success" onClick={this.toggleTerms}> I Agree to the Terms and Conditions</Button>				            
+						 	<Button  color="success" onClick={this.acceptTerms}> I Agree to the Terms and Conditions</Button>				            
 						   </div>
 						     </ModalFooter>
 						     </Modal>
@@ -181,4 +175,4 @@ toggleTerms(){
   }
 }
 
-export default Popup;
+export default TCPopup;
