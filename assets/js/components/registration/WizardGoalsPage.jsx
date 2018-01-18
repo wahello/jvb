@@ -241,7 +241,7 @@ render(){
 				            
                                    <Modal isOpen={this.state.nestedModal} toggle={this.toggleNested} onClosed={this.state.closeAll ? this.toggle : undefined}>
               
-              <ModalBody> You have selected not to agree with our Terms and Conditions, do you want to continue?</ModalBody>
+              <ModalBody> You have selected not to agree with our Terms and Conditions. You must agree to our Terms and Conditions to register for out site. Do you want to continue?</ModalBody>
               <ModalFooter>
                 <Button color="primary" onClick={this.toggleNested}>Yes</Button>
                 <Button color="primary" onClick={this.onDisagreeTerms}>No</Button>
