@@ -170,11 +170,19 @@ render(){
 
 				           <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>COPYRIGHT COMPLAINTS   </p>
 
+
 				             <p id="text_style" style={{marginLeft:'52px'}}>JVB Health & Wellness respects the intellectual property of others. If you believe that your work has been copied in a way that constitutes copyright infringement, <a href="#">contact us </a>  </p>
 				           <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>PRIVACY AND INFORMATION DISCLOSURE   </p>
 
 				             <p id="text_style" style={{marginLeft:'52px'}}>JVB Health & Wellness's current privacy policy is available at http://www.jvbwellness.com/privacy/    </p>
 				           <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>NO MEDICAL ADVICE   </p>
+
+				             <p style={{marginLeft:'52px'}}>JVB Health & Wellness respects the intellectual property of others. If you believe that your work has been copied in a way that constitutes copyright infringement, <a href="#">contact us </a>  </p>
+				           <p style={{fontWeight:'bold' ,fontSize:'20px'}}>PRIVACY AND INFORMATION DISCLOSURE   </p>
+
+				             <p style={{marginLeft:'52px'}}>JVB Health & Wellness's current privacy policy is available at http://www.jvbwellness.com/privacy/    </p>
+				           <p style={{fontWeight:'bold' ,fontSize:'20px'}}>NO MEDICAL ADVICE   </p>
+
 
 				             <p id="text_style" style={{marginLeft:'52px'}}>Neither JVB Health & Wellness (nor its employees, directors, subsidiaries, agents, licensors, managers, and other affiliated companies, and their employees, contractors, agents, officers and directors) nor any of the Coaches can provide any medical or professional advice, diagnosis, or treatment of any kind nor do they create a doctor-patient relationship. Coaching Services are provided for informational purposes only. Users should not rely on the Services or their coach to make any medical decisions and should always consult their physician for any medical question. You agree that before use of Coaching Services, you will consult with your physician. Services are only intended for those who are healthy. You should stop if you are ever experiencing pain or severe discomfort. Call 911 or your doctor immediately if you think you have a medical emergency. You should never disregard medical advice or delay in seeking medical advice because of any content presented on this site, and you should not use our content for diagnosing or treating a health problem. Our content does not constitute medical advice. Relying on any information provided by JVB Health & Wellness or your Coach is solely at your own risk. We reserve the right to terminate your use of the Services for any reason or no reason, including if we determine, in our sole discretion, that you have certain medical conditions. The transmission and receipt of our content, in whole or in part, or communication via the internet, e-mail or other means does not constitute or create a doctor-patient, therapist-patient or other healthcare professional relationship between you and us. JVB Health & Wellness is not a healthcare provider or business associate of a healthcare provider and is not subject to the privacy rule of the health insurance portability and accountability act of 1996 (HIPAA).   </p>
 				           <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>INDEMNITY   </p>
@@ -202,28 +210,15 @@ render(){
 
                                 <p id="text_style" style={{marginLeft:'52px'}}>The Terms constitute the entire agreement between you and JVB Health & Wellness and govern your use of the Services, superceding any prior agreements between you and JVB Health & Wellness. The Terms and the relationship between you and JVB Health & Wellness shall be governed by the laws of the State of Delaware without regard to its conflict of law provisions. You and JVB Health & Wellness agree to submit to the personal and exclusive jurisdiction of the courts located within the county of New Castle, Delaware. The failure of JVB Health & Wellness to exercise or enforce any right or provision of the Terms shall not constitute a waiver of such right or provision. If any provision of the Terms is found by a court of competent jurisdiction to be invalid, the parties nevertheless agree that the court should endeavor to give effect to the parties' intentions as reflected in the provision, and the other provisions of the Terms remain in full force and effect. You agree that regardless of any statute or law to the contrary, any claim or cause of action arising out of or related to use of the Services or the Terms must be filed within one (1) year after such claim or cause of action arose or be forever barred. </p>
                                 <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>VIOLATION OF TERMS AND LIQUIDATED DAMAGES  </p>
-				          
-                                 <p id="text_style" style={{marginLeft:'52px'}}> Please report any violations of the Terms, <a href="#">contact us</a> </p>  
-                                  
-
-                                  <p id="text_style" style={{marginLeft:'52px'}}> Our failure to act with respect to a breach by you or others does not waive our right to act with respect to subsequent or similar breaches. </p>  
-                                
 
 
-
-
-                                 <p id="mid_heading" style={{fontWeight:'bold' ,fontSize:'32px',marginTop:'60px'}}>JVB Health & Wellness Privacy Policy </p>    
-
-                                  <p style={{marginTop:'10px'}}>Some people provide JVB Health & Wellness with information and/or data.   JVB Health & Wellness believes in keeping you information confidential.  We established this privacy policy to explain how your information is protected, collected and used. This privacy policy may be updated by JVB Health & Wellness from time to time, and JVB Health & Wellness will provide notice of materially significant changes to this privacy policy by posting notice on the JVBWellness.com site.  </p>  
-                                 <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>Protecting your privacy </p>    
-
-                                  <p >For those users that provide us information, we don't share it with third parties for marketing purposes. We don't send you unsolicited communications for marketing purposes.   </p>  
+                                  <p >For those users that provide us information, we don't share it with third parties for marketing purposes. We don't send you unsolicited communications for marketing purposes.   </p>  
                                  <p >JVB Health & Wellness does not knowingly collect any information from persons under the age of 13. If JVB Health & Wellness learns that an account was created by a person under the age of 13, JVB Health & Wellness will remove that account. JVB Health & Wellness, or people who post on JVB Health & Wellness, may provide links to third party websites, which may have different privacy practices. We are not responsible for, nor have any control over, the privacy policies of those third party websites, and encourage all users to read the privacy policies of each and every website visited. </p>    
 
                                 
                                  <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>Data we collect </p>    
                                  
-                                 <p>In some instances, we may collect data from our users.  Our primary goal in collecting personal information is to provide analyses of your data. We only collect personal information that is relevant to the purpose of our analyses.</p>
+                                 <p>In some instances, we may collect data from our users.  Our primary goal in collecting personal information is to provide analyses of your data. We only collect personal information that is relevant to the purpose of our analyses.</p>
                                  <p>We receive and store any information you provide. You can choose not to provide us with certain information, but then you may not get as much detail in our reporting as you’d like. The personal information you provide is used for such purposes as registration; in order for you to use JVB Health & Wellness services, you must complete a registration form. As part of this registration form, we require your email address.</p>
                                 
                                   <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>Data we store </p>  

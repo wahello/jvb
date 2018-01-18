@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { fetchGarminData } from '../../network/garminOperations';
 import { Link } from 'react-router-dom';
 import NavbarMenu from '../navbar';
+import Popup from './dashboard_terms_and_conditions';
 
 class Dashboard extends Component {
 
@@ -47,9 +48,9 @@ class Dashboard extends Component {
                                <a href='/users/request_token'>Garmin Health Connect</a><br/>
                                <a href='/users/connect_request_token'>Garmin Connect</a><br/>
                                <Link to='/quicksummary'>Raw Data</Link><br/>
-                                <Link to='/dashboard_summary'>Summary Dashboard</Link><br/>
+                                <Link to='/dashboard_summary'>Progress Analyzer</Link><br/>
                               {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
-                              {/* <Link to=' '>Set up Links to Garmin</Link><br/>*/}
+
 
                           </div>
                         </div>

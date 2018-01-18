@@ -8,6 +8,7 @@ axiosRetry(axios, { retries: 3});
 class RegisterNetwork {
 
 	register(post_data, callback=undefined, err_callback=undefined){
+		post_data['terms_conditions'] = true;
 		post_data['height'] = post_data['feet']+"'"+post_data['inches']+"\"";
 		post_data['sleep_goals'] = post_data['sleep_hours']+":"+post_data['sleep_minutes'];
 		let new_date_of_birth = post_data['dob_year']+"-"+post_data['dob_month']+"-"+post_data['dob_day'];

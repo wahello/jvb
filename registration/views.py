@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication
 
 
 from .serializers import UserSerializer, UserProfileSerializer
-from .models import Profile
+from .models import Profile,TermsConditions,TermsConditionsText
 
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
@@ -31,6 +31,7 @@ class Login(APIView):
 			return Response(status=status.HTTP_200_OK)
 		else:
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class Logout(APIView):
 	def get(self,request,format="json"):
@@ -63,5 +64,23 @@ class UserItemView(generics.RetrieveUpdateDestroyAPIView):
 
 class IsUserLoggedIn(APIView):
 	def get(self, request, format="json"):
-		return Response({"user_status":request.user.is_authenticated()},
+		return Response({"user_status":request.user.is_authenticated()	},
 			   status=status.HTTP_200_OK)
+
+class IsUserAccepteTermsCondition(APIView):
+	def get(self, request, format="json"):
+		return Response({"terms_conditions":request.user.profile.terms_conditions},
+			   status=status.HTTP_200_OK)
+
+class AccepteTermsCondition(APIView):
+	def post(self, request, format="json"):
+		if request.data.get("terms_conditions",None):
+			request.user.profile.terms_conditions = True
+			request.user.save()
+			terms = TermsConditionsText.objects.get(version='1.0.0.3')
+			TermsConditions.objects.create(user=request.user,
+					terms_conditions_version=terms)
+			return Response(status=status.HTTP_200_OK)
+		else:
+			return Response(status=status.HTTP_401_UNAUTHORIZED)
+

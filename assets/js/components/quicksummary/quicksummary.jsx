@@ -625,7 +625,7 @@ onLogoutSuccess(response){
 									         <Button
 		                                        className="daterange-btn btn"		                         
 									            id="daterange"
-									            style={{color:"white",fontSize:"12px"}}
+									            
 									            onClick={this.toggleDate} >Date Range
 									        </Button>
 									        </span>

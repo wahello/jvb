@@ -2180,10 +2180,17 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-
+                         
+                           <div className="input padding"  style={{fontWeight:"bold"}}>
+                          
+                   <p id="sleep_wearable"><Label className="padding" >Total Sleep From Wearable Device:</Label>
+                         {this.getTotalSleep()}</p>
+                        
+                          </div>
+                         
                            <FormGroup>
                           
-                            <Label className="padding">2.1 Sleep Bed Time</Label>
+                            <Label className="padding">2.1 Sleep Bed Time Fell Asleep Per Wearable Device.</Label>
                             {this.state.editable &&
                               <div className="input1">
                                 <DatePicker
@@ -2192,11 +2199,11 @@ handleScroll() {
                                     selected={this.state.sleep_bedtime}
                                     onChange={this.handleChangeSleepBedTime}
                                     showTimeSelect
-                                    timeFormat="HH:mm"
-                                    timeIntervals={15}
+                                    excludeTimes={[moment().hours(17).minutes(0), moment().hours(18).minutes(0), moment().hours(19).minutes(0)], moment().hours(17).minutes(0)}
+                                    timeIntervals={1}
                                     dateFormat="LLL"
                                     isClearable={true}
-                                    shouldCloseOnSelect={false}
+                                    shouldCloseOnSelect={true}
                                 />
                               </div>
                             }
@@ -2214,7 +2221,7 @@ handleScroll() {
                           </FormGroup>
                            <FormGroup>
                           
-                            <Label className="padding">2.2 Sleep Awake Time</Label>
+                            <Label className="padding">2.2 Sleep Awake Time Per Wearable Device</Label>
                             {this.state.editable &&
                               <div className="input1">
                                 <DatePicker
@@ -2223,11 +2230,11 @@ handleScroll() {
                                     selected={this.state.sleep_awake_time}
                                     onChange={this.handleChangeSleepAwakeTime}
                                     showTimeSelect
-                                    timeFormat="HH:mm"
-                                    timeIntervals={15}
+                                     excludeTimes={[moment().hours(17).minutes(0), moment().hours(18).minutes(0), moment().hours(19).minutes(0)], moment().hours(17).minutes(0)}
+                                    timeIntervals={1}
                                     dateFormat="LLL"
                                     isClearable={true}
-                                    shouldCloseOnSelect={false}
+                                    shouldCloseOnSelect={true}
                                 />
                               </div>
                             }
@@ -2245,7 +2252,7 @@ handleScroll() {
                           </FormGroup>
                            <FormGroup>
                           
-                            <Label className="padding">2.3 Awake Time</Label>
+                            <Label className="padding">2.3 Awake Time Per Wearable Device</Label>
                             {this.state.editable &&
                               <div>
                                 <div className="col-xs-6">
@@ -2284,10 +2291,7 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-                          <div className="input padding">
-                          <Label className="padding">Total Sleep From Wearable Device (excluding awake time):</Label>
-                          {this.getTotalSleep()}
-                          </div>
+                         
 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>

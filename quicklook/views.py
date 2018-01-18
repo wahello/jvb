@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import ast
 import xlwt
 import time
+import xlsxwriter	
 from xlwt import easyxf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -10,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from xlsxwriter.workbook import Workbook
 
 from .serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
@@ -211,42 +213,53 @@ def export_users_xls(request):
 		to_date.strftime("%b %d, %Y")
 	)
 
-	response = HttpResponse(content_type='application/ms-excel')
-	response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_download_name)
-	# date_of_joined = User.objects.values_list(request.user.date_joined)
-	# print(date_of_joined)
-	aaa = request.user.date_joined
-	print(aaa)
-	print("Unix Timestamp: ",(time.mktime(aaa.timetuple())))
-	wb = xlwt.Workbook(encoding='utf-8')
-	ws = wb.add_sheet('All Stats')
-	ws1 = wb.add_sheet('Grades')
-	ws2 = wb.add_sheet('Swim Stats')
-	ws3 = wb.add_sheet('Bike Stats')
-	ws4 = wb.add_sheet('Steps')
-	ws5 = wb.add_sheet('Sleep')
-	ws6 = wb.add_sheet('Food')
-	ws7 = wb.add_sheet('Alcohol')
-
-
-	row_num = 0
-	ws.set_panes_frozen(True)
-	ws.set_horz_split_pos(1)
-	ws.set_vert_split_pos(1)
-	ws.col(0).width = int(40 * 260)
-	for d in range(1,256,1):
-		ws.col(d).width = int(10 * 260)
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
-	style = xlwt.XFStyle()
-	style.num_format_str = 'MM-D-YY'
-	base_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left")
-	# perc_style = xlwt.easyxf("align: wrap yes ; alignment: horizontal left ;num_format_str : '0%'")
-	f_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour red;")
-	ab_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour green;")
-	cd_style = easyxf("alignment: horizontal left ; pattern: pattern solid, fore_colour yellow;")
-
-	#All Status
+	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+	response['Content-Disposition'] = "attachment; filename=file_download_name.xlsx"
+	book = Workbook(response, {'in_memory': True})
+	sheet1 = book.add_worksheet('All Stats')
+	sheet2 = book.add_worksheet('Grades')
+	sheet3 = book.add_worksheet('Steps')
+	sheet4 = book.add_worksheet('Sleep')
+	sheet5 = book.add_worksheet('Food')
+	sheet6 = book.add_worksheet('Alcohol')
+	sheet7 = book.add_worksheet('All Raw Data')
+	sheet8 = book.add_worksheet('Swim Stats')
+	sheet9 = book.add_worksheet('Bike Stats')
+	sheet1.freeze_panes(1, 1)
+	sheet1.set_column('A:A',35)
+	sheet2.freeze_panes(1, 1)
+	sheet2.set_column('A:A',35)
+	sheet3.freeze_panes(1, 1)
+	sheet3.set_column('A:A',35)
+	sheet4.freeze_panes(1, 1)
+	sheet4.set_column('A:A',35)
+	sheet5.freeze_panes(1, 1)
+	sheet5.set_column('A:A',35)
+	sheet6.freeze_panes(1, 1)
+	sheet6.set_column('A:A',35)
+	sheet7.freeze_panes(1, 1)
+	sheet7.set_column('A:A',35)
+	sheet8.freeze_panes(1, 1)
+	sheet8.set_column('A:A',35)
+	sheet9.freeze_panes(1, 1)
+	sheet9.set_column('A:A',35)
+	sheet1.repeat_rows(0)
+	sheet1.repeat_columns(0)
+	date_format = book.add_format({'num_format': 'm-d-yy'})
+	current_date = to_date
+	r = 0
+	date1 = []
+	if to_date and from_date :
+		while (current_date >= from_date):
+			r = r + 1
+			sheet1.write(0,r,current_date,date_format)
+			date1.append(current_date)
+			current_date -= timedelta(days = 1)
+	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
+	format_green = book.add_format({'align':'left', 'bg_color': 'green','num_format': '#,##0'})
+	format_yellow = book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '#,##0'})
+	format = book.add_format({'align':'left','num_format': '#,##0'})
+	format1 = book.add_format({'align':'left','num_format': '0.00'})
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade',
 			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
@@ -258,27 +271,16 @@ def export_users_xls(request):
 			   'Overall Workout Grade','Workout Duration Grade','Workout Effort Level Grade',
 			   'Average Exercise Heartrate Grade','Percentage of Unprocessed Food Grade','Alcoholic Drink Per Week Grade',
 			   'Sleep Aid Penalty','Control Substance Penalty','Smoke Penalty']
-	current_date = to_date
 	created1 = list(UserQuickLook.objects.filter(created_at__isnull=False).values())
-	date2 = []
-	# for created2 in created1:
-	for i,key3 in enumerate(created1):
-			date2.append(key3['created_at'])
+	
 	r = 0
-	date1 = []
-	if to_date and from_date :
-		while (current_date >= from_date):
-			r = r + 1
-			ws.write(0,r,current_date,style)
-			date1.append(current_date)
-			current_date -= timedelta(days = 1)
-
-	ws.write(0,0,"All Stats(month-day-year)",font_style)
-	ws.write(2,0,"Grades",font_style)
+	row_num = 0
+	sheet1.write(0,0,"All Stats(month-day-year)")
+	sheet1.write(2,0,"Grades")
 	col_num1 = 2
 	for col_num in range(len(columnsw)):
 		col_num1 = col_num1 + 1
-		ws.write(col_num1, row_num, columnsw[col_num], base_style)
+		sheet1.write(col_num1, row_num, columnsw[col_num])
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -292,41 +294,31 @@ def export_users_xls(request):
 	for row in rows:
 		count = count + 1
 		row_num += 1
-		if set(date2).intersection(date1):
-			count = count + 1
-			# row_num += 1
-			inv_map = {v: k for k, v in row.items()}
-			for i,key in enumerate(columns):
+		inv_map = {v: k for k, v in row.items()}
+		for i,key in enumerate(columns):
 				if row[key] == 'A':
-					ws.write(i+3,row_num, row[key],ab_style)
+					sheet1.write(i+3,row_num, row[key],format_green)
 				elif row[key] == 'B':
-					ws.write(i+3,row_num, row[key],ab_style)
+					sheet1.write(i+3,row_num, row[key],format_green)
 				elif row[key] == 'C':
-					ws.write(i+3,row_num, row[key],cd_style)
+					sheet1.write(i+3,row_num, row[key],format_yellow)
 				elif row[key] == 'D':
-					ws.write(i+3,row_num, row[key],cd_style)
+					sheet1.write(i+3,row_num, row[key],format_yellow)
 				elif row[key] == 'F':
-					ws.write(i+3,row_num, row[key],f_style)
+					sheet1.write(i+3,row_num, row[key],format_red)
 				else:
-					ws.write(i+3,row_num, row[key],base_style)
-		else:
-			ws.write(i+3+count,row_num, 'NO Data',base_style)
-			row_num += 1
-
-
-
+					sheet1.write(i+3,row_num, row[key],format1)
 
 	# Swim status
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
+
 	columns1 = ['pace_per_100_yard','total_strokes']
 	columns1W = ['Pace Per 100 Yard','Total Strokes']
-	ws.write(19, 0, "Swim Stats",font_style)
+	sheet1.write(19, 0, "Swim Stats")
 	col_num2 = 19
 	a = len(rows)
 	for col_num1 in range(len(columns1W)):
 			col_num2 = col_num2 + 1
-			ws.write(col_num2 , row_num - a  , columns1W[col_num1],base_style)
+			sheet1.write(col_num2 , row_num - a  , columns1W[col_num1],format)
 	rows1 = SwimStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -335,19 +327,17 @@ def export_users_xls(request):
 	for row in rows1:
 		row_num += 1
 		for i,key in enumerate(columns1):
-			ws.write(i1+i+1,row_num - a, row[key],base_style)
+			sheet1.write(i1+i+1,row_num - a, row[key],format)
 
 	# Bike
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
 	columns3 = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	columns3W = ['Avg Speed (MPH) Bike', 'Avg Power Bike','Avg_Speed Per Mile','Avg Cadence Bike']
-	ws.write(23, 0, "Bike Stats",font_style)
+	sheet1.write(23, 0, "Bike Stats")
 	col_num2 = 23
 	a = len(rows) + len(rows1)
 	for col_num in range(len(columns3W)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a, columns3W[col_num],base_style)
+		sheet1.write(col_num2, row_num - a, columns3W[col_num],format)
 	rows2 = BikeStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -356,56 +346,17 @@ def export_users_xls(request):
 	for row in rows2:
 		row_num += 1
 		for i,key in enumerate(columns3):
-			ws.write(i1+i+1,row_num - a, row[key],base_style)
-
+			sheet1.write(i1+i+1,row_num - a, row[key],format)
 	# Steps
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
-	font_style1 = xlwt.XFStyle()
-	font_style1.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style1.alignment = alignment
-	font_style4 = xlwt.XFStyle()
-	font_style4.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style4.alignment = alignment
-	pattern = xlwt.Pattern()
-	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-	pattern.pattern_fore_colour = 17
-	font_style4.pattern = pattern
-	font_style1 = xlwt.XFStyle()
-	font_style1.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style1.alignment = alignment
-	pattern = xlwt.Pattern()
-	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-	pattern.pattern_fore_colour = 5
-	font_style1.pattern = pattern
-	font_style2 = xlwt.XFStyle()
-	font_style2.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style2.alignment = alignment
-	pattern = xlwt.Pattern()
-	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-	pattern.pattern_fore_colour = 2
-	font_style2.pattern = pattern
-	font_style3 = xlwt.XFStyle()
-	font_style3.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style3.alignment = alignment
+
 	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed']
-	ws.write(29, 0, "Steps",font_style)
+	sheet1.write(29, 0, "Steps")
 	col_num2 = 29
 	a = len(rows) + len(rows1) + len(rows2)
 	for col_num in range(len(columns4W)):
 		 col_num2 = col_num2 + 1
-		 ws.write(col_num2,row_num - a, columns4W[col_num], base_style)
+		 sheet1.write(col_num2,row_num - a, columns4W[col_num])
 	rows3 = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -415,97 +366,98 @@ def export_users_xls(request):
 		row_num += 1
 		for i,key in enumerate(columns4):
 				if i == 1 and h['movement_non_exercise_steps_grade'] == 'A':
-					ws.write(i1+i+1,row_num - a, g[key], font_style4)
+					sheet1.write(i1+i+1,row_num - a, g[key], format_green)
 				elif i == 1 and h['movement_non_exercise_steps_grade'] == 'B':
-					ws.write(i1+i+1,row_num - a, g[key], font_style4)
+					sheet1.write(i1+i+1,row_num - a, g[key], format_green)
 				elif i == 1 and h['movement_non_exercise_steps_grade'] == 'C':
-					ws.write(i1+i+1,row_num - a, g[key], font_style1)
+					sheet1.write(i1+i+1,row_num - a, g[key], format_yellow)
 				elif i == 1 and h['movement_non_exercise_steps_grade'] == 'D':
-					ws.write(i1+i+1,row_num - a, g[key], font_style1)
+					sheet1.write(i1+i+1,row_num - a, g[key], format_yellow)
 				elif i == 1 and h['movement_non_exercise_steps_grade'] == 'F':
-					ws.write(i1+i+1,row_num - a, g[key], font_style2)
+					sheet1.write(i1+i+1,row_num - a, g[key], format_red)
 				elif i == 0 and h['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and g[key]:
-					ws.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], font_style4)
+					sheet1.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], format_green)
 				elif i == 0 and h['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and g[key]:
-					ws.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], font_style4)
+					sheet1.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], format_green)
 				elif i == 0 and h['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and g[key]:
-					ws.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], font_style1)
+					sheet1.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], format_yellow)
 				elif i == 0 and h['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and g[key]:
-					ws.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], font_style1)
+					sheet1.write(i1+i+1,row_num - a, ast.literal_eval(g[key])['inactive_hours'], format_yellow)
 				elif i == 0 and h['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and g[key]:
-					ws.write(i1+i+1,row_num - a,ast.literal_eval(g[key])['inactive_hours'], font_style2)
+					sheet1.write(i1+i+1,row_num - a,ast.literal_eval(g[key])['inactive_hours'], format_red)
 				else:
-					ws.write(i1+i+1,row_num - a, g[key], font_style3)
-	# Sleep
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
+					sheet1.write(i1+i+1,row_num - a, g[key], format)
+	#Sleep
+
 	columns5 = ['sleep_per_wearable','sleep_comments', 'sleep_per_user_input', 'sleep_aid', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
 	columns5W = ['Sleep per Wearable (excluding awake time)','Sleep Comments','Sleep Per User Input (excluding awake time)', 'Sleep Aid', 'Sleep Bed Time', 'Sleep Awake Time',
 			   'Deep Sleep','Light Sleep','Awake Time']
-	ws.write(36, 0, "Sleep",font_style)
+	sheet1.write(36, 0, "Sleep")
 	col_num2 = 36
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3)
 	for col_num in range(len(columns5W)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a , columns5W[col_num], base_style)
+		sheet1.write(col_num2, row_num - a , columns5W[col_num])
 	rows4 = Sleep.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
 	i1 = 36
-	# for row in rows4:
-	# 	row_num += 1
-	# 	for i, key in enumerate(columns5):
-	# 	   ws.write(i1 + i + 1, row_num - a, row[key],base_style)
 	for m,n in zip(rows4,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns5):
 				if i == 2 and n['avg_sleep_per_night_grade'] == 'A':
-					ws.write(i1 + i + 1, row_num - a, m[key], ab_style)
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format_green)
 				elif i == 2 and n['avg_sleep_per_night_grade'] == 'B':
-					ws.write(i1 + i + 1, row_num - a, m[key], ab_style)
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format_green)
 				elif i == 2 and n['avg_sleep_per_night_grade'] == 'C':
-					ws.write(i1 + i + 1, row_num - a, m[key], cd_style)
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format_yellow)
 				elif i == 2 and n['avg_sleep_per_night_grade'] == 'D':
-					ws.write(i1 + i + 1, row_num - a, m[key], cd_style)
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format_yellow)
 				elif i == 2 and n['avg_sleep_per_night_grade'] == 'F':
-					ws.write(i1 + i + 1, row_num - a, m[key], f_style)
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format_red)
 				else:
-					ws.write(i1 + i + 1, row_num - a, m[key], base_style)
+					sheet1.write(i1 + i + 1, row_num - a, m[key], format)
 	# Food
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
+
 	columns6 = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
 	columns6W = ['Percentage of Unprocessed Food', 'Non Processed Food', 'Diet Type']
-	ws.write(47, 0, "Food",font_style)
+	sheet1.write(47, 0, "Food")
 	col_num2 = 47
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4)
 	for col_num in range(len(columns6W)):
 		col_num2 = col_num2 + 1
-		ws.write(col_num2, row_num - a, columns6W[col_num],base_style)
+		sheet1.write(col_num2, row_num - a, columns6W[col_num])
 	i1 = 47
 	rows5 = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	for row in rows5:
+	for j1,k1 in zip (rows5,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns6):
-			if key == 'prcnt_non_processed_food':
-				ws.write(i1 + i + 1, row_num - a, str(int(row[key]))+ '%')
+			if k1['prcnt_unprocessed_food_consumed_grade'] == 'A' and i == 0:
+				sheet1.write(i1 + i + 1, row_num - a,str(int(j1[key])) + '%' ,format_green)
+			elif k1['prcnt_unprocessed_food_consumed_grade'] == 'B' and i == 0:
+				sheet1.write(i1 + i + 1, row_num - a, str(int(j1[key])) + '%' ,format_green)
+			elif k1['prcnt_unprocessed_food_consumed_grade'] == 'C' and i == 0:
+				sheet1.write(i1 + i + 1, row_num - a,str(int(j1[key])) + '%' ,format_yellow)
+			elif k1['prcnt_unprocessed_food_consumed_grade'] == 'D' and i == 0:
+				sheet1.write(i1 + i + 1, row_num - a, str(int(j1[key])) + '%' ,format_yellow)
+			elif k1['prcnt_unprocessed_food_consumed_grade'] == 'F' and i == 0:
+				sheet1.write(i1 + i + 1, row_num - a,str(int(j1[key])) + '%' ,format_red)
 			else:
-				ws.write(i1 + i + 1, row_num - a, row[key],base_style)
+				sheet1.write(i1 + i + 1, row_num - a, j1[key], format)
 
 	#Alcohol
-	font_style = xlwt.XFStyle()
-	font_style.font.bold = True
+
 	columns7 = ['alcohol_day', 'alcohol_week']
 	columns7W = ['Alcohol Per Day', 'Average Alcohol Consumed per Week']
-	ws.write(52, 0, "Alcohol",font_style)
+	sheet1.write(52, 0, "Alcohol")
 	col_num2 = 52
 	a = len(rows) + len(rows1) + len(rows2) + len(rows3) + len(rows4) + len(rows5)
 	for col_num in range(len(columns7W)):
 		   col_num2 = col_num2 + 1
-		   ws.write(col_num2, row_num - a, columns7W[col_num], base_style)
+		   sheet1.write(col_num2, row_num - a, columns7W[col_num])
 	rows6 = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
@@ -514,24 +466,20 @@ def export_users_xls(request):
 		row_num += 1
 		for i, key in enumerate(columns7):
 			if i == 1 and f['alcoholic_drink_per_week_grade'] == 'A':
-				ws.write(i1 + i + 1, row_num - a, e[key], ab_style)
+				sheet1.write(i1 + i + 1, row_num - a, e[key], format_green)
 			elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'B':
-				ws.write(i1 + i + 1, row_num - a, e[key], ab_style)
+				sheet1.write(i1 + i + 1, row_num - a, e[key], format_green)
 			elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'C':
-				ws.write(i1 + i + 1, row_num - a, e[key], cd_style)
+				sheet1.write(i1 + i + 1, row_num - a, e[key], format_yellow)
 			elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'D':
-				ws.write(i1 + i + 1, row_num - a, e[key], cd_style)
+				sheet1.write(i1 + i + 1, row_num - a, e[key], format_yellow)
 			elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'F':
-				ws.write(i1 + i + 1, row_num - a, e[key], f_style)
+				sheet1.write(i1 + i + 1, row_num - a, e[key], format_red)
 			else:
-				ws.write(i1 + i + 1, row_num - a, e[key],base_style)
-    #Grades sheet
-	ws1.set_panes_frozen(True)
-	ws1.set_horz_split_pos(1)
-	ws1.set_vert_split_pos(1)
-	ws1.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws1.col(d).width = int(10 * 260)
+				sheet1.write(i1 + i + 1, row_num - a, e[key],format)
+
+	#Grades sheet
+
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade',
 			   'movement_consistency_grade','avg_sleep_per_night_grade','exercise_consistency_grade',
 			   'overall_workout_grade','workout_duration_grade','workout_effortlvl_grade',
@@ -542,14 +490,14 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws1.write(0, r, current_date, style)
+			sheet2	.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws1.write(0, 0, "Grades",font_style)
+	sheet2.write(0, 0, "Grades")
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columnsw)):
 		col_num1 = col_num1 + 1
-		ws1.write(col_num1, row_num, columnsw[col_num], base_style)
+		sheet2.write(col_num1, row_num, columnsw[col_num])
 	rows = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -557,168 +505,112 @@ def export_users_xls(request):
 		row_num += 1
 		for i,key in enumerate(columns):
 				if row[key] == 'A':
-					ws1.write(i+2,row_num, row[key],ab_style)
+					sheet2.write(i+2,row_num, row[key],format_green)
 				elif row[key] == 'B':
-					ws1.write(i+2,row_num, row[key],ab_style)
+					sheet2.write(i+2,row_num, row[key],format_green)
 				elif row[key] == 'C':
-					ws1.write(i+2,row_num, row[key],cd_style)
+					sheet2.write(i+2,row_num, row[key],format_yellow)
 				elif row[key] == 'D':
-					ws1.write(i+2,row_num, row[key],cd_style)
+					sheet2.write(i+2,row_num, row[key],format_yellow)
 				elif row[key] == 'F':
-					ws1.write(i+2,row_num, row[key],f_style)
+					sheet2.write(i+2,row_num, row[key],format_red)
 				else:
-					ws1.write(i+2,row_num, row[key],base_style)
+					sheet2.write(i+2,row_num, row[key],format)
 	#Swim Stats sheet
-	ws2.set_panes_frozen(True)
-	ws2.set_horz_split_pos(1)
-	ws2.set_vert_split_pos(1)
-	ws2.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws2.col(d).width = int(10 * 260)
+
 	columns = ['pace_per_100_yard', 'total_strokes']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws2.write(0, r, current_date, style)
+			sheet8.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws2.write(0, 0, "Swim Stats",font_style)
+	sheet8.write(0, 0, "Swim Stats")
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns1W)):
 		col_num1 = col_num1 + 1
-		ws2.write(col_num1, row_num, columns1W[col_num], base_style)
+		sheet8.write(col_num1, row_num, columns1W[col_num])
 	rows = SwimStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
 	for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			ws2.write(i + 2, row_num, row[key], base_style)
+			sheet8.write(i + 2, row_num, row[key],format)
 	# Bike stats sheet
-	ws3.set_panes_frozen(True)
-	ws3.set_horz_split_pos(1)
-	ws3.set_vert_split_pos(1)
-	ws3.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws3.col(d).width = int(10 * 260)
+
 	columns = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws3.write(0, r, current_date, style)
+			sheet9.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws3.write(0, 0, "Bike Stats",font_style)
+	sheet9.write(0, 0, "Bike Stats")
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns3W)):
 		col_num1 = col_num1 + 1
-		ws3.write(col_num1, row_num, columns3W[col_num], base_style)
+		sheet9.write(col_num1, row_num, columns3W[col_num])
 	rows = BikeStats.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
 	for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-	 		ws3.write(i + 2, row_num, row[key], base_style)
+	 		sheet9.write(i + 2, row_num, row[key], format)
+
 	# steps stats sheet
-	ws4.set_panes_frozen(True)
-	ws4.set_horz_split_pos(1)
-	ws4.set_vert_split_pos(1)
-	ws4.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws4.col(d).width = int(10 * 260)
+
 	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws4.write(0, r, current_date, style)
+			sheet3.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws4.write(0, 0, "Steps",font_style)
+	sheet3.write(0, 0, "Steps")
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns4W)):
 		col_num1 = col_num1 + 1
-		ws4.write(col_num1, row_num, columns4W[col_num], base_style)
+		sheet3.write(col_num1, row_num, columns4W[col_num])
 	rows = Steps.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
-	font_style4 = xlwt.XFStyle()
-	font_style4.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style4.alignment = alignment
-	pattern = xlwt.Pattern()
-	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-	pattern.pattern_fore_colour = 17
-	font_style4.pattern = pattern
-	font_style1 = xlwt.XFStyle()
-	font_style1.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style1.alignment = alignment
-	pattern = xlwt.Pattern()
-	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-	pattern.pattern_fore_colour = 5
-	font_style1.pattern = pattern
-	font_style2 = xlwt.XFStyle()
-	font_style2.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style2.alignment = alignment
-	pattern = xlwt.Pattern()
-	pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-	pattern.pattern_fore_colour = 2
-	font_style2.pattern = pattern
-	font_style3 = xlwt.XFStyle()
-	font_style3.num_format_str='#,##0'
-	alignment = xlwt.Alignment()
-	alignment.horz = xlwt.Alignment.HORZ_LEFT
-	font_style3.alignment = alignment
+
 	for a1,b1 in zip(rows,rowsg):
-		# print (a1,b1)
-	# for row in rows:
 		row_num += 1
 		for i, key in enumerate(columns):
-			# if(key == 'movement_consistency' and row[key]):
-			# 	ws4.write(i+2,row_num , ast.literal_eval(a1[key])['inactive_hours'],base_style)
-			# else:
-			# 	ws4.write(i+2,row_num , row[key],base_style)
 				if i == 1 and b1['movement_non_exercise_steps_grade'] == 'A':
-					ws4.write(i + 2, row_num, a1[key], font_style4)
+					sheet3.write(i + 2, row_num, a1[key], format_green)
 				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'B':
-					ws4.write(i + 2, row_num, a1[key], font_style4)
+					sheet3.write(i + 2, row_num, a1[key], format_green)
 				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'C':
-					ws4.write(i + 2, row_num, a1[key], font_style1)
+					sheet3.write(i + 2, row_num, a1[key], format_yellow)
 				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'D':
-					ws4.write(i + 2, row_num, a1[key], font_style1)
+					sheet3.write(i + 2, row_num, a1[key], format_yellow)
 				elif i == 1 and b1['movement_non_exercise_steps_grade'] == 'F':
-					ws4.write(i + 2, row_num, a1[key], font_style2)
+					sheet3.write(i + 2, row_num, a1[key], format_red)
 				elif i == 0 and b1['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and a1[key]:
-					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style4)
+					sheet3.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], format_green)
 				elif i == 0 and b1['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and a1[key]:
-					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style4)
+					sheet3.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], format_green)
 				elif i == 0 and b1['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and a1[key]:
-					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style1)
+					sheet3.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], format_yellow)
 				elif i == 0 and b1['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and a1[key]:
-					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style1)
+					sheet3.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], format_yellow)
 				elif i == 0 and b1['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and a1[key]:
-					ws4.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], font_style2)
+					sheet3.write(i + 2, row_num, ast.literal_eval(a1[key])['inactive_hours'], format_red)
 				else:
-					ws4.write(i + 2, row_num, a1[key], font_style3)
+					sheet3.write(i + 2, row_num, a1[key], format)
 
 	# sleep stats sheet
-	ws5.set_panes_frozen(True)
-	ws5.set_horz_split_pos(1)
-	ws5.set_vert_split_pos(1)
-	ws5.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws5.col(d).width = int(10 * 260)
+
 	columns = ['sleep_per_wearable', 'sleep_comments','sleep_per_user_input', 'sleep_aid', 'sleep_bed_time',
 			   'sleep_awake_time','deep_sleep','light_sleep','awake_time']
 	current_date = to_date
@@ -726,84 +618,95 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws5.write(0, r, current_date, style)
+			sheet4.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws5.write(0, 0, "Sleep",font_style)
+	sheet4.write(0, 0, "Sleep")
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns5W)):
 		col_num1 = col_num1 + 1
-		ws5.write(col_num1, row_num, columns5W[col_num], base_style)
+		sheet4.write(col_num1, row_num, columns5W[col_num])
 	rows = Sleep.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
+	format2 = book.add_format()
+	format2.set_align('top')
+	format2.set_text_wrap()
+
+	format2.set_shrink()
+	# wrap = book.add_format({'text_wrap': True})
+	sheet4.set_row(3, 150)
+	
 	for a2,b2 in zip (rows,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns):
 				if i == 2 and b2['avg_sleep_per_night_grade'] == 'A':
-					ws5.write(i + 2, row_num, a2[key], ab_style)
+					sheet4.write(i + 2, row_num, a2[key],format_green)
 				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'B':
-					ws5.write(i + 2, row_num, a2[key], ab_style)
+					sheet4.write(i + 2, row_num, a2[key],format_green)
 				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'C':
-					ws5.write(i + 2, row_num, a2[key], cd_style)
+					sheet4.write(i + 2, row_num, a2[key], format_yellow)
 				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'D':
-					ws5.write(i + 2, row_num, a2[key], cd_style)
+					sheet4.write(i + 2, row_num, a2[key], format_yellow)
 				elif i == 2 and b2['avg_sleep_per_night_grade'] == 'F':
-					ws5.write(i + 2, row_num, a2[key], f_style)
+					sheet4.write(i + 2, row_num, a2[key], format_red)
+				elif i == 1:
+					sheet4.write(i + 2, row_num, a2[key],format2)
 				else:
-					ws5.write(i + 2, row_num, a2[key], base_style)
+					sheet4.write(i + 2, row_num, a2[key],format)
 	# Food sheet
-	ws6.set_panes_frozen(True)
-	ws6.set_horz_split_pos(1)
-	ws6.set_vert_split_pos(1)
-	ws6.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws6.col(d).width = int(10 * 260)
+
 	columns = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws6.write(0, r, current_date, style)
+			sheet5.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws6.write(0, 0, "Food",font_style)
+	sheet5.write(0, 0, "Food",)
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns6W)):
 		col_num1 = col_num1 + 1
-		ws6.write(col_num1, row_num, columns6W[col_num], base_style)
+		sheet5.write(col_num1, row_num, columns6W[col_num])
 	rows = Food.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
-	for row in rows:
+	format2 = book.add_format()
+	format2.set_align('fill')
+
+	for j,k in zip (rows,rowsg):
 		row_num += 1
 		for i, key in enumerate(columns):
-			if key == 'prcnt_non_processed_food':
-				ws6.write(i + 2, row_num, str(int(row[key])) + '%')
+			if k['prcnt_unprocessed_food_consumed_grade'] == 'A' and i == 0:
+				sheet5.write(i + 2, row_num, str(int(j[key])) + '%' ,format_green)
+			elif k['prcnt_unprocessed_food_consumed_grade'] == 'B' and i == 0:
+				sheet5.write(i + 2, row_num, str(int(j[key])) + '%' ,format_green)
+			elif k['prcnt_unprocessed_food_consumed_grade'] == 'C' and i == 0:
+				sheet5.write(i + 2, row_num, str(int(j[key])) + '%' ,format_yellow)
+			elif k['prcnt_unprocessed_food_consumed_grade'] == 'D' and i == 0:
+				sheet5.write(i + 2, row_num, str(int(j[key])) + '%' ,format_yellow)
+			elif k['prcnt_unprocessed_food_consumed_grade'] == 'F' and i == 0:
+				sheet5.write(i + 2, row_num, str(int(j[key])) + '%' ,format_red)
 			else:
-				ws6.write(i + 2, row_num, row[key], base_style)
+				sheet5.write(i + 2, row_num, j[key], format2)
 	# Alcohol sheet
-	ws7.set_panes_frozen(True)
-	ws7.set_horz_split_pos(1)
-	ws7.set_vert_split_pos(1)
-	ws7.col(0).width = int(40 * 260)
-	for d in range(1, 256, 1):
-		ws7.col(d).width = int(10 * 260)
+
 	columns = ['alcohol_day', 'alcohol_week']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			ws7.write(0, r, current_date, style)
+			sheet6.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
-	ws7.write(0, 0, "Alcohol",font_style)
+	sheet6.write(0, 0, "Alcohol")
 	col_num1 = 1
 	row_num = 0
 	for col_num in range(len(columns7W)):
 		col_num1 = col_num1 + 1
-		ws7.write(col_num1, row_num, columns7W[col_num], base_style)
+		sheet6.write(col_num1, row_num, columns7W[col_num])
 	rows = Alcohol.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user=request.user).order_by('-user_ql__created_at').values()
@@ -811,16 +714,17 @@ def export_users_xls(request):
 		row_num += 1
 		for i, key in enumerate(columns):
 			if i == 1 and b['alcoholic_drink_per_week_grade'] == 'A':
-				ws7.write(i + 2, row_num, a[key], ab_style)
+				sheet6.write(i + 2, row_num, a[key], format_green)
 			elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'B':
-				ws7.write(i + 2, row_num, a[key], ab_style)
+				sheet6.write(i + 2, row_num, a[key], format_green)
 			elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'C':
-				ws7.write(i + 2, row_num, a[key], cd_style)
+				sheet6.write(i + 2, row_num, a[key], format_yellow)
 			elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'D':
-				ws7.write(i + 2, row_num, a[key], cd_style)
+				sheet6.write(i + 2, row_num, a[key], format_yellow)
 			elif i == 1 and b['alcoholic_drink_per_week_grade'] == 'F':
-				ws7.write(i + 2, row_num, a[key], f_style)
+				sheet6.write(i + 2, row_num, a[key], format_red)
 			else:
-				ws7.write(i + 2, row_num, a[key], base_style)
-	wb.save(response)
+				sheet6.write(i + 2, row_num, a[key], format)
+
+	book.close()
 	return response

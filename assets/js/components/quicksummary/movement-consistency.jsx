@@ -50,7 +50,7 @@ class Movementquick extends Component{
         {name: 'Active Hours'},
         {name: 'Inactive Hours'},
         {name: 'Sleeping Hours'},
-        {name: 'Total Steps'}              
+        {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
        mc_data:[],
        selectedDate: new Date()                      
@@ -221,7 +221,7 @@ class Movementquick extends Component{
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>Steps</Cell>}
               cell={props => (
-                    <Cell {...props} className={css(styles.newTableBody)}>
+                    <Cell {...{'title':steps_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
                       {steps_data[props.rowIndex]}
                     </Cell>
                   )}
@@ -232,7 +232,7 @@ class Movementquick extends Component{
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>Status</Cell>}
               cell={props => (
-                    <Cell {...props} className={css(styles.newTableBody)}>
+                    <Cell {...{'title':status_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
                       {status_data[props.rowIndex]}
                     </Cell>
                   )}
@@ -263,7 +263,7 @@ render(){
           <Column
             header={<Cell className={css(styles.newTableHeader)}>Movement Consistency</Cell>}
             cell={props => (
-              <Cell {...props} className={css(styles.newTableBody)}>
+              <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
                 {this.state.tableAttrColumn[props.rowIndex].name}
               </Cell>
             )}
