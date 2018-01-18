@@ -22,7 +22,7 @@ import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/qui
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
-import Grades from './quicksummary_grades';
+import Grades from './quicksummary_grades';  
 import Swim from './quicksummary_swim';
 import Bike from './quicksummary_bike';
 import Steps from './quicksummary_steps';
@@ -500,7 +500,7 @@ onLogoutSuccess(response){
 
 		 <Navbar toggleable
          fixed={fix ? 'top' : ''}
-          className="navbar navbar-expand-sm navbar-inverse nav6">
+          className="navbar navbar-expand-sm navbar-inverse ">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
            <FontAwesome
                  name = "bars"
@@ -632,7 +632,9 @@ onLogoutSuccess(response){
                                  		 <span id="spa">
                                           <abbr  id="abbri">
                                            <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
+                                            <div className="btn3">
                                             <Button id="nav-btn" className="btn">Print</Button>
+                                            </div>
                                            </a>
                                           </abbr>
                                           </span>                                    
@@ -793,7 +795,7 @@ onLogoutSuccess(response){
                                   </Nav>
                                 </Collapse>
 
-                                         <span className="btn2">
+                                         <span className="btn2 btn4">
 	                                  <Button
 	                                   id="nav-btn"
 	                                  style={{backgroundColor:"#ed9507"}}
