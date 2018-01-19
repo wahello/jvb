@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import { getTermsConditionStatus } from '../../network/dashboard';
-import { Link } from 'react-router-dom';
+import { Link,withRouter } from 'react-router-dom';
 import NavbarMenu from '../navbar';
 import TCPopup from './dashboard_terms_and_conditions';
 
@@ -19,7 +19,9 @@ class Dashboard extends Component {
 
 	renderTCPopup(){
 		if(this.state.terms_condition_accepted == false){
-			return(<TCPopup/>)
+		
+				this.props.history.push("/dashboard_terms_and_conditions");
+			
 		}
 	}
 
@@ -33,9 +35,9 @@ class Dashboard extends Component {
 		console.log(error.message);
 	}
 
-	// componentDidMount(){
-	// 	getTermsConditionStatus(this.onTCStatusSuccess, this.onTCStatusFailure)
-	// }
+	componentDidMount(){
+		getTermsConditionStatus(this.onTCStatusSuccess, this.onTCStatusFailure)
+	}
 	
 	render(){
 		return (
@@ -60,7 +62,7 @@ class Dashboard extends Component {
 							   <Link to='/quicksummary'>Raw Data</Link><br/>
 								<Link to='/dashboard_summary'>Progress Analyzer</Link><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
-							  {/*this.renderTCPopup()*/}
+							  {this.renderTCPopup()}
 						  </div>
 						</div>
 					</div>
@@ -79,4 +81,4 @@ function mapStateToProps(state){
   };
 }
 
-export default connect(mapStateToProps)(Dashboard);
+export default withRouter(connect(mapStateToProps)(Dashboard));

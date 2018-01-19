@@ -17,7 +17,8 @@ class TCPopup extends React.Component {
 
     this.toggle = this.toggle.bind(this);
     this.acceptTerms = this.acceptTerms.bind(this);
-    
+    this.toggleNested = this.toggleNested.bind(this);
+    this.onDisagreeTerms = this.onDisagreeTerms.bind(this);
   }
 
 toggle() {
@@ -31,9 +32,20 @@ acceptTerms(){
       modal:false,
       terms_condition_accepted:true
 	},function(){
-    acceptTermsCondition(this.state.terms_condition_accepted); 
+    acceptTermsCondition(this.state.terms_condition_accepted);
+    this.props.history.push("/users/dashboard"); 
   });
+
 }
+ toggleNested() {
+    this.setState({
+      nestedModal: !this.state.nestedModal,
+      closeAll: false
+    });
+  }
+   onDisagreeTerms(){
+    this.props.history.push("/");
+  }
 
 
   render() {
@@ -157,8 +169,18 @@ acceptTerms(){
 
 				          <ModalFooter id="footer_style">
 				          <div  id="disagree_btn" style={{float:'left'}}>
-				          <Button color="danger" onClick={this.toggle}> I DO NOT Agree to the Terms and Conditions</Button>
+				          <Button color="danger" onClick={this.toggleNested}> I DO NOT Agree to the Terms and Conditions</Button>
                           </div>
+                           <Modal isOpen={this.state.nestedModal} toggle={this.toggleNested} onClosed={this.state.closeAll ? this.toggle : undefined}>
+              
+              <ModalBody> You have selected not to agree with our Terms and Conditions, do you want to continue?</ModalBody>
+              <ModalFooter>
+              <Button color="primary" onClick={this.onDisagreeTerms}>No</Button>
+                <Button color="primary" onClick={this.toggleNested}>Yes</Button>
+                
+                
+              </ModalFooter>
+            </Modal>
 
 
 						   <div id="agree_btn">
@@ -172,4 +194,4 @@ acceptTerms(){
   }
 }
 
-export default TCPopup;
+export default withRouter(TCPopup);

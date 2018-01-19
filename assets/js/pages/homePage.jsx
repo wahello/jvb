@@ -24,6 +24,7 @@ import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
 import Quicklook from '../components/quicksummary/quicksummary';
 import Movement from '../components/movement_consistency';
 import DashboardSummary from '../components/dashboard_summary';
+import TCPopup from '../components/dashboard/dashboard_terms_and_conditions';
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -58,6 +59,8 @@ function initializeLocalState(){
 					<Route path='/quicksummary' component={RequireAuth(Quicklook)} />
 					<Route path='/dashboard_summary' component={RequireAuth(DashboardSummary)} />					
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
+					<Route path='/dashboard_terms_and_conditions' component={RequireAuth(TCPopup)} />	
+
 
 			    </Switch>
 			  </BrowserRouter>

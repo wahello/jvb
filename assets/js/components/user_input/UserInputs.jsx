@@ -212,6 +212,7 @@ class UserInputs extends React.Component{
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
       this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
+      this.infoPrint = this.infoPrint.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -596,7 +597,9 @@ handleScroll() {
      fastedInfo:!this.state.fastedInfo
     });
    }
-
+   infoPrint(){
+    window.print();
+   }
     toggleEasyorHard(){
     this.setState({
       easyorhardInfo:!this.state.easyorhardInfo
@@ -744,7 +747,15 @@ handleScroll() {
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
-                              <ModalBody className="modalcontent">
+                            <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                 <div>
                                   <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
                                   to your results and our hope is that you will make healthier
@@ -891,7 +902,7 @@ handleScroll() {
                                               <FontAwesome
                                                 name = "plus-circle"
                                                 size = "1x"
-                                              />&nbsp; Extra 
+                                              />&nbsp; Extra <b style={{fontWeight:"bold"}}>. . .</b>
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -920,7 +931,15 @@ handleScroll() {
                             isOpen={this.state.infoBtn}
                             target="info2" 
                             toggle={this.toggleInfo2}>
-                              <ModalBody className="modalcontent">
+                            <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                  Use the calendar to select the date you want to enter your inputs for.  The calendar defaults to today,
                                  but if you need to enter your inputs for another date, you can select any date by clicking the calendar
@@ -1017,7 +1036,15 @@ handleScroll() {
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
                             toggle={this.toggleInfoworkout}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                 If you worked out (exercised) today, select “Yes”, and
                                  then answer the questions related to your workout that follow.
@@ -1096,7 +1123,15 @@ handleScroll() {
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                User can select “Cardio”, “Strength” or “Both”.
                                  </div>
@@ -1118,7 +1153,7 @@ handleScroll() {
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
-                                <Label className="padding">1.2 Was Your Workout Easy or Hard?
+                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard”?
                                 <span id="easyorhard"
                              onClick={this.toggleEasyorHard} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -1141,6 +1176,13 @@ handleScroll() {
                                         checked={this.state.workout_easy === 'easy'}
                                         onChange={this.handleChangeWorkout}/>{' '}
                                         Easy
+                                     </Label>
+                                      <Label check className="btn btn-secondary radio1">
+                                        <Input type="radio" name="workout_easy" 
+                                        value="medium"
+                                        checked={this.state.workout_easy === 'medium'}
+                                        onChange={this.handleChangeWorkout}/>{' '}
+                                        Medium
                                      </Label>
                                      <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="workout_easy"
@@ -1168,7 +1210,15 @@ handleScroll() {
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                               User should indicate whether the workout was easy or hard.
                               We will correlate your answer to this question to your perceived
@@ -1250,7 +1300,15 @@ handleScroll() {
                                     isOpen={this.state.enjoybleInfo}
                                     target="enjoyble" 
                                     toggle={this.toggleEnjoyble}>
-                                      <ModalBody className="modalcontent">
+                                     <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                                      <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                         We encourage people to enjoy their workouts! When they do,
                                         they tend to exercise more frequently and don’t dread doing it.
@@ -1316,7 +1374,15 @@ handleScroll() {
                                     isOpen={this.state.workoutlevelInfo}
                                     target="workoutlevel" 
                                     toggle={this.toggleWorkoutLevel}>
-                                      <ModalBody className="modalcontent">
+                                     <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                                      <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                          As a general guideline, an effort level of 1-2 is super easy,
                                          barely moving. A 3-4 is an effort level that gets your heart rate up
@@ -1382,7 +1448,15 @@ handleScroll() {
                             isOpen={this.state.painInfo}
                             target="pain" 
                             toggle={this.togglePain}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                             Enter any twinges/pains here. Be honest. Staying healthy is critical to fitness.
                             We track all twinges and injuries so (1) you can get a picture of what is bothering 
@@ -1444,7 +1518,15 @@ handleScroll() {
                             isOpen={this.state.waterInfo}
                             target="water" 
                             toggle={this.toggleWater}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                              Indicate how many ounces of water you consumed during your workout.
                              We encourage you to drink water when thirsty during your workouts
@@ -1511,7 +1593,15 @@ handleScroll() {
                             isOpen={this.state.chaiseedsInfo}
                             target="chaiseeds" 
                             toggle={this.toggleChaiseeds}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                               We encourage everybody to consume chia seeds during their workout,                               
                               particularly runners and triathletes that do workouts/races longer
@@ -1578,7 +1668,15 @@ handleScroll() {
                             isOpen={this.state.breatheInfo}
                             target="breathe" 
                             toggle={this.toggleBreathe}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                We encourage you to breathe in and out of your nose as much as possible.
                                Indicate what percent of your workout that you breathed in and out of your nose.
@@ -1672,7 +1770,17 @@ handleScroll() {
                             isOpen={this.state.fastedInfo}
                             target="fast" 
                             toggle={this.toggleFasted}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                          <a title="Share by Email">
+                            <img src="http://png-2.findicons.com/files/icons/573/must_have/48/mail.png"/>
+                          </a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                 Did you eat anything 5 hours or less before your workout? If “Yes”,
                                 then you were not fasted and you should answer “No” to this question. Otherwise,
@@ -1734,7 +1842,15 @@ handleScroll() {
                             isOpen={this.state.commentInfo}
                             target="general" 
                             toggle={this.toggleComment}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                Enter any comments about your workout here, including but not limited to how you felt,
                                 pain/twinges, things you want to remember later, whether you worked out with somebody,
@@ -1795,7 +1911,15 @@ handleScroll() {
                             isOpen={this.state.weatherInfo}
                             target="wether" 
                             toggle={this.toggleWeather}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                We encourage all users to enter weather information after each workout.
                                We track weather because it can have a HUGE impact on performance. We encourage
@@ -2035,7 +2159,15 @@ handleScroll() {
                             isOpen={this.state.hrrInfo}
                             target="hrr" 
                             toggle={this.toggleHrr}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                 HRR: Heart Rate Recovery Tracking after an aerobic workout (you do not need to do HRR after strength,
                                 a swim, or other non-aerobic exercise). We find that heart recovery is one of the truest indications
@@ -2184,6 +2316,7 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
+                          <Label className="padding" >* If your sleep above is incorrect, please fix it by updating hours and minutes above or by updating bedtime and wokeup time below. </Label>
                          
                            <div className="input padding"  style={{fontWeight:"bold"}}>
                           
@@ -2194,7 +2327,7 @@ handleScroll() {
                          
                            <FormGroup>
                           
-                            <Label className="padding">2.1 Sleep Bed Time Fell Asleep Per Wearable Device.</Label>
+                            <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
                             {this.state.editable &&
                               <div className="input1">
                                 <DatePicker
@@ -2225,7 +2358,7 @@ handleScroll() {
                           </FormGroup>
                            <FormGroup>
                           
-                            <Label className="padding">2.2 Sleep Awake Time Per Wearable Device</Label>
+                            <Label className="padding">2.2 Time Woke Up As Per Wearable.</Label>
                             {this.state.editable &&
                               <div className="input1">
                                 <DatePicker
@@ -2256,7 +2389,7 @@ handleScroll() {
                           </FormGroup>
                            <FormGroup>
                           
-                            <Label className="padding">2.3 Awake Time Per Wearable Device</Label>
+                            <Label className="padding">2.3 Total Time Awake While Trying To Sleep As Per Wearable Device</Label>
                             {this.state.editable &&
                               <div>
                                 <div className="col-xs-6">
@@ -2402,7 +2535,15 @@ handleScroll() {
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
                             toggle={this.toggleUnprocessedInfo}>
-                              <ModalBody className="modalcontent">
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
                                <div>
                                We encourage people to eat as much unprocessed food as possible and if you
                                do eat processed foods, try and have the higher quality processed foods that
