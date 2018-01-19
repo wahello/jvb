@@ -44,7 +44,7 @@ class Dashboard extends Component {
 				<div>
 					  <div className="row">
 						<div className="col-sm-6 col-sm-offset-3 social-login" style={{marginTop:"80px"}}>
-						  <h3>Links</h3>
+						  <h3 id="link_style">Links</h3>
 						  <div className="social-login-buttons">
 	  
 							 <Link to='/userinputs'>User Inputs</Link><br/>

@@ -43,7 +43,7 @@ acceptTerms(){
 				         
 				          <ModalHeader >
                          
-				          <div  id="main_heading" style={{fontSize:'25px', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
+				          <div  id="main_heading" style={{fontSize:'28px',textAlign:'center', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
 				          </ModalHeader>
 
 
