@@ -3,13 +3,13 @@ import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import {Field, reduxForm } from 'redux-form';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import {acceptTermsCondition} from '../../network/dashboard';
+import {acceptTermsCondition} from '../network/terms_condition';
 import PropTypes from 'prop-types';
 
-import {logoutUser} from '../../network/auth';
+import {logoutUser} from '../network/auth';
 
 
-class TCPopup extends React.Component {
+class TermsConditions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -203,11 +203,4 @@ onLogoutSuccess(response){
   }
 }
 
-function mapStateToProps(state){
-  return {
-    errorMessage: state.garmin_auth.error,
-    message : state.garmin_auth.message
-  };
-}
-
-export default connect(mapStateToProps,{logoutUser})(withRouter(TCPopup));
+export default withRouter(TermsConditions);
