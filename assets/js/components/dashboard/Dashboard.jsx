@@ -19,9 +19,7 @@ class Dashboard extends Component {
 
 	renderTCPopup(){
 		if(this.state.terms_condition_accepted == false){
-		
 				this.props.history.push("/dashboard_terms_and_conditions");
-			
 		}
 	}
 

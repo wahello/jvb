@@ -1177,13 +1177,14 @@ handleScroll() {
                                         onChange={this.handleChangeWorkout}/>{' '}
                                         Easy
                                      </Label>
+                                     {/*
                                       <Label check className="btn btn-secondary radio1">
                                         <Input type="radio" name="workout_easy" 
                                         value="medium"
                                         checked={this.state.workout_easy === 'medium'}
                                         onChange={this.handleChangeWorkout}/>{' '}
                                         Medium
-                                     </Label>
+                                     </Label>*/}
                                      <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="workout_easy"
                                             value="hard"

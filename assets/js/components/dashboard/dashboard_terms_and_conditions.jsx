@@ -4,6 +4,10 @@ import { withRouter, Link } from 'react-router-dom';
 import {Field, reduxForm } from 'redux-form';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import {acceptTermsCondition} from '../../network/dashboard';
+import PropTypes from 'prop-types';
+
+import {logoutUser} from '../../network/auth';
+
 
 class TCPopup extends React.Component {
   constructor(props) {
@@ -18,7 +22,8 @@ class TCPopup extends React.Component {
     this.toggle = this.toggle.bind(this);
     this.acceptTerms = this.acceptTerms.bind(this);
     this.toggleNested = this.toggleNested.bind(this);
-    this.onDisagreeTerms = this.onDisagreeTerms.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
   }
 
 toggle() {
@@ -43,10 +48,14 @@ acceptTerms(){
       closeAll: false
     });
   }
-   onDisagreeTerms(){
-    this.props.history.push("/");
+   
+onLogoutSuccess(response){
+    this.props.history.push("/#logout");
   }
 
+  handleLogout(){
+    this.props.logoutUser(this.onLogoutSuccess);
+  }
 
   render() {
     return (
@@ -173,9 +182,9 @@ acceptTerms(){
                           </div>
                            <Modal isOpen={this.state.nestedModal} toggle={this.toggleNested} onClosed={this.state.closeAll ? this.toggle : undefined}>
               
-              <ModalBody> You have selected not to agree with our Terms and Conditions, do you want to continue?</ModalBody>
+              <ModalBody> You have selected not to agree with our Terms and Conditions. You must agree to our Terms and Conditions to register for our site. Do you want to continue?</ModalBody>
               <ModalFooter>
-              <Button color="primary" onClick={this.onDisagreeTerms}>No</Button>
+              <Button color="primary" onClick={this.handleLogout}>No</Button>
                 <Button color="primary" onClick={this.toggleNested}>Yes</Button>
                 
                 
@@ -194,4 +203,11 @@ acceptTerms(){
   }
 }
 
-export default withRouter(TCPopup);
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+
+export default connect(mapStateToProps,{logoutUser})(withRouter(TCPopup));
