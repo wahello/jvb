@@ -19,15 +19,17 @@ import NumberFormat from 'react-number-format';
         {name: 'Overall Health Grade'},
         {name: 'Overall Health Gpa'},
         {name: 'Movement Non Exercise steps Grade'},
-        {name: 'Movement Consistency Grade'}, 
+        {name: 'Movement Non Exercise steps'},
+        {name: 'Movement Consistency Grade'},
+        {name: 'Movement Consistency Score'}, 
         {name: 'Avg Sleep Per Night Grade'},
+        {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
-        {name: 'Overall Workout Grade'},
-        {name: 'Workout Duration Grade'},
-        {name: 'Workout Effort Level Grade'},
-        {name: 'Average Exercise Heartrate Grade'},
-        {name: 'Percentage of Unprocessed Food Grade'}, 
+        {name: 'Exercise Consistency Score'},
+        {name: 'Percentage of Unprocessed Food Grade'},
+        {name: 'Percentage of Unprocessed Food'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
+        {name: 'Alcoholic Drink Per Week'},
         {name: 'Sleep Aid Penalty'},
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}              
@@ -50,10 +52,6 @@ renderTableColumns(dateWiseData,category,classes=""){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-            console.log(key);
-    //           var num = 18;
-    // var n = num.toFixed(2)
-    // document.write( n);
             if(key !== 'id' && key !== 'user_ql'){
             if(key === 'overall_health_gpa'){
                var i = parseFloat(value);
@@ -69,7 +67,20 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
-             else {
+            else if(key == 'movement_consistency_score'){
+              let mc = value;
+              if( mc != undefined && mc != "" && mc != "-"){
+                mc = JSON.parse(mc);
+                all_data.push({
+                  value: mc.inactive_hours,
+                  style: ''});
+              }else
+                all_data.push({
+                  value:'-',
+                  style:''
+                });
+            }
+            else {
                 all_data.push({
                     value: value,
                     style: obj[value]

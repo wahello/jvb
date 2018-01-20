@@ -70,6 +70,7 @@ class UserDailyInput(models.Model):
 class DailyUserInputStrong(models.Model):
     EASY = 'easy'
     HARD = 'hard'
+    MEDIUM = 'medium'
     NO_WORKOUT = 'no workout today'
     NOT_YET = 'not yet'
     DECLINE = 'decline'
@@ -77,6 +78,7 @@ class DailyUserInputStrong(models.Model):
     WORK_OUT_EASY_OR_HARD_CHOICES = (
     ('','-'),
     (EASY,'Easy'),
+    (MEDIUM,'Medium'),
     (HARD,'Hard'),
     (NO_WORKOUT,'No Workout Today'),
     )
