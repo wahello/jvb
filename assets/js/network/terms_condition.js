@@ -1,25 +1,10 @@
 import axiosRetry from 'axios-retry';
 import axios from 'axios';
+import {saveLocalState,loadLocalState} from '../components/localStorage';
 
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 axiosRetry(axios, { retries: 3}); 
-
-export function getTermsConditionStatus(succesCallback=undefined, errorCallback=undefined){
-	const URL = '/api/users/statusofterms/';
-	const config = {
-		url:URL,
-		method:'get',
-		withCredentials:true
-	};
-	axios(config).then(function(response){
-		if(succesCallback != undefined)
-			succesCallback(response);
-	}).catch((error) => {
-		if(succesCallback != undefined)
-			errorCallback(error);
-	})
-}
 
 export function acceptTermsCondition(terms_condition_accepted=false,succesCallback=undefined, errorCallback=undefined){
 	const URL = 'api/users/termsconditions/';
@@ -32,10 +17,16 @@ export function acceptTermsCondition(terms_condition_accepted=false,succesCallba
 		}
 	};
 	axios(config).then(function(response){
+		let local_state = loadLocalState();
+		const updated_state = {
+			...local_state,
+			terms_accepted: true
+		};
+		saveLocalState(updated_state);
 		if(succesCallback != undefined)
 			succesCallback(response);
 	}).catch((error) => {
-		if(succesCallback != undefined)
+		if(errorCallback != undefined)
 			errorCallback(error);
 	})
 }

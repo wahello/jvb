@@ -72,7 +72,7 @@ constructor(props){
                      <Row >
                      <Col xs="12" sm="12">
                     <Field 
-                    	style={{borderRadius:"0px",position:"relative"}}
+                    	style={{borderRadius:"0px",position:"relative"}} 
 
 						name = "password"
 						type={this.state.password_type}

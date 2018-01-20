@@ -28,7 +28,8 @@ class Login(APIView):
 		user = authenticate(request,username=username, password=password)
 		if user:
 			login(request,user)
-			return Response(status=status.HTTP_200_OK)
+			return Response({"user_status":user.is_authenticated(),
+			"terms_conditions":user.profile.terms_conditions}, status=status.HTTP_200_OK)
 		else:
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -64,13 +65,13 @@ class UserItemView(generics.RetrieveUpdateDestroyAPIView):
 
 class IsUserLoggedIn(APIView):
 	def get(self, request, format="json"):
-		return Response({"user_status":request.user.is_authenticated()	},
-			   status=status.HTTP_200_OK)
-
-class IsUserAccepteTermsCondition(APIView):
-	def get(self, request, format="json"):
-		return Response({"terms_conditions":request.user.profile.terms_conditions},
-			   status=status.HTTP_200_OK)
+		if request.user.is_anonymous():
+			terms_conditions = False
+		else:
+			terms_conditions = request.user.profile.terms_conditions
+		return Response({"user_status":request.user.is_authenticated(),
+			"terms_conditions":terms_conditions
+			},status=status.HTTP_200_OK)
 
 class AccepteTermsCondition(APIView):
 	def post(self, request, format="json"):
@@ -78,7 +79,6 @@ class AccepteTermsCondition(APIView):
 			request.user.profile.terms_conditions = True
 			request.user.profile.save()
 			terms = TermsConditionsText.objects.get(version='1.0')
-			
 			TermsConditions.objects.create(user=request.user,
 					terms_conditions_version=terms)
 			return Response(status=status.HTTP_200_OK)

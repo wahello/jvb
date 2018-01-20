@@ -12,9 +12,13 @@ export default function(ComposedComponent) {
         };
         componentWillMount(){
             const persisted_state = loadLocalState();
-            if((persisted_state && !persisted_state.authenticated) || 
+            if((persisted_state && !persisted_state.authenticated) ||
                 persisted_state === undefined){
                 this.context.router.history.push('/');
+            }
+            else if((persisted_state && persisted_state.authenticated) &&
+                !persisted_state.terms_accepted){
+                this.context.router.history.push('/terms_and_conditions');
             }
         }
         componentWillUpdate(nextProps){
@@ -22,6 +26,10 @@ export default function(ComposedComponent) {
             if((persisted_state && !persisted_state.authenticated) ||
                 persisted_state === undefined){
                 this.context.router.history.push('/');
+            }
+            else if((persisted_state && persisted_state.authenticated) &&
+                !persisted_state.terms_accepted){
+                this.context.router.history.push('/terms_and_conditions');
             }
         }
         render(){
