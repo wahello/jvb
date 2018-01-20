@@ -45,7 +45,7 @@ export function renderSelectFeet(field){
 				name={field.input.name} 
 				required
 				{...field.input}>
-				<option value="feet">Feet</option> 
+				<option value="feet">feet</option> 
 				{createDropdown(1,9)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
@@ -61,7 +61,7 @@ export function renderSelectInches(field){
 				name={field.input.name}
 				required 
 				{...field.input}>
-				<option value="inches">Inches</option> 
+				<option value="inches">inches</option> 
 				{createDropdown(1,12)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
