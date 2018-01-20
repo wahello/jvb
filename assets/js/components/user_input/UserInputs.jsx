@@ -386,13 +386,29 @@ class UserInputs extends React.Component{
     }
 
     onFetchGarminSuccess(data){
-      console.log(data);
-      this.setState({
-        sleep_bedtime:data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null,
-        sleep_awake_time:data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null,
-        awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
-        awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:''
+      let sleep_bedtime = data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null;
+      let sleep_awake_time = data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null;
+      let awake_hours = data.data.awake_time?data.data.awake_time.split(':')[0]:'';
+      awake_hours = awake_hours?parseInt(awake_hours):0
+      let awake_mins = data.data.awake_time?data.data.awake_time.split(':')[1]:'';
+      awake_mins = awake_mins?parseInt(awake_mins):0
+      let awake_time_in_mins = awake_hours*60 + awake_mins;
+      if(sleep_bedtime && sleep_awake_time){
+        let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
+        let hours = Math.floor(diff/60);
+        let mins = diff % 60;
+        if(mins < 10)
+           mins = `0${mins}`;
+
+        this.setState({
+          sleep_bedtime:data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null,
+          sleep_awake_time:data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null,
+          awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
+          awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:'',
+          sleep_hours_last_night:hours,
+          sleep_mins_last_night:mins
       });
+     }
     }
 
     onFetchGarminFailure(error){
@@ -657,23 +673,6 @@ handleScroll() {
        this.setState({
          editable:!this.state.editable
        });
-    }
-
-    getTotalSleep(){
-      let sleep_bedtime = this.state.sleep_bedtime;
-      let sleep_awake_time = this.state.sleep_awake_time;
-      let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
-      let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
-      let awake_time_in_mins = awake_hours*60 + awake_mins;
-      if(sleep_bedtime && sleep_awake_time){
-        let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
-        let hours = Math.floor(diff/60);
-        let mins = diff % 60;
-        if(mins < 10)
-          mins = `0${mins}`;
-        return hours+":"+mins;
-      }else
-        return '';
     }
 
     render(){
@@ -2318,14 +2317,6 @@ handleScroll() {
                             }                          
                           </FormGroup>
                           <Label className="padding" >* If your sleep above is incorrect, please fix it by updating hours and minutes above or by updating bedtime and wokeup time below. </Label>
-                         
-                           <div className="input padding"  style={{fontWeight:"bold"}}>
-                          
-                   <p id="sleep_wearable"><Label className="padding" >Total Sleep From Wearable Device:</Label>
-                         {this.getTotalSleep()}</p>
-                        
-                          </div>
-                         
                            <FormGroup>
                           
                             <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>

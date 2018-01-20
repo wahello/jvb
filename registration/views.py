@@ -64,12 +64,8 @@ class UserItemView(generics.RetrieveUpdateDestroyAPIView):
 
 class IsUserLoggedIn(APIView):
 	def get(self, request, format="json"):
-		return Response({"user_status":request.user.is_authenticated()	},
-			   status=status.HTTP_200_OK)
-
-class IsUserAccepteTermsCondition(APIView):
-	def get(self, request, format="json"):
-		return Response({"terms_conditions":request.user.profile.terms_conditions},
+		return Response({"user_status":request.user.is_authenticated(),
+			"terms_conditions":request.user.profile.terms_conditions},
 			   status=status.HTTP_200_OK)
 
 class AccepteTermsCondition(APIView):
@@ -78,7 +74,6 @@ class AccepteTermsCondition(APIView):
 			request.user.profile.terms_conditions = True
 			request.user.profile.save()
 			terms = TermsConditionsText.objects.get(version='1.0')
-			
 			TermsConditions.objects.create(user=request.user,
 					terms_conditions_version=terms)
 			return Response(status=status.HTTP_200_OK)

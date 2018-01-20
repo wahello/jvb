@@ -19,7 +19,6 @@ urlpatterns = [
     url(r'api/users/logout/$',views.Logout.as_view(), name='logout'),
     url(r'api/users/profile/$',views.UserItemView.as_view(), name="user_profile"),
     url(r'api/users/status/$',views.IsUserLoggedIn.as_view(), name="user_logged_status"),
-    url(r'api/users/statusofterms/$',views.IsUserAccepteTermsCondition.as_view(), name="user_status_terms"),
     url(r'api/users/termsconditions/$',views.AccepteTermsCondition.as_view(), name="terms_and conditions"),
 ]
 
