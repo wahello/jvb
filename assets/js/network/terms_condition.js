@@ -26,7 +26,7 @@ export function acceptTermsCondition(terms_condition_accepted=false,succesCallba
 		if(succesCallback != undefined)
 			succesCallback(response);
 	}).catch((error) => {
-		if(succesCallback != undefined)
+		if(errorCallback != undefined)
 			errorCallback(error);
 	})
 }

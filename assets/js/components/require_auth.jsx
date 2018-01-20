@@ -16,7 +16,7 @@ export default function(ComposedComponent) {
                 persisted_state === undefined){
                 this.context.router.history.push('/');
             }
-            if((persisted_state && persisted_state.authenticated) &&
+            else if((persisted_state && persisted_state.authenticated) &&
                 !persisted_state.terms_accepted){
                 this.context.router.history.push('/terms_and_conditions');
             }
@@ -27,7 +27,7 @@ export default function(ComposedComponent) {
                 persisted_state === undefined){
                 this.context.router.history.push('/');
             }
-            if((persisted_state && persisted_state.authenticated) &&
+            else if((persisted_state && persisted_state.authenticated) &&
                 !persisted_state.terms_accepted){
                 this.context.router.history.push('/terms_and_conditions');
             }

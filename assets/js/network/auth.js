@@ -54,7 +54,8 @@ export function loginUser(data, successCallback=undefined, errorCallback=undefin
 
 		axios(config).then((response) => {
 			const auth_state = {
-					authenticated: true
+					authenticated: true,
+					terms_accepted: response.data.terms_conditions
 				};
 
 			saveLocalState(auth_state);
@@ -69,7 +70,8 @@ export function loginUser(data, successCallback=undefined, errorCallback=undefin
 			}
 		}).catch((error) => {
 			const auth_state = {
-					authenticated: false
+					authenticated: false,
+					terms_accepted:false
 				};
 			saveLocalState(auth_state);
 			
@@ -92,7 +94,8 @@ export function logoutUser(succesCallback=undefined,errorCallback=undefined){
 		};
 		axios(config).then((response) => {
 			const auth_state = {
-					authenticated: false
+					authenticated: false,
+					terms_accepted:  false
 				};
 			saveLocalState(auth_state);
 			dispatch({
