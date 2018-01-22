@@ -23,10 +23,12 @@ class ProgressReport(APIView):
 
 		# Custom date range for which report is to be created
 		# expected format of the date is 'YYYY-MM-DD'
-		self.current_date = self.context['request'].query_params.get('date',None)
-		self.from_dt = self.context['request'].query_params.get('from',None)
-		self.to_dt = self.context['request'].query_params.get('to',None)
-		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q for q in self._get_queryset()}
+		self.current_date = self._str_to_dt(self.context['request'].query_params.get('date',None))
+		self.from_dt = self._str_to_dt(self.context['request'].query_params.get('from',None))
+		self.to_dt = self._str_to_dt(self.context['request'].query_params.get('to',None))
+		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q for q in self.get_queryset()}
+		self.cumulative_datewise_data_manual_range = {q.created_at.strftime("%Y-%m-%d"):q 
+			for q in self._get_queryset_manual_range(self.from_dt, self.to_dt)}
 		self.duration_denominator = {
 			'today':1,'yesterday':1, 'week':7, "month":30, "year":365
 		}
@@ -47,6 +49,12 @@ class ProgressReport(APIView):
 			for d in existing-allowed:
 				self.duration_type.pop(d)
 
+	def _str_to_dt(self,dt_str):
+		if dt_str:
+			return datetime.strptime(dt_str, "%Y-%m-%d").date()
+		else:
+			return None
+
 	def _hours_to_hours_min(self,hours):
 		mins = hours * 60
 		hours,mins = divmod(mins,60)
@@ -62,7 +70,7 @@ class ProgressReport(APIView):
 		avg = (stat1 - stat2)/self.duration_denominator(duration_type)
 		return avg
 
-	def _get_queryset(self):
+	def get_queryset(self):
 		duration_end_dt = self._get_duration_datetime(self.current_date)
 		filters = Q()
 		for d in duration_end_dt.values():
@@ -71,6 +79,14 @@ class ProgressReport(APIView):
 				'overall_health_grade_cum','non_exercise_steps_cum','sleep_per_night_cum',
 				'movement_consistency_cum','exercise_consistency_cum','nutrition_cum',
 				'exercise_stats_cum','alcohol_cum','penalty_cum').filter(filters) 
+		return cumulative_data_qs
+
+	def _get_queryset_manual_range(self,from_dt, to_dt):
+		filters = Q(created_at=from_dt) or Q(created_at=to_dt)
+		cumulative_data_qs = CumulativeSum.objects.select_related(
+			'overall_health_grade_cum','non_exercise_steps_cum','sleep_per_night_cum',
+			'movement_consistency_cum','exercise_consistency_cum','nutrition_cum',
+			'exercise_stats_cum','alcohol_cum','penalty_cum').filter(filters) 
 		return cumulative_data_qs
 
 	def _get_duration_datetime(self,current_date):
