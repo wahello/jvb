@@ -62,8 +62,6 @@ function initializeLocalState(){
 					<Route path='/dashboard_summary' component={RequireAuth(DashboardSummary)} />					
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
-
-
 			    </Switch>
 			  </BrowserRouter>
 			</Provider> 
@@ -71,6 +69,7 @@ function initializeLocalState(){
 	};
 
 	const onFailure = (error) => {
+		console.log(error);
 		console.log(error.message);
 	};
 

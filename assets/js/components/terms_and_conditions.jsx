@@ -1,5 +1,6 @@
 import React,{ Component } from 'react';
 import { withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import {acceptTermsCondition} from '../network/terms_condition';
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -54,11 +55,11 @@ acceptTerms(){
   }
    
 onLogoutSuccess(response){
-    this.props.history.push("/logout");
+    this.props.history.push("/");
 }
 
 handleLogout(){
-  logoutUser(this.onLogoutSuccess);
+  this.props.logoutUser(this.onLogoutSuccess);
 }
 
   render() {
@@ -206,5 +207,4 @@ handleLogout(){
     );
   }
 }
-
-export default withRouter(TermsConditions);
+export default connect(null,{logoutUser})(withRouter(TermsConditions))
