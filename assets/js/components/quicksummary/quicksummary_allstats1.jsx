@@ -59,15 +59,21 @@ const attrVerboseName = {
     overall_health_grade: 'Overall Health Grade',
     overall_health_gpa: 'Overall Health Gpa',
     movement_non_exercise_steps_grade: 'Movement Non Exercise steps Grade',
+    movement_non_exercise_steps: 'Movement Non Exercise steps',
     movement_consistency_grade: 'Movement Consistency Grade',
+    movement_consistency_score: 'Movement Consistency Score',
     avg_sleep_per_night_grade: 'Avg Sleep Per Night Grade',
+    avg_sleep_per_night: 'Avg Sleep Per Night',
     exercise_consistency_grade: 'Exercise Consistency Grade',
+    exercise_consistency_score: 'Exercise Consistency Score',
     overall_workout_grade: 'Overall Workout Grade',
     workout_duration_grade:'Workout Duration Grade',
     workout_effortlvl_grade:'Workout Effort Level Grade',
     avg_exercise_hr_grade:'Average Exercise Heartrate Grade',
     prcnt_unprocessed_food_consumed_grade: 'Percentage of Unprocessed Food Grade',
+    prcnt_unprocessed_food_consumed: 'Percentage of Unprocessed Food',
     alcoholic_drink_per_week_grade: 'Alcoholic Drink Per Week Grade',
+    alcoholic_drink_per_week: 'Alcoholic Drink Per Week',
     sleep_aid_penalty:'Sleep Aid Penalty',
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
@@ -166,7 +172,7 @@ class AllStats1 extends Component{
 					for(let key of Object.keys(data[cat]).sort()){
                         let value = data[cat][key];
 
-                        if (key == 'movement_consistency'){
+                        if (key == 'movement_consistency'|| key == 'movement_consistency_score'){
                             let mc = value;
                             if( mc != undefined && mc != "" && mc != "-"){
                                 mc = JSON.parse(mc);

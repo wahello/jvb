@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from quicklook import calculation_helper
 from progress_analyzer.models import CumulativeSum
 	
 class ProgressReport(APIView):
@@ -25,7 +26,7 @@ class ProgressReport(APIView):
 		self.current_date = self.context['request'].query_params.get('date',None)
 		self.from_dt = self.context['request'].query_params.get('from',None)
 		self.to_dt = self.context['request'].query_params.get('to',None)
-		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q for q in self.get_queryset()}
+		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q for q in self._get_queryset()}
 		self.duration_denominator = {
 			'today':1,'yesterday':1, 'week':7, "month":30, "year":365
 		}
@@ -46,7 +47,13 @@ class ProgressReport(APIView):
 			for d in existing-allowed:
 				self.duration_type.pop(d)
 
-	def get_queryset(self):
+	def _get_average(self, stat1, stat2, duration_type):
+		if duration_type == 'today' or duration_type == 'yesterday':
+			return stat1
+		avg = (stat1 - stat2)/self.duration_denominator(duration_type)
+		return avg
+
+	def _get_queryset(self):
 		duration_end_dt = self._get_duration_datetime(self.current_date)
 		filters = Q()
 		for d in duration_end_dt.values():
@@ -84,11 +91,55 @@ class ProgressReport(APIView):
 				data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
 				if todays_data and data:
 					if key =='total_gpa_point':
-						calculated_data[key][alias] = (todays_data.cum_total_gpa_point -
-							data.cum_total_gpa_point/self.duration_denominator(alias))
+						calculated_data[key][alias] = self._get_average(
+							todays_data.cum_total_gpa_point,
+							data.cum_total_gpa_point,alias)
+
+					if key == 'overall_health_gpa':
+						calculated_data[key][alias] = self._get_average(
+							todays_data.cum_overall_health_gpa_point,
+							data.cum_overall_health_gpa_point,alias)
+
+					if key == 'overall_health_gpa_grade':
+						calculated_data[key][alias] = calculation_helper.cal_overall_grade(
+							self._get_average(
+								todays_data.cum_overall_health_gpa_point,
+								data.cum_overall_health_gpa_point,alias
+							)
+						)
 
 	def _cal_non_exercise_summary(self,custom_daterange = False):
-		pass
+		calculated_data = {
+			'non_exercise_steps':{d:None for d in self.duration_type},
+			'rank':{d:None for d in self.duration_type},
+			'movement_non_exercise_step_grade':{d:None for d in self.duration_type},
+			'non_exericse_steps_gpa':{d:None for d in self.duration_type}
+		}
+		if custom_daterange:
+			pass
+
+		todays_data = self.cumulative_datewise_data.get(self.current_date.strftime("%Y-%m-%d"),None)
+		for key in calculated_data.keys():
+			for alias, dtobj in self._get_duration_datetime(self.current_date):
+				data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+				if todays_data and data:
+					if key =='total_gpa_point':
+						calculated_data[key][alias] = self._get_average(
+							todays_data.cum_total_gpa_point,
+							data.cum_total_gpa_point,alias)
+
+					if key == 'overall_health_gpa':
+						calculated_data[key][alias] = self._get_average(
+							todays_data.cum_overall_health_gpa_point,
+							data.cum_overall_health_gpa_point,alias)
+
+					if key == 'overall_health_gpa_grade':
+						calculated_data[key][alias] = calculation_helper.cal_overall_grade(
+							self._get_average(
+								todays_data.cum_overall_health_gpa_point,
+								data.cum_overall_health_gpa_point,alias
+							)
+						)
 
 	def _cal_sleep_summary(self,custom_daterange = False):
 		pass
