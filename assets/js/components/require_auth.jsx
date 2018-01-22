@@ -17,19 +17,18 @@ export default function(ComposedComponent) {
                 this.context.router.history.push('/');
             }
             else if((persisted_state && persisted_state.authenticated) &&
-                !persisted_state.terms_accepted){
+                (!persisted_state.terms_accepted)){
                 this.context.router.history.push('/terms_and_conditions');
             }
         }
         // componentWillUpdate(nextProps){
         //     const persisted_state = loadLocalState();
         //     if((persisted_state && !persisted_state.authenticated) ||
-        //         persisted_state === undefined){
+        //        (persisted_state === undefined)){
         //         this.context.router.history.push('/');
         //     }
         //     else if((persisted_state && persisted_state.authenticated) &&
         //         !persisted_state.terms_accepted){
-        //         console.log("pushing to terms on update");
         //         this.context.router.history.push('/terms_and_conditions');
         //     }
         // }

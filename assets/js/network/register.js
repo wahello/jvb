@@ -31,7 +31,8 @@ class RegisterNetwork {
 		};
 		axios(config).then(function(response){
 			const auth_state = {
-					authenticated: true
+					authenticated: true,
+					terms_accepted:true
 				};
 			saveLocalState(auth_state);
 			if (callback != undefined) callback(response);

@@ -207,4 +207,5 @@ handleLogout(){
     );
   }
 }
+
 export default connect(null,{logoutUser})(withRouter(TermsConditions))
