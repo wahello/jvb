@@ -26,12 +26,13 @@ class Dashboard extends Component {
 							  {/*<Link to='/weeklygrade'>Weekly Grade</Link><br/>*/}
 							  {/*<Link to='/breakdown'>Break Down Grade</Link><br/>*/}
 							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}
-							   <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
-							   <a href='/users/request_token'>Garmin Health Connect</a><br/>
-							   <a href='/users/connect_request_token'>Garmin Connect</a><br/>
+							   <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>				  
 							   <Link to='/quicksummary'>Raw Data</Link><br/>
 								<Link to='/dashboard_summary'>Progress Analyzer</Link><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
+							  <h3 id="link_style">Set up Links to Garmin</h3>
+							  <a href='/users/request_token'>Garmin Health Connect</a><br/>
+							  <a href='/users/connect_request_token'>Garmin Connect</a><br/>
 						  </div>
 						</div>
 					</div>

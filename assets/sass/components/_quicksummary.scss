@@ -163,19 +163,16 @@ background-color: #777777;
 	.dropbutton{
 		display: inline;
 	}
-	.bikestats{
-		display:none;
-	}
-	.swimstats{
-		display: none;
-	}
-	.allstats{
+	.Movement{
 		display:none;
 	}
 	.userinputs{
 		display: none;
 	}
-	#dropexercise{
+	.exercise{
+		display: none;
+	}
+	.bikestats{
 		display: none;
 	}
 	#dropalcohol{
@@ -184,6 +181,9 @@ background-color: #777777;
 	#dropfood{
 		display: none;
 	}
+	#dropswim{
+		display:none;
+	}
 	
 }
 
@@ -191,18 +191,15 @@ background-color: #777777;
 	.dropbutton{
 		display: inline;
 	}
-	.exercise{
-		display: none;
-	}
+	
 	.alcohol{
 		display: none;
 	}
 	.food{
 		display: none;
 	}
-
-	#dropexercise{
-		display:inline;
+	.swimstats{
+		display: none;
 	}
 	#dropalcohol{
 		display: inline;

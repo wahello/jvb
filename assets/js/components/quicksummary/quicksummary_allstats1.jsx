@@ -84,7 +84,7 @@ const attrVerboseName = {
 
     non_exercise_steps: 'Non Exercise Steps',
     exercise_steps: 'Exercise Steps',
-    total_steps: 'Total Steps *Total Steps on this chart may differ slightly from overall steps',
+    total_steps: 'Total Steps',
     floor_climed: 'Floor Climed',
     movement_consistency: 'Movement Consistency',
 
