@@ -17,6 +17,9 @@ class HomePageReactTitle extends Component {
 
   constructor(props){
     super(props);
+    this.state={
+       password_type: 'password',
+    };
 
     const persisted_state = loadLocalState();
     
@@ -32,6 +35,7 @@ class HomePageReactTitle extends Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.renderAlert = this.renderAlert.bind(this);
     this.onLoginSuccess = this.onLoginSuccess.bind(this);
+    this.showHidePassword = this.showHidePassword.bind(this);
   }
 
   onLoginSuccess(){
@@ -55,7 +59,13 @@ class HomePageReactTitle extends Component {
   onSubmit(values){
     this.props.loginUser(values, this.onLoginSuccess,this.onLoginFailure);
   }
-
+showHidePassword(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      password_type: this.state.password_type === 'password' ? 'input' : 'password'
+    })  
+  }
   renderField(field){
     const { meta: {touched, error} } = field;
     const className = `${ touched && error ? 'has-danger' : '' }`;
@@ -126,13 +136,22 @@ class HomePageReactTitle extends Component {
                                         placeholder = "Email / Username"
                                         component = {this.renderField}
                                       />
+                                      <FormGroup>
                                       <Field
+                                      style={{borderRadius:"0px",position:"relative"}} 
                                         name = "password"
-                                        type = "password"
+                                        type={this.state.password_type} 
                                         label = "Password"
                                         placeholder = "Password"
                                         component = {this.renderField}
                                       />
+
+                                      <a onClick={this.showHidePassword} color="link" style={{ color:"#535559" , position:"absolute", top:"172px", right:"57px"}}>
+                                        {this.state.password_type === 'input' ?
+                                         <span ><i  className="fa fa-eye-slash" aria-hidden="true"></i></span> :
+                                         <i className="fa fa-eye" aria-hidden="true"></i>}
+                                      </a> 
+                                      </FormGroup>
                                       <Button>Submit</Button>
                                       {this.renderAlert()}
                                     </Form>

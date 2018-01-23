@@ -1,11 +1,15 @@
 import React,{ Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter, Link } from 'react-router-dom';
-import {Field, reduxForm } from 'redux-form';
+import { withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import {acceptTermsCondition} from '../../network/dashboard';
+import {acceptTermsCondition} from '../network/terms_condition';
+import {loadLocalState,saveLocalState} from '../components/localStorage';
+import PropTypes from 'prop-types';
 
-class TCPopup extends React.Component {
+import {logoutUser} from '../network/auth';
+
+
+class TermsConditions extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,7 +21,10 @@ class TCPopup extends React.Component {
 
     this.toggle = this.toggle.bind(this);
     this.acceptTerms = this.acceptTerms.bind(this);
-    
+    this.toggleNested = this.toggleNested.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+    this.acceptTermsSuccess = this.acceptTermsSuccess.bind(this);
   }
 
 toggle() {
@@ -25,29 +32,48 @@ toggle() {
     modal: !this.state.modal
   });
 }
-
+acceptTermsSuccess(data){
+  let local_state = loadLocalState();
+  let updated_state = {...local_state, terms_accepted:true};
+  saveLocalState(updated_state);
+  this.props.history.push("/users/dashboard"); 
+}
 acceptTerms(){
-	this.setState({
+  this.setState({
       modal:false,
       terms_condition_accepted:true
-	},function(){
-    acceptTermsCondition(this.state.terms_condition_accepted); 
+  },function(){
+    acceptTermsCondition(this.state.terms_condition_accepted,this.acceptTermsSuccess);
   });
+
+}
+ toggleNested() {
+    this.setState({
+      nestedModal: !this.state.nestedModal,
+      closeAll: false
+    });
+  }
+   
+onLogoutSuccess(response){
+    this.props.history.push("/");
 }
 
+handleLogout(){
+  this.props.logoutUser(this.onLogoutSuccess);
+}
 
   render() {
     return (
       <div>
         <Modal id="modal_stye" isOpen={this.state.modal} backdrop={this.state.backdrop} toggle={this.toggle} style={{ maxWidth: '52%' }}>
-				         
-				          <ModalHeader >
+                 
+                  <ModalHeader >
                          
-				          <div  id="main_heading" style={{fontSize:'28px',textAlign:'center', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
-				          </ModalHeader>
+                  <div  id="main_heading" style={{fontSize:'28px',textAlign:'center', fontWeight:'bold'}}>Terms of Service have been Updated. Please read through the following</div>
+                  </ModalHeader>
 
 
-				           <ModalBody style={{marginLeft:'20px', marginRight:'20px;' }}>
+                   <ModalBody style={{marginLeft:'20px', marginRight:'20px' }}>
                     <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>ACCEPTANCE OF TERMS</p>
                     <p  id="text_style" style={{marginLeft:'52px'}}>JVB Health & Wellness LLC ("JVB Health & Wellness") provides websites, apps, services, and a platform, (referred to collectively hereafter as "the Services") subject to the following Terms of Use ("Terms"). By using the Services in any way, you are agreeing to comply with these Terms. You are not permitted to use the Services if you object to any part of these Terms or our Privacy Policy.</p>
                              <p id="sub-heading" style={{fontWeight:'bold' ,fontSize:'20px'}}>MODIFICATIONS TO THIS AGREEMENT</p>  
@@ -155,21 +181,31 @@ acceptTerms(){
                   </ModalBody>
 
 
-				          <ModalFooter id="footer_style">
-				          <div  id="disagree_btn" style={{float:'left'}}>
-				          <Button color="danger" onClick={this.toggle}> I DO NOT Agree to the Terms and Conditions</Button>
+                  <ModalFooter id="footer_style">
+                  <div  id="disagree_btn" style={{float:'left'}}>
+                  <Button color="danger" onClick={this.toggleNested}> I DO NOT Agree to the Terms and Conditions</Button>
                           </div>
+                           <Modal isOpen={this.state.nestedModal} toggle={this.toggleNested} onClosed={this.state.closeAll ? this.toggle : undefined}>
+              
+              <ModalBody> You have selected not to agree with our Terms and Conditions. You must agree to our Terms and Conditions to register for our site. Do you want to continue?</ModalBody>
+              <ModalFooter>
+              <Button color="primary" onClick={this.handleLogout}>No</Button>
+                <Button color="primary" onClick={this.toggleNested}>Yes</Button>
+                
+                
+              </ModalFooter>
+            </Modal>
 
 
-						   <div id="agree_btn">
-						 	<Button  color="success" onClick={this.acceptTerms}> I Agree to the Terms and Conditions</Button>				            
-						   </div>
-						     </ModalFooter>
-						     </Modal>
+               <div id="agree_btn">
+              <Button  color="success" onClick={this.acceptTerms}> I Agree to the Terms and Conditions</Button>                   
+               </div>
+                 </ModalFooter>
+                 </Modal>
 
       </div>
     );
   }
 }
 
-export default TCPopup;
+export default connect(null,{logoutUser})(withRouter(TermsConditions))
