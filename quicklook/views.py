@@ -12,7 +12,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
-
+from user_input.models import DailyUserInputOptional ,\
+                              DailyUserInputEncouraged
 from .serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
 						 StepsSerializer,\
@@ -517,6 +518,12 @@ def export_users_xls(request):
 	exec1 = ExerciseAndReporting.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
 		user_ql__user = request.user).order_by('-user_ql__created_at').values()
+	options_user = DailyUserInputOptional.objects.filter(
+		user_input__created_at__range=(from_date, to_date),
+		user_input__user = request.user).order_by('-user_input__created_at').values()
+	options_user1 = DailyUserInputEncouraged.objects.filter(
+		user_input__created_at__range=(from_date, to_date),
+		user_input__user = request.user).order_by('-user_input__created_at').values()
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -535,7 +542,7 @@ def export_users_xls(request):
 		# print(grades1[''])
 		row_num += 1
 		for i,key in enumerate(columns):
-				print(key)
+			
 				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_user_input' and key != 'exercise_consistency' and key != 'prcnt_non_processed_food' and key != 'alcohol_week':
 					if grades1[key] == 'A':
 						sheet2.write(i+2,row_num, grades1[key],format_green)
@@ -556,7 +563,7 @@ def export_users_xls(request):
 				elif key == '':
 					sheet2.write(i+2,row_num, '',format1)
 				elif i == 3:
-					sheet2.write(i+2,row_num, steps1[key],format1)
+					sheet2.write(i+2,row_num, steps1[key],format)
 				elif i == 5 and key == 'movement_consistency' and steps1[key]:
 					sheet2.write(i+2,row_num, ast.literal_eval(steps1[key])['inactive_hours'],format1)
 				elif i == 7:
@@ -564,29 +571,81 @@ def export_users_xls(request):
 				elif i == 9:
 					sheet2.write(i+2,row_num, exercise1[key],format1)
 				elif i == 11:
-					sheet2.write(i+2,row_num, food1[key],format1)
+					if food1[key] == '':
+						print(food1[key])
+						sheet2.write(i+2,row_num, '')
+					else:
+						sheet2.write(i+2,row_num, str(int(food1[key])) + '%')
 				elif i == 13:
 					sheet2.write(i+2,row_num, alcohol1[key],format1)	
 				else:
 					sheet2.write(i+2,row_num, 'YES',format_red)
+	print(row_num)
 	columnsg2 = ['Resting Heart Rate','Stress Level','Did you Stand for 3 hours or more above and beyond your exercise yesterday?']
+	col = ['sleep_resting_hr_last_night','stress_level','stand_for_three_hours']
 	sheet2.write(20, 0, "OVERALL HEALTH GRADES",bold)
 	col_num2 = 20
-	a = len(rows_of_grades)
+	len_gra = len(rows_of_grades)
 	for col_num in range(len(columnsg2)):
 		 col_num2 = col_num2 + 1
-		 sheet2.write(col_num2,row_num - a, columnsg2[col_num])
-	
-	# sheet2.write(25, 0, "OVERALL PERFORMANCE ASSESSMENT",bold)
-	# columnsg3 = ['Overall Workout Grade ','Overall Workout Score (points)','Workout Duration Grade','Workout Duration'
-	# ,'Workout Effort Level Grade','Workout Effort Level','Average Exercise Heart Rate Grade ','Average Exercise Heart Rate'
-	# ,'Heart Rate Recovery (HRR) - time to 99','Heart Rate Recovery (HRR) - heart beats lowered in the first minute '
-	# ,'Heart Rate Recovery (HRR) - Highest Heart Rate in the first minute ','VO2 Max','Floors Climbed ','Garmin Stress Score']
-	# col_num2 = 25
-	# a = len(rows_of_grades) + len(rows_of_grades)
-	# for col_num in range(len(columnsg3)):
-	# 	 col_num2 = col_num2 + 1
-	# 	 sheet2.write(col_num2,row_num - a, columnsg3[col_num])
+		 sheet2.write(col_num2,row_num - len_gra, columnsg2[col_num])
+
+	for row,user_op in zip(exec1,options_user):
+		row_num += 1
+		for i, key in enumerate(col):
+			if key == 'stand_for_three_hours':
+				sheet2.write(col_num2+i-2, row_num - len_gra, user_op[key],format)
+			else:
+				sheet2.write(col_num2+i-2, row_num - len_gra, row[key],format)
+	print(row_num)
+	sheet2.write(25, 0, "OVERALL PERFORMANCE ASSESSMENT",bold)
+	columnsg3 = ['Overall Workout Grade ','Overall Workout Score (points)','Workout Duration Grade','Workout Duration'
+	,'Workout Effort Level Grade','Workout Effort Level','Average Exercise Heart Rate Grade ','Average Exercise Heart Rate'
+	,'Heart Rate Recovery (HRR) - time to 99','Heart Rate Recovery (HRR) - heart beats lowered in the first minute '
+	,'VO2 Max','Floors Climbed ']
+	columnsg4 = ['overall_workout_grade','overall_workout_gpa','workout_duration_grade','workout_duration',
+	'workout_effortlvl_grade','workout_effortlvl_gpa','avg_exercise_hr_grade','avg_exercise_hr_gpa','time_to_99',
+	'lowest_hr_first_minute','vo2_max','floor_climed']
+	col_num2 = 25
+	len_gra1 = len(rows_of_grades) + len(exec1) 
+	num_1 = row_num
+	for col_num in range(len(columnsg3)):
+		 col_num2 = col_num2 + 1
+		 sheet2.write(col_num2,row_num - num_1, columnsg3[col_num])
+	l2 = 25
+	num_2 = row_num
+	print(num_2)
+	for grades2,excec2,steps2,user_op1 in zip(rows_of_grades,exec1,rows3,options_user1):
+		row_num += 1
+		for i, key in enumerate(columnsg4):
+			if key != 'workout_duration' and key != 'floor_climed' and key != 'vo2_max' and key != 'lowest_hr_first_minute' and key != 'time_to_99':
+				if grades2[key] == 'A':
+					sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_green)
+				elif grades2[key] == 'B':
+					sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_green)
+				elif grades2[key] == 'C':
+					sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_yellow)
+				elif grades2[key] == 'D':
+					sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_yellow)
+				elif grades2[key] == 'F':
+					sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_red)
+				elif grades2[key] == 'N/A':
+					sheet2.write(l2+i+1,row_num-num_2, grades2[key],format1)
+				elif grades2[key] == '':
+					sheet2.write(l2+i+1,row_num-num_2, '',format1)
+			elif key == 'workout_duration':
+				sheet2.write(l2+i+1, row_num-num_2, excec2[key],format)
+			elif key == 'floor_climed':
+				sheet2.write(l2+i+1, row_num-num_2, steps2[key],format)
+			elif key == 'vo2_max':
+				sheet2.write(l2+i+1, row_num-num_2, excec2[key],format)
+			elif key == 'lowest_hr_first_minute':
+				sheet2.write(l2+i+1, row_num-num_2, user_op1[key],format)
+			elif key == 'time_to_99':
+				sheet2.write(l2+i+1, row_num-num_2, user_op1[key],format)
+			else:
+				sheet2.write(l2+i+1,row_num-num_2, 'YES',format_red)
+
 	#Swim Stats sheet
 	sheet8.set_landscape()
 	sheet8.repeat_rows(0)

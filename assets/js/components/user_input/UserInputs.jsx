@@ -674,27 +674,6 @@ handleScroll() {
          editable:!this.state.editable
        });
     }
-    
-    // getTotalSleep(){
-    
-    //   let sleep_bedtime = this.state.sleep_bedtime;
-    //   let sleep_awake_time = this.state.sleep_awake_time;
-    //   let awake_hours = this.state.awake_hours?this.state.awake_hours:0;
-    //   let awake_mins = this.state.awake_mins?this.state.awake_mins:0;
-    //   let awake_time_in_mins = awake_hours*60 + awake_mins;
-    //   if(sleep_bedtime && sleep_awake_time){
-    //     let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
-    //     let hours = Math.floor(diff/60);
-    //     let mins = diff % 60;
-    //     if(mins < 10)
-    //       mins = `0${mins}`;
-    //     this.setState({
-    //       sleep_hours_last_night:hours,
-    //       sleep_mins_last_night:mins
-    //    });
-    // }}
-
-
 
     render(){
        const {fix} = this.props;
@@ -2306,7 +2285,6 @@ handleScroll() {
                                 <Input type="select" name="sleep_hours_last_night"
                                 id="hours"
                                 className="form-control custom-select"
-              
                                 value={this.state.sleep_hours_last_night}
                                 onChange={this.handleChange}>
                                  <option key="hours" value="">Hours</option>
@@ -2375,7 +2353,7 @@ handleScroll() {
                             <Label className="padding">2.2 Time Woke Up As Per Wearable.</Label>
                             {this.state.editable &&
                               <div className="input1">
-                                <DatePicker0
+                                <DatePicker
                                     id="datepicker"
                                     name = "sleep_awake_time"
                                     selected={this.state.sleep_awake_time}
@@ -3059,4 +3037,3 @@ Navbar.propTypes={
     fixed: PropTypes.string,
     color: PropTypes.string,
 }
-
