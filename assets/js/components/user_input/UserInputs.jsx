@@ -3037,4 +3037,3 @@ Navbar.propTypes={
     fixed: PropTypes.string,
     color: PropTypes.string,
 }
-
