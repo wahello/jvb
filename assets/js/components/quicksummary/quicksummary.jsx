@@ -186,7 +186,7 @@ class Quicklook extends Component{
 			    	 sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			    	  sleep_comments: data.sleep_ql.sleep_comments,
 			    	   sleep_aid: data.sleep_ql.sleep_aid,
-			    	    sleep_aid_penalty: data.grades_ql.sleep_aid_penalty,
+			    	    resting_heart_rate: data.grades_ql.resting_heart_rate,
 			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
 			       sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
@@ -197,6 +197,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
+			        processed_food_consumed: data.food_ql.processed_food_consumed ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },
