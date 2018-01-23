@@ -117,10 +117,10 @@ class Quicklook extends Component{
 			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
 			        smoke_penalty:data.grades_ql.smoke_penalty,
-
+	        
 			        resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
 			        stress_level:data.exercise_reporting_ql.stress_level,
-			        stand_three_hours:user_input_data.optional_input.stand_for_three_hours,
+			        stand_three_hours:user_input_data.optional_input.stand_for_three_hours, 
 
 			        overall_workout_grade:data.grades_ql.overall_workout_grade,
 			        overall_workout_score:data.grades_ql.overall_workout_gpa,

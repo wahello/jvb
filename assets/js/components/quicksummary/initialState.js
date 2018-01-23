@@ -36,8 +36,9 @@ export function getInitialState(start_dt, end_dt){
 	        "ctrl_subs_penalty":'-',
 	        "smoke_penalty":'-',
 
+	        
 	        "resting_hr":'-',
-	        "stress_level":'-',
+	        "stress_level":'-',  
 	        "stand_three_hours":'-',
 
 	        "overall_workout_grade":"-",
