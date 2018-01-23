@@ -18,7 +18,7 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
           {name: 'Sleep Comments'},
           {name: 'Sleep Aid taken?'},
-          {name: 'Sleep Aid Penalty'} ,
+          {name: 'Resting Heart Rate (RHR)'} ,
           {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
           {name: 'Sleep Bed Time'}, 
           {name: 'Sleep Awake Time'},

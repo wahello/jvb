@@ -78,6 +78,23 @@ const attrVerboseName = {
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
 
+    resting_hr:'Resting Heart Rate',
+    stress_level:'Stress Level',
+    stand_three_hours:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?', 
+
+    overall_workout_grade:'Overall Workout Grade ',
+    overall_workout_score:'Overall Workout Score (points)',
+    workout_duration_grade:'Workout Duration Grade',
+    workout_duration:'Workout Duration',
+    workout_effortlvl_grade:'Workout Effort Level Grade',
+    workout_effortlvl:'Workout Effort Level',
+    avg_exercise_hr_grade:'Average Exercise Heart Rate Grade',
+    avg_exercise_hr:'Average Exercise Heart Rate',
+    time_to_99:'Heart Rate Recovery (HRR) - time to 99',
+    lowest_hr_first_minute:'Heart Rate Recovery (HRR) - heart beats lowered in the first minute ',
+    vo2_max:'VO2 Max',
+    floor_climed:'Floors Climbed',   
+
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time) (hh:mm)',
     sleep_comments:'Sleep Comments',
     sleep_per_user_input: 'Sleep Per User Input (excluding awake time) (hh:mm)',
@@ -90,7 +107,7 @@ const attrVerboseName = {
 
     non_exercise_steps: 'Non Exercise Steps',
     exercise_steps: 'Exercise Steps',
-    total_steps: 'Total Steps *Total Steps on this chart may differ slightly from overall steps',
+    total_steps: 'Total Steps',
     floor_climed: 'Floor Climed',
     movement_consistency: 'Movement Consistency',
 

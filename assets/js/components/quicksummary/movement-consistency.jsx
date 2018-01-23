@@ -209,7 +209,9 @@ class Movementquick extends Component{
       let steps_data = [];
       let status_data = [];
       for(let slot of this.getSortKeysAccordingTime()){
+       
           steps_data.push(data['movement_consistency'][slot].steps);
+          console.log(data['movement_consistency']);
           status_data.push(data['movement_consistency'][slot].status);
         }
       steps_data.push(data['movement_consistency'].active_hours);
