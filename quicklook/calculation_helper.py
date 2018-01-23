@@ -736,7 +736,7 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities):
 
 	return (exercise_steps, total_steps)
 
-def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
+def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	def _to_sec(duration):
 		hours,mins = map(int,[0 if x == '' else x 
 					for x in duration.split(':')])
@@ -803,17 +803,12 @@ def cal_unprocessed_food_grade(prcnt_food):
  	elif (prcnt_food < 50):
  		return 'F'
 
-def cal_alcohol_drink_grade(alcohol_drank_past_week, gender,period):
+def cal_alcohol_drink_grade(drink_avg, gender):
 	'''
 	Calculate Average alcohol dring a week and grade
 	return tuple (grade,average drink)
 	'''
-	alcohol_drank_past_week = ['21' if x == '20+' else x
-								for x in alcohol_drank_past_week]
-
-	drink_avg = (sum(map(float,alcohol_drank_past_week))/period)*7
 	grade = ''
-
 	if gender == 'M':
 		if (drink_avg >= 0 and drink_avg <= 4):
 			grade = 'A'
@@ -863,13 +858,7 @@ def cal_movement_consistency_grade(hours_inactive):
 	elif hours_inactive > 10 :
 		return 'F'
 
-def cal_exercise_consistency_grade(workout_over_period, hr90_duration_15min, period):
-	points = 0
-	for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
-		if hr_over_90: points += 1
-		elif workout == 'yes': points += 1
-
-	avg_point_week = points / (period/7)
+def cal_exercise_consistency_grade(avg_point_week):
 	grade = 'F'
 	if avg_point_week >= 4:
 		grade = 'A'
@@ -1030,11 +1019,16 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 	return ''
 
 def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
-	alcohol_stats = cal_alcohol_drink_grade(
-		[q.number_of_alcohol_consumed_yesterday
+	alcoholic_drink_last_week = [q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
-		for q in daily_strong],
-		user.profile.gender,7)
+		for q in daily_strong]
+
+	alcoholic_drink_last_week = ['21' if x == '20+' else x
+								for x in alcoholic_drink_last_week]
+	period = 7
+	drink_avg = (sum(map(float,alcoholic_drink_last_week))/period)*7
+
+	alcohol_stats = cal_alcohol_drink_grade(drink_avg,user.profile.gender)
 	return alcohol_stats
 
 def get_exercise_consistency_grade(workout_over_period,weekly_activities,
@@ -1046,7 +1040,14 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 		activity_weekly_stats.append(get_activity_stats(act,manual_act_indexed))
 
 	hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
-	grade_point = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
+
+	points = 0
+	for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
+		if hr_over_90: points += 1
+		elif workout == 'yes': points += 1
+	avg_point_week = points / (period/7)
+
+	grade_point = cal_exercise_consistency_grade(avg_point_week)
 	return grade_point 
 
 def get_workout_duration_grade(todays_activities, todays_manually_updated):
