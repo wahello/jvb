@@ -206,7 +206,7 @@ class Quicklook extends Component{
 			    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			    	sleep_comments: data.sleep_ql.sleep_comments,
 			    	sleep_aid: data.sleep_ql.sleep_aid,
-			        resting_heart_rate: data.grades_ql.resting_heart_rate,
+			        resting_heart_rate: data.exercise_reporting_ql.sleep_resting_hr_last_night,
                     sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
 			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
