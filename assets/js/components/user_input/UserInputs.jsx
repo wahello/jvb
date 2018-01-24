@@ -2409,7 +2409,7 @@ handleScroll() {
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.awake_hours}
-                                onChange={this.handleChange}>
+                                onChange={this.handleChangeSleepLast}>
                                  <option key="hours" value="">Hours</option>
                                 {this.createSleepDropdown(0,24)}                        
                                 </Input>
@@ -2422,7 +2422,7 @@ handleScroll() {
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.awake_mins}
-                                onChange={this.handleChange}>
+                                onChange={this.handleChangeSleepLast}>
                                  <option key="mins" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
