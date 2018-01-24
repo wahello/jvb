@@ -6,19 +6,61 @@ export function handleChange(event){
 	[name]: value
   });
 }
+export function handleChangeSleepLast(event,getTotalSleep){
+ const target = event.target;
+  const value = target.value;
+  const name = target.name;
+  this.setState({
+  [name]: value
+  },()=>{
+    let duration = this.getTotalSleep();
+     if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+      this.setState({
+        sleep_hours_last_night:hours,
+        sleep_mins_last_night:mins
+      })
+    }
+  });
+}
 
-export function handleChangeSleepBedTime(date){
+export function handleChangeSleepBedTime(date,getTotalSleep){
   const name = event.target.name;
   this.setState({
       sleep_bedtime: date
-    });
+    },()=>{
+    let duration = this.getTotalSleep();
+     if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+      this.setState({
+        sleep_hours_last_night:hours,
+        sleep_mins_last_night:mins
+      })
+    }
+  });
+
 }
 
-export function handleChangeSleepAwakeTime(date){
+export function handleChangeSleepAwakeTime(date,getTotalSleep){
   const name = event.target.name;
   this.setState({
       sleep_awake_time: date
-    });
+    },()=>{
+    let duration = this.getTotalSleep();
+    if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+      this.setState({
+        sleep_hours_last_night:hours,
+        sleep_mins_last_night:mins
+      })
+    }
+  });
 }
 
 export function handleChangeWorkoutDone(event){

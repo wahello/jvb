@@ -18,7 +18,7 @@ import { Container, Select, option, Option, Row, Col, Button,
 import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css'; 
 
 import * as handlers from './handlers';
 import * as renderers from './renderers';
@@ -163,6 +163,7 @@ class UserInputs extends React.Component{
       this.handleCaloriesItemCheck = handlers.handleCaloriesItemCheck.bind(this);
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
+      this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this)
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -213,6 +214,7 @@ class UserInputs extends React.Component{
       this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
+      this.getTotalSleep = this.getTotalSleep.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -337,9 +339,9 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
-          } 
+          // if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+          //   fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          // } 
           window.scrollTo(0,0);
         });
       }
@@ -410,6 +412,23 @@ class UserInputs extends React.Component{
       });
      }
     }
+
+getTotalSleep(){
+     let sleep_bedtime = this.state.sleep_bedtime;
+     let sleep_awake_time = this.state.sleep_awake_time;
+     let awake_hours = this.state.awake_hours?this.state.awake_hours:0;
+     let awake_mins = this.state.awake_mins?this.state.awake_mins:0;
+     let awake_time_in_mins = awake_hours*60 + awake_mins;
+     if(sleep_bedtime && sleep_awake_time){
+       let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins;
+       let hours = Math.floor(diff/60);
+       let mins = diff % 60;
+       if(mins < 10)
+         mins = `0${mins}`;
+       return hours+":"+mins;
+     }else
+       return '';
+   }
 
     onFetchGarminFailure(error){
       console.log(error);
@@ -1176,14 +1195,14 @@ handleScroll() {
                                         onChange={this.handleChangeWorkout}/>{' '}
                                         Easy
                                      </Label>
-                                     {/*
+                                    
                                       <Label check className="btn btn-secondary radio1">
                                         <Input type="radio" name="workout_easy" 
                                         value="medium"
                                         checked={this.state.workout_easy === 'medium'}
                                         onChange={this.handleChangeWorkout}/>{' '}
                                         Medium
-                                     </Label>*/}
+                                     </Label>
                                      <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="workout_easy"
                                             value="hard"
@@ -2286,7 +2305,7 @@ handleScroll() {
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_last_night}
-                                onChange={this.handleChange}>
+                                onChange={this.handleChangeSleepLast}>
                                  <option key="hours" value="">Hours</option>
                                 {this.createSleepDropdown(0,24)}                        
                                 </Input>
@@ -2299,7 +2318,7 @@ handleScroll() {
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.sleep_mins_last_night}
-                                onChange={this.handleChange}>
+                                onChange={this.handleChangeSleepLast}>
                                  <option key="mins" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
@@ -2332,7 +2351,7 @@ handleScroll() {
                                     timeIntervals={1}
                                     dateFormat="LLL"
                                     isClearable={true}
-                                    shouldCloseOnSelect={true}
+                                    shouldCloseOnSelect={false}
                                 />
                               </div>
                             }
@@ -2363,7 +2382,7 @@ handleScroll() {
                                     timeIntervals={1}
                                     dateFormat="LLL"
                                     isClearable={true}
-                                    shouldCloseOnSelect={true}
+                                    shouldCloseOnSelect={false}
                                 />
                               </div>
                             }
@@ -3037,4 +3056,3 @@ Navbar.propTypes={
     fixed: PropTypes.string,
     color: PropTypes.string,
 }
-

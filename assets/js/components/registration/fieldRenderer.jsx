@@ -45,7 +45,7 @@ export function renderSelectFeet(field){
 				name={field.input.name} 
 				required
 				{...field.input}>
-				<option value="feet">feet</option> 
+				<option value="Feet">Feet</option> 
 				{createDropdown(1,9)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
@@ -61,7 +61,7 @@ export function renderSelectInches(field){
 				name={field.input.name}
 				required 
 				{...field.input}>
-				<option value="inches">inches</option> 
+				<option value="Inches">Inches</option> 
 				{createDropdown(1,12)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
@@ -77,7 +77,7 @@ export function renderSelectPounds(field){
 				name={field.input.name}
 				required 
 				{...field.input}>
-				<option value="weight">weight</option> 
+				<option value="Weight">Weight</option> 
 				{createDropdown(40,500)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
@@ -124,7 +124,7 @@ export function renderSelectMonth(field){
 				name={field.input.name} 
 				required
 				{...field.input}>
-				<option value="month">month</option> 
+				<option value="Month">Month</option> 
 				{createDropdown(1,12)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
@@ -140,7 +140,7 @@ export function renderSelectDate(field){
 				name={field.input.name} 
 				required
 				{...field.input}>
-				<option value="date">date</option> 
+				<option value="Date">Date</option> 
 				{createDropdown(1,31)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
@@ -156,7 +156,7 @@ export function renderSelectYear(field){
 				name={field.input.name} 
 				required
 				{...field.input}>
-				<option value="year">year</option> 
+				<option value="Year">Year</option> 
 				{createDropdown(1930,2018)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>

@@ -36,8 +36,9 @@ export function getInitialState(start_dt, end_dt){
 	        "ctrl_subs_penalty":'-',
 	        "smoke_penalty":'-',
 
+	        
 	        "resting_hr":'-',
-	        "stress_level":'-',
+	        "stress_level":'-',  
 	        "stand_three_hours":'-',
 
 	        "overall_workout_grade":"-",
@@ -122,7 +123,7 @@ export function getInitialState(start_dt, end_dt){
 	    	  "sleep_per_user_input": '-',
 	    	   "sleep_comments": '-',
 	           "sleep_aid": '-',
-	    	   "sleep_aid_penalty":'-',
+	    	   "resting_heart_rate":'-',
 	           "sleep_per_wearable": '-',
 	           "sleep_bed_time": '-',
 	           "sleep_awake_time": '-',
@@ -133,6 +134,7 @@ export function getInitialState(start_dt, end_dt){
 	    },
 	    "food_ql": {
 	        "prcnt_non_processed_food": '-',
+	        "processed_food_consumed":'-',
 	        "non_processed_food": '-',
 	        "diet_type": '-'
 	    },

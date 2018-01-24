@@ -5,7 +5,7 @@ import 'moment-timezone';
 
 axiosRetry(axios, { retries: 3}); 
 
-function formatJSON(data){
+function formatJSON(data){   
 	/* This function will format the form
 		 data into JSON acceptable by API.
 		 example - 
