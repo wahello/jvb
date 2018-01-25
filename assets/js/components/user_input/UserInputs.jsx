@@ -67,6 +67,7 @@ class UserInputs extends React.Component{
         hrrInfo:false,
         wetherInfo:false,
         commentInfo:false,
+        alcoholInfo:false,
 
         workout:'',
         workout_type:'',
@@ -210,6 +211,7 @@ class UserInputs extends React.Component{
       this.toggleHrr=this.toggleHrr.bind(this);
       this.toggleWeather=this.toggleWeather.bind(this);
       this.toggleComment=this.toggleComment.bind(this);
+      this.toggleAlcohol=this.toggleAlcohol.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
       this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
@@ -699,7 +701,11 @@ handleScroll() {
         weatherInfo:!this.state.weatherInfo
       });
      }
-
+     toggleAlcohol(){
+      this.setState({
+        alcoholInfo:!this.state.alcoholInfo
+      });
+     }
      toggleComment(){
       this.setState({
         commentInfo:!this.state.commentInfo
@@ -2685,7 +2691,20 @@ handleScroll() {
                            </Modal>       
 
                           <FormGroup>
-                               <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>
+                               <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?
+                                <span id="alcoholinfo"
+                                   onClick={this.toggleAlcohol} 
+                                   style={{paddingLeft:"15px",color:"gray"}}>
+                                 
+                                   <FontAwesome 
+                                                style={{color:"#5E5E5E"}}
+                                                name = "info-circle"
+                                                size = "1x"                                      
+                                              
+                              />
+                        
+                              </span>
+                               </Label>
                                 {this.state.editable &&
                                   <div className="input1">
                                        <Input 
@@ -2711,6 +2730,52 @@ handleScroll() {
                                     {this.renderAlcoholModal()}
                                   </FormGroup>
                           </FormGroup>
+                          <Modal
+                           id="popover" 
+                           className="pop"
+                            placement="right" 
+                            isOpen={this.state.alcoholInfo}
+                            target="alcoholinfo" 
+                            toggle={this.toggleAlcohol}>
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
+                               <div>
+                                 Report how many drinks of alcohol you consumed YESTERDAY.
+                                 In order to determine how many drinks you consumed, use the
+                                 following guidelines:
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                  In the Unites States, a standard drink is equal to 14.0 grams (0.6 ounces) of pure alcohol.
+                                  Generally, this amount of pure alcohol is found in:  
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   (1) 12 ounces of beer (5% alcohol content);
+                               </div>
+
+                                <div style={{paddingTop:"15px"}}>
+                                    (2) 8 ounces of malt liquor (7% alcohol content); 
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   (3) 5 ounces of wine (12% alcohol content); 
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                               (4) 1.5 ounces or a “shot” of 80-proof (40% alcohol content) distilled
+                                spirits or liquor (e.g., gin, rum, vodka, whiskey)"
+                               </div>                                                                        
+                              </ModalBody>
+                           </Modal>       
+
                                             
                           <FormGroup>
                             <Label className="padding">7. Did You Smoke Any Substances Yesterday?</Label>

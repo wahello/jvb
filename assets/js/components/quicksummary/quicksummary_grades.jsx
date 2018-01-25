@@ -34,12 +34,12 @@ import NumberFormat from 'react-number-format';
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
         
-        {name:'NOT GRADED CATEGORIES:--'},
+        {name:'NOT GRADED CATEGORIES'},
         {name:'Resting Heart Rate'},
         {name:'Stress Level'},
         {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
         
-        {name:'PERFORMANCE ASSESSMENT:--'},
+        {name:'PERFORMANCE ASSESSMENT'},
         {name: 'Overall Workout Grade '},
         {name: 'Overall Workout Score (points)'},
         {name: 'Workout Duration Grade'},   
