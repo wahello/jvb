@@ -1115,7 +1115,7 @@ def export_users_xls(request):
 			sheet2.write(col_num2+i-2, row_num - num_10, '')
 		current_date -= timedelta(days=1)
 	
-	sheet2.write(26, 0, "OVERALL PERFORMANCE ASSESSMENT",bold)
+	sheet2.write(26, 0, "PERFORMANCE ASSESSMENT",bold)
 	columnsg3 = ['Overall Workout Grade ','Overall Workout Score (points)','Workout Duration Grade','Workout Duration'
 	,'Workout Effort Level Grade','Workout Effort Level','Average Exercise Heart Rate Grade ','Average Exercise Heart Rate'
 	,'Heart Rate Recovery (HRR) - time to 99','Heart Rate Recovery (HRR) - heart beats lowered in the first minute '
