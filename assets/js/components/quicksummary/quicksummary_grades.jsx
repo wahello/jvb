@@ -94,6 +94,19 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
+            else if(key == 'smoke_penalty' || key ==  'ctrl_subs_penalty' || key == 'sleep_aid_penalty'){
+              if(value && value != "-"){
+                all_data.push({
+                  value:'Yes',
+                  style:''
+                });
+              }else{
+                all_data.push({
+                  value:'No',
+                  style:''
+                });
+              }
+            }
             else if(key == 'movement_consistency_score'){
               let mc = value;
               if( mc != undefined && mc != "" && mc != "-"){
