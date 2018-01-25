@@ -18,19 +18,40 @@ import NumberFormat from 'react-number-format';
       myTableData: [
         {name: 'Overall Health Grade'},
         {name: 'Overall Health Gpa'},
-        {name: 'Movement Non Exercise steps Grade'},
-        {name: 'Movement Consistency Grade'}, 
+        {name: 'Movement Non Exercise steps Grade'},   
+        {name: 'Movement Non Exercise steps'},
+        {name: 'Movement Consistency Grade'},
+        {name: 'Movement Consistency Score'}, 
         {name: 'Avg Sleep Per Night Grade'},
+        {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
-        {name: 'Overall Workout Grade'},
-        {name: 'Workout Duration Grade'},
-        {name: 'Workout Effort Level Grade'},
-        {name: 'Average Exercise Heartrate Grade'},
-        {name: 'Percentage of Unprocessed Food Grade'}, 
+        {name: 'Exercise Consistency Score'},
+        {name: 'Percentage of Unprocessed Food Grade'},
+        {name: 'Percentage of Unprocessed Food'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
+        {name: 'Alcoholic Drink Per Week'},
         {name: 'Sleep Aid Penalty'},
         {name: 'Controlled Substance Penalty'},
-        {name: 'Smoking Penalty'}              
+        {name: 'Smoking Penalty'}, 
+        
+        {name:'NOT GRADED CATEGORIES:--'},
+        {name:'Resting Heart Rate'},
+        {name:'Stress Level'},
+        {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
+        
+        {name:'PERFORMANCE ASSESSMENT:--'},
+        {name: 'Overall Workout Grade '},
+        {name: 'Overall Workout Score (points)'},
+        {name: 'Workout Duration Grade'},   
+        {name: 'Workout Duration'},
+        {name: 'Workout Effort Level Grade'},
+        {name: 'Workout Effort Level'}, 
+        {name: 'Average Exercise Heart Rate Grade'},
+        {name: 'Average Exercise Heart Rate'},
+        {name: 'Heart Rate Recovery (HRR) - time to 99'},
+        {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
+        {name: 'VO2 Max'}, 
+        {name: 'Floors Climbed '},          
       ],
     };
   }
@@ -50,11 +71,15 @@ renderTableColumns(dateWiseData,category,classes=""){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-            console.log(key);
-    //           var num = 18;
-    // var n = num.toFixed(2)
-    // document.write( n);
             if(key !== 'id' && key !== 'user_ql'){
+
+            if(key == "resting_hr" || key == "overall_workout_grade"){
+              all_data.push({
+                  value:'',
+                  style:''
+                });
+            }
+
             if(key === 'overall_health_gpa'){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -69,7 +94,21 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
-             else {
+            else if(key == 'movement_consistency_score'){
+              let mc = value;
+              if( mc != undefined && mc != "" && mc != "-"){
+                mc = JSON.parse(mc);
+                all_data.push({
+                  value: mc.inactive_hours,
+                  style:''
+                  });
+              }else
+                all_data.push({
+                  value:'',
+                  style:''
+                });
+            }
+            else {
                 all_data.push({
                     value: value,
                     style: obj[value]
@@ -137,7 +176,6 @@ const styles = StyleSheet.create({
   },
   newTableBody:{
     textAlign:'center',
-    
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',

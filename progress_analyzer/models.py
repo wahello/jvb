@@ -62,6 +62,7 @@ class ExerciseStatsCumulative(models.Model):
 	cum_workout_duration_in_hours = models.FloatField(blank=True, null=True)
 	cum_workout_effort_level = models.FloatField(blank=True, null=True)
 	cum_avg_exercise_hr = models.BigIntegerField(blank=True, null=True)
+	cum_overall_workout_gpa = models.FloatField(blank=True, null=True)
 	cum_overall_exercise_gpa = models.FloatField(blank=True, null=True)
 	rank = models.BigIntegerField(blank=True, null=True)
 

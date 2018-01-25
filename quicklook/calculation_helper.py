@@ -136,14 +136,20 @@ def get_blank_model_fields(model):
 		fields = {
 			'overall_health_grade':'',
 			'overall_health_gpa':0,
-			'movement_non_exercise_steps_grade':'' ,
-			'movement_consistency_grade': '' ,
+			'movement_non_exercise_steps_grade':'',
+			'movement_consistency_grade': '',
 			'avg_sleep_per_night_grade':'',
-			'exercise_consistency_grade':'' ,
+			'avg_sleep_per_night_gpa':0,
+			'exercise_consistency_grade':'',
+			'exercise_consistency_gpa':0,
 			'overall_workout_grade':'',
+			'overall_workout_gpa':0,
 			'workout_duration_grade':'',
+			'workout_duration_gpa':0,
 			'workout_effortlvl_grade':'',
+			'workout_effortlvl_gpa':0,
 			'avg_exercise_hr_grade':'',
+			'avg_exercise_hr_gpa':0,
 			'prcnt_unprocessed_food_consumed_grade':'',
 			'alcoholic_drink_per_week_grade':'' ,
 			'sleep_aid_penalty':0,
@@ -373,6 +379,24 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 	# If str_dt is True then string reperesentation of sleep and awake
 	# time is returned otherwise datetime Object or None if no sleep data.
 
+	def _get_awake_time(data):
+		max_duration = 0
+		sleep_level_maps = data.get('sleepLevelsMap')
+		for lvl_data in sleep_level_maps.values():
+			max_end_time = max(int(d.get('endTimeInSeconds')) for d in lvl_data)
+			max_duration = max_end_time if max_end_time >= max_duration else max_duration
+		return max_duration
+
+	def _get_actual_sleep_start_time(data):
+		min_duration = None
+		sleep_level_maps = data.get('sleepLevelsMap')
+		for lvl_data in sleep_level_maps.values():
+			min_start_time = min(int(d.get('startTimeInSeconds')) for d in lvl_data)
+			if not min_duration:
+				min_duration = min_start_time
+			min_duration = min_start_time if min_start_time <= min_duration else min_duration
+		return min_duration
+
 	recent_auto_manual = None
 	recent_auto_final = None
 	recent_auto_tentative = None
@@ -470,19 +494,37 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			target_tz = pytz.timezone(user_input_timezone)
 			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
 						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
+			# awake_time = _get_awake_time(target_sleep_data)
+			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+			# 				awake_time)).astimezone(target_tz).replace(tzinfo = None)
+
 			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-						target_sleep_data.get('startTimeInSeconds')+
+						_get_actual_sleep_start_time(target_sleep_data)+
 						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+			
+			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+			# 			target_sleep_data.get('startTimeInSeconds')+
+			# 			target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
 
 		else:
 			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
-												 target_sleep_data.get('startTimeOffsetInSeconds'))
-			awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+				target_sleep_data.get('startTimeOffsetInSeconds'))
+			# awake_time = _get_awake_time(target_sleep_data)
+			# awake_time = datetime.utcfromtimestamp(awake_time + 
+			# 	target_sleep_data.get('startTimeOffsetInSeconds',0))
+
+			awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
 												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 												   target_sleep_data.get('durationInSeconds'))
 
-		sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
+			# awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+			# 									   target_sleep_data.get('durationInSeconds'))
+
+		sleep_per_wearable = (awake_time-bed_time).seconds\
 							 - target_sleep_data.get('awakeDurationInSeconds',0)
+		# sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
+		# 					 - target_sleep_data.get('awakeDurationInSeconds',0)
 		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
 		if str_dt:
 			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
@@ -730,7 +772,7 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities):
 
 	return (exercise_steps, total_steps)
 
-def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
+def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	def _to_sec(duration):
 		hours,mins = map(int,[0 if x == '' else x 
 					for x in duration.split(':')])
@@ -781,7 +823,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken):
 		else:
 			points = 0
 
-	return GRADES[points]
+	return (GRADES[points],points)
  
 def cal_unprocessed_food_grade(prcnt_food):
  	prcnt_food = int(prcnt_food)
@@ -797,39 +839,34 @@ def cal_unprocessed_food_grade(prcnt_food):
  	elif (prcnt_food < 50):
  		return 'F'
 
-def cal_alcohol_drink_grade(alcohol_drank_past_week, gender,period):
+def cal_alcohol_drink_grade(drink_avg, gender):
 	'''
 	Calculate Average alcohol dring a week and grade
 	return tuple (grade,average drink)
 	'''
-	alcohol_drank_past_week = ['21' if x == '20+' else x
-								for x in alcohol_drank_past_week]
-
-	drink_avg = (sum(map(float,alcohol_drank_past_week))/period)*7
 	grade = ''
-
 	if gender == 'M':
-		if (drink_avg >= 0 and drink_avg <= 4):
+		if (drink_avg >= 0 and drink_avg <= 5):
 			grade = 'A'
-		elif (drink_avg >= 4.01 and drink_avg <= 7):
+		elif (drink_avg > 5 and drink_avg < 12):
 			grade = 'B'
-		elif (drink_avg >= 7.01 and drink_avg <= 10):
+		elif (drink_avg >= 12 and drink_avg < 15):
 			grade = 'C'
-		elif (drink_avg >= 10.01 and drink_avg <= 13.99):
+		elif (drink_avg >= 15 and drink_avg < 16):
 			grade = 'D'
-		elif (drink_avg >= 14):
+		elif (drink_avg >= 16):
 			grade = 'F'
 
 	else:
-		if (drink_avg >= 0 and drink_avg <= 2):
+		if (drink_avg >= 0 and drink_avg <= 3):
 			grade = 'A'
-		elif (drink_avg >= 2.01 and drink_avg <= 4):
+		elif (drink_avg > 3 and drink_avg <= 5):
 			grade = 'B'
-		elif (drink_avg >= 4.01 and drink_avg <= 5):
+		elif (drink_avg > 5 and drink_avg <= 7):
 			grade = 'C'
-		elif (drink_avg >= 5.01 and drink_avg <= 6.99):
+		elif (drink_avg > 7 and drink_avg <= 8):
 			grade = 'D'
-		elif (drink_avg >= 7):
+		elif (drink_avg > 8):
 			grade = 'F'
 	return (grade,round(drink_avg,2))
 
@@ -857,24 +894,19 @@ def cal_movement_consistency_grade(hours_inactive):
 	elif hours_inactive > 10 :
 		return 'F'
 
-def cal_exercise_consistency_grade(workout_over_period, hr90_duration_15min, period):
-	points = 0
-	for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
-		if hr_over_90: points += 1
-		elif workout == 'yes': points += 1
-
-	avg_point_week = points / (period/7)
-
+def cal_exercise_consistency_grade(avg_point_week):
+	grade = 'F'
 	if avg_point_week >= 4:
-		return 'A'
+		grade = 'A'
 	elif avg_point_week >= 3 and avg_point_week < 4:
-		return 'B'
+		grade =  'B'
 	elif avg_point_week >= 2 and avg_point_week < 3:
-		return 'C'
+		grade =  'C'
 	elif avg_point_week >= 1 and avg_point_week < 2:
-		return 'D'
+		grade =  'D'
 	elif avg_point_week < 1:
-		return 'F' 
+		grade = 'F'
+	return (grade, avg_point_week) 
 	
 def cal_overall_workout_grade(gpa):
 	'''
@@ -1006,11 +1038,11 @@ def get_avg_sleep_grade(daily_strong,current_date):
 		if (q.user_input.created_at == current_date.date() and 
 			q.sleep_time_excluding_awake_time != '' and
 			q.sleep_time_excluding_awake_time != None):
-			grade = cal_average_sleep_grade(
+			grade_point = cal_average_sleep_grade(
 				  q.sleep_time_excluding_awake_time,
 				  q.prescription_or_non_prescription_sleep_aids_last_night)
-			return grade
-	return ''
+			return grade_point
+	return (None,None)
 
 def get_unprocessed_food_grade(daily_strong,current_date):
 	for q in daily_strong:
@@ -1022,12 +1054,21 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 			return grade
 	return ''
 
-def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
-	alcohol_stats = cal_alcohol_drink_grade(
-		[q.number_of_alcohol_consumed_yesterday
+def get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user):
+	alcoholic_drink_last_week = [q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
-		for q in daily_strong],
-		user.profile.gender,7)
+		for q in daily_strong]
+
+	# including today's alcohol consumed 
+	alcoholic_drink_last_week.append(safe_get(
+		todays_daily_strong,"number_of_alcohol_consumed_yesterday",""))
+
+	alcoholic_drink_last_week = ['21' if x == '20+' else x
+								for x in alcoholic_drink_last_week]
+	period = 7
+	drink_avg = (sum(map(float,alcoholic_drink_last_week))/period)*7
+
+	alcohol_stats = cal_alcohol_drink_grade(drink_avg,user.profile.gender)
 	return alcohol_stats
 
 def get_exercise_consistency_grade(workout_over_period,weekly_activities,
@@ -1039,8 +1080,15 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activities,
 		activity_weekly_stats.append(get_activity_stats(act,manual_act_indexed))
 
 	hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
-	grades = cal_exercise_consistency_grade(workout_over_period,hr90_duration_15min,period)
-	return grades 
+
+	points = 0
+	for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
+		if hr_over_90: points += 1
+		elif workout == 'yes': points += 1
+	avg_point_week = points / (period/7)
+
+	grade_point = cal_exercise_consistency_grade(avg_point_week)
+	return grade_point 
 
 def get_workout_duration_grade(todays_activities, todays_manually_updated):
 	'''
@@ -1117,7 +1165,6 @@ def get_overall_grade(grades):
 	exercise_consistency_grade = grades.get('exercise_consistency_grade')
 	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
 	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
-	overall_workout_grade = grades.get('overall_workout_grade')
 	penalty = grades.get('sleep_aid_penalty')+\
 				grades.get('ctrl_subs_penalty')+\
 				grades.get('smoke_penalty')
@@ -1128,8 +1175,7 @@ def get_overall_grade(grades):
 		   GRADES[exercise_consistency_grade]+
 		   GRADES[prcnt_unprocessed_food_grade]+
 		   GRADES[alcoholic_drink_per_week_grade]+
-		   GRADES[overall_workout_grade]+
-		   penalty) / 7,2)
+		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
 
 def get_weather_data(todays_daily_strong,todays_activities,
@@ -1385,32 +1431,40 @@ def create_quick_look(user,from_date=None,to_date=None):
 		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json,
 																 todays_manually_updated_json)
 		grades_calculated_data['workout_duration_grade'] = workout_duration_grade_pts[0]
+		grades_calculated_data['workout_duration_gpa'] = workout_duration_grade_pts[1]
 
 		# Workout effort level grade calculation
 		workout_effortlvl_grade_pts = get_workout_effort_grade(todays_daily_strong)
 		grades_calculated_data['workout_effortlvl_grade'] = workout_effortlvl_grade_pts[0]
+		grades_calculated_data['workout_effortlvl_gpa'] = workout_effortlvl_grade_pts[1]
 
 		# Average exercise heartrate grade calculation
 		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
 									todays_manually_updated_json,todays_daily_strong, user.profile.age())
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
+		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
+			if avg_exercise_hr_grade_pts[1] else 0  
+
 		# Overall workout grade calculation
 		overall_workout_grade_pt = get_overall_workout_grade(
 								workout_duration_grade_pts[1],
 								workout_effortlvl_grade_pts[1],
 								avg_exercise_hr_grade_pts[1])
 		grades_calculated_data['overall_workout_grade'] = overall_workout_grade_pt[0]
+		grades_calculated_data['overall_workout_gpa'] = overall_workout_grade_pt[1]
 
 		# Average sleep per night grade calculation
-		grades_calculated_data['avg_sleep_per_night_grade'] = get_avg_sleep_grade(todays_daily_strong, current_date)
+		grade_point = get_avg_sleep_grade(todays_daily_strong, current_date)
+		grades_calculated_data['avg_sleep_per_night_grade'] = grade_point[0] if grade_point[0] else ''
+		grades_calculated_data['avg_sleep_per_night_gpa'] = grade_point[1] if grade_point[1] else 0
 
 		# Unprocessed food grade calculation 
 		grade  = get_unprocessed_food_grade(todays_daily_strong, current_date)
 		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
 	
 		# Alcohol drink consumed grade and avg alcohol per week
-		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
+		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user)
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
 		alcohol_calculated_data['alcohol_week'] = avg_alcohol
 
@@ -1438,9 +1492,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 		cal_non_exercise_step_grade(total_steps - exercise_steps)
 
 		# Exercise Consistency grade calculation over period of 7 days
-		exercise_consistency_grade = get_exercise_consistency_grade(
+		exercise_consistency_grade_point = get_exercise_consistency_grade(
 			[q.workout for q in daily_strong],weekly_activities,weekly_manual_activities,7)
-		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
+
+		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade_point[0]
+		grades_calculated_data['exercise_consistency_gpa'] = exercise_consistency_grade_point[1]
 
 		# Penalty calculation
 		penalties = cal_penalty(

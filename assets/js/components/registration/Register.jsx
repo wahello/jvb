@@ -88,6 +88,7 @@ toggle() {
            
 			 </div>
 
+
 			 <div className="col-md-4 col-sm-4 col-xs-12 registration" >
               Registration
 			 </div>
@@ -96,6 +97,7 @@ toggle() {
             </div>
        
           
+
         </Navbar>
 			<div className="form-container" id="form_margin">
 				<Container className="h-100" id="reg-form">

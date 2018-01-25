@@ -96,25 +96,44 @@ class Quicklook extends Component{
 		};
 	}
 
-	updateDateState(data){
+	updateDateState(data,user_input_data){
        			var properties={
        			created_at:data.created_at,
 				grades_ql: {
 			        overall_health_grade: data.grades_ql.overall_health_grade,
 			        overall_health_gpa: data.grades_ql.overall_health_gpa,
 			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,
+			        movement_non_exercise_steps:data.steps_ql.non_exercise_steps,
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
+			        movement_consistency_score:data.steps_ql.movement_consistency,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
+			        avg_sleep_per_night:data.sleep_ql.sleep_per_user_input,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
-			        overall_workout_grade: data.grades_ql.overall_workout_grade,
-			        workout_duration_grade: data.grades_ql.workout_duration_grade,
-			        workout_effortlvl_grade: data.grades_ql.workout_effortlvl_grade,
-			        avg_exercise_hr_grade: data.grades_ql.avg_exercise_hr_grade,
+			        exercise_consistency_score:data.grades_ql.exercise_consistency_gpa,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
+			        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
+			        alcoholic_drink_per_week:data.alcohol_ql.alcohol_week,
 			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
-			        smoke_penalty:data.grades_ql.smoke_penalty
+			        smoke_penalty:data.grades_ql.smoke_penalty,
+	        
+			        resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
+			        stress_level:data.exercise_reporting_ql.stress_level,
+			        stand_three_hours:user_input_data.optional_input.stand_for_three_hours, 
+
+			        overall_workout_grade:data.grades_ql.overall_workout_grade,
+			        overall_workout_score:data.grades_ql.overall_workout_gpa,
+				    workout_duration_grade:data.grades_ql.workout_duration_grade,
+				    workout_duration:data.exercise_reporting_ql.workout_duration,
+				    workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
+				    workout_effortlvl:data.grades_ql.workout_effortlvl_gpa,
+				    avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
+				    avg_exercise_hr:data.grades_ql.avg_exercise_hr_gpa,
+				    time_to_99:user_input_data.encouraged_input.time_to_99,
+				    lowest_hr_first_minute:user_input_data.encouraged_input.lowest_hr_first_minute,
+				    vo2_max:data.exercise_reporting_ql.vo2_max,
+				    floor_climed:data.steps_ql.floor_climed,
 	    		},
 
 			    exercise_reporting_ql: {
@@ -183,12 +202,13 @@ class Quicklook extends Component{
 			        "floor_climed": data.steps_ql.floor_climed,
 			    },
 			    sleep_ql: {
-			    	 sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
-			    	  sleep_comments: data.sleep_ql.sleep_comments,
-			    	   sleep_aid: data.sleep_ql.sleep_aid,
-			    	    sleep_aid_penalty: data.grades_ql.sleep_aid_penalty,
-			        sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
-			       sleep_bed_time: data.sleep_ql.sleep_bed_time,
+
+			    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
+			    	sleep_comments: data.sleep_ql.sleep_comments,
+			    	sleep_aid: data.sleep_ql.sleep_aid,
+			        resting_heart_rate: data.exercise_reporting_ql.sleep_resting_hr_last_night,
+                    sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
+			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 			        deep_sleep: data.sleep_ql.deep_sleep,
 			        light_sleep: data.sleep_ql.light_sleep,
@@ -197,6 +217,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
+			        processed_food_consumed: data.food_ql.processed_food_consumed ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },
@@ -283,7 +304,8 @@ class Quicklook extends Component{
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
 		      	const date = moment(dataitem.created_at).format('M-D-YY');
-		      	let obj = this.updateDateState(dataitem);
+		      	console.log(this.state.userInputData);
+		      	let obj = this.updateDateState(dataitem,this.state.userInputData[date]);
 		      	initial_state[date] = obj;
 		      }
 		      this.setState({
@@ -331,7 +353,9 @@ class Quicklook extends Component{
 		}
 		this.setState({
 			userInputData:initial_state,
-			 selected_date:this.state.selected_date,
+			selected_date:this.state.selected_date,
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 		});
 	}
 
@@ -341,7 +365,9 @@ class Quicklook extends Component{
 
 		this.setState({
 			userInputData:initial_state,
-			 selected_date:this.state.selected_date, 
+			selected_date:this.state.selected_date, 
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 		});
 	}
 
@@ -356,7 +382,6 @@ class Quicklook extends Component{
 			end_date : end_dt.toDate(),
 			fetching_ql:true
 		},()=>{
-			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 						  this.userInputFetchFailure);
 		});
@@ -381,14 +406,12 @@ class Quicklook extends Component{
 			dateRange:!this.state.dateRange,
 			fetching_ql:true
 		},()=>{
-			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 						  this.userInputFetchFailure);
 		});
   }
 
 	componentDidMount(){
-		quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
 		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 					  this.userInputFetchFailure);
 		 window.addEventListener('scroll', this.handleScroll);
@@ -640,6 +663,18 @@ onLogoutSuccess(response){
                                           </span>                                    
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
                                   <Nav className="nav navbar-nav" navbar className="fonts">
+
+                                  			 <NavItem onClick={this.toggle} className="allstats">
+                                          <span id="spa">
+                                            <abbr id="abbri"  title="All Stats">
+                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
+						    								 onClick={this.activateTab.bind(this,"allstats1")}>
+                                               All Stats
+                                              </NavLink>
+                                            </abbr>
+                                            </span>
+                                          </NavItem>
+
                                   			 <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Grades">
@@ -662,17 +697,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                       	<NavItem onClick={this.toggle}>
-                                        <span id="spa">
-                                          <abbr  id="abbri"  title="Movement Consistency">
-                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
-						    		 				onClick={this.activateTab.bind(this,"movement")}>
-						    		 		 Movement Consistency
-                                            </NavLink>
-                                          </abbr>
-                                          </span>
-                                       </NavItem>
-
+                                       	
 
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
@@ -707,39 +732,6 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem onClick={this.toggle} className="exercise">
-                                        <span id="spa">
-                                          <abbr  id="abbri"  title="Exercise Reporting">
-                                            <NavLink id="headernames" href="#" className={class_exercise} value="exercise"
-						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
-						    		 		Exercise Reporting
-                                            </NavLink>
-                                          </abbr>
-                                          </span>
-                                       </NavItem>
-
-                                       	<NavItem onClick={this.toggle} className="userinputs">
-                                        <span id="spa">
-                                          <abbr  id="abbri"  title="User Inputs">
-                                            <NavLink id="headernames" href="#" className={class_user} value="user"
-						    		 				onClick={this.activateTab.bind(this,"user")}>
-						    		 		 User Inputs
-                                            </NavLink>
-                                          </abbr>
-                                          </span>
-                                       </NavItem>
-
-                                          <NavItem onClick={this.toggle} className="allstats">
-                                          <span id="spa">
-                                            <abbr id="abbri"  title="All Stats">
-                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
-						    								 onClick={this.activateTab.bind(this,"allstats1")}>
-                                               All Stats
-                                              </NavLink>
-                                            </abbr>
-                                            </span>
-                                          </NavItem>
-
                                         <NavItem onClick={this.toggle} className="swimstats">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
@@ -762,6 +754,39 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem> 
 
+                                        <NavItem onClick={this.toggle} className="exercise">
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Exercise Reporting">
+                                            <NavLink id="headernames" href="#" className={class_exercise} value="exercise"
+						    		 				  onClick={this.activateTab.bind(this,"exercise")}>
+						    		 		Exercise Reporting
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
+                                       	<NavItem onClick={this.toggle} className="userinputs">
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="User Inputs">
+                                            <NavLink id="headernames" href="#" className={class_user} value="user"
+						    		 				onClick={this.activateTab.bind(this,"user")}>
+						    		 		 User Inputs
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
+                                        <NavItem onClick={this.toggle} className="Movement">
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Movement Consistency">
+                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>
+						    		 		 Movement Consistency
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>
+
                                        <span className="dropbutton">
                                          
                                         <span id="spa">
@@ -769,23 +794,23 @@ onLogoutSuccess(response){
 									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"13px"}}>
 									          More
 									        </DropdownToggle>
-									        <DropdownMenu>
-									          <DropdownItem style={{paddingLeft:"30px"}} className={class_bike} value="bike"
-							    		 			onClick={this.activateTab.bind(this,"bike")}>
-							    			 Bike Stats
-                                            </DropdownItem>
-									          <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
-									          <DropdownItem style={{paddingLeft:"30px"}} id="dropallstats"  className={class_allstats1} value="allstats1"
-						    								 onClick={this.activateTab.bind(this,"allstats1")}>All Stats</DropdownItem>
-									          <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
-						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
-						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
-									          <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
-						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
+									        <DropdownMenu>									                                                     						    		 													         									         								         									         
 									          <DropdownItem style={{paddingLeft:"30px"}} id="dropfood"  className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
+						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>	
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
+						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
+						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
+						    		 		   <DropdownItem style={{paddingLeft:"30px"}} className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>
+							    			 Movement Consistency
+                                            </DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>
