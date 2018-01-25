@@ -599,7 +599,9 @@ def export_users_xls(request):
 					elif grades_data[key] == 'N/A':
 						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 					elif grades_data[key] == '':
-						sheet1.write(l2+i+1,row_num-num_2, '',format1)
+						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
+					else:
+						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 				elif key == 'workout_duration':
 					sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
 				elif key == 'floor_climed':
