@@ -599,18 +599,18 @@ def export_users_xls(request):
 						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 					elif grades_data[key] == '':
 						sheet1.write(l2+i+1,row_num-num_2, '',format1)
-					elif key == 'workout_duration':
-						sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
-					elif key == 'floor_climed':
-						sheet1.write(l2+i+1, row_num-num_2, steps_data[key],format)
-					elif key == 'vo2_max':
-						sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
-					elif key == 'lowest_hr_first_minute':
-						sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
-					elif key == 'time_to_99':
-						sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
-					else:
-						sheet1.write(l2+i+1,row_num-num_2, 'YES',format_red)
+				elif key == 'workout_duration':
+					sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
+				elif key == 'floor_climed':
+					sheet1.write(l2+i+1, row_num-num_2, steps_data[key],format)
+				elif key == 'vo2_max':
+					sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
+				elif key == 'lowest_hr_first_minute':
+					sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+				elif key == 'time_to_99':
+					sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+				else:
+					sheet1.write(l2+i+1,row_num-num_2, 'YES',format_red)
 		else:
 			# print("no data")
 			row_num += 1
@@ -890,22 +890,6 @@ def export_users_xls(request):
 		 for q in alcohol_qs}	
 	grades_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
 		 for q in grades_qs}	
-	# i1 = 64
-	# for e,f in zip(rows6,rows_of_grades):
-	# 	row_num += 1
-	# 	for i, key in enumerate(columns7):
-	# 		if i == 1 and f['alcoholic_drink_per_week_grade'] == 'A':
-	# 			sheet1.write(i1 + i + 1, row_num - num_6, e[key], format_green)
-	# 		elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'B':
-	# 			sheet1.write(i1 + i + 1, row_num - num_6, e[key], format_green)
-	# 		elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'C':
-	# 			sheet1.write(i1 + i + 1, row_num - num_6, e[key], format_yellow)
-	# 		elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'D':
-	# 			sheet1.write(i1 + i + 1, row_num - num_6, e[key], format_yellow)
-	# 		elif i == 1 and f['alcoholic_drink_per_week_grade'] == 'F':
-	# 			sheet1.write(i1 + i + 1, row_num - num_6, e[key], format_red)
-	# 		else:
-	# 			sheet1.write(i1 + i + 1, row_num - num_6, e[key],format)
 
 	current_date = to_date
 	while (current_date >= from_date):
@@ -931,7 +915,7 @@ def export_users_xls(request):
 				else:
 					sheet1.write(i1 + i + 1, row_num - num_6, alcohol_data[key],format)
 		else:
-			print("no data")
+			
 			row_num += 1
 			sheet1.write(i1+i+1,row_num - num_6, '')
 		current_date -= timedelta(days=1)
@@ -987,20 +971,6 @@ def export_users_xls(request):
 	bike_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
 		 for q in bike_qs }
 
-	# current_date = to_date
-	# while (current_date >= from_date):
-	# 	# logic
-	# 	data = bike_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-	# 	if data:
-	# 		i1 = 72	
-	# 		for row in bike_qs.values():
-	# 			row_num += 1
-	# 			for i,key in enumerate(columns3):
-	# 				sheet1.write(i1+i+1,row_num - num_8, row[key],format)
-	# 	else:
-	# 		row_num += 1
-	# 		sheet1.write(i1+i+1,row_num - num_8, '')
-	# 	current_date -= timedelta(days=1)
 		
 	current_date = to_date
 	for row in bike_qs.values():
@@ -1019,161 +989,10 @@ def export_users_xls(request):
 				sheet1.write(i1+i+1,row_num - num_8, '')
 			current_date -= timedelta(days=1)
 
-
-	# rows2 = BikeStats.objects.filter(
-	# 	user_ql__created_at__range=(from_date, to_date),
-	# 	user_ql__user = request.user).order_by('-user_ql__created_at').values()
-		
-	# i1 = 72	
-	# for row in rows2:
-	# 		row_num += 1
-	# 		for i,key in enumerate(columns3):
-	# 			sheet1.write(i1+i+1,row_num - num_8, row[key],format)
 	#Grades sheet
 	sheet2.repeat_rows(0)
 	sheet2.repeat_columns(0)
 	sheet2.set_landscape()
-	# columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
-	# 		   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_user_input','exercise_consistency_grade',
-	# 		   'exercise_consistency','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
-	# 		   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
-	# columnsw = ['Overall Health Grade','Overall Health Gpa','Movement Non Exercise Steps Grade','Movement Non Exercise Steps',
-	# 		   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
-	# 		   'Exercise Consistency Grade','Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
-	# 		   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
-	# 		   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty']
-	# exec1 = ExerciseAndReporting.objects.filter(
-	# 	user_ql__created_at__range=(from_date, to_date),
-	# 	user_ql__user = request.user).order_by('-user_ql__created_at').values()
-	# options_user = DailyUserInputOptional.objects.filter(
-	# 	user_input__created_at__range=(from_date, to_date),
-	# 	user_input__user = request.user).order_by('-user_input__created_at').values()
-	# options_user1 = DailyUserInputEncouraged.objects.filter(
-	# 	user_input__created_at__range=(from_date, to_date),
-	# 	user_input__user = request.user).order_by('-user_input__created_at').values()
-	# current_date = to_date
-	# r = 0
-	# if to_date and from_date:
-	# 	while (current_date >= from_date):
-	# 		r = r + 1
-	# 		sheet2.write(0, r, current_date,date_format)
-	# 		current_date -= timedelta(days=1)
-	# sheet2.write(0, 0, "Grades",bold)
-	# sheet2.write(1, 0, "OVERALL HEALTH GRADES",bold)
-	# col_num1 = 1
-	# row_num = 0
-	# for col_num in range(len(columnsw)):
-	# 	col_num1 = col_num1 + 1
-	# 	sheet2.write(col_num1, row_num, columnsw[col_num])
-	# for grades1,steps1,sleep1,exercise1,food1,alcohol1 in zip(rows_of_grades,rows3,rows4,exec1,rows5,rows6):
-		
-	# 	row_num += 1
-	# 	for i,key in enumerate(columns):
-			
-	# 			if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_user_input' and key != 'exercise_consistency' and key != 'prcnt_non_processed_food' and key != 'alcohol_week':
-	# 				if grades1[key] == 'A':
-	# 					sheet2.write(i+2,row_num, grades1[key],format_green)
-	# 				elif grades1[key] == 'B':
-	# 					sheet2.write(i+2,row_num, grades1[key],format_green)
-	# 				elif grades1[key] == 'C':
-	# 					sheet2.write(i+2,row_num, grades1[key],format_yellow)
-	# 				elif grades1[key] == 'D':
-	# 					sheet2.write(i+2,row_num, grades1[key],format_yellow)
-	# 				elif grades1[key] == 'F':
-	# 					sheet2.write(i+2,row_num, grades1[key],format_red)
-	# 				elif grades1[key] == 'N/A':
-	# 					sheet2.write(i+2,row_num, grades1[key],format1)
-	# 				elif key == 'sleep_aid_penalty' or key == 'ctrl_subs_penalty' or key == 'smoke_penalty':
-	# 					if grades1[key] == 0:
-	# 						sheet2.write(i+2,row_num, 'NO',format1)
-	# 					else:	
-	# 						sheet2.write(i+2,row_num, 'YES',format_red)
-	# 				elif i == 1:
-	# 					sheet2.write(i+2,row_num, grades1[key],format1)
-	# 			elif key == '':
-	# 				sheet2.write(i+2,row_num, '',format1)
-	# 			elif i == 3:
-	# 				sheet2.write(i+2,row_num, steps1[key],format)
-	# 			elif i == 5 and key == 'movement_consistency' and steps1[key]:
-	# 				sheet2.write(i+2,row_num, ast.literal_eval(steps1[key])['inactive_hours'],format1)
-	# 			elif i == 7:
-	# 				sheet2.write(i+2,row_num, sleep1[key],format1)
-	# 			elif i == 9:
-	# 				sheet2.write(i+2,row_num, exercise1[key],format1)
-	# 			elif i == 11:
-	# 				if food1[key] == '':
-	# 					sheet2.write(i+2,row_num, '')
-	# 				else:
-	# 					sheet2.write(i+2,row_num, str(int(food1[key])) + '%')
-	# 			elif i == 13:
-	# 				sheet2.write(i+2,row_num, alcohol1[key],format1)	
-	# 			else:
-	# 				sheet2.write(i+2,row_num, '')
-	
-	# columnsg2 = ['Resting Heart Rate','Stress Level','Did you Stand for 3 hours or more above and beyond your exercise yesterday?']
-	# col = ['sleep_resting_hr_last_night','stress_level','stand_for_three_hours']
-	# sheet2.write(20, 0, "OVERALL HEALTH GRADES",bold)
-	# col_num2 = 20
-	# len_gra = len(rows_of_grades)
-	# for col_num in range(len(columnsg2)):
-	# 	 col_num2 = col_num2 + 1
-	# 	 sheet2.write(col_num2,row_num - len_gra, columnsg2[col_num])
-
-	# for row,user_op in zip(exec1,options_user):
-	# 	row_num += 1
-	# 	for i, key in enumerate(col):
-	# 		if key == 'stand_for_three_hours':
-	# 			sheet2.write(col_num2+i-2, row_num - len_gra, user_op[key],format)
-	# 		else:
-	# 			sheet2.write(col_num2+i-2, row_num - len_gra, row[key],format)
-
-	# sheet2.write(25, 0, "OVERALL PERFORMANCE ASSESSMENT",bold)
-	# columnsg3 = ['Overall Workout Grade ','Overall Workout Score (points)','Workout Duration Grade','Workout Duration'
-	# ,'Workout Effort Level Grade','Workout Effort Level','Average Exercise Heart Rate Grade ','Average Exercise Heart Rate'
-	# ,'Heart Rate Recovery (HRR) - time to 99','Heart Rate Recovery (HRR) - heart beats lowered in the first minute '
-	# ,'VO2 Max','Floors Climbed ']
-	# columnsg4 = ['overall_workout_grade','overall_workout_gpa','workout_duration_grade','workout_duration',
-	# 'workout_effortlvl_grade','workout_effortlvl_gpa','avg_exercise_hr_grade','avg_exercise_hr_gpa','time_to_99',
-	# 'lowest_hr_first_minute','vo2_max','floor_climed']
-	# col_num2 = 25
-	# len_gra1 = len(rows_of_grades) + len(exec1) 
-	# num_1 = row_num
-	# for col_num in range(len(columnsg3)):
-	# 	 col_num2 = col_num2 + 1
-	# 	 sheet2.write(col_num2,row_num - num_1, columnsg3[col_num])
-	# l2 = 25
-	# num_2 = row_num
-	
-	# for grades2,excec2,steps2,user_op1 in zip(rows_of_grades,exec1,rows3,options_user1):
-	# 	row_num += 1
-	# 	for i, key in enumerate(columnsg4):
-	# 		if key != 'workout_duration' and key != 'floor_climed' and key != 'vo2_max' and key != 'lowest_hr_first_minute' and key != 'time_to_99':
-	# 			if grades2[key] == 'A':
-	# 				sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_green)
-	# 			elif grades2[key] == 'B':
-	# 				sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_green)
-	# 			elif grades2[key] == 'C':
-	# 				sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_yellow)
-	# 			elif grades2[key] == 'D':
-	# 				sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_yellow)
-	# 			elif grades2[key] == 'F':
-	# 				sheet2.write(l2+i+1,row_num-num_2, grades2[key],format_red)
-	# 			elif grades2[key] == 'N/A':
-	# 				sheet2.write(l2+i+1,row_num-num_2, grades2[key],format1)
-	# 			elif grades2[key] == '':
-	# 				sheet2.write(l2+i+1,row_num-num_2, '',format1)
-	# 		elif key == 'workout_duration':
-	# 			sheet2.write(l2+i+1, row_num-num_2, excec2[key],format)
-	# 		elif key == 'floor_climed':
-	# 			sheet2.write(l2+i+1, row_num-num_2, steps2[key],format)
-	# 		elif key == 'vo2_max':
-	# 			sheet2.write(l2+i+1, row_num-num_2, excec2[key],format)
-	# 		elif key == 'lowest_hr_first_minute':
-	# 			sheet2.write(l2+i+1, row_num-num_2, user_op1[key],format)
-	# 		elif key == 'time_to_99':
-	# 			sheet2.write(l2+i+1, row_num-num_2, user_op1[key],format)
-	# 		else:
-	# 			sheet2.write(l2+i+1,row_num-num_2, 'YES',format_red)
 
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_user_input','exercise_consistency_grade',
@@ -1291,12 +1110,12 @@ def export_users_xls(request):
 				else:
 					sheet2.write(col_num2+i-2, row_num - num_10, exercise_data[key],format)
 		else:
-			# print("no data")
+	
 			row_num += 1
 			sheet2.write(col_num2+i-2, row_num - num_10, '')
 		current_date -= timedelta(days=1)
 	
-	sheet1.write(26, 0, "OVERALL PERFORMANCE ASSESSMENT",bold)
+	sheet2.write(26, 0, "OVERALL PERFORMANCE ASSESSMENT",bold)
 	columnsg3 = ['Overall Workout Grade ','Overall Workout Score (points)','Workout Duration Grade','Workout Duration'
 	,'Workout Effort Level Grade','Workout Effort Level','Average Exercise Heart Rate Grade ','Average Exercise Heart Rate'
 	,'Heart Rate Recovery (HRR) - time to 99','Heart Rate Recovery (HRR) - heart beats lowered in the first minute '
@@ -1325,6 +1144,7 @@ def export_users_xls(request):
 			grades_data = grades_data.__dict__
 			steps_data = steps_data.__dict__
 			# logic
+			print(steps_data)
 			row_num += 1
 			for i, key in enumerate(columnsg4):
 				if key != 'workout_duration' and key != 'floor_climed' and key != 'vo2_max' and key != 'lowest_hr_first_minute' and key != 'time_to_99':
@@ -1342,20 +1162,20 @@ def export_users_xls(request):
 						sheet2.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 					elif grades_data[key] == '':
 						sheet2.write(l2+i+1,row_num-num_2, '',format1)
-					elif key == 'workout_duration':
-						sheet2.write(l2+i+1, row_num-num_2, exercise_data[key],format)
-					elif key == 'floor_climed':
-						sheet2.write(l2+i+1, row_num-num_2, steps_data[key],format)
-					elif key == 'vo2_max':
-						sheet.write(l2+i+1, row_num-num_2, exercise_data[key],format)
-					elif key == 'lowest_hr_first_minute':
-						sheet2.write(l2+i+1, row_num-num_2, options_user_data[key],format)
-					elif key == 'time_to_99':
-						sheet.write(l2+i+1, row_num-num_2, options_user_data[key],format)
-					else:
-						sheet2.write(l2+i+1,row_num-num_2, 'YES',format_red)
+				elif key == 'workout_duration':
+					sheet2.write(l2+i+1, row_num-num_2, exercise_data[key],format)
+				elif key == 'floor_climed':
+					sheet2.write(l2+i+1, row_num-num_2, steps_data[key],format)
+				elif key == 'vo2_max':
+					sheet2.write(l2+i+1, row_num-num_2, exercise_data[key],format)
+				elif key == 'lowest_hr_first_minute':
+					sheet2.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+				elif key == 'time_to_99':
+					sheet2.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+				else:
+					sheet2.write(l2+i+1,row_num-num_2, 'YES',format_red)
 		else:
-			# print("no data")
+
 			row_num += 1
 			sheet2.write(col_num2+i-2, row_num - num_10, '')
 		current_date -= timedelta(days=1)
@@ -1666,7 +1486,7 @@ def export_users_xls(request):
 				else:
 					sheet5.write(i + 2, row_num, food_data[key], format)
 		else:
-			# print("no data")
+			
 			row_num += 1
 			sheet5.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
@@ -1728,7 +1548,7 @@ def export_users_xls(request):
 				else:
 					sheet6.write(i + 2, row_num, alcohol_data[key],format)
 		else:
-			print("no data")
+		
 			row_num += 1
 			sheet6.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
