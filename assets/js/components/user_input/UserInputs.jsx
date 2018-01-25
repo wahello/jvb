@@ -2357,7 +2357,7 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-                          <Label className="padding" >* If your sleep above is incorrect, please fix it by updating hours and minutes above or by updating bedtime and wokeup time below. </Label>
+                          <Label className="padding" >* If your sleep above is incorrect, please fix it by updating hours and minutes above or by updating "Time Fell Asleep" and "Time Woke Up" below. </Label>
                            <FormGroup>
                           
                             <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
