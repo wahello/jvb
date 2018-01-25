@@ -79,30 +79,25 @@ toggle() {
 		return(
 			<div>
 			 <Navbar color="faded" light expand="md"  >
-          <NavbarBrand > <img className="img-fluid"
+
+              <div className="col-md-12 col-sm-12 col-xs-12" > 
+			 <div className="col-md-4 col-sm-4 col-xs-12 brand" >
+                 <img className="img-fluid"
                style={{maxWidth:"200px"}}
                src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-            </NavbarBrand>
+           
+			 </div>
 
 
- <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-              <NavItem className=" ">
-               <h2 className="head" id="head">Registration
-            
-            </h2>
-              </NavItem>
-              
-            </Nav>
+			 <div className="col-md-4 col-sm-4 col-xs-12 registration" >
+              Registration
+			 </div>
+			 <div className="col-md-4 col-sm-4  col-xs-12 home"></div>
+			   <Link id="logout"className="nav-link home" to='/'>Home</Link>
+            </div>
+       
+          
 
-          <NavbarToggler onClick={this.toggle} />
-          <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-              <NavItem className="float-sm-right">
-                <Link id="logout"className="nav-link" to='/'>Home</Link>
-              </NavItem>
-              
-            </Nav>
-          </Collapse>
         </Navbar>
 			<div className="form-container" id="form_margin">
 				<Container className="h-100" id="reg-form">

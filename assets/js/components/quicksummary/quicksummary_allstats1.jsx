@@ -123,8 +123,8 @@ const attrVerboseName = {
     pace_per_100_yard: 'Pace per 100 yard',
     total_strokes: 'Total Strokes',
 
-    alcohol_day: 'Alcohol Per Day',
-    alcohol_week: 'Average Alcohol Consumed per Week', 
+    alcohol_day: '# of Alcohol Drinks Consumed Yesterday',
+    alcohol_week: '# of Drinks Consumed Over the Last 7 Days', 
 }
 
 class AllStats1 extends Component{

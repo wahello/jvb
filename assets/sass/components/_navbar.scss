@@ -40,8 +40,32 @@ color: #d1d1d1;
  } 
   
  
- 
+ .registration{
+ text-align:center;
+ color:white;
+ font-size:24px;
+ }
+ .home{
+ text-align:right;
+ color:white;
+ font-size:24px ;
+ }
 
+@media screen and (max-width: 768px) and (min-width: 481px) {
+.brand{
+	text-align:center;
+}
+ .home{
+ text-align:center;
+ }
+}
 
+@media screen and (max-width: 480px) and (min-width: 320px) {
+.home{
+ text-align:center;
+ }
+ .brand{
+	text-align:center;
+}
 
-
+}

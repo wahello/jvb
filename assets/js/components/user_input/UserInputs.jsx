@@ -633,8 +633,25 @@ handleScroll() {
     });
    }
    infoPrint(){
-    window.print();
+    var mywindow = window.open('', 'PRINT');
+    mywindow.document.write('<html><head><style>' +
+        '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
+        '.print {visibility: hidden;}' +
+        '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
+        '</style><title>' + document.title  + '</title>');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write(document.getElementById('modal1').innerHTML);
+    mywindow.document.write('</body></html>');
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
+    mywindow.print();
+    mywindow.close();
+  
    }
+
     toggleEasyorHard(){
     this.setState({
       easyorhardInfo:!this.state.easyorhardInfo
@@ -759,8 +776,7 @@ handleScroll() {
         </Navbar>
         </div>                                                                                    
                             <Modal
-                            id="popover" 
-                          
+                            id="popover"                          
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -1935,7 +1951,7 @@ handleScroll() {
                            <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
                            </span>
                            <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            <a href="#" onClick={this.infoPrint}  style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
                               <ModalBody className="modalcontent" id="modal1">
@@ -2409,7 +2425,7 @@ handleScroll() {
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.awake_hours}
-                                onChange={this.handleChange}>
+                                onChange={this.handleChangeSleepLast}>
                                  <option key="hours" value="">Hours</option>
                                 {this.createSleepDropdown(0,24)}                        
                                 </Input>
@@ -2422,7 +2438,7 @@ handleScroll() {
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.awake_mins}
-                                onChange={this.handleChange}>
+                                onChange={this.handleChangeSleepLast}>
                                  <option key="mins" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
@@ -2589,7 +2605,8 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                1. Dairy (cheese, milk, yogurt, other refined milk products),
+                                1. 1. Dairy (cheese, milk, yogurt, other refined milk products).
+                                  Unless you get it directly out of the animal, it is likely highly processed,
                                </div>
 
                                 <div style={{paddingTop:"15px"}}>
@@ -2612,9 +2629,10 @@ handleScroll() {
                                  </div>  
 
                                <div style={{paddingTop:"15px"}}>
-                                  6. Oils that have been heated up (e.g., olive oil, coconut oil, avocado oils, corn oils,
-                                   soybean oils, etc).  If the oil has been heated up to prepare/sanitize your food, it is
-                                   processed (for example nuts cooked in oil, anything else heated in oil)
+                                  6. Lower quality oils are often highly processed and may become carcinogenic when heated up
+                                   (e.g., olive oil, coconut oil, avocado oils, corn oils, soybean oils, etc). If the lower quality,
+                                    highly processed  oil has been heated up to prepare/preserve your food,  you may want to consider
+                                     what you consumed processed,
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
