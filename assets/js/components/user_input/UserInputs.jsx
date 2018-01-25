@@ -1813,9 +1813,7 @@ handleScroll() {
                             toggle={this.toggleFasted}>
                              <ModalHeader >
                             <span >
-                          <a title="Share by Email">
-                            <img src="http://png-2.findicons.com/files/icons/573/must_have/48/mail.png"/>
-                          </a>
+                          <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
                            </span>
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
