@@ -576,8 +576,9 @@ def export_users_xls(request):
 		exercise_data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		grades_data = grades_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-		if options_user_data and exercise_data and grades_data and steps_data:
-			options_user_data = options_user_data.__dict__
+		if exercise_data and grades_data and steps_data:
+			if options_user_data:
+				options_user_data = options_user_data.__dict__
 			exercise_data = exercise_data.__dict__
 			grades_data = grades_data.__dict__
 			steps_data = steps_data.__dict__
@@ -598,7 +599,9 @@ def export_users_xls(request):
 					elif grades_data[key] == 'N/A':
 						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 					elif grades_data[key] == '':
-						sheet1.write(l2+i+1,row_num-num_2, '',format1)
+						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
+					else:
+						sheet1.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 				elif key == 'workout_duration':
 					sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
 				elif key == 'floor_climed':
@@ -606,15 +609,20 @@ def export_users_xls(request):
 				elif key == 'vo2_max':
 					sheet1.write(l2+i+1, row_num-num_2, exercise_data[key],format)
 				elif key == 'lowest_hr_first_minute':
-					sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+					if options_user_data:
+						sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+					else:
+						sheet1.write(l2+i+1, row_num-num_2," ",format)
 				elif key == 'time_to_99':
-					sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+					if options_user_data:
+						sheet1.write(l2+i+1, row_num-num_2, options_user_data[key],format)
+					else:
+						sheet1.write(l2+i+1, row_num-num_2," ",format)
 				else:
 					sheet1.write(l2+i+1,row_num-num_2, 'YES',format_red)
 		else:
-			# print("no data")
 			row_num += 1
-			sheet1.write(col_num2+i-2, row_num - num_10, '')
+			sheet1.write(col_num2+i-2, row_num - num_2, '')
 		current_date -= timedelta(days=1)
 
 	
@@ -1144,7 +1152,7 @@ def export_users_xls(request):
 			grades_data = grades_data.__dict__
 			steps_data = steps_data.__dict__
 			# logic
-			print(steps_data)
+		
 			row_num += 1
 			for i, key in enumerate(columnsg4):
 				if key != 'workout_duration' and key != 'floor_climed' and key != 'vo2_max' and key != 'lowest_hr_first_minute' and key != 'time_to_99':
@@ -1162,6 +1170,9 @@ def export_users_xls(request):
 						sheet2.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 					elif grades_data[key] == '':
 						sheet2.write(l2+i+1,row_num-num_2, '',format1)
+					else:
+						sheet2.write(l2+i+1,row_num-num_2,grades_data[key] ,format1)
+
 				elif key == 'workout_duration':
 					sheet2.write(l2+i+1, row_num-num_2, exercise_data[key],format)
 				elif key == 'floor_climed':
