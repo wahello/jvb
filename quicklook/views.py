@@ -1170,6 +1170,9 @@ def export_users_xls(request):
 						sheet2.write(l2+i+1,row_num-num_2, grades_data[key],format1)
 					elif grades_data[key] == '':
 						sheet2.write(l2+i+1,row_num-num_2, '',format1)
+					else:
+						sheet2.write(l2+i+1,row_num-num_2,grades_data[key] ,format1)
+
 				elif key == 'workout_duration':
 					sheet2.write(l2+i+1, row_num-num_2, exercise_data[key],format)
 				elif key == 'floor_climed':
