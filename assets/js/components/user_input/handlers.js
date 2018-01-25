@@ -18,6 +18,8 @@ export function handleChangeSleepLast(event,getTotalSleep){
     {  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
+      console.log(hours);
+      console.log(mins);
       this.setState({
         sleep_hours_last_night:hours,
         sleep_mins_last_night:mins
@@ -36,6 +38,8 @@ export function handleChangeSleepBedTime(date,getTotalSleep){
     {  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
+
+      console.log(mins);
       this.setState({
         sleep_hours_last_night:hours,
         sleep_mins_last_night:mins
@@ -55,6 +59,9 @@ export function handleChangeSleepAwakeTime(date,getTotalSleep){
     {  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
+      console.log(hours);
+
+      console.log(mins);
       this.setState({
         sleep_hours_last_night:hours,
         sleep_mins_last_night:mins

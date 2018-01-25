@@ -418,8 +418,8 @@ class UserInputs extends React.Component{
 getTotalSleep(){
      let sleep_bedtime = this.state.sleep_bedtime;
      let sleep_awake_time = this.state.sleep_awake_time;
-     let awake_hours = this.state.awake_hours?this.state.awake_hours:0;
-     let awake_mins = this.state.awake_mins?this.state.awake_mins:0;
+     let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
+     let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
      let awake_time_in_mins = awake_hours*60 + awake_mins;
      if(sleep_bedtime && sleep_awake_time){
        let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins;
@@ -431,6 +431,7 @@ getTotalSleep(){
      }else
        return '';
    }
+   
 
     onFetchGarminFailure(error){
       console.log(error);
@@ -1813,9 +1814,7 @@ handleScroll() {
                             toggle={this.toggleFasted}>
                              <ModalHeader >
                             <span >
-                          <a title="Share by Email">
-                            <img src="http://png-2.findicons.com/files/icons/573/must_have/48/mail.png"/>
-                          </a>
+                          <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
                            </span>
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
@@ -2327,7 +2326,7 @@ handleScroll() {
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_last_night}
-                                onChange={this.handleChangeSleepLast}>
+                                onChange={this.handleChange}>
                                  <option key="hours" value="">Hours</option>
                                 {this.createSleepDropdown(0,24)}                        
                                 </Input>
@@ -2340,7 +2339,7 @@ handleScroll() {
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.sleep_mins_last_night}
-                                onChange={this.handleChangeSleepLast}>
+                                onChange={this.handleChange}>
                                  <option key="mins" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
@@ -2442,7 +2441,7 @@ handleScroll() {
                                <div className="input">
                                 <Input type="select" name="awake_mins"
                                  id="minutes"
-                                className="form-control custom-select "
+                                className="form-control custom-select"
                                 value={this.state.awake_mins}
                                 onChange={this.handleChangeSleepLast}>
                                  <option key="mins" value="">Minutes</option>
