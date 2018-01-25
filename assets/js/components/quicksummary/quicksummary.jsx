@@ -127,7 +127,7 @@ class Quicklook extends Component{
 				    workout_duration_grade:data.grades_ql.workout_duration_grade,
 				    workout_duration:data.exercise_reporting_ql.workout_duration,
 				    workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
-				    workout_effortlvl:data.grades_ql.workout_effortlvl_gpa,
+				    workout_effortlvl:user_input_data.strong_input.workout_effort_level,
 				    avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
 				    avg_exercise_hr:data.grades_ql.avg_exercise_hr_gpa,
 				    time_to_99:user_input_data.encouraged_input.time_to_99,
@@ -206,7 +206,7 @@ class Quicklook extends Component{
 			    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			    	sleep_comments: data.sleep_ql.sleep_comments,
 			    	sleep_aid: data.sleep_ql.sleep_aid,
-			        resting_heart_rate: data.grades_ql.resting_heart_rate,
+			        resting_heart_rate: data.exercise_reporting_ql.sleep_resting_hr_last_night,
                     sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
 			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
@@ -217,7 +217,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        processed_food_consumed: data.food_ql.processed_food_consumed ,
+			        processed_food_consumed: user_input_data.strong_input.list_of_processed_food_consumed_yesterday ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },

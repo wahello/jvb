@@ -52,7 +52,7 @@ constructor(props){
 						name = "username"
 						type = "text"
 						label = "Username"
-						placeholder = "john"
+						placeholder = "John"
 						component = {renderFieldFormGroup}
 					/>
 
@@ -61,7 +61,7 @@ constructor(props){
 						name = "email"
 						type = "email"
 						label = "Email"
-						placeholder = "example@address.com"
+						placeholder = "Example@address.com"
 						component = {renderFieldFormGroup}
 					/>
 

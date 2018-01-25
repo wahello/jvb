@@ -379,6 +379,24 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 	# If str_dt is True then string reperesentation of sleep and awake
 	# time is returned otherwise datetime Object or None if no sleep data.
 
+	def _get_awake_time(data):
+		max_duration = 0
+		sleep_level_maps = data.get('sleepLevelsMap')
+		for lvl_data in sleep_level_maps.values():
+			max_end_time = max(int(d.get('endTimeInSeconds')) for d in lvl_data)
+			max_duration = max_end_time if max_end_time >= max_duration else max_duration
+		return max_duration
+
+	def _get_actual_sleep_start_time(data):
+		min_duration = None
+		sleep_level_maps = data.get('sleepLevelsMap')
+		for lvl_data in sleep_level_maps.values():
+			min_start_time = min(int(d.get('startTimeInSeconds')) for d in lvl_data)
+			if not min_duration:
+				min_duration = min_start_time
+			min_duration = min_start_time if min_start_time <= min_duration else min_duration
+		return min_duration
+
 	recent_auto_manual = None
 	recent_auto_final = None
 	recent_auto_tentative = None
@@ -476,19 +494,37 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			target_tz = pytz.timezone(user_input_timezone)
 			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
 						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
+			# awake_time = _get_awake_time(target_sleep_data)
+			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+			# 				awake_time)).astimezone(target_tz).replace(tzinfo = None)
+
 			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-						target_sleep_data.get('startTimeInSeconds')+
+						_get_actual_sleep_start_time(target_sleep_data)+
 						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+			
+			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+			# 			target_sleep_data.get('startTimeInSeconds')+
+			# 			target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
 
 		else:
 			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
-												 target_sleep_data.get('startTimeOffsetInSeconds'))
-			awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+				target_sleep_data.get('startTimeOffsetInSeconds'))
+			# awake_time = _get_awake_time(target_sleep_data)
+			# awake_time = datetime.utcfromtimestamp(awake_time + 
+			# 	target_sleep_data.get('startTimeOffsetInSeconds',0))
+
+			awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
 												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 												   target_sleep_data.get('durationInSeconds'))
 
-		sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
+			# awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+			# 									   target_sleep_data.get('durationInSeconds'))
+
+		sleep_per_wearable = (awake_time-bed_time).seconds\
 							 - target_sleep_data.get('awakeDurationInSeconds',0)
+		# sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
+		# 					 - target_sleep_data.get('awakeDurationInSeconds',0)
 		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
 		if str_dt:
 			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
@@ -810,27 +846,27 @@ def cal_alcohol_drink_grade(drink_avg, gender):
 	'''
 	grade = ''
 	if gender == 'M':
-		if (drink_avg >= 0 and drink_avg <= 4):
+		if (drink_avg >= 0 and drink_avg <= 5):
 			grade = 'A'
-		elif (drink_avg >= 4.01 and drink_avg <= 7):
+		elif (drink_avg > 5 and drink_avg < 12):
 			grade = 'B'
-		elif (drink_avg >= 7.01 and drink_avg <= 10):
+		elif (drink_avg >= 12 and drink_avg < 15):
 			grade = 'C'
-		elif (drink_avg >= 10.01 and drink_avg <= 13.99):
+		elif (drink_avg >= 15 and drink_avg < 16):
 			grade = 'D'
-		elif (drink_avg >= 14):
+		elif (drink_avg >= 16):
 			grade = 'F'
 
 	else:
-		if (drink_avg >= 0 and drink_avg <= 2):
+		if (drink_avg >= 0 and drink_avg <= 3):
 			grade = 'A'
-		elif (drink_avg >= 2.01 and drink_avg <= 4):
+		elif (drink_avg > 3 and drink_avg <= 5):
 			grade = 'B'
-		elif (drink_avg >= 4.01 and drink_avg <= 5):
+		elif (drink_avg > 5 and drink_avg <= 7):
 			grade = 'C'
-		elif (drink_avg >= 5.01 and drink_avg <= 6.99):
+		elif (drink_avg > 7 and drink_avg < 9):
 			grade = 'D'
-		elif (drink_avg >= 7):
+		elif (drink_avg >= 9):
 			grade = 'F'
 	return (grade,round(drink_avg,2))
 
@@ -956,6 +992,24 @@ def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
 			elif effort_level >= 9 and effort_level <= 10:
 				grade = 'F'
 				point = 0
+
+		elif workout_easy_hard == 'medium':
+			if effort_level in [5,6]:
+				grade = 'A',
+				point = 4
+			elif effort_level in [3,4,7]:
+				grade = 'B'
+				point = 3
+			elif effort_level in [2,8]:
+				grade = 'C'
+				point = 2
+			elif effort_level in [1,9]:
+				grade = 'D'
+				point = 1
+			elif effort_level == 10:
+				grade = 'F'
+				point = 0
+
 		elif workout_easy_hard == 'hard':
 			if effort_level >= 1 and effort_level <= 3:
 				grade = 'F'
@@ -1018,10 +1072,14 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 			return grade
 	return ''
 
-def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
+def get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user):
 	alcoholic_drink_last_week = [q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
 		for q in daily_strong]
+
+	# including today's alcohol consumed 
+	alcoholic_drink_last_week.append(safe_get(
+		todays_daily_strong,"number_of_alcohol_consumed_yesterday",""))
 
 	alcoholic_drink_last_week = ['21' if x == '20+' else x
 								for x in alcoholic_drink_last_week]
@@ -1424,7 +1482,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
 	
 		# Alcohol drink consumed grade and avg alcohol per week
-		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
+		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user)
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
 		alcohol_calculated_data['alcohol_week'] = avg_alcohol
 
