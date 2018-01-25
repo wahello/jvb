@@ -127,7 +127,7 @@ class Quicklook extends Component{
 				    workout_duration_grade:data.grades_ql.workout_duration_grade,
 				    workout_duration:data.exercise_reporting_ql.workout_duration,
 				    workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
-				    workout_effortlvl:data.grades_ql.workout_effortlvl_gpa,
+				    workout_effortlvl:user_input_data.strong_input.workout_effort_level,
 				    avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
 				    avg_exercise_hr:data.grades_ql.avg_exercise_hr_gpa,
 				    time_to_99:user_input_data.encouraged_input.time_to_99,

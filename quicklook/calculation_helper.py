@@ -864,9 +864,9 @@ def cal_alcohol_drink_grade(drink_avg, gender):
 			grade = 'B'
 		elif (drink_avg > 5 and drink_avg <= 7):
 			grade = 'C'
-		elif (drink_avg > 7 and drink_avg <= 8):
+		elif (drink_avg > 7 and drink_avg < 9):
 			grade = 'D'
-		elif (drink_avg > 8):
+		elif (drink_avg >= 9):
 			grade = 'F'
 	return (grade,round(drink_avg,2))
 
@@ -992,6 +992,24 @@ def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
 			elif effort_level >= 9 and effort_level <= 10:
 				grade = 'F'
 				point = 0
+
+		elif workout_easy_hard == 'medium':
+			if effort_level in [5,6]:
+				grade = 'A',
+				point = 4
+			elif effort_level in [3,4,7]:
+				grade = 'B'
+				point = 3
+			elif effort_level in [2,8]:
+				grade = 'C'
+				point = 2
+			elif effort_level in [1,9]:
+				grade = 'D'
+				point = 1
+			elif effort_level == 10:
+				grade = 'F'
+				point = 0
+
 		elif workout_easy_hard == 'hard':
 			if effort_level >= 1 and effort_level <= 3:
 				grade = 'F'
