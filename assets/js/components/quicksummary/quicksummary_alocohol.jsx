@@ -15,8 +15,8 @@ class Alcohol extends Component{
 
     this.state = {
       myTableData: [
-        {name: 'Alcohol Per Day'},
-        {name: 'Average Alcohol Consumed per Week'},       
+        {name: '# of Alcohol Drinks Consumed Yesterday'},
+        {name: '# of Drinks Consumed Over the Last 7 Days'},       
       ],
     };
   }

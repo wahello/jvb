@@ -484,6 +484,7 @@ textarea.form-control{
 	}
 }
 
+
 @media print {
   body * {
     visibility: hidden;
@@ -495,5 +496,18 @@ textarea.form-control{
     position: absolute;
     left: 0;
     top: 0;
+  }
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+ #modal2, #modal2 * {
+    visibility: visible;
+  }
+  #modal2 {
+    position: absolute;
+    left: 0;
+    top:-100;
   }
 }
