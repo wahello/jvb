@@ -6,14 +6,16 @@ import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
+import {getUserProfile} from '../../network/auth';
 
 class Alcohol extends Component{
 
 	constructor(props) {
     super(props);
     this.renderTableColumns = this.renderTableColumns.bind(this);  
-
+this.onProfileSuccessFetch=this.onProfileSuccessFetch.bind(this);
     this.state = {
+    	gender:'M',
       myTableData: [
         {name: 'Alcohol Per Day'},
         {name: 'Average Alcohol Consumed per Week'},       
@@ -21,14 +23,40 @@ class Alcohol extends Component{
     };
   }
 
+
+onProfileSuccessFetch(data){
+      this.setState({
+        gender:data.data.gender
+      });
+    }
+    
+componentDidMount(){
+     
+      getUserProfile(this.onProfileSuccessFetch);
+      console.log(getUserProfile);
+      
+    }
+
  	renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
+		 const obj = {
+        A: { background: 'green', color: 'black'},
+        B: { background: 'green', color: 'black' },
+        C: { background: 'yellow', color:'black' },
+        D: { background: 'yellow', color:'black' },
+        F: { background: 'red', color: 'black' },
+    };
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
-			for(let [key,value] of Object.entries(data[category])){   
+			for(let [key,value] of Object.entries(data[category])){  
+			 console.log(value);
 				if(key !== 'id' && key !== 'user_ql'){
-					all_data.push(value);
-				}
+					
+        all_data.push(value); 
+    } 
+
+
+				
 			}
 
 			columns.push(
