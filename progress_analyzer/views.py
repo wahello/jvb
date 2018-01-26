@@ -42,7 +42,7 @@ class ProgressReportView(APIView):
 			allowed = set(summaries)
 			existing = set(self.summary_type)
 			for s in existing-allowed:
-				self.summary_type.pop(s)
+				self.summary_type.pop(self.summary_type.index(s))
 
 		duration = self.request.query_params.get('duration',None)
 		if duration:
@@ -50,7 +50,7 @@ class ProgressReportView(APIView):
 			allowed = set(duration)
 			existing = set(self.duration_type)
 			for d in existing-allowed:
-				self.duration_type.pop(d)
+				self.duration_type.pop(self.duration_type.index(d))
 
 	def _str_to_dt(self,dt_str):
 		if dt_str:
@@ -192,16 +192,18 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.overall_health_grade_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.overall_health_grade_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					if alias in self.duration_type:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 
 		return calculated_data
 
@@ -267,16 +269,17 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.non_exercise_steps_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.non_exercise_steps_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_sleep_summary(self,custom_daterange = False):
@@ -335,17 +338,18 @@ class ProgressReportView(APIView):
 			day_before_yesterday_data = day_before_yesterday_data.sleep_per_night_cum
 
 		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.sleep_per_night_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+			if alias in self.duration_type:
+				for alias, dtobj in self._get_duration_datetime(self.current_date).items():
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.sleep_per_night_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_movement_consistency_summary(self,custom_daterange = False):
@@ -402,16 +406,17 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.movement_consistency_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.movement_consistency_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_exercise_consistency_summary(self,custom_daterange = False):
@@ -468,16 +473,17 @@ class ProgressReportView(APIView):
 		
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.exercise_consistency_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.exercise_consistency_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_nutrition_summary(self, custom_daterange = False):
@@ -533,16 +539,17 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.nutrition_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.nutrition_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_exercise_summary(self, custom_daterange = False):
@@ -647,16 +654,17 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.exercise_stats_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.exercise_stats_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_alcohol_summary(self, custom_daterange = False):
@@ -713,17 +721,18 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.alcohol_cum
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.alcohol_cum
 
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_penalty_summary(self, custom_daterange = False):
@@ -777,16 +786,17 @@ class ProgressReportView(APIView):
 
 		for key in calculated_data.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-				if current_data:
-					current_data = current_data.penalty_cum
-				if alias == 'today' and yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-					continue
-				elif alias == 'yesterday' and day_before_yesterday_data:
-					calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-					continue
-				calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.penalty_cum
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 

@@ -104,6 +104,7 @@ const attrVerboseName = {
     deep_sleep: 'Deep Sleep (hh:mm)',
     light_sleep: 'Light Sleep (hh:mm)',
     awake_time: 'Awake Time (hh:mm)',
+    resting_heart_rate: 'Resting Heart Rate (RHR)',
 
     non_exercise_steps: 'Non Exercise Steps',
     exercise_steps: 'Exercise Steps',
@@ -118,13 +119,14 @@ const attrVerboseName = {
 
     prcnt_non_processed_food: '% Non Processed Food',
     non_processed_food: 'Non Processed Food',
+    processed_food_consumed:'Processed Food Consumed',
     diet_type: 'Diet Type',
 
     pace_per_100_yard: 'Pace per 100 yard',
     total_strokes: 'Total Strokes',
 
-    alcohol_day: 'Alcohol Per Day',
-    alcohol_week: 'Average Alcohol Consumed per Week', 
+    alcohol_day: '# of Alcohol Drinks Consumed Yesterday',
+    alcohol_week: '# of Drinks Consumed Over the Last 7 Days', 
 }
 
 class AllStats1 extends Component{
@@ -275,7 +277,7 @@ class AllStats1 extends Component{
                                            style:obj[value]});     
                         }
 
-                        if(pushKeytoggle)    
+                        if(pushKeytoggle)
                             keys.push(key);   
 					}
 				}
@@ -296,7 +298,6 @@ class AllStats1 extends Component{
 			);
             pushKeytoggle = false;
 		}
-
         let tableAttrColumn = [];
         for(let key of keys){
             if(key == "avg_heartrate"){      

@@ -39,33 +39,65 @@ color: #d1d1d1;
  	color: white;
  } 
   
- 
+ .brand{
+ width:33%;
+ }
  .registration{
  text-align:center;
  color:white;
  font-size:24px;
+ width:33%;
  }
  .home{
  text-align:right;
  color:white;
  font-size:24px ;
+  width:33%;
  }
-
+ .color_home{
+ color:white;
+ }
+.navbar_div{
+	display:flex;
+	width:100%;
+}
 @media screen and (max-width: 768px) and (min-width: 481px) {
+.navbar_div{
+	display:block;
+	width:100%;
+}
+.registration{
+	width:100%;
+	text-align:center;
+}
+
 .brand{
+width:100%;
 	text-align:center;
 }
  .home{
+ width:100%;
  text-align:center;
  }
 }
 
 @media screen and (max-width: 480px) and (min-width: 320px) {
-.home{
- text-align:center;
- }
- .brand{
+.navbar_div{
+	display:block;
+	width:100%;
+}
+.registration{
+	width:100%;
 	text-align:center;
 }
+
+.brand{
+width:100%;
+	text-align:center;
+}
+ .home{
+ width:100%;
+ text-align:center;
+ }
 
 }

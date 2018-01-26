@@ -127,7 +127,7 @@ class Quicklook extends Component{
 				    workout_duration_grade:data.grades_ql.workout_duration_grade,
 				    workout_duration:data.exercise_reporting_ql.workout_duration,
 				    workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
-				    workout_effortlvl:data.grades_ql.workout_effortlvl_gpa,
+				    workout_effortlvl:user_input_data.strong_input.workout_effort_level,
 				    avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
 				    avg_exercise_hr:data.grades_ql.avg_exercise_hr_gpa,
 				    time_to_99:user_input_data.encouraged_input.time_to_99,
@@ -217,7 +217,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        processed_food_consumed: data.food_ql.processed_food_consumed ,
+			        processed_food_consumed: user_input_data.strong_input.list_of_processed_food_consumed_yesterday ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },

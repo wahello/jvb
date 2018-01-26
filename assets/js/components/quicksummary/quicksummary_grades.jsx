@@ -29,17 +29,17 @@ import NumberFormat from 'react-number-format';
         {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Percentage of Unprocessed Food'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
-        {name: 'Alcoholic Drink Per Week'},
+        {name: '# of Drinks Consumed Over the Last 7 Days'},
         {name: 'Sleep Aid Penalty'},
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
         
-        {name:'NOT GRADED CATEGORIES:--'},
+        {name:'NOT GRADED CATEGORIES'},
         {name:'Resting Heart Rate'},
         {name:'Stress Level'},
         {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
         
-        {name:'PERFORMANCE ASSESSMENT:--'},
+        {name:'PERFORMANCE ASSESSMENT'},
         {name: 'Overall Workout Grade '},
         {name: 'Overall Workout Score (points)'},
         {name: 'Workout Duration Grade'},   
@@ -93,6 +93,19 @@ renderTableColumns(dateWiseData,category,classes=""){
                if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
                s = minus + s;
                all_data.push({value: s});
+            }
+            else if(key == 'smoke_penalty' || key ==  'ctrl_subs_penalty' || key == 'sleep_aid_penalty'){
+              if(value && value != "-"){
+                all_data.push({
+                  value:'Yes',
+                  style:''
+                });
+              }else{
+                all_data.push({
+                  value:'No',
+                  style:''
+                });
+              }
             }
             else if(key == 'movement_consistency_score'){
               let mc = value;

@@ -67,6 +67,7 @@ class UserInputs extends React.Component{
         hrrInfo:false,
         wetherInfo:false,
         commentInfo:false,
+        alcoholInfo:false,
 
         workout:'',
         workout_type:'',
@@ -210,6 +211,7 @@ class UserInputs extends React.Component{
       this.toggleHrr=this.toggleHrr.bind(this);
       this.toggleWeather=this.toggleWeather.bind(this);
       this.toggleComment=this.toggleComment.bind(this);
+      this.toggleAlcohol=this.toggleAlcohol.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
       this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
@@ -416,8 +418,8 @@ class UserInputs extends React.Component{
 getTotalSleep(){
      let sleep_bedtime = this.state.sleep_bedtime;
      let sleep_awake_time = this.state.sleep_awake_time;
-     let awake_hours = this.state.awake_hours?this.state.awake_hours:0;
-     let awake_mins = this.state.awake_mins?this.state.awake_mins:0;
+     let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
+     let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
      let awake_time_in_mins = awake_hours*60 + awake_mins;
      if(sleep_bedtime && sleep_awake_time){
        let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins;
@@ -429,6 +431,7 @@ getTotalSleep(){
      }else
        return '';
    }
+   
 
     onFetchGarminFailure(error){
       console.log(error);
@@ -633,8 +636,25 @@ handleScroll() {
     });
    }
    infoPrint(){
-    window.print();
+    var mywindow = window.open('', 'PRINT');
+    mywindow.document.write('<html><head><style>' +
+        '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
+        '.print {visibility: hidden;}' +
+        '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
+        '</style><title>' + document.title  + '</title>');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write(document.getElementById('modal1').innerHTML);
+    mywindow.document.write('</body></html>');
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
+    mywindow.print();
+    mywindow.close();
+  
    }
+
     toggleEasyorHard(){
     this.setState({
       easyorhardInfo:!this.state.easyorhardInfo
@@ -682,7 +702,11 @@ handleScroll() {
         weatherInfo:!this.state.weatherInfo
       });
      }
-
+     toggleAlcohol(){
+      this.setState({
+        alcoholInfo:!this.state.alcoholInfo
+      });
+     }
      toggleComment(){
       this.setState({
         commentInfo:!this.state.commentInfo
@@ -759,8 +783,7 @@ handleScroll() {
         </Navbar>
         </div>                                                                                    
                             <Modal
-                            id="popover" 
-                          
+                            id="popover"                          
                             placement="bottom" 
                             isOpen={this.state.infoButton}
                             target="infobutton" 
@@ -1791,9 +1814,7 @@ handleScroll() {
                             toggle={this.toggleFasted}>
                              <ModalHeader >
                             <span >
-                          <a title="Share by Email">
-                            <img src="http://png-2.findicons.com/files/icons/573/must_have/48/mail.png"/>
-                          </a>
+                          <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
                            </span>
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
@@ -1935,7 +1956,7 @@ handleScroll() {
                            <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
                            </span>
                            <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            <a href="#" onClick={this.infoPrint}  style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
                               <ModalBody className="modalcontent" id="modal1">
@@ -2305,7 +2326,7 @@ handleScroll() {
                                 id="hours"
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_last_night}
-                                onChange={this.handleChangeSleepLast}>
+                                onChange={this.handleChange}>
                                  <option key="hours" value="">Hours</option>
                                 {this.createSleepDropdown(0,24)}                        
                                 </Input>
@@ -2318,7 +2339,7 @@ handleScroll() {
                                  id="minutes"
                                 className="form-control custom-select "
                                 value={this.state.sleep_mins_last_night}
-                                onChange={this.handleChangeSleepLast}>
+                                onChange={this.handleChange}>
                                  <option key="mins" value="">Minutes</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
@@ -2420,7 +2441,7 @@ handleScroll() {
                                <div className="input">
                                 <Input type="select" name="awake_mins"
                                  id="minutes"
-                                className="form-control custom-select "
+                                className="form-control custom-select"
                                 value={this.state.awake_mins}
                                 onChange={this.handleChangeSleepLast}>
                                  <option key="mins" value="">Minutes</option>
@@ -2589,7 +2610,8 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                1. Dairy (cheese, milk, yogurt, other refined milk products),
+                                1. 1. Dairy (cheese, milk, yogurt, other refined milk products).
+                                  Unless you get it directly out of the animal, it is likely highly processed,
                                </div>
 
                                 <div style={{paddingTop:"15px"}}>
@@ -2612,9 +2634,10 @@ handleScroll() {
                                  </div>  
 
                                <div style={{paddingTop:"15px"}}>
-                                  6. Oils that have been heated up (e.g., olive oil, coconut oil, avocado oils, corn oils,
-                                   soybean oils, etc).  If the oil has been heated up to prepare/sanitize your food, it is
-                                   processed (for example nuts cooked in oil, anything else heated in oil)
+                                  6. Lower quality oils are often highly processed and may become carcinogenic when heated up
+                                   (e.g., olive oil, coconut oil, avocado oils, corn oils, soybean oils, etc). If the lower quality,
+                                    highly processed  oil has been heated up to prepare/preserve your food,  you may want to consider
+                                     what you consumed processed,
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
@@ -2667,7 +2690,20 @@ handleScroll() {
                            </Modal>       
 
                           <FormGroup>
-                               <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?</Label>
+                               <Label className="padding">6. Number of Alcohol Drinks Consumed Yesterday?
+                                <span id="alcoholinfo"
+                                   onClick={this.toggleAlcohol} 
+                                   style={{paddingLeft:"15px",color:"gray"}}>
+                                 
+                                   <FontAwesome 
+                                                style={{color:"#5E5E5E"}}
+                                                name = "info-circle"
+                                                size = "1x"                                      
+                                              
+                              />
+                        
+                              </span>
+                               </Label>
                                 {this.state.editable &&
                                   <div className="input1">
                                        <Input 
@@ -2693,6 +2729,52 @@ handleScroll() {
                                     {this.renderAlcoholModal()}
                                   </FormGroup>
                           </FormGroup>
+                          <Modal
+                           id="popover" 
+                           className="pop"
+                            placement="right" 
+                            isOpen={this.state.alcoholInfo}
+                            target="alcoholinfo" 
+                            toggle={this.toggleAlcohol}>
+                             <ModalHeader >
+                            <span >
+                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
+                           </span>
+                           <span >
+                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                            </span>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1">
+                               <div>
+                                 Report how many drinks of alcohol you consumed YESTERDAY.
+                                 In order to determine how many drinks you consumed, use the
+                                 following guidelines:
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                  In the Unites States, a standard drink is equal to 14.0 grams (0.6 ounces) of pure alcohol.
+                                  Generally, this amount of pure alcohol is found in:  
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   (1) 12 ounces of beer (5% alcohol content);
+                               </div>
+
+                                <div style={{paddingTop:"15px"}}>
+                                    (2) 8 ounces of malt liquor (7% alcohol content); 
+                                 </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                                   (3) 5 ounces of wine (12% alcohol content); 
+                               </div>
+
+                               <div style={{paddingTop:"15px"}}>
+                               (4) 1.5 ounces or a “shot” of 80-proof (40% alcohol content) distilled
+                                spirits or liquor (e.g., gin, rum, vodka, whiskey)"
+                               </div>                                                                        
+                              </ModalBody>
+                           </Modal>       
+
                                             
                           <FormGroup>
                             <Label className="padding">7. Did You Smoke Any Substances Yesterday?</Label>
