@@ -77,11 +77,11 @@ toggle() {
 		const class_goals = `f-cp-icon ${page === 3 ? 'active':''}`;
 
 		return(
-			<div>
+			<div >
 			 <Navbar color="faded" light expand="md"  >
 
-              <div className="col-md-12 col-sm-12 col-xs-12" > 
-			 <div className="col-md-4 col-sm-4 col-xs-12 brand" >
+              <div className="navbar_div" > 
+			 <div className=" brand" >
                  <img className="img-fluid"
                style={{maxWidth:"200px"}}
                src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
@@ -89,11 +89,12 @@ toggle() {
 			 </div>
 
 
-			 <div className="col-md-4 col-sm-4 col-xs-12 registration" >
+			 <div className=" registration" >
               Registration
 			 </div>
-			 <div className="col-md-4 col-sm-4  col-xs-12 home"></div>
-			   <Link id="logout"className="nav-link home" to='/'>Home</Link>
+			 <div className=" home">
+			   <Link id="logout"className="nav-link color_home" to='/'>Home</Link>
+			   </div>
             </div>
        
           
