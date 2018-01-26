@@ -163,9 +163,10 @@ background-color: #777777;
 	.dropbutton{
 		display: inline;
 	}
-	.Movement{
-		display:none;
+	.swimstats{
+		display: none;
 	}
+	
 	.userinputs{
 		display: none;
 	}
@@ -182,7 +183,10 @@ background-color: #777777;
 		display: none;
 	}
 	#dropswim{
-		display:none;
+		display:inline;
+	}
+	#dropmovement{
+		display: none;
 	}
 	
 }
@@ -191,33 +195,40 @@ background-color: #777777;
 	.dropbutton{
 		display: inline;
 	}
-	
+	.Movement{
+		display:none;
+	}
 	.alcohol{
 		display: none;
 	}
 	.food{
 		display: none;
 	}
-	.swimstats{
-		display: none;
-	}
+	
 	#dropalcohol{
 		display: inline;
 	}
 	#dropfood{
 		display: inline;
 	}
+	#dropmovement{
+		display: inline;
+	}
+
 
 }
 @media (max-width: 800px){
 	.dropbutton{
 		display: none;
 	}
+	.Movement{
+		display:inline;
+	}
 	.bikestats{
 		display:inline;
 	}
 	.swimstats{
-		display: inline;
+		display: inline; 
 	}
 	.allstats{
 		display:inline;
@@ -233,6 +244,9 @@ background-color: #777777;
 	}
 	.food{
 		display: inline;
+	}
+	#dropmovement{
+		display:inline;
 	}
 
 }
