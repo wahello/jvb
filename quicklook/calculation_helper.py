@@ -1533,7 +1533,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
-
+		print(grades_calculated_data)
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
 			update_helper(user_ql.grades_ql,grades_calculated_data)
