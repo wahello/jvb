@@ -243,7 +243,7 @@ def export_users_xls(request):
 	sheet9.set_column('A:A',35)
 	sheet1.repeat_rows(0)
 	sheet1.repeat_columns(0)
-	sheet1.set_row(49, 150)
+	sheet1.set_row(30, 150)
 	sheet1.set_landscape()
 	bold = book.add_format({'bold': True})
 	date_format = book.add_format({'num_format': 'm-d-yy'})
