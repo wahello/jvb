@@ -341,9 +341,9 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          // if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-          //   fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
-          // } 
+          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          } 
           window.scrollTo(0,0);
         });
       }
