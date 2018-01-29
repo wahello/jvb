@@ -61,6 +61,7 @@ class ExerciseAndReporting(models.Model):
 	No = 'no'
 
 	Easy = 'easy'
+	MEDIUM = 'medium'
 	Hard = 'hard'
 
 	TR = 'trademil run'
@@ -89,6 +90,7 @@ class ExerciseAndReporting(models.Model):
 
 	EH_CHOICES = (
 		(Easy, 'Easy'),
+		(MEDIUM,'Medium'),
 		(Hard, 'Hard'),
 	)
 
@@ -104,7 +106,7 @@ class ExerciseAndReporting(models.Model):
 	)
 
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "exercise_reporting_ql")
-	workout_easy_hard = models.CharField(choices=EH_CHOICES, max_length=4, blank=True)
+	workout_easy_hard = models.CharField(choices=EH_CHOICES, max_length=10, blank=True)
 	workout_type = models.CharField(choices=WORKOUT_TYPE, max_length=20, blank=True)
 
 	workout_time = models.CharField(max_length=10, blank=True)

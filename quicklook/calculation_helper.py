@@ -995,7 +995,7 @@ def cal_workout_effort_level_grade(workout_easy_hard, effort_level):
 
 		elif workout_easy_hard == 'medium':
 			if effort_level in [5,6]:
-				grade = 'A',
+				grade = 'A'
 				point = 4
 			elif effort_level in [3,4,7]:
 				grade = 'B'
@@ -1533,7 +1533,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
-
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
 			update_helper(user_ql.grades_ql,grades_calculated_data)
