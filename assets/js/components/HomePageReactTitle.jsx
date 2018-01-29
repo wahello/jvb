@@ -130,6 +130,7 @@ showHidePassword(e){
                                       <h3>Login</h3>
                                     <Form className="login-form" onSubmit={handleSubmit(this.onSubmit)}>
                                         <Field
+                                        id="user"
                                         name = "username"
                                         type = "text"
                                         label = "Email/Username"
@@ -138,6 +139,7 @@ showHidePassword(e){
                                       />
                                       <FormGroup>
                                       <Field
+                                      id="pass1"
                                       style={{borderRadius:"0px",position:"relative"}} 
                                         name = "password"
                                         type={this.state.password_type} 
@@ -152,7 +154,7 @@ showHidePassword(e){
                                          <i className="fa fa-eye" aria-hidden="true"></i>}
                                       </a> 
                                       </FormGroup>
-                                      <Button>Submit</Button>
+                                      <Button id="submit" type="submit">Submit</Button>
                                       {this.renderAlert()}
                                     </Form>
                                   </div>
