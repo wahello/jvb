@@ -148,7 +148,7 @@ showHidePassword(e){
                                         component = {this.renderField}
                                       />
 
-                                      <a onClick={this.showHidePassword} color="link" style={{ color:"#535559" , position:"absolute", top:"172px", right:"57px"}}>
+                                      <a onClick={this.showHidePassword} color="link" className="home_eye">
                                         {this.state.password_type === 'input' ?
                                          <span ><i  className="fa fa-eye-slash" aria-hidden="true"></i></span> :
                                          <i className="fa fa-eye" aria-hidden="true"></i>}
