@@ -218,7 +218,20 @@ class AllStats1 extends Component{
                            s = minus + s;
                            all_data.push({value: s});
                         }
-
+                         else  if(key === 'exercise_consistency_score' ){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
 
                         else if(value !== '-' && value !== undefined && 
                            value !== "" && (key == 'deep_sleep' ||
@@ -340,7 +353,7 @@ class AllStats1 extends Component{
 
 		            </Cell>
 		          )}
-		          width={250}
+		          width={280}
 		          fixed={true}
 
 

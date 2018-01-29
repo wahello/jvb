@@ -39,21 +39,23 @@ componentDidMount(){
 
  	renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
+    let A=[8,7];
 		 const obj = {
-        A: { background: 'green', color: 'black'},
+        [8]: { background: 'green', color: 'black'},
         B: { background: 'green', color: 'black' },
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
-    };
+    }; 
+   var x=$( this );
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){  
 			 console.log(value);
-				if(key !== 'id' && key !== 'user_ql'){
-					
-        all_data.push(value); 
-    } 
+       			if(key !== 'id' && key !== 'user_ql' ){
+              all_data.push(value);
+           
+}
 
 
 				
