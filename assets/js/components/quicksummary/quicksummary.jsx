@@ -109,6 +109,7 @@ class Quicklook extends Component{
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 			        avg_sleep_per_night:data.sleep_ql.sleep_per_user_input,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
+			        did_you_workout_today:data.grades_ql.did_you_workout_today,
 			        exercise_consistency_score:data.grades_ql.exercise_consistency_gpa,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,

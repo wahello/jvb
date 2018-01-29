@@ -25,6 +25,7 @@ import NumberFormat from 'react-number-format';
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
+        {name: 'Did you Workout Today'},
         {name: 'Exercise Consistency Score'},
         {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Percentage of Unprocessed Food'}, 
@@ -80,7 +81,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
             }
 
-            if(key === 'overall_health_gpa'){
+            if(key === 'overall_health_gpa' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
                var minus = '';
@@ -94,6 +95,32 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
+            else  if(key === 'exercise_consistency_score' ){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
+            // else if(key ==='movement_non_exercise_steps'){
+            //   value += '';
+            //       var x = value.split('.');
+            //       var x1 = x[0];
+            //       var x2 = x.length > 1 ? '.' + x[1] : '';
+            //       var rgx = /(\d+)(\d{3})/;
+            //       while (rgx.test(x1)) {
+            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            //       }
+            //   all_data.push(x1 + x2)
+
+            // }
             else if(key == 'smoke_penalty' || key ==  'ctrl_subs_penalty' || key == 'sleep_aid_penalty'){
               if(value && value != "-"){
                 all_data.push({

@@ -229,7 +229,7 @@ class UserInputs extends React.Component{
       }
       else {
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
         let other_diet = true;
@@ -357,7 +357,7 @@ class UserInputs extends React.Component{
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
             other_diet = false;
@@ -3012,7 +3012,8 @@ handleScroll() {
                                                 <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>                                                                                                                                                                            
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>   
+                                                 <option value="pescetarian">Pescetarian</option>                                                                                                                                                                         
                                       </Input>
                                     </div>
                                   }
