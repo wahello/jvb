@@ -340,7 +340,7 @@ class AllStats1 extends Component{
 
 		            </Cell>
 		          )}
-		          width={250}
+		          width={280}
 		          fixed={true}
 
 

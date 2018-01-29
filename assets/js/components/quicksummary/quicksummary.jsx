@@ -791,7 +791,7 @@ onLogoutSuccess(response){
                                          
                                         <span id="spa">
                                         <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"13px"}}>
+									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"8px"}}>
 									          More
 									        </DropdownToggle>
 									        <DropdownMenu>									                                                     						    		 													         									         								         									         

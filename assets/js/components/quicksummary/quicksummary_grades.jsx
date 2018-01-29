@@ -168,7 +168,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={280}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"grades_ql")}
