@@ -732,16 +732,17 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem onClick={this.toggle} className="swimstats">
+                                        <NavItem onClick={this.toggle} className="Movement">
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
-                                            <NavLink id="headernames" href="#" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>
-						    		 		Swim Stats
+                                          <abbr  id="abbri"  title="Movement Consistency">
+                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>
+						    		 		 Movement Consistency
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                        </NavItem>
+                                       </NavItem>
+                                       
 
                                         <NavItem onClick={this.toggle} className="bikestats">
                                         <span id="spa">
@@ -776,22 +777,24 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                        <NavItem onClick={this.toggle} className="Movement">
+ 										<NavItem onClick={this.toggle} className="swimstats">
                                         <span id="spa">
-                                          <abbr  id="abbri"  title="Movement Consistency">
-                                            <NavLink id="headernames" href="#" className={class_movement} value="movement"
-						    		 				onClick={this.activateTab.bind(this,"movement")}>
-						    		 		 Movement Consistency
+                                          <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
+                                            <NavLink id="headernames" href="#" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>
+						    		 		Swim Stats
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>
+                                        </NavItem>
+                                       
 
                                        <span className="dropbutton">
                                          
                                         <span id="spa">
                                         <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"8px"}}>
+
+									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"10px"}}>
 									          More
 									        </DropdownToggle>
 									        <DropdownMenu>									                                                     						    		 													         									         								         									         
@@ -799,18 +802,18 @@ onLogoutSuccess(response){
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
+						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
+                                            </DropdownItem>
+						    		 		 
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
 							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>	
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		   <DropdownItem style={{paddingLeft:"30px"}} className={class_movement} value="movement"
-						    		 				onClick={this.activateTab.bind(this,"movement")}>
-							    			 Movement Consistency
-                                            </DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>
