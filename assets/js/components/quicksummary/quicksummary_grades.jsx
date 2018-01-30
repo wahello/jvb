@@ -17,7 +17,7 @@ import NumberFormat from 'react-number-format';
 	 this.state = {
       myTableData: [
         {name: 'Overall Health Grade'},
-        {name: 'Overall Health Gpa'},
+        {name: 'Overall Health GPA'},
         {name: 'Movement Non Exercise steps Grade'},   
         {name: 'Movement Non Exercise steps'},
         {name: 'Movement Consistency Grade'},
