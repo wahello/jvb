@@ -25,6 +25,7 @@ import NumberFormat from 'react-number-format';
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
+        {name: 'Did You Workout Today'},
         {name: 'Exercise Consistency Score'},
         {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Percentage of Unprocessed Food'}, 

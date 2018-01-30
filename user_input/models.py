@@ -74,6 +74,17 @@ class DailyUserInputStrong(models.Model):
     NO_WORKOUT = 'no workout today'
     NOT_YET = 'not yet'
     DECLINE = 'decline'
+
+    REASON_NO_WORKOUT_CHOICES = (
+        ("rest day","Rest Day"),
+        ("sick", "Sick"),
+        ("too busy/not enough time","Too Busy/Not Enough Time"),
+        ("didn’t feel like it","Didn’t Feel Like It"),
+        ("work got in the way","Work Got in the Way"),
+        ("travel day","Travel Day"),
+        ("weather","Weather"),
+        ("other","Other"),
+    )
  
     WORK_OUT_EASY_OR_HARD_CHOICES = (
     ('','-'),
@@ -130,6 +141,13 @@ class DailyUserInputStrong(models.Model):
         choices=WORKOUT_DONE_CHOICES,
         blank=True
     )
+
+    # reason_no_workout = models.CharField(
+    #     max_length = 100,
+    #     choices = REASON_NO_WORKOUT_CHOICES,
+    #      blank=True
+    # )
+    # comments_no_workout = models.TextField(blank=True)
 
     workout_type = models.CharField(
         max_length = 10,

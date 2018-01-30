@@ -341,9 +341,9 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          // if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-          //   fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
-          // } 
+          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          } 
           window.scrollTo(0,0);
         });
       }
@@ -2279,7 +2279,7 @@ handleScroll() {
                             {
                               !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories === null ?this.state.calories : this.state.calories="NotEntered"}</p>
+                                <p>{this.state.calories ? this.state.calories : "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -2302,7 +2302,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item ?this.state.calories_item:this.state.calories_item="NotEntered"}</p>
+                                <p >{this.state.calories_item ? this.state.calories_item: "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
