@@ -35,24 +35,24 @@ import NumberFormat from 'react-number-format';
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
         
-        {name:'NOT GRADED CATEGORIES'},
-        {name:'Resting Heart Rate'},
-        {name:'Stress Level'},
-        {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
+        // {name:'NOT GRADED CATEGORIES'},
+        // {name:'Resting Heart Rate'},
+        // {name:'Stress Level'},
+        // {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
         
-        {name:'PERFORMANCE ASSESSMENT'},
-        {name: 'Overall Workout Grade '},
-        {name: 'Overall Workout Score (points)'},
-        {name: 'Workout Duration Grade'},   
-        {name: 'Workout Duration'},
-        {name: 'Workout Effort Level Grade'},
-        {name: 'Workout Effort Level'}, 
-        {name: 'Average Exercise Heart Rate Grade'},
-        {name: 'Average Exercise Heart Rate'},
-        {name: 'Heart Rate Recovery (HRR) - time to 99'},
-        {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
-        {name: 'VO2 Max'}, 
-        {name: 'Floors Climbed '},          
+        // {name:'PERFORMANCE ASSESSMENT'},
+        // {name: 'Overall Workout Grade '},
+        // {name: 'Overall Workout Score (points)'},
+        // {name: 'Workout Duration Grade'},   
+        // {name: 'Workout Duration'},
+        // {name: 'Workout Effort Level Grade'},
+        // {name: 'Workout Effort Level'}, 
+        // {name: 'Average Exercise Heart Rate Grade'},
+        // {name: 'Average Exercise Heart Rate'},
+        // {name: 'Heart Rate Recovery (HRR) - time to 99'},
+        // {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
+        // {name: 'VO2 Max'}, 
+        // {name: 'Floors Climbed '},          
       ],
     };
   }
@@ -66,6 +66,7 @@ renderTableColumns(dateWiseData,category,classes=""){
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
+        yes:{background: 'red', color: 'black' },        
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -125,7 +126,7 @@ renderTableColumns(dateWiseData,category,classes=""){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
-                  style:''
+                  style:obj['yes']
                 });
               }else{
                 all_data.push({
