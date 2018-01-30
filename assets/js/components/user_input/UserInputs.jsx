@@ -139,6 +139,9 @@ class UserInputs extends React.Component{
         diet_type:'',
         general_comment:'',
 
+        no_exercise_reason:'',
+        no_exercise_comment:'',
+
       };
       return initialState;
     }
@@ -164,7 +167,8 @@ class UserInputs extends React.Component{
       this.handleCaloriesItemCheck = handlers.handleCaloriesItemCheck.bind(this);
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
-      this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this)
+      this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this);
+      this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -339,7 +343,9 @@ class UserInputs extends React.Component{
           breath_sleep:have_optional_input?data.data.optional_input.percent_breath_nose_last_night:'',
           breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:''
+          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
+          no_exercise_reason:have_optional_input?data.data.optional_input.no_exercise_reason:'',
+          no_exercise_comment:have_optional_input?data.data.optional_input.no_exercise_comment:'',
         },()=>{
           if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
@@ -1105,7 +1111,58 @@ handleScroll() {
                                </div>
                               </ModalBody>
                            </Modal>       
-                          
+                           {(this.state.workout === "no") &&
+                          <FormGroup>
+                              <Label className="padding">1.0.1 What Was The Reason You Did Not Exercise Today?</Label>
+
+                                  {this.state.editable &&
+                                    <div className="input1">
+                                        <Input 
+                                        type="select" 
+                                        className="custom-select form-control" 
+                                        name="no_exercise_reason"
+                                        value={this.state.no_exercise_reason}                                       
+                                        onChange={this.handleChangeNoExerciseReason}>
+                                                <option value="other">Other</option>
+                                                <option value="rest day">Rest Day</option> 
+                                                <option value="sick">Sick</option>
+                                                <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
+                                                <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
+                                                <option value="work got in the way">Work Got in the Way</option>
+                                                <option value="travel day">Travel Day</option>
+                                                <option value="weather">Weather</option>                                                                                                                                                                            
+                                      </Input>
+                                    </div>
+                                  }
+                                  {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.no_exercise_reason}</p>
+                                  </div>
+                                }
+                          </FormGroup>
+                        }
+                         {(this.state.workout === "no") &&
+                           <FormGroup>      
+                            <Label className="padding">1.0.2 No Exercise Reason Comments</Label>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Textarea  name="no_exercise_comment" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.no_exercise_comment}
+                                     onChange={this.handleChange}></Textarea>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.no_exercise_comment}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                        }
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
@@ -2609,7 +2666,11 @@ handleScroll() {
 
                                <div style={{paddingTop:"15px"}}>
                                 1. 1. Dairy (cheese, milk, yogurt, other refined milk products).
-                                  Unless you get it directly out of the animal, it is likely highly processed,
+                                      If you consumed any of these dairy products that you
+                                     (1) directly obtained from an animal at a local farm or
+                                     (2) obtained directly from a local farm that you know has
+                                     not been processed in any way (I.e., it has not been processed
+                                     at all, including no preservatives added), consider this Unprocessed
                                </div>
 
                                 <div style={{paddingTop:"15px"}}>
@@ -2633,9 +2694,8 @@ handleScroll() {
 
                                <div style={{paddingTop:"15px"}}>
                                   6. Lower quality oils are often highly processed and may become carcinogenic when heated up
-                                   (e.g., olive oil, coconut oil, avocado oils, corn oils, soybean oils, etc). If the lower quality,
-                                    highly processed  oil has been heated up to prepare/preserve your food,  you may want to consider
-                                     what you consumed processed,
+                                   (e.g., olive oil, coconut oil, avocado oils, corn oils, soybean oils, etc). “If you consume lower quality,
+                                    more highly processed oil, either raw or heated up, you may want to consider it processed
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
