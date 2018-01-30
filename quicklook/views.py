@@ -13,7 +13,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from user_input.models import DailyUserInputOptional ,\
-                              DailyUserInputEncouraged
+                              DailyUserInputEncouraged,\
+                              DailyUserInputStrong
+
 from .serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
 						 StepsSerializer,\
@@ -235,15 +237,15 @@ def export_users_xls(request):
 	sheet5.set_column('A:A',35)
 	sheet6.freeze_panes(1, 1)
 	sheet6.set_column('A:A',35)
-	# sheet7.freeze_panes(1, 1)
-	# sheet7.set_column('A:A',35)
+	sheet7.freeze_panes(1, 1)
+	sheet7.set_column('A:A',35)
 	sheet8.freeze_panes(1, 1)
 	sheet8.set_column('A:A',35)
 	sheet9.freeze_panes(1, 1)
 	sheet9.set_column('A:A',35)
 	sheet1.repeat_rows(0)
 	sheet1.repeat_columns(0)
-	sheet1.set_row(30, 150)
+	sheet1.set_row(31, 150)
 	sheet1.set_landscape()
 	bold = book.add_format({'bold': True})
 	date_format = book.add_format({'num_format': 'm-d-yy'})
@@ -265,12 +267,12 @@ def export_users_xls(request):
 	format1 = book.add_format({'align':'left','num_format': '0.00'})
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
-			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_user_input','exercise_consistency_grade',
-			   'exercise_consistency','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
+			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
+			   'workout','exercise_consistency','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
 			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
 	columnsw = ['Overall Health Grade','Overall Health Gpa','Movement Non Exercise Steps Grade','Movement Non Exercise Steps',
 			   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
-			   'Exercise Consistency Grade','Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
+			   'Exercise Consistency Grade',"Did you Workout Today",'Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
 			   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
 			   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty']
 
@@ -324,6 +326,15 @@ def export_users_xls(request):
 		user_input__user = request.user).order_by('-user_input__created_at')
 	options_user_input_datewise = {q.user_input.created_at.strftime("%Y-%m-%d"):q
 		 for q in options_user_input }
+
+
+	user_input_strong = DailyUserInputStrong.objects.filter(
+		user_input__created_at__range=(from_date, to_date),
+		user_input__user = request.user).order_by('-user_input__created_at')
+	user_input_strong_datewise = {q.user_input.created_at.strftime("%Y-%m-%d"):q
+		 for q in user_input_strong }
+
+
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -349,20 +360,24 @@ def export_users_xls(request):
 		food_data = food_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		alcohol_data = alcohol_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		exercise_data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		user_input_strong_data = user_input_strong_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		
 		if steps_data and grades_data and exercise_data and food_data and alcohol_data and sleep_data:
+			if user_input_strong_data:
+				user_input_strong_data = user_input_strong_data.__dict__
 			steps_data = steps_data.__dict__
 			grades_data = grades_data.__dict__
 			sleep_data = sleep_data.__dict__
 			exercise_data = exercise_data.__dict__
 			alcohol_data = alcohol_data.__dict__
 			food_data = food_data.__dict__
+			
 			# logic
 
 			row_num += 1
 			for i,key in enumerate(columns):
 			
-				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_user_input' and key != 'exercise_consistency' and key != 'prcnt_non_processed_food' and key != 'alcohol_week':
+				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'exercise_consistency' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout':
 					if grades_data[key] == 'A':
 						sheet1.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
@@ -387,18 +402,23 @@ def export_users_xls(request):
 				elif i == 3:
 					sheet1.write(i+3,row_num, steps_data[key],format)
 				elif i == 5 and key == 'movement_consistency' and steps_data[key]:
-					sheet1.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format1)
+					sheet1.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format)
 				elif i == 7:
 					sheet1.write(i+3,row_num, sleep_data[key],format1)
-				elif i == 9:
+				elif key == 'workout':
+					if user_input_strong_data:
+						sheet1.write(i+3, row_num, user_input_strong_data[key],format)
+					else:
+						sheet1.write(i+3, row_num," ",format)
+				elif i == 10:
 					sheet1.write(i+3,row_num, exercise_data[key],format1)
-				elif i == 11:
+				elif i == 12:
 					if food_data[key] == '':
 						
 						sheet1.write(i+3,row_num, '')
 					else:
 						sheet1.write(i+3,row_num, str(int(food_data[key])) + '%')
-				elif i == 13:
+				elif i == 14:
 					sheet1.write(i+3,row_num, alcohol_data[key],format1)	
 				else:
 					sheet1.write(i+3,row_num, '')
@@ -517,8 +537,8 @@ def export_users_xls(request):
 	num_3 = row_num
 	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed']
-	sheet1.write(21, 0, "Steps",bold)
-	col_num2 = 21
+	sheet1.write(22, 0, "Steps",bold)
+	col_num2 = 22
 	# a = len(rows_of_grades)
 	for col_num in range(len(columns4W)):
 		 col_num2 = col_num2 + 1
@@ -536,7 +556,7 @@ def export_users_xls(request):
 
 
 	current_date = to_date
-	i1 = 21
+	i1 = 22
 	while (current_date >= from_date):
 		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		grades_data = grades_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -544,7 +564,7 @@ def export_users_xls(request):
 			steps_data = steps_data.__dict__
 			grades_data = grades_data.__dict__
 			# logic
-			i1 = 21
+			i1 = 22
 			row_num += 1
 			for i,key in enumerate(columns4):
 				if i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'A':
@@ -578,13 +598,13 @@ def export_users_xls(request):
 
 	#Sleep
 
-	columns5 = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
+	columns5 = ['sleep_per_wearable','sleep_comments',  'sleep_aid','sleep_resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
 	'sleep_awake_time','deep_sleep','light_sleep','awake_time']
 	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 
 	'Resting Heart Rate (RHR)','Sleep per Wearable (excluding awake time)',
 	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep','Light Sleep','Awake Time']
-	sheet1.write(28, 0, "Sleep",bold)
-	col_num2 = 28
+	sheet1.write(29, 0, "Sleep",bold)
+	col_num2 = 29
 	num_4 = row_num
 	# a = len(rows_of_grades) + len(rows3)
 	for col_num in range(len(columns5W)):
@@ -625,7 +645,7 @@ def export_users_xls(request):
 			grades_data = grades_data.__dict__
 			exercise_data = exercise_data.__dict__
 			# logic
-			i1 = 28
+			i1 = 29
 			row_num += 1
 			for i, key in enumerate(columns5):
 				if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
@@ -650,10 +670,10 @@ def export_users_xls(request):
 		current_date -= timedelta(days=1)
 	#Food
 	num_5 = row_num
-	columns6 = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
-	columns6W = ['Percentage of Unprocessed Food', 'Non Processed Food', 'Diet Type']
-	sheet1.write(40, 0, "Food",bold)
-	col_num2 = 40
+	columns6 = ['prcnt_non_processed_food','processed_food','non_processed_food', 'diet_type']
+	columns6W = ['Percentage of Unprocessed Food','Processed Food Consumed', 'Non Processed Food', 'Diet Type']
+	sheet1.write(41, 0, "Food",bold)
+	col_num2 = 41
 	# a = len(rows_of_grades) + len(rows3) + len(rows4)
 	for col_num in range(len(columns6W)):
 		col_num2 = col_num2 + 1
@@ -675,7 +695,7 @@ def export_users_xls(request):
 			food_data = food_data.__dict__
 			grades_data = grades_data.__dict__
 			# logic
-			i1 = 40
+			i1 = 41
 			row_num += 1
 			for i, key in enumerate(columns6):
 				if grades_data['prcnt_unprocessed_food_consumed_grade'] == 'A' and i == 0:
@@ -703,8 +723,8 @@ def export_users_xls(request):
 	num_6 = row_num
 	columns7 = ['alcohol_day', 'alcohol_week']
 	columns7W = ['# of Alcohol Drinks Consumed Yesterday', '# of Alcohol Drinks Consumed over last  7 Days']
-	sheet1.write(45, 0, "Alcohol",bold)
-	col_num2 = 45
+	sheet1.write(47, 0, "Alcohol",bold)
+	col_num2 = 47
 	# a = len(rows_of_grades) + len(rows3) + len(rows4) + len(rows5)
 	for col_num in range(len(columns7W)):
 		   col_num2 = col_num2 + 1
@@ -731,7 +751,7 @@ def export_users_xls(request):
 			alcohol_data = alcohol_data.__dict__
 			grades_data = grades_data.__dict__
 			# logic
-			i1 = 45
+			i1 = 47
 			row_num += 1
 			for i, key in enumerate(columns7):
 				if i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'A':
@@ -752,12 +772,59 @@ def export_users_xls(request):
 			sheet1.write(i1+i+1,row_num - num_6, '')
 		current_date -= timedelta(days=1)
 
+	# Exercise Reporting
+
+	columns_of_exercise = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
+	"distance_run","distance_bike","distance_swim","distance_other","pace",
+	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+	"temperature_feels_like","wind","hrr","hrr_start_point","hrr_beats_lowered","sleep_resting_hr_last_night","vo2_max","running_cadence",
+	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
+	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
+	"heartrate_variability_stress","fitness_age","workout_comment"]
+	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
+	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Elevation Gain(feet)','Elevation Loss(feet)', 
+	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
+	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
+	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+	
+	current_date = to_date
+	r = 0
+	if to_date and from_date:
+		while (current_date >= from_date):
+			r = r + 1
+			sheet1.write(0, r, current_date,date_format)
+			current_date -= timedelta(days=1)
+	num_11 = row_num
+	sheet1.write(51, 0, "Exercise Reporting",bold)
+	col_num1 = 51
+	for col_num in range(len(columns8w)):
+		col_num1 = col_num1 + 1
+		sheet1.write(col_num1, row_num-num_11, columns8w[col_num])
+	i1 = 51
+	current_date = to_date
+	for row in exercise_qs.values():
+		while (current_date >= from_date):
+			# logic
+			data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+			if data:
+				row_num += 1
+				for i,key in enumerate(columns_of_exercise):
+					if row[key] == None:
+						sheet1.write(i1+i+1,row_num - num_11,'No GPS data',format)
+					else:
+						sheet1.write(i1+i+1,row_num - num_11,row[key],format)
+			else:
+				row_num += 1
+				sheet1.write(i1+i+1,row_num - num_11, '')
+			current_date -= timedelta(days=1)
+
+
 	# Swim status
 	num_7 = row_num
 	columns1 = ['pace_per_100_yard','total_strokes']
 	columns1W = ['Pace Per 100 Yard','Total Strokes']
-	sheet1.write(49, 0, "Swim Stats",bold)
-	col_num2 = 49
+	sheet1.write(98, 0, "Swim Stats",bold)
+	col_num2 = 98
 	# a = len(rows_of_grades) + len(rows3) + len(rows4) + len(rows5) + len(rows6)
 	for col_num1 in range(len(columns1W)):
 			col_num2 = col_num2 + 1
@@ -776,7 +843,7 @@ def export_users_xls(request):
 			data = swim_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 			if data:
 				# logic
-				i1 = 49
+				i1 = 98
 				row_num += 1
 				for i,key in enumerate(columns1):
 					sheet1.write(i1+i+1,row_num - num_7, row[key],format)
@@ -789,8 +856,8 @@ def export_users_xls(request):
 	num_8 = row_num
 	columns3 = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	columns3W = ['Avg Speed (MPH) Bike', 'Avg Power Bike','Avg_Speed Per Mile','Avg Cadence Bike']
-	sheet1.write(53, 0, "Bike Stats",bold)
-	col_num2 = 53
+	sheet1.write(102, 0, "Bike Stats",bold)
+	col_num2 = 102
 	# a = len(rows_of_grades) + len(rows3) + len(rows4) + len(rows5) + len(rows6) + len(rows1)
 	for col_num in range(len(columns3W)):
 		col_num2 = col_num2 + 1
@@ -811,7 +878,7 @@ def export_users_xls(request):
 			# logic
 			data = bike_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 			if data:
-				i1 = 53	
+				i1 = 101	
 			# for row in bike_qs.values():
 				row_num += 1
 				for i,key in enumerate(columns3):
@@ -827,12 +894,12 @@ def export_users_xls(request):
 	sheet2.set_landscape()
 
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
-			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_user_input','exercise_consistency_grade',
-			   'exercise_consistency','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
+			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
+			   'workout','exercise_consistency','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
 			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
 	columnsw = ['Overall Health Grade','Overall Health Gpa','Movement Non Exercise Steps Grade','Movement Non Exercise Steps',
 			   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
-			   'Exercise Consistency Grade','Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
+			   'Exercise Consistency Grade','Did you Workout Today','Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
 			   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
 			   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty']
 
@@ -859,8 +926,11 @@ def export_users_xls(request):
 		food_data = food_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		alcohol_data = alcohol_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		exercise_data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-		
+		user_input_strong_data = user_input_strong_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+
 		if steps_data and grades_data and exercise_data and food_data and alcohol_data and sleep_data:
+			if user_input_strong_data:
+				user_input_strong_data = user_input_strong_data.__dict__
 			steps_data = steps_data.__dict__
 			grades_data = grades_data.__dict__
 			sleep_data = sleep_data.__dict__
@@ -872,7 +942,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns):
 			
-				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_user_input' and key != 'exercise_consistency' and key != 'prcnt_non_processed_food' and key != 'alcohol_week':
+				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'exercise_consistency' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout':
 					if grades_data[key] == 'A':
 						sheet2.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
@@ -897,12 +967,17 @@ def export_users_xls(request):
 				elif i == 3:
 					sheet2.write(i+3,row_num, steps_data[key],format)
 				elif i == 5 and key == 'movement_consistency' and steps_data[key]:
-					sheet2.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format1)
+					sheet2.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format)
 				elif i == 7:
 					sheet2.write(i+3,row_num, sleep_data[key],format1)
-				elif i == 9:
+				elif key == 'workout':
+					if user_input_strong_data:
+						sheet2.write(i+3, row_num, user_input_strong_data[key],format)
+					else:
+						sheet2.write(i+3, row_num," ",format)
+				elif i == 10:
 					sheet2.write(i+3,row_num, exercise_data[key],format1)
-				elif i == 11:
+				elif i == 12:
 					if food_data[key] == '':
 						
 						sheet2.write(i+3,row_num, '')
@@ -911,7 +986,7 @@ def export_users_xls(request):
 				elif i == 13:
 					sheet2.write(i+3,row_num, alcohol_data[key],format1)	
 				else:
-					sheet2.write(i+3,row_num, '')
+					sheet2.write(i+3,row_num,'')
 		else:
 			row_num += 1
 			sheet2.write(i+3,row_num, '')
@@ -1213,7 +1288,7 @@ def export_users_xls(request):
 	sheet5.set_landscape()
 	sheet5.repeat_rows(0)
 	sheet5.repeat_columns(0)
-	columns = ['prcnt_non_processed_food', 'non_processed_food', 'diet_type']
+	columns = ['prcnt_non_processed_food','processed_food','non_processed_food', 'diet_type']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -1317,12 +1392,48 @@ def export_users_xls(request):
 	sheet7.repeat_rows(0)
 	sheet7.repeat_columns(0)
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate",
-"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
-"temperature_feels_like","wind","hrr","hrr_start_point","hrr_beats_lowered","sleep_resting_hr_last_night","vo2_max","running_cadence",
-"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
-"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
-"heartrate_variability_stress","fitness_age","workout_comment"]
+	"distance_run","distance_bike","distance_swim","distance_other","pace",
+	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+	"temperature_feels_like","wind","hrr","hrr_start_point","hrr_beats_lowered","sleep_resting_hr_last_night","vo2_max","running_cadence",
+	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
+	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
+	"heartrate_variability_stress","fitness_age","workout_comment"]
+	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
+	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Elevation Gain(feet)','Elevation Loss(feet)', 
+	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
+	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
+	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+	
+	current_date = to_date
+	r = 0
+	if to_date and from_date:
+		while (current_date >= from_date):
+			r = r + 1
+			sheet7.write(0, r, current_date,date_format)
+			current_date -= timedelta(days=1)
+	sheet7.write(0, 0, "Exercise Reporting",bold)
+	col_num1 = 1
+	row_num = 0
+	for col_num in range(len(columns8w)):
+		col_num1 = col_num1 + 1
+		sheet7.write(col_num1, row_num, columns8w[col_num])
+
+	current_date = to_date
+	for row in exercise_qs.values():
+		while (current_date >= from_date):
+			# logic
+			data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+			if data:
+				row_num += 1
+				for i,key in enumerate(columns):
+					if row[key] == None:
+						sheet7.write(i + 2, row_num,'No GPS data',format)
+					else:
+						sheet7.write(i + 2, row_num,row[key],format)
+			else:
+				row_num += 1
+				sheet9.write(i + 2, row_num, '')
+			current_date -= timedelta(days=1)
 	
 
 
