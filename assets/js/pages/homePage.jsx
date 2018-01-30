@@ -58,8 +58,8 @@ function initializeLocalState(){
 					{/*<Route path='/BreakDown' component={RequireAuth(Breakdown)} /> */}
 					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
-					<Route path='/quicksummary' component={RequireAuth(Quicklook)} />
-					<Route path='/dashboard_summary' component={RequireAuth(DashboardSummary)} />					
+					<Route path='/rawdata' component={RequireAuth(Quicklook)} />
+					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />					
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 			    </Switch>

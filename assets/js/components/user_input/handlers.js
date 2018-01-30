@@ -75,6 +75,8 @@ export function handleChangeWorkoutDone(event){
   if(value === 'no' || value === 'not yet'){
       this.setState({
         workout:value,
+        no_exercise_reason:'',
+        no_exercise_comment:'',
         workout_type:'',
         workout_input_type:'',
         workout_easy:'',
@@ -343,3 +345,20 @@ export function handleWeatherCheck(){
     })
   }
 }
+export function handleChangeNoExerciseReason(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
+if(value === 'sick'){
+  this.setState({
+   sick:'yes',
+   no_exercise_reason:value,
+  });
+}
+else{
+  this.setState({    
+   no_exercise_reason:value,
+  });
+}
+}
+

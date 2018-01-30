@@ -57,7 +57,7 @@ const attrVerboseName = {
     general_comment:'Genaral comment',
 
     overall_health_grade: 'Overall Health Grade',
-    overall_health_gpa: 'Overall Health Gpa',
+    overall_health_gpa: 'Overall Health GPA',
     movement_non_exercise_steps_grade: 'Movement Non Exercise steps Grade',
     movement_non_exercise_steps: 'Movement Non Exercise steps',
     movement_consistency_grade: 'Movement Consistency Grade',
