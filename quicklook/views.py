@@ -220,7 +220,7 @@ def export_users_xls(request):
 	sheet4 = book.add_worksheet('Sleep')
 	sheet5 = book.add_worksheet('Food')
 	sheet6 = book.add_worksheet('Alcohol')
-	# sheet7 = book.add_worksheet('All Raw Data')
+	sheet7 = book.add_worksheet('Exercise Reporting')
 	sheet8 = book.add_worksheet('Swim Stats')
 	sheet9 = book.add_worksheet('Bike Stats')
 	sheet1.freeze_panes(1, 1)
@@ -1310,6 +1310,22 @@ def export_users_xls(request):
 			row_num += 1
 			sheet6.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
+
+	# Exercise Reporting
+
+	sheet7.set_landscape()
+	sheet7.repeat_rows(0)
+	sheet7.repeat_columns(0)
+	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
+"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate",
+"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+"temperature_feels_like","wind","hrr","hrr_start_point","hrr_beats_lowered","sleep_resting_hr_last_night","vo2_max","running_cadence",
+"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
+"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
+"heartrate_variability_stress","fitness_age","workout_comment"]
+	
+
+
 
 	book.close()
 	return response

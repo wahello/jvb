@@ -49,13 +49,14 @@ class Command(BaseCommand):
 			uploadStartTimeInSeconds = int(datetime.datetime.strptime(from_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			uploadEndTimeInSeconds = int(datetime.datetime.strptime(to_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			data = {
-		        'uploadStartTimeInSeconds': uploadStartTimeInSeconds,
-		        'uploadEndTimeInSeconds':uploadEndTimeInSeconds
+		        'summaryStartTimeInSeconds': uploadStartTimeInSeconds,
+		        'summaryEndTimeInSeconds':uploadEndTimeInSeconds
 	      	}
 			ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/backfill/{}'
-			# for dtype in self.DATA_TYPES.values():
-			# 		URL = ROOT_URL.format(dtype)
-			# 		r = sess.get(URL, header_auth=True, params=data)
+			for dtype in self.DATA_TYPES.values():
+				time.sleep(60)
+				URL = ROOT_URL.format(dtype)
+				r = sess.get(URL, header_auth=True, params=data)
 			# return Response(status = status.HTTP_202_ACCEPTED)
 			# return Response(status = status.HTTP_403_FORBIDDEN)
 		# else:
