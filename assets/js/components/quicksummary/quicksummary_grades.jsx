@@ -35,24 +35,24 @@ import NumberFormat from 'react-number-format';
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
         
-        {name:'NOT GRADED CATEGORIES'},
-        {name:'Resting Heart Rate'},
-        {name:'Stress Level'},
-        {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
+        // {name:'NOT GRADED CATEGORIES'},
+        // {name:'Resting Heart Rate'},
+        // {name:'Stress Level'},
+        // {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
         
-        {name:'PERFORMANCE ASSESSMENT'},
-        {name: 'Overall Workout Grade '},
-        {name: 'Overall Workout Score (points)'},
-        {name: 'Workout Duration Grade'},   
-        {name: 'Workout Duration'},
-        {name: 'Workout Effort Level Grade'},
-        {name: 'Workout Effort Level'}, 
-        {name: 'Average Exercise Heart Rate Grade'},
-        {name: 'Average Exercise Heart Rate'},
-        {name: 'Heart Rate Recovery (HRR) - time to 99'},
-        {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
-        {name: 'VO2 Max'}, 
-        {name: 'Floors Climbed '},          
+        // {name:'PERFORMANCE ASSESSMENT'},
+        // {name: 'Overall Workout Grade '},
+        // {name: 'Overall Workout Score (points)'},
+        // {name: 'Workout Duration Grade'},   
+        // {name: 'Workout Duration'},
+        // {name: 'Workout Effort Level Grade'},
+        // {name: 'Workout Effort Level'}, 
+        // {name: 'Average Exercise Heart Rate Grade'},
+        // {name: 'Average Exercise Heart Rate'},
+        // {name: 'Heart Rate Recovery (HRR) - time to 99'},
+        // {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
+        // {name: 'VO2 Max'}, 
+        // {name: 'Floors Climbed '},          
       ],
     };
   }
@@ -66,6 +66,7 @@ renderTableColumns(dateWiseData,category,classes=""){
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
+        yes:{background: 'red', color: 'black' },        
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -81,7 +82,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
             }
 
-            if(key === 'overall_health_gpa'){
+            if(key === 'overall_health_gpa' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
                var minus = '';
@@ -95,11 +96,37 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
+            else  if(key === 'exercise_consistency_score' ){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
+            // else if(key ==='movement_non_exercise_steps'){
+            //   value += '';
+            //       var x = value.split('.');
+            //       var x1 = x[0];
+            //       var x2 = x.length > 1 ? '.' + x[1] : '';
+            //       var rgx = /(\d+)(\d{3})/;
+            //       while (rgx.test(x1)) {
+            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            //       }
+            //   all_data.push(x1 + x2)
+
+            // }
             else if(key == 'smoke_penalty' || key ==  'ctrl_subs_penalty' || key == 'sleep_aid_penalty'){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
-                  style:''
+                  style:obj['yes']
                 });
               }else{
                 all_data.push({
@@ -169,7 +196,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={200}
+		          width={280}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"grades_ql")}

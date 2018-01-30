@@ -636,19 +636,19 @@ handleScroll() {
     });
    }
    infoPrint(){
-    var mywindow = window.open('', 'PRINT');
+    var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
         '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
         '.print {visibility: hidden;}' +
         '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
-        '</style><title>' + document.title  + '</title>');
+        '</style><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
-    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById('modal1').innerHTML);
     mywindow.document.write('</body></html>');
 
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
 
     mywindow.print();
     mywindow.close();
@@ -1752,7 +1752,6 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? 
-
                             <span id="fast"
                              onClick={this.toggleFasted} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -1793,7 +1792,6 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.fasted == 'yes' &&
-
                                 <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
                                   <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>

@@ -12,6 +12,442 @@ import { getGarminToken,logoutUser} from '../network/auth';
  class DashboardSummary extends Component{
 constructor(props){
     super(props);
+    // this.state ={
+    //     "created_at":"-",
+    //     "summary":{
+    //         "overall_health":{
+    //            "overall_health_gpa":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+
+    //                  },
+    //              "overall_health_gpa_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+
+    //                  },
+    //              "rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+
+    //                  },
+    //              "total_gpa_point":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+
+    //                  }
+    //             },
+
+    //         "ec":{
+    //              "avg_no_of_days_exercises_per_week":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //               "exercise_consistency_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //                "rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //                "exercise_consistency_gpa":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  }
+    //              },
+    //             "nutrition":{
+    //                "prcnt_unprocessed_food_gpa":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //              "prcnt_unprocessed_food_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //              "rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //               "prcnt_unprocessed_volume_of_food":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  }
+
+    //               },
+    //         "mc":{
+    //             "movement_consistency_gpa":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //                  "movement_consistency_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //                  "rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //                  "movement_consistency_score":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  }
+    //               },
+    //         "non_exercise":{
+    //              "non_exericse_steps_gpa":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //              "rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //              "movement_non_exercise_step_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //              "non_exercise_steps":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //             "total_steps":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },     
+    //         },
+    //     "exercise":{
+    //        "workout_duration_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },    
+    //         "overall_workout_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },    
+    //         "workout_duration_hours_min":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  }, 
+    //             "rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },    
+    //             "avg_exercise_heart_rate":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },    
+    //             "overall_exercise_gpa_rank":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //             "workout_effort_level_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //             "avg_exercise_heart_rate_grade":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //             "overall_exercise_gpa":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  },
+    //             "workout_effort_level":{
+    //                     "week":"-",
+    //                     "yesterday":"-",
+    //                     "month":"-",
+    //                     "custom_range":{
+    //                        "from_dt" :"-",
+    //                        "to_dt":"-",
+    //                        "data":"-"
+    //                     },
+    //                     "today":"-",
+    //                     "year":"-"
+    //                  }        
+    //             },
+
+    //     "penalty":{
+    //          "sleep_aid_penalty": {
+    //             "week":"",
+    //             "yesterday": 0,
+    //             "month": null,
+    //             "custom_range": {
+    //                 "from_dt": "2018-01-17",
+    //                 "to_dt": "2018-01-20",
+    //                 "data": -1
+    //             },
+    //             "today": -2,
+    //             "year": null
+    //         },
+    //         "controlled_substance_penalty": {
+    //             "week": -1.33,
+    //             "yesterday": 0,
+    //             "month": null,
+    //             "custom_range": {
+    //                 "from_dt": "2018-01-17",
+    //                 "to_dt": "2018-01-20",
+    //                 "data": -1.55
+    //             },
+    //             "today": -3.1,
+    //             "year": null
+    //         },
+    //         "smoking_penalty": {
+    //             "week": -0.89,
+    //             "yesterday": 0,
+    //             "month": null,
+    //             "custom_range": {
+    //                 "from_dt": "2018-01-17",
+    //                 "to_dt": "2018-01-20",
+    //                 "data": -0.78
+    //             },
+    //             "today": 0,
+    //             "year": null
+    //         }
+    //     }
+              
+    //     }
+
+    // }
     this.toggle = this.toggle.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);

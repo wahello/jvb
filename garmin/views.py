@@ -233,7 +233,7 @@ class fetchGarminBackFillData(APIView):
 		"USER_METRICS":"userMetrics"
 	}
 
-	def get(self, request, format="json"):
+	def get(self, request, format="json",to_date=None,from_date=None):
 		req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
 		authurl = 'http://connect.garmin.com/oauthConfirm'
 		acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
@@ -252,6 +252,8 @@ class fetchGarminBackFillData(APIView):
 		access_token_secret = user.garmin_token.token_secret
 		User_Reg_Date = user.date_joined
 		startDateTimeInSeconds = int(time.mktime(User_Reg_Date.timetuple()))
+		to_date = int(time.mktime(to_date.timetuple()))
+		from_date = int(time.mktime(from_date.timetuple()))
 
 		if access_token and access_token_secret:
 			service = OAuth1Service(
@@ -263,16 +265,19 @@ class fetchGarminBackFillData(APIView):
 			)
 			sess = service.get_session((access_token, access_token_secret))
 
-			data = {
-				'summaryStartTimeInSeconds': startDateTimeInSeconds-7776000,
-				'summaryEndTimeInSeconds': startDateTimeInSeconds
-			}
+			if (from_date - to_date) <= 7776000:
+				data = {
+				'summaryStartTimeInSeconds': to_date,
+				'summaryEndTimeInSeconds': from_date
+				}
+			else:
+				print("Date Range should be in the range of 90 days only because garmin sends the date for one call only 90 days data")
 
 			ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/backfill/{}'
 
-			for dtype in self.DATA_TYPES.values():
-				URL = ROOT_URL.format(dtype)
-				r = sess.get(URL, header_auth=True, params=data)
+			# for dtype in self.DATA_TYPES.values():
+			# 	URL = ROOT_URL.format(dtype)
+			# 	r = sess.get(URL, header_auth=True, params=data)
 				
 			return Response(status = status.HTTP_202_ACCEPTED)
 		return Response(status = status.HTTP_403_FORBIDDEN)

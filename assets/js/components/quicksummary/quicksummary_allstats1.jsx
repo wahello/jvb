@@ -79,22 +79,22 @@ const attrVerboseName = {
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
 
-    resting_hr:'Resting Heart Rate',
-    stress_level:'Stress Level',
-    stand_three_hours:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?', 
+    // resting_hr:'Resting Heart Rate',
+    // stress_level:'Stress Level',
+    // stand_three_hours:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?', 
 
-    overall_workout_grade:'Overall Workout Grade ',
-    overall_workout_score:'Overall Workout Score (points)',
-    workout_duration_grade:'Workout Duration Grade',
-    workout_duration:'Workout Duration',
-    workout_effortlvl_grade:'Workout Effort Level Grade',
-    workout_effortlvl:'Workout Effort Level',
-    avg_exercise_hr_grade:'Average Exercise Heart Rate Grade',
-    avg_exercise_hr:'Average Exercise Heart Rate',
-    time_to_99:'Heart Rate Recovery (HRR) - time to 99',
-    lowest_hr_first_minute:'Heart Rate Recovery (HRR) - heart beats lowered in the first minute ',
-    vo2_max:'VO2 Max',
-    floor_climed:'Floors Climbed',   
+    // overall_workout_grade:'Overall Workout Grade ',
+    // overall_workout_score:'Overall Workout Score (points)',
+    // workout_duration_grade:'Workout Duration Grade',
+    // workout_duration:'Workout Duration',
+    // workout_effortlvl_grade:'Workout Effort Level Grade',
+    // workout_effortlvl:'Workout Effort Level',
+    // avg_exercise_hr_grade:'Average Exercise Heart Rate Grade',
+    // avg_exercise_hr:'Average Exercise Heart Rate',
+    // time_to_99:'Heart Rate Recovery (HRR) - time to 99',
+    // lowest_hr_first_minute:'Heart Rate Recovery (HRR) - heart beats lowered in the first minute ',
+    // vo2_max:'VO2 Max',
+    // floor_climed:'Floors Climbed',   
 
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time) (hh:mm)',
     sleep_comments:'Sleep Comments',
@@ -219,7 +219,20 @@ class AllStats1 extends Component{
                            s = minus + s;
                            all_data.push({value: s});
                         }
-
+                         else  if(key === 'exercise_consistency_score' ){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
 
                         else if(value !== '-' && value !== undefined && 
                            value !== "" && (key == 'deep_sleep' ||
@@ -341,7 +354,7 @@ class AllStats1 extends Component{
 
 		            </Cell>
 		          )}
-		          width={250}
+		          width={280}
 		          fixed={true}
 
 
