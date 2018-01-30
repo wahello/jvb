@@ -142,12 +142,12 @@ class DailyUserInputStrong(models.Model):
         blank=True
     )
 
-    # reason_no_workout = models.CharField(
-    #     max_length = 100,
-    #     choices = REASON_NO_WORKOUT_CHOICES,
-    #      blank=True
-    # )
-    # comments_no_workout = models.TextField(blank=True)
+    reason_no_workout = models.CharField(
+        max_length = 100,
+        choices = REASON_NO_WORKOUT_CHOICES,
+         blank=True
+    )
+    comments_no_workout = models.TextField(blank=True)
 
     workout_type = models.CharField(
         max_length = 10,

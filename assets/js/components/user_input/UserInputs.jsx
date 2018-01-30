@@ -228,7 +228,7 @@ class UserInputs extends React.Component{
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       }
       else {
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
@@ -356,7 +356,7 @@ class UserInputs extends React.Component{
         let have_optional_input = data.data.optional_input?true:false;
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
@@ -3010,7 +3010,8 @@ handleScroll() {
                                                 <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>                                                                                                                                                                            
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>
+                                                <option value="pescetarian">Pescetarian</option>                                                                                                                                                                            
                                       </Input>
                                     </div>
                                   }

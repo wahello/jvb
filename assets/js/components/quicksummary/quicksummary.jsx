@@ -218,7 +218,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        processed_food_consumed: user_input_data.strong_input.list_of_processed_food_consumed_yesterday ,
+			        processed_food_consumed: data.food_ql.processed_food ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },

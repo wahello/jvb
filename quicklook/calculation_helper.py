@@ -255,6 +255,7 @@ def get_blank_model_fields(model):
 		fields = {
 			'prcnt_non_processed_food':0,
 			'non_processed_food': '',
+			'processed_food':'',
 			'diet_type':'',
 		}
 		return fields
@@ -1437,6 +1438,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 									   "prcnt_unprocessed_food_consumed_yesterday", 0)
 		food_calculated_data['non_processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_unprocessed_food_consumed_yesterday", "")
+		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
+								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
 
 		# Alcohol

@@ -66,7 +66,7 @@ renderTableColumns(dateWiseData,category,classes=""){
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
-        yes:{background: 'red', color: 'black' },        
+        penalty:{background: 'red', color: 'black' },        
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -126,7 +126,7 @@ renderTableColumns(dateWiseData,category,classes=""){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
-                  style:obj['yes']
+                  style:obj['penalty']
                 });
               }else{
                 all_data.push({

@@ -238,6 +238,7 @@ class Food(models.Model):
 		blank=True,null=True)
 
 	non_processed_food = models.TextField(blank=True)
+	processed_food = models.TextField(blank=True)
 
 	# choices are not provided, will be choice field in the future
 	diet_type = models.TextField(blank=True)
