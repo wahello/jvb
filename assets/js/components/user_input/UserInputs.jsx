@@ -275,6 +275,8 @@ class UserInputs extends React.Component{
           editable: was_cloning ? true : false,
 
           workout:have_strong_input?data.data.strong_input.workout:'',
+          no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
+          no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
@@ -343,9 +345,7 @@ class UserInputs extends React.Component{
           breath_sleep:have_optional_input?data.data.optional_input.percent_breath_nose_last_night:'',
           breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
-          no_exercise_reason:have_optional_input?data.data.optional_input.no_exercise_reason:'',
-          no_exercise_comment:have_optional_input?data.data.optional_input.no_exercise_comment:'',
+          general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
           if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
