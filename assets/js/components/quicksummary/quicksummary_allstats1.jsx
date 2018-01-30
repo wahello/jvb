@@ -57,7 +57,7 @@ const attrVerboseName = {
     general_comment:'Genaral comment',
 
     overall_health_grade: 'Overall Health Grade',
-    overall_health_gpa: 'Overall Health Gpa',
+    overall_health_gpa: 'Overall Health GPA',
     movement_non_exercise_steps_grade: 'Movement Non Exercise steps Grade',
     movement_non_exercise_steps: 'Movement Non Exercise steps',
     movement_consistency_grade: 'Movement Consistency Grade',
@@ -65,6 +65,7 @@ const attrVerboseName = {
     avg_sleep_per_night_grade: 'Avg Sleep Per Night Grade',
     avg_sleep_per_night: 'Avg Sleep Per Night',
     exercise_consistency_grade: 'Exercise Consistency Grade',
+    workout_today: 'Did You Workout Today',
     exercise_consistency_score: 'Exercise Consistency Score',
     overall_workout_grade: 'Overall Workout Grade',
     workout_duration_grade:'Workout Duration Grade',

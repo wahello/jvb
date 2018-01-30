@@ -23,14 +23,15 @@ class ProgressReportView(APIView):
 		self.from_dt = self._str_to_dt(self.request.query_params.get('from',None))
 		self.to_dt = self._str_to_dt(self.request.query_params.get('to',None))
 		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q for q in self.get_queryset()}
-		self.cumulative_datewise_data_custom_range = {q.created_at.strftime("%Y-%m-%d"):q 
-			for q in self._get_queryset_custom_range(self.from_dt, self.to_dt)}
 		self.duration_denominator = {
 			'today':1,'yesterday':1, 'week':7, "month":30, "year":365
 		}
 		self.custom_daterange = False
 
 		if self.from_dt and self.to_dt:
+			self.cumulative_datewise_data_custom_range = {q.created_at.strftime("%Y-%m-%d"):q 
+				for q in self._get_queryset_custom_range(self.from_dt, self.to_dt)}
+
 			custom_range_denominator = (self.to_dt - self.from_dt).days + 1
 			self.duration_denominator['custom_range'] = custom_range_denominator
 			self.custom_daterange = True
@@ -68,9 +69,11 @@ class ProgressReportView(APIView):
 		return "{}:{}".format(hours,mins)
 
 	def _get_average(self, stat1, stat2, duration_type):
-		avg = (stat1 - stat2)/self.duration_denominator.get(duration_type)
-		return avg
-
+		if not stat1 == None and not stat2 == None:
+			avg = (stat1 - stat2)/self.duration_denominator.get(duration_type)
+			return avg
+		return 0
+		
 	def get_queryset(self):
 		duration_end_dt = self._get_duration_datetime(self.current_date)
 		day_before_yesterday = self.current_date - timedelta(days=2)
@@ -84,7 +87,8 @@ class ProgressReportView(APIView):
 		return cumulative_data_qs
 
 	def _get_queryset_custom_range(self,from_dt, to_dt):
-		filters = Q(created_at=to_dt.date()) | Q(created_at=from_dt.date())
+		day_before_from_date = from_dt - timedelta(days=1)
+		filters = Q(created_at=to_dt.date()) | Q(created_at=day_before_from_date.date())
 		cumulative_data_qs = CumulativeSum.objects.select_related(
 			'overall_health_grade_cum','non_exercise_steps_cum','sleep_per_night_cum',
 			'movement_consistency_cum','exercise_consistency_cum','nutrition_cum',
@@ -105,8 +109,9 @@ class ProgressReportView(APIView):
 
 		#for select related
 		summary_type = "_{}_cache".format(summary_type)
+		day_before_from_date = self.from_dt - timedelta(days=1)
 		range_start_data = self.cumulative_datewise_data_custom_range.get(
-			self.from_dt.strftime("%Y-%m-%d"),None
+			day_before_from_date.strftime("%Y-%m-%d"),None
 		)
 		range_start_data = range_start_data.__dict__.get(summary_type)
 		range_end_data = self.cumulative_datewise_data_custom_range.get(
@@ -202,8 +207,7 @@ class ProgressReportView(APIView):
 					elif alias == 'yesterday' and day_before_yesterday_data:
 						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
 						continue
-					if alias in self.duration_type:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 
 		return calculated_data
 
@@ -338,8 +342,8 @@ class ProgressReportView(APIView):
 			day_before_yesterday_data = day_before_yesterday_data.sleep_per_night_cum
 
 		for key in calculated_data.keys():
-			if alias in self.duration_type:
-				for alias, dtobj in self._get_duration_datetime(self.current_date).items():
+			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
+				if alias in self.duration_type:
 					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
 					if current_data:
 						current_data = current_data.sleep_per_night_cum

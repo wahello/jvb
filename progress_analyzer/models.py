@@ -6,7 +6,7 @@ class CumulativeSum(models.Model):
 		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE
 	)
-	created_at = models.DateField(auto_now_add=True)
+	created_at = models.DateField()
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):

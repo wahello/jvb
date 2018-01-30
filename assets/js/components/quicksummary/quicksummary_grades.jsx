@@ -17,7 +17,7 @@ import NumberFormat from 'react-number-format';
 	 this.state = {
       myTableData: [
         {name: 'Overall Health Grade'},
-        {name: 'Overall Health Gpa'},
+        {name: 'Overall Health GPA'},
         {name: 'Movement Non Exercise steps Grade'},   
         {name: 'Movement Non Exercise steps'},
         {name: 'Movement Consistency Grade'},
@@ -25,7 +25,7 @@ import NumberFormat from 'react-number-format';
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
-        {name: 'Did you Workout Today'},
+        {name: 'Did You Workout Today'},
         {name: 'Exercise Consistency Score'},
         {name: 'Percentage of Unprocessed Food Grade'},
         {name: 'Percentage of Unprocessed Food'}, 
@@ -66,7 +66,7 @@ renderTableColumns(dateWiseData,category,classes=""){
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
-        yes:{background: 'red', color: 'black' },        
+        penalty:{background: 'red', color: 'black' },        
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -126,7 +126,7 @@ renderTableColumns(dateWiseData,category,classes=""){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
-                  style:obj['yes']
+                  style:obj['penalty']
                 });
               }else{
                 all_data.push({
