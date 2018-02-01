@@ -807,15 +807,15 @@ onLogoutSuccess(response){
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
                                             </DropdownItem>
-						    		 		 
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
-							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>	
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
+						    		 		 <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>
+							    		 	  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
+						    		 		 
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>
