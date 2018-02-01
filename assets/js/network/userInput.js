@@ -18,6 +18,8 @@ function formatJSON(data){
 		        "id": 1,
 		        "user_input": 18,
 		        "workout":"yes",
+		        "no_exercise_reason":"sick",
+		        "no_exercise_comment":"sick of cold",
 		        "workout_type":"cardio",
 		        "workout_input_type":"strength",
 		        "work_out_easy_or_hard": "easy",
@@ -102,6 +104,8 @@ function formatJSON(data){
 		"optional_input":{}
 	};
 	json_data.strong_input['workout'] = data.workout;
+	json_data.strong_input['no_exercise_reason'] = data.no_exercise_reason,
+	json_data.strong_input['no_exercise_comment'] = data.no_exercise_comment,
 	json_data.strong_input['workout_type'] = data.workout_type;
 	json_data.strong_input['workout_input_type'] = data.workout_input_type;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 

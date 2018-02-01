@@ -232,7 +232,7 @@ class UserInputs extends React.Component{
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       }
       else {
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
@@ -275,6 +275,8 @@ class UserInputs extends React.Component{
           editable: was_cloning ? true : false,
 
           workout:have_strong_input?data.data.strong_input.workout:'',
+          no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
+          no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
@@ -343,9 +345,7 @@ class UserInputs extends React.Component{
           breath_sleep:have_optional_input?data.data.optional_input.percent_breath_nose_last_night:'',
           breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
-          no_exercise_reason:have_optional_input?data.data.optional_input.no_exercise_reason:'',
-          no_exercise_comment:have_optional_input?data.data.optional_input.no_exercise_comment:'',
+          general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
           if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
@@ -362,7 +362,7 @@ class UserInputs extends React.Component{
         let have_optional_input = data.data.optional_input?true:false;
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
@@ -2334,7 +2334,7 @@ handleScroll() {
                             {
                               !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories === null ?this.state.calories : this.state.calories="NotEntered"}</p>
+                                <p>{this.state.calories ? this.state.calories : "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -2357,7 +2357,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item ?this.state.calories_item:this.state.calories_item="NotEntered"}</p>
+                                <p >{this.state.calories_item ? this.state.calories_item: "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -3070,7 +3070,8 @@ handleScroll() {
                                                 <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>                                                                                                                                                                            
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>
+                                                <option value="pescetarian">Pescetarian</option>                                                                                                                                                                            
                                       </Input>
                                     </div>
                                   }

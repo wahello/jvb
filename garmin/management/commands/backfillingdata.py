@@ -42,27 +42,29 @@ class Command(BaseCommand):
 		}
 		return flags
 
-	# to_date = ''
-	# from_date = ''
-
 	def _is_valid(self,session,from_date=None,to_date=None):
 		# if to_date and from_date:
+			print(to_date)
+			print(from_date)
 			uploadStartTimeInSeconds = int(datetime.datetime.strptime(from_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			uploadEndTimeInSeconds = int(datetime.datetime.strptime(to_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			data = {
-		        'uploadStartTimeInSeconds': uploadStartTimeInSeconds,
-		        'uploadEndTimeInSeconds':uploadEndTimeInSeconds
+		        'summaryStartTimeInSeconds': uploadStartTimeInSeconds,
+		        'summaryEndTimeInSeconds':uploadEndTimeInSeconds
 	      	}
 			ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/backfill/{}'
-			# for dtype in self.DATA_TYPES.values():
-			# 		URL = ROOT_URL.format(dtype)
-			# 		r = sess.get(URL, header_auth=True, params=data)
+			for dtype in self.DATA_TYPES.values():
+				time.sleep(60)
+				URL = ROOT_URL.format(dtype)
+				r = sess.get(URL, header_auth=True, params=data)
 			# return Response(status = status.HTTP_202_ACCEPTED)
 			# return Response(status = status.HTTP_403_FORBIDDEN)
 		# else:
 		# 	self.stdout.write(self.style.ERROR('Please enter Date range'))
 		# 	return True
+			print("Data Backfilled")
 			return True
+
 	def _validate_options(self,options):
 		no_flags = True
 		flags = self._get_flags()
@@ -106,7 +108,7 @@ class Command(BaseCommand):
 		HEALTH_CONSKEY = '6c1a770b-60b9-4d7e-83a2-3726080f5556'
 		HEALTH_CONSSEC = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9'
 		try:
-			sess = None
+			global sess
 			# if options['api'] == 'health':
 			token = GarminToken.objects.get(user__email= email)
 			access_token = token.token
@@ -126,6 +128,7 @@ class Command(BaseCommand):
 
 		except (GarminToken.DoesNotExist):
 			self.stdout.write(self.style.ERROR('Token for email "%s" does not exist' % email))
+		self.stdout.write(self.style.SUCCESS('\nEmail "%s" has valid Garmin Health Token' % email))
 		return True
 	
 
@@ -151,8 +154,8 @@ class Command(BaseCommand):
 		)
 
 		parser.add_argument(
-			flags.get('duration')[2],
 			flags.get('duration')[1],
+			flags.get('duration')[2],
 			type = str,
 			nargs = 2,
 			dest = flags.get('duration')[0],
@@ -160,19 +163,20 @@ class Command(BaseCommand):
 		)
 
 	def handle(self, *args, **options):
+		from_date = options['duration'][0]
+		to_date = options['duration'][1]
 		if self._validate_options(options):
 
 			if self.date_range_flag == 'duration':
-				from_date = options['duration'][0]
-				to_date = options['duration'][1]
-				print(to_date)
+				pass
 
 			if not options['all'] and options['email']:
 				for email in options['email']:
 					# print(options)
 					if self._validate_token(email,options):
-						print(options)
-						self._is_valid(to_date,from_date)
+						print(from_date,to_date)
+						self._is_valid(sess,from_date,to_date)
+
 			elif options['all'] and not options['email']:
 				for token in GarminToken.objects.all():
 					if self._validate_token(token.user.email,options):

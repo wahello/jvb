@@ -6,7 +6,7 @@ class CumulativeSum(models.Model):
 		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE
 	)
-	created_at = models.DateField(auto_now_add=True)
+	created_at = models.DateField()
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
@@ -65,6 +65,7 @@ class ExerciseStatsCumulative(models.Model):
 	cum_overall_workout_gpa = models.FloatField(blank=True, null=True)
 	cum_overall_exercise_gpa = models.FloatField(blank=True, null=True)
 	rank = models.BigIntegerField(blank=True, null=True)
+	overall_exercise_rank = models.BigIntegerField(blank=True, null=True)
 
 class AlcoholCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="alcohol_cum")

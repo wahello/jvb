@@ -27,7 +27,7 @@ export function getInitialState(start_dt, end_dt){
 	        "avg_sleep_per_night_grade": '-',
 	        "avg_sleep_per_night": '-',
 	        "exercise_consistency_grade": '-',
-	        "did_you_workout_today": '-',
+	        "workout_today":"-",
 	        "exercise_consistency_score":'-',
 	        "prcnt_unprocessed_food_consumed_grade": '-',
 	        "prcnt_unprocessed_food_consumed":'-',

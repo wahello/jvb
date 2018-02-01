@@ -36,7 +36,7 @@ class Grades(models.Model,):
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
 	avg_sleep_per_night_gpa = models.FloatField(blank=True,null=True)
 	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
-	exercise_consistency_gpa = models.FloatField(blank=True, null=True)
+	exercise_consistency_score = models.FloatField(blank=True, null=True)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
 	overall_workout_gpa = models.FloatField(blank=True, null=True)
 	workout_duration_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
@@ -129,6 +129,7 @@ class ExerciseAndReporting(models.Model):
 	# pace = models.TimeField()
 
 	avg_heartrate = models.TextField(blank=True)
+	avg_exercise_heartrate = models.FloatField(blank=True,null=True)
 	elevation_gain = models.IntegerField(blank=True,null=True)
 	elevation_loss = models.IntegerField(blank=True,null=True)
 	effort_level = models.PositiveIntegerField(blank=True,null=True)
@@ -237,6 +238,7 @@ class Food(models.Model):
 		blank=True,null=True)
 
 	non_processed_food = models.TextField(blank=True)
+	processed_food = models.TextField(blank=True)
 
 	# choices are not provided, will be choice field in the future
 	diet_type = models.TextField(blank=True)
