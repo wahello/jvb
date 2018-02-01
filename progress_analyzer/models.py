@@ -65,6 +65,7 @@ class ExerciseStatsCumulative(models.Model):
 	cum_overall_workout_gpa = models.FloatField(blank=True, null=True)
 	cum_overall_exercise_gpa = models.FloatField(blank=True, null=True)
 	rank = models.BigIntegerField(blank=True, null=True)
+	overall_exercise_rank = models.BigIntegerField(blank=True, null=True)
 
 class AlcoholCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="alcohol_cum")
