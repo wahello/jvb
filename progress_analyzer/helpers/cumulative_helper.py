@@ -66,7 +66,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_avg_exercise_hr":None,
 			"cum_overall_workout_gpa":None,
 			"cum_overall_exercise_gpa":None,
-			"rank":None
+			"rank":None,
+			"overall_exercise_rank":None
 		}
 		return fields
 	elif model == "alcohol":
@@ -473,3 +474,31 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			_create_cumulative_instance(user, data)
 
 		current_date += timedelta(days = 1)
+
+def create_cum_raw_data(today_ql_data, yday_cum_data=None):
+	data = {"created_at":today_ql_data.created_at.strftime("%Y-%m-%d")}
+
+	if today_ql_data and yday_cum_data:
+		data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data,yday_cum_data)
+		data["non_exercise_steps_cum"] = _get_non_exercise_steps_cum_sum(today_ql_data,yday_cum_data)
+		data["sleep_per_night_cum"] = _get_sleep_per_night_cum_sum(today_ql_data,yday_cum_data)
+		data["movement_consistency_cum"] = _get_mc_cum_sum(today_ql_data,yday_cum_data)
+		data["exercise_consistency_cum"] = _get_ec_cum_sum(today_ql_data, yday_cum_data)
+		data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data, yday_cum_data)
+		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
+		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
+		data["penalty_cum"] = _get_penalty_cum_sum(today_ql_data, yday_cum_data)
+
+	elif today_ql_data:
+		# get current quicklook data and create cumulative sum
+		data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data)
+		data["non_exercise_steps_cum"] = _get_non_exercise_steps_cum_sum(today_ql_data)
+		data["sleep_per_night_cum"] = _get_sleep_per_night_cum_sum(today_ql_data)
+		data["movement_consistency_cum"] = _get_mc_cum_sum(today_ql_data)
+		data["exercise_consistency_cum"] = _get_ec_cum_sum(today_ql_data)
+		data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data)
+		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
+		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
+		data["penalty_cum"] = _get_penalty_cum_sum(today_ql_data)
+
+	return data
