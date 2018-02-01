@@ -1388,8 +1388,10 @@ def export_users_xls(request):
 				else:
 					if alcohol_data[key] == '':
 						sheet5.write(i + 2, row_num, '',format_exe)
+					elif alcohol_data[key] == '20+':
+						sheet5.write(i + 2, row_num, '20+')
 					else:
-						sheet5.write(i + 2, row_num, int(str(alcohol_data[key])),format_exe)
+						sheet5.write(i + 2, row_num, float(str(alcohol_data[key])),format_exe)
 		else:
 		
 			row_num += 1
