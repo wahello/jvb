@@ -36,6 +36,7 @@ export function getInitialState(start_dt, end_dt){
 	        "sleep_aid_penalty":'-',
 	        "ctrl_subs_penalty":'-',
 	        "smoke_penalty":'-',
+	        "overall_health_gpa_before_panalty":'-',
 
 	        
 	     //    "resting_hr":'-',

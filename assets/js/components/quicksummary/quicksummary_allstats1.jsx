@@ -70,13 +70,14 @@ const attrVerboseName = {
     workout_duration_grade:'Workout Duration Grade',
     workout_effortlvl_grade:'Workout Effort Level Grade',
     avg_exercise_hr_grade:'Average Exercise Heartrate Grade',
-    prcnt_unprocessed_food_consumed_grade: 'Percentage of Unprocessed Food Grade',
-    prcnt_unprocessed_food_consumed: 'Percentage of Unprocessed Food',
+    prcnt_unprocessed_food_consumed_grade: '% Unprocessed Food Grade',
+    prcnt_unprocessed_food_consumed: '% Unprocessed Food',
     alcoholic_drink_per_week_grade: 'Alcoholic Drink Per Week Grade',
     alcoholic_drink_per_week: 'Alcoholic Drink Per Week',
     sleep_aid_penalty:'Sleep Aid Penalty',
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
+    overall_health_gpa_before_panalty:'Overall Health GPA Before Penalties',
 
     // resting_hr:'Resting Heart Rate',
     // stress_level:'Stress Level',
@@ -160,8 +161,8 @@ class AllStats1 extends Component{
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
-            A: { background: 'green', color: 'black' },
-            B: { background: 'green', color: 'black' },
+            A: { background: 'green', color: 'white' },
+            B: { background: 'green', color: 'white' },
             C: { background: 'yellow', color: 'black'},
             D: { background: 'yellow', color: 'black'},
             F: { background: 'red', color: 'black' }
@@ -203,7 +204,20 @@ class AllStats1 extends Component{
                                                style:{}});
                             }
                         }
-
+                         else if(key === 'overall_health_gpa_before_panalty' ){
+                                   var i = parseFloat(value);
+                                   if(isNaN(i)) { i = 0.00; }
+                                   var minus = '';
+                                   if(i < 0) { minus = '-'; }
+                                   i = Math.abs(i);
+                                   i = parseInt((i + .005) * 100);
+                                   i = i / 100;
+                                   var s = new String(i);
+                                   if(s.indexOf('.') < 0) { s += '.00'; }
+                                   if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+                                   s = minus + s;
+                                   all_data.push({value: s});
+                                }
                        else if(key === 'overall_health_gpa'){
                            var i = parseFloat(value);
                            if(isNaN(i)) { i = 0.00; }
