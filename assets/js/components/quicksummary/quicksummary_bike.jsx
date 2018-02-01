@@ -57,7 +57,7 @@ render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3"
+			<div 
 			 >
 			 <Table
 		        rowsCount={rowsCount}
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 405;
+    return window.innerHeight - 335;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

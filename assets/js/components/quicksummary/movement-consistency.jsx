@@ -304,7 +304,7 @@ export default Dimensions({
     return window.innerHeight - 192;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :1000;
+    var widthOffset = window.innerWidth < 1024 ? 0 :600;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);
