@@ -68,8 +68,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 	 	const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3"
-			 >
+			<div>
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={65}
@@ -117,7 +116,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

@@ -51,14 +51,10 @@ componentDidMount(){
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){  
-			 console.log(value);
        			if(key !== 'id' && key !== 'user_ql' ){
               all_data.push(value);
            
-}
-
-
-				
+              }	
 			}
 
 			columns.push(
@@ -80,7 +76,7 @@ componentDidMount(){
 		 const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3">			
+			<div>			
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={65}
@@ -128,7 +124,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 380;
+    return window.innerHeight - 463;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth <1024 ? 0 : 3;

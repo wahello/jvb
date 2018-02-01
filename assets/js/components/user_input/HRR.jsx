@@ -260,7 +260,7 @@ toggle() {
 				{ (this.state.hr_down_99 == "yes") &&
 				  (this.state.lowest_hr_first_minute >= "60") &&
 
-				 <div  className="table-responsive input1">			       			       			    
+				 <div  className="table-responsive input1 tablecenter1">			       			       			    
 			         <table className="table table-bordered">
 			         <thead>
 			         <th>HRR time to 99</th>
@@ -404,7 +404,7 @@ toggle() {
 				{ (this.state.hr_down_99 == "no") &&
 				  (this.state.lowest_hr_first_minute >= "70") &&
 				<FormGroup>
-				 <div className="table-responsive input1">			       			       			         
+				 <div className="table-responsive input1 tablecenter1">			       			       			         
 			         <table className="table table-bordered">
 			         <thead>
 			         <th>HRR Time to 99</th>
