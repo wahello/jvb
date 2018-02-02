@@ -173,7 +173,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		let rowsCount = this.state.tableAttrColumn.length;
 
 		return(
-			<div className="quick3"
+			<div 
             >
 			 <Table
 		        rowsCount={rowsCount}
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

@@ -145,6 +145,9 @@ class UserInputs extends React.Component{
         diet_type:'',
         general_comment:'',
 
+        no_exercise_reason:'',
+        no_exercise_comment:'',
+
       };
       return initialState;
     }
@@ -171,7 +174,11 @@ class UserInputs extends React.Component{
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
       this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this);
+<<<<<<< HEAD
       this.handleChangeSleepHoursMin = handlers.handleChangeSleepHoursMin.bind(this);
+=======
+      this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
+>>>>>>> f237bde6186c5402a4e94b1f508529c03bdf9c74
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -235,8 +242,13 @@ class UserInputs extends React.Component{
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       }
       else {
+<<<<<<< HEAD
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
+=======
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+>>>>>>> f237bde6186c5402a4e94b1f508529c03bdf9c74
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
         let other_diet = true;
@@ -278,6 +290,8 @@ class UserInputs extends React.Component{
           editable: was_cloning ? true : false,
 
           workout:have_strong_input?data.data.strong_input.workout:'',
+          no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
+          no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
@@ -364,8 +378,13 @@ class UserInputs extends React.Component{
         let have_optional_input = data.data.optional_input?true:false;
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
+<<<<<<< HEAD
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
+=======
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+>>>>>>> f237bde6186c5402a4e94b1f508529c03bdf9c74
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
             other_diet = false;
@@ -1161,7 +1180,58 @@ handleScroll() {
                                </div>
                               </ModalBody>
                            </Modal>       
-                          
+                           {(this.state.workout === "no") &&
+                          <FormGroup>
+                              <Label className="padding">1.0.1 What Was The Reason You Did Not Exercise Today?</Label>
+
+                                  {this.state.editable &&
+                                    <div className="input1">
+                                        <Input 
+                                        type="select" 
+                                        className="custom-select form-control" 
+                                        name="no_exercise_reason"
+                                        value={this.state.no_exercise_reason}                                       
+                                        onChange={this.handleChangeNoExerciseReason}>
+                                                <option value="other">Other</option>
+                                                <option value="rest day">Rest Day</option> 
+                                                <option value="sick">Sick</option>
+                                                <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
+                                                <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
+                                                <option value="work got in the way">Work Got in the Way</option>
+                                                <option value="travel day">Travel Day</option>
+                                                <option value="weather">Weather</option>                                                                                                                                                                            
+                                      </Input>
+                                    </div>
+                                  }
+                                  {
+                                  !this.state.editable &&
+                                  <div className="input">
+                                    <p>{this.state.no_exercise_reason}</p>
+                                  </div>
+                                }
+                          </FormGroup>
+                        }
+                         {(this.state.workout === "no") &&
+                           <FormGroup>      
+                            <Label className="padding">1.0.2 No Exercise Reason Comments</Label>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Textarea  name="no_exercise_comment" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.no_exercise_comment}
+                                     onChange={this.handleChange}></Textarea>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.no_exercise_comment}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                        }
                           {(this.state.workout === "yes" || this.state.workout === "") &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
@@ -2335,7 +2405,7 @@ handleScroll() {
                             {
                               !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories === null ?this.state.calories : this.state.calories="NotEntered"}</p>
+                                <p>{this.state.calories ? this.state.calories : "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -2358,7 +2428,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item ?this.state.calories_item:this.state.calories_item="NotEntered"}</p>
+                                <p >{this.state.calories_item ? this.state.calories_item: "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -2765,7 +2835,11 @@ handleScroll() {
 
                                <div style={{paddingTop:"15px"}}>
                                 1. 1. Dairy (cheese, milk, yogurt, other refined milk products).
-                                  Unless you get it directly out of the animal, it is likely highly processed,
+                                      If you consumed any of these dairy products that you
+                                     (1) directly obtained from an animal at a local farm or
+                                     (2) obtained directly from a local farm that you know has
+                                     not been processed in any way (I.e., it has not been processed
+                                     at all, including no preservatives added), consider this Unprocessed
                                </div>
 
                                 <div style={{paddingTop:"15px"}}>
@@ -2789,9 +2863,8 @@ handleScroll() {
 
                                <div style={{paddingTop:"15px"}}>
                                   6. Lower quality oils are often highly processed and may become carcinogenic when heated up
-                                   (e.g., olive oil, coconut oil, avocado oils, corn oils, soybean oils, etc). If the lower quality,
-                                    highly processed  oil has been heated up to prepare/preserve your food,  you may want to consider
-                                     what you consumed processed,
+                                   (e.g., olive oil, coconut oil, avocado oils, corn oils, soybean oils, etc). “If you consume lower quality,
+                                    more highly processed oil, either raw or heated up, you may want to consider it processed
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
@@ -3166,9 +3239,8 @@ handleScroll() {
                                                 <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>   
-                                                 <option value="pescetarian">Pescetarian</option>                                                                                                                                                                         
-                                      </Input>
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>
+                                                <option value="pescetarian">Pescetarian</option>                                                                                                                                                                                                                  </Input>
                                     </div>
                                   }
                                   {

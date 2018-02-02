@@ -57,7 +57,7 @@ const attrVerboseName = {
     general_comment:'Genaral comment',
 
     overall_health_grade: 'Overall Health Grade',
-    overall_health_gpa: 'Overall Health Gpa',
+    overall_health_gpa: 'Overall Health GPA',
     movement_non_exercise_steps_grade: 'Movement Non Exercise steps Grade',
     movement_non_exercise_steps: 'Movement Non Exercise steps',
     movement_consistency_grade: 'Movement Consistency Grade',
@@ -65,35 +65,37 @@ const attrVerboseName = {
     avg_sleep_per_night_grade: 'Avg Sleep Per Night Grade',
     avg_sleep_per_night: 'Avg Sleep Per Night',
     exercise_consistency_grade: 'Exercise Consistency Grade',
+    workout_today: 'Did You Workout Today',
     exercise_consistency_score: 'Exercise Consistency Score',
     overall_workout_grade: 'Overall Workout Grade',
     workout_duration_grade:'Workout Duration Grade',
     workout_effortlvl_grade:'Workout Effort Level Grade',
     avg_exercise_hr_grade:'Average Exercise Heartrate Grade',
-    prcnt_unprocessed_food_consumed_grade: 'Percentage of Unprocessed Food Grade',
-    prcnt_unprocessed_food_consumed: 'Percentage of Unprocessed Food',
+    prcnt_unprocessed_food_consumed_grade: '% Unprocessed Food Grade',
+    prcnt_unprocessed_food_consumed: '% Unprocessed Food',
     alcoholic_drink_per_week_grade: 'Alcoholic Drink Per Week Grade',
     alcoholic_drink_per_week: 'Alcoholic Drink Per Week',
     sleep_aid_penalty:'Sleep Aid Penalty',
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
+    overall_health_gpa_before_panalty:'Overall Health GPA Before Penalties',
 
-    resting_hr:'Resting Heart Rate',
-    stress_level:'Stress Level',
-    stand_three_hours:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?', 
+    // resting_hr:'Resting Heart Rate',
+    // stress_level:'Stress Level',
+    // stand_three_hours:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?', 
 
-    overall_workout_grade:'Overall Workout Grade ',
-    overall_workout_score:'Overall Workout Score (points)',
-    workout_duration_grade:'Workout Duration Grade',
-    workout_duration:'Workout Duration',
-    workout_effortlvl_grade:'Workout Effort Level Grade',
-    workout_effortlvl:'Workout Effort Level',
-    avg_exercise_hr_grade:'Average Exercise Heart Rate Grade',
-    avg_exercise_hr:'Average Exercise Heart Rate',
-    time_to_99:'Heart Rate Recovery (HRR) - time to 99',
-    lowest_hr_first_minute:'Heart Rate Recovery (HRR) - heart beats lowered in the first minute ',
-    vo2_max:'VO2 Max',
-    floor_climed:'Floors Climbed',   
+    // overall_workout_grade:'Overall Workout Grade ',
+    // overall_workout_score:'Overall Workout Score (points)',
+    // workout_duration_grade:'Workout Duration Grade',
+    // workout_duration:'Workout Duration',
+    // workout_effortlvl_grade:'Workout Effort Level Grade',
+    // workout_effortlvl:'Workout Effort Level',
+    // avg_exercise_hr_grade:'Average Exercise Heart Rate Grade',
+    // avg_exercise_hr:'Average Exercise Heart Rate',
+    // time_to_99:'Heart Rate Recovery (HRR) - time to 99',
+    // lowest_hr_first_minute:'Heart Rate Recovery (HRR) - heart beats lowered in the first minute ',
+    // vo2_max:'VO2 Max',
+    // floor_climed:'Floors Climbed',   
 
     sleep_per_wearable: 'Sleep per Wearable (excluding awake time) (hh:mm)',
     sleep_comments:'Sleep Comments',
@@ -160,8 +162,8 @@ class AllStats1 extends Component{
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
-            A: { background: 'green', color: 'black' },
-            B: { background: 'green', color: 'black' },
+            A: { background: 'green', color: 'white' },
+            B: { background: 'green', color: 'white' },
             C: { background: 'yellow', color: 'black'},
             D: { background: 'yellow', color: 'black'},
             F: { background: 'red', color: 'black' }
@@ -203,7 +205,20 @@ class AllStats1 extends Component{
                                                style:{}});
                             }
                         }
-
+                         else if(key === 'overall_health_gpa_before_panalty' ){
+                                   var i = parseFloat(value);
+                                   if(isNaN(i)) { i = 0.00; }
+                                   var minus = '';
+                                   if(i < 0) { minus = '-'; }
+                                   i = Math.abs(i);
+                                   i = parseInt((i + .005) * 100);
+                                   i = i / 100;
+                                   var s = new String(i);
+                                   if(s.indexOf('.') < 0) { s += '.00'; }
+                                   if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+                                   s = minus + s;
+                                   all_data.push({value: s});
+                                }
                        else if(key === 'overall_health_gpa'){
                            var i = parseFloat(value);
                            if(isNaN(i)) { i = 0.00; }

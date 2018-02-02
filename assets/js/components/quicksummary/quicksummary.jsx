@@ -107,10 +107,10 @@ class Quicklook extends Component{
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        movement_consistency_score:data.steps_ql.movement_consistency,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
-			        avg_sleep_per_night:data.sleep_ql.sleep_per_user_input,
+			        avg_sleep_per_night:data.sleep_ql.sleep_per_wearable,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
-			        did_you_workout_today:data.grades_ql.did_you_workout_today,
-			        exercise_consistency_score:data.grades_ql.exercise_consistency_gpa,
+			        workout_today: user_input_data.strong_input.workout,
+			        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
@@ -118,23 +118,24 @@ class Quicklook extends Component{
 			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
 			        smoke_penalty:data.grades_ql.smoke_penalty,
+			        overall_health_gpa_before_panalty:data.grades_ql.overall_health_gpa+Math.abs(data.grades_ql.sleep_aid_penalty+data.grades_ql.ctrl_subs_penalty+data.grades_ql.smoke_penalty),
 	        
-			        resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
-			        stress_level:data.exercise_reporting_ql.stress_level,
-			        stand_three_hours:user_input_data.optional_input.stand_for_three_hours, 
+			     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
+			     //    stress_level:data.exercise_reporting_ql.stress_level,
+			     //    stand_three_hours:user_input_data.optional_input.stand_for_three_hours, 
 
-			        overall_workout_grade:data.grades_ql.overall_workout_grade,
-			        overall_workout_score:data.grades_ql.overall_workout_gpa,
-				    workout_duration_grade:data.grades_ql.workout_duration_grade,
-				    workout_duration:data.exercise_reporting_ql.workout_duration,
-				    workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
-				    workout_effortlvl:user_input_data.strong_input.workout_effort_level,
-				    avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
-				    avg_exercise_hr:data.grades_ql.avg_exercise_hr_gpa,
-				    time_to_99:user_input_data.encouraged_input.time_to_99,
-				    lowest_hr_first_minute:user_input_data.encouraged_input.lowest_hr_first_minute,
-				    vo2_max:data.exercise_reporting_ql.vo2_max,
-				    floor_climed:data.steps_ql.floor_climed,
+			     //    overall_workout_grade:data.grades_ql.overall_workout_grade,
+			     //    overall_workout_score:data.grades_ql.overall_workout_gpa,
+				    // workout_duration_grade:data.grades_ql.workout_duration_grade,
+				    // workout_duration:data.exercise_reporting_ql.workout_duration,
+				    // workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
+				    // workout_effortlvl:user_input_data.strong_input.workout_effort_level,
+				    // avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
+				    // avg_exercise_hr:data.exercise_reporting_ql.avg_exercise_heartrate,
+				    // time_to_99:user_input_data.encouraged_input.time_to_99,
+				    // lowest_hr_first_minute:user_input_data.encouraged_input.lowest_hr_first_minute,
+				    // vo2_max:data.exercise_reporting_ql.vo2_max,
+				    // floor_climed:data.steps_ql.floor_climed,
 	    		},
 
 			    exercise_reporting_ql: {
@@ -218,7 +219,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        processed_food_consumed: user_input_data.strong_input.list_of_processed_food_consumed_yesterday ,
+			        processed_food_consumed: data.food_ql.processed_food ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },
@@ -806,15 +807,15 @@ onLogoutSuccess(response){
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
                                             </DropdownItem>
-						    		 		 
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
-							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>	
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
+						    		 		 <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>
+							    		 	  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
+						    		 		 
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>

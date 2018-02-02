@@ -242,6 +242,10 @@ padding-top: 30px;
 input, textarea {
     font-size: initial;
 }
+.tablecenter1{
+	width: 330px;
+	overflow-x: scroll;
+}
 
 }
 
@@ -517,6 +521,7 @@ textarea.form-control{
     top:-100;
   }
 }
+
 @media screen and (max-width: 1200px) and (min-width: 769px) {
 #bed_hr{
 	width:100% !important;

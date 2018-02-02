@@ -9,10 +9,6 @@ body{
 	border-color: gray;
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
 }
-
-.tablecenter{
-	overflow-x: hidden;
-}
 .createbutton{
 		font-family:futura-pt;
 		background-color: rgb(237, 149, 7);
@@ -27,9 +23,18 @@ body{
 	.tablecenter{
 	overflow-x: scroll;
 }
+#pdf_button{
+	padding-left:110px;
+}
 }
 #link_style{
 	text-align: left;
     font-weight: bold;
-    font-size: 26px;
+    font-size: 22px;
+}
+.pdf_button{
+	padding-left: 600px;
+}
+#progress{
+	padding-left: 50px;
 }

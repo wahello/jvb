@@ -17,42 +17,43 @@ import NumberFormat from 'react-number-format';
 	 this.state = {
       myTableData: [
         {name: 'Overall Health Grade'},
-        {name: 'Overall Health Gpa'},
-        {name: 'Movement Non Exercise steps Grade'},   
-        {name: 'Movement Non Exercise steps'},
+        {name: 'Overall Health GPA'},
+        {name: 'Non Exercise steps Grade'},   
+        {name: 'Non Exercise steps'},
         {name: 'Movement Consistency Grade'},
         {name: 'Movement Consistency Score'}, 
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
-        {name: 'Did you Workout Today'},
+        {name: 'Did You Workout Today'},
         {name: 'Exercise Consistency Score'},
-        {name: 'Percentage of Unprocessed Food Grade'},
-        {name: 'Percentage of Unprocessed Food'}, 
+        {name: '% Unprocessed Food Grade'},
+        {name: '% Unprocessed Food'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
         {name: '# of Drinks Consumed Over the Last 7 Days'},
         {name: 'Sleep Aid Penalty'},
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
+        {name:'Overall Health GPA Before Penalties'},
         
-        {name:'NOT GRADED CATEGORIES'},
-        {name:'Resting Heart Rate'},
-        {name:'Stress Level'},
-        {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
+        // {name:'NOT GRADED CATEGORIES'},
+        // {name:'Resting Heart Rate'},
+        // {name:'Stress Level'},
+        // {name:'Did you Stand for 3 hours or more above and beyond your exercise yesterday?'},
         
-        {name:'PERFORMANCE ASSESSMENT'},
-        {name: 'Overall Workout Grade '},
-        {name: 'Overall Workout Score (points)'},
-        {name: 'Workout Duration Grade'},   
-        {name: 'Workout Duration'},
-        {name: 'Workout Effort Level Grade'},
-        {name: 'Workout Effort Level'}, 
-        {name: 'Average Exercise Heart Rate Grade'},
-        {name: 'Average Exercise Heart Rate'},
-        {name: 'Heart Rate Recovery (HRR) - time to 99'},
-        {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
-        {name: 'VO2 Max'}, 
-        {name: 'Floors Climbed '},          
+        // {name:'PERFORMANCE ASSESSMENT'},
+        // {name: 'Overall Workout Grade '},
+        // {name: 'Overall Workout Score (points)'},
+        // {name: 'Workout Duration Grade'},   
+        // {name: 'Workout Duration'},
+        // {name: 'Workout Effort Level Grade'},
+        // {name: 'Workout Effort Level'}, 
+        // {name: 'Average Exercise Heart Rate Grade'},
+        // {name: 'Average Exercise Heart Rate'},
+        // {name: 'Heart Rate Recovery (HRR) - time to 99'},
+        // {name: 'Heart Rate Recovery (HRR) - heart beats lowered in the first minute '},
+        // {name: 'VO2 Max'}, 
+        // {name: 'Floors Climbed '},          
       ],
     };
   }
@@ -61,11 +62,12 @@ renderTableColumns(dateWiseData,category,classes=""){
     console.log(dateWiseData);
     let columns = [];
     const obj = {
-        A: { background: 'green', color: 'black'},
-        B: { background: 'green', color: 'black' },
+        A: { background: 'green', color: 'white'},
+        B: { background: 'green', color: 'white' },
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
+        penalty:{background: 'red', color: 'black' },        
     };
 
     for(let [date,data] of Object.entries(dateWiseData)){
@@ -82,6 +84,20 @@ renderTableColumns(dateWiseData,category,classes=""){
             }
 
             if(key === 'overall_health_gpa' ){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
+            else if(key === 'overall_health_gpa_before_panalty' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
                var minus = '';
@@ -125,7 +141,7 @@ renderTableColumns(dateWiseData,category,classes=""){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
-                  style:''
+                  style:obj['penalty']
                 });
               }else{
                 all_data.push({
@@ -177,7 +193,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3">
+			<div>
 			 <Table
 			 	className="responsive"
 		        rowsCount={rowsCount}
@@ -224,7 +240,7 @@ const styles = StyleSheet.create({
 });
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;
