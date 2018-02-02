@@ -113,8 +113,22 @@ function formatJSON(data){
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
-	json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
-	json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
+	
+    json_data.strong_input['sleep_bedtime_date'] = data.sleep_bedtime_date;
+    json_data.strong_input['sleep_hours_bed_time'] = data.sleep_hours_bed_time;  
+    json_data.strong_input['sleep_mins_bed_time'] = data.sleep_mins_bed_time;
+    json_data.strong_input['sleep_bedtime_am_pm'] = data.sleep_bedtime_am_pm;
+    json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime_date+data.sleep_hours_bed_time+":"+data.sleep_mins_bed_time+data.sleep_bedtime_am_pm;
+
+    json_data.strong_input['sleep_awake_time_date'] = data.sleep_awake_time_date;
+    json_data.strong_input['sleep_hours_awake_time'] = data.sleep_hours_awake_time;
+    json_data.strong_input['sleep_mins_awake_time'] = data.sleep_mins_awake_time;
+    json_data.strong_input['sleep_awake_time_am_pm'] = data.sleep_awake_time_am_pm; 
+    json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time_date+data.sleep_hours_awake_time+":"+data.sleep_mins_awake_time+data.sleep_awake_time_am_pm;
+      
+
+	// json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
+	// json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
 	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;

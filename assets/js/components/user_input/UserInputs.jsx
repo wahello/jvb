@@ -116,8 +116,14 @@ class UserInputs extends React.Component{
 
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
-        sleep_bedtime:null,
-        sleep_awake_time:null,
+        sleep_bedtime_date:null,
+        sleep_hours_bed_time:'',
+        sleep_mins_bed_time:'',
+        sleep_awake_time_date:null,
+        sleep_hours_awake_time:'',
+        sleep_mins_awake_time:'',
+        sleep_bedtime_am_pm:'am',
+        sleep_awake_time_am_pm:'am',
         awake_hours:'',
         awake_mins:'',
         sleep_comment:'',
@@ -164,7 +170,8 @@ class UserInputs extends React.Component{
       this.handleCaloriesItemCheck = handlers.handleCaloriesItemCheck.bind(this);
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
-      this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this)
+      this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this);
+      this.handleChangeSleepHoursMin = handlers.handleChangeSleepHoursMin.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -229,7 +236,7 @@ class UserInputs extends React.Component{
       }
       else {
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
         let other_diet = true;
@@ -333,6 +340,7 @@ class UserInputs extends React.Component{
           stand:have_optional_input?data.data.optional_input.stand_for_three_hours:'',
           food_consumed:have_optional_input?data.data.optional_input.list_of_processed_food_consumed_yesterday:'',
           weight:have_optional_input?data.data.optional_input.weight:'',
+           sleep_awake_time_am_pm:have_optional_input?data.data.optional_input.sleep_awake_time_am_pm:'',
           waist:have_optional_input?data.data.optional_input.waist_size:'',
           clothes_size:have_optional_input?data.data.optional_input.clothes_size:'',
           heart_variability:have_optional_input?data.data.optional_input.heart_rate_variability:'',
@@ -341,9 +349,9 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
-          } 
+          // if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+          //   fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          // } 
           window.scrollTo(0,0);
         });
       }
@@ -357,7 +365,7 @@ class UserInputs extends React.Component{
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
             other_diet = false;
@@ -414,15 +422,63 @@ class UserInputs extends React.Component{
       });
      }
     }
+getDTMomentObj(dt,hour,min,am_pm){
+  hour = parseInt(hour);
+  min = parseInt(min);
+
+  if(am_pm == 'am' && hour == 12){
+    hour = 0
+  }
+  if (am_pm == 'pm' && hour != 12){
+    hour = parseInt(hour)+12;
+  }
+  let y = dt.year();
+  let m = dt.month();
+  let d = dt.date();
+  let sleep_bedtime_dt = moment({ 
+    year :y,
+    month :m,
+    day :d,
+    hour :hour,
+    minute :min
+  });
+  return sleep_bedtime_dt;
+}
 
 getTotalSleep(){
-     let sleep_bedtime = this.state.sleep_bedtime;
-     let sleep_awake_time = this.state.sleep_awake_time;
+     let sleep_bedtime_date = this.state.sleep_bedtime_date;
+     let sleep_hours_bed_time=this.state.sleep_hours_bed_time;
+     let sleep_mins_bed_time=this.state.sleep_mins_bed_time;
+     let sleep_bedtime_am_pm = this.state.sleep_bedtime_am_pm;
+     let sleep_bedtime_dt = null;
+     if (sleep_bedtime_date && sleep_hours_bed_time
+         && sleep_mins_bed_time && sleep_bedtime_am_pm){
+        sleep_bedtime_dt = this.getDTMomentObj(sleep_bedtime_date,sleep_hours_bed_time,
+          sleep_mins_bed_time,sleep_bedtime_am_pm)
+     }
+     
+     let sleep_awake_time_date = this.state.sleep_awake_time_date;
+     let sleep_hours_awake_time=this.state.sleep_hours_awake_time;
+     let sleep_mins_awake_time=this.state.sleep_mins_awake_time;
+     let sleep_awake_time_am_pm = this.state.sleep_awake_time_am_pm;
+     console.log(sleep_awake_time_date);
+     console.log(sleep_hours_awake_time);
+     console.log(sleep_mins_awake_time);
+     console.log(sleep_awake_time_am_pm);
+     let sleep_awake_time_dt = null;
+     if (sleep_awake_time_date && sleep_hours_awake_time
+         && sleep_mins_awake_time && sleep_awake_time_am_pm){
+        sleep_awake_time_dt = this.getDTMomentObj(sleep_awake_time_date,sleep_hours_awake_time,
+          sleep_mins_awake_time,sleep_awake_time_am_pm)
+     }
+
      let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
      let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
      let awake_time_in_mins = awake_hours*60 + awake_mins;
-     if(sleep_bedtime && sleep_awake_time){
-       let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins;
+     console.log(sleep_bedtime_dt);
+     console.log(sleep_awake_time_dt);
+     if(sleep_bedtime_dt && sleep_awake_time_dt){
+       let diff = sleep_awake_time_dt.diff(sleep_bedtime_dt,'minutes')-awake_time_in_mins;
        let hours = Math.floor(diff/60);
        let mins = diff % 60;
        if(mins < 10)
@@ -636,19 +692,19 @@ handleScroll() {
     });
    }
    infoPrint(){
-    var mywindow = window.open('', 'PRINT');
+    var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
         '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
         '.print {visibility: hidden;}' +
         '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
-        '</style><title>' + document.title  + '</title>');
+        '</style><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
-    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById('modal1').innerHTML);
     mywindow.document.write('</body></html>');
 
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
 
     mywindow.print();
     mywindow.close();
@@ -1752,6 +1808,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? 
+
                             <span id="fast"
                              onClick={this.toggleFasted} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -1792,6 +1849,7 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.fasted == 'yes' &&
+
                                 <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
                                   <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
@@ -2359,63 +2417,161 @@ handleScroll() {
                           
                             <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="input1">
+                              <div className="col-xs-12 col-md-12 col-sm-12">
+                              <div className="input col-xs-12 col-md-4 col-sm-4">
                                 <DatePicker
                                     id="datepicker"
-                                    name = "sleep_bedtime"
-                                    selected={this.state.sleep_bedtime}
+                                    name = "sleep_bedtime_date"
+                                    selected={this.state.sleep_bedtime_date}
                                     onChange={this.handleChangeSleepBedTime}
-                                    showTimeSelect
-                                    excludeTimes={[moment().hours(17).minutes(0), moment().hours(18).minutes(0), moment().hours(19).minutes(0)], moment().hours(17).minutes(0)}
-                                    timeIntervals={1}
-                                    dateFormat="LLL"
+                                    
+                                    dateFormat="LL"
                                     isClearable={true}
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
+                               <div className="col-xs-12 col-md-3 col-sm-3">
+                                  <div className="input"> 
+                                <Input type="select" name="sleep_hours_bed_time"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_bed_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="col-xs-12  col-md-3 col-sm-3 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="sleep_mins_bed_time"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_bed_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+
+                                 <div className="input1 col-xs-12 col-md-2 col-sm-2">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     name="sleep_bedtime_am_pm"                                  
+                                     value={this.state.sleep_bedtime_am_pm}
+                                     onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="am">AM</option>
+                                                <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      
+
+                              </div>
+                              </div>
                             }
-                            {
+
+                           {
                               !this.state.editable &&
                               <div className="input">
-                                <p>
-                                  {
-                                    this.state.sleep_bedtime != null?
-                                    this.state.sleep_bedtime.format('MMMM Do YYYY, h:mm a'): ''
-                                  }
-                                </p>
+                              {(this.state.sleep_bedtime_date && this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time && this.state.sleep_bedtime_am_pm) &&
+                                <p>{this.state.sleep_bedtime_date.format('MMMM Do YYYY, ')}{this.state.sleep_hours_bed_time} :{this.state.sleep_mins_bed_time}  {this.state.sleep_bedtime_am_pm}</p>
+                              }
                               </div>
-                            }                          
+                            }     
+
+
+
+
+
+
+
+
+                                                
                           </FormGroup>
                            <FormGroup>
                           
                             <Label className="padding">2.2 Time Woke Up As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="input1">
+                              <div className="col-xs-12 col-md-12 col-sm-12">
+                              <div className="input col-xs-4 col-md-4 col-sm-4" id="date_pickr">
                                 <DatePicker
                                     id="datepicker"
-                                    name = "sleep_awake_time"
-                                    selected={this.state.sleep_awake_time}
+                                    name = "sleep_awake_time_date"
+                                    selected={this.state.sleep_awake_time_date}
                                     onChange={this.handleChangeSleepAwakeTime}
-                                    showTimeSelect
-                                     excludeTimes={[moment().hours(17).minutes(0), moment().hours(18).minutes(0), moment().hours(19).minutes(0)], moment().hours(17).minutes(0)}
-                                    timeIntervals={1}
-                                    dateFormat="LLL"
+                                   
+                                    dateFormat="LL"
                                     isClearable={true}
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
+
+                               <div className="col-xs-3 col-md-3 col-sm-3">
+                                  <div className="input"> 
+                                <Input type="select" name="sleep_hours_awake_time"
+                                id="bed_hr"
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_awake_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="col-xs-3 col-md-3  col-sm-3 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="sleep_mins_awake_time"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_awake_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+
+                                 <div className="input1 col-xs-2 col-md-2 col-sm-2">
+                                  <Input type="select" 
+                                     className="custom-select form-control"
+                                     id="tme_typ"
+                                     name="sleep_awake_time_am_pm"                                  
+                                     value={this.state.sleep_awake_time_am_pm}
+                                     onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="am">AM</option>
+                                                <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      
+
+                              </div>
+                              </div>
                             }
+
                             {
                               !this.state.editable &&
                               <div className="input">
                                 <p >
                                   {
-                                    this.state.sleep_awake_time != null?
-                                    this.state.sleep_awake_time.format('MMMM Do YYYY, h:mm a'): ''
+                                    this.state.sleep_awake_time_date != null?
+                                    this.state.sleep_awake_time_date.format('MMMM Do YYYY, ')+this.state.sleep_hours_awake_time+":"+ this.state.sleep_mins_awake_time +this.state.sleep_awake_time_am_pm: ''
                                   }
                                 </p>
                               </div>
-                            }                          
+                            }     
+
+
+
+
+
+
+                   
                           </FormGroup>
                            <FormGroup>
                           
@@ -3010,7 +3166,8 @@ handleScroll() {
                                                 <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>                                                                                                                                                                            
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>   
+                                                 <option value="pescetarian">Pescetarian</option>                                                                                                                                                                         
                                       </Input>
                                     </div>
                                   }
