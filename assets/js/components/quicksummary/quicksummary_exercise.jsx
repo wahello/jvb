@@ -124,7 +124,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             else if((key == 'dew_point' && (value && value != '-')) ||
                     (key == 'temperature' && (value && value != '-'))||
                     (key == 'temperature_feels_like' && (value && value != '-'))){
-                all_data.push(this.toFahrenheit(value).toFixed(2));
+                all_data.push(value);
             }
             else if(key == 'workout_duration' && value && (value != '-' && value != '')){
                 let hms = value.split(':');
