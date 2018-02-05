@@ -504,10 +504,10 @@ getDTMomentObj(dt,hour,min,am_pm){
   hour = hour ? parseInt(hour) : 0;
   min = min ? parseInt(min) : 0;
 
-  if(am_pm == 'am' &&  hour == 12){
+  if(am_pm == 'am' && hour && hour == 12){
     hour = 0
   }
-  if (am_pm == 'pm' &&  hour != 12){
+  if (am_pm == 'pm' && hour && hour != 12){
     hour = hour + 12;
   }
   let y = dt.year();
@@ -520,7 +520,6 @@ getDTMomentObj(dt,hour,min,am_pm){
     hour :hour,
     minute :min
   });
-  console.log(sleep_bedtime_dt);
   return sleep_bedtime_dt;
 }
 
@@ -2609,7 +2608,8 @@ handleScroll() {
                             }     
 
 
-                           
+
+
 
 
 
