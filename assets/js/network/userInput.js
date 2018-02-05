@@ -6,26 +6,29 @@ import 'moment-timezone';
 axiosRetry(axios, { retries: 3}); 
 
 function createMomentObj(dt,hour,min,am_pm){
-  hour = hour ? parseInt(hour) : 0;
-  min = min ? parseInt(min) : 0;
+  if(dt && hour && min && am_pm){
+	  hour = hour ? parseInt(hour) : 0;
+	  min = min ? parseInt(min) : 0;
 
-  if(am_pm == 'am' && hour && hour == 12){
-    hour = 0
-  }
-  if (am_pm == 'pm' && hour && hour != 12){
-    hour = parseInt(hour)+12;
-  }
-  let y = dt.year();
-  let m = dt.month();
-  let d = dt.date();
-  let date_format = moment({
-    year :y,
-    month :m,
-    day :d,
-    hour :hour,
-    minute :min
-  });
-  return date_format;
+	  if(am_pm == 'am' && hour && hour == 12){
+	    hour = 0
+	  }
+	  if (am_pm == 'pm' && hour && hour != 12){
+	    hour = parseInt(hour)+12;
+	  }
+	  let y = dt.year();
+	  let m = dt.month();
+	  let d = dt.date();
+	  let date_format = moment({
+	    year :y,
+	    month :m,
+	    day :d,
+	    hour :hour,
+	    minute :min
+	  });
+	  return date_format;
+	}
+  return null
 }
 
 
