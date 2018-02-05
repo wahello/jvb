@@ -138,7 +138,7 @@ padding-top: 30px;
 		font-style: normal;
 		 font-size: 14px;
 		color:#5e5e5e;
-		width:120%;
+		width:100%; 
 	}
 	.input1{
 		padding:0px 0px 0px 23px;
@@ -181,10 +181,10 @@ padding-top: 30px;
 		position: relative;
 	}
 #bed_min{
-		width:120% !important;
+		width:100% !important;
 	}
 	#bed_hr{
-		width:120% !important;
+		width:100% !important;
 	}
 	.food h2{
 		text-align:center;
@@ -535,40 +535,33 @@ textarea.form-control{
 }
 
 @media screen and (max-width: 768px) and (min-width: 481px) {
-#bed_hr, .date_pick, #bed_min{
-	width:100% !important;
+
+.pad_input{
+	padding:0;
 }
-.small_screen{
-	width:25%;
+.date_width{
+	margin-left:9% !important;
+	width:112% !important;
 }
-.small_screen2, .small_screen4{
-	width:25% !important;
+#datepicker{
+	width:100%;
 }
+
 
 	}
-// @media screen and (max-width: 480px) and (min-width: 320px) {
-// 	.input{
-// 		width:100% !important;
-// 	}
-// 	#hours, #minutes{
-// 		width:100% !important;
-// 	}
 
-// 	.date_pick, .date_type{
-// 		width:60% ;
-// margin-bottom:5px;
-// 	}
-// 	#datepicker{
-// 		margin-left:15px;
-// 		margin-bottom:5px;
-// 	}
-// 	.date_type{
-// 		margin-left:15px;
-// 	}
-// 	#bed_hr, #bed_min{
-// 	width:112% !important;
-// }
-// }
 @media screen and (max-width: 480px) and (min-width: 320px) {
-	
+	.input_width{
+	width:50%;
+}
+.pad_input{
+	padding:0;
+}
+.date_width{
+	margin-left:9% !important;
+	width:112% !important;
+}
+.picker_width{
+	width:50%;
+}
 }

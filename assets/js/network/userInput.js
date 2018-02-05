@@ -5,7 +5,32 @@ import 'moment-timezone';
 
 axiosRetry(axios, { retries: 3}); 
 
+function createMomentObj(dt,hour,min,am_pm){
+  hour = parseInt(hour);
+  min = parseInt(min);
+
+  if(am_pm == 'am' && hour == 12){
+    hour = 0
+  }
+  if (am_pm == 'pm' && hour != 12){
+    hour = parseInt(hour)+12;
+  }
+  let y = dt.year();
+  let m = dt.month();
+  let d = dt.date();
+  let date_format = moment({
+    year :y,
+    month :m,
+    day :d,
+    hour :hour,
+    minute :min
+  });
+  return date_format;
+}
+
+
 function formatJSON(data){   
+	console.log(data);
 	/* This function will format the form
 		 data into JSON acceptable by API.
 		 example - 
@@ -91,18 +116,30 @@ function formatJSON(data){
 		    }
 	}
 	*/
-	const d = data.selected_date.getDate();
-    const m = data.selected_date.getMonth()+1;
-    const y = data.selected_date.getFullYear();
-    const created_at = y+"-"+m+"-"+d;
+
+	// const d = data.selected_date.getDate();
+ //    const m = data.selected_date.getMonth()+1;
+ //    const y = data.selected_date.getFullYear();
+    const created_at = moment(data.selected_date).format("YYYY-MM-DD");
+
+   
+  const sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
+  	data.sleep_hours_bed_time,
+  	data.sleep_mins_bed_time,
+  	data.sleep_bedtime_am_pm);
+  const  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
+  	data.sleep_hours_awake_time,
+  	data.sleep_mins_awake_time,
+  	data.sleep_awake_time_am_pm);
 
 	let json_data = {
 		"created_at":created_at,
 		"timezone":moment.tz.guess(),
 		"strong_input":{},   
 		"encouraged_input":{},
-		"optional_input":{}
+		"optional_input":{},
 	};
+
 	json_data.strong_input['workout'] = data.workout;
 	json_data.strong_input['no_exercise_reason'] = data.no_exercise_reason,
 	json_data.strong_input['no_exercise_comment'] = data.no_exercise_comment,
@@ -117,22 +154,8 @@ function formatJSON(data){
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
-	
-    json_data.strong_input['sleep_bedtime_date'] = data.sleep_bedtime_date;
-    json_data.strong_input['sleep_hours_bed_time'] = data.sleep_hours_bed_time;  
-    json_data.strong_input['sleep_mins_bed_time'] = data.sleep_mins_bed_time;
-    json_data.strong_input['sleep_bedtime_am_pm'] = data.sleep_bedtime_am_pm;
-    json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime_date+data.sleep_hours_bed_time+":"+data.sleep_mins_bed_time+data.sleep_bedtime_am_pm;
-
-    json_data.strong_input['sleep_awake_time_date'] = data.sleep_awake_time_date;
-    json_data.strong_input['sleep_hours_awake_time'] = data.sleep_hours_awake_time;
-    json_data.strong_input['sleep_mins_awake_time'] = data.sleep_mins_awake_time;
-    json_data.strong_input['sleep_awake_time_am_pm'] = data.sleep_awake_time_am_pm; 
-    json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time_date+data.sleep_hours_awake_time+":"+data.sleep_mins_awake_time+data.sleep_awake_time_am_pm;
-      
-
-	// json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
-	// json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
+	json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
+	json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
 	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;

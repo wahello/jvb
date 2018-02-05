@@ -174,11 +174,10 @@ class UserInputs extends React.Component{
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
       this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this);
-<<<<<<< HEAD
+
       this.handleChangeSleepHoursMin = handlers.handleChangeSleepHoursMin.bind(this);
-=======
+
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
->>>>>>> f237bde6186c5402a4e94b1f508529c03bdf9c74
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -242,13 +241,9 @@ class UserInputs extends React.Component{
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       }
       else {
-<<<<<<< HEAD
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
-=======
+
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
->>>>>>> f237bde6186c5402a4e94b1f508529c03bdf9c74
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
         let other_diet = true;
@@ -378,13 +373,9 @@ class UserInputs extends React.Component{
         let have_optional_input = data.data.optional_input?true:false;
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
-<<<<<<< HEAD
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
-=======
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
->>>>>>> f237bde6186c5402a4e94b1f508529c03bdf9c74
+
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
             other_diet = false;
@@ -2487,8 +2478,8 @@ handleScroll() {
                           
                             <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="col-xs-12 col-md-12 col-sm-12">
-                              <div className="input col-xs-12 col-md-4 col-sm-4">
+                              <div className="col-xs-12 col-md-12 col-sm-12 " >
+                              <div className="input col-xs-12 col-md-4 col-sm-4 picker_width">
                                 <DatePicker
                                     id="datepicker"
                                     name = "sleep_bedtime_date"
@@ -2500,8 +2491,8 @@ handleScroll() {
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
-                               <div className="col-xs-12 col-md-3 col-sm-3">
-                                  <div className="input"> 
+                               <div className="col-xs-12 col-md-3 col-sm-3 pad_input">
+                                  <div className="input input_width"> 
                                 <Input type="select" name="sleep_hours_bed_time"
                                 id="bed_hr"
 
@@ -2514,8 +2505,8 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="col-xs-12  col-md-3 col-sm-3 justify-content-right">
-                               <div className="input">
+                                <div className="col-xs-12 pad_input col-md-3 col-sm-3 justify-content-right">
+                               <div className="input input_width">
                                 <Input type="select" name="sleep_mins_bed_time"
                                  id="bed_min"
                                 className="form-control custom-select "
@@ -2528,9 +2519,9 @@ handleScroll() {
                                 </div>
 
 
-                                 <div className="input1 col-xs-12 col-md-2 col-sm-2">
+                                 <div className="input1 col-xs-12 pad_input col-md-2 col-sm-2">
                                   <Input type="select" 
-                                     className="custom-select form-control"
+                                     className="custom-select form-control input_width"
                                      name="sleep_bedtime_am_pm"                                  
                                      value={this.state.sleep_bedtime_am_pm}
                                      onChange={this.handleChangeSleepHoursMin} >
@@ -2566,8 +2557,8 @@ handleScroll() {
                           
                             <Label className="padding">2.2 Time Woke Up As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="col-xs-12 col-md-12 col-sm-12">
-                              <div className="input col-xs-4 col-md-4 col-sm-4" id="date_pickr">
+                              <div className="col-xs-12 col-md-12 col-sm-12 ">
+                              <div className="input col-xs-4 col-md-4 col-sm-4 picker_width" id="date_pickr">
                                 <DatePicker
                                     id="datepicker"
                                     name = "sleep_awake_time_date"
@@ -2580,8 +2571,8 @@ handleScroll() {
                                 />
                               </div>
 
-                               <div className="col-xs-3 col-md-3 col-sm-3">
-                                  <div className="input"> 
+                               <div className="col-xs-3 col-md-3 col-sm-3 pad_input">
+                                  <div className="input input_width"> 
                                 <Input type="select" name="sleep_hours_awake_time"
                                 id="bed_hr"
                                 className="form-control custom-select"
@@ -2593,8 +2584,8 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="col-xs-3 col-md-3  col-sm-3 justify-content-right">
-                               <div className="input">
+                                <div className="col-xs-3 col-md-3  pad_input col-sm-3 justify-content-right">
+                               <div className="input input_width">
                                 <Input type="select" name="sleep_mins_awake_time"
                                  id="bed_min"
                                 className="form-control custom-select "
@@ -2607,9 +2598,9 @@ handleScroll() {
                                 </div>
 
 
-                                 <div className="input1 col-xs-2 col-md-2 col-sm-2">
+                                 <div className="input1 col-xs-2 col-md-2 col-sm-2 pad_input">
                                   <Input type="select" 
-                                     className="custom-select form-control"
+                                     className="custom-select form-control input_width"
                                      id="tme_typ"
                                      name="sleep_awake_time_am_pm"                                  
                                      value={this.state.sleep_awake_time_am_pm}
