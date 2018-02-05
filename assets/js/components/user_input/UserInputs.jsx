@@ -391,6 +391,7 @@ class UserInputs extends React.Component{
           window.scrollTo(0,0);
         });
       }else{
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure)
         this.onFetchFailure(data)
       }
     }
