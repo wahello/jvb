@@ -551,9 +551,7 @@ textarea.form-control{
 	}
 
 @media screen and (max-width: 480px) and (min-width: 320px) {
-	.input_width{
-	width:50%;
-}
+	
 .pad_input{
 	padding:0;
 }
@@ -561,7 +559,11 @@ textarea.form-control{
 	margin-left:9% !important;
 	width:112% !important;
 }
-.picker_width{
-	width:50%;
+#datepicker{
+	width:172%;
+}
+.mar_styles{
+	margin-top:2%;
+
 }
 }
