@@ -119,10 +119,10 @@ class UserInputs extends React.Component{
         sleep_bedtime_date:null,
         sleep_hours_bed_time:'',
         sleep_mins_bed_time:'',
+        sleep_bedtime_am_pm:'am',
         sleep_awake_time_date:null,
         sleep_hours_awake_time:'',
         sleep_mins_awake_time:'',
-        sleep_bedtime_am_pm:'am',
         sleep_awake_time_am_pm:'am',
         awake_hours:'',
         awake_mins:'',
@@ -235,8 +235,44 @@ class UserInputs extends React.Component{
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
+
+    _extractDateTimeInfo(dateObj){
+      let datetimeInfo = {
+        calendarDate:null,
+        hour:'',
+        min:'',
+        meridiem:''
+      }
+
+      if(dateObj){
+        dateObj = moment(dateObj);
+        datetimeInfo['calendarDate'] = moment({ 
+          year :dateObj.year(),
+          month :dateObj.month(),
+          day :dateObj.date()
+        });
+
+        let hour = dateObj.hour();
+        if(hour < 12){
+          if(hour == 0)
+            hour = 12;
+          datetimeInfo['hour'] = hour;
+          datetimeInfo['meridiem'] = 'am';
+        }
+        else if(hour >= 12){
+          if(hour > 12)
+            hour -= 12;
+          datetimeInfo['hour'] = hour;
+          datetimeInfo['meridiem'] = 'pm';
+        }
+        let mins = dateObj.minute();
+        mins = (mins < 10) ? '0'+mins : mins;
+        datetimeInfo['min'] = mins;
+      }
+      return datetimeInfo;
+    }
     
-    onFetchSuccess(data,clone_form=undefined){
+    onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       }
@@ -274,9 +310,17 @@ class UserInputs extends React.Component{
           has_calories_data = true;
         }
 
+        let sleep_bedtime_info = this._extractDateTimeInfo(null);
+        if(have_strong_input && data.data.strong_input.sleep_bedtime && canUpdateForm)
+          sleep_bedtime_info = this._extractDateTimeInfo(data.data.strong_input.sleep_bedtime);
+
+        let sleep_awake_time_info = this._extractDateTimeInfo(null);
+        if(have_strong_input && data.data.strong_input.sleep_awake_time && canUpdateForm)
+          sleep_awake_time_info = this._extractDateTimeInfo(data.data.strong_input.sleep_awake_time);
+
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
-          update_form:clone_form,
+          update_form:canUpdateForm,
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           cloning_data:false,
           fetching_data:false,
@@ -332,12 +376,22 @@ class UserInputs extends React.Component{
           time_to_lowest_point_sec:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
 
 
-          sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
-          sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
-          sleep_bedtime:data.data.strong_input.sleep_bedtime? moment(data.data.strong_input.sleep_bedtime):null,
-          sleep_awake_time:data.data.strong_input.sleep_awake_time ? moment(data.data.strong_input.sleep_awake_time):null,
-          awake_hours:data.data.strong_input.awake_time.split(':')[0],
-          awake_mins:data.data.strong_input.awake_time.split(':')[1],
+          sleep_hours_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
+          sleep_mins_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
+         
+          sleep_bedtime_date:sleep_bedtime_info.calendarDate,
+          sleep_hours_bed_time:sleep_bedtime_info.hour,
+          sleep_mins_bed_time:sleep_bedtime_info.min,
+          sleep_bedtime_am_pm:sleep_bedtime_info.meridiem,
+
+          sleep_awake_time_date:sleep_awake_time_info.calendarDate,
+          sleep_hours_awake_time:sleep_awake_time_info.hour,
+          sleep_mins_awake_time:sleep_awake_time_info.min,
+          sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
+         
+          awake_hours:(have_strong_input&&canUpdateForm)?data.data.strong_input.awake_time.split(':')[0]:'',
+          awake_mins:(have_strong_input&&canUpdateForm)?data.data.strong_input.awake_time.split(':')[1]:'',
+
           sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
           prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
           sleep_aid_taken:have_strong_input?data.data.strong_input.sleep_aid_taken:'',
@@ -349,7 +403,6 @@ class UserInputs extends React.Component{
           stand:have_optional_input?data.data.optional_input.stand_for_three_hours:'',
           food_consumed:have_optional_input?data.data.optional_input.list_of_processed_food_consumed_yesterday:'',
           weight:have_optional_input?data.data.optional_input.weight:'',
-           sleep_awake_time_am_pm:have_optional_input?data.data.optional_input.sleep_awake_time_am_pm:'',
           waist:have_optional_input?data.data.optional_input.waist_size:'',
           clothes_size:have_optional_input?data.data.optional_input.clothes_size:'',
           heart_variability:have_optional_input?data.data.optional_input.heart_rate_variability:'',
@@ -358,9 +411,9 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          // if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-          //   fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
-          // } 
+          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          } 
           window.scrollTo(0,0);
         });
       }
@@ -403,7 +456,7 @@ class UserInputs extends React.Component{
           window.scrollTo(0,0);
         });
       }else{
-        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure)
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
         this.onFetchFailure(data)
       }
     }
@@ -411,11 +464,16 @@ class UserInputs extends React.Component{
     onFetchGarminSuccess(data){
       let sleep_bedtime = data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null;
       let sleep_awake_time = data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null;
+
+      let sleep_bedtime_info = this._extractDateTimeInfo(sleep_bedtime);
+      let sleep_awake_time_info = this._extractDateTimeInfo(sleep_awake_time);
+
       let awake_hours = data.data.awake_time?data.data.awake_time.split(':')[0]:'';
       awake_hours = awake_hours?parseInt(awake_hours):0
       let awake_mins = data.data.awake_time?data.data.awake_time.split(':')[1]:'';
       awake_mins = awake_mins?parseInt(awake_mins):0
       let awake_time_in_mins = awake_hours*60 + awake_mins;
+
       if(sleep_bedtime && sleep_awake_time){
         let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
         let hours = Math.floor(diff/60);
@@ -424,8 +482,16 @@ class UserInputs extends React.Component{
            mins = `0${mins}`;
 
         this.setState({
-          sleep_bedtime:data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null,
-          sleep_awake_time:data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null,
+          sleep_bedtime_date:sleep_bedtime_info.calendarDate,
+          sleep_hours_bed_time:sleep_bedtime_info.hour,
+          sleep_mins_bed_time:sleep_bedtime_info.min,
+          sleep_bedtime_am_pm:sleep_bedtime_info.meridiem,
+
+          sleep_awake_time_date:sleep_awake_time_info.calendarDate,
+          sleep_hours_awake_time:sleep_awake_time_info.hour,
+          sleep_mins_awake_time:sleep_awake_time_info.min,
+          sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
+
           awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
           awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:'',
           sleep_hours_last_night:hours,
@@ -433,15 +499,16 @@ class UserInputs extends React.Component{
       });
      }
     }
-getDTMomentObj(dt,hour,min,am_pm){
-  hour = parseInt(hour);
-  min = parseInt(min);
 
-  if(am_pm == 'am' && hour == 12){
+getDTMomentObj(dt,hour,min,am_pm){
+  hour = hour ? parseInt(hour) : 0;
+  min = min ? parseInt(min) : 0;
+
+  if(am_pm == 'am' && hour && hour == 12){
     hour = 0
   }
-  if (am_pm == 'pm' && hour != 12){
-    hour = parseInt(hour)+12;
+  if (am_pm == 'pm' && hour && hour != 12){
+    hour = hour + 12;
   }
   let y = dt.year();
   let m = dt.month();
@@ -472,10 +539,6 @@ getTotalSleep(){
      let sleep_hours_awake_time=this.state.sleep_hours_awake_time;
      let sleep_mins_awake_time=this.state.sleep_mins_awake_time;
      let sleep_awake_time_am_pm = this.state.sleep_awake_time_am_pm;
-     console.log(sleep_awake_time_date);
-     console.log(sleep_hours_awake_time);
-     console.log(sleep_mins_awake_time);
-     console.log(sleep_awake_time_am_pm);
      let sleep_awake_time_dt = null;
      if (sleep_awake_time_date && sleep_hours_awake_time
          && sleep_mins_awake_time && sleep_awake_time_am_pm){
@@ -486,8 +549,7 @@ getTotalSleep(){
      let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
      let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
      let awake_time_in_mins = awake_hours*60 + awake_mins;
-     console.log(sleep_bedtime_dt);
-     console.log(sleep_awake_time_dt);
+     
      if(sleep_bedtime_dt && sleep_awake_time_dt){
        let diff = sleep_awake_time_dt.diff(sleep_bedtime_dt,'minutes')-awake_time_in_mins;
        let hours = Math.floor(diff/60);
@@ -2540,7 +2602,7 @@ handleScroll() {
                               !this.state.editable &&
                               <div className="input">
                               {(this.state.sleep_bedtime_date && this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time && this.state.sleep_bedtime_am_pm) &&
-                                <p>{this.state.sleep_bedtime_date.format('MMMM Do YYYY, ')}{this.state.sleep_hours_bed_time} :{this.state.sleep_mins_bed_time}  {this.state.sleep_bedtime_am_pm}</p>
+                                <p>{this.state.sleep_bedtime_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_bed_time}:{this.state.sleep_mins_bed_time}  {this.state.sleep_bedtime_am_pm}</p>
                               }
                               </div>
                             }     
@@ -2619,12 +2681,9 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >
-                                  {
-                                    this.state.sleep_awake_time_date != null?
-                                    this.state.sleep_awake_time_date.format('MMMM Do YYYY, ')+this.state.sleep_hours_awake_time+":"+ this.state.sleep_mins_awake_time +this.state.sleep_awake_time_am_pm: ''
-                                  }
-                                </p>
+                                  {(this.state.sleep_bedtime_date && this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time && this.state.sleep_bedtime_am_pm) &&
+                                  <p>{this.state.sleep_awake_time_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_awake_time}:{this.state.sleep_mins_awake_time}  {this.state.sleep_awake_time_am_pm}</p>
+                              }
                               </div>
                             }     
 
@@ -2670,8 +2729,8 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                              {(this.state.awake_hours && this.state.awake_mins) &&
-                                <p>{this.state.awake_hours} hours {this.state.awake_mins} minutes</p>
+                              {
+                                <p>{this.state.awake_hours?this.state.awake_hours:0} hours {this.state.awake_mins?this.state.awake_mins:0} minutes</p>
                               }
                               </div>
                             }                          

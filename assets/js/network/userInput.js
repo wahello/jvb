@@ -6,13 +6,13 @@ import 'moment-timezone';
 axiosRetry(axios, { retries: 3}); 
 
 function createMomentObj(dt,hour,min,am_pm){
-  hour = parseInt(hour);
-  min = parseInt(min);
+  hour = hour ? parseInt(hour) : 0;
+  min = min ? parseInt(min) : 0;
 
-  if(am_pm == 'am' && hour == 12){
+  if(am_pm == 'am' && hour && hour == 12){
     hour = 0
   }
-  if (am_pm == 'pm' && hour != 12){
+  if (am_pm == 'pm' && hour && hour != 12){
     hour = parseInt(hour)+12;
   }
   let y = dt.year();
@@ -30,7 +30,7 @@ function createMomentObj(dt,hour,min,am_pm){
 
 
 function formatJSON(data){   
-	console.log(data);
+
 	/* This function will format the form
 		 data into JSON acceptable by API.
 		 example - 
@@ -117,20 +117,16 @@ function formatJSON(data){
 	}
 	*/
 
-	// const d = data.selected_date.getDate();
- //    const m = data.selected_date.getMonth()+1;
- //    const y = data.selected_date.getFullYear();
     const created_at = moment(data.selected_date).format("YYYY-MM-DD");
-
    
-  const sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
-  	data.sleep_hours_bed_time,
-  	data.sleep_mins_bed_time,
-  	data.sleep_bedtime_am_pm);
-  const  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
-  	data.sleep_hours_awake_time,
-  	data.sleep_mins_awake_time,
-  	data.sleep_awake_time_am_pm);
+	const sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
+		data.sleep_hours_bed_time,
+		data.sleep_mins_bed_time,
+		data.sleep_bedtime_am_pm);
+	const  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
+		data.sleep_hours_awake_time,
+		data.sleep_mins_awake_time,
+		data.sleep_awake_time_am_pm);
 
 	let json_data = {
 		"created_at":created_at,
@@ -154,8 +150,8 @@ function formatJSON(data){
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
-	json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
-	json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
+	json_data.strong_input['sleep_bedtime'] = sleep_bedtime;
+	json_data.strong_input['sleep_awake_time'] = sleep_awake_time;
 	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;
