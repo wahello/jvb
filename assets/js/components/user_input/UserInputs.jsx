@@ -2554,7 +2554,7 @@ handleScroll() {
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
-                               <div className="col-xs-12 col-md-3 col-sm-3 pad_input">
+                               <div className="col-xs-12 col-md-3 col-sm-3 pad_input mar_styles">
                                   <div className="input input_width"> 
                                 <Input type="select" name="sleep_hours_bed_time"
                                 id="bed_hr"
@@ -2568,7 +2568,7 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="col-xs-12 pad_input col-md-3 col-sm-3 justify-content-right">
+                                <div className="col-xs-12 pad_input mar_styles col-md-3 col-sm-3 justify-content-right">
                                <div className="input input_width">
                                 <Input type="select" name="sleep_mins_bed_time"
                                  id="bed_min"
@@ -2582,7 +2582,7 @@ handleScroll() {
                                 </div>
 
 
-                                 <div className="input1 col-xs-12 pad_input col-md-2 col-sm-2">
+                                 <div className="input1 col-xs-12 pad_input mar_styles col-md-2 col-sm-2">
                                   <Input type="select" 
                                      className="custom-select form-control input_width"
                                      name="sleep_bedtime_am_pm"                                  
@@ -2634,7 +2634,7 @@ handleScroll() {
                                 />
                               </div>
 
-                               <div className="col-xs-3 col-md-3 col-sm-3 pad_input">
+                               <div className="col-xs-3 col-md-3 col-sm-3 pad_input mar_styles">
                                   <div className="input input_width"> 
                                 <Input type="select" name="sleep_hours_awake_time"
                                 id="bed_hr"
@@ -2647,7 +2647,7 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="col-xs-3 col-md-3  pad_input col-sm-3 justify-content-right">
+                                <div className="col-xs-3 col-md-3  pad_input mar_styles col-sm-3 justify-content-right">
                                <div className="input input_width">
                                 <Input type="select" name="sleep_mins_awake_time"
                                  id="bed_min"
@@ -2661,7 +2661,7 @@ handleScroll() {
                                 </div>
 
 
-                                 <div className="input1 col-xs-2 col-md-2 col-sm-2 pad_input">
+                                 <div className="input1 col-xs-2 col-md-2 col-sm-2 mar_styles pad_input">
                                   <Input type="select" 
                                      className="custom-select form-control input_width"
                                      id="tme_typ"
