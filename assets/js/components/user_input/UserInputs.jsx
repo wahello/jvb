@@ -241,7 +241,7 @@ class UserInputs extends React.Component{
         calendarDate:null,
         hour:'',
         min:'',
-        meridiem:''
+        meridiem:'am'
       }
 
       if(dateObj){
@@ -2681,7 +2681,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                  {(this.state.sleep_bedtime_date && this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time && this.state.sleep_bedtime_am_pm) &&
+                                  {(this.state.sleep_awake_time_date && this.state.sleep_hours_awake_time && this.state.sleep_mins_awake_time && this.state.sleep_awake_time_am_pm) &&
                                   <p>{this.state.sleep_awake_time_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_awake_time}:{this.state.sleep_mins_awake_time}  {this.state.sleep_awake_time_am_pm}</p>
                               }
                               </div>

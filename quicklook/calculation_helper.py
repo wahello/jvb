@@ -472,13 +472,13 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 
 	if target_sleep_data:
 		sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('deepSleepDurationInSeconds'),
+									target_sleep_data.get('deepSleepDurationInSeconds',0),
 									include_sec=False)
 		sleep_stats['light_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('lightSleepDurationInSeconds'),
+									target_sleep_data.get('lightSleepDurationInSeconds',0),
 									include_sec=False)
 		sleep_stats['awake_time'] = sec_to_hours_min_sec(
-									target_sleep_data.get('awakeDurationInSeconds'),
+									target_sleep_data.get('awakeDurationInSeconds',0),
 									include_sec=False)
 
 		if yesterday_sleep_data is not None and user_submitted_sleep:
