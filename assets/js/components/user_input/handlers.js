@@ -6,7 +6,7 @@ export function handleChange(event){
 	[name]: value
   });
 }
-export function handleChangeSleepLast(event,getTotalSleep){
+export function handleChangeSleepLast(event){
  const target = event.target;
   const value = target.value;
   const name = target.name;
@@ -28,10 +28,9 @@ export function handleChangeSleepLast(event,getTotalSleep){
   });
 }
 
-export function handleChangeSleepBedTime(date,getTotalSleep){
-  const name = event.target.name;
+export function handleChangeSleepBedTime(date){
   this.setState({
-      sleep_bedtime: date
+    sleep_bedtime_date:date
     },()=>{
     let duration = this.getTotalSleep();
      if(duration)
@@ -49,10 +48,29 @@ export function handleChangeSleepBedTime(date,getTotalSleep){
 
 }
 
-export function handleChangeSleepAwakeTime(date,getTotalSleep){
+export function handleChangeSleepHoursMin(event){
+  const value = event.target.value;
   const name = event.target.name;
   this.setState({
-      sleep_awake_time: date
+  [name]: value
+  },()=>{
+    let duration = this.getTotalSleep();
+     if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+      this.setState({
+        sleep_hours_last_night:hours,
+        sleep_mins_last_night:mins
+      })
+    }
+  });
+}
+
+export function handleChangeSleepAwakeTime(date){
+  const name = event.target.name;
+  this.setState({
+      sleep_awake_time_date: date,
     },()=>{
     let duration = this.getTotalSleep();
     if(duration)

@@ -380,6 +380,14 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			min_duration = min_start_time if min_start_time <= min_duration else min_duration
 		return min_duration
 
+	# def _get_deep_light_awake_sleep_duration(data):
+	# 	durations = {'deep':0,'light':0,'awake':0}
+	# 	sleep_level_maps = data.get('sleepLevelsMap')
+	# 	for lvl_type,lvl_data in sleep_level_maps.items():
+	# 		durations[lvl_type] += (datetime.utcfromtimestamp(lvl_data['endTimeInSeconds'])
+	# 			- datetime.utcfromtimestamp(lvl_data['startTimeInSeconds']))
+	# 	return durations
+
 	recent_auto_manual = None
 	recent_auto_final = None
 	recent_auto_tentative = None
@@ -415,6 +423,8 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			next_day_midnight = datetime.combine((start_time+timedelta(days=1)).date(),time(0))
 			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
 			if end_time > next_day_midnight:
+				# if 'MANUAL' in obj.get('validation',None)':
+				# 	recent_auto_manual = obj
 				if obj.get('validation',None) == 'AUTO_MANUAL':
 					recent_auto_manual = obj
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
@@ -472,13 +482,13 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 
 	if target_sleep_data:
 		sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('deepSleepDurationInSeconds'),
+									target_sleep_data.get('deepSleepDurationInSeconds',0),
 									include_sec=False)
 		sleep_stats['light_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('lightSleepDurationInSeconds'),
+									target_sleep_data.get('lightSleepDurationInSeconds',0),
 									include_sec=False)
 		sleep_stats['awake_time'] = sec_to_hours_min_sec(
-									target_sleep_data.get('awakeDurationInSeconds'),
+									target_sleep_data.get('awakeDurationInSeconds',0),
 									include_sec=False)
 
 		if yesterday_sleep_data is not None and user_submitted_sleep:
