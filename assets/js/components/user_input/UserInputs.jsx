@@ -2556,7 +2556,7 @@ handleScroll() {
                                 />
                               </div>
                               </div>
-                               <div className="align_width align_width1 margin_tp">
+                               <div className="align_width_time align_width1 margin_tp">
                                   <div className="input "> 
                                 <Input type="select" name="sleep_hours_bed_time"
                                 id="bed_hr"
@@ -2570,7 +2570,7 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="align_width align_width1 margin_tp">
+                                <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="sleep_mins_bed_time"
                                  id="bed_min"
@@ -2583,7 +2583,7 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="align_width align_width1 margin_tp">
+                                <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
                                      className="custom-select form-control "
@@ -2637,7 +2637,7 @@ handleScroll() {
                                 />
                               </div>
                               </div>  
-                               <div className="align_width align_width1 margin_tp">
+                               <div className="align_width_time align_width1 margin_tp">
                                   <div className="input "> 
                                 <Input type="select" name="sleep_hours_awake_time"
                                 id="bed_hr"
@@ -2650,7 +2650,7 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="align_width align_width1 margin_tp">
+                                <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="sleep_mins_awake_time"
                                  id="bed_min"
@@ -2663,7 +2663,7 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="align_width align_width1 margin_tp">
+                                <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
                                      className="custom-select form-control input_width"
