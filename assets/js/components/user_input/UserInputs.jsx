@@ -2093,7 +2093,7 @@ handleScroll() {
                                 onClick={this.handleWeatherCheck}
                                 >
                                 </Input>
-                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout
+                                <Label className="LAbel" style={{paddingLeft:"25px"}}>1.11 I want to manually enter in weather information for my workout
                                  <span id="wether"
                              onClick={this.toggleWeather} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -2421,7 +2421,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                         <FormGroup>
                           {this.state.editable &&
-                          <div className="input1">
+                          <div className="input1" style={{paddingLeft:"25px"}}>
                           <Input
                           type="checkbox"
                           checked = {this.state.calories_item_check}
