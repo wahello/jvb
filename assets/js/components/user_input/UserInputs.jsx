@@ -2541,8 +2541,9 @@ handleScroll() {
                           
                             <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="col-xs-12 col-md-12 col-sm-12 " >
-                              <div className="input col-xs-12 col-md-4 col-sm-4 picker_width">
+                              <div className=" display_flex" >
+                              <div className="align_width align_width1">
+                              <div className="input ">
                                 <DatePicker
                                     id="datepicker"
                                     name = "sleep_bedtime_date"
@@ -2554,8 +2555,9 @@ handleScroll() {
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
-                               <div className="col-xs-12 col-md-3 col-sm-3 pad_input mar_styles">
-                                  <div className="input input_width"> 
+                              </div>
+                               <div className="align_width align_width1 margin_tp">
+                                  <div className="input "> 
                                 <Input type="select" name="sleep_hours_bed_time"
                                 id="bed_hr"
 
@@ -2568,8 +2570,8 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="col-xs-12 pad_input mar_styles col-md-3 col-sm-3 justify-content-right">
-                               <div className="input input_width">
+                                <div className="align_width align_width1 margin_tp">
+                               <div className="input ">
                                 <Input type="select" name="sleep_mins_bed_time"
                                  id="bed_min"
                                 className="form-control custom-select "
@@ -2581,10 +2583,10 @@ handleScroll() {
                                 </div>
                                 </div>
 
-
-                                 <div className="input1 col-xs-12 pad_input mar_styles col-md-2 col-sm-2">
+                                <div className="align_width align_width1 margin_tp">
+                                 <div className="input1 ">
                                   <Input type="select" 
-                                     className="custom-select form-control input_width"
+                                     className="custom-select form-control "
                                      name="sleep_bedtime_am_pm"                                  
                                      value={this.state.sleep_bedtime_am_pm}
                                      onChange={this.handleChangeSleepHoursMin} >
@@ -2592,7 +2594,7 @@ handleScroll() {
                                                 <option value="pm">PM</option> 
                                     
                                      </Input>
-                                      
+                                      </div> 
 
                               </div>
                               </div>
@@ -2620,8 +2622,9 @@ handleScroll() {
                           
                             <Label className="padding">2.2 Time Woke Up As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="col-xs-12 col-md-12 col-sm-12 ">
-                              <div className="input col-xs-4 col-md-4 col-sm-4 picker_width" id="date_pickr">
+                              <div className="display_flex ">
+                              <div className="align_width align_width1">
+                              <div className="input " id="date_pickr">
                                 <DatePicker
                                     id="datepicker"
                                     name = "sleep_awake_time_date"
@@ -2633,9 +2636,9 @@ handleScroll() {
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
-
-                               <div className="col-xs-3 col-md-3 col-sm-3 pad_input mar_styles">
-                                  <div className="input input_width"> 
+                              </div>  
+                               <div className="align_width align_width1 margin_tp">
+                                  <div className="input "> 
                                 <Input type="select" name="sleep_hours_awake_time"
                                 id="bed_hr"
                                 className="form-control custom-select"
@@ -2647,8 +2650,8 @@ handleScroll() {
                                 </div>
                                 </div>
 
-                                <div className="col-xs-3 col-md-3  pad_input mar_styles col-sm-3 justify-content-right">
-                               <div className="input input_width">
+                                <div className="align_width align_width1 margin_tp">
+                               <div className="input ">
                                 <Input type="select" name="sleep_mins_awake_time"
                                  id="bed_min"
                                 className="form-control custom-select "
@@ -2660,8 +2663,8 @@ handleScroll() {
                                 </div>
                                 </div>
 
-
-                                 <div className="input1 col-xs-2 col-md-2 col-sm-2 mar_styles pad_input">
+                                <div className="align_width align_width1 margin_tp">
+                                 <div className="input1 ">
                                   <Input type="select" 
                                      className="custom-select form-control input_width"
                                      id="tme_typ"
@@ -2672,7 +2675,7 @@ handleScroll() {
                                                 <option value="pm">PM</option> 
                                     
                                      </Input>
-                                      
+                               </div>      
 
                               </div>
                               </div>

@@ -258,8 +258,14 @@ h3{
        color:#103047;
 	}
 
-
-
+.display_flex{
+	display:inline-flex;
+	width:100%;
+}
+.align_width{
+	width:20%;
+	margin-left:4%;
+}
 	.input{
 		padding:0px ;
 		font-family: Proxima-Nova;
@@ -522,48 +528,17 @@ textarea.form-control{
   }
 }
 
-@media screen and (max-width: 1200px) and (min-width: 769px) {
-#bed_hr{
-	width:100% !important;
-}
-#bed_min{
-	width:100% !important;
-}
-.date_pick{
-	width:105% !important;
-}
-}
-
-@media screen and (max-width: 768px) and (min-width: 481px) {
-
-.pad_input{
-	padding:0;
-}
-.date_width{
-	margin-left:9% !important;
-	width:112% !important;
-}
-#datepicker{
+@media screen and (max-width: 480px) and (min-width: 320px) {
+	.display_flex{
+	display:block;
+	margin-left:4%;
 	width:100%;
 }
-
-
-	}
-
-@media screen and (max-width: 480px) and (min-width: 320px) {
+.align_width1{
+	width:50%;
 	
-.pad_input{
-	padding:0;
 }
-.date_width{
-	margin-left:9% !important;
-	width:112% !important;
-}
-#datepicker{
-	width:172%;
-}
-.mar_styles{
-	margin-top:2%;
-
+.margin_tp{
+	margin-top:3%;
 }
 }
