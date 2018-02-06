@@ -1123,14 +1123,15 @@ handleScroll() {
                                         name="no_exercise_reason"
                                         value={this.state.no_exercise_reason}                                       
                                         onChange={this.handleChangeNoExerciseReason}>
-                                                <option value="other">Other</option>
+                                                <option value=" ">Select</option>                                        
                                                 <option value="rest day">Rest Day</option> 
                                                 <option value="sick">Sick</option>
                                                 <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
                                                 <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
                                                 <option value="work got in the way">Work Got in the Way</option>
                                                 <option value="travel day">Travel Day</option>
-                                                <option value="weather">Weather</option>                                                                                                                                                                            
+                                                <option value="weather">Weather</option>
+                                                <option value="other">Other</option>                                                                                                                                                                            
                                       </Input>
                                     </div>
                                   }
