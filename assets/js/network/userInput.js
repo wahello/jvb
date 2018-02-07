@@ -143,6 +143,12 @@ function formatJSON(data){
 	json_data.strong_input['no_exercise_reason'] = data.no_exercise_reason,
 	json_data.strong_input['no_exercise_comment'] = data.no_exercise_comment,
 	json_data.strong_input['workout_type'] = data.workout_type;
+	json_data.strong_input['strength_workout_start_hour'] = data.strength_workout_start_hour;
+	json_data.strong_input['strength_workout_start_min'] = data.strength_workout_start_min;
+	json_data.strong_input['strength_workout_start_am_pm'] = data.strength_workout_start_am_pm;
+	json_data.strong_input['strength_workout_end_hour'] = data.strength_workout_end_hour;
+	json_data.strong_input['strength_workout_end_min'] = data.strength_workout_end_min;
+	json_data.strong_input['strength_workout_end_am_pm'] = data.strength_workout_end_am_pm;
 	json_data.strong_input['workout_input_type'] = data.workout_input_type;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
