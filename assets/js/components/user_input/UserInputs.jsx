@@ -74,10 +74,10 @@ class UserInputs extends React.Component{
         workout_input_type:'',
         strength_workout_start_hour:'',
         strength_workout_start_min:'',
-        strength_workout_start_am_pm:'am',
+        strength_workout_start_am_pm:'',
         strength_workout_end_hour:'',
         strength_workout_end_min:'',        
-        strength_workout_end_am_pm:'am',
+        strength_workout_end_am_pm:'',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -1424,6 +1424,7 @@ handleScroll() {
                                      name="strength_workout_start_am_pm"                                  
                                      value={this.state.strength_workout_start_am_pm}
                                      onChange={this.handleChange} >
+                                       <option value="">AM/PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     
@@ -1486,6 +1487,7 @@ handleScroll() {
                                      name="strength_workout_end_am_pm"                                  
                                      value={this.state.strength_workout_end_am_pm}
                                      onChange={this.handleChange} >
+                                     <option value="">AM/PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     

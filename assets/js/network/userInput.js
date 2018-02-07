@@ -31,7 +31,11 @@ function createMomentObj(dt,hour,min,am_pm){
   return null
 }
 
-
+function createString(hour,min,pm_am){
+	if(hour && min && pm_am)
+		return hour+':'+min+' '+pm_am;
+	return '';
+}
 function formatJSON(data){   
 
 	/* This function will format the form
@@ -130,7 +134,12 @@ function formatJSON(data){
 		data.sleep_hours_awake_time,
 		data.sleep_mins_awake_time,
 		data.sleep_awake_time_am_pm);
-
+	const strength_workout_start = createString(data.strength_workout_start_hour,
+		strength_workout_start_min,
+		strength_workout_start_am_pm);
+	const strength_workout_end = createString(data.strength_workout_end_hour,
+		strength_workout_end_min,
+		strength_workout_end_am_pm);
 	let json_data = {
 		"created_at":created_at,
 		"timezone":moment.tz.guess(),
@@ -143,12 +152,8 @@ function formatJSON(data){
 	json_data.strong_input['no_exercise_reason'] = data.no_exercise_reason,
 	json_data.strong_input['no_exercise_comment'] = data.no_exercise_comment,
 	json_data.strong_input['workout_type'] = data.workout_type;
-	json_data.strong_input['strength_workout_start_hour'] = data.strength_workout_start_hour;
-	json_data.strong_input['strength_workout_start_min'] = data.strength_workout_start_min;
-	json_data.strong_input['strength_workout_start_am_pm'] = data.strength_workout_start_am_pm;
-	json_data.strong_input['strength_workout_end_hour'] = data.strength_workout_end_hour;
-	json_data.strong_input['strength_workout_end_min'] = data.strength_workout_end_min;
-	json_data.strong_input['strength_workout_end_am_pm'] = data.strength_workout_end_am_pm;
+	json_data.strong_input['strength_workout_start'] = strength_workout_start;
+	json_data.strong_input['strength_workout_end'] = strength_workout_end;
 	json_data.strong_input['workout_input_type'] = data.workout_input_type;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
