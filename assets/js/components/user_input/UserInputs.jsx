@@ -338,12 +338,12 @@ class UserInputs extends React.Component{
           no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
           no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
-          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour:'',
-          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min:'',
-          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm:'',
-          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour:'',
-          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min:'',        
-          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm:'',
+          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour.split(':')[0]:'',
+          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min.split(':')[1]:'',
+          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm.split(' ')[3]:'',
+          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour.split(':')[0]:'',
+          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min.split(':')[1]:'',        
+          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm.split(' ')[2]:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
           workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
@@ -1487,7 +1487,7 @@ handleScroll() {
                                      name="strength_workout_end_am_pm"                                  
                                      value={this.state.strength_workout_end_am_pm}
                                      onChange={this.handleChange} >
-                                     <option value="">AM/PM</option>
+                                       <option value="">AM/PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     
