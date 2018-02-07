@@ -72,6 +72,12 @@ class UserInputs extends React.Component{
         workout:'',
         workout_type:'',
         workout_input_type:'',
+        strength_workout_start_hour:'',
+        strength_workout_start_min:'',
+        strength_workout_start_am_pm:'am',
+        strength_workout_end_hour:'',
+        strength_workout_end_min:'',        
+        strength_workout_end_am_pm:'am',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -332,6 +338,12 @@ class UserInputs extends React.Component{
           no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
           no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
+          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour:'',
+          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min:'',
+          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm:'',
+          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour:'',
+          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min:'',        
+          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
           workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
@@ -1371,7 +1383,132 @@ handleScroll() {
                               exercises, pull ups, etc.  
                                </div>
                               </ModalBody>
-                           </Modal>                         
+                           </Modal> 
+                           {(this.state.workout_type =="strength" || 
+                           this.state.workout_type =="both") &&
+                           <FormGroup>
+                            <Label className="padding">1.1.1 Enter the time your strength workout started.</Label>
+                            {this.state.editable &&
+                              <div className="display_flex">
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="strength_workout_start_hour"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.strength_workout_start_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="strength_workout_start_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.strength_workout_start_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="strength_workout_start_am_pm"                                  
+                                     value={this.state.strength_workout_start_am_pm}
+                                     onChange={this.handleChange} >
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                            }
+                            </FormGroup> 
+                            }                           
+                            <FormGroup>
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                          
+                                <p>{this.state.strength_workout_start_hour}:{this.state.strength_workout_start_min}  {this.state.strength_workout_start_am_pm}</p>
+                          
+                              </div>
+                            } 
+                            </FormGroup> 
+
+                        
+                         {(this.state.workout_type =="strength" ||  this.state.workout_type == "both") &&
+                         <FormGroup>
+                            <Label className="padding">1.1.2 Enter the Time your Strength Workout Ended.</Label>
+                            {this.state.editable &&
+                              <div className = "display_flex">
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="strength_workout_end_hour"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.strength_workout_end_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="strength_workout_end_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.strength_workout_end_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="strength_workout_end_am_pm"                                  
+                                     value={this.state.strength_workout_end_am_pm}
+                                     onChange={this.handleChange} >
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                            }
+                            </FormGroup>
+                          }
+                            <FormGroup>
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                
+                                <p>{this.state.strength_workout_end_hour}:{this.state.strength_workout_end_min}  {this.state.strength_workout_end_am_pm}</p>
+                              
+                              </div>
+                            } 
+                            </FormGroup> 
+
+                        
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
