@@ -236,12 +236,23 @@ class UserInputs extends React.Component{
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
+      this.extractString = this.extractString.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
-
+extractString(){
+  let str = "7:30 am";
+  let h = str.split(":");
+  let hour=h[0];
+  let m = h[1].split(" ");
+  let min = m[0];
+  let am = m[1];
+  let str1 = hours+":"+min+" "+am;
+  return str1;
+  console.log(str1); 
+}
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
@@ -338,12 +349,12 @@ class UserInputs extends React.Component{
           no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
           no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
-          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour.split(':')[0]:'',
-          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min.split(':')[1]:'',
-          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm.split(' ')[2]:'',
-          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour.split(':')[0]:'',
-          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min.split(':')[1]:'',        
-          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm.split(' ')[2]:'',
+          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour:'',
+          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min:'',
+          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm:'',
+          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour:'',
+          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min:'',        
+          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
           workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
