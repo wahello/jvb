@@ -155,6 +155,9 @@ class DailyUserInputStrong(models.Model):
         blank = True
     )
 
+    strength_workout_start = models.CharField(max_length = 10, blank=True)
+    strength_workout_end = models.CharField(max_length = 10, blank=True)
+
     workout_input_type = models.CharField(
         max_length = 10,
         choices = WORKOUT_INPUT_TYPE_CHOICES,
