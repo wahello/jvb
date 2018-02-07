@@ -1452,3 +1452,32 @@ def export_users_xls(request):
 
 	book.close()
 	return response
+
+def export_movement_consistency_xls(request):
+	filename = '{}_Movemenr_Consistency_data.xlsx'.format(request.user.username)
+	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+	response['Content-Disposition'] = "attachment; filename={}".format(filename)
+	book = Workbook(response,{'in_memory': True})
+	sheet1 = book.add_worksheet('Movement Consistency')
+	# steps_qs = Steps.objects.filter(
+	# 	user_ql__created_at__range=(from_date, to_date),
+	# 	user_ql__user = request.user).order_by('-user_ql__created_at')
+
+	# steps_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
+	# 	 for q in steps_qs }
+
+	steps_qs = Steps.objects.all()
+
+	steps_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
+		 for q in steps_qs }
+	sheet1.write(2,0,"Hour")
+	sheet1.write(3,0,"Date")
+	sheet1.write(3,1,"Daily Movement Consistency Score")
+	sheet1.write(3,2,"Total Daily Steps")
+	col_num = 2
+	for hour in range(1,25,1):
+		col_num += 1
+		sheet1.write(2,col_num,hour)
+
+	book.close()
+	return response
