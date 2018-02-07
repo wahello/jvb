@@ -133,14 +133,15 @@ padding-top: 30px;
     font-family: futura-pt;
       }
 	.input{
-		padding:0px 17px;
+		padding:0px ;
 		font-family: Proxima-Nova;
 		font-style: normal;
 		 font-size: 14px;
 		color:#5e5e5e;
+		width:100%; 
 	}
 	.input1{
-		padding:0px 17px 0px 23px;
+		padding:0px 0px 0px 23px;
 		font-family: Proxima-Nova;
 		font-style: normal;
 		 font-size: 14px;
@@ -179,7 +180,12 @@ padding-top: 30px;
 		width:41%;
 		position: relative;
 	}
-
+#bed_min{
+		width:100% !important;
+	}
+	#bed_hr{
+		width:100% !important;
+	}
 	.food h2{
 		text-align:center;
 		padding-top:20px;
@@ -252,17 +258,28 @@ h3{
        color:#103047;
 	}
 
-
-
+.display_flex{
+	display:inline-flex;
+	width:100%;
+	margin-left:3%;
+}
+.align_width{
+	width:25%;
+	
+}
+.align_width_time{
+width:20%;
+margin-left:2%;
+}
 	.input{
-		padding:0px 17px;
+		padding:0px ;
 		font-family: Proxima-Nova;
 		font-style: normal;
 		font-size: 18px;
 		color:#5e5e5e;
 	}
 	.input1{
-		padding:0px 17px 0px 23px;
+		padding:0px ;
 		font-family: Proxima-Nova;
 		font-style: normal;
 		font-size: 18px;
@@ -436,7 +453,7 @@ textarea.form-control{
 	padding:0.5rem 0.75rem;
 	border-radius:5px;
 	font-size:13px;
-	width:200px;
+	width:100%;
 }
 .container{
 	max-width:760px;
@@ -514,4 +531,19 @@ textarea.form-control{
     left: 0;
     top:-100;
   }
+}
+
+@media screen and (max-width: 480px) and (min-width: 320px) {
+	.display_flex{
+	display:block;
+	margin-left:4%;
+	width:100%;
+}
+.align_width1{
+	width:50%;
+	margin-left:2%;
+}
+.margin_tp{
+	margin-top:3%;
+}
 }

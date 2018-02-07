@@ -251,7 +251,7 @@ render(){
 
                                
 				            </div>
-				            <div id="agree_btn"><Button  type="submit" color="success" onClick={handleSubmit(onSubmit)}> I Agree to the Terms and Conditions</Button>				            
+				            <div id="agree_btn"><Button id="submit4" type="submit" color="success" onClick={handleSubmit(onSubmit)}> I Agree to the Terms and Conditions</Button>				            
 				          </div>
 				          </ModalFooter>
 				        </Modal>
@@ -261,7 +261,7 @@ render(){
 						<Button outline color="primary" onClick={previousPage}>
 							Previous
 						</Button>
-						<Button outline color="primary" onClick={this.toggle}  style={{float:'right'}}>
+						<Button outline  color="primary" id="submit3" onClick={this.toggle}  style={{float:'right'}}>
 							Submit
 						</Button>
 

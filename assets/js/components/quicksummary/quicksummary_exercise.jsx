@@ -124,7 +124,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             else if((key == 'dew_point' && (value && value != '-')) ||
                     (key == 'temperature' && (value && value != '-'))||
                     (key == 'temperature_feels_like' && (value && value != '-'))){
-                all_data.push(this.toFahrenheit(value).toFixed(2));
+                all_data.push(value);
             }
             else if(key == 'workout_duration' && value && (value != '-' && value != '')){
                 let hms = value.split(':');
@@ -204,8 +204,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 const styles = StyleSheet.create({
   newTableHeader: {
     textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+    color: '#111111',  
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'

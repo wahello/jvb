@@ -91,7 +91,7 @@ constructor(props){
 				</FormGroup>
 				
 					<div className="f-footer">
-						<Button type="submit" outline color="primary">Next</Button>
+						<Button id="submit1" type="submit" outline color="primary">Next</Button>
 					</div>
 				</Col>
 			</Row>
