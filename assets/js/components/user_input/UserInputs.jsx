@@ -340,7 +340,7 @@ class UserInputs extends React.Component{
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
           strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour.split(':')[0]:'',
           strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min.split(':')[1]:'',
-          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm.split(' ')[3]:'',
+          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm.split(' ')[2]:'',
           strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour.split(':')[0]:'',
           strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min.split(':')[1]:'',        
           strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm.split(' ')[2]:'',
