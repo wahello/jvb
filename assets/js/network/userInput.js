@@ -134,12 +134,14 @@ function formatJSON(data){
 		data.sleep_hours_awake_time,
 		data.sleep_mins_awake_time,
 		data.sleep_awake_time_am_pm);
+
 	const strength_workout_start = createString(data.strength_workout_start_hour,
-		strength_workout_start_min,
-		strength_workout_start_am_pm);
+		data.strength_workout_start_min,
+		data.strength_workout_start_am_pm);
 	const strength_workout_end = createString(data.strength_workout_end_hour,
-		strength_workout_end_min,
-		strength_workout_end_am_pm);
+		data.strength_workout_end_min,
+		data.strength_workout_end_am_pm);
+
 	let json_data = {
 		"created_at":created_at,
 		"timezone":moment.tz.guess(),

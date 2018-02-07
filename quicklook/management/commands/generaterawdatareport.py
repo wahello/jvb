@@ -13,7 +13,7 @@ class Command(BaseCommand):
 		self.email_or_all_flag = 'email'
 		self.date_range_flag = 'today'
 
-	help = 'Validate the existing Garmin Health and Garmin Connect access token'
+	help = 'Generate Raw data report'
 
 	def _get_flags(self):
 		'''
