@@ -139,6 +139,7 @@ def get_blank_model_fields(model):
 			'overall_health_grade':'',
 			'overall_health_gpa':0,
 			'movement_non_exercise_steps_grade':'',
+			'movement_non_exercise_steps_gpa':'',
 			'movement_consistency_grade': '',
 			'avg_sleep_per_night_grade':'',
 			'avg_sleep_per_night_gpa':0,
@@ -926,16 +927,28 @@ def cal_alcohol_drink_grade(drink_avg, gender):
 	return (grade,round(drink_avg,2))
 
 def cal_non_exercise_step_grade(steps):
+
+	def _point_advantage(current_steps, range_min_steps, per_step_pt):
+		return (current_steps - range_min_steps) * per_step_pt
+
+	point = 0
+	grade = 'F'
 	if steps >= 10000:
-		return 'A'
+		grade = 'A'
+		point = 4
 	elif (steps <= 9999 and steps >= 7500):
-		return 'B'
+		grade = 'B'
+		point = 3 + _point_advantage(steps,7500,0.0004)
 	elif (steps <= 7499 and steps >= 5000):
-		return 'C'
+		grade = 'C'
+		point = 2 + _point_advantage(steps,5000,0.0004)
 	elif (steps <= 4999 and steps >= 3500):
-		return 'D'
+		grade = 'D'
+		point = 1 + _point_advantage(steps,3500,0.00067)
 	elif steps < 3500:
-		return 'F'
+		grade = 'F'
+		point = 0 + _point_advantage(steps,0,0.00029)
+	return (grade, round(point,2))
 
 def cal_movement_consistency_grade(hours_inactive):
 	if hours_inactive <= 4.5:
@@ -1582,8 +1595,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 		steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps
 
-		grades_calculated_data['movement_non_exercise_steps_grade'] = \
-		cal_non_exercise_step_grade(total_steps - exercise_steps)
+		moment_non_exercise_steps_grade_point = cal_non_exercise_step_grade(total_steps - exercise_steps)
+		grades_calculated_data['movement_non_exercise_steps_grade'] = moment_non_exercise_steps_grade_point[0]
+		grades_calculated_data['movement_non_exercise_steps_gpa'] = moment_non_exercise_steps_grade_point[1]
+		
 
 		# Exercise Consistency grade calculation over period of 7 days
 		exercise_consistency_grade_point = get_exercise_consistency_grade(

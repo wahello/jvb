@@ -289,7 +289,7 @@ class ProgressReportView(APIView):
 							todays_data.cum_non_exercise_steps,
 							current_data.cum_non_exercise_steps,alias
 						)
-					)
+					)[0]
 			return None
 
 		calculated_data = {
