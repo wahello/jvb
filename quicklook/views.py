@@ -824,21 +824,21 @@ def export_users_xls(request):
 		sheet9.write(col_num1, row_num-num_11, columns8w[col_num])
 	i1 = 51
 	current_date = to_date
-	for row in exercise_qs.values():
-		while (current_date >= from_date):
-			# logic
-			data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-			if data:
-				row_num += 1
-				for i,key in enumerate(columns_of_exercise):
-					if row[key] == None:
-						sheet9.write(i1+i+1,row_num - num_11,'No GPS data',format)
-					else:
-						sheet9.write(i1+i+1,row_num - num_11,row[key],format)
-			else:
-				row_num += 1
-				sheet9.write(i1+i+1,row_num - num_11, '')
-			current_date -= timedelta(days=1)
+	while (current_date >= from_date):
+		# logic
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			row_num += 1
+			for i,key in enumerate(columns_of_exercise):
+				if data[key] == None:
+					sheet9.write(i1+i+1,row_num - num_11,'No GPS data',format)
+				else:
+					sheet9.write(i1+i+1,row_num - num_11, data[key],format)
+		else:
+			row_num += 1
+			sheet9.write(i1+i+1,row_num - num_11, '')
+		current_date -= timedelta(days=1)
 
 
 	# Swim status
