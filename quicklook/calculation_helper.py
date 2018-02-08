@@ -791,8 +791,9 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
 
-				elif hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
-					movement_consistency[interval]['status'] = 'strength'
+				elif(user_input_strength_end_time and user_input_strength_start_time):
+					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
+						movement_consistency[interval]['status'] = 'strength'
 
 				elif not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
