@@ -1492,7 +1492,7 @@ def export_users_xls(request):
 	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
 	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
 	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","Sleeping Hours",
-	"Active Hours","Inactive Hours"]
+	"Active Hours","Inactive Hours","Strength Hours"]
 	hours_range1 = ["total_steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
 	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
 	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
@@ -1566,6 +1566,7 @@ def export_users_xls(request):
 					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
 					sheet11.write(row,col+x+26,json1_data['active_hours'])
 					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
+					sheet11.write(row,col+x+28,json1_data.get('strength_hours',0))
 
 			# for x,key1 in enumerate(hours_range1):
 			# 	if json1_data[key1]['status'] == 'active':
@@ -1622,7 +1623,7 @@ def export_movement_consistency_xls(request):
 	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
 	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
 	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","Sleeping Hours",
-	"Active Hours","Inactive Hours"]
+	"Active Hours","Inactive Hours","Strength Hours"]
 	hours_range1 = ["total_steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
 	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
 	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
@@ -1687,6 +1688,8 @@ def export_movement_consistency_xls(request):
 					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
 					sheet11.write(row,col+x+26,json1_data['active_hours'])
 					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
+					sheet11.write(row,col+x+28,json1_data.get['strength_hours',0])
+
 
 			# for x,key1 in enumerate(hours_range1):
 			# 	if json1_data[key1]['status'] == 'active':
