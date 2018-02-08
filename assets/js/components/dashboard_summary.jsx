@@ -4,8 +4,9 @@ import {connect} from 'react-redux';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-        Button,Popover,PopoverBody} from 'reactstrap';
+        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import fetchProgress from '../network/progress';
 
@@ -19,8 +20,11 @@ constructor(props){
     super(props);
     this.state ={
         selectedDate: new Date(),
+        start_date:'',
+        end_date:'',
         isOpen: false,
         calendarOpen:false,
+        dateRange:false,
 
         "created_at":"-",
         "summary":{
@@ -75,7 +79,6 @@ constructor(props){
                         },
                         "today":"-",
                         "year":"-"
-
                      }
                 },
 
@@ -564,542 +567,545 @@ constructor(props){
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     this.processDate = this.processDate.bind(this);
    this.toggleCalendar=this.toggleCalendar.bind(this);
+   this.toggleDate = this.toggleDate.bind(this);
+   this.onSubmitDate = this.onSubmitDate.bind(this);
+   this.handleChange = this.handleChange.bind(this);
   }
-
   successProgress(data){
     this.setState({
-        //  created_at:data.data.created_at,
-        // summary:{
-        //     overall_health:{
-        //        overall_health_gpa:{
-        //                 week:data.data.summary.overall_health.overall_health_gpa.week,
-        //                 yesterday:data.data.summary.overall_health.overall_health_gpa.yesterday,
-        //                 month:data.data.summary.overall_health.overall_health_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.overall_health.overall_health_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.overall_health.overall_health_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.overall_health.overall_health_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.overall_health.overall_health_gpa.today,
-        //                 year:data.data.summary.overall_health.overall_health_gpa.year
+        created_at:data.data.created_at,
+        summary:{
+            overall_health:{
+               overall_health_gpa:{
+                        week:data.data.summary.overall_health.overall_health_gpa.week,
+                        yesterday:data.data.summary.overall_health.overall_health_gpa.yesterday,
+                        month:data.data.summary.overall_health.overall_health_gpa.month,
+                        
+                        custom_range:{
+                           from_dt :data.data.summary.overall_health.overall_health_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.overall_health.overall_health_gpa.custom_range.to_dt,
+                           data:data.data.summary.overall_health.overall_health_gpa.custom_range.data
+                        },
+                        today:data.data.summary.overall_health.overall_health_gpa.today,
+                        year:data.data.summary.overall_health.overall_health_gpa.year
 
-        //              },
-        //          overall_health_gpa_grade:{
-        //                 week:data.data.summary.overall_health.overall_health_gpa_grade.week,
-        //                 yesterday:data.data.summary.overall_health.overall_health_gpa_grade.yesterday,
-        //                 month:data.data.summary.overall_health.overall_health_gpa_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.overall_health.overall_health_gpa_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.overall_health.overall_health_gpa_grade.custom_range.to_dt,
-        //                    data:data.data.summary.overall_health.overall_health_gpa_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.overall_health.overall_health_gpa_grade.today,
-        //                 year:data.data.summary.overall_health.overall_health_gpa_grade.year
+                     },
+                 overall_health_gpa_grade:{
+                        week:data.data.summary.overall_health.overall_health_gpa_grade.week,
+                        yesterday:data.data.summary.overall_health.overall_health_gpa_grade.yesterday,
+                        month:data.data.summary.overall_health.overall_health_gpa_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.overall_health.overall_health_gpa_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.overall_health.overall_health_gpa_grade.custom_range.to_dt,
+                           data:data.data.summary.overall_health.overall_health_gpa_grade.custom_range.data
+                        },
+                        today:data.data.summary.overall_health.overall_health_gpa_grade.today,
+                        year:data.data.summary.overall_health.overall_health_gpa_grade.year
 
-        //              },
-        //          rank:{
-        //                  week:data.data.summary.overall_health.rank.week,
-        //                 yesterday:data.data.summary.overall_health.rank.yesterday,
-        //                 month:data.data.summary.overall_health.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.overall_health.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.overall_health.rank.custom_range.to_dt,
-        //                    data:data.data.summary.overall_health.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.overall_health.rank.today,
-        //                 year:data.data.summary.overall_health.rank.year
+                     },
+                 rank:{
+                         week:data.data.summary.overall_health.rank.week,
+                        yesterday:data.data.summary.overall_health.rank.yesterday,
+                        month:data.data.summary.overall_health.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.overall_health.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.overall_health.rank.custom_range.to_dt,
+                           data:data.data.summary.overall_health.rank.custom_range.data
+                        },
+                        today:data.data.summary.overall_health.rank.today,
+                        year:data.data.summary.overall_health.rank.year
 
-        //              },
-        //          total_gpa_point:{
-        //                 week:data.data.summary.overall_health.total_gpa_point.week,
-        //                 yesterday:data.data.summary.overall_health.total_gpa_point.yesterday,
-        //                 month:data.data.summary.overall_health.total_gpa_point.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.overall_health.total_gpa_point.custom_range.from_dt,
-        //                    to_dt:data.data.summary.overall_health.total_gpa_point.custom_range.to_dt,
-        //                    data:data.data.summary.overall_health.total_gpa_point.custom_range.data
-        //                 },
-        //                 today:data.data.summary.overall_health.total_gpa_point.today,
-        //                 year:data.data.summary.overall_health.total_gpa_point.year
-        //              }
-        //         },
+                     },
+                 total_gpa_point:{
+                        week:data.data.summary.overall_health.total_gpa_point.week,
+                        yesterday:data.data.summary.overall_health.total_gpa_point.yesterday,
+                        month:data.data.summary.overall_health.total_gpa_point.month,
+                        custom_range:{
+                           from_dt :data.data.summary.overall_health.total_gpa_point.custom_range.from_dt,
+                           to_dt:data.data.summary.overall_health.total_gpa_point.custom_range.to_dt,
+                           data:data.data.summary.overall_health.total_gpa_point.custom_range.data
+                        },
+                        today:data.data.summary.overall_health.total_gpa_point.today,
+                        year:data.data.summary.overall_health.total_gpa_point.year
+                     }
+                },
 
-        //     ec:{
-        //          avg_no_of_days_exercises_per_week:{
-        //                 week:data.data.summary.ec.avg_no_of_days_exercises_per_week.week,
-        //                 yesterday:data.data.summary.ec.avg_no_of_days_exercises_per_week.yesterday,
-        //                 month:data.data.summary.ec.avg_no_of_days_exercises_per_week.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.from_dt,
-        //                    to_dt:data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.to_dt,
-        //                    data:data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.data
-        //                 },
-        //                 today:data.data.summary.ec.avg_no_of_days_exercises_per_week.today,
-        //                 year:data.data.summary.ec.avg_no_of_days_exercises_per_week.year
-        //              },
-        //           exercise_consistency_grade:{
-        //                 week:data.data.summary.ec.exercise_consistency_grade.week,
-        //                 yesterday:data.data.summary.ec.exercise_consistency_grade.yesterday,
-        //                 month:data.data.summary.ec.exercise_consistency_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.ec.exercise_consistency_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.ec.exercise_consistency_grade.custom_range.to_dt,
-        //                    data:data.data.summary.ec.exercise_consistency_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.ec.exercise_consistency_grade.today,
-        //                 year:data.data.summary.ec.exercise_consistency_grade.year
-        //              },
-        //            rank:{
-        //                 week:data.data.summary.ec.rank.week,
-        //                 yesterday:data.data.summary.ec.rank.yesterday,
-        //                 month:data.data.summary.ec.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.ec.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.ec.rank.custom_range.to_dt,
-        //                    data:data.data.summary.ec.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.ec.rank.today,
-        //                 year:data.data.summary.ec.rank.year
-        //              },
-        //            exercise_consistency_gpa:{
-        //                 week:data.data.summary.ec.exercise_consistency_gpa.week,
-        //                 yesterday:data.data.summary.ec.exercise_consistency_gpa.yesterday,
-        //                 month:data.data.summary.ec.exercise_consistency_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.ec.exercise_consistency_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.ec.exercise_consistency_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.ec.exercise_consistency_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.ec.exercise_consistency_gpa.today,
-        //                 year:data.data.summary.ec.exercise_consistency_gpa.year
-        //              }
-        //          },
-        //         nutrition:{
-        //            prcnt_unprocessed_food_gpa:{
-        //                week:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.week,
-        //                 yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday,
-        //                 month:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today,
-        //                 year:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.year
-        //              },
-        //          prcnt_unprocessed_food_grade:{
-        //                  week:data.data.summary.nutrition.prcnt_unprocessed_food_grade.week,
-        //                 yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_grade.yesterday,
-        //                 month:data.data.summary.nutrition.prcnt_unprocessed_food_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.to_dt,
-        //                    data:data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.nutrition.prcnt_unprocessed_food_grade.today,
-        //                 year:data.data.summary.nutrition.prcnt_unprocessed_food_grade.year
-        //              },
-        //          rank:{
-        //                  week:data.data.summary.nutrition.rank.week,
-        //                 yesterday:data.data.summary.nutrition.rank.yesterday,
-        //                 month:data.data.summary.nutrition.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.nutrition.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.nutrition.rank.custom_range.to_dt,
-        //                    data:data.data.summary.nutrition.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.nutrition.rank.today,
-        //                 year:data.data.summary.nutrition.rank.year
-        //              },
-        //           prcnt_unprocessed_volume_of_food:{
-        //                  week:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.week,
-        //                 yesterday:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.yesterday,
-        //                 month:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.from_dt,
-        //                    to_dt:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.to_dt,
-        //                    data:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.data
-        //                 },
-        //                 today:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.today,
-        //                 year:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.year
-        //              }
+            ec:{
+                 avg_no_of_days_exercises_per_week:{
+                        week:data.data.summary.ec.avg_no_of_days_exercises_per_week.week,
+                        yesterday:data.data.summary.ec.avg_no_of_days_exercises_per_week.yesterday,
+                        month:data.data.summary.ec.avg_no_of_days_exercises_per_week.month,
+                        custom_range:{
+                           from_dt :data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.from_dt,
+                           to_dt:data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.to_dt,
+                           data:data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.data
+                        },
+                        today:data.data.summary.ec.avg_no_of_days_exercises_per_week.today,
+                        year:data.data.summary.ec.avg_no_of_days_exercises_per_week.year
+                     },
+                  exercise_consistency_grade:{
+                        week:data.data.summary.ec.exercise_consistency_grade.week,
+                        yesterday:data.data.summary.ec.exercise_consistency_grade.yesterday,
+                        month:data.data.summary.ec.exercise_consistency_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.ec.exercise_consistency_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.ec.exercise_consistency_grade.custom_range.to_dt,
+                           data:data.data.summary.ec.exercise_consistency_grade.custom_range.data
+                        },
+                        today:data.data.summary.ec.exercise_consistency_grade.today,
+                        year:data.data.summary.ec.exercise_consistency_grade.year
+                     },
+                   rank:{
+                        week:data.data.summary.ec.rank.week,
+                        yesterday:data.data.summary.ec.rank.yesterday,
+                        month:data.data.summary.ec.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.ec.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.ec.rank.custom_range.to_dt,
+                           data:data.data.summary.ec.rank.custom_range.data
+                        },
+                        today:data.data.summary.ec.rank.today,
+                        year:data.data.summary.ec.rank.year
+                     },
+                   exercise_consistency_gpa:{
+                        week:data.data.summary.ec.exercise_consistency_gpa.week,
+                        yesterday:data.data.summary.ec.exercise_consistency_gpa.yesterday,
+                        month:data.data.summary.ec.exercise_consistency_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.ec.exercise_consistency_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.ec.exercise_consistency_gpa.custom_range.to_dt,
+                           data:data.data.summary.ec.exercise_consistency_gpa.custom_range.data
+                        },
+                        today:data.data.summary.ec.exercise_consistency_gpa.today,
+                        year:data.data.summary.ec.exercise_consistency_gpa.year
+                     }
+                 },
+                nutrition:{
+                   prcnt_unprocessed_food_gpa:{
+                       week:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.week,
+                        yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday,
+                        month:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.to_dt,
+                           data:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.data
+                        },
+                        today:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today,
+                        year:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.year
+                     },
+                 prcnt_unprocessed_food_grade:{
+                         week:data.data.summary.nutrition.prcnt_unprocessed_food_grade.week,
+                        yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_grade.yesterday,
+                        month:data.data.summary.nutrition.prcnt_unprocessed_food_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.to_dt,
+                           data:data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.data
+                        },
+                        today:data.data.summary.nutrition.prcnt_unprocessed_food_grade.today,
+                        year:data.data.summary.nutrition.prcnt_unprocessed_food_grade.year
+                     },
+                 rank:{
+                         week:data.data.summary.nutrition.rank.week,
+                        yesterday:data.data.summary.nutrition.rank.yesterday,
+                        month:data.data.summary.nutrition.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.nutrition.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.nutrition.rank.custom_range.to_dt,
+                           data:data.data.summary.nutrition.rank.custom_range.data
+                        },
+                        today:data.data.summary.nutrition.rank.today,
+                        year:data.data.summary.nutrition.rank.year
+                     },
+                  prcnt_unprocessed_volume_of_food:{
+                         week:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.week,
+                        yesterday:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.yesterday,
+                        month:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.month,
+                        custom_range:{
+                           from_dt :data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.from_dt,
+                           to_dt:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.to_dt,
+                           data:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.data
+                        },
+                        today:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.today,
+                        year:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.year
+                     }
 
-        //           },
-        //     mc:{
-        //         movement_consistency_gpa:{
-        //                 week:data.data.summary.mc.movement_consistency_gpa.week,
-        //                 yesterday:data.data.summary.mc.movement_consistency_gpa.yesterday,
-        //                 month:data.data.summary.mc.movement_consistency_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.mc.movement_consistency_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.mc.movement_consistency_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.mc.movement_consistency_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.mc.movement_consistency_gpa.today,
-        //                 year:data.data.summary.mc.movement_consistency_gpa.year
-        //              },
-        //              movement_consistency_grade:{
-        //                 week:data.data.summary.mc.movement_consistency_grade.week,
-        //                 yesterday:data.data.summary.mc.movement_consistency_grade.yesterday,
-        //                 month:data.data.summary.mc.movement_consistency_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.mc.movement_consistency_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.mc.movement_consistency_grade.custom_range.to_dt,
-        //                    data:data.data.summary.mc.movement_consistency_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.mc.movement_consistency_grade.today,
-        //                 year:data.data.summary.mc.movement_consistency_grade.year
-        //              },
-        //              rank:{
-        //                week:data.data.summary.mc.rank.week,
-        //                 yesterday:data.data.summary.mc.rank.yesterday,
-        //                 month:data.data.summary.mc.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.mc.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.mc.rank.custom_range.to_dt,
-        //                    data:data.data.summary.mc.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.mc.rank.today,
-        //                 year:data.data.summary.mc.rank.year
-        //              },
-        //              movement_consistency_score:{
-        //                week:data.data.summary.mc.movement_consistency_score.week,
-        //                 yesterday:data.data.summary.mc.movement_consistency_score.yesterday,
-        //                 month:data.data.summary.mc.movement_consistency_score.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.mc.movement_consistency_score.custom_range.from_dt,
-        //                    to_dt:data.data.summary.mc.movement_consistency_score.custom_range.to_dt,
-        //                    data:data.data.summary.mc.movement_consistency_score.custom_range.data
-        //                 },
-        //                 today:data.data.summary.mc.movement_consistency_score.today,
-        //                 year:data.data.summary.mc.movement_consistency_score.year
-        //              }
-        //           },
-        //     non_exercise:{
-        //          non_exericse_steps_gpa:{
-        //                 week:data.data.summary.non_exercise.non_exericse_steps_gpa.week,
-        //                 yesterday:data.data.summary.non_exercise.non_exericse_steps_gpa.yesterday,
-        //                 month:data.data.summary.non_exercise.non_exericse_steps_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.non_exercise.non_exericse_steps_gpa.today,
-        //                 year:data.data.summary.non_exercise.non_exericse_steps_gpa.year
-        //              },
-        //          rank:{
-        //                 week:data.data.summary.non_exercise.rank.week,
-        //                 yesterday:data.data.summary.non_exercise.rank.yesterday,
-        //                 month:data.data.summary.non_exercise.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.non_exercise.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.non_exercise.rank.custom_range.to_dt,
-        //                    data:data.data.summary.non_exercise.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.non_exercise.rank.today,
-        //                 year:data.data.summary.non_exercise.rank.year
-        //              },
-        //          movement_non_exercise_step_grade:{
-        //                  week:data.data.summary.non_exercise.movement_non_exercise_step_grade.week,
-        //                 yesterday:data.data.summary.non_exercise.movement_non_exercise_step_grade.yesterday,
-        //                 month:data.data.summary.non_exercise.movement_non_exercise_step_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.to_dt,
-        //                    data:data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.non_exercise.movement_non_exercise_step_grade.today,
-        //                 year:data.data.summary.non_exercise.movement_non_exercise_step_grade.year
-        //              },
-        //          non_exercise_steps:{
-        //                 week:data.data.summary.non_exercise.non_exercise_steps.week,
-        //                 yesterday:data.data.summary.non_exercise.non_exercise_steps.yesterday,
-        //                 month:data.data.summary.non_exercise.non_exercise_steps.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.non_exercise.non_exercise_steps.custom_range.from_dt,
-        //                    to_dt:data.data.summary.non_exercise.non_exercise_steps.custom_range.to_dt,
-        //                    data:data.data.summary.non_exercise.non_exercise_steps.custom_range.data
-        //                 },
-        //                 today:data.data.summary.non_exercise.non_exercise_steps.today,
-        //                 year:data.data.summary.non_exercise.non_exercise_steps.year
-        //              },
-        //         total_steps:{
-        //                  week:data.data.summary.non_exercise.total_steps.week,
-        //                 yesterday:data.data.summary.non_exercise.total_steps.yesterday,
-        //                 month:data.data.summary.non_exercise.total_steps.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.non_exercise.total_steps.custom_range.from_dt,
-        //                    to_dt:data.data.summary.non_exercise.total_steps.custom_range.to_dt,
-        //                    data:data.data.summary.non_exercise.total_steps.custom_range.data
-        //                 },
-        //                 today:data.data.summary.non_exercise.total_steps.today,
-        //                 year:data.data.summary.non_exercise.total_steps.year
-        //              },     
-        //     },
-        // exercise:{
-        //    workout_duration_grade:{
-        //                 week:data.data.summary.exercise.workout_duration_grade.week,
-        //                 yesterday:data.data.summary.exercise.workout_duration_grade.yesterday,
-        //                 month:data.data.summary.exercise.workout_duration_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.workout_duration_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.workout_duration_grade.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.workout_duration_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.workout_duration_grade.today,
-        //                 year:data.data.summary.exercise.workout_duration_grade.year
-        //              },    
-        //     overall_workout_grade:{
-        //                 week:data.data.summary.exercise.overall_workout_grade.week,
-        //                 yesterday:data.data.summary.exercise.overall_workout_grade.yesterday,
-        //                 month:data.data.summary.exercise.overall_workout_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.overall_workout_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.overall_workout_grade.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.overall_workout_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.overall_workout_grade.today,
-        //                 year:data.data.summary.exercise.overall_workout_grade.year
-        //              },    
-        //     workout_duration_hours_min:{
-        //                 week:data.data.summary.exercise.workout_duration_hours_min.week,
-        //                 yesterday:data.data.summary.exercise.workout_duration_hours_min.yesterday,
-        //                 month:data.data.summary.exercise.workout_duration_hours_min.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.workout_duration_hours_min.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.workout_duration_hours_min.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.workout_duration_hours_min.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.workout_duration_hours_min.today,
-        //                 year:data.data.summary.exercise.workout_duration_hours_min.year
-        //              }, 
-        //         rank:{
-        //                 week:data.data.summary.exercise.rank.week,
-        //                 yesterday:data.data.summary.exercise.rank.yesterday,
-        //                 month:data.data.summary.exercise.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.rank.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.rank.today,
-        //                 year:data.data.summary.exercise.rank.year
-        //              },    
-        //         avg_exercise_heart_rate:{
-        //                 week:data.data.summary.exercise.avg_exercise_heart_rate.week,
-        //                 yesterday:data.data.summary.exercise.avg_exercise_heart_rate.yesterday,
-        //                 month:data.data.summary.exercise.avg_exercise_heart_rate.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.avg_exercise_heart_rate.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.avg_exercise_heart_rate.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.avg_exercise_heart_rate.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.avg_exercise_heart_rate.today,
-        //                 year:data.data.summary.exercise.avg_exercise_heart_rate.year
-        //              },    
-        //         overall_exercise_gpa_rank:{
-        //                 week:data.data.summary.exercise.overall_exercise_gpa_rank.week,
-        //                 yesterday:data.data.summary.exercise.overall_exercise_gpa_rank.yesterday,
-        //                 month:data.data.summary.exercise.overall_exercise_gpa_rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.overall_exercise_gpa_rank.today,
-        //                 year:data.data.summary.exercise.overall_exercise_gpa_rank.year
-        //              },
-        //         workout_effort_level_grade:{
-        //                 week:data.data.summary.exercise.workout_effort_level_grade.week,
-        //                 yesterday:data.data.summary.exercise.workout_effort_level_grade.yesterday,
-        //                 month:data.data.summary.exercise.workout_effort_level_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.workout_effort_level_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.workout_effort_level_grade.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.workout_effort_level_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.workout_effort_level_grade.today,
-        //                 year:data.data.summary.exercise.workout_effort_level_grade.year
-        //              },
-        //         avg_exercise_heart_rate_grade:{
-        //                 week:data.data.summary.exercise.avg_exercise_heart_rate_grade.week,
-        //                 yesterday:data.data.summary.exercise.avg_exercise_heart_rate_grade.yesterday,
-        //                 month:data.data.summary.exercise.avg_exercise_heart_rate_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.avg_exercise_heart_rate_grade.today,
-        //                 year:data.data.summary.exercise.avg_exercise_heart_rate_grade.year
-        //              },
-        //         overall_exercise_gpa:{
-        //                 week:data.data.summary.exercise.overall_exercise_gpa.week,
-        //                 yesterday:data.data.summary.exercise.overall_exercise_gpa.yesterday,
-        //                 month:data.data.summary.exercise.overall_exercise_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.overall_exercise_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.overall_exercise_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.overall_exercise_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.overall_exercise_gpa.today,
-        //                 year:data.data.summary.exercise.overall_exercise_gpa.year
-        //              },
-        //         workout_effort_level:{
-        //                 week:data.data.summary.exercise.workout_effort_level.week,
-        //                 yesterday:data.data.summary.exercise.workout_effort_level.yesterday,
-        //                 month:data.data.summary.exercise.workout_effort_level.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.exercise.workout_effort_level.custom_range.from_dt,
-        //                    to_dt:data.data.summary.exercise.workout_effort_level.custom_range.to_dt,
-        //                    data:data.data.summary.exercise.workout_effort_level.custom_range.data
-        //                 },
-        //                 today:data.data.summary.exercise.workout_effort_level.today,
-        //                 year:data.data.summary.exercise.workout_effort_level.year
-        //              }        
-        //         },
+                  },
+            mc:{
+                movement_consistency_gpa:{
+                        week:data.data.summary.mc.movement_consistency_gpa.week,
+                        yesterday:data.data.summary.mc.movement_consistency_gpa.yesterday,
+                        month:data.data.summary.mc.movement_consistency_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.mc.movement_consistency_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.mc.movement_consistency_gpa.custom_range.to_dt,
+                           data:data.data.summary.mc.movement_consistency_gpa.custom_range.data
+                        },
+                        today:data.data.summary.mc.movement_consistency_gpa.today,
+                        year:data.data.summary.mc.movement_consistency_gpa.year
+                     },
+                     movement_consistency_grade:{
+                        week:data.data.summary.mc.movement_consistency_grade.week,
+                        yesterday:data.data.summary.mc.movement_consistency_grade.yesterday,
+                        month:data.data.summary.mc.movement_consistency_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.mc.movement_consistency_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.mc.movement_consistency_grade.custom_range.to_dt,
+                           data:data.data.summary.mc.movement_consistency_grade.custom_range.data
+                        },
+                        today:data.data.summary.mc.movement_consistency_grade.today,
+                        year:data.data.summary.mc.movement_consistency_grade.year
+                     },
+                     rank:{
+                       week:data.data.summary.mc.rank.week,
+                        yesterday:data.data.summary.mc.rank.yesterday,
+                        month:data.data.summary.mc.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.mc.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.mc.rank.custom_range.to_dt,
+                           data:data.data.summary.mc.rank.custom_range.data
+                        },
+                        today:data.data.summary.mc.rank.today,
+                        year:data.data.summary.mc.rank.year
+                     },
+                     movement_consistency_score:{
+                       week:data.data.summary.mc.movement_consistency_score.week,
+                        yesterday:data.data.summary.mc.movement_consistency_score.yesterday,
+                        month:data.data.summary.mc.movement_consistency_score.month,
+                        custom_range:{
+                           from_dt :data.data.summary.mc.movement_consistency_score.custom_range.from_dt,
+                           to_dt:data.data.summary.mc.movement_consistency_score.custom_range.to_dt,
+                           data:data.data.summary.mc.movement_consistency_score.custom_range.data
+                        },
+                        today:data.data.summary.mc.movement_consistency_score.today,
+                        year:data.data.summary.mc.movement_consistency_score.year
+                     }
+                  },
+            non_exercise:{
+                 non_exericse_steps_gpa:{
+                        week:data.data.summary.non_exercise.non_exericse_steps_gpa.week,
+                        yesterday:data.data.summary.non_exercise.non_exericse_steps_gpa.yesterday,
+                        month:data.data.summary.non_exercise.non_exericse_steps_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.to_dt,
+                           data:data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.data
+                        },
+                        today:data.data.summary.non_exercise.non_exericse_steps_gpa.today,
+                        year:data.data.summary.non_exercise.non_exericse_steps_gpa.year
+                     },
+                 rank:{
+                        week:data.data.summary.non_exercise.rank.week,
+                        yesterday:data.data.summary.non_exercise.rank.yesterday,
+                        month:data.data.summary.non_exercise.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.non_exercise.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.non_exercise.rank.custom_range.to_dt,
+                           data:data.data.summary.non_exercise.rank.custom_range.data
+                        },
+                        today:data.data.summary.non_exercise.rank.today,
+                        year:data.data.summary.non_exercise.rank.year
+                     },
+                 movement_non_exercise_step_grade:{
+                         week:data.data.summary.non_exercise.movement_non_exercise_step_grade.week,
+                        yesterday:data.data.summary.non_exercise.movement_non_exercise_step_grade.yesterday,
+                        month:data.data.summary.non_exercise.movement_non_exercise_step_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.to_dt,
+                           data:data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.data
+                        },
+                        today:data.data.summary.non_exercise.movement_non_exercise_step_grade.today,
+                        year:data.data.summary.non_exercise.movement_non_exercise_step_grade.year
+                     },
+                 non_exercise_steps:{
+                        week:data.data.summary.non_exercise.non_exercise_steps.week,
+                        yesterday:data.data.summary.non_exercise.non_exercise_steps.yesterday,
+                        month:data.data.summary.non_exercise.non_exercise_steps.month,
+                        custom_range:{
+                           from_dt :data.data.summary.non_exercise.non_exercise_steps.custom_range.from_dt,
+                           to_dt:data.data.summary.non_exercise.non_exercise_steps.custom_range.to_dt,
+                           data:data.data.summary.non_exercise.non_exercise_steps.custom_range.data
+                        },
+                        today:data.data.summary.non_exercise.non_exercise_steps.today,
+                        year:data.data.summary.non_exercise.non_exercise_steps.year
+                     },
+                total_steps:{
+                         week:data.data.summary.non_exercise.total_steps.week,
+                        yesterday:data.data.summary.non_exercise.total_steps.yesterday,
+                        month:data.data.summary.non_exercise.total_steps.month,
+                        custom_range:{
+                           from_dt :data.data.summary.non_exercise.total_steps.custom_range.from_dt,
+                           to_dt:data.data.summary.non_exercise.total_steps.custom_range.to_dt,
+                           data:data.data.summary.non_exercise.total_steps.custom_range.data
+                        },
+                        today:data.data.summary.non_exercise.total_steps.today,
+                        year:data.data.summary.non_exercise.total_steps.year
+                     },     
+            },
+        exercise:{
+           workout_duration_grade:{
+                        week:data.data.summary.exercise.workout_duration_grade.week,
+                        yesterday:data.data.summary.exercise.workout_duration_grade.yesterday,
+                        month:data.data.summary.exercise.workout_duration_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.workout_duration_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.workout_duration_grade.custom_range.to_dt,
+                           data:data.data.summary.exercise.workout_duration_grade.custom_range.data
+                        },
+                        today:data.data.summary.exercise.workout_duration_grade.today,
+                        year:data.data.summary.exercise.workout_duration_grade.year
+                     },    
+            overall_workout_grade:{
+                        week:data.data.summary.exercise.overall_workout_grade.week,
+                        yesterday:data.data.summary.exercise.overall_workout_grade.yesterday,
+                        month:data.data.summary.exercise.overall_workout_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.overall_workout_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.overall_workout_grade.custom_range.to_dt,
+                           data:data.data.summary.exercise.overall_workout_grade.custom_range.data
+                        },
+                        today:data.data.summary.exercise.overall_workout_grade.today,
+                        year:data.data.summary.exercise.overall_workout_grade.year
+                     },    
+            workout_duration_hours_min:{
+                        week:data.data.summary.exercise.workout_duration_hours_min.week,
+                        yesterday:data.data.summary.exercise.workout_duration_hours_min.yesterday,
+                        month:data.data.summary.exercise.workout_duration_hours_min.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.workout_duration_hours_min.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.workout_duration_hours_min.custom_range.to_dt,
+                           data:data.data.summary.exercise.workout_duration_hours_min.custom_range.data
+                        },
+                        today:data.data.summary.exercise.workout_duration_hours_min.today,
+                        year:data.data.summary.exercise.workout_duration_hours_min.year
+                     }, 
+                rank:{
+                        week:data.data.summary.exercise.rank.week,
+                        yesterday:data.data.summary.exercise.rank.yesterday,
+                        month:data.data.summary.exercise.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.rank.custom_range.to_dt,
+                           data:data.data.summary.exercise.rank.custom_range.data
+                        },
+                        today:data.data.summary.exercise.rank.today,
+                        year:data.data.summary.exercise.rank.year
+                     },    
+                avg_exercise_heart_rate:{
+                        week:data.data.summary.exercise.avg_exercise_heart_rate.week,
+                        yesterday:data.data.summary.exercise.avg_exercise_heart_rate.yesterday,
+                        month:data.data.summary.exercise.avg_exercise_heart_rate.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.avg_exercise_heart_rate.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.avg_exercise_heart_rate.custom_range.to_dt,
+                           data:data.data.summary.exercise.avg_exercise_heart_rate.custom_range.data
+                        },
+                        today:data.data.summary.exercise.avg_exercise_heart_rate.today,
+                        year:data.data.summary.exercise.avg_exercise_heart_rate.year
+                     },    
+                overall_exercise_gpa_rank:{
+                        week:data.data.summary.exercise.overall_exercise_gpa_rank.week,
+                        yesterday:data.data.summary.exercise.overall_exercise_gpa_rank.yesterday,
+                        month:data.data.summary.exercise.overall_exercise_gpa_rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.to_dt,
+                           data:data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.data
+                        },
+                        today:data.data.summary.exercise.overall_exercise_gpa_rank.today,
+                        year:data.data.summary.exercise.overall_exercise_gpa_rank.year
+                     },
+                workout_effort_level_grade:{
+                        week:data.data.summary.exercise.workout_effort_level_grade.week,
+                        yesterday:data.data.summary.exercise.workout_effort_level_grade.yesterday,
+                        month:data.data.summary.exercise.workout_effort_level_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.workout_effort_level_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.workout_effort_level_grade.custom_range.to_dt,
+                           data:data.data.summary.exercise.workout_effort_level_grade.custom_range.data
+                        },
+                        today:data.data.summary.exercise.workout_effort_level_grade.today,
+                        year:data.data.summary.exercise.workout_effort_level_grade.year
+                     },
+                avg_exercise_heart_rate_grade:{
+                        week:data.data.summary.exercise.avg_exercise_heart_rate_grade.week,
+                        yesterday:data.data.summary.exercise.avg_exercise_heart_rate_grade.yesterday,
+                        month:data.data.summary.exercise.avg_exercise_heart_rate_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.to_dt,
+                           data:data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.data
+                        },
+                        today:data.data.summary.exercise.avg_exercise_heart_rate_grade.today,
+                        year:data.data.summary.exercise.avg_exercise_heart_rate_grade.year
+                     },
+                overall_exercise_gpa:{
+                        week:data.data.summary.exercise.overall_exercise_gpa.week,
+                        yesterday:data.data.summary.exercise.overall_exercise_gpa.yesterday,
+                        month:data.data.summary.exercise.overall_exercise_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.overall_exercise_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.overall_exercise_gpa.custom_range.to_dt,
+                           data:data.data.summary.exercise.overall_exercise_gpa.custom_range.data
+                        },
+                        today:data.data.summary.exercise.overall_exercise_gpa.today,
+                        year:data.data.summary.exercise.overall_exercise_gpa.year
+                     },
+                workout_effort_level:{
+                        week:data.data.summary.exercise.workout_effort_level.week,
+                        yesterday:data.data.summary.exercise.workout_effort_level.yesterday,
+                        month:data.data.summary.exercise.workout_effort_level.month,
+                        custom_range:{
+                           from_dt :data.data.summary.exercise.workout_effort_level.custom_range.from_dt,
+                           to_dt:data.data.summary.exercise.workout_effort_level.custom_range.to_dt,
+                           data:data.data.summary.exercise.workout_effort_level.custom_range.data
+                        },
+                        today:data.data.summary.exercise.workout_effort_level.today,
+                        year:data.data.summary.exercise.workout_effort_level.year
+                     }        
+                },
 
-        // penalty:{
-        //      sleep_aid_penalty: {
-        //                 week:data.data.summary.penalty.sleep_aid_penalty.week,
-        //                 yesterday:data.data.summary.penalty.sleep_aid_penalty.yesterday,
-        //                 month:data.data.summary.penalty.sleep_aid_penalty.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.penalty.sleep_aid_penalty.custom_range.from_dt,
-        //                    to_dt:data.data.summary.penalty.sleep_aid_penalty.custom_range.to_dt,
-        //                    data:data.data.summary.penalty.sleep_aid_penalty.custom_range.data
-        //                 },
-        //                 today:data.data.summary.penalty.sleep_aid_penalty.today,
-        //                 year:data.data.summary.penalty.sleep_aid_penalty.year
-        //             },
-        //     controlled_substance_penalty: {
-        //                 week:data.data.summary.penalty.controlled_substance_penalty.week,
-        //                 yesterday:data.data.summary.penalty.controlled_substance_penalty.yesterday,
-        //                 month:data.data.summary.penalty.controlled_substance_penalty.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.penalty.controlled_substance_penalty.custom_range.from_dt,
-        //                    to_dt:data.data.summary.penalty.controlled_substance_penalty.custom_range.to_dt,
-        //                    data:data.data.summary.penalty.controlled_substance_penalty.custom_range.data
-        //                 },
-        //                 today:data.data.summary.penalty.controlled_substance_penalty.today,
-        //                 year:data.data.summary.penalty.controlled_substance_penalty.year
-        //              },
-        //     smoking_penalty: {
-        //                 week:data.data.summary.penalty.smoking_penalty.week,
-        //                 yesterday:data.data.summary.penalty.smoking_penalty.yesterday,
-        //                 month:data.data.summary.penalty.smoking_penalty.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.penalty.smoking_penalty.custom_range.from_dt,
-        //                    to_dt:data.data.summary.penalty.smoking_penalty.custom_range.to_dt,
-        //                    data:data.data.summary.penalty.smoking_penalty.custom_range.data
-        //                 },
-        //                 today:data.data.summary.penalty.smoking_penalty.today,
-        //                 year:data.data.summary.penalty.smoking_penalty.year
-        //     },
-        // },
-        //  sleep: {
-        //     average_sleep_grade: {
-        //                 week:data.data.summary.sleep.average_sleep_grade.week,
-        //                 yesterday:data.data.summary.sleep.average_sleep_grade.yesterday,
-        //                 month:data.data.summary.sleep.average_sleep_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.sleep.average_sleep_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.sleep.average_sleep_grade.custom_range.to_dt,
-        //                    data:data.data.summary.sleep.average_sleep_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.sleep.average_sleep_grade.today,
-        //                 year:data.data.summary.sleep.average_sleep_grade.year
-        //              },
-        //     rank: {
-        //                 week:data.data.summary.sleep.rank.week,
-        //                 yesterday:data.data.summary.sleep.rank.yesterday,
-        //                 month:data.data.summary.sleep.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.sleep.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.sleep.rank.custom_range.to_dt,
-        //                    data:data.data.summary.sleep.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.sleep.rank.today,
-        //                 year:data.data.summary.sleep.rank.year
-        //             },
-        //     total_sleep_in_hours_min: {
-        //                 week:data.data.summary.sleep.total_sleep_in_hours_min.week,
-        //                 yesterday:data.data.summary.sleep.total_sleep_in_hours_min.yesterday,
-        //                 month:data.data.summary.sleep.total_sleep_in_hours_min.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.sleep.total_sleep_in_hours_min.custom_range.from_dt,
-        //                    to_dt:data.data.summary.sleep.total_sleep_in_hours_min.custom_range.to_dt,
-        //                    data:data.data.summary.sleep.total_sleep_in_hours_min.custom_range.data
-        //                 },
-        //                 today:data.data.summary.sleep.total_sleep_in_hours_min.today,
-        //                 year:data.data.summary.sleep.total_sleep_in_hours_min.year
-        //             },
-        //     overall_sleep_gpa: {
-        //                 week:data.data.summary.sleep.overall_sleep_gpa.week,
-        //                 yesterday:data.data.summary.sleep.overall_sleep_gpa.yesterday,
-        //                 month:data.data.summary.sleep.overall_sleep_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.sleep.overall_sleep_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.sleep.overall_sleep_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.sleep.overall_sleep_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.sleep.overall_sleep_gpa.today,
-        //                 year:data.data.summary.sleep.overall_sleep_gpa.year
-        //              }
-        //        },
-        //  alcohol: {
-        //     alcoholic_drinks_per_week_grade: {
-        //                 week:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.week,
-        //                 yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.yesterday,
-        //                 month:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.from_dt,
-        //                    to_dt:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.to_dt,
-        //                    data:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.data
-        //                 },
-        //                 today:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.today,
-        //                 year:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.year
-        //     },
-        //     avg_drink_per_week: {
-        //                 week:data.data.summary.alcohol.avg_drink_per_week.week,
-        //                 yesterday:data.data.summary.alcohol.avg_drink_per_week.yesterday,
-        //                 month:data.data.summary.alcohol.avg_drink_per_week.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.alcohol.avg_drink_per_week.custom_range.from_dt,
-        //                    to_dt:data.data.summary.alcohol.avg_drink_per_week.custom_range.to_dt,
-        //                    data:data.data.summary.alcohol.avg_drink_per_week.custom_range.data
-        //                 },
-        //                 today:data.data.summary.alcohol.avg_drink_per_week.today,
-        //                 year:data.data.summary.alcohol.avg_drink_per_week.year
-        //     },
-        //     rank: {
-        //                week:data.data.summary.alcohol.rank.week,
-        //                 yesterday:data.data.summary.alcohol.rank.yesterday,
-        //                 month:data.data.summary.alcohol.rank.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.alcohol.rank.custom_range.from_dt,
-        //                    to_dt:data.data.summary.alcohol.rank.custom_range.to_dt,
-        //                    data:data.data.summary.alcohol.rank.custom_range.data
-        //                 },
-        //                 today:data.data.summary.alcohol.rank.today,
-        //                 year:data.data.summary.alcohol.rank.year
-        //     },
-        //     alcoholic_drinks_per_week_gpa: {
-        //                 week:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.week,
-        //                 yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday,
-        //                 month:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month,
-        //                 custom_range:{
-        //                    from_dt :data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.from_dt,
-        //                    to_dt:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.to_dt,
-        //                    data:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.data
-        //                 },
-        //                 today:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today,
-        //                 year:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year
-        //     }
-        // }
+        penalty:{
+             sleep_aid_penalty: {
+                        week:data.data.summary.penalty.sleep_aid_penalty.week,
+                        yesterday:data.data.summary.penalty.sleep_aid_penalty.yesterday,
+                        month:data.data.summary.penalty.sleep_aid_penalty.month,
+                        custom_range:{
+                           from_dt :data.data.summary.penalty.sleep_aid_penalty.custom_range.from_dt,
+                           to_dt:data.data.summary.penalty.sleep_aid_penalty.custom_range.to_dt,
+                           data:data.data.summary.penalty.sleep_aid_penalty.custom_range.data
+                        },
+                        today:data.data.summary.penalty.sleep_aid_penalty.today,
+                        year:data.data.summary.penalty.sleep_aid_penalty.year
+                    },
+            controlled_substance_penalty: {
+                        week:data.data.summary.penalty.controlled_substance_penalty.week,
+                        yesterday:data.data.summary.penalty.controlled_substance_penalty.yesterday,
+                        month:data.data.summary.penalty.controlled_substance_penalty.month,
+                        custom_range:{
+                           from_dt :data.data.summary.penalty.controlled_substance_penalty.custom_range.from_dt,
+                           to_dt:data.data.summary.penalty.controlled_substance_penalty.custom_range.to_dt,
+                           data:data.data.summary.penalty.controlled_substance_penalty.custom_range.data
+                        },
+                        today:data.data.summary.penalty.controlled_substance_penalty.today,
+                        year:data.data.summary.penalty.controlled_substance_penalty.year
+                     },
+            smoking_penalty: {
+                        week:data.data.summary.penalty.smoking_penalty.week,
+                        yesterday:data.data.summary.penalty.smoking_penalty.yesterday,
+                        month:data.data.summary.penalty.smoking_penalty.month,
+                        custom_range:{
+                           from_dt :data.data.summary.penalty.smoking_penalty.custom_range.from_dt,
+                           to_dt:data.data.summary.penalty.smoking_penalty.custom_range.to_dt,
+                           data:data.data.summary.penalty.smoking_penalty.custom_range.data
+                        },
+                        today:data.data.summary.penalty.smoking_penalty.today,
+                        year:data.data.summary.penalty.smoking_penalty.year
+            },
+        },
+         sleep: {
+            average_sleep_grade: {
+                        week:data.data.summary.sleep.average_sleep_grade.week,
+                        yesterday:data.data.summary.sleep.average_sleep_grade.yesterday,
+                        month:data.data.summary.sleep.average_sleep_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.sleep.average_sleep_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.sleep.average_sleep_grade.custom_range.to_dt,
+                           data:data.data.summary.sleep.average_sleep_grade.custom_range.data
+                        },
+                        today:data.data.summary.sleep.average_sleep_grade.today,
+                        year:data.data.summary.sleep.average_sleep_grade.year
+                     },
+            rank: {
+                        week:data.data.summary.sleep.rank.week,
+                        yesterday:data.data.summary.sleep.rank.yesterday,
+                        month:data.data.summary.sleep.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.sleep.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.sleep.rank.custom_range.to_dt,
+                           data:data.data.summary.sleep.rank.custom_range.data
+                        },
+                        today:data.data.summary.sleep.rank.today,
+                        year:data.data.summary.sleep.rank.year
+                    },
+            total_sleep_in_hours_min: {
+                        week:data.data.summary.sleep.total_sleep_in_hours_min.week,
+                        yesterday:data.data.summary.sleep.total_sleep_in_hours_min.yesterday,
+                        month:data.data.summary.sleep.total_sleep_in_hours_min.month,
+                        custom_range:{
+                           from_dt :data.data.summary.sleep.total_sleep_in_hours_min.custom_range.from_dt,
+                           to_dt:data.data.summary.sleep.total_sleep_in_hours_min.custom_range.to_dt,
+                           data:data.data.summary.sleep.total_sleep_in_hours_min.custom_range.data
+                        },
+                        today:data.data.summary.sleep.total_sleep_in_hours_min.today,
+                        year:data.data.summary.sleep.total_sleep_in_hours_min.year
+                    },
+            overall_sleep_gpa: {
+                        week:data.data.summary.sleep.overall_sleep_gpa.week,
+                        yesterday:data.data.summary.sleep.overall_sleep_gpa.yesterday,
+                        month:data.data.summary.sleep.overall_sleep_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.sleep.overall_sleep_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.sleep.overall_sleep_gpa.custom_range.to_dt,
+                           data:data.data.summary.sleep.overall_sleep_gpa.custom_range.data
+                        },
+                        today:data.data.summary.sleep.overall_sleep_gpa.today,
+                        year:data.data.summary.sleep.overall_sleep_gpa.year
+                     }
+               },
+         alcohol: {
+            alcoholic_drinks_per_week_grade: {
+                        week:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.week,
+                        yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.yesterday,
+                        month:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.month,
+                        custom_range:{
+                           from_dt :data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.from_dt,
+                           to_dt:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.to_dt,
+                           data:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.data
+                        },
+                        today:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.today,
+                        year:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.year
+            },
+            avg_drink_per_week: {
+                        week:data.data.summary.alcohol.avg_drink_per_week.week,
+                        yesterday:data.data.summary.alcohol.avg_drink_per_week.yesterday,
+                        month:data.data.summary.alcohol.avg_drink_per_week.month,
+                        custom_range:{
+                           from_dt :data.data.summary.alcohol.avg_drink_per_week.custom_range.from_dt,
+                           to_dt:data.data.summary.alcohol.avg_drink_per_week.custom_range.to_dt,
+                           data:data.data.summary.alcohol.avg_drink_per_week.custom_range.data
+                        },
+                        today:data.data.summary.alcohol.avg_drink_per_week.today,
+                        year:data.data.summary.alcohol.avg_drink_per_week.year
+            },
+            rank: {
+                       week:data.data.summary.alcohol.rank.week,
+                        yesterday:data.data.summary.alcohol.rank.yesterday,
+                        month:data.data.summary.alcohol.rank.month,
+                        custom_range:{
+                           from_dt :data.data.summary.alcohol.rank.custom_range.from_dt,
+                           to_dt:data.data.summary.alcohol.rank.custom_range.to_dt,
+                           data:data.data.summary.alcohol.rank.custom_range.data
+                        },
+                        today:data.data.summary.alcohol.rank.today,
+                        year:data.data.summary.alcohol.rank.year
+            },
+            alcoholic_drinks_per_week_gpa: {
+                        week:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.week,
+                        yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday,
+                        month:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month,
+                        custom_range:{
+                           from_dt :data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.from_dt,
+                           to_dt:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.to_dt,
+                           data:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.data
+                        },
+                        today:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today,
+                        year:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year
+            }
+        }
               
-        // }
+        }
     })
   }
 
@@ -1108,17 +1114,26 @@ constructor(props){
        console.log(error.message);
     }
 
-    processDate(selectedDate){
-    console.log(selectedDate);
+    processDate(selectedDate,fromDate,toDate){ 
     this.setState({
       selectedDate: selectedDate,
     },()=>{
-      fetchProgress(this.state.selectedDate,this.successProgress,this.errorProgress);
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
     });
   }
 
+  onSubmitDate(event){
+    event.preventDefault();
+    this.setState({
+      dateRange:!this.state.dateRange,
+    },()=>{
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,this.state.start_date,this.state.end_date);
+    });
+  }
+
+
     componentDidMount(){
-      fetchProgress(this.state.selectedDate,this.successProgress,this.errorProgress);
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
     }
   toggle() {
     this.setState({
@@ -1126,6 +1141,11 @@ constructor(props){
      
     });
   }
+  toggleDate(){
+    this.setState({
+      dateRange:!this.state.dateRange
+    });
+   }
 
   onLogoutSuccess(response){
     this.props.history.push("/#logout");
@@ -1139,6 +1159,14 @@ constructor(props){
       calendarOpen:!this.state.calendarOpen
     });
   }
+handleChange(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      this.setState({
+        [name]: value
+      });
+    }
 
 	render(){
 		const {fix} = this.props;
@@ -1206,9 +1234,21 @@ constructor(props){
             <span className="pdf_button" id="pdf_button">
             <Button className="btn createbutton">Create PDF</Button>
             </span>
-      </div>
+
+            <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
+                         
+                          <span className="date_range_btn">
+                           <Button
+                                            className="daterange-btn btn"                            
+                              id="daterange"
+                              
+                              onClick={this.toggleDate} >Date Range
+                          </Button>
+                          </span>
+                           </span>
+                        </div>
                                         
-             <Popover
+                          <Popover
                             placement="bottom"
                             isOpen={this.state.calendarOpen}
                             target="progress"
@@ -1216,6 +1256,48 @@ constructor(props){
                               <PopoverBody className="calendar2">
                                 <CalendarWidget  onDaySelect={this.processDate}/>
                               </PopoverBody>
+                           </Popover>
+
+
+                           <Popover
+                            placement="bottom"
+                            isOpen={this.state.dateRange}
+                            target="daterange"
+                            toggle={this.toggleDate}>
+                              <PopoverBody>
+                                <div >
+
+                   <Form>
+                    <div style={{paddingBottom:"12px"}} className="justify-content-center">
+                      <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                      <Input type="date"
+                       name="start_date"
+                       value={this.state.start_date}
+                       onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                    </div>
+                    <div id="date" className="justify-content-center">
+
+                      <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                      <Input type="date"
+                       name="end_date"
+                       value={this.state.end_date}
+                       onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                    </div>
+                    <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+                    <button
+                    id="nav-btn"
+                     style={{backgroundColor:"#ed9507"}}
+                     type="submit"
+                     className="btn btn-block-lg"
+                     onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
+                     </div>
+
+                   </Form>
+              </div>
+                           </PopoverBody>
                            </Popover>
 
 			<div className="col-sm-12 col-md-12 col-lg-12 padding">
@@ -1237,7 +1319,7 @@ constructor(props){
         <tbody>
             <tr>
                 <td >Total GPA Points</td>
-                <td>{this.state.summary.overall_health.total_gpa_point.custom_range.from_dt} to
+               <td>{this.state.summary.overall_health.total_gpa_point.custom_range.from_dt} to
                  {this.state.summary.overall_health.total_gpa_point.custom_range.to_dt} value
                  {this.state.summary.overall_health.total_gpa_point.custom_range.data}</td>
                 <td>{this.state.summary.overall_health.total_gpa_point.today}</td>

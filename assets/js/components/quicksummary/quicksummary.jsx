@@ -97,6 +97,14 @@ class Quicklook extends Component{
 	}
 
 	updateDateState(data,user_input_data){
+				let grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
+				let overall_health_gpa_before_panalty = (grade_point[data.grades_ql.movement_non_exercise_steps_grade]+
+					grade_point[data.grades_ql.movement_consistency_grade]+
+					grade_point[data.grades_ql.avg_sleep_per_night_grade]+
+					grade_point[data.grades_ql.exercise_consistency_grade]+
+					grade_point[data.grades_ql.prcnt_unprocessed_food_consumed_grade]+
+					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
+
        			var properties={
        			created_at:data.created_at,
 				grades_ql: {
@@ -118,7 +126,7 @@ class Quicklook extends Component{
 			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
 			        smoke_penalty:data.grades_ql.smoke_penalty,
-			        overall_health_gpa_before_panalty:data.grades_ql.overall_health_gpa+Math.abs(data.grades_ql.sleep_aid_penalty+data.grades_ql.ctrl_subs_penalty+data.grades_ql.smoke_penalty),
+			        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
 	        
 			     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
 			     //    stress_level:data.exercise_reporting_ql.stress_level,
