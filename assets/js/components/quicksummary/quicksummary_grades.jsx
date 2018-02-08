@@ -74,8 +74,11 @@ renderTableColumns(dateWiseData,category,classes=""){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-            if(key !== 'id' && key !== 'user_ql'){
+          console.log(key);
+          
 
+            if(key !== 'id' && key !== 'user_ql'){
+            
             if(key == "resting_hr" || key == "overall_workout_grade"){
               all_data.push({
                   value:'',
@@ -83,6 +86,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
             }
 
+           
             if(key === 'overall_health_gpa' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -97,6 +101,31 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
+
+           else if(key =='movement_non_exercise_steps' ){
+            
+            
+             
+              all_data.push({
+                    value: value.toLocaleString(),
+                    style: obj[value]
+                });
+            }
+            // else if((key =='movement_consistency_grade' || key =='overall_health_grade' || 
+            //   key =='overall_health_gpa' ||  key =='movement_non_exercise_steps_grade' || 
+            //   key =='movement_non_exercise_steps' ||  key =='movement_consistency_score' || 
+            //   key =='avg_sleep_per_night_grade' ||  key =='avg_sleep_per_night' || 
+            //   key =='exercise_consistency_grade' ||  key =='workout_today' || 
+            //   key =='exercise_consistency_score' ||  key =='prcnt_unprocessed_food_consumed_grade' || 
+            //   key =='prcnt_unprocessed_food_consumed' ||  key =='alcoholic_drink_per_week_grade' || 
+            //   key =='alcoholic_drink_per_week' ||  key =='sleep_aid_penalty' || 
+            //   key =='ctrl_subs_penalty' ||  key =='smoke_penalty' || 
+            //   key =='overall_health_gpa_before_panalty'  ) && (value ==' ' )){
+            //      all_data.push({
+            //         value: 'Not Reported',
+            //         style: obj[value]
+            //     });
+            // }
             else if(key === 'overall_health_gpa_before_panalty' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -125,25 +154,17 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
-            // else if(key ==='movement_non_exercise_steps'){
-            //   value += '';
-            //       var x = value.split('.');
-            //       var x1 = x[0];
-            //       var x2 = x.length > 1 ? '.' + x[1] : '';
-            //       var rgx = /(\d+)(\d{3})/;
-            //       while (rgx.test(x1)) {
-            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            //       }
-            //   all_data.push(x1 + x2)
-
-            // }
+            
             else if(key == 'smoke_penalty' || key ==  'ctrl_subs_penalty' || key == 'sleep_aid_penalty'){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
                   style:obj['penalty']
                 });
-              }else{
+              }
+               
+
+              else{
                 all_data.push({
                   value:'No',
                   style:''
@@ -160,8 +181,14 @@ renderTableColumns(dateWiseData,category,classes=""){
                   });
               }else
                 all_data.push({
-                  value:'',
+                  value:'Not Reported',
                   style:''
+                });
+            }
+            else if(value == ''  && value != '0'){
+                all_data.push({
+                    value: 'Not Reported',
+                    style: obj[value]
                 });
             }
             else {
@@ -181,7 +208,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                         {all_data[props.rowIndex].value}
                     </Cell>
                 )}
-               width={135}
+               width={100}
             />
         )
     }
@@ -211,7 +238,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={280}
+		          width={170}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"grades_ql")}

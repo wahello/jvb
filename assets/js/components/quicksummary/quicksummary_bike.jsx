@@ -45,7 +45,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
