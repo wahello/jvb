@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import ast
 import xlwt
 import time
+import json
 import xlsxwriter	
 from xlwt import easyxf
 from django.shortcuts import get_object_or_404
@@ -251,12 +252,10 @@ def export_users_xls(request):
 	date_format = book.add_format({'num_format': 'm-d-yy'})
 	current_date = to_date
 	r = 0
-	date1 = []
 	if to_date and from_date :
 		while (current_date >= from_date):
 			r = r + 1
 			sheet9.write(0,r,current_date,date_format)
-			date1.append(current_date)
 			current_date -= timedelta(days = 1)
 
 	
@@ -274,12 +273,12 @@ def export_users_xls(request):
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
 			   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
-			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
+			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty','overall_gpa_without_penalties']
 	columnsw = ['Overall Health Grade','Overall Health Gpa','Non Exercise Steps Grade','Non Exercise Steps',
 			   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
 			   'Exercise Consistency Grade',"Did you Workout Today",'Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
 			   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
-			   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty']
+			   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty','Overall Health Grade Before Penalties']
 
 	grades_qs = Grades.objects.filter(
 		user_ql__created_at__range=(from_date, to_date),
@@ -382,7 +381,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns):
 			
-				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout':
+				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout' and key != 'overall_gpa_without_penalties':
 					if grades_data[key] == 'A':
 						sheet9.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
@@ -404,6 +403,7 @@ def export_users_xls(request):
 							sheet9.write(i+3,row_num, 'YES',format_red)
 					elif i == 1:
 						sheet9.write(i+3,row_num, grades_data[key],format1)
+
 				elif key == '':
 					sheet9.write(i+3,row_num, '',format1)
 				elif i == 3:
@@ -424,7 +424,14 @@ def export_users_xls(request):
 					else:
 						sheet9.write(i+3,row_num, str(int(food_data[key])) + '%')
 				elif i == 14:
-					sheet9.write(i+3,row_num, alcohol_data[key],format_exe)	
+					sheet9.write(i+3,row_num, alcohol_data[key],format_exe)
+				elif i == 18:
+					overall_workout_gpa_cal = grades_data['overall_health_gpa']
+					sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
+					ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
+					smoke_penalty_cal = grades_data['smoke_penalty']
+					overall_workout_gpa_without_penalty = overall_workout_gpa_cal+sleep_aid_penalty_cal+ctrl_subs_penalty_cal+smoke_penalty_cal
+					sheet9.write(i+3,row_num,overall_workout_gpa_without_penalty,format1)
 				else:
 					sheet9.write(i+3,row_num, '')
 		else:
@@ -898,15 +905,15 @@ def export_users_xls(request):
 	sheet1.repeat_columns(0)
 	sheet1.set_landscape()
 
-	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
-			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
-			   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
-			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
-	columnsw = ['Overall Health Grade','Overall Health Gpa','Non Exercise Steps Grade','Non Exercise Steps',
-			   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
-			   'Exercise Consistency Grade','Did you Workout Today','Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
-			   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
-			   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty']
+	# columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
+	# 		   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
+	# 		   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
+	# 		   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty']
+	# columnsw = ['Overall Health Grade','Overall Health Gpa','Non Exercise Steps Grade','Non Exercise Steps',
+	# 		   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
+	# 		   'Exercise Consistency Grade','Did you Workout Today','Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
+	# 		   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
+	# 		   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty']
 
 	current_date = to_date
 	r = 0
@@ -947,7 +954,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns):
 			
-				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout':
+				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout' and key != 'overall_gpa_without_penalties':
 					if grades_data[key] == 'A':
 						sheet1.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
@@ -989,7 +996,14 @@ def export_users_xls(request):
 					else:
 						sheet1.write(i+3,row_num, str(int(food_data[key])) + '%')
 				elif i == 14:
-					sheet1.write(i+3,row_num, alcohol_data[key],format_exe)	
+					sheet1.write(i+3,row_num, alcohol_data[key],format_exe)
+				elif i == 18:
+					overall_workout_gpa_cal = grades_data['overall_health_gpa']
+					sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
+					ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
+					smoke_penalty_cal = grades_data['smoke_penalty']
+					overall_workout_gpa_without_penalty = overall_workout_gpa_cal+sleep_aid_penalty_cal+ctrl_subs_penalty_cal+smoke_penalty_cal
+					sheet1.write(i+3,row_num,overall_workout_gpa_without_penalty,format1)
 				else:
 					sheet1.write(i+3,row_num,'')
 		else:
@@ -1431,53 +1445,242 @@ def export_users_xls(request):
 		sheet6.write(col_num1, row_num, columns8w[col_num])
 
 	current_date = to_date
-	for row in exercise_qs.values():
-		while (current_date >= from_date):
-			# logic
-			data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-			if data:
-				row_num += 1
-				for i,key in enumerate(columns):
-					if row[key] == None:
-						sheet6.write(i + 2, row_num,'No GPS data',format)
-					else:
-						sheet6.write(i + 2, row_num,row[key],format)
-			else:
-				row_num += 1
-				sheet6.write(i + 2, row_num, '')
-			current_date -= timedelta(days=1)
+	# for row in exercise_qs.values():
+		# print (row)
+	while (current_date >= from_date):
+		# logic
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			row_num += 1
+			for i,key in enumerate(columns):
+				if data[key] == None:
+					sheet6.write(i + 2, row_num,'No GPS data',format)
+				else:
+					sheet6.write(i + 2, row_num,data[key],format)
+		else:
+			row_num += 1
+			sheet6.write(i + 2, row_num, '')
+		current_date -= timedelta(days=1)
 	
+	#movement consistenct
+	sheet11 = book.add_worksheet('Movement Consistency')
+	sheet11.write(2,0,"Hour")
+	sheet11.write(3,0,"Date")
+	sheet11.write(3,1,"Daily Movement Consistency Score")
+	hours_range = ["Total Daily Steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
+	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
+	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
+	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","Sleeping Hours",
+	"Active Hours","Inactive Hours"]
+	hours_range1 = ["total_steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
+	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
+	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
+	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","sleeping_hours",
+	"active_hours","inactive_hours"]
+	columns = ['movement_consistency']
+	current_date = to_date
+	r = 4
+	# ?from_date=01-31-2018&to_date=01-05-2018
+	if to_date and from_date:
+		while (current_date >= from_date):
+			r = r + 1
+			sheet11.write(r,0,current_date,date_format)
+			current_date -= timedelta(days = 1)
+	sheet11.set_row(3,45)
+	col_num = 2
+	start_num = 12
+	start_digit =':01'
+	end_digit = ':59'
+	for hour in range(1,25,1):
+		col_num += 1
+		sheet11.write(2,col_num,hour)
+	col_num1 = 1
+	for col_num in range(len(hours_range)):
+		col_num1 += 1
+		sheet11.write(3,col_num1,hours_range[col_num])
+	current_date = to_date
+	row_num = 4
+	row = 4
+	col = 2
+	while (current_date >= from_date):
+		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if steps_data:
+			steps_data = steps_data.__dict__
+			# logic
+			row += 1
+			# print(steps_data)
+			for x,key in enumerate(columns):
+				steps_string = steps_data['movement_consistency']
+				print(steps_string)
+				if steps_string:
+					json1_data = json.loads(steps_string)
+					# print (json1_data)
+					# print(json1_data.keys())
+					# if json1_data['12:00 AM to 12:59 AM']
+					# row += 1
+					sheet11.write(row,col+x,json1_data['total_steps'])
+					sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
+					sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
+					sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
+					sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
+					sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
+					sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
+					sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
+					sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
+					sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
+					sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
+					sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
+					sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
+					sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
+					sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
+					sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
+					sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
+					sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
+					sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
+					sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
+					sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
+					sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
+					sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
+					sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
+					sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
+					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
+					sheet11.write(row,col+x+26,json1_data['active_hours'])
+					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
+
+			# for x,key1 in enumerate(hours_range1):
+			# 	if json1_data[key1]['status'] == 'active':
+			# 		sheet11.write.(row,column,json1_data[key1]['steps'])
+			# 	else:
+			# 		sheet11.write.(row,column,json1_data[key1]['steps'])
 
 
+		else:
+			row += 1
+			sheet11.write(row,col,'')
+		current_date -= timedelta(days=1)
 
 	book.close()
 	return response
 
 def export_movement_consistency_xls(request):
+	to_date = request.GET.get('to_date',None)
+	from_date = request.GET.get('from_date', None)
+
+	to_date = datetime.strptime(to_date, "%m-%d-%Y").date()
+	from_date = datetime.strptime(from_date, "%m-%d-%Y").date()
 	filename = '{}_Movemenr_Consistency_data.xlsx'.format(request.user.username)
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 	response['Content-Disposition'] = "attachment; filename={}".format(filename)
 	book = Workbook(response,{'in_memory': True})
-	sheet1 = book.add_worksheet('Movement Consistency')
+	sheet11 = book.add_worksheet('Movement Consistency')
+	date_format = book.add_format({'num_format': 'm-d-yy'})
 	# steps_qs = Steps.objects.filter(
 	# 	user_ql__created_at__range=(from_date, to_date),
 	# 	user_ql__user = request.user).order_by('-user_ql__created_at')
 
 	# steps_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
 	# 	 for q in steps_qs }
-
-	steps_qs = Steps.objects.all()
+	current_date = to_date
+	r = 4
+	# ?from_date=01-31-2018&to_date=01-05-2018
+	if to_date and from_date:
+		while (current_date >= from_date):
+			r = r + 1
+			sheet11.write(r,0,current_date,date_format)
+			current_date -= timedelta(days = 1)
+	sheet11.set_row(3,45)
+	steps_qs = Steps.objects.filter(
+		user_ql__created_at__range=(from_date, to_date),
+		user_ql__user = request.user).order_by('-user_ql__created_at')
 
 	steps_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
 		 for q in steps_qs }
-	sheet1.write(2,0,"Hour")
-	sheet1.write(3,0,"Date")
-	sheet1.write(3,1,"Daily Movement Consistency Score")
-	sheet1.write(3,2,"Total Daily Steps")
+	sheet11.write(2,0,"Hour")
+	sheet11.write(3,0,"Date")
+	sheet11.write(3,1,"Daily Movement Consistency Score")
+	hours_range = ["Total Daily Steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
+	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
+	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
+	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","Sleeping Hours",
+	"Active Hours","Inactive Hours"]
+	hours_range1 = ["total_steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
+	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
+	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
+	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","sleeping_hours",
+	"active_hours","inactive_hours"]
+	columns = ['movement_consistency']
 	col_num = 2
+	start_num = 12
+	start_digit =':01'
+	end_digit = ':59'
 	for hour in range(1,25,1):
 		col_num += 1
-		sheet1.write(2,col_num,hour)
+		sheet11.write(2,col_num,hour)
+	col_num1 = 1
+	for col_num in range(len(hours_range)):
+		col_num1 += 1
+		sheet11.write(3,col_num1,hours_range[col_num])
+	current_date = to_date
+	row_num = 4
+	row = 4
+	col = 2
+	while (current_date >= from_date):
+		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if steps_data:
+			steps_data = steps_data.__dict__
+			# logic
+			row += 1
+			# print(steps_data)
+			for x,key in enumerate(columns):
+				steps_string = steps_data['movement_consistency']
+				if steps_string:
+					json1_data = json.loads(steps_string)
+					# print (json1_data)
+					# print(json1_data.keys())
+					# if json1_data['12:00 AM to 12:59 AM']
+					# row += 1
+					sheet11.write(row,col+x,json1_data['total_steps'])
+					sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
+					sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
+					sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
+					sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
+					sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
+					sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
+					sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
+					sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
+					sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
+					sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
+					sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
+					sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
+					sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
+					sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
+					sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
+					sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
+					sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
+					sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
+					sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
+					sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
+					sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
+					sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
+					sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
+					sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
+					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
+					sheet11.write(row,col+x+26,json1_data['active_hours'])
+					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
 
+			# for x,key1 in enumerate(hours_range1):
+			# 	if json1_data[key1]['status'] == 'active':
+			# 		sheet11.write.(row,column,json1_data[key1]['steps'])
+			# 	else:
+			# 		sheet11.write.(row,column,json1_data[key1]['steps'])
+
+
+		else:
+			row += 1
+			sheet11.write(row,col,'')
+		current_date -= timedelta(days=1)
+
+	
 	book.close()
 	return response
