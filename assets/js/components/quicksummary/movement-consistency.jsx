@@ -49,6 +49,7 @@ class Movementquick extends Component{
         {name: '11:00 PM - 11:59 AM'},
         {name: 'Active Hours'},
         {name: 'Inactive Hours'},
+        {name: 'Strength Hours'},
         {name: 'Sleeping Hours'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
@@ -160,6 +161,7 @@ class Movementquick extends Component{
            }, 
            active_hours:'-',
            inactive_hours:'-',
+           strength_hours:'-',
            sleeping_hours:'-',
            total_steps:'-'
          }
@@ -209,13 +211,12 @@ class Movementquick extends Component{
       let steps_data = [];
       let status_data = [];
       for(let slot of this.getSortKeysAccordingTime()){
-       
           steps_data.push(data['movement_consistency'][slot].steps);
-          console.log(data['movement_consistency']);
           status_data.push(data['movement_consistency'][slot].status);
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
+      steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
       steps_data.push(data['movement_consistency'].total_steps);
       
@@ -284,7 +285,6 @@ const styles = StyleSheet.create({
   newTableHeader: {
     textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'

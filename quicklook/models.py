@@ -32,6 +32,7 @@ class Grades(models.Model,):
 	overall_health_gpa = models.FloatField(blank=True,null=True)
 	movement_non_exercise_steps_grade = models.CharField(choices=GRADE_CHOICES,
 														 max_length=3,blank=True)
+	movement_non_exercise_steps_gpa = models.FloatField(blank=True,null=True)
 	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
 	avg_sleep_per_night_gpa = models.FloatField(blank=True,null=True)

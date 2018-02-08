@@ -77,7 +77,7 @@ render(){
 		          width={167}
 		          fixed={true}
 		        />
-			    {this.renderTableColumns(this.props.data,"bike_stats_ql")}
+			    {this.renderTableColumns(this.props.data,"bike_stats_ql")}  
       		</Table>
 			</div>
 
@@ -85,25 +85,24 @@ render(){
 	}
 }
 const styles = StyleSheet.create({
-  newTableHeader: {
-  	textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+  newTableHeader: {  
+  	textAlign:'center', 
+    color: '#111111', 
+    border: 'none', 
+    fontFamily:'Proxima-Nova', 
+    fontStyle:'normal' 
+  }, 
+  newTableBody:{ 
+  	textAlign:'center', 
+    color: '#5e5e5e', 
+    fontSize: '16px',  
     border: 'none',
-    fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
-  },
-  newTableBody:{
-  	textAlign:'center',
-    color: '#5e5e5e',
-    fontSize: '16px', 
-    border: 'none',
-    fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
-  }
-});
+    fontFamily:'Proxima-Nova', 
+    fontStyle:'normal' 
+  } 
+}); 
 
-export default Dimensions({
+export default Dimensions({ 
   getHeight: function(element) {
     return window.innerHeight - 335;
   },

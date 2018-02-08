@@ -72,6 +72,12 @@ class UserInputs extends React.Component{
         workout:'',
         workout_type:'',
         workout_input_type:'',
+        strength_workout_start_hour:'',
+        strength_workout_start_min:'',
+        strength_workout_start_am_pm:'',
+        strength_workout_end_hour:'',
+        strength_workout_end_min:'',        
+        strength_workout_end_am_pm:'',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -230,12 +236,23 @@ class UserInputs extends React.Component{
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
+      this.extractString = this.extractString.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
-
+extractString(){
+  let str = "7:30 am";
+  let h = str.split(":");
+  let hour=h[0];
+  let m = h[1].split(" ");
+  let min = m[0];
+  let am = m[1];
+  let str1 = hours+":"+min+" "+am;
+  return str1;
+  console.log(str1); 
+}
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
@@ -332,6 +349,12 @@ class UserInputs extends React.Component{
           no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
           no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
+          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour:'',
+          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min:'',
+          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm:'',
+          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour:'',
+          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min:'',        
+          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm:'',
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
           workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
@@ -356,24 +379,24 @@ class UserInputs extends React.Component{
           calories:have_optional_input? data.data.optional_input.calories_consumed_during_workout: '',
           calories_item:have_optional_input?data.data.optional_input.food_ate_during_workout:'',
 
-          indoor_temperature:have_strong_input?data.data.strong_input.indoor_temperature:'',
-          outdoor_temperature:have_strong_input?data.data.strong_input.outdoor_temperature:'',
-          temperature_feels_like:have_strong_input?data.data.strong_input.temperature_feels_like:'',
-          wind:have_strong_input?data.data.strong_input.wind:'',
-          dewpoint:have_strong_input?data.data.strong_input.dewpoint:'',
-          humidity:have_strong_input?data.data.strong_input.humidity:'',
-          weather_comment:have_strong_input?data.data.strong_input.weather_comment:'',
+          indoor_temperature:(have_strong_input&&canUpdateForm)?data.data.strong_input.indoor_temperature:'',
+          outdoor_temperature:(have_strong_input&&canUpdateForm)?data.data.strong_input.outdoor_temperature:'',
+          temperature_feels_like:(have_strong_input&&canUpdateForm)?data.data.strong_input.temperature_feels_like:'',
+          wind:(have_strong_input&&canUpdateForm)?data.data.strong_input.wind:'',
+          dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
+          humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
+          weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
 
 
-          measured_hr:have_encouraged_input?data.data.encouraged_input.measured_hr:'',
-          hr_down_99:have_encouraged_input?data.data.encouraged_input.hr_down_99:'',
-          time_to_99_min:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[0]:'',
-          time_to_99_sec:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[1]:'',
-          hr_level:have_encouraged_input?data.data.encouraged_input.hr_level:'',
-          lowest_hr_first_minute:have_encouraged_input?data.data.encouraged_input.lowest_hr_first_minute:'',
-          lowest_hr_during_hrr:have_encouraged_input?data.data.encouraged_input.lowest_hr_during_hrr:'',
-          time_to_lowest_point_min:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
-          time_to_lowest_point_sec:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
+          measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
+          hr_down_99:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.hr_down_99:'',
+          time_to_99_min:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_99.split(':')[0]:'',
+          time_to_99_sec:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_99.split(':')[1]:'',
+          hr_level:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.hr_level:'',
+          lowest_hr_first_minute:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.lowest_hr_first_minute:'',
+          lowest_hr_during_hrr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.lowest_hr_during_hrr:'',
+          time_to_lowest_point_min:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
+          time_to_lowest_point_sec:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
 
 
           sleep_hours_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
@@ -1246,7 +1269,7 @@ handleScroll() {
                                         name="no_exercise_reason"
                                         value={this.state.no_exercise_reason}                                       
                                         onChange={this.handleChangeNoExerciseReason}>
-                                                <option value="other">Other</option>
+                                                <option value=" ">Select</option>                                        
                                                 <option value="rest day">Rest Day</option> 
                                                 <option value="sick">Sick</option>
                                                 <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
@@ -1254,6 +1277,7 @@ handleScroll() {
                                                 <option value="work got in the way">Work Got in the Way</option>
                                                 <option value="travel day">Travel Day</option>
                                                 <option value="weather">Weather</option> 
+
                                       </Input>
                                     </div>
                                   }
@@ -1370,7 +1394,134 @@ handleScroll() {
                               exercises, pull ups, etc.  
                                </div>
                               </ModalBody>
-                           </Modal>                         
+                           </Modal> 
+                           {(this.state.workout_type =="strength" || 
+                           this.state.workout_type =="both") &&
+                           <FormGroup>
+                            <Label className="padding">1.1.1 Enter the time your strength workout started.</Label>
+                            {this.state.editable &&
+                              <div className="display_flex">
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="strength_workout_start_hour"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.strength_workout_start_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="strength_workout_start_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.strength_workout_start_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="strength_workout_start_am_pm"                                  
+                                     value={this.state.strength_workout_start_am_pm}
+                                     onChange={this.handleChange} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                            }
+                            </FormGroup> 
+                            }                           
+                            <FormGroup>
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                          
+                                <p>{this.state.strength_workout_start_hour}:{this.state.strength_workout_start_min}  {this.state.strength_workout_start_am_pm}</p>
+                          
+                              </div>
+                            } 
+                            </FormGroup> 
+
+                        
+                         {(this.state.workout_type =="strength" ||  this.state.workout_type == "both") &&
+                         <FormGroup>
+                            <Label className="padding">1.1.2 Enter the Time your Strength Workout Ended.</Label>
+                            {this.state.editable &&
+                              <div className = "display_flex">
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="strength_workout_end_hour"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.strength_workout_end_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="strength_workout_end_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.strength_workout_end_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="strength_workout_end_am_pm"                                  
+                                     value={this.state.strength_workout_end_am_pm}
+                                     onChange={this.handleChange} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                            }
+                            </FormGroup>
+                          }
+                            <FormGroup>
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                
+                                <p>{this.state.strength_workout_end_hour}:{this.state.strength_workout_end_min}  {this.state.strength_workout_end_am_pm}</p>
+                              
+                              </div>
+                            } 
+                            </FormGroup> 
+
+                        
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
@@ -2092,7 +2243,7 @@ handleScroll() {
                                 onClick={this.handleWeatherCheck}
                                 >
                                 </Input>
-                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout
+                                <Label className="LAbel" style={{paddingLeft:"25px"}}>1.11 I want to manually enter in weather information for my workout
                                  <span id="wether"
                              onClick={this.toggleWeather} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -2420,7 +2571,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                         <FormGroup>
                           {this.state.editable &&
-                          <div className="input1">
+                          <div className="input1" style={{paddingLeft:"25px"}}>
                           <Input
                           type="checkbox"
                           checked = {this.state.calories_item_check}

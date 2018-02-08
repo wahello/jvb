@@ -252,7 +252,6 @@ const styles = StyleSheet.create({
   newTableHeader: {
     textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'

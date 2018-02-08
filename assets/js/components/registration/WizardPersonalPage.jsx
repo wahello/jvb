@@ -185,7 +185,7 @@ class WizardPersonalPage extends Component{
 							<Button outline color="primary" onClick={previousPage}>
 								Previous
 							</Button>
-							<Button type="submit" outline color="primary" style={{float:'right'}}>
+							<Button id= "submit2" type="submit" outline color="primary" style={{float:'right'}}>
 								Next
 							</Button>
 						</div>
