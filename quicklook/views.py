@@ -426,11 +426,21 @@ def export_users_xls(request):
 				elif i == 14:
 					sheet9.write(i+3,row_num, alcohol_data[key],format_exe)
 				elif i == 18:
-					overall_workout_gpa_cal = grades_data['overall_health_gpa']
-					sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
-					ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
-					smoke_penalty_cal = grades_data['smoke_penalty']
-					overall_workout_gpa_without_penalty = overall_workout_gpa_cal+sleep_aid_penalty_cal+ctrl_subs_penalty_cal+smoke_penalty_cal
+					grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
+					# overall_workout_gpa_cal = grades_data['overall_health_gpa']
+					# sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
+					# ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
+					# smoke_penalty_cal = grades_data['smoke_penalty']
+					grades_steps = grades_data['movement_non_exercise_steps_grade']
+					grades_consistency = grades_data['movement_consistency_grade']
+					grades_sleep = grades_data['avg_sleep_per_night_grade']
+					grades_consistency_exe = grades_data['exercise_consistency_grade']
+					grades_food = grades_data['prcnt_unprocessed_food_consumed_grade']
+					grades_alcohol = grades_data['alcoholic_drink_per_week_grade']
+					overall_workout_gpa_without_penalty = (grade_point[grades_steps]+grade_point[grades_consistency]+
+					grade_point[grades_sleep]+grade_point[grades_consistency_exe]+grade_point[grades_food]+grade_point[grades_alcohol])/6
+
+					# overall_workout_gpa_without_penalty = overall_workout_gpa_cal+sleep_aid_penalty_cal+ctrl_subs_penalty_cal+smoke_penalty_cal
 					sheet9.write(i+3,row_num,overall_workout_gpa_without_penalty,format1)
 				else:
 					sheet9.write(i+3,row_num, '')
@@ -1512,7 +1522,6 @@ def export_users_xls(request):
 			# print(steps_data)
 			for x,key in enumerate(columns):
 				steps_string = steps_data['movement_consistency']
-				print(steps_string)
 				if steps_string:
 					json1_data = json.loads(steps_string)
 					# print (json1_data)
