@@ -387,7 +387,6 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 
 	If bed_time_today is True, that's mean we are tying to find out today's bedtime
 	"""
-
 	def _get_actual_sleep_start_time(data):
 		min_duration = None
 		sleep_level_maps = data.get('sleepLevelsMap')
@@ -443,6 +442,7 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			if end_time > next_day_midnight:
 				if 'MANUAL' in obj.get('validation',None):
 					recent_auto_manual = obj
+					break;
 				# if obj.get('validation',None) == 'AUTO_MANUAL':
 				# 	recent_auto_manual = obj
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
@@ -487,7 +487,7 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 					target_sleep_data = obj
 					max_end_time = obj_end_time
 
-				elif 'MANUAL' in (obj.get('validation',None) and
+				elif ('MANUAL' in obj.get('validation',None) and
 					obj_start_time < max_end_time):
 					target_sleep_data = obj
 					max_end_time = obj_end_time
@@ -766,6 +766,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 		total_steps = 0
 		sleeping_hours = 0
 		strength_hours = 0
+
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -789,9 +790,11 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
-				else:
-					if(not movement_consistency[interval]['steps'] and
-						movement_consistency[interval]['status'] != 'strength'):
+
+				elif hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
+					movement_consistency[interval]['status'] = 'strength'
+
+				elif not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
 
