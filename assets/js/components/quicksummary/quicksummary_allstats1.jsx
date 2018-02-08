@@ -319,7 +319,7 @@ class AllStats1 extends Component{
 				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 
 
 				/>
@@ -368,7 +368,7 @@ class AllStats1 extends Component{
 
 		            </Cell>
 		          )}
-		          width={280}
+		          width={225}
 		          fixed={true}
 
 

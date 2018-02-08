@@ -39,22 +39,22 @@ componentDidMount(){
 
  	renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
-    let A=[8,7];
-		 const obj = {
-        [8]: { background: 'green', color: 'black'},
-        B: { background: 'green', color: 'black' },
-        C: { background: 'yellow', color:'black' },
-        D: { background: 'yellow', color:'black' },
-        F: { background: 'red', color: 'black' },
-    }; 
-   var x=$( this );
+   
+		 
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){  
        			if(key !== 'id' && key !== 'user_ql' ){
+
+              if((key == 'alcohol_day' || key == 'alcohol_week') && (value == ''  && value != '0')) {
+              
+                value ='Not Reported';
+                 all_data.push(value);
+            }else{
               all_data.push(value);
-           
-              }	
+           }
+          }    
+              
 			}
 
 			columns.push(
@@ -65,7 +65,7 @@ componentDidMount(){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -92,7 +92,7 @@ componentDidMount(){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={165}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"alcohol_ql")}

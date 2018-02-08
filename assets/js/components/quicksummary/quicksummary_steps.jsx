@@ -63,7 +63,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -94,7 +94,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={150}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"steps_ql")}

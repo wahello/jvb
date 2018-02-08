@@ -1253,7 +1253,7 @@ handleScroll() {
                                                 <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
                                                 <option value="work got in the way">Work Got in the Way</option>
                                                 <option value="travel day">Travel Day</option>
-                                                <option value="weather">Weather</option>                                                                                                                                                                            
+                                                <option value="weather">Weather</option> 
                                       </Input>
                                     </div>
                                   }

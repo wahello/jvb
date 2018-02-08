@@ -80,7 +80,7 @@ render(){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={150}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"food_ql")}
