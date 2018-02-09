@@ -125,11 +125,11 @@ class UserInputs extends React.Component{
         sleep_bedtime_date:null,
         sleep_hours_bed_time:'',
         sleep_mins_bed_time:'',
-        sleep_bedtime_am_pm:'am',
+        sleep_bedtime_am_pm:'',
         sleep_awake_time_date:null,
         sleep_hours_awake_time:'',
         sleep_mins_awake_time:'',
-        sleep_awake_time_am_pm:'am',
+        sleep_awake_time_am_pm:'',
         awake_hours:'',
         awake_mins:'',
         sleep_comment:'',
@@ -246,7 +246,7 @@ class UserInputs extends React.Component{
         calendarDate:null,
         hour:'',
         min:'',
-        meridiem:'am'
+        meridiem:''
       }
 
       if(dateObj){
@@ -2761,8 +2761,9 @@ handleScroll() {
                                      name="sleep_bedtime_am_pm"                                  
                                      value={this.state.sleep_bedtime_am_pm}
                                      onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="">AM/PM</option>
                                        <option value="am">AM</option>
-                                                <option value="pm">PM</option> 
+                                       <option value="pm">PM</option> 
                                     
                                      </Input>
                                       </div> 
@@ -2842,8 +2843,9 @@ handleScroll() {
                                      name="sleep_awake_time_am_pm"                                  
                                      value={this.state.sleep_awake_time_am_pm}
                                      onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="">AM/PM</option>
                                        <option value="am">AM</option>
-                                                <option value="pm">PM</option> 
+                                       <option value="pm">PM</option> 
                                     
                                      </Input>
                                </div>      
