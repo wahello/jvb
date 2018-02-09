@@ -445,7 +445,10 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
+          if(!this.state.sleep_bedtime_date && !this.state.sleep_hours_bed_time &&
+             !this.state.sleep_mins_bed_time && !this.state.sleep_bedtime_am_pm &&
+             !this.state.sleep_awake_time_date && !this.state.sleep_hours_awake_time &&
+             !this.state.sleep_mins_awake_time && !this.state.sleep_awake_time_am_pm){
             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
           } 
           window.scrollTo(0,0);
