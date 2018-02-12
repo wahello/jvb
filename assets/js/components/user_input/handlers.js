@@ -6,6 +6,28 @@ export function handleChange(event){
 	[name]: value
   });
 }
+
+export function handleChangeWorkoutType(event){
+  const name = event.target.name;
+  const value = event.target.value;
+  if(value != "strength" && value != "both"){
+    this.setState({
+      [name]:value,
+      strength_workout_start_hour:'',
+      strength_workout_start_min:'',
+      strength_workout_start_am_pm:'',
+      strength_workout_end_hour:'',
+      strength_workout_end_min:'',        
+      strength_workout_end_am_pm:'',
+    })
+  }
+  else{
+    this.setState({
+      [name]:value
+    })
+  }
+}
+
 export function handleChangeSleepLast(event){
  const target = event.target;
   const value = target.value;
@@ -18,8 +40,6 @@ export function handleChangeSleepLast(event){
     {  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
-      console.log(hours);
-      console.log(mins);
       this.setState({
         sleep_hours_last_night:hours,
         sleep_mins_last_night:mins
@@ -96,6 +116,12 @@ export function handleChangeWorkoutDone(event){
         no_exercise_reason:'',
         no_exercise_comment:'',
         workout_type:'',
+        strength_workout_start_hour:'',
+        strength_workout_start_min:'',
+        strength_workout_start_am_pm:'',
+        strength_workout_end_hour:'',
+        strength_workout_end_min:'',        
+        strength_workout_end_am_pm:'',
         workout_input_type:'',
         workout_easy:'',
         workout_effort:'',
