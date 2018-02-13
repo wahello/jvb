@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta , date
+import calendar
 import ast
-import xlwt
 import time
 import json
 import xlsxwriter	
-from xlwt import easyxf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -206,12 +205,13 @@ class SleepListView(generics.ListCreateAPIView):
 	serializer_class = SleepSerializer
 
 def export_users_xls(request):
-	to_date = request.GET.get('to_date',None)
-	from_date = request.GET.get('from_date', None)
+	to_date1 = request.GET.get('to_date',None)
+	from_date1 = request.GET.get('from_date', None)
 
-	to_date = datetime.strptime(to_date, "%m-%d-%Y").date()
-	from_date = datetime.strptime(from_date, "%m-%d-%Y").date()
-
+	to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
+	from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
+	x= to_date.strftime('%-m-%d-%y')
+	print(x)
 	filename = '{}_raw_data_{}_to_{}.xlsx'.format(request.user.username,
 		from_date.strftime('%b_%d_%Y'),to_date.strftime('%b_%d_%Y'))
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -255,13 +255,20 @@ def export_users_xls(request):
 	if to_date and from_date :
 		while (current_date >= from_date):
 			r = r + 1
-			sheet9.write(0,r,current_date,date_format)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			current_date1 = str(current_date)
+			result = [weekday1,current_date1]
+			sheet9.write_rich_string(0,r,weekday1)
+			
+			# print(weekday1)
 			current_date -= timedelta(days = 1)
 
 	
 	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
 	format_green = book.add_format({'align':'left', 'bg_color': 'green','num_format': '#,##0','font_color': 'white'})
 	format_yellow = book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '#,##0'})
+	format_orange = book.add_format({'align':'left', 'bg_color': 'orange','num_format': '#,##0'})
+	format_purple = book.add_format({'align':'left', 'bg_color': 'pink','num_format': '#,##0'})
 	format = book.add_format({'align':'left','num_format': '#,##0'})
 	format1 = book.add_format({'align':'left','num_format': '0.00'})
 	format_exe = book.add_format({'align':'left','num_format': '0.0'})
@@ -832,7 +839,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns_of_exercise):
 				if data[key] == None:
-					sheet9.write(i1+i+1,row_num - num_11,'No GPS data',format)
+					sheet9.write(i1+i+1,row_num - num_11,'Not Reported',format)
 				else:
 					sheet9.write(i1+i+1,row_num - num_11, data[key],format)
 		else:
@@ -914,7 +921,11 @@ def export_users_xls(request):
 	sheet1.repeat_rows(0)
 	sheet1.repeat_columns(0)
 	sheet1.set_landscape()
-
+	format2 = book.add_format()
+	format2.set_align('top')
+	format2.set_text_wrap()
+	format2.set_shrink()
+	# sheet1.set_row(0, 30)
 	# columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 	# 		   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
 	# 		   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
@@ -930,6 +941,13 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
+
+			# sheet1.write_rich_string(0,r,*result,format2)
 			sheet1.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet1.write(1, 0, "Grades",bold)
@@ -1141,7 +1159,7 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			sheet8.write(0, r, current_date,date_format)
+			sheet7.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet7.write(0, 0, "Swim Stats",bold)
 	col_num1 = 1
@@ -1475,7 +1493,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns):
 				if data[key] == None:
-					sheet6.write(i + 2, row_num,'No GPS data',format)
+					sheet6.write(i + 2, row_num,'Not Reported',format)
 				else:
 					sheet6.write(i + 2, row_num,data[key],format)
 		else:
@@ -1485,13 +1503,28 @@ def export_users_xls(request):
 	
 	#movement consistenct
 	sheet11 = book.add_worksheet('Movement Consistency')
+	sheet11.set_landscape()
+	sheet11.fit_to_pages(1, 1)
+	sheet11.set_zoom(73)
+	sheet11.write(0,0,"Movement Consistency Historical Data",bold)
+	sheet11.write(0,10,"Sleeping",format_orange)
+	sheet11.write(0,11,"Active",format_green)
+	sheet11.write(0,12,"Inactive",format_red)
+	sheet11.write(0,13,"Strength",format_purple)
 	sheet11.write(2,0,"Hour")
 	sheet11.write(3,0,"Date")
 	sheet11.write(3,1,"Daily Movement Consistency Score")
-	hours_range = ["Total Daily Steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
-	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
-	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
-	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","Sleeping Hours",
+	format2 = book.add_format()
+	format2.set_align('bottom')
+	format2.set_text_wrap()
+	sheet11.set_column('D:AA',8)
+	sheet11.freeze_panes(4,3)
+	# format2.set_shrink()
+	sheet11.write(3,1,"Daily Movement Consistency Score",format2)
+	hours_range = ["Total Daily Steps","12:00 - 12:59 AM","01:00 - 01:59 AM","02:00 - 02:59 AM","03:00 - 03:59 AM","04:00 - 04:59 AM",
+	"05:00 - 05:59 AM","06:00 - 06:59 AM","07:00 - 07:59 AM","08:00 - 08:59 AM","09:00 - 09:59 AM","10:00 - 10:59 AM","11:00 - 11:59 AM",
+	"12:00 - 12:59 PM","01:00 - 01:59 PM","02:00 - 02:59 PM","03:00 - 03:59 PM","04:00 - 04:59 PM","05:00 - 05:59 PM",
+	"06:00 - 06:59 PM","07:00 - 07:59 PM","08:00 - 08:59 PM","09:00 - 09:59 PM","10:00 - 10:59 PM","11:00 - 11:59 PM","Sleeping Hours",
 	"Active Hours","Inactive Hours","Strength Hours"]
 	hours_range1 = ["total_steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
 	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
@@ -1518,61 +1551,323 @@ def export_users_xls(request):
 	col_num1 = 1
 	for col_num in range(len(hours_range)):
 		col_num1 += 1
-		sheet11.write(3,col_num1,hours_range[col_num])
+		sheet11.write(3,col_num1,hours_range[col_num],format2)
 	current_date = to_date
 	row_num = 4
 	row = 4
 	col = 2
 	while (current_date >= from_date):
 		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		grades_data = grades_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		if steps_data:
 			steps_data = steps_data.__dict__
+			grades_data = grades_data.__dict__
 			# logic
 			row += 1
-			# print(steps_data)
+			for i,key in enumerate(columns4):
+				
+				if i == 0 and grades_data['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and steps_data[key]:
+					sheet11.write(row,col-1,ast.literal_eval(steps_data[key])['inactive_hours'], format_green)
+				elif i == 0 and grades_data['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and steps_data[key]:
+					sheet11.write(row,col-1, ast.literal_eval(steps_data[key])['inactive_hours'], format_green)
+				elif i == 0 and grades_data['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and steps_data[key]:
+					sheet11.write(row,col-1, ast.literal_eval(steps_data[key])['inactive_hours'], format_yellow)
+				elif i == 0 and grades_data['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and steps_data[key]:
+					sheet11.write(row,col-1, ast.literal_eval(steps_data[key])['inactive_hours'], format_yellow)
+				elif i == 0 and grades_data['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and steps_data[key]:
+					sheet11.write(row,col-1,ast.literal_eval(steps_data[key])['inactive_hours'], format_red)
+				# else:
+				# 	sheet11.write(i + 2, row_num, steps_data[key], format)
 			for x,key in enumerate(columns):
 				steps_string = steps_data['movement_consistency']
 				if steps_string:
 					json1_data = json.loads(steps_string)
-					# print (json1_data)
-					# print(json1_data.keys())
-					# if json1_data['12:00 AM to 12:59 AM']
-					# row += 1
-					sheet11.write(row,col+x,json1_data['total_steps'])
-					sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
-					sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
-					sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
-					sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
-					sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
-					sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
-					sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
-					sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
-					sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
-					sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
-					sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
-					sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
-					sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
-					sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
-					sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
-					sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
-					sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
-					sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
-					sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
-					sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
-					sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
-					sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
-					sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
-					sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
+					sheet11.write(row,col+x,json1_data['total_steps'],format)
+					# sheet11.write(row, col, ast.literal_eval(steps_data[key])['inactive_hours'])
+					# sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
+					if json1_data['12:00 AM to 12:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_orange)
+					elif json1_data['12:00 AM to 12:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_green)
+					elif json1_data['12:00 AM to 12:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
+					if json1_data['01:00 AM to 01:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_orange)
+					elif json1_data['01:00 AM to 01:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_green)
+					elif json1_data['01:00 AM to 01:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_purple)
+
+					if json1_data['02:00 AM to 02:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_orange)
+					elif json1_data['02:00 AM to 02:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_green)
+					elif json1_data['02:00 AM to 02:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_purple)
+
+					if json1_data['03:00 AM to 03:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_orange)
+					elif json1_data['03:00 AM to 03:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_green)
+					elif json1_data['03:00 AM to 03:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_purple)
+
+					if json1_data['04:00 AM to 04:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_orange)
+					elif json1_data['04:00 AM to 04:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_green)
+					elif json1_data['04:00 AM to 04:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_purple)
+					#5
+					if json1_data['05:00 AM to 05:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_orange)
+					elif json1_data['05:00 AM to 05:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_green)
+					elif json1_data['05:00 AM to 05:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_purple)
+					#6
+					if json1_data['06:00 AM to 06:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_orange)
+					elif json1_data['06:00 AM to 06:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_green)
+					elif json1_data['06:00 AM to 06:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_purple)
+					#7
+					if json1_data['07:00 AM to 07:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_orange)
+					elif json1_data['07:00 AM to 07:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_green)
+					elif json1_data['07:00 AM to 07:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_purple)
+					#8
+					if json1_data['08:00 AM to 08:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_orange)
+					elif json1_data['08:00 AM to 08:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_green)
+					elif json1_data['08:00 AM to 08:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_purple)
+					#9
+					if json1_data['09:00 AM to 09:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_orange)
+					elif json1_data['09:00 AM to 09:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_green)
+					elif json1_data['09:00 AM to 09:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_purple)
+					#10
+					if json1_data['10:00 AM to 10:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_orange)
+					elif json1_data['10:00 AM to 10:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_green)
+					elif json1_data['10:00 AM to 10:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_purple)
+					#11
+					if json1_data['11:00 AM to 11:59 AM']["status"] == "sleeping":
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_orange)
+					elif json1_data['11:00 AM to 11:59 AM']["status"] == "active":
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_green)
+					elif json1_data['11:00 AM to 11:59 AM']["status"] == "inactive":
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_purple)
+					#12
+					if json1_data['12:00 PM to 12:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_orange)
+					elif json1_data['12:00 PM to 12:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_green)
+					elif json1_data['12:00 PM to 12:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_purple)
+					#1
+					if json1_data['01:00 PM to 01:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_orange)
+					elif json1_data['01:00 PM to 01:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_green)
+					elif json1_data['01:00 PM to 01:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_purple)
+					#2
+					if json1_data['02:00 PM to 02:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_orange)
+					elif json1_data['02:00 PM to 02:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_green)
+					elif json1_data['02:00 PM to 02:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_purple)
+					#3
+					if json1_data['03:00 PM to 03:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_orange)
+					elif json1_data['03:00 PM to 03:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_green)
+					elif json1_data['03:00 PM to 03:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_purple)
+					#4
+					if json1_data['04:00 PM to 04:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_orange)
+					elif json1_data['04:00 PM to 04:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_green)
+					elif json1_data['04:00 PM to 04:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_purple)
+					#5
+					if json1_data['05:00 PM to 05:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_orange)
+					elif json1_data['05:00 PM to 05:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_green)
+					elif json1_data['05:00 PM to 05:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_purple)
+					#6
+					if json1_data['06:00 PM to 06:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_orange)
+					elif json1_data['06:00 PM to 06:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_green)
+					elif json1_data['06:00 PM to 06:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_purple)
+					#7
+					if json1_data['07:00 PM to 07:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_orange)
+					elif json1_data['07:00 PM to 07:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_green)
+					elif json1_data['07:00 PM to 07:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_purple)
+					#8
+					if json1_data['08:00 PM to 08:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_orange)
+					elif json1_data['08:00 PM to 08:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_green)
+					elif json1_data['08:00 PM to 08:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_purple)
+					#9
+					if json1_data['09:00 PM to 09:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_orange)
+					elif json1_data['09:00 PM to 09:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_green)
+					elif json1_data['09:00 PM to 09:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_purple)
+					#10
+					if json1_data['10:00 PM to 10:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_orange)
+					elif json1_data['10:00 PM to 10:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_green)
+					elif json1_data['10:00 PM to 10:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_purple)
+					#11
+					if json1_data['11:00 PM to 11:59 PM']["status"] == "sleeping":
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_orange)
+					elif json1_data['11:00 PM to 11:59 PM']["status"] == "active":
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_green)
+					elif json1_data['11:00 PM to 11:59 PM']["status"] == "inactive":
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_red)
+					else:
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_purple)
+					# sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
+					# sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
+					# sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
+					# sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
+					# sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
+					# sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
+					# sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
+					# sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
+					# sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
+					# sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
+					# sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
+					# sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
+					# sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
+					# sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
+					# sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
+					# sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
+					# sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
+					# sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
+					# sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
+					# sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
+					# sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
+					# sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
+					# sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
 					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
 					sheet11.write(row,col+x+26,json1_data['active_hours'])
 					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
 					sheet11.write(row,col+x+28,json1_data.get('strength_hours',0))
 
-			# for x,key1 in enumerate(hours_range1):
-			# 	if json1_data[key1]['status'] == 'active':
-			# 		sheet11.write.(row,column,json1_data[key1]['steps'])
-			# 	else:
-			# 		sheet11.write.(row,column,json1_data[key1]['steps'])
+			# for x,key in enumerate(columns):
+			# 	steps_string = steps_data['movement_consistency']
+			# 	if steps_string:
+			# 		json1_data = json.loads(steps_string)
+			# 		sheet11.write_row(row,col+x,json1_data['total_steps'])
+					# if json1_data['12:00 AM to 12:59 AM']["status"] == "sleeping":
+					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_orange)
+					# elif json1_data['12:00 AM to 12:59 AM']["status"] == "active":
+					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_green)
+					# elif json1_data['12:00 AM to 12:59 AM']["status"] == "inactive":
+					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_red)
+					# else:
+					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
+						
+						# sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
+						# sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
+						# sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
+						# sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
+						# sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
+						# sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
+						# sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
+						# sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
+						# sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
+						# sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
+						# sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
+						# sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
+						# sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
+						# sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
+						# sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
+						# sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
+						# sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
+						# sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
+						# sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
+						# sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
+						# sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
+						# sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
+						# sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
+						# sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
+						# sheet11.write(row,col+x+26,json1_data['active_hours'])
+						# sheet11.write(row,col+x+27,json1_data['inactive_hours'])
+						# sheet11.write(row,col+x+28,json1_data.get('strength_hours',0))
 
 
 		else:
