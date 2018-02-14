@@ -639,7 +639,7 @@ def export_users_xls(request):
 
 	#Sleep
 
-	columns5 = ['sleep_per_wearable','sleep_comments',  'sleep_aid','sleep_resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
+	columns5 = ['sleep_per_wearable','sleep_comments',  'sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
 	'sleep_awake_time','deep_sleep','light_sleep','awake_time']
 	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 
 	'Resting Heart Rate (RHR)','Sleep per Wearable (excluding awake time)',
@@ -818,13 +818,13 @@ def export_users_xls(request):
 	columns_of_exercise = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
 	"distance_run","distance_bike","distance_swim","distance_other","pace",
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
-	"temperature_feels_like","wind","hrr","hrr_start_point","hrr_beats_lowered","sleep_resting_hr_last_night","vo2_max","running_cadence",
+	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
 	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
 	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Elevation Gain(feet)','Elevation Loss(feet)', 
-	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
+	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR Starting Point','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
 	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
 	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
 	
@@ -1524,13 +1524,13 @@ def export_users_xls(request):
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
 	"distance_run","distance_bike","distance_swim","distance_other","pace",
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
-	"temperature_feels_like","wind","hrr","hrr_start_point","hrr_beats_lowered","sleep_resting_hr_last_night","vo2_max","running_cadence",
+	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
 	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
 	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Elevation Gain(feet)','Elevation Loss(feet)', 
-	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
+	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
 	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
 	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
 	
