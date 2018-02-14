@@ -12,7 +12,7 @@ import { StyleSheet, css } from 'aphrodite';
 	constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
-
+	 this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 	 this.state = {
       myTableData: [
           {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
@@ -28,7 +28,15 @@ import { StyleSheet, css } from 'aphrodite';
       ],
     };
   }
-
+getStylesGpaBeforePanalities(score){	
+      if (score<50)
+        return {background:'red',color:'black'};
+      else if (score>=50 && score<70)
+        return {background:'yellow',color:'black'};
+      else if (score > 7 && score <= 10.5)
+        return {background:'green',color:'white'};
+      
+    }
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -43,9 +51,12 @@ renderTableColumns(dateWiseData,category,classes=""){
 						key == 'sleep_per_wearable')){
 						let hm = value.split(':');
 						let time_str = `${hm[0]}:${hm[1]}`;
-						all_data.push(time_str);
+
+						all_data.push({value:time_str,
+									   style:this.getStylesGpaBeforePanalities(time_str)});						
 					}
-					else all_data.push(value);
+					else all_data.push({value:value,
+										style:''});
 				}
 			}
 
@@ -53,8 +64,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
-				              {all_data[props.rowIndex]}
+				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
+				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
 			        width={100}

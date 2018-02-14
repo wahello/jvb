@@ -119,7 +119,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                      (key == 'humidity' && value === null)||
                      (key == 'temperature_feels_like' && value === null) ||
                      (key == 'wind' && value === null)){
-                all_data.push('No GPS data');
+                all_data.push('Not Reported');
             }
             else if((key == 'dew_point' && (value && value != '-')) ||
                     (key == 'temperature' && (value && value != '-'))||

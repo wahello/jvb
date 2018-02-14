@@ -136,6 +136,8 @@ class AllStats1 extends Component{
 	constructor(props) {
         super(props);
         this.renderTableColumns = this.renderTableColumns.bind(this);
+        this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
+        this.getStylesNonProcessedFood = this.getStylesNonProcessedFood.bind(this);
         let cols = this.renderTableColumns(props.data);
         this.state = {
             columns:cols[0],
@@ -157,6 +159,26 @@ class AllStats1 extends Component{
 
     toFahrenheit(tempInCelcius){
         return (tempInCelcius * 1.8) + 32;
+    }
+
+    getStylesGpaBeforePanalities(score){
+      if (score<=2.00)
+        return {background:'red',color:'black'};
+      else if (score > 2.00 && score <= 3.50)
+        return {background:'yellow',color:'black'};
+      else if (score > 3.50 && score <= 5.00)
+        return {background:'yellow',color:'black'};
+      else if(score > 5.00)
+        return {background:'green',color:'black'};
+    }
+    getStylesNonProcessedFood(score){
+      if (score<50)
+        return {background:'red',color:'black'};
+      else if (score>=50 && score<70)
+        return {background:'yellow',color:'black'};
+      else if (score >= 70)
+        return {background:'green',color:'white'};
+      
     }
 
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
@@ -217,8 +239,18 @@ class AllStats1 extends Component{
                                    if(s.indexOf('.') < 0) { s += '.00'; }
                                    if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
                                    s = minus + s;
-                                   all_data.push({value: s});
+                                   all_data.push({value: s,
+                                                  style:this.getStylesGpaBeforePanalities(parseFloat(s))});
                                 }
+                        
+                           else if(key === 'prcnt_non_processed_food'){
+                              if(value !=='-' && value !==0){
+                                        
+                              all_data.push({value:value+'%',
+                                       style:this.getStylesNonProcessedFood(value)});
+                                
+                            }
+                          }
                        else if(key === 'overall_health_gpa'){
                            var i = parseFloat(value);
                            if(isNaN(i)) { i = 0.00; }
@@ -282,7 +314,7 @@ class AllStats1 extends Component{
                                  (key == 'humidity' && value === null)||
                                  (key == 'temperature_feels_like' && value === null) ||
                                  (key == 'wind' && value === null)){
-                            all_data.push({value:'No GPS Data',
+                            all_data.push({value:'Not Reported',
                                            style:{}});
                         }
                         else if((key == 'dew_point' && (value && value != '-')) ||       

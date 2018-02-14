@@ -1423,7 +1423,7 @@ handleScroll() {
                                 className="form-control custom-select"
                                 value={this.state.strength_workout_start_hour}
                                 onChange={this.handleChange}>
-                                 <option key="hours" value="">Hours</option>
+                                 <option key="hours" value="">Hour</option>
                                 {this.createSleepDropdown(1,12)}                        
                                 </Input>
                                 </div>
@@ -1436,7 +1436,7 @@ handleScroll() {
                                 className="form-control custom-select "
                                 value={this.state.strength_workout_start_min}
                                 onChange={this.handleChange}>
-                                 <option key="mins" value="">Minutes</option>
+                                 <option key="mins" value="">Minute</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
                                 </div>
@@ -1449,7 +1449,7 @@ handleScroll() {
                                      name="strength_workout_start_am_pm"                                  
                                      value={this.state.strength_workout_start_am_pm}
                                      onChange={this.handleChange} >
-                                       <option value="">AM/PM</option>
+                                       <option value="">AM or PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     
@@ -1515,7 +1515,7 @@ handleScroll() {
                                      name="strength_workout_end_am_pm"                                  
                                      value={this.state.strength_workout_end_am_pm}
                                      onChange={this.handleChange} >
-                                       <option value="">AM/PM</option>
+                                       <option value="">AM or PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     
@@ -2969,7 +2969,7 @@ handleScroll() {
                         <div id="food">
                         <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
-                          <FormGroup className="food">
+                          <FormGroup className="un_process_food">
                             
                             <Label className="padding">5. What % of The Food You Consumed Yesterday Was &nbsp; 
                              <span style={{fontWeight:"bold"}}>
