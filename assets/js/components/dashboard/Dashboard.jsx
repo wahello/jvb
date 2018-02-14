@@ -30,6 +30,8 @@ class Dashboard extends Component {
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							   	<h3 id="link_style">Raw Data</h3>		  
 							   <Link to='/rawdata'>Raw Data</Link><br/>
+							   <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
+							   <Link to='/rawdata#grades'>Grades</Link><br/>
 								
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 							  <h3 id="link_style">Set up Links to Garmin</h3>
