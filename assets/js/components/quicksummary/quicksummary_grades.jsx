@@ -59,13 +59,11 @@ import NumberFormat from 'react-number-format';
     };
   }
 getStylesGpaBeforePanalities(score){
-      if (score<=2.00)
+      if (score<1)
         return {background:'red',color:'black'};
-      else if (score > 2.00 && score <= 3.50)
+      else if (score >= 1 && score < 3)
         return {background:'yellow',color:'black'};
-      else if (score > 3.50 && score <= 5.00)
-        return {background:'yellow',color:'black'};
-      else if(score > 5.00)
+      else if (score >= 3)
         return {background:'green',color:'black'};
     }
 
