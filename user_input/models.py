@@ -409,8 +409,7 @@ class DailyUserInputOptional(models.Model):
         validators = [CharMinValueValidator(1),CharMaxValueValidator(100)],
         blank = True,null = True)
 
-    type_of_diet_eaten = models.CharField(
-        max_length=100,
+    type_of_diet_eaten = models.TextField(
         blank=True)
 
     general_comment = models.TextField(blank=True)

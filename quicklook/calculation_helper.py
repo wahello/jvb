@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone,time
 from collections import OrderedDict,namedtuple
+from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
 
@@ -154,6 +155,7 @@ def get_blank_model_fields(model):
 			'avg_exercise_hr_grade':'',
 			'avg_exercise_hr_gpa':0,
 			'prcnt_unprocessed_food_consumed_grade':'',
+			'prcnt_unprocessed_food_consumed_gpa':0,
 			'alcoholic_drink_per_week_grade':'' ,
 			'sleep_aid_penalty':0,
 			'ctrl_subs_penalty':0,
@@ -186,10 +188,14 @@ def get_blank_model_fields(model):
 			'humidity': 0,
 			'temperature_feels_like':0,
 			'wind': 0,
-			'hrr': '',
-			'hrr_start_point': 0,
-			'hrr_beats_lowered': 0,
-			'sleep_resting_hr_last_night': 0,
+
+			'hrr_time_to_99': '',
+			'hrr_starting_point': 0,
+			'hrr_beats_lowered_first_minute': 0,
+			'resting_hr_last_night': 0,
+			'lowest_hr_during_hrr':0,
+			'highest_hr_first_minute':0,
+
 			'vo2_max': 0,
 			'running_cadence':0,
 			'nose_breath_prcnt_workout': 0,
@@ -555,8 +561,8 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 			# 									   target_sleep_data.get('durationInSeconds'))
 
-		sleep_per_wearable = (awake_time-bed_time).seconds\
-							 - target_sleep_data.get('awakeDurationInSeconds',0)
+		sleep_per_wearable = (awake_time-bed_time).seconds - sleep_stats.get('awake_time',0)
+
 		# sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
 		# 					 - target_sleep_data.get('awakeDurationInSeconds',0)
 		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
@@ -787,6 +793,10 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 					movement_consistency[interval]['steps'] = 0
 
 			elif hour_start >= today_awake_time:
+				if not movement_consistency[interval]['steps']:
+						movement_consistency[interval]['status'] = 'inactive'
+						movement_consistency[interval]['steps'] = 0
+
 				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
@@ -794,10 +804,6 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 				elif(user_input_strength_end_time and user_input_strength_start_time):
 					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
 						movement_consistency[interval]['status'] = 'strength'
-
-				elif not movement_consistency[interval]['steps']:
-						movement_consistency[interval]['status'] = 'inactive'
-						movement_consistency[interval]['steps'] = 0
 
 			if values['status'] == 'active': 
 				active_hours += 1 
@@ -886,18 +892,29 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	return (GRADES[points],points)
  
 def cal_unprocessed_food_grade(prcnt_food):
- 	prcnt_food = int(prcnt_food)
- 	
- 	if (prcnt_food >= 80 and prcnt_food <= 100):
- 		return 'A'
- 	elif (prcnt_food >= 70 and prcnt_food <= 79):
- 		return 'B'
- 	elif (prcnt_food >= 60 and prcnt_food <= 69):
- 		return 'C'
- 	elif (prcnt_food >= 50 and prcnt_food <= 59):
- 		return 'D'
- 	elif (prcnt_food < 50):
- 		return 'F'
+	def _point_advantage(current_prcnt, range_min_prcnt, per_prcnt_pt):
+		return (current_prcnt - range_min_prcnt) * per_prcnt_pt
+
+	point = 0
+	grade = 'F'
+	prcnt_food = int(Decimal(prcnt_food).quantize(0,ROUND_HALF_DOWN))
+	
+	if (prcnt_food >= 80):
+		grade = 'A'
+		point = 4
+	elif (prcnt_food >= 70 and prcnt_food < 80):
+		grade = 'B'
+		point = 3 + _point_advantage(prcnt_food,70,0.1)
+	elif (prcnt_food >= 60 and prcnt_food < 70):
+		grade = 'C'
+		point = 2 + _point_advantage(prcnt_food,60,0.1)
+	elif (prcnt_food >= 50 and prcnt_food < 60):
+		grade = 'D'
+		point = 1 + _point_advantage(prcnt_food,50,0.1)
+	elif (prcnt_food < 50):
+		grade = 'F'
+		point = 0 + _point_advantage(prcnt_food,0,0.02)
+	return (grade,point)
 
 def cal_alcohol_drink_grade(drink_avg, gender):
 	'''
@@ -1140,10 +1157,10 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 		if (q.user_input.created_at == current_date.date() and
 			q.prcnt_unprocessed_food_consumed_yesterday != '' and
 			q.prcnt_unprocessed_food_consumed_yesterday != None):
-			grade = cal_unprocessed_food_grade(
+			grade_pt = cal_unprocessed_food_grade(
 					q.prcnt_unprocessed_food_consumed_yesterday)
-			return grade
-	return ''
+			return grade_pt
+	return (None,None)
 
 def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 
@@ -1449,8 +1466,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['humidity'] = weather_data['humidity']
 		exercise_calculated_data['temperature_feels_like'] = weather_data['apparentTemperature']
 		exercise_calculated_data['wind'] = weather_data['windSpeed']
-		exercise_calculated_data['sleep_resting_hr_last_night'] = safe_get_dict(dailies_json,
-															'restingHeartRateInBeatsPerMinute',0)
+		exercise_calculated_data['hrr_time_to_99'] = safe_get(daily_encouraged,"time_to_99","") 
+		exercise_calculated_data['hrr_starting_point'] = safe_get(daily_encouraged,"hr_level",0)
+		exercise_calculated_data['hrr_beats_lowered_first_minute'] = safe_get(
+			daily_encouraged,"lowest_hr_first_minute",0)
+		exercise_calculated_data['resting_hr_last_night'] = safe_get_dict(dailies_json,
+			'restingHeartRateInBeatsPerMinute',0)
+		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
+			daily_encouraged,"lowest_hr_during_hrr",0)
+		# exercise_calculated_data['highest_hr_first_minute'] = f
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
 		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
 											'averageRunCadenceInStepsPerMinute')
@@ -1564,8 +1588,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['avg_sleep_per_night_gpa'] = grade_point[1] if grade_point[1] else 0
 
 		# Unprocessed food grade calculation 
-		grade  = get_unprocessed_food_grade(todays_daily_strong, current_date)
-		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
+		prcnt_unprocessed_food_grade_pt  = get_unprocessed_food_grade(todays_daily_strong, current_date)
+		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = prcnt_unprocessed_food_grade_pt[0] \
+			if prcnt_unprocessed_food_grade_pt[0] else ''
+		grades_calculated_data['prcnt_unprocessed_food_consumed_gpa'] = prcnt_unprocessed_food_grade_pt[1] \
+			if prcnt_unprocessed_food_grade_pt[1] else 0 
 	
 		# Alcohol drink consumed grade and avg alcohol per week
 		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
