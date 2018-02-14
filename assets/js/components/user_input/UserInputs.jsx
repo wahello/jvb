@@ -499,15 +499,18 @@ class UserInputs extends React.Component{
     }
 
     onFetchGarminSuccess(data){
-      let sleep_bedtime = data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null;
-      let sleep_awake_time = data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null;
+      let sleep_stats = data.data.sleep_stats;
+      let have_activities = data.data.have_activities;
+
+      let sleep_bedtime = sleep_stats.sleep_bed_time?moment(sleep_stats.sleep_bed_time):null;
+      let sleep_awake_time = sleep_stats.sleep_awake_time?moment(sleep_stats.sleep_awake_time):null;
 
       let sleep_bedtime_info = this._extractDateTimeInfo(sleep_bedtime);
       let sleep_awake_time_info = this._extractDateTimeInfo(sleep_awake_time);
 
-      let awake_hours = data.data.awake_time?data.data.awake_time.split(':')[0]:'';
+      let awake_hours = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[0]:'';
       awake_hours = awake_hours?parseInt(awake_hours):0
-      let awake_mins = data.data.awake_time?data.data.awake_time.split(':')[1]:'';
+      let awake_mins = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'';
       awake_mins = awake_mins?parseInt(awake_mins):0
       let awake_time_in_mins = awake_hours*60 + awake_mins;
 
@@ -529,10 +532,11 @@ class UserInputs extends React.Component{
           sleep_mins_awake_time:sleep_awake_time_info.min,
           sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
 
-          awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
-          awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:'',
+          awake_hours:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[0]:'',
+          awake_mins:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'',
           sleep_hours_last_night:hours,
-          sleep_mins_last_night:mins
+          sleep_mins_last_night:mins,
+          workout:have_activities?'yes':''
       });
      }
     }
