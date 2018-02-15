@@ -69,6 +69,7 @@ def _get_blank_pa_model_fields(model):
 		return fields
 	elif model == "other_stats":
 		fields = {
+			"cum_resting_hr":None,
 			"cum_hrr_time_to_99_in_mins":None,
 			"cum_hrr_beats_lowered_in_first_min":None,
 			"cum_highest_hr_in_first_min":None,
@@ -399,6 +400,10 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 	other_stats_cum_data = _get_blank_pa_model_fields("other_stats")
 
 	if today_ql_data and yday_cum_data:
+		other_stats_cum_data['cum_resting_hr'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0) \
+			+ _safe_get_mobj(yday_cum_data.other_stats_cum, "cum_resting_hr",0)
+
 		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = round(
 			_str_to_hours_min_sec(_safe_get_mobj(
 				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute'),3) \
@@ -421,6 +426,9 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_floors_climbed",0)
 	
 	elif today_ql_data:
+		other_stats_cum_data['cum_resting_hr'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0)
+
 		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = round(
 			_str_to_hours_min_sec(_safe_get_mobj(
 				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute'),3)
@@ -503,7 +511,7 @@ def create_cum_raw_data(today_ql_data, yday_cum_data=None):
 		data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data, yday_cum_data)
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
-		data["other_stats_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
+		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
 
 	elif today_ql_data:
 		# get current quicklook data and create cumulative sum

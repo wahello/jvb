@@ -231,7 +231,8 @@ class UserInputs extends React.Component{
       this.toggleComment=this.toggleComment.bind(this);
       this.toggleAlcohol=this.toggleAlcohol.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
-      this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
+      this.onFetchGarminSuccessSleep = this.onFetchGarminSuccessSleep.bind(this);
+      this.onFetchGarminSuccessWorkout = this.onFetchGarminSuccessWorkout.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
@@ -445,11 +446,12 @@ class UserInputs extends React.Component{
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          if(!this.state.sleep_bedtime_date && !this.state.sleep_hours_bed_time &&
-             !this.state.sleep_mins_bed_time && !this.state.sleep_bedtime_am_pm &&
-             !this.state.sleep_awake_time_date && !this.state.sleep_hours_awake_time &&
-             !this.state.sleep_mins_awake_time && !this.state.sleep_awake_time_am_pm){
-            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
+              this.state.workout == 'no' || this.state.workout == 'not yet'){
+            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+            else if(this.state.workout == 'no' || this.state.workout == 'not yet')
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
           } 
           window.scrollTo(0,0);
         });
@@ -489,16 +491,16 @@ class UserInputs extends React.Component{
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
-          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
-        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         this.onFetchFailure(data)
       }
     }
 
-    onFetchGarminSuccess(data){
+    onFetchGarminSuccessSleep(data){
       let sleep_stats = data.data.sleep_stats;
       let have_activities = data.data.have_activities;
 
@@ -540,6 +542,14 @@ class UserInputs extends React.Component{
       });
      }
     }
+    
+  onFetchGarminSuccessWorkout(data){
+    let workout_status = this.state.workout;
+    let have_activities = data.data.have_activities;
+    this.setState({
+      workout: have_activities?'yes':workout_status
+    });
+  }
 
 getDTMomentObj(dt,hour,min,am_pm){
   hour = hour ? parseInt(hour) : 0;

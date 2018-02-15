@@ -16,7 +16,7 @@ class ProgressReportView(APIView):
 
 	def _initialize(self):
 		self.summary_type = ['overall_health','non_exercise','sleep','mc','ec',
-		'nutrition','exercise','alcohol']
+		'nutrition','exercise','alcohol','other']
 		self.duration_type = ['today','yesterday','week','month','year']
 
 		# Custom date range for which report is to be created
@@ -73,6 +73,17 @@ class ProgressReportView(APIView):
 			mins = "{:02d}".format(mins) 
 		return "{}:{}".format(hours,mins)
 
+	def _min_to_min_sec(self,mins):
+		seconds = mins * 60
+		mins,seconds = divmod(seconds,60)
+		mins = round(mins)
+		seconds = round(seconds)
+		if mins < 10:
+			mins = "{:02d}".format(mins)
+		if seconds < 10:
+			seconds = "{:02d}".format(seconds)
+		return "{}:{}".format(mins,seconds)
+
 	def _get_average(self, stat1, stat2, duration_type):
 		if not stat1 == None and not stat2 == None:
 			avg = (stat1 - stat2)/self.duration_denominator.get(duration_type)
@@ -87,7 +98,7 @@ class ProgressReportView(APIView):
 
 	def _get_cum_queryset(self):
 		"""
-			Returns queryset of CumulativeSum for "yesterday",
+			Returns queryset of CumulativeSum for "today", "yesterday",
 			"day before yesterday","week", "month", "year" according
 			to current date  
 		"""
@@ -190,6 +201,7 @@ class ProgressReportView(APIView):
 			"nutrition":self._cal_nutrition_summary,
 			"exercise":self._cal_exercise_summary,
 			"alcohol":self._cal_alcohol_summary,
+			"other":self._cal_other_summary
 		}
 		return SUMMARY_CALCULATOR_BINDING
 
@@ -247,7 +259,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).overall_health_grade_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).overall_health_grade_cum
+				todays_data = ToCumulativeSum(todays_data).overall_health_grade_cum
 		if yesterday_data:
 			yesterday_data = yesterday_data.overall_health_grade_cum
 		if day_before_yesterday_data:
@@ -326,7 +338,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).non_exercise_steps_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).non_exercise_steps_cum
+				todays_data = ToCumulativeSum(todays_data).non_exercise_steps_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.non_exercise_steps_cum
@@ -420,7 +432,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).sleep_per_night_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).sleep_per_night_cum
+				todays_data = ToCumulativeSum(todays_data).sleep_per_night_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.sleep_per_night_cum
@@ -491,7 +503,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).movement_consistency_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).movement_consistency_cum
+				todays_data = ToCumulativeSum(todays_data).movement_consistency_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.movement_consistency_cum
@@ -562,7 +574,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_consistency_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_consistency_cum
+				todays_data = ToCumulativeSum(todays_data).exercise_consistency_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.exercise_consistency_cum
@@ -632,7 +644,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).nutrition_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).nutrition_cum
+				todays_data = ToCumulativeSum(todays_data).nutrition_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.nutrition_cum
@@ -713,7 +725,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_stats_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_stats_cum
+				todays_data = ToCumulativeSum(todays_data).exercise_stats_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.exercise_stats_cum
@@ -784,7 +796,7 @@ class ProgressReportView(APIView):
 			if yesterday_data:
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).alcohol_cum
 			else:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).alcohol_cum
+				todays_data = ToCumulativeSum(todays_data).alcohol_cum
 
 		if yesterday_data:
 			yesterday_data = yesterday_data.alcohol_cum
@@ -807,6 +819,92 @@ class ProgressReportView(APIView):
 					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
+	def _cal_other_summary(self, custom_daterange = False):
+		def _calculate(key,alias,todays_data,current_data):
+			if todays_data and current_data:
+				if key =='resting_hr':
+					val = self._get_average(
+						todays_data.cum_resting_hr,
+						current_data.cum_resting_hr,alias)
+					return round(val)
+
+				elif key == 'hrr_time_to_99':
+					val = self._min_to_min_sec(self._get_average(
+						todays_data.cum_hrr_time_to_99_in_mins,
+						current_data.cum_hrr_time_to_99_in_mins,alias))
+					return val
+				elif key == 'hrr_beats_lowered_in_first_min':
+					val = self._get_average(
+						todays_data.cum_hrr_beats_lowered_in_first_min,
+						current_data.cum_hrr_beats_lowered_in_first_min,alias)
+					return round(val)
+				elif key == 'hrr_highest_hr_in_first_min':
+					val = self._get_average(
+						todays_data.cum_highest_hr_in_first_min,
+						current_data.cum_highest_hr_in_first_min,alias)
+					return round(val)
+				elif key == 'hrr_lowest_hr_point':
+					val = self._get_average(
+						todays_data.cum_hrr_lowest_hr_point,
+						current_data.cum_hrr_lowest_hr_point,alias)
+					return round(val)
+				elif key == 'floors_climbed':
+					val = self._get_average(
+						todays_data.cum_floors_climbed,
+						current_data.cum_floors_climbed,alias)
+					return round(val)
+			return None
+
+		calculated_data = {
+			'resting_hr':{d:None for d in self.duration_type},
+			'hrr_time_to_99':{d:None for d in self.duration_type},
+			'hrr_beats_lowered_in_first_min':{d:None for d in self.duration_type},
+			'hrr_highest_hr_in_first_min':{d:None for d in self.duration_type},
+			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
+			'floors_climbed':{d:None for d in self.duration_type}
+		}
+		if custom_daterange:
+			alias = "custom_range"
+			summary_type = "other_stats_cum"
+			for key in calculated_data.keys():
+				calculated_data[key][alias] = self._generic_custom_range_calculator(
+					key, alias,summary_type, _calculate
+				)
+
+		
+		todays_data = self.ql_datewise_data.get(
+			self.current_date.strftime("%Y-%m-%d"),None)
+		yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
+		day_before_yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+
+		if todays_data:
+			if yesterday_data:
+				todays_data = ToCumulativeSum(todays_data,yesterday_data).other_stats_cum
+			else:
+				todays_data = ToCumulativeSum(todays_data).other_stats_cum
+
+		if yesterday_data:
+			yesterday_data = yesterday_data.other_stats_cum
+		if day_before_yesterday_data:
+			day_before_yesterday_data = day_before_yesterday_data.other_stats_cum
+
+		for key in calculated_data.keys():
+			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						current_data = current_data.other_stats_cum
+
+					if alias == 'today' and yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+		return calculated_data
 
 	def get(self, request, format="json"):
 		self._initialize()
