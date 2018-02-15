@@ -541,27 +541,31 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
 						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
 
-			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-						_get_actual_sleep_start_time(target_sleep_data)+
-						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
-			
 			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-			# 			target_sleep_data.get('startTimeInSeconds')+
+			# 			_get_actual_sleep_start_time(target_sleep_data)+
 			# 			target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+			
+			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+						target_sleep_data.get('startTimeInSeconds')+
+						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
 
 		else:
 			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
 				target_sleep_data.get('startTimeOffsetInSeconds'))
 
-			awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
-												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-												   target_sleep_data.get('durationInSeconds'))
-
-			# awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+			# awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
 			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 			# 									   target_sleep_data.get('durationInSeconds'))
 
-		sleep_per_wearable = (awake_time-bed_time).seconds - sleep_stats.get('awake_time',0)
+			awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+												   target_sleep_data.get('durationInSeconds'))
+
+		if target_sleep_data.get('validation',None) == 'MANUAL':
+			awake_duration = _get_deep_light_awake_sleep_duration(target_sleep_data).get('awake',0)
+		else:
+			awake_duration = target_sleep_data.get('awakeDurationInSeconds',0)
+		sleep_per_wearable = (awake_time-bed_time).seconds - awake_duration
 
 		# sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
 		# 					 - target_sleep_data.get('awakeDurationInSeconds',0)
@@ -715,7 +719,6 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
-
 
 	# If user slept after midnight and again went to bed after next midnight
 	# In that case we have same yesterday_bedtime and today_bedtime 
