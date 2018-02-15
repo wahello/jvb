@@ -82,16 +82,36 @@ def _str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
 
-def _str_to_hours_min_sec(str_duration,time_format='hour'):
+def _get_lst(lst,i,default = None):
+	""" get method for list similar to dictionary's get method """
+	try:
+		return lst[i];
+	except IndexError:
+		return default
+	except TypeError:
+		return default
+
+def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss"):
 	'''
 		Expect duration in this format - "hh:mm:ss"
 		convert in into hours 
 	'''
 	if str_duration:
 		hms = str_duration.split(":")
-		h = int(hms[0]) if hms[0] else 0
-		m = int(hms[1]) if hms[1] else 0
-		s = int(hms[2]) if len(hms) == 3 and hms[2] else 0
+		pattern_lst = time_pattern.split(":")
+		pattern_indexed = {
+			"hour":pattern_lst.index("hh") if "hh" in pattern_lst else None,
+			"minute":pattern_lst.index("mm") if "mm" in pattern_lst else None,
+			"second":pattern_lst.index("ss") if "ss" in pattern_lst else None
+		}
+
+		h = int(_get_lst(hms,pattern_indexed["hour"],0))\
+			if _get_lst(hms,pattern_indexed["hour"],0) else 0
+		m = int(_get_lst(hms,pattern_indexed["minute"],0))\
+			if _get_lst(hms,pattern_indexed["minute"],0) else 0
+		s = int(_get_lst(hms,pattern_indexed["second"],0))\
+			if _get_lst(hms,pattern_indexed["second"],0) else 0
+
 		t = 0
 		if time_format == 'hour':
 			t = h + (m/60) + (s/3600)
@@ -406,7 +426,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 
 		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = round(
 			_str_to_hours_min_sec(_safe_get_mobj(
-				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute'),3) \
+				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute',"mm:ss"),3) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_hrr_time_to_99_in_mins",0)
 
 		other_stats_cum_data['cum_hrr_beats_lowered_in_first_min'] = _safe_get_mobj(
@@ -422,7 +442,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_hrr_lowest_hr_point",0)
 
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0) \
+			today_ql_data.steps_ql,"floor_climed",0) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_floors_climbed",0)
 	
 	elif today_ql_data:
@@ -431,7 +451,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 
 		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = round(
 			_str_to_hours_min_sec(_safe_get_mobj(
-				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute'),3)
+				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute',"mm:ss"),3)
 
 		other_stats_cum_data['cum_hrr_beats_lowered_in_first_min'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
@@ -443,7 +463,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
 
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
+			today_ql_data.steps_ql,"floor_climed",0)
 
 	return other_stats_cum_data
 
