@@ -14,7 +14,7 @@ import { Container, Select, option, Option, Row, Col, Button,
          ButtonGroup, Form,FormGroup, Label, Input, FormText,
          className, Modal,ModalHeader, ModalBody, ModalFooter,
          Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand,Popover,PopoverBody} from 'reactstrap';
+         NavbarBrand,Popover,PopoverBody,PopoverHeader} from 'reactstrap';
 import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
@@ -620,7 +620,8 @@ getTotalSleep(){
     processDate(date){
       this.setState({
         selected_date:date,
-        fetching_data:true
+        fetching_data:true,
+        calendarOpen:!this.state.calendarOpen
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -958,15 +959,12 @@ handleScroll() {
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
-                            <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
+                            <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
+                            <div >                      
+                            <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a>
+                            </div>
                             </ModalHeader>
-                              <ModalBody className="modalcontent" id="modal1">
+                              <ModalBody className="modalcontent" id="modal1" >
                                 <div>
                                   <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
                                   to your results and our hope is that you will make healthier
@@ -1130,9 +1128,9 @@ handleScroll() {
                             placement="bottom" 
                             isOpen={this.state.calendarOpen}
                             target="calendar" 
-                            toggle={this.toggleCalendar}>
-                              <PopoverBody>
-                                <CalendarWidget onDaySelect={this.processDate}/>
+                            toggle={this.toggleCalendar}>       
+                              <PopoverBody toggle={this.toggleCalendar}>
+                                <CalendarWidget  onDaySelect={this.processDate}/>
                               </PopoverBody>
                            </Popover> 
 
@@ -1142,10 +1140,7 @@ handleScroll() {
                             isOpen={this.state.infoBtn}
                             target="info2" 
                             toggle={this.toggleInfo2}>
-                            <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                            <ModalHeader toggle={this.toggleInfo2}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1247,11 +1242,8 @@ handleScroll() {
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
                             toggle={this.toggleInfoworkout}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
+                             <ModalHeader toggle={this.toggleInfoworkout}>
+                           <span>
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
@@ -1386,10 +1378,7 @@ handleScroll() {
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleInfoworkoutType}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1607,10 +1596,7 @@ handleScroll() {
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleEasyorHard}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1697,14 +1683,11 @@ handleScroll() {
                                     isOpen={this.state.enjoybleInfo}
                                     target="enjoyble" 
                                     toggle={this.toggleEnjoyble}>
-                                     <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
-                            </ModalHeader>
+                                     <ModalHeader toggle={this.toggleEnjoyble}>                            
+                                     <span >
+                                      <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                                      </span>
+                                </ModalHeader>
                                       <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                         We encourage people to enjoy their workouts! When they do,
@@ -1771,14 +1754,11 @@ handleScroll() {
                                     isOpen={this.state.workoutlevelInfo}
                                     target="workoutlevel" 
                                     toggle={this.toggleWorkoutLevel}>
-                                     <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
-                            </ModalHeader>
+                                     <ModalHeader toggle={this.toggleWorkoutLevel}>                            
+                                   <span >
+                                    <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                                    </span>
+                                  </ModalHeader>
                                       <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                          As a general guideline, an effort level of 1-2 is super easy,
@@ -1845,10 +1825,7 @@ handleScroll() {
                             isOpen={this.state.painInfo}
                             target="pain" 
                             toggle={this.togglePain}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.togglePain}>
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1915,10 +1892,7 @@ handleScroll() {
                             isOpen={this.state.waterInfo}
                             target="water" 
                             toggle={this.toggleWater}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleWater}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1990,10 +1964,7 @@ handleScroll() {
                             isOpen={this.state.chaiseedsInfo}
                             target="chaiseeds" 
                             toggle={this.toggleChaiseeds}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleChaiseeds}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2065,10 +2036,7 @@ handleScroll() {
                             isOpen={this.state.breatheInfo}
                             target="breathe" 
                             toggle={this.toggleBreathe}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleBreathe}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2167,11 +2135,8 @@ handleScroll() {
                             isOpen={this.state.fastedInfo}
                             target="fast" 
                             toggle={this.toggleFasted}>
-                             <ModalHeader >
+                             <ModalHeader toggle={this.toggleFasted}>                           
                             <span >
-                          <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
@@ -2237,10 +2202,7 @@ handleScroll() {
                             isOpen={this.state.commentInfo}
                             target="general" 
                             toggle={this.toggleComment}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader  toggle={this.toggleComment}>                           
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2306,10 +2268,7 @@ handleScroll() {
                             isOpen={this.state.weatherInfo}
                             target="wether" 
                             toggle={this.toggleWeather}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleWeather}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint}  style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2554,10 +2513,7 @@ handleScroll() {
                             isOpen={this.state.hrrInfo}
                             target="hrr" 
                             toggle={this.toggleHrr}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleHrr}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -3022,10 +2978,7 @@ handleScroll() {
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
                             toggle={this.toggleUnprocessedInfo}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleUnprocessedInfo}>                     
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -3194,10 +3147,7 @@ handleScroll() {
                             isOpen={this.state.alcoholInfo}
                             target="alcoholinfo" 
                             toggle={this.toggleAlcohol}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleAlcohol}>                           
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
