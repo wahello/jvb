@@ -246,6 +246,12 @@ input, textarea {
 	width: 330px;
 	overflow-x: scroll;
 }
+.close{
+	font-size: 30px !important;
+	font-weight: bold;
+	background-color: none;
+	border-color: none;
+}
 
 }
 
@@ -546,4 +552,12 @@ textarea.form-control{
 .margin_tp{
 	margin-top:3%;
 }
+}
+button.close{
+	margin-left: 265px;
+	font-size: 30px;
+	font-weight: bold;
+	background-color: none;
+	border-color: none;
+	color:red !important;
 }
