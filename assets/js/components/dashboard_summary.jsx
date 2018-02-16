@@ -253,27 +253,7 @@ constructor(props){
                         "year":"-"
                      },     
             },
-        "exercise":{
-           "workout_duration_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                           
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },    
-            "overall_workout_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                          
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },    
+        "exercise":{                
             "workout_duration_hours_min":{
                         "week":"-",
                         "yesterday":"-",
@@ -284,16 +264,6 @@ constructor(props){
                         "today":"-",
                         "year":"-"
                      }, 
-                "rank":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                           
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },    
                 "avg_exercise_heart_rate":{
                         "week":"-",
                         "yesterday":"-",
@@ -303,47 +273,7 @@ constructor(props){
                         },
                         "today":"-",
                         "year":"-"
-                     },    
-                "overall_exercise_gpa_rank":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                           
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },
-                "workout_effort_level_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                           
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },
-                "avg_exercise_heart_rate_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                           
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },
-                "overall_exercise_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                        "custom_range":{                           
-                           "data":"-"
-                        },
-                        "today":"-",
-                        "year":"-"
-                     },
+                     },                                      
                 "workout_effort_level":{
                         "week":"-",
                         "yesterday":"-",
@@ -353,42 +283,31 @@ constructor(props){
                         },
                         "today":"-",
                         "year":"-"
-                     }        
+                     },
+                      "vo2_max":{
+                        "week":"-",
+                        "yesterday":"-",
+                        "month":"-",
+                        "custom_range":{                           
+                           "data":"-"
+                        },
+                        "today":"-",
+                        "year":"-"
+                     }               
                 },
-
-        "penalty":{
-             "sleep_aid_penalty": {
-                "week":"-",
-                "yesterday":"-",
-                "month":"-",
-                "custom_range": {                   
-                    "data":"-"
-                },
-                "today":"-",
-                "year":"-"
-            },
-            "controlled_substance_penalty": {
-                "week":"-",
-                "yesterday":"-",
-                "month":"-",
-                "custom_range": {                   
+         "sleep": {
+             "prcnt_days_sleep_aid_taken_in_period": {
+                "custom_range": {
+                    "to_dt": "-",
+                    "from_dt": "-",
                     "data": "-"
                 },
-                "today": "-",
-                "year": "-"
-            },
-            "smoking_penalty": {
-                "week": "-",
+                "year": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
-                    "data": "-"
-                },
-                "today": "-",
-                "year": "-"
+                "today":"-" ,
+                "week":"-" 
             },
-        },
-         "sleep": {
             "average_sleep_grade": {
                 "week": "-",
                 "yesterday": "-",
@@ -420,6 +339,16 @@ constructor(props){
                 "year": "-"
             },
             "overall_sleep_gpa": {
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            },
+             "num_days_sleep_aid_taken_in_period": {
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
@@ -462,6 +391,68 @@ constructor(props){
                 "year": "-"
             },
             "alcoholic_drinks_per_week_gpa": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            }
+        },
+         "other": {
+            "hrr_beats_lowered_in_first_min": {
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            },
+            "hrr_highest_hr_in_first_min": {
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            },
+            "hrr_lowest_hr_point": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            },
+            "floors_climbed": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            },
+            "resting_hr": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range": {                    
+                    "data": "-"
+                },
+                "today": "-",
+                "year": "-"
+            },
+            "hrr_time_to_99": {
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
@@ -718,27 +709,7 @@ constructor(props){
                         year:data.data.summary.non_exercise.total_steps.year
                      },     
             },
-        exercise:{
-           workout_duration_grade:{
-                        week:data.data.summary.exercise.workout_duration_grade.week,
-                        yesterday:data.data.summary.exercise.workout_duration_grade.yesterday,
-                        month:data.data.summary.exercise.workout_duration_grade.month,
-                        custom_range:{     
-                           data:haveCustomData?data.data.summary.exercise.workout_duration_grade.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.workout_duration_grade.today,
-                        year:data.data.summary.exercise.workout_duration_grade.year
-                     },    
-            overall_workout_grade:{
-                        week:data.data.summary.exercise.overall_workout_grade.week,
-                        yesterday:data.data.summary.exercise.overall_workout_grade.yesterday,
-                        month:data.data.summary.exercise.overall_workout_grade.month,
-                        custom_range:{           
-                           data:haveCustomData?data.data.summary.exercise.overall_workout_grade.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.overall_workout_grade.today,
-                        year:data.data.summary.exercise.overall_workout_grade.year
-                     },    
+        exercise:{ 
             workout_duration_hours_min:{
                         week:data.data.summary.exercise.workout_duration_hours_min.week,
                         yesterday:data.data.summary.exercise.workout_duration_hours_min.yesterday,
@@ -748,17 +719,7 @@ constructor(props){
                         },
                         today:data.data.summary.exercise.workout_duration_hours_min.today,
                         year:data.data.summary.exercise.workout_duration_hours_min.year
-                     }, 
-                rank:{
-                        week:data.data.summary.exercise.rank.week,
-                        yesterday:data.data.summary.exercise.rank.yesterday,
-                        month:data.data.summary.exercise.rank.month,
-                        custom_range:{                        
-                           data:haveCustomData?data.data.summary.exercise.rank.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.rank.today,
-                        year:data.data.summary.exercise.rank.year
-                     },    
+                     },   
                 avg_exercise_heart_rate:{
                         week:data.data.summary.exercise.avg_exercise_heart_rate.week,
                         yesterday:data.data.summary.exercise.avg_exercise_heart_rate.yesterday,
@@ -769,46 +730,6 @@ constructor(props){
                         today:data.data.summary.exercise.avg_exercise_heart_rate.today,
                         year:data.data.summary.exercise.avg_exercise_heart_rate.year
                      },    
-                overall_exercise_gpa_rank:{
-                        week:data.data.summary.exercise.overall_exercise_gpa_rank.week,
-                        yesterday:data.data.summary.exercise.overall_exercise_gpa_rank.yesterday,
-                        month:data.data.summary.exercise.overall_exercise_gpa_rank.month,
-                        custom_range:{
-                           data:haveCustomData?data.data.summary.exercise.overall_exercise_gpa_rank.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.overall_exercise_gpa_rank.today,
-                        year:data.data.summary.exercise.overall_exercise_gpa_rank.year
-                     },
-                workout_effort_level_grade:{
-                        week:data.data.summary.exercise.workout_effort_level_grade.week,
-                        yesterday:data.data.summary.exercise.workout_effort_level_grade.yesterday,
-                        month:data.data.summary.exercise.workout_effort_level_grade.month,
-                        custom_range:{                           
-                           data:haveCustomData?data.data.summary.exercise.workout_effort_level_grade.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.workout_effort_level_grade.today,
-                        year:data.data.summary.exercise.workout_effort_level_grade.year
-                     },
-                avg_exercise_heart_rate_grade:{
-                        week:data.data.summary.exercise.avg_exercise_heart_rate_grade.week,
-                        yesterday:data.data.summary.exercise.avg_exercise_heart_rate_grade.yesterday,
-                        month:data.data.summary.exercise.avg_exercise_heart_rate_grade.month,
-                        custom_range:{   
-                           data:haveCustomData?data.data.summary.exercise.avg_exercise_heart_rate_grade.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.avg_exercise_heart_rate_grade.today,
-                        year:data.data.summary.exercise.avg_exercise_heart_rate_grade.year
-                     },
-                overall_exercise_gpa:{
-                        week:data.data.summary.exercise.overall_exercise_gpa.week,
-                        yesterday:data.data.summary.exercise.overall_exercise_gpa.yesterday,
-                        month:data.data.summary.exercise.overall_exercise_gpa.month,
-                        custom_range:{            
-                           data:haveCustomData?data.data.summary.exercise.overall_exercise_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.exercise.overall_exercise_gpa.today,
-                        year:data.data.summary.exercise.overall_exercise_gpa.year
-                     },
                 workout_effort_level:{
                         week:data.data.summary.exercise.workout_effort_level.week,
                         yesterday:data.data.summary.exercise.workout_effort_level.yesterday,
@@ -818,42 +739,29 @@ constructor(props){
                         },
                         today:data.data.summary.exercise.workout_effort_level.today,
                         year:data.data.summary.exercise.workout_effort_level.year
-                     }        
-                },
-
-        penalty:{
-             sleep_aid_penalty: {
-                        week:data.data.summary.penalty.sleep_aid_penalty.week,
-                        yesterday:data.data.summary.penalty.sleep_aid_penalty.yesterday,
-                        month:data.data.summary.penalty.sleep_aid_penalty.month,
-                        custom_range:{               
-                           data:haveCustomData?data.data.summary.penalty.sleep_aid_penalty.custom_range.data:''
-                        },
-                        today:data.data.summary.penalty.sleep_aid_penalty.today,
-                        year:data.data.summary.penalty.sleep_aid_penalty.year
-                    },
-            controlled_substance_penalty: {
-                        week:data.data.summary.penalty.controlled_substance_penalty.week,
-                        yesterday:data.data.summary.penalty.controlled_substance_penalty.yesterday,
-                        month:data.data.summary.penalty.controlled_substance_penalty.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.penalty.controlled_substance_penalty.custom_range.data:''
-                        },
-                        today:data.data.summary.penalty.controlled_substance_penalty.today,
-                        year:data.data.summary.penalty.controlled_substance_penalty.year
                      },
-            smoking_penalty: {
-                        week:data.data.summary.penalty.smoking_penalty.week,
-                        yesterday:data.data.summary.penalty.smoking_penalty.yesterday,
-                        month:data.data.summary.penalty.smoking_penalty.month,
+                      vo2_max:{
+                        week:data.data.summary.exercise.vo2_max.week,
+                        yesterday:data.data.summary.exercise.vo2_max.yesterday,
+                        month:data.data.summary.exercise.vo2_max.month,
                         custom_range:{           
-                           data:haveCustomData?data.data.summary.penalty.smoking_penalty.custom_range.data:''
+                           data:haveCustomData?data.data.summary.exercise.vo2_max.custom_range.data:''
                         },
-                        today:data.data.summary.penalty.smoking_penalty.today,
-                        year:data.data.summary.penalty.smoking_penalty.year
-            },
-        },
+                        today:data.data.summary.exercise.vo2_max.today,
+                        year:data.data.summary.exercise.vo2_max.year
+                     }                               
+                },
          sleep: {
+             prcnt_days_sleep_aid_taken_in_period: {
+                        week:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.week,
+                        yesterday:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.yesterday,
+                        month:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.month,
+                        custom_range:{               
+                           data:haveCustomData?data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range.data:''
+                        },
+                        today:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today,
+                        year:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.year
+                     },
             average_sleep_grade: {
                         week:data.data.summary.sleep.average_sleep_grade.week,
                         yesterday:data.data.summary.sleep.average_sleep_grade.yesterday,
@@ -893,6 +801,16 @@ constructor(props){
                         },
                         today:data.data.summary.sleep.overall_sleep_gpa.today,
                         year:data.data.summary.sleep.overall_sleep_gpa.year
+                     },
+            num_days_sleep_aid_taken_in_period: {
+                        week:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.week,
+                        yesterday:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.yesterday,
+                        month:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.month,
+                        custom_range:{                   
+                           data:haveCustomData?data.data.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range.data:''
+                        },
+                        today:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.today,
+                        year:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.year
                      }
                },
          alcohol: {
@@ -935,6 +853,68 @@ constructor(props){
                         },
                         today:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today,
                         year:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year
+            }
+        },
+        other: {
+            hrr_beats_lowered_in_first_min: {
+                        week:data.data.summary.other.hrr_beats_lowered_in_first_min.week,
+                        yesterday:data.data.summary.other.hrr_beats_lowered_in_first_min.yesterday,
+                        month:data.data.summary.other.hrr_beats_lowered_in_first_min.month,
+                        custom_range:{    
+                           data:haveCustomData?data.data.summary.other.hrr_beats_lowered_in_first_min.custom_range.data:''
+                        },
+                        today:data.data.summary.other.hrr_beats_lowered_in_first_min.today,
+                        year:data.data.summary.other.hrr_beats_lowered_in_first_min.year
+            },
+            hrr_highest_hr_in_first_min: {
+                        week:data.data.summary.other.hrr_highest_hr_in_first_min.week,
+                        yesterday:data.data.summary.other.hrr_highest_hr_in_first_min.yesterday,
+                        month:data.data.summary.other.hrr_highest_hr_in_first_min.month,
+                        custom_range:{    
+                           data:haveCustomData?data.data.summary.other.hrr_highest_hr_in_first_min.custom_range.data:''
+                        },
+                        today:data.data.summary.other.hrr_highest_hr_in_first_min.today,
+                        year:data.data.summary.other.hrr_highest_hr_in_first_min.year
+            },
+            hrr_lowest_hr_point: {
+                        week:data.data.summary.other.hrr_lowest_hr_point.week,
+                        yesterday:data.data.summary.other.hrr_lowest_hr_point.yesterday,
+                        month:data.data.summary.other.hrr_lowest_hr_point.month,
+                        custom_range:{    
+                           data:haveCustomData?data.data.summary.other.hrr_lowest_hr_point.custom_range.data:''
+                        },
+                        today:data.data.summary.other.hrr_lowest_hr_point.today,
+                        year:data.data.summary.other.hrr_lowest_hr_point.year
+            },
+            floors_climbed: {
+                        week:data.data.summary.other.floors_climbed.week,
+                        yesterday:data.data.summary.other.floors_climbed.yesterday,
+                        month:data.data.summary.other.floors_climbed.month,
+                        custom_range:{    
+                           data:haveCustomData?data.data.summary.other.floors_climbed.custom_range.data:''
+                        },
+                        today:data.data.summary.other.floors_climbed.today,
+                        year:data.data.summary.other.floors_climbed.year
+            },
+            resting_hr: {
+                        week:data.data.summary.other.resting_hr.week,
+                        yesterday:data.data.summary.other.resting_hr.yesterday,
+                        month:data.data.summary.other.resting_hr.month,
+                        custom_range:{    
+                           data:haveCustomData?data.data.summary.other.resting_hr.custom_range.data:''
+                        },
+                        today:data.data.summary.other.resting_hr.today,
+                        year:data.data.summary.other.resting_hr.year
+            },
+            hrr_time_to_99: {
+                        week:data.data.summary.other.hrr_time_to_99.week,
+                        yesterday:data.data.summary.other.hrr_time_to_99.yesterday,
+                        month:data.data.summary.other.hrr_time_to_99.month,
+                        custom_range:{    
+                           data:haveCustomData?data.data.summary.other.hrr_time_to_99.custom_range.data:''
+                        },
+                        today:data.data.summary.other.hrr_time_to_99.today,
+                        year:data.data.summary.other.hrr_time_to_99.year
             }
         }
               
@@ -1450,175 +1430,6 @@ handleChange(event){
         <thead>
             <tr>
                 
-                <th>Other Stats</th>
-                 {haveCustomData && <th>Custom Date Range</th>}
-                <th>Today</th>
-                <th>Yesterday</th>
-                <th>Avg Last 7 Days</th>
-                <th>Avg Last 30 Days</th>
-                <th>Avg Year to Date</th>
-            
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>HRR (time to 99)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-               <td>HRR (heart beats lowered in 1st minute)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>HRR (higest heart rate in 1st minute)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>HRR (lowest heart rate point)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-</div>
-
-</div>
-<div className="row padding">
-			<div className="col-md-6">
-			<div className="table-responsive tablecenter"> 
-    <table className="table table-bordered">
-        <thead>
-            <tr>
-                
-                <th>Exercise Stats</th>
-                {haveCustomData && <th>Custom Date Range</th>}
-                <th>Today</th>
-                <th>Yesterday</th>
-                <th>Avg Last 7 Days</th>
-                <th>Avg Last 30 Days</th>
-                <th>Avg Year to Date</th>
-            
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Workout Duration (hours:minutes)</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.workout_duration_hours_min.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.workout_duration_hours_min.today}</td>
-                <td>{this.state.summary.exercise.workout_duration_hours_min.yesterday}</td>
-                <td>{this.state.summary.exercise.workout_duration_hours_min.week}</td>
-                <td>{this.state.summary.exercise.workout_duration_hours_min.month}</td>
-                <td>{this.state.summary.exercise.workout_duration_hours_min.year}</td>
-            </tr>
-            <tr>
-               <td>Workout Duration Grade </td>
-               {haveCustomData && <td>{this.state.summary.exercise.workout_duration_grade.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.workout_duration_grade.today}</td>
-                <td>{this.state.summary.exercise.workout_duration_grade.yesterday}</td>
-                <td>{this.state.summary.exercise.workout_duration_grade.week}</td>
-                <td>{this.state.summary.exercise.workout_duration_grade.month}</td>
-                <td>{this.state.summary.exercise.workout_duration_grade.year}</td>
-            </tr>
-            <tr>
-                <td>Rank against other users</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.rank.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.rank.today}</td>
-                <td>{this.state.summary.exercise.rank.yesterday}</td>
-                <td>{this.state.summary.exercise.rank.week}</td>
-                <td>{this.state.summary.exercise.rank.month}</td>
-                <td>{this.state.summary.exercise.rank.year}</td>
-            </tr>
-            <tr>
-            	<td>Workout Effort Level</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.workout_effort_level.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.workout_effort_level.today}</td>
-                <td>{this.state.summary.exercise.workout_effort_level.yesterday}</td>
-                <td>{this.state.summary.exercise.workout_effort_level.week}</td>
-                <td>{this.state.summary.exercise.workout_effort_level.month}</td>
-                <td>{this.state.summary.exercise.workout_effort_level.year}</td>
-            </tr>
-             <tr>
-            	<td>Workout Effort Level Grade</td>
-               {haveCustomData && <td>{this.state.summary.exercise.workout_effort_level_grade.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.workout_effort_level_grade.today}</td>
-                <td>{this.state.summary.exercise.workout_effort_level_grade.yesterday}</td>
-                <td>{this.state.summary.exercise.workout_effort_level_grade.week}</td>
-                <td>{this.state.summary.exercise.workout_effort_level_grade.month}</td>
-                <td>{this.state.summary.exercise.workout_effort_level_grade.year}</td>
-            </tr>
-
-             <tr>
-                <td>Average Exercise Heart Rate</td>
-               {haveCustomData && <td>{this.state.summary.exercise.avg_exercise_heart_rate.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate.today}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate.yesterday}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate.week}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate.month}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate.year}</td>
-            </tr>
-            <tr>
-               <td>Average Exercise Heart Rate Grade </td>
-               {haveCustomData && <td>{this.state.summary.exercise.avg_exercise_heart_rate_grade.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate_grade.today}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate_grade.yesterday}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate_grade.week}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate_grade.month}</td>
-                <td>{this.state.summary.exercise.avg_exercise_heart_rate_grade.year}</td>
-            </tr>
-            <tr>
-                <td>Overall Workout Grade</td>
-               {haveCustomData && <td>{this.state.summary.exercise.overall_workout_grade.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.overall_workout_grade.today}</td>
-                <td>{this.state.summary.exercise.overall_workout_grade.yesterday}</td>
-                <td>{this.state.summary.exercise.overall_workout_grade.week}</td>
-                <td>{this.state.summary.exercise.overall_workout_grade.month}</td>
-                <td>{this.state.summary.exercise.overall_workout_grade.year}</td>
-            </tr>
-            <tr>
-            	<td>Overall Exercise GPA</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.overall_exercise_gpa.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.overall_exercise_gpa.today}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa.yesterday}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa.week}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa.month}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa.year}</td>
-            </tr>
-             <tr>
-            	<td>Overall Exercise GPA Rank</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.overall_exercise_gpa_rank.custom_range.data}</td>}
-                <td>{this.state.summary.exercise.overall_exercise_gpa_rank.today}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa_rank.yesterday}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa_rank.week}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa_rank.month}</td>
-                <td>{this.state.summary.exercise.overall_exercise_gpa_rank.year}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-</div>
-
-<div className="col-md-6">
-	<div className="table-responsive tablecenter"> 
-    <table className="table table-bordered">
-        <thead>
-            <tr>
-                
                 <th>Exercise Consistency</th>
                  {haveCustomData && <th>Custom Date Range</th>}
                 <th>Today</th>
@@ -1668,6 +1479,144 @@ handleChange(event){
             </tr>
         </tbody>
     </table>
+</div>
+</div>
+
+</div>
+<div className="row padding">
+			<div className="col-md-6">
+			<div className="table-responsive tablecenter"> 
+    <table className="table table-bordered">
+        <thead>
+            <tr>
+                
+                <th>Exercise Stats</th>
+                {haveCustomData && <th>Custom Date Range</th>}
+                <th>Today</th>
+                <th>Yesterday</th>
+                <th>Avg Last 7 Days</th>
+                <th>Avg Last 30 Days</th>
+                <th>Avg Year to Date</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Workout Duration (hours:minutes)</td>
+                {haveCustomData &&<td>{this.state.summary.exercise.workout_duration_hours_min.custom_range.data}</td>}
+                <td>{this.state.summary.exercise.workout_duration_hours_min.today}</td>
+                <td>{this.state.summary.exercise.workout_duration_hours_min.yesterday}</td>
+                <td>{this.state.summary.exercise.workout_duration_hours_min.week}</td>
+                <td>{this.state.summary.exercise.workout_duration_hours_min.month}</td>
+                <td>{this.state.summary.exercise.workout_duration_hours_min.year}</td>
+            </tr>
+            <tr>
+            	<td>Workout Effort Level</td>
+                {haveCustomData &&<td>{this.state.summary.exercise.workout_effort_level.custom_range.data}</td>}
+                <td>{this.state.summary.exercise.workout_effort_level.today}</td>
+                <td>{this.state.summary.exercise.workout_effort_level.yesterday}</td>
+                <td>{this.state.summary.exercise.workout_effort_level.week}</td>
+                <td>{this.state.summary.exercise.workout_effort_level.month}</td>
+                <td>{this.state.summary.exercise.workout_effort_level.year}</td>
+            </tr>
+             <tr>
+                <td>Average Exercise Heart Rate</td>
+               {haveCustomData && <td>{this.state.summary.exercise.avg_exercise_heart_rate.custom_range.data}</td>}
+                <td>{this.state.summary.exercise.avg_exercise_heart_rate.today}</td>
+                <td>{this.state.summary.exercise.avg_exercise_heart_rate.yesterday}</td>
+                <td>{this.state.summary.exercise.avg_exercise_heart_rate.week}</td>
+                <td>{this.state.summary.exercise.avg_exercise_heart_rate.month}</td>
+                <td>{this.state.summary.exercise.avg_exercise_heart_rate.year}</td>
+            </tr>
+             <tr>
+            	<td>VO2 Max</td>
+               {haveCustomData && <td>{this.state.summary.exercise.vo2_max.custom_range.data}</td>}
+                <td>{this.state.summary.exercise.vo2_max.today}</td>
+                <td>{this.state.summary.exercise.vo2_max.yesterday}</td>
+                <td>{this.state.summary.exercise.vo2_max.week}</td>
+                <td>{this.state.summary.exercise.vo2_max.month}</td>
+                <td>{this.state.summary.exercise.vo2_max.year}</td>
+            </tr>
+
+            
+        </tbody>
+    </table>
+</div>
+</div>
+
+<div className="col-md-6">
+	<div className="table-responsive tablecenter"> 
+    <table className="table table-bordered">
+         <thead>
+            <tr>
+                
+                <th>Other Stats</th>
+                 {haveCustomData && <th>Custom Date Range</th>}
+                <th>Today</th>
+                <th>Yesterday</th>
+                <th>Avg Last 7 Days</th>
+                <th>Avg Last 30 Days</th>
+                <th>Avg Year to Date</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Resting Heart Rate (RHR)</td>
+               {haveCustomData &&<td>{this.state.summary.other.resting_hr.custom_range.data}</td>}
+                <td>{this.state.summary.other.resting_hr.today}</td>
+                <td>{this.state.summary.other.resting_hr.yesterday}</td>
+                <td>{this.state.summary.other.resting_hr.week}</td>
+                <td>{this.state.summary.other.resting_hr.month}</td>
+                <td>{this.state.summary.other.resting_hr.year}</td>
+            </tr>
+            <tr>
+                <td>HRR (time to 99)</td>
+               {haveCustomData &&<td>{this.state.summary.other.hrr_time_to_99.custom_range.data}</td>}
+                <td>{this.state.summary.other.hrr_time_to_99.today}</td>
+                <td>{this.state.summary.other.hrr_time_to_99.yesterday}</td>
+                <td>{this.state.summary.other.hrr_time_to_99.week}</td>
+                <td>{this.state.summary.other.hrr_time_to_99.month}</td>
+                <td>{this.state.summary.other.hrr_time_to_99.year}</td>
+            </tr>
+            <tr>
+               <td>HRR (heart beats lowered in 1st minute)</td>
+               {haveCustomData &&<td>{this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range.data}</td>}
+                <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.today}</td>
+                <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.yesterday}</td>
+                <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.week}</td>
+                <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.month}</td>
+                <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.year}</td>
+            </tr>
+            <tr>
+                <td>HRR (higest heart rate in 1st minute)</td>
+                {haveCustomData &&<td>{this.state.summary.other.hrr_highest_hr_in_first_min.custom_range.data}</td>}
+                <td>{this.state.summary.other.hrr_highest_hr_in_first_min.today}</td>
+                <td>{this.state.summary.other.hrr_highest_hr_in_first_min.yesterday}</td>
+                <td>{this.state.summary.other.hrr_highest_hr_in_first_min.week}</td>
+                <td>{this.state.summary.other.hrr_highest_hr_in_first_min.month}</td>
+                <td>{this.state.summary.other.hrr_highest_hr_in_first_min.year}</td>
+            </tr>
+            <tr>
+                <td>HRR (lowest heart rate point)</td>
+               {haveCustomData &&<td>{this.state.summary.other.hrr_lowest_hr_point.custom_range.data}</td>}
+                <td>{this.state.summary.other.hrr_lowest_hr_point.today}</td>
+                <td>{this.state.summary.other.hrr_lowest_hr_point.yesterday}</td>
+                <td>{this.state.summary.other.hrr_lowest_hr_point.week}</td>
+                <td>{this.state.summary.other.hrr_lowest_hr_point.month}</td>
+                <td>{this.state.summary.other.hrr_lowest_hr_point.year}</td>
+            </tr>
+             <tr>
+                <td>Floors Climbed</td>
+               {haveCustomData &&<td>{this.state.summary.other.floors_climbed.custom_range.data}</td>}
+                <td>{this.state.summary.other.floors_climbed.today}</td>
+                <td>{this.state.summary.other.floors_climbed.yesterday}</td>
+                <td>{this.state.summary.other.floors_climbed.week}</td>
+                <td>{this.state.summary.other.floors_climbed.month}</td>
+                <td>{this.state.summary.other.floors_climbed.year}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>		
 <div className="padding">
    <div className="table-responsive"> 
@@ -1675,8 +1624,8 @@ handleChange(event){
          <thead>
              
                 <tr>
-                 {haveCustomData && <th>Sleep Per Night(excluding awake time)</th>}
-                <th>Custom Date Range</th>
+                  <th>Sleep Per Night(excluding awake time)</th>
+               {haveCustomData && <th>Custom Date Range</th>}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1712,6 +1661,24 @@ handleChange(event){
                 <td>{this.state.summary.sleep.average_sleep_grade.week}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.month}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.year}</td>
+            </tr>
+            <tr>
+                <td># of Days Sleep Aid Taken in Period</td>
+                {haveCustomData && <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range.data}</td>}
+                <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.today}</td>
+                <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.yesterday}</td>
+                <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.week}</td>
+                <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.month}</td>
+                <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.year}</td>
+            </tr>
+            <tr>
+                <td>% of Days Sleep Aid Taken in Period</td>
+                {haveCustomData && <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range.data}</td>}
+                <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today}</td>
+                <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.yesterday}</td>
+                <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.week}</td>
+                <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.month}</td>
+                <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.year}</td>
             </tr>
             <tr>
                 <td>Overall Sleep GPA</td>
