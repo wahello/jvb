@@ -1,5 +1,6 @@
 from decouple import Csv, config
 from dj_database_url import parse as db_url
+from celery.schedules import crontab
 
 from .base import *  # noqa
 
@@ -52,6 +53,14 @@ WEBPACK_LOADER['DEFAULT']['CACHE'] = True
 CELERY_BROKER_URL = config('REDIS_URL')
 CELERY_RESULT_BACKEND = config('REDIS_URL')
 CELERY_SEND_TASK_ERROR_EMAILS = True
+CELERY_TIMEZONE = 'America/New_York'
+CELERY_BEAT_SCHEDULE = {
+    #execute every day at 12:01 AM EST (America/New_york)
+    'create-cumulative-sum':{
+        'task':'progress_analyzer.generate_cumulative_instances',
+        'schedule':crontab(minute=1, hour=0)
+    },
+}
 
 # Whitenoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
