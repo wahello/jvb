@@ -45,6 +45,15 @@ class ToAlcoholCumulative(object):
 		self.cum_average_drink_per_week = raw_data["cum_average_drink_per_week"]
 		self.cum_alcohol_drink_per_week_gpa = raw_data["cum_alcohol_drink_per_week_gpa"]
 
+class ToOtherStatsCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_resting_hr = raw_data["cum_resting_hr"]
+		self.cum_hrr_time_to_99_in_mins = raw_data["cum_hrr_time_to_99_in_mins"]
+		self.cum_hrr_beats_lowered_in_first_min = raw_data["cum_hrr_beats_lowered_in_first_min"]
+		self.cum_highest_hr_in_first_min = raw_data["cum_highest_hr_in_first_min"]
+		self.cum_hrr_lowest_hr_point = raw_data["cum_hrr_lowest_hr_point"]
+		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
+
 class ToCumulativeSum(object):
 	'''
 	Convert a quicklook object to cumulative sum object
@@ -52,7 +61,7 @@ class ToCumulativeSum(object):
 	def __init__(self,ql_obj,cum_obj=None):
 
 		cum_raw_data = create_cum_raw_data(ql_obj,cum_obj)
-
+		
 		self.overall_health_grade_cum = ToOverallHealthGradeCumulative(
 			cum_raw_data["overall_health_grade_cum"]
 		)
@@ -76,4 +85,7 @@ class ToCumulativeSum(object):
 		)
 		self.alcohol_cum = ToAlcoholCumulative(
 			cum_raw_data["alcohol_cum"]
+		)
+		self.other_stats_cum = ToOtherStatsCumulative(
+			cum_raw_data["other_stats_cum"]
 		)

@@ -2,7 +2,6 @@ import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import { Link,withRouter } from 'react-router-dom';
 import NavbarMenu from '../navbar';
-
 class Dashboard extends Component {
 
 	constructor(props){
@@ -38,7 +37,7 @@ class Dashboard extends Component {
 							  <a href='/users/request_token'>Garmin Health Connect</a><br/>
 							  <a href='/users/connect_request_token'>Garmin Connect</a><br/>
 							  <h3 id="link_style">Other</h3>
-							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>	
+							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>							 
 						  </div>
 						</div>
 					</div>

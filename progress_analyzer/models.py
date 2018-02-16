@@ -66,6 +66,7 @@ class AlcoholCumulative(models.Model):
 
 class OtherStatsCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name="other_stats_cum")
+	cum_resting_hr = models.IntegerField(blank=True, null=True)
 	cum_hrr_time_to_99_in_mins = models.FloatField(blank=True, null=True)
 	cum_hrr_beats_lowered_in_first_min = models.IntegerField(blank=True, null=True )
 	cum_highest_hr_in_first_min = models.IntegerField(blank=True,null=True)

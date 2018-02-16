@@ -541,25 +541,25 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
 						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
 
-			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-						_get_actual_sleep_start_time(target_sleep_data)+
-						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
-			
 			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-			# 			target_sleep_data.get('startTimeInSeconds')+
+			# 			_get_actual_sleep_start_time(target_sleep_data)+
 			# 			target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+			
+			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+						target_sleep_data.get('startTimeInSeconds')+
+						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
 
 		else:
 			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
 				target_sleep_data.get('startTimeOffsetInSeconds'))
 
-			awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
-												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-												   target_sleep_data.get('durationInSeconds'))
-
-			# awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+			# awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
 			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 			# 									   target_sleep_data.get('durationInSeconds'))
+
+			awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+												   target_sleep_data.get('durationInSeconds'))
 
 		if target_sleep_data.get('validation',None) == 'MANUAL':
 			awake_duration = _get_deep_light_awake_sleep_duration(target_sleep_data).get('awake',0)
