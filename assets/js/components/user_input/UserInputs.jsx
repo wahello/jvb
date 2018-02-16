@@ -2103,14 +2103,14 @@ handleScroll() {
                                 <div className="input">
                                   
                                     <Label check className="btn btn-secondary radio1">
-                                      <Input type="radio" name="fasted" 
+                                      <Input type="radio" name="fasted" id="radio_yes" 
                                       value="yes"
                                       checked={this.state.fasted === 'yes'}
                                       onChange={this.handleChangeFasted}/>{' '}
                                       Yes
                                    </Label>
                                    <Label check className="btn btn-secondary radio1">
-                                     <Input type="radio" name="fasted" 
+                                     <Input type="radio" name="fasted" id="radio_no"
                                           value="no"
                                           checked={this.state.fasted === 'no'}
                                           onChange={this.handleChangeFasted}/>{' '}
@@ -2234,7 +2234,8 @@ handleScroll() {
                                 <div className="input1">
                                 <Input
                                 className = "radio1"
-                                type="checkbox" 
+                                type="checkbox"
+                                name = "weather_check" 
                                 checked = {this.state.weather_check}                                            
                                 onClick={this.handleWeatherCheck}
                                 >
