@@ -1675,6 +1675,8 @@ def export_users_xls(request):
 					# sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
 					if json1_data['12:00 AM to 12:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_orange)
+						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
+							days_count['12:00 AM to 12:59 AM'] += 1
 					elif json1_data['12:00 AM to 12:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_green)
 						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
@@ -1687,19 +1689,22 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
 					if json1_data['01:00 AM to 01:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_orange)
+						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
+							days_count['01:00 AM to 01:59 AM'] += 1
 					elif json1_data['01:00 AM to 01:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_green)
 						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
 							days_count['01:00 AM to 01:59 AM'] += 1
 					elif json1_data['01:00 AM to 01:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_red_con)
-						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
-							days_count['12:00 AM to 12:59 AM'] += 1
+
 					else:
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_purple)
 
 					if json1_data['02:00 AM to 02:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_orange)
+						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
+							days_count['02:00 AM to 02:59 AM'] += 1
 					elif json1_data['02:00 AM to 02:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_green)
 						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
@@ -1713,6 +1718,8 @@ def export_users_xls(request):
 
 					if json1_data['03:00 AM to 03:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_orange)
+						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
+							days_count['03:00 AM to 03:59 AM'] += 1
 					elif json1_data['03:00 AM to 03:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_green)
 						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
@@ -1726,6 +1733,8 @@ def export_users_xls(request):
 
 					if json1_data['04:00 AM to 04:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_orange)
+						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
+							days_count['04:00 AM to 04:59 AM'] += 1
 					elif json1_data['04:00 AM to 04:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_green)
 						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
@@ -1739,6 +1748,8 @@ def export_users_xls(request):
 					#5
 					if json1_data['05:00 AM to 05:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_orange)
+						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
+							days_count['05:00 AM to 05:59 AM']+= 1
 					elif json1_data['05:00 AM to 05:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_green)
 						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
@@ -1833,11 +1844,11 @@ def export_users_xls(request):
 					if json1_data['12:00 PM to 12:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_orange)
 						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
-							days_count['12:00 PM to 12:59 PM']+= 1
+							days_count['12:00 PM to 12:59 PM'] += 1
 					elif json1_data['12:00 PM to 12:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_green)
 						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
-							days_count['12:00 PM to 12:59 PM']+= 1
+							days_count['12:00 PM to 12:59 PM'] += 1
 					elif json1_data['12:00 PM to 12:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_red_con)
 					else:
@@ -1845,13 +1856,13 @@ def export_users_xls(request):
 					#1
 					if json1_data['01:00 PM to 01:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_orange)
-						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
-							days_count['02:00 PM to 02:59 PM']+= 1
+						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
+							days_count['01:00 PM to 01:59 PM']+= 1
 					elif json1_data['01:00 PM to 01:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_green)
-						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
-							days_count['02:00 PM to 02:59 PM']+= 1
-					elif json1_data['02:00 PM to 02:59 PM']["status"] == "inactive":
+						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
+							days_count['01:00 PM to 01:59 PM']+= 1
+					elif json1_data['01:00 PM to 01:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_purple)
@@ -1953,7 +1964,7 @@ def export_users_xls(request):
 							days_count['09:00 PM to 09:59 PM']+= 1
 					elif json1_data['09:00 PM to 09:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_green)
-						if json1_data['10:00 AM to 10:59 AM']['steps'] >= 300:
+						if json1_data['09:00 PM to 09:59 PM']['steps'] >= 300:
 							days_count['09:00 PM to 09:59 PM']+= 1
 					elif json1_data['09:00 PM to 09:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_red_con)
@@ -2021,28 +2032,28 @@ def export_users_xls(request):
 					sheet11.write(5,2+1,str(round(((days_count["12:00 AM to 12:59 AM"]/total_days))*100))+" %",bold)
 					# print(((days_count["12:00 AM to 12:59 AM"]/total_days))*100)
 					sheet11.write(5,2+2,format_active_prcnt(days_count,'01:00 AM to 01:59 AM',total_days),bold)
-					sheet11.write(5,2+3,str(round(((days_count["02:00 AM to 02:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+4,str(round(((days_count["03:00 AM to 03:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+5,str(round(((days_count["04:00 AM to 04:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+6,str(round(((days_count["05:00 AM to 05:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+7,str(round(((days_count["06:00 AM to 06:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+8,str(round(((days_count["07:00 AM to 07:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+9,str(round(((days_count["08:00 AM to 08:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+10,str(round(((days_count["09:00 AM to 09:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+11,str(round(((days_count["10:00 AM to 10:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+12,str(round(((days_count["11:00 AM to 11:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+13,str(round(((days_count["12:00 AM to 12:59 AM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+14,str(round(((days_count["01:00 PM to 01:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+15,str(round(((days_count["02:00 PM to 02:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+16,str(round(((days_count["03:00 PM to 03:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+17,str(round(((days_count["04:00 PM to 04:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+18,str(round(((days_count["05:00 PM to 05:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+19,str(round(((days_count["06:00 PM to 06:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+20,str(round(((days_count["07:00 PM to 07:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+21,str(round(((days_count["08:00 PM to 08:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+22,str(round(((days_count["09:00 PM to 09:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+23,str(round(((days_count["10:00 PM to 10:59 PM"]/total_days))*100))+" %",bold)
-					sheet11.write(5,2+24,str(round(((days_count["11:00 PM to 11:59 PM"]/total_days))*100))+" %",bold)
+					sheet11.write(5,2+3,str(round(((days_count["02:00 AM to 02:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+4,str(round(((days_count["03:00 AM to 03:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+5,str(round(((days_count["04:00 AM to 04:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+6,str(round(((days_count["05:00 AM to 05:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+7,str(round(((days_count["06:00 AM to 06:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+8,str(round(((days_count["07:00 AM to 07:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+9,str(round(((days_count["08:00 AM to 08:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+10,str(round(((days_count["09:00 AM to 09:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+11,str(round(((days_count["10:00 AM to 10:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+12,str(round(((days_count["11:00 AM to 11:59 AM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+13,str(round(((days_count["12:00 PM to 12:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+14,str(round(((days_count["01:00 PM to 01:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+15,str(round(((days_count["02:00 PM to 02:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+16,str(round(((days_count["03:00 PM to 03:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+17,str(round(((days_count["04:00 PM to 04:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+18,str(round(((days_count["05:00 PM to 05:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+19,str(round(((days_count["06:00 PM to 06:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+20,str(round(((days_count["07:00 PM to 07:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+21,str(round(((days_count["08:00 PM to 08:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+22,str(round(((days_count["09:00 PM to 09:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+23,str(round(((days_count["10:00 PM to 10:59 PM"]/total_days))*100),2)+" %",bold)
+					sheet11.write(5,2+24,str(round(((days_count["11:00 PM to 11:59 PM"]/total_days))*100),2)+" %",bold)
 
 
 
