@@ -1118,7 +1118,6 @@ handleChange(event){
 
 			<div className="col-sm-12 col-md-12 col-lg-12 padding">
 			<div className="row">
-			<div className="col-md-6">
 			<div className="table-responsive"> 
    		 <table className="table table-bordered">
          <thead>
@@ -1174,7 +1173,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="col-md-6">
+<div className="row">
 	<div className="table-responsive tablecenter"> 
     <table className="table table-bordered ">
          <thead>
@@ -1232,10 +1231,8 @@ handleChange(event){
 </div>		
 </div>
 
-</div>
 
 <div className="row padding">
-			<div className="col-md-6">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1302,7 +1299,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="col-md-6">
+<div className="row padding">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1358,15 +1355,10 @@ handleChange(event){
         </tbody>
     </table>
 </div>
-
-
-
 </div>
 
-</div>
 
 <div className="row padding">
-			<div className="col-md-6">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1424,7 +1416,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="col-md-6">
+<div className="row padding">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1481,12 +1473,9 @@ handleChange(event){
     </table>
 </div>
 </div>
-
-</div>
 <div className="row padding">
-			<div className="col-md-6">
-			<div className="table-responsive tablecenter"> 
-    <table className="table table-bordered">
+<div className="table-responsive tablecenter"> 
+<table className="table table-bordered">
         <thead>
             <tr>
                 
@@ -1544,7 +1533,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="col-md-6">
+<div className="row padding">
 	<div className="table-responsive tablecenter"> 
     <table className="table table-bordered">
          <thead>
@@ -1617,8 +1606,9 @@ handleChange(event){
             </tr>
         </tbody>
     </table>
+</div>
 </div>		
-<div className="padding">
+<div className=" row padding">
    <div className="table-responsive"> 
     <table className="table table-bordered">
          <thead>
@@ -1691,15 +1681,9 @@ handleChange(event){
             </tr>
         </tbody>
     </table>
-</div>
-         
-</div>
-</div>
-
-
+</div>        
 </div>
 </div>
-
 </div>		
 			
 			)
