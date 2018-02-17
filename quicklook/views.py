@@ -210,7 +210,8 @@ def export_users_xls(request):
 
 	to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
-	x= to_date.strftime('%-m-%d-%y')
+	# x= to_date.strftime('%_m-%d-%y')
+	# print(x)
 	filename = '{}_raw_data_{}_to_{}.xlsx'.format(request.user.username,
 		from_date.strftime('%b_%d_%Y'),to_date.strftime('%b_%d_%Y'))
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -247,7 +248,7 @@ def export_users_xls(request):
 	sheet9.repeat_columns(0)
 	sheet9.set_row(31, 150)
 	sheet9.set_landscape()
-	sheet9.set_row(0,30)
+	# sheet9.set_row(0,30)
 	bold = book.add_format({'bold': True})
 	date_format = book.add_format({'num_format': 'm-d-yy'})
 	current_date = to_date
@@ -255,13 +256,13 @@ def export_users_xls(request):
 	if to_date and from_date :
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
-
-			sheet9.write_rich_string(0,r,*result)
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
+			sheet9.write(0, r, current_date,date_format)
+			# sheet9.write_rich_string(0,r,*result)
 			current_date -= timedelta(days = 1)
 
 	
@@ -273,6 +274,7 @@ def export_users_xls(request):
 	format_purple = book.add_format({'align':'left', 'bg_color': 'pink','num_format': '#,##0','font_color': 'white'})
 	format = book.add_format({'align':'left','num_format': '#,##0'})
 	format1 = book.add_format({'align':'left','num_format': '0.00'})
+	
 	format_exe = book.add_format({'align':'left','num_format': '0.0'})
 	format_red_a = book.add_format({'align':'left', 'bg_color': 'red','num_format': '0.0'})
 	format_green_a = book.add_format({'align':'left', 'bg_color': 'green','num_format': '0.0','font_color': 'white'})
@@ -450,7 +452,6 @@ def export_users_xls(request):
 					grades_alcohol = grades_data['alcoholic_drink_per_week_grade']
 					overall_workout_gpa_without_penalty = (grade_point[grades_steps]+grade_point[grades_consistency]+
 					grade_point[grades_sleep]+grade_point[grades_consistency_exe]+grade_point[grades_food]+grade_point[grades_alcohol])/6
-					print(overall_workout_gpa_without_penalty)
 					if overall_workout_gpa_without_penalty >= 3:
 						sheet9.write(i+3,row_num,overall_workout_gpa_without_penalty,format_green_overall)
 					elif overall_workout_gpa_without_penalty >= 1 and overall_workout_gpa_without_penalty < 3:
@@ -934,10 +935,11 @@ def export_users_xls(request):
 	sheet1.repeat_columns(0)
 	sheet1.set_landscape()
 	format2 = book.add_format()
+	
 	format2.set_align('top')
 	format2.set_text_wrap()
 	format2.set_shrink()
-	sheet1.set_row(0, 30)
+	# sheet1.set_row(0, 30)
 	# columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 	# 		   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
 	# 		   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
@@ -953,14 +955,14 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet1.write_rich_string(0,r,*result)
-			# sheet1.write(0, r, current_date,date_format)
+			# sheet1.write_rich_string(0,r,*result)
+			sheet1.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
@@ -1170,21 +1172,21 @@ def export_users_xls(request):
 	sheet7.set_landscape()
 	sheet7.repeat_rows(0)
 	sheet7.repeat_columns(0)
-	sheet7.set_row(0,30)
+	# sheet7.set_row(0,30)
 	columns = ['pace_per_100_yard', 'total_strokes']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet7.write_rich_string(0,r,*result)
-			# sheet7.write(0, r, current_date,date_format)
+			# sheet7.write_rich_string(0,r,*result)
+			sheet7.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet7.write(0, 0, "Swim Stats",bold)
 	col_num1 = 1
@@ -1213,21 +1215,21 @@ def export_users_xls(request):
 	sheet8.set_landscape()
 	sheet8.repeat_rows(0)
 	sheet8.repeat_columns(0)
-	sheet8.set_row(0,30)
+	# sheet8.set_row(0,30)
 	columns = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet8.write_rich_string(0,r,*result)
-			# sheet8.write(0, r, current_date,date_format)
+			# sheet8.write_rich_string(0,r,*result)
+			sheet8.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet8.write(0, 0, "Bike Stats",bold)
 	col_num1 = 1
@@ -1256,21 +1258,21 @@ def export_users_xls(request):
 	sheet2.set_landscape()
 	sheet2.repeat_rows(0)
 	sheet2.repeat_columns(0)
-	sheet2.set_row(0,30)
+	# sheet2.set_row(0,30)
 	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet2.write_rich_string(0,r,*result)
-			# sheet2.write(0, r, current_date,date_format)
+			# sheet2.write_rich_string(0,r,*result)
+			sheet2.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet2.write(0, 0, "Steps",bold)
 	col_num1 = 1
@@ -1324,7 +1326,7 @@ def export_users_xls(request):
 	sheet3.set_landscape()
 	sheet3.repeat_rows(0)
 	sheet3.repeat_columns(0)
-	sheet3.set_row(0,30)
+	# sheet3.set_row(0,30)
 	columns = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
 	current_date = to_date
@@ -1332,14 +1334,14 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet3.write_rich_string(0,r,*result)
-			# sheet3.write(0, r, current_date,date_format)
+			# sheet3.write_rich_string(0,r,*result)
+			sheet3.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet3.write(0, 0, "Sleep",bold)
 	col_num1 = 1
@@ -1394,21 +1396,21 @@ def export_users_xls(request):
 	sheet4.set_landscape()
 	sheet4.repeat_rows(0)
 	sheet4.repeat_columns(0)
-	sheet4.set_row(0,30)
+	# sheet4.set_row(0,30)
 	columns = ['prcnt_non_processed_food','processed_food','non_processed_food', 'diet_type']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet4.write_rich_string(0,r,*result)
-			# sheet4.write(0, r, current_date,date_format)
+			# sheet4.write_rich_string(0,r,*result)
+			sheet4.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet4.write(0, 0, "Food",bold)
 	col_num1 = 1
@@ -1455,21 +1457,21 @@ def export_users_xls(request):
 	sheet5.set_landscape()
 	sheet5.repeat_rows(0)
 	sheet5.repeat_columns(0)
-	sheet5.set_row(0,30)
+	# sheet5.set_row(0,30)
 	columns = ['alcohol_day', 'alcohol_week']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet5.write_rich_string(0,r,*result,format2)
-			# sheet5.write(0, r, current_date,date_format)
+			# sheet5.write_rich_string(0,r,*result,format2)
+			sheet5.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet5.write(0, 0, "Alcohol",bold)
 	col_num1 = 1
@@ -1520,7 +1522,7 @@ def export_users_xls(request):
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
 	sheet6.repeat_columns(0)
-	sheet6.set_row(0,30)
+	# sheet6.set_row(0,30)
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
 	"distance_run","distance_bike","distance_swim","distance_other","pace",
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
@@ -1539,14 +1541,14 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			weekday1 = calendar.day_name[current_date.weekday()]
-			current_date_format= current_date.strftime('%-m-%d-%y')
-			current_date_string = str(current_date_format)
-			result = [weekday1,'\n',
-			current_date_string]
+			# weekday1 = calendar.day_name[current_date.weekday()]
+			# current_date_format= current_date.strftime('%-m-%d-%y')
+			# current_date_string = str(current_date_format)
+			# result = [weekday1,'\n',
+			# current_date_string]
 
-			sheet6.write_rich_string(0,r,*result,format2)
-			# sheet6.write(0, r, current_date,date_format)
+			# sheet6.write_rich_string(0,r,*result,format2)
+			sheet6.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet6.write(0, 0, "Exercise Reporting",bold)
 	col_num1 = 1
@@ -1592,9 +1594,12 @@ def export_users_xls(request):
 	format3 = book.add_format({'bold':True,'align':'center'})
 	format3.set_align('bottom')
 	format3.set_text_wrap()
+	format4 = book.add_format({'bold':True})
+	format4.set_num_format("0%") 
 	sheet11.set_column('D:AA',8)
 	sheet11.freeze_panes(4,3)
 	sheet11.set_column(1,1,15)
+	sheet11.write(5,0,'% of Days User Gets 300  in the hour*',bold)
 	# format2.set_shrink()
 	sheet11.write(3,1,"Daily Movement Consistency Score",format3)
 	hours_range = ["Total Daily Steps","12:00 - 12:59 AM","01:00 - 01:59 AM","02:00 - 02:59 AM","03:00 - 03:59 AM","04:00 - 04:59 AM",
@@ -1607,10 +1612,16 @@ def export_users_xls(request):
 	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
 	"06:00 PM to 06:59 PM","07:00 PM to 07:59 PM","08:00 PM to 08:59 PM","09:00 PM to 09:59 PM","10:00 PM to 10:59 PM","11:00 PM to 11:59 PM","sleeping_hours",
 	"active_hours","inactive_hours"]
+	days_count = {"12:00 AM to 12:59 AM":0,"01:00 AM to 01:59 AM":0,"02:00 AM to 02:59 AM":0,"03:00 AM to 03:59 AM":0,"04:00 AM to 04:59 AM":0,
+	"05:00 AM to 05:59 AM":0,"06:00 AM to 06:59 AM":0,"07:00 AM to 07:59 AM":0,"08:00 AM to 08:59 AM":0,"09:00 AM to 09:59 AM":0,"10:00 AM to 10:59 AM":0,"11:00 AM to 11:59 AM":0,
+	"12:00 PM to 12:59 PM":0,"01:00 PM to 01:59 PM":0,"02:00 PM to 02:59 PM":0,"03:00 PM to 03:59 PM":0,"04:00 PM to 04:59 PM":0,"05:00 PM to 05:59 PM":0,
+	"06:00 PM to 06:59 PM":0,"07:00 PM to 07:59 PM":0,"08:00 PM to 08:59 PM":0,"09:00 PM to 09:59 PM":0,"10:00 PM to 10:59 PM":0,"11:00 PM to 11:59 PM":0}
 	columns = ['movement_consistency']
 	current_date = to_date
-	r = 4
+	r = 6
 	# ?from_date=01-31-2018&to_date=01-05-2018
+	total_days = (to_date-from_date).days+1
+	print(total_days)
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
@@ -1630,7 +1641,8 @@ def export_users_xls(request):
 		sheet11.write(3,col_num1,hours_range[col_num],format2)
 	current_date = to_date
 	row_num = 4
-	row = 4
+	row = 6
+	row_per = 5
 	col = 2
 	while (current_date >= from_date):
 		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -1663,70 +1675,114 @@ def export_users_xls(request):
 					# sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
 					if json1_data['12:00 AM to 12:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_orange)
+						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
+							days_count['12:00 AM to 12:59 AM'] += 1
 					elif json1_data['12:00 AM to 12:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_green)
+						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
+							days_count['12:00 AM to 12:59 AM'] += 1
 					elif json1_data['12:00 AM to 12:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_red_con)
+						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
+							days_count['12:00 AM to 12:59 AM'] += 1
 					else:
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
 					if json1_data['01:00 AM to 01:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_orange)
+						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
+							days_count['01:00 AM to 01:59 AM'] += 1
 					elif json1_data['01:00 AM to 01:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_green)
+						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
+							days_count['01:00 AM to 01:59 AM'] += 1
 					elif json1_data['01:00 AM to 01:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_red_con)
+
 					else:
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_purple)
 
 					if json1_data['02:00 AM to 02:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_orange)
+						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
+							days_count['02:00 AM to 02:59 AM'] += 1
 					elif json1_data['02:00 AM to 02:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_green)
+						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
+							days_count['02:00 AM to 02:59 AM'] += 1
 					elif json1_data['02:00 AM to 02:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_red_con)
+						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
+							days_count['02:00 AM to 02:59 AM'] += 1
 					else:
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_purple)
 
 					if json1_data['03:00 AM to 03:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_orange)
+						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
+							days_count['03:00 AM to 03:59 AM'] += 1
 					elif json1_data['03:00 AM to 03:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_green)
+						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
+							days_count['03:00 AM to 03:59 AM'] += 1
 					elif json1_data['03:00 AM to 03:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_red_con)
+						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
+							days_count['03:00 AM to 03:59 AM'] += 1
 					else:
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_purple)
 
 					if json1_data['04:00 AM to 04:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_orange)
+						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
+							days_count['04:00 AM to 04:59 AM'] += 1
 					elif json1_data['04:00 AM to 04:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_green)
+						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
+							days_count['04:00 AM to 04:59 AM'] += 1
 					elif json1_data['04:00 AM to 04:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_red_con)
+						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
+							days_count['04:00 AM to 04:59 AM']+= 1
 					else:
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_purple)
 					#5
 					if json1_data['05:00 AM to 05:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_orange)
+						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
+							days_count['05:00 AM to 05:59 AM']+= 1
 					elif json1_data['05:00 AM to 05:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_green)
+						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
+							days_count['05:00 AM to 05:59 AM']+= 1
 					elif json1_data['05:00 AM to 05:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_red_con)
+						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
+							days_count['05:00 AM to 05:59 AM']+= 1
 					else:
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_purple)
 					#6
 					if json1_data['06:00 AM to 06:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_orange)
+						if json1_data['06:00 AM to 06:59 AM']['steps'] >= 300:
+							days_count['06:00 AM to 06:59 AM']+= 1
 					elif json1_data['06:00 AM to 06:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_green)
+						if json1_data['06:00 AM to 06:59 AM']['steps'] >= 300:
+							days_count['06:00 AM to 06:59 AM']+= 1
 					elif json1_data['06:00 AM to 06:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_red_con)
+
 					else:
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_purple)
 					#7
 					if json1_data['07:00 AM to 07:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_orange)
+						if json1_data['07:00 AM to 07:59 AM']['steps'] >= 300:
+							days_count['07:00 AM to 07:59 AM']+= 1
 					elif json1_data['07:00 AM to 07:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_green)
+						if json1_data['07:00 AM to 07:59 AM']['steps'] >= 300:
+							days_count['07:00 AM to 07:59 AM']+= 1
 					elif json1_data['07:00 AM to 07:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_red_con)
 					else:
@@ -1734,8 +1790,12 @@ def export_users_xls(request):
 					#8
 					if json1_data['08:00 AM to 08:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_orange)
+						if json1_data['08:00 AM to 08:59 AM']['steps'] >= 300:
+							days_count['08:00 AM to 08:59 AM']+= 1
 					elif json1_data['08:00 AM to 08:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_green)
+						if json1_data['08:00 AM to 08:59 AM']['steps'] >= 300:
+							days_count['08:00 AM to 08:59 AM']+= 1
 					elif json1_data['08:00 AM to 08:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_red_con)
 					else:
@@ -1743,17 +1803,26 @@ def export_users_xls(request):
 					#9
 					if json1_data['09:00 AM to 09:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_orange)
+						if json1_data['09:00 AM to 09:59 AM']['steps'] >= 300:
+							days_count['09:00 AM to 09:59 AM']+= 1
 					elif json1_data['09:00 AM to 09:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_green)
+						if json1_data['09:00 AM to 09:59 AM']['steps'] >= 300:
+							days_count['09:00 AM to 09:59 AM']+= 1
 					elif json1_data['09:00 AM to 09:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_red_con)
+
 					else:
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_purple)
 					#10
 					if json1_data['10:00 AM to 10:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_orange)
+						if json1_data['10:00 AM to 10:59 AM']['steps'] >= 300:
+							days_count['10:00 AM to 10:59 AM']+= 1
 					elif json1_data['10:00 AM to 10:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_green)
+						if json1_data['10:00 AM to 10:59 AM']['steps'] >= 300:
+							days_count['10:00 AM to 10:59 AM']+= 1
 					elif json1_data['10:00 AM to 10:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_red_con)
 					else:
@@ -1761,8 +1830,12 @@ def export_users_xls(request):
 					#11
 					if json1_data['11:00 AM to 11:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_orange)
+						if json1_data['11:00 AM to 11:59 AM']['steps'] >= 300:
+							days_count['11:00 AM to 11:59 AM']+= 1
 					elif json1_data['11:00 AM to 11:59 AM']["status"] == "active":
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_green)
+						if json1_data['11:00 AM to 11:59 AM']['steps'] >= 300:
+							days_count['11:00 AM to 11:59 AM']+= 1
 					elif json1_data['11:00 AM to 11:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_red_con)
 					else:
@@ -1770,8 +1843,12 @@ def export_users_xls(request):
 					#12
 					if json1_data['12:00 PM to 12:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_orange)
+						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
+							days_count['12:00 PM to 12:59 PM'] += 1
 					elif json1_data['12:00 PM to 12:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_green)
+						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
+							days_count['12:00 PM to 12:59 PM'] += 1
 					elif json1_data['12:00 PM to 12:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_red_con)
 					else:
@@ -1779,8 +1856,12 @@ def export_users_xls(request):
 					#1
 					if json1_data['01:00 PM to 01:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_orange)
+						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
+							days_count['01:00 PM to 01:59 PM']+= 1
 					elif json1_data['01:00 PM to 01:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_green)
+						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
+							days_count['01:00 PM to 01:59 PM']+= 1
 					elif json1_data['01:00 PM to 01:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_red_con)
 					else:
@@ -1788,8 +1869,12 @@ def export_users_xls(request):
 					#2
 					if json1_data['02:00 PM to 02:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_orange)
+						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
+							days_count['02:00 PM to 02:59 PM']+= 1
 					elif json1_data['02:00 PM to 02:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_green)
+						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
+							days_count['02:00 PM to 02:59 PM']+= 1
 					elif json1_data['02:00 PM to 02:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_red_con)
 					else:
@@ -1797,8 +1882,12 @@ def export_users_xls(request):
 					#3
 					if json1_data['03:00 PM to 03:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_orange)
+						if json1_data['03:00 PM to 03:59 PM']['steps'] >= 300:
+							days_count['03:00 PM to 03:59 PM']+= 1
 					elif json1_data['03:00 PM to 03:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_green)
+						if json1_data['03:00 PM to 03:59 PM']['steps'] >= 300:
+							days_count['03:00 PM to 03:59 PM']+= 1
 					elif json1_data['03:00 PM to 03:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_red_con)
 					else:
@@ -1806,8 +1895,12 @@ def export_users_xls(request):
 					#4
 					if json1_data['04:00 PM to 04:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_orange)
+						if json1_data['04:00 PM to 04:59 PM']['steps'] >= 300:
+							days_count['04:00 PM to 04:59 PM']+= 1
 					elif json1_data['04:00 PM to 04:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_green)
+						if json1_data['04:00 PM to 04:59 PM']['steps'] >= 300:
+							days_count['04:00 PM to 04:59 PM']+= 1
 					elif json1_data['04:00 PM to 04:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_red_con)
 					else:
@@ -1815,8 +1908,12 @@ def export_users_xls(request):
 					#5
 					if json1_data['05:00 PM to 05:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_orange)
+						if json1_data['05:00 PM to 05:59 PM']['steps'] >= 300:
+							days_count['05:00 PM to 05:59 PM']+= 1
 					elif json1_data['05:00 PM to 05:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_green)
+						if json1_data['05:00 PM to 05:59 PM']['steps'] >= 300:
+							days_count['05:00 PM to 05:59 PM']+= 1
 					elif json1_data['05:00 PM to 05:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_red_con)
 					else:
@@ -1824,8 +1921,12 @@ def export_users_xls(request):
 					#6
 					if json1_data['06:00 PM to 06:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_orange)
+						if json1_data['06:00 PM to 06:59 PM']['steps'] >= 300:
+							days_count['06:00 PM to 06:59 PM']+= 1
 					elif json1_data['06:00 PM to 06:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_green)
+						if json1_data['06:00 PM to 06:59 PM']['steps'] >= 300:
+							days_count['06:00 PM to 06:59 PM']+= 1
 					elif json1_data['06:00 PM to 06:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_red_con)
 					else:
@@ -1833,8 +1934,12 @@ def export_users_xls(request):
 					#7
 					if json1_data['07:00 PM to 07:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_orange)
+						if json1_data['07:00 PM to 07:59 PM']['steps'] >= 300:
+							days_count['07:00 PM to 07:59 PM']+= 1
 					elif json1_data['07:00 PM to 07:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_green)
+						if json1_data['07:00 PM to 07:59 PM']['steps'] >= 300:
+							days_count['07:00 PM to 07:59 PM']+= 1
 					elif json1_data['07:00 PM to 07:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_red_con)
 					else:
@@ -1842,8 +1947,12 @@ def export_users_xls(request):
 					#8
 					if json1_data['08:00 PM to 08:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_orange)
+						if json1_data['08:00 PM to 08:59 PM']['steps'] >= 300:
+							days_count['08:00 PM to 08:59 PM']+= 1
 					elif json1_data['08:00 PM to 08:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_green)
+						if json1_data['08:00 PM to 08:59 PM']['steps'] >= 300:
+							days_count['08:00 PM to 08:59 PM']+= 1
 					elif json1_data['08:00 PM to 08:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_red_con)
 					else:
@@ -1851,8 +1960,12 @@ def export_users_xls(request):
 					#9
 					if json1_data['09:00 PM to 09:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_orange)
+						if json1_data['09:00 PM to 09:59 PM']['steps'] >= 300:
+							days_count['09:00 PM to 09:59 PM']+= 1
 					elif json1_data['09:00 PM to 09:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_green)
+						if json1_data['09:00 PM to 09:59 PM']['steps'] >= 300:
+							days_count['09:00 PM to 09:59 PM']+= 1
 					elif json1_data['09:00 PM to 09:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_red_con)
 					else:
@@ -1860,8 +1973,12 @@ def export_users_xls(request):
 					#10
 					if json1_data['10:00 PM to 10:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_orange)
+						if json1_data['10:00 PM to 10:59 PM']['steps'] >= 300:
+							days_count['10:00 PM to 10:59 PM']+= 1
 					elif json1_data['10:00 PM to 10:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_green)
+						if json1_data['10:00 PM to 10:59 PM']['steps'] >= 300:
+							days_count['10:00 PM to 10:59 PM']+= 1
 					elif json1_data['10:00 PM to 10:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_red_con)
 					else:
@@ -1869,8 +1986,12 @@ def export_users_xls(request):
 					#11
 					if json1_data['11:00 PM to 11:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_orange)
+						if json1_data['11:00 PM to 11:59 PM']['steps'] >= 300:
+							days_count['11:00 PM to 11:59 PM']+= 1
 					elif json1_data['11:00 PM to 11:59 PM']["status"] == "active":
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_green)
+						if json1_data['11:00 PM to 11:59 PM']['steps'] >= 300:
+							days_count['11:00 PM to 11:59 PM']+= 1
 					elif json1_data['11:00 PM to 11:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_red_con)
 					else:
@@ -1898,10 +2019,44 @@ def export_users_xls(request):
 					# sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
 					# sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
 					# sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
+					def format_active_prcnt(days_count,time_slot,total_days):
+						if total_days:
+							prcnt = round((days_count.get(time_slot,0) / total_days) * 100,2)
+							return str(prcnt) + " %"
+						return str(0)+" %"
+
 					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
 					sheet11.write(row,col+x+26,json1_data['active_hours'])
 					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
 					sheet11.write(row,col+x+28,json1_data.get('strength_hours',0))
+					sheet11.write(5,2+1,str(round(((days_count["12:00 AM to 12:59 AM"]/total_days))*100,2))+" %",bold)
+					# print(((days_count["12:00 AM to 12:59 AM"]/total_days))*100)
+					sheet11.write(5,2+2,format_active_prcnt(days_count,'01:00 AM to 01:59 AM',total_days),bold)
+					sheet11.write(5,2+3,str(round(((days_count["02:00 AM to 02:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+4,str(round(((days_count["03:00 AM to 03:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+5,str(round(((days_count["04:00 AM to 04:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+6,str(round(((days_count["05:00 AM to 05:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+7,str(round(((days_count["06:00 AM to 06:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+8,str(round(((days_count["07:00 AM to 07:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+9,str(round(((days_count["08:00 AM to 08:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+10,str(round(((days_count["09:00 AM to 09:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+11,str(round(((days_count["10:00 AM to 10:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+12,str(round(((days_count["11:00 AM to 11:59 AM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+13,str(round(((days_count["12:00 PM to 12:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+14,str(round(((days_count["01:00 PM to 01:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+15,str(round(((days_count["02:00 PM to 02:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+16,str(round(((days_count["03:00 PM to 03:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+17,str(round(((days_count["04:00 PM to 04:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+18,str(round(((days_count["05:00 PM to 05:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+19,str(round(((days_count["06:00 PM to 06:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+20,str(round(((days_count["07:00 PM to 07:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+21,str(round(((days_count["08:00 PM to 08:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+22,str(round(((days_count["09:00 PM to 09:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+23,str(round(((days_count["10:00 PM to 10:59 PM"]/total_days))*100,2))+" %",bold)
+					sheet11.write(5,2+24,str(round(((days_count["11:00 PM to 11:59 PM"]/total_days))*100,2))+" %",bold)
+
+
+
 
 			# for x,key in enumerate(columns):
 			# 	steps_string = steps_data['movement_consistency']
@@ -1950,6 +2105,8 @@ def export_users_xls(request):
 			row += 1
 			sheet11.write(row,col,'')
 		current_date -= timedelta(days=1)
+
+	
 
 	book.close()
 	return response
