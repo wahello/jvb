@@ -210,8 +210,15 @@ def export_users_xls(request):
 
 	to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
-	x= to_date.strftime('%-m-%d-%y')
-	print(x)
+
+	x= to_date.strftime('%m-%d-%y')
+	# print(type(x))
+	y= x.split("-")
+	z = str(int(y[0]))+'-'+str(int(y[1]))+'-'+str(int(y[2]))
+	print(z)
+	# date_format_month = str(to_date.month)+'-'+str(to_date.day)+'-'+str(to_date.year)
+	# print (date_format_month)
+
 	filename = '{}_raw_data_{}_to_{}.xlsx'.format(request.user.username,
 		from_date.strftime('%b_%d_%Y'),to_date.strftime('%b_%d_%Y'))
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -248,21 +255,27 @@ def export_users_xls(request):
 	sheet9.repeat_columns(0)
 	sheet9.set_row(31, 150)
 	sheet9.set_landscape()
-	# sheet9.set_row(0,30)
+	sheet9.set_row(0,30)
 	bold = book.add_format({'bold': True})
 	date_format = book.add_format({'num_format': 'm-d-yy'})
 	current_date = to_date
+	format_week = book.add_format()
+	format_week.set_align('top')
+	format_week.set_text_wrap()
+	format_week.set_shrink()
 	r = 0
 	if to_date and from_date :
 		while (current_date >= from_date):
 			r = r + 1
-			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-			sheet9.write(0, r, current_date,date_format)
-			# sheet9.write_rich_string(0,r,*result)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			print(current_date_string)
+			result = [current_date_string]
+			sheet9.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet9.write(0, r, current_date,date_format)
 			current_date -= timedelta(days = 1)
 
 	
@@ -939,7 +952,7 @@ def export_users_xls(request):
 	format2.set_align('top')
 	format2.set_text_wrap()
 	format2.set_shrink()
-	# sheet1.set_row(0, 30)
+	sheet1.set_row(0, 30)
 	# columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 	# 		   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
 	# 		   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
@@ -955,14 +968,15 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet1.write_rich_string(0,r,*result)
-			sheet1.write(0, r, current_date,date_format)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			print(current_date_string)
+			result = [current_date_string]
+			sheet1.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet1.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
@@ -1172,21 +1186,20 @@ def export_users_xls(request):
 	sheet7.set_landscape()
 	sheet7.repeat_rows(0)
 	sheet7.repeat_columns(0)
-	# sheet7.set_row(0,30)
+	sheet7.set_row(0,30)
 	columns = ['pace_per_100_yard', 'total_strokes']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet7.write_rich_string(0,r,*result)
-			sheet7.write(0, r, current_date,date_format)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet7.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet7.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet7.write(0, 0, "Swim Stats",bold)
 	col_num1 = 1
@@ -1215,7 +1228,7 @@ def export_users_xls(request):
 	sheet8.set_landscape()
 	sheet8.repeat_rows(0)
 	sheet8.repeat_columns(0)
-	# sheet8.set_row(0,30)
+	sheet8.set_row(0,30)
 	columns = ['avg_speed', 'avg_power','avg_speed_per_mile','avg_cadence']
 	current_date = to_date
 	r = 0
@@ -1223,13 +1236,12 @@ def export_users_xls(request):
 		while (current_date >= from_date):
 			r = r + 1
 			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet8.write_rich_string(0,r,*result)
-			sheet8.write(0, r, current_date,date_format)
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet8.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet8.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet8.write(0, 0, "Bike Stats",bold)
 	col_num1 = 1
@@ -1258,7 +1270,7 @@ def export_users_xls(request):
 	sheet2.set_landscape()
 	sheet2.repeat_rows(0)
 	sheet2.repeat_columns(0)
-	# sheet2.set_row(0,30)
+	sheet2.set_row(0,30)
 	columns = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
 	current_date = to_date
 	r = 0
@@ -1266,13 +1278,12 @@ def export_users_xls(request):
 		while (current_date >= from_date):
 			r = r + 1
 			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet2.write_rich_string(0,r,*result)
-			sheet2.write(0, r, current_date,date_format)
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet2.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet2.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet2.write(0, 0, "Steps",bold)
 	col_num1 = 1
@@ -1326,7 +1337,7 @@ def export_users_xls(request):
 	sheet3.set_landscape()
 	sheet3.repeat_rows(0)
 	sheet3.repeat_columns(0)
-	# sheet3.set_row(0,30)
+	sheet3.set_row(0,30)
 	columns = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
 			   'deep_sleep','light_sleep','awake_time']
 	current_date = to_date
@@ -1335,13 +1346,12 @@ def export_users_xls(request):
 		while (current_date >= from_date):
 			r = r + 1
 			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet3.write_rich_string(0,r,*result)
-			sheet3.write(0, r, current_date,date_format)
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet3.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet3.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet3.write(0, 0, "Sleep",bold)
 	col_num1 = 1
@@ -1396,21 +1406,20 @@ def export_users_xls(request):
 	sheet4.set_landscape()
 	sheet4.repeat_rows(0)
 	sheet4.repeat_columns(0)
-	# sheet4.set_row(0,30)
+	sheet4.set_row(0,30)
 	columns = ['prcnt_non_processed_food','processed_food','non_processed_food', 'diet_type']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet4.write_rich_string(0,r,*result)
-			sheet4.write(0, r, current_date,date_format)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet4.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet4.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet4.write(0, 0, "Food",bold)
 	col_num1 = 1
@@ -1457,21 +1466,20 @@ def export_users_xls(request):
 	sheet5.set_landscape()
 	sheet5.repeat_rows(0)
 	sheet5.repeat_columns(0)
-	# sheet5.set_row(0,30)
+	sheet5.set_row(0,30)
 	columns = ['alcohol_day', 'alcohol_week']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet5.write_rich_string(0,r,*result,format2)
-			sheet5.write(0, r, current_date,date_format)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet5.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet5.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet5.write(0, 0, "Alcohol",bold)
 	col_num1 = 1
@@ -1522,7 +1530,7 @@ def export_users_xls(request):
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
 	sheet6.repeat_columns(0)
-	# sheet6.set_row(0,30)
+	sheet6.set_row(0,30)
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
 	"distance_run","distance_bike","distance_swim","distance_other","pace",
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
@@ -1541,14 +1549,13 @@ def export_users_xls(request):
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
-			# weekday1 = calendar.day_name[current_date.weekday()]
-			# current_date_format= current_date.strftime('%-m-%d-%y')
-			# current_date_string = str(current_date_format)
-			# result = [weekday1,'\n',
-			# current_date_string]
-
-			# sheet6.write_rich_string(0,r,*result,format2)
-			sheet6.write(0, r, current_date,date_format)
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet6.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			# sheet6.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet6.write(0, 0, "Exercise Reporting",bold)
 	col_num1 = 1
