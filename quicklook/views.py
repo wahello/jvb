@@ -210,8 +210,8 @@ def export_users_xls(request):
 
 	to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
-	# x= to_date.strftime('%_m-%d-%y')
-	# print(x)
+	x= to_date.strftime('%-m-%d-%y')
+	print(x)
 	filename = '{}_raw_data_{}_to_{}.xlsx'.format(request.user.username,
 		from_date.strftime('%b_%d_%Y'),to_date.strftime('%b_%d_%Y'))
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -1621,7 +1621,7 @@ def export_users_xls(request):
 	r = 6
 	# ?from_date=01-31-2018&to_date=01-05-2018
 	total_days = (to_date-from_date).days+1
-	print(total_days)
+
 	if to_date and from_date:
 		while (current_date >= from_date):
 			r = r + 1
