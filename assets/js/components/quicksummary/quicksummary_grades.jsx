@@ -10,11 +10,11 @@ import NumberFormat from 'react-number-format';
 
  class Grades extends Component{
 
-	constructor(props){
-	super(props);
-	 this.renderTableColumns = this.renderTableColumns.bind(this);
+  constructor(props){
+  super(props);
+   this.renderTableColumns = this.renderTableColumns.bind(this);
 
-	 this.state = {
+   this.state = {
       myTableData: [
         {name: 'Overall Health Grade'},
         {name: 'Overall Health GPA'},
@@ -171,6 +171,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
               }
             }
+
             else if(key == 'movement_consistency_score'){
               let mc = value;
               if( mc != undefined && mc != "" && mc != "-"){
@@ -185,7 +186,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                   style:''
                 });
             }
-            else if(value == ''  && value != '0'){
+            else if(value == ''  ){
                 all_data.push({
                     value: 'Not Reported',
                     style: obj[value]
@@ -215,38 +216,38 @@ renderTableColumns(dateWiseData,category,classes=""){
     return columns;
 }
 
-	
-	render(){
-		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		let rowsCount = this.state.myTableData.length;
-		return(
-			<div>
-			 <Table
-			 	className="responsive"
-		        rowsCount={rowsCount}
-		        rowHeight={65}
-		        headerHeight={50}
-		        width={containerWidth}
-        		height={containerHeight}
-        		touchScrollEnabled={true}
+  
+  render(){
+    const {height, width, containerHeight, containerWidth, ...props} = this.props;
+    let rowsCount = this.state.myTableData.length;
+    return(
+      <div>
+       <Table
+        className="responsive"
+            rowsCount={rowsCount}
+            rowHeight={65}
+            headerHeight={50}
+            width={containerWidth}
+            height={containerHeight}
+            touchScrollEnabled={true}
                 
-        		{...props}>
-		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
-		          cell={props => (
-		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
-		              {this.state.myTableData[props.rowIndex].name}
-		            </Cell>
-		          )}
-		          width={170}
-		          fixed={true}
-		        />
-			    {this.renderTableColumns(this.props.data,"grades_ql")}
-      		</Table>
-			</div>
+            {...props}>
+            <Column
+              header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
+              cell={props => (
+                <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
+                  {this.state.myTableData[props.rowIndex].name}
+                </Cell>
+              )}
+              width={170}
+              fixed={true}
+            />
+          {this.renderTableColumns(this.props.data,"grades_ql")}
+          </Table>
+      </div>
 
-			);
-	}
+      );
+  }
 }
 const styles = StyleSheet.create({
   newTableHeader: {
