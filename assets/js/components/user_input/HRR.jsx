@@ -137,13 +137,15 @@ toggle() {
 		                              <Label className="btn  radio1">
                                     <Input type="radio"
                                     name="hr_down_99"                                                                   
-                                    value="yes" 
+                                    value="yes"
+                                    id="hr_down_yes" 
                                     checked={this.state.hr_down_99 === 'yes'}
                                     onChange={this.handleChangeDown99}/> Yes
                                   </Label>
                                   <Label className="btn  radio1">
                                     <Input type="radio" name="hr_down_99" 
                                     value="no"
+                                    id="hr_down_no" 
                                     checked={this.state.hr_down_99 === 'no'}
                                     onChange={this.handleChangeDown99}/> No
                                   </Label>

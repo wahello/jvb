@@ -2493,6 +2493,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                         <Input type="radio" name="measured_hr" 
                                         value="yes"
+                                        id="m_yes"
                                         checked={this.state.measured_hr === 'yes'}
                                         onChange={this.handleChangeHrr}/>{' '}
                                         Yes
@@ -2500,6 +2501,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="measured_hr" 
                                             value="no"
+                                            id="m_no"
                                             checked={this.state.measured_hr === 'no'}
                                             onChange={this.handleChangeHrr}/>{' '}
                                           No
@@ -2566,11 +2568,12 @@ handleScroll() {
                           <div className="input1" style={{paddingLeft:"25px"}}>
                           <Input
                           type="checkbox"
+                          name="calories_item_check"
                           checked = {this.state.calories_item_check}
                           onClick={this.handleCaloriesItemCheck}
                           >
                           </Input>
-                          <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
+                          <Label className="LAbel">I Want to Enter What I Ate and The Calories Consumed During My Workout</Label>
                           </div>
                           }
                          
@@ -2913,6 +2916,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="prescription_sleep_aids" 
                                       value="yes"
+                                      id="prescription_yes"
                                       checked={this.state.prescription_sleep_aids === 'yes'}
                                       onChange={this.handleChangeSleepAids}/>{' '}
                                       Yes
@@ -2920,6 +2924,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="prescription_sleep_aids" 
                                           value="no"
+                                          id="prescription_no"
                                           checked={this.state.prescription_sleep_aids === 'no'}
                                           onChange={this.handleChangeSleepAids}/>{' '}
                                         No
@@ -3204,6 +3209,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="smoke_substances" 
                                       value="yes"
+                                      id="smoke_yes"
                                       checked={this.state.smoke_substances === 'yes'}
                                       onChange={this.handleChangeSmokeSubstance}/>{' '}
                                       Yes
@@ -3211,6 +3217,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="smoke_substances" 
                                           value="no"
+                                          id="smoke_no"
                                           checked={this.state.smoke_substances === 'no'}
                                           onChange={this.handleChangeSmokeSubstance}/>{' '}
                                         No
@@ -3237,6 +3244,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="medications" 
                                       value="yes"
+                                      id="medication_yes"
                                       checked={this.state.medications === 'yes'}
                                       onChange={this.handleChangePrescription}/>{' '}
                                       Yes
@@ -3244,6 +3252,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="medications" 
                                           value="no"
+                                          id="medication_no"
                                           checked={this.state.medications === 'no'}
                                           onChange={this.handleChangePrescription}/>{' '}
                                         No
@@ -3273,6 +3282,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="stress" 
                                     value="low"
+                                    id="stress_low"
                                     checked={this.state.stress === 'low'}
                                     onChange={this.handleChange}/>{' '}
                                     Low
@@ -3280,6 +3290,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stress" 
                                         value="medium"
+                                        id="stress_medium"
                                         checked={this.state.stress === 'medium'}
                                         onChange={this.handleChange}/>{' '}
                                       Medium
@@ -3287,6 +3298,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stress" 
                                         value="high"
+                                        id="stress_heigh"
                                         checked={this.state.stress === 'high'}
                                         onChange={this.handleChange}/>{' '}
                                       High
@@ -3309,6 +3321,7 @@ handleScroll() {
                                   <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="sick" 
                                     value="yes"
+                                    id="sick_yes"
                                     checked={this.state.sick === 'yes'}
                                     onChange={this.handleChangeSick}/>{' '}
                                     Yes
@@ -3316,6 +3329,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="sick" 
                                         value="no"
+                                        id="sick_no"
                                         checked={this.state.sick === 'no'}
                                         onChange={this.handleChangeSick}/>{' '}
                                       No
@@ -3421,6 +3435,7 @@ handleScroll() {
                                         <Input 
                                         type="select" 
                                         className="custom-select form-control" 
+                                        id="diet"
                                         name="diet_type"
                                         value={this.state.diet_to_show}
                                         onChange={this.handleChangeDietModel}>
@@ -3457,6 +3472,7 @@ handleScroll() {
                                     <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="stand" 
                                       value="yes"
+                                      id="stand_yes"
                                       checked={this.state.stand === 'yes'}
                                       onChange={this.handleChange}/>{' '}
                                       Yes
@@ -3464,6 +3480,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="stand" 
                                           value="no"
+                                          id="stand_no"
                                           checked={this.state.stand === 'no'}
                                           onChange={this.handleChange}/>{' '}
                                         No
@@ -3505,7 +3522,7 @@ handleScroll() {
                               id="btn1" 
                               type="submit"
                               color="info" 
-                              className="btn btn-block btn-primary">
+                              className="btn btn-block btn-primary submit_form">
                                 Submit
                             </Button>
                           }

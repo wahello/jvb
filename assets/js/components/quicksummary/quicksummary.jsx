@@ -33,6 +33,7 @@ import Exercise from './quicksummary_exercise';
 import User from './user_inputs';
 import AllStats1 from './quicksummary_allstats1';
 import Movementquick from './movement-consistency';
+import MovementHistorical from './movement_consistency_historical_data';
 
 
 
@@ -53,7 +54,9 @@ let hashComponentMapping = {
 	"food":"food",
 	"alcohol":"alcohol",
 	"exercisereporting":"exercise",
-	"userinputs":"user"
+	"userinputs":"user",
+	"mchistorical":""
+
 
 } 
 
@@ -549,6 +552,7 @@ onLogoutSuccess(response){
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;
         const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;
+        const class_movementHistorical=`nav-link ${activeTab === "movementhistorical" ? 'active':''}`;
 	return(
 		<div className="hori">
 		<div className="container-fluid">
@@ -788,7 +792,17 @@ onLogoutSuccess(response){
                                           </abbr>
                                           </span>
                                        </NavItem>
-                                       
+
+                                       {/* <NavItem onClick={this.toggle} className="Movement">
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Movement Consistency Historical Data">
+                                            <NavLink id="headernames" href="#" className={class_movementHistorical} value="movementhistorical"
+						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>
+						    		 		 Movement Consistency Historical
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>*/}
 
                                         <NavItem onClick={this.toggle} className="bikestats">
                                         <span id="spa">
@@ -936,6 +950,7 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data}/>}
 
 
 			</div>

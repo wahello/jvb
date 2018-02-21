@@ -8,6 +8,11 @@ body{
 	border-collapse: collapse;
 	border-color: gray;
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
+	
+}
+.dashboard th,tr,td{
+width: 190px;
+height:40px;
 }
 .createbutton{
 		font-family:futura-pt;
@@ -33,7 +38,7 @@ body{
     font-size: 22px;
 }
 .pdf_button{
-	padding-left: 600px;
+	padding-left: 500px;
 }
 #progress{
 	padding-left: 50px;
