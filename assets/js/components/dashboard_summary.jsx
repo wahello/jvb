@@ -7,7 +7,10 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-
+import Dimensions from 'react-dimensions';
+import { StyleSheet, css } from 'aphrodite';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import fetchProgress from '../network/progress';
 
 var CalendarWidget = require('react-calendar-widget');  
@@ -477,6 +480,7 @@ constructor(props){
    this.toggleDate = this.toggleDate.bind(this);
    this.onSubmitDate = this.onSubmitDate.bind(this);
    this.handleChange = this.handleChange.bind(this);
+   this.printDocument = this.printDocument.bind(this);
   }
   successProgress(data){
     console.log(data);
@@ -982,7 +986,18 @@ handleChange(event){
         [name]: value
       });
     }
-
+ printDocument() {
+    const input = document.getElementById('divToPrint');
+    html2canvas(input)
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('http://127.0.0.1:8000/progressanalyzer');
+        const pdf = new jsPDF();
+        pdf.addImage(imgData, 'json', 0, 0);
+        // pdf.output('dataurlnewwindow');
+        pdf.save("download.pdf");
+      })
+    ;
+  }
 	render(){
 		const {fix} = this.props;
    let haveCustomData = (this.state.start_date && this.state.end_date)?true:false;
@@ -1048,7 +1063,7 @@ handleChange(event){
                 />
       </span>               
             <span className="pdf_button" id="pdf_button">
-            <Button className="btn createbutton">Create PDF</Button>
+            <Button className="btn createbutton mb5" onClick={this.printDocument}>Create PDF</Button>
             </span>
 
             <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
@@ -1115,9 +1130,9 @@ handleChange(event){
               </div>
                            </PopoverBody>
                            </Popover>
-
+ <div id="divToPrint" className="mt4">
 			<div className="col-sm-12 col-md-12 col-lg-12 padding">
-			<div className="row">
+			<div className="row justify-content-center">
 			<div className="table-responsive"> 
    		 <table className="table table-bordered">
          <thead>
@@ -1173,7 +1188,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="row">
+<div className="row justify-content-center">
 	<div className="table-responsive tablecenter"> 
     <table className="table table-bordered ">
          <thead>
@@ -1232,7 +1247,7 @@ handleChange(event){
 </div>
 
 
-<div className="row padding">
+<div className="row justify-content-center padding">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1299,7 +1314,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="row padding">
+<div className="row justify-content-center padding">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1358,7 +1373,7 @@ handleChange(event){
 </div>
 
 
-<div className="row padding">
+<div className="row justify-content-center padding">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1416,7 +1431,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="row padding">
+<div className="row justify-content-center padding">
 <div className="table-responsive"> 
     <table className="table table-bordered">
         <thead>
@@ -1473,7 +1488,7 @@ handleChange(event){
     </table>
 </div>
 </div>
-<div className="row padding">
+<div className="row justify-content-center padding">
 <div className="table-responsive tablecenter"> 
 <table className="table table-bordered">
         <thead>
@@ -1533,7 +1548,7 @@ handleChange(event){
 </div>
 </div>
 
-<div className="row padding">
+<div className="row justify-content-center padding">
 	<div className="table-responsive tablecenter"> 
     <table className="table table-bordered">
          <thead>
@@ -1608,7 +1623,7 @@ handleChange(event){
     </table>
 </div>
 </div>		
-<div className=" row padding">
+<div className=" row justify-content-center padding">
    <div className="table-responsive"> 
     <table className="table table-bordered">
          <thead>
@@ -1681,6 +1696,7 @@ handleChange(event){
             </tr>
         </tbody>
     </table>
+    </div>
 </div>        
 </div>
 </div>

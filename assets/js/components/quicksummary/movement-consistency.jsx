@@ -202,7 +202,7 @@ class Movementquick extends Component{
   }
 
   componentDidMount(){
-    fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
+    fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);  
   }
 
  renderTableColumns(dateWiseData){

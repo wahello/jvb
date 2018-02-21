@@ -125,12 +125,14 @@ export default class SmokedSubstance extends Component{
                                     <Input type="radio"
                                     name="smoked_substance_to_show"                                                                   
                                     value="cigarettes" 
+                                    id="cigarets"
                                     checked={this.state.smoked_substance_to_show === 'cigarettes'}
                                     onChange={this.handleChange}/> Cigarettes
                                   </Label>
                                   <Label className="btn  radio1">
                                     <Input type="radio" name="smoked_substance_to_show" 
                                     value="cigars"
+                                    id="cigars"
                                     checked={this.state.smoked_substance_to_show === 'cigars'}
                                     onChange={this.handleChange}/> Cigars
                                   </Label>
@@ -138,6 +140,7 @@ export default class SmokedSubstance extends Component{
                                     <Input type="radio" 
                                     name="smoked_substance_to_show" 
                                     value="marijuana"
+                                    id="marjun"
                                     checked={this.state.smoked_substance_to_show === 'marijuana'}
                                     onChange={this.handleChange}/>Marijuana
                                   </Label> 
@@ -145,6 +148,7 @@ export default class SmokedSubstance extends Component{
                                     <Input type="radio" 
                                     name="smoked_substance_to_show" 
                                     value="other"
+                                    id="other"
                                     checked={this.state.smoked_substance_to_show === 'other'}
                                     onChange={this.handleChange}/> Other
                                   </Label> 
@@ -194,6 +198,7 @@ export default class SmokedSubstance extends Component{
 		                            className="form-control" 
 		                            rows="5" cols="5"
 		                            placeholder="Please type in..."
+		                            name="smoked_substance_list"
 		                            value={this.state.smoked_substance_list}
 		                            onChange={this.handleChange} />
 	                            </div>

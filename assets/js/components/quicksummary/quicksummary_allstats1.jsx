@@ -118,7 +118,7 @@ const attrVerboseName = {
     avg_power: 'Avg Power Bike',
     avg_speed_per_mile: 'Asvg Speed Per Mile',
     avg_cadence: 'Avg Cadence Bike',
-
+    
     prcnt_non_processed_food: '% Non Processed Food',
     non_processed_food: 'Non Processed Food',
     processed_food_consumed:'Processed Food Consumed',
@@ -335,9 +335,12 @@ class AllStats1 extends Component{
                                            style:obj[value]});     
                         }
 
-                        if(pushKeytoggle)
-                            keys.push(key);   
+                        if(pushKeytoggle){
+                            keys.push(key);
+                            console.log(key); 
+                          } 
 					}
+
 				}
 			}
 			columns.push(
