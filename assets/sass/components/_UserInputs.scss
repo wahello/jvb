@@ -186,7 +186,7 @@ padding-top: 30px;
 	#bed_hr{
 		width:100% !important;
 	}
-	.food h2{
+	.un_process_food h2{
 		text-align:center;
 		padding-top:20px;
 	}
@@ -245,6 +245,12 @@ input, textarea {
 .tablecenter1{
 	width: 330px;
 	overflow-x: scroll;
+}
+.close{
+	font-size: 30px !important;
+	font-weight: bold;
+	background-color: none;
+	border-color: none;
 }
 
 }
@@ -316,7 +322,7 @@ margin-left:2%;
 	}
 	
 
-	.food h2{
+	.un_process_food h2{
 		text-align:center;
 		padding-top:20px;
 	}
@@ -546,4 +552,11 @@ textarea.form-control{
 .margin_tp{
 	margin-top:3%;
 }
+}
+button.close{
+	margin-left: 265px;
+	font-size: 30px;
+	font-weight: bold;
+	background-color: none;
+	border-color: none;
 }

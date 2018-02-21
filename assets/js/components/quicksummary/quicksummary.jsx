@@ -42,6 +42,21 @@ axiosRetry(axios, { retries: 3});
 var ReactDOM = require('react-dom'); 
 
 
+let hashComponentMapping = {
+	"movementconsistency":"movement",
+	"allstats":"allstats1",
+	"grades":"grade",
+	"swimstats":"swim",
+	"bikestats":"bike",
+	"steps":"steps",
+	"sleep":"sleep",
+	"food":"food",
+	"alcohol":"alcohol",
+	"exercisereporting":"exercise",
+	"userinputs":"user"
+
+} 
+
 class Quicklook extends Component{
 
 	constructor(props){
@@ -74,7 +89,6 @@ class Quicklook extends Component{
 
 		let initial_state = getInitialState(moment().subtract(7,'days'),
 											moment());
-
 		this.state = {
 			today_date:moment(),
 			start_date:moment().subtract(7,'days').toDate(),
@@ -168,10 +182,10 @@ class Quicklook extends Component{
 			        humidity: data.exercise_reporting_ql.humidity,
 			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,
 			        wind:data.exercise_reporting_ql.wind,
-			        hrr: data.exercise_reporting_ql.hrr,
-			        hrr_start_point: data.exercise_reporting_ql.hrr_start_point,
-			        hrr_beats_lowered:data.exercise_reporting_ql.hrr_beats_lowered,
-			        sleep_resting_hr_last_night:data.exercise_reporting_ql.sleep_resting_hr_last_night,
+			        hrr_time_to_99: data.exercise_reporting_ql.hrr_time_to_99,
+			        hrr_starting_point: data.exercise_reporting_ql.hrr_starting_point,
+			        hrr_beats_lowered_first_minute:data.exercise_reporting_ql.hrr_beats_lowered_first_minute,
+			        resting_hr_last_night:data.exercise_reporting_ql.resting_hr_last_night,
 			        vo2_max:data.exercise_reporting_ql.vo2_max,
 			        running_cadence: data.exercise_reporting_ql.running_cadence,
 			        nose_breath_prcnt_workout: data.exercise_reporting_ql.nose_breath_prcnt_workout,
@@ -216,7 +230,7 @@ class Quicklook extends Component{
 			    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			    	sleep_comments: data.sleep_ql.sleep_comments,
 			    	sleep_aid: data.sleep_ql.sleep_aid,
-			        resting_heart_rate: data.exercise_reporting_ql.sleep_resting_hr_last_night,
+			        resting_heart_rate: data.exercise_reporting_ql.resting_hr_last_night,
                     sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
 			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
@@ -305,6 +319,12 @@ class Quicklook extends Component{
        		}
 
 	successquick(data,start_dt,end_dt){
+		let targetTab = 'allstats1'
+		if (location.hash)
+			targetTab = hashComponentMapping[location.hash.split('#')[1]];
+		
+		if (!targetTab)
+			targetTab = 'allstats1';
 
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
@@ -323,16 +343,18 @@ class Quicklook extends Component{
 				data:initial_state,
 				visible:false,
 				fetching_ql:false,
-				error:true
+				error:true,
+				activeTab:targetTab
 			});
 	     }
 	     else{
 	     		this.setState({
-	     			 selected_date:this.state.selected_date,
+	     		selected_date:this.state.selected_date,
 				data:initial_state,
 				visible:true,
 				fetching_ql:false,
-				error:false
+				error:false,
+				activeTab:targetTab
 			});
 	     }
 	}

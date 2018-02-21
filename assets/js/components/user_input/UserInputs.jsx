@@ -14,7 +14,7 @@ import { Container, Select, option, Option, Row, Col, Button,
          ButtonGroup, Form,FormGroup, Label, Input, FormText,
          className, Modal,ModalHeader, ModalBody, ModalFooter,
          Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand,Popover,PopoverBody} from 'reactstrap';
+         NavbarBrand,Popover,PopoverBody,PopoverHeader} from 'reactstrap';
 import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
@@ -125,11 +125,11 @@ class UserInputs extends React.Component{
         sleep_bedtime_date:null,
         sleep_hours_bed_time:'',
         sleep_mins_bed_time:'',
-        sleep_bedtime_am_pm:'am',
+        sleep_bedtime_am_pm:'',
         sleep_awake_time_date:null,
         sleep_hours_awake_time:'',
         sleep_mins_awake_time:'',
-        sleep_awake_time_am_pm:'am',
+        sleep_awake_time_am_pm:'',
         awake_hours:'',
         awake_mins:'',
         sleep_comment:'',
@@ -180,10 +180,9 @@ class UserInputs extends React.Component{
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
       this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this);
-
       this.handleChangeSleepHoursMin = handlers.handleChangeSleepHoursMin.bind(this);
-
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
+      this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -232,33 +231,23 @@ class UserInputs extends React.Component{
       this.toggleComment=this.toggleComment.bind(this);
       this.toggleAlcohol=this.toggleAlcohol.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
-      this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
+      this.onFetchGarminSuccessSleep = this.onFetchGarminSuccessSleep.bind(this);
+      this.onFetchGarminSuccessWorkout = this.onFetchGarminSuccessWorkout.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
-      this.extractString = this.extractString.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
-extractString(){
-  let str = "7:30 am";
-  let h = str.split(":");
-  let hour=h[0];
-  let m = h[1].split(" ");
-  let min = m[0];
-  let am = m[1];
-  let str1 = hours+":"+min+" "+am;
-  return str1;
-  console.log(str1); 
-}
+    
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
         hour:'',
         min:'',
-        meridiem:'am'
+        meridiem:''
       }
 
       if(dateObj){
@@ -287,6 +276,21 @@ extractString(){
         datetimeInfo['min'] = mins;
       }
       return datetimeInfo;
+    }
+
+    _extractDurationInfo(duration){
+      // extract hour, min, am/pm info from string eg "7:30 am"
+      let durationInfo = {
+        hour:'',
+        min:'',
+        meridiem:''
+      }
+      if(duration){
+        durationInfo["hour"] = duration.split(":")[0];
+        durationInfo["min"] = duration.split(":")[1].split(" ")[0];
+        durationInfo["meridiem"] = duration.split(":")[1].split(" ")[1]; 
+      }
+      return durationInfo;
     }
     
     onFetchSuccess(data,canUpdateForm=undefined){
@@ -335,6 +339,14 @@ extractString(){
         if(have_strong_input && data.data.strong_input.sleep_awake_time && canUpdateForm)
           sleep_awake_time_info = this._extractDateTimeInfo(data.data.strong_input.sleep_awake_time);
 
+        let strength_start_info = this._extractDurationInfo(null);
+        if(have_strong_input && data.data.strong_input.strength_workout_start) 
+          strength_start_info = this._extractDurationInfo(data.data.strong_input.strength_workout_start);
+
+        let strength_end_info = this._extractDurationInfo(null);
+        if(have_strong_input && data.data.strong_input.strength_workout_end)
+          strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
+
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -349,12 +361,12 @@ extractString(){
           no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
           no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
-          strength_workout_start_hour:have_strong_input?data.data.strong_input.strength_workout_start_hour:'',
-          strength_workout_start_min:have_strong_input?data.data.strong_input.strength_workout_start_min:'',
-          strength_workout_start_am_pm:have_strong_input?data.data.strong_input.strength_workout_start_am_pm:'',
-          strength_workout_end_hour:have_strong_input?data.data.strong_input.strength_workout_end_hour:'',
-          strength_workout_end_min:have_strong_input?data.data.strong_input.strength_workout_end_min:'',        
-          strength_workout_end_am_pm:have_strong_input?data.data.strong_input.strength_workout_end_am_pm:'',
+          strength_workout_start_hour:strength_start_info.hour,
+          strength_workout_start_min:strength_start_info.min,
+          strength_workout_start_am_pm:strength_start_info.meridiem,
+          strength_workout_end_hour:strength_end_info.hour,
+          strength_workout_end_min:strength_end_info.min,        
+          strength_workout_end_am_pm:strength_end_info.meridiem,
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
           workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
@@ -434,8 +446,12 @@ extractString(){
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
+              this.state.workout == 'no' || this.state.workout == 'not yet'){
+            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+            else if(this.state.workout == 'no' || this.state.workout == 'not yet')
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
           } 
           window.scrollTo(0,0);
         });
@@ -475,25 +491,28 @@ extractString(){
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
-          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
-        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         this.onFetchFailure(data)
       }
     }
 
-    onFetchGarminSuccess(data){
-      let sleep_bedtime = data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null;
-      let sleep_awake_time = data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null;
+    onFetchGarminSuccessSleep(data){
+      let sleep_stats = data.data.sleep_stats;
+      let have_activities = data.data.have_activities;
+
+      let sleep_bedtime = sleep_stats.sleep_bed_time?moment(sleep_stats.sleep_bed_time):null;
+      let sleep_awake_time = sleep_stats.sleep_awake_time?moment(sleep_stats.sleep_awake_time):null;
 
       let sleep_bedtime_info = this._extractDateTimeInfo(sleep_bedtime);
       let sleep_awake_time_info = this._extractDateTimeInfo(sleep_awake_time);
 
-      let awake_hours = data.data.awake_time?data.data.awake_time.split(':')[0]:'';
+      let awake_hours = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[0]:'';
       awake_hours = awake_hours?parseInt(awake_hours):0
-      let awake_mins = data.data.awake_time?data.data.awake_time.split(':')[1]:'';
+      let awake_mins = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'';
       awake_mins = awake_mins?parseInt(awake_mins):0
       let awake_time_in_mins = awake_hours*60 + awake_mins;
 
@@ -515,13 +534,22 @@ extractString(){
           sleep_mins_awake_time:sleep_awake_time_info.min,
           sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
 
-          awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
-          awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:'',
+          awake_hours:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[0]:'',
+          awake_mins:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'',
           sleep_hours_last_night:hours,
-          sleep_mins_last_night:mins
+          sleep_mins_last_night:mins,
+          workout:have_activities?'yes':''
       });
      }
     }
+    
+  onFetchGarminSuccessWorkout(data){
+    let workout_status = this.state.workout;
+    let have_activities = data.data.have_activities;
+    this.setState({
+      workout: have_activities?'yes':workout_status
+    });
+  }
 
 getDTMomentObj(dt,hour,min,am_pm){
   hour = hour ? parseInt(hour) : 0;
@@ -602,7 +630,8 @@ getTotalSleep(){
     processDate(date){
       this.setState({
         selected_date:date,
-        fetching_data:true
+        fetching_data:true,
+        calendarOpen:!this.state.calendarOpen
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -940,15 +969,12 @@ handleScroll() {
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
-                            <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
+                            <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
+                            <div >                      
+                            <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a>
+                            </div>
                             </ModalHeader>
-                              <ModalBody className="modalcontent" id="modal1">
+                              <ModalBody className="modalcontent" id="modal1" >
                                 <div>
                                   <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
                                   to your results and our hope is that you will make healthier
@@ -1112,9 +1138,9 @@ handleScroll() {
                             placement="bottom" 
                             isOpen={this.state.calendarOpen}
                             target="calendar" 
-                            toggle={this.toggleCalendar}>
-                              <PopoverBody>
-                                <CalendarWidget onDaySelect={this.processDate}/>
+                            toggle={this.toggleCalendar}>       
+                              <PopoverBody toggle={this.toggleCalendar}>
+                                <CalendarWidget  onDaySelect={this.processDate}/>
                               </PopoverBody>
                            </Popover> 
 
@@ -1124,10 +1150,7 @@ handleScroll() {
                             isOpen={this.state.infoBtn}
                             target="info2" 
                             toggle={this.toggleInfo2}>
-                            <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                            <ModalHeader toggle={this.toggleInfo2}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1229,11 +1252,8 @@ handleScroll() {
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
                             toggle={this.toggleInfoworkout}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
+                             <ModalHeader toggle={this.toggleInfoworkout}>
+                           <span>
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
@@ -1334,21 +1354,21 @@ handleScroll() {
                                     name="workout_type" 
                                     value="cardio" 
                                     checked={this.state.workout_type === 'cardio'}
-                                    onChange={this.handleChange}/> Cardio
+                                    onChange={this.handleChangeWorkoutType}/> Cardio
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="strength"
                                     checked={this.state.workout_type === 'strength'}
-                                    onChange={this.handleChange}/> Strength
+                                    onChange={this.handleChangeWorkoutType}/> Strength
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="both"
                                     checked={this.state.workout_type === 'both'}
-                                    onChange={this.handleChange}/> Both
+                                    onChange={this.handleChangeWorkoutType}/> Both
                                   </Label>
                                 </div>
                               }
@@ -1368,10 +1388,7 @@ handleScroll() {
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleInfoworkoutType}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1409,7 +1426,7 @@ handleScroll() {
                                 className="form-control custom-select"
                                 value={this.state.strength_workout_start_hour}
                                 onChange={this.handleChange}>
-                                 <option key="hours" value="">Hours</option>
+                                 <option key="hours" value="">Hour</option>
                                 {this.createSleepDropdown(1,12)}                        
                                 </Input>
                                 </div>
@@ -1422,7 +1439,7 @@ handleScroll() {
                                 className="form-control custom-select "
                                 value={this.state.strength_workout_start_min}
                                 onChange={this.handleChange}>
-                                 <option key="mins" value="">Minutes</option>
+                                 <option key="mins" value="">Minute</option>
                                 {this.createSleepDropdown(0,59,true)}                        
                                 </Input>                        
                                 </div>
@@ -1435,7 +1452,7 @@ handleScroll() {
                                      name="strength_workout_start_am_pm"                                  
                                      value={this.state.strength_workout_start_am_pm}
                                      onChange={this.handleChange} >
-                                       <option value="">AM/PM</option>
+                                       <option value="">AM or PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     
@@ -1452,7 +1469,10 @@ handleScroll() {
                               !this.state.editable &&
                               <div className="input">
                           
-                                <p>{this.state.strength_workout_start_hour}:{this.state.strength_workout_start_min}  {this.state.strength_workout_start_am_pm}</p>
+                              {(this.state.strength_workout_start_hour &&
+                               this.state.strength_workout_start_min &&
+                               this.state.strength_workout_start_am_pm) &&
+                               <p>{this.state.strength_workout_start_hour}:{this.state.strength_workout_start_min}  {this.state.strength_workout_start_am_pm}</p>}
                           
                               </div>
                             } 
@@ -1498,7 +1518,7 @@ handleScroll() {
                                      name="strength_workout_end_am_pm"                                  
                                      value={this.state.strength_workout_end_am_pm}
                                      onChange={this.handleChange} >
-                                       <option value="">AM/PM</option>
+                                       <option value="">AM or PM</option>
                                        <option value="am">AM</option>
                                        <option value="pm">PM</option> 
                                     
@@ -1515,7 +1535,10 @@ handleScroll() {
                               !this.state.editable &&
                               <div className="input">
                 
-                                <p>{this.state.strength_workout_end_hour}:{this.state.strength_workout_end_min}  {this.state.strength_workout_end_am_pm}</p>
+                              {(this.state.strength_workout_end_hour &&
+                               this.state.strength_workout_end_min &&
+                               this.state.strength_workout_end_am_pm) &&
+                               <p>{this.state.strength_workout_end_hour}:{this.state.strength_workout_end_min}  {this.state.strength_workout_end_am_pm}</p>}
                               
                               </div>
                             } 
@@ -1583,10 +1606,7 @@ handleScroll() {
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleEasyorHard}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1673,14 +1693,11 @@ handleScroll() {
                                     isOpen={this.state.enjoybleInfo}
                                     target="enjoyble" 
                                     toggle={this.toggleEnjoyble}>
-                                     <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
-                            </ModalHeader>
+                                     <ModalHeader toggle={this.toggleEnjoyble}>                            
+                                     <span >
+                                      <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                                      </span>
+                                </ModalHeader>
                                       <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                         We encourage people to enjoy their workouts! When they do,
@@ -1747,14 +1764,11 @@ handleScroll() {
                                     isOpen={this.state.workoutlevelInfo}
                                     target="workoutlevel" 
                                     toggle={this.toggleWorkoutLevel}>
-                                     <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
-                            </ModalHeader>
+                                     <ModalHeader toggle={this.toggleWorkoutLevel}>                            
+                                   <span >
+                                    <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                                    </span>
+                                  </ModalHeader>
                                       <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                          As a general guideline, an effort level of 1-2 is super easy,
@@ -1821,10 +1835,7 @@ handleScroll() {
                             isOpen={this.state.painInfo}
                             target="pain" 
                             toggle={this.togglePain}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.togglePain}>
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1891,10 +1902,7 @@ handleScroll() {
                             isOpen={this.state.waterInfo}
                             target="water" 
                             toggle={this.toggleWater}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleWater}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1966,10 +1974,7 @@ handleScroll() {
                             isOpen={this.state.chaiseedsInfo}
                             target="chaiseeds" 
                             toggle={this.toggleChaiseeds}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleChaiseeds}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2041,10 +2046,7 @@ handleScroll() {
                             isOpen={this.state.breatheInfo}
                             target="breathe" 
                             toggle={this.toggleBreathe}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleBreathe}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2101,14 +2103,14 @@ handleScroll() {
                                 <div className="input">
                                   
                                     <Label check className="btn btn-secondary radio1">
-                                      <Input type="radio" name="fasted" 
+                                      <Input type="radio" name="fasted" id="radio_yes" 
                                       value="yes"
                                       checked={this.state.fasted === 'yes'}
                                       onChange={this.handleChangeFasted}/>{' '}
                                       Yes
                                    </Label>
                                    <Label check className="btn btn-secondary radio1">
-                                     <Input type="radio" name="fasted" 
+                                     <Input type="radio" name="fasted" id="radio_no"
                                           value="no"
                                           checked={this.state.fasted === 'no'}
                                           onChange={this.handleChangeFasted}/>{' '}
@@ -2143,11 +2145,8 @@ handleScroll() {
                             isOpen={this.state.fastedInfo}
                             target="fast" 
                             toggle={this.toggleFasted}>
-                             <ModalHeader >
+                             <ModalHeader toggle={this.toggleFasted}>                           
                             <span >
-                          <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
@@ -2213,10 +2212,7 @@ handleScroll() {
                             isOpen={this.state.commentInfo}
                             target="general" 
                             toggle={this.toggleComment}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader  toggle={this.toggleComment}>                           
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2238,7 +2234,8 @@ handleScroll() {
                                 <div className="input1">
                                 <Input
                                 className = "radio1"
-                                type="checkbox" 
+                                type="checkbox"
+                                name = "weather_check" 
                                 checked = {this.state.weather_check}                                            
                                 onClick={this.handleWeatherCheck}
                                 >
@@ -2282,10 +2279,7 @@ handleScroll() {
                             isOpen={this.state.weatherInfo}
                             target="wether" 
                             toggle={this.toggleWeather}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleWeather}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint}  style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2530,10 +2524,7 @@ handleScroll() {
                             isOpen={this.state.hrrInfo}
                             target="hrr" 
                             toggle={this.toggleHrr}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleHrr}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2741,8 +2732,9 @@ handleScroll() {
                                      name="sleep_bedtime_am_pm"                                  
                                      value={this.state.sleep_bedtime_am_pm}
                                      onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="">AM/PM</option>
                                        <option value="am">AM</option>
-                                                <option value="pm">PM</option> 
+                                       <option value="pm">PM</option> 
                                     
                                      </Input>
                                       </div> 
@@ -2822,8 +2814,9 @@ handleScroll() {
                                      name="sleep_awake_time_am_pm"                                  
                                      value={this.state.sleep_awake_time_am_pm}
                                      onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="">AM/PM</option>
                                        <option value="am">AM</option>
-                                                <option value="pm">PM</option> 
+                                       <option value="pm">PM</option> 
                                     
                                      </Input>
                                </div>      
@@ -2947,7 +2940,7 @@ handleScroll() {
                         <div id="food">
                         <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
-                          <FormGroup className="food">
+                          <FormGroup className="un_process_food">
                             
                             <Label className="padding">5. What % of The Food You Consumed Yesterday Was &nbsp; 
                              <span style={{fontWeight:"bold"}}>
@@ -2996,10 +2989,7 @@ handleScroll() {
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
                             toggle={this.toggleUnprocessedInfo}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleUnprocessedInfo}>                     
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -3168,10 +3158,7 @@ handleScroll() {
                             isOpen={this.state.alcoholInfo}
                             target="alcoholinfo" 
                             toggle={this.toggleAlcohol}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleAlcohol}>                           
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>

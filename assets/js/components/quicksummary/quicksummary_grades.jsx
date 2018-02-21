@@ -10,9 +10,11 @@ import NumberFormat from 'react-number-format';
 
  class Grades extends Component{
 
-  constructor(props){
-  super(props);
-   this.renderTableColumns = this.renderTableColumns.bind(this);
+
+	constructor(props){
+	super(props);
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
+   this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 
    this.state = {
       myTableData: [
@@ -57,9 +59,16 @@ import NumberFormat from 'react-number-format';
       ],
     };
   }
+getStylesGpaBeforePanalities(score){
+      if (score<1)
+        return {background:'red',color:'black'};
+      else if (score >= 1 && score < 3)
+        return {background:'yellow',color:'black'};
+      else if (score >= 3)
+        return {background:'green',color:'black'};
+    }
 
 renderTableColumns(dateWiseData,category,classes=""){
-    console.log(dateWiseData);
     let columns = [];
     const obj = {
         A: { background: 'green', color: 'white'},
@@ -69,14 +78,10 @@ renderTableColumns(dateWiseData,category,classes=""){
         F: { background: 'red', color: 'black' },
         penalty:{background: 'red', color: 'black' },        
     };
-
     for(let [date,data] of Object.entries(dateWiseData)){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
-          console.log(key);
-          
-
             if(key !== 'id' && key !== 'user_ql'){
             
             if(key == "resting_hr" || key == "overall_workout_grade"){
@@ -103,9 +108,6 @@ renderTableColumns(dateWiseData,category,classes=""){
             }
 
            else if(key =='movement_non_exercise_steps' ){
-            
-            
-             
               all_data.push({
                     value: value.toLocaleString(),
                     style: obj[value]
@@ -138,7 +140,9 @@ renderTableColumns(dateWiseData,category,classes=""){
                if(s.indexOf('.') < 0) { s += '.00'; }
                if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
                s = minus + s;
-               all_data.push({value: s});
+               console.log(this.getStylesGpaBeforePanalities(parseFloat(s)));
+               all_data.push({value: s,
+                style:this.getStylesGpaBeforePanalities(parseFloat(s))});
             }
             else  if(key === 'exercise_consistency_score' ){
                var i = parseFloat(value);
