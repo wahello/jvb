@@ -501,6 +501,7 @@ class UserInputs extends React.Component{
     }
 
     onFetchGarminSuccessSleep(data){
+      let workout_status = this.state.workout;
       let sleep_stats = data.data.sleep_stats;
       let have_activities = data.data.have_activities;
 
@@ -538,7 +539,7 @@ class UserInputs extends React.Component{
           awake_mins:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'',
           sleep_hours_last_night:hours,
           sleep_mins_last_night:mins,
-          workout:have_activities?'yes':''
+          workout:have_activities?'yes':workout_status
       });
      }
     }

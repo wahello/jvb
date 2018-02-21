@@ -2,41 +2,6 @@ html,body{
 	font-size: 16px;      	
 }
 
-.quick{
-	padding-top: 0px;
-}
-
-@media (max-width: 1023px){
-
-
-.nav5 .navbar-toggler{            
-	margin-left: -5px;             
-}
-#calendar1 #navlink{                              
-	margin-left: -13px;      
-}
-.navbar-brand img{     
-	margin-right: 15px;         
-}
-.nav6 .navbar-toggler{
-	margin-left: -50px;      
-}
-#head{
-	font-size: larger;
-}
-.btn3{
-	padding-right: 135px;
-}
-.date_range_btn{
-	padding-right: 0px !important;
-	padding-left: 0px !important;
-	margin-left: -6px;
-}
-.btn4{
-	margin-left: -135px;
-}
-}
-
 
 .nav2{
 	  top:0; 
@@ -157,7 +122,20 @@ background-color: #777777;
 	background-color: #777777;
 }
 
-@media (max-width:2024px){
+@media screen and (min-width: 1200px) {
+
+.sleep{
+		display:inline;
+	}
+	.steps{
+		display:inline;
+	}
+	#dropsteps{
+		display:none;
+	}
+	#dropsleep{
+		display:none;
+	}
 	.dropbutton{
 		display: inline;
 	}
@@ -188,70 +166,347 @@ background-color: #777777;
 	}
 	
 }
+@media screen and (max-width: 2560px) and (min-width: 1201px) {
 
-@media (max-width: 1100px){
+.sleep{
+		display:inline;
+	}
+	.steps{
+		display:inline;
+	}
+	#dropsteps{
+		display:none;
+	}
+	#dropsleep{
+		display:none;
+	}
 	.dropbutton{
 		display: inline;
 	}
-	.Movement{
-		display:none;
-	}
-	.alcohol{
-		display: none;
-	}
-	.food{
+	.swimstats{
 		display: none;
 	}
 	
+	.userinputs{
+		display: none;
+	}
+	.exercise{
+		display: none;
+	}
+	.bikestats{
+		display: none;
+	}
 	#dropalcohol{
-		display: inline;
+		display: none;
 	}
 	#dropfood{
-		display: inline;
+		display: none;
+	}
+	#dropswim{
+		display:inline;
 	}
 	#dropmovement{
+		display: none;
+	}
+	
+}
+@media screen and (max-width: 1200px) and (min-width: 769px) {
+
+	.dropbutton{
 		display: inline;
 	}
-
-
+	.swimstats{
+		display: none;
+	}
+	
+	.userinputs{
+		display: none;
+	}
+	.exercise{
+		display: none;
+	}
+	.bikestats{
+		display: none;
+	}
+	.sleep{
+		display:inline;
+	}
+	.steps{
+		display:inline;
+	}
+	#dropsteps{
+		display:none;
+	}
+	#dropsleep{
+		display:none;
+	}
+	#dropalcohol{
+		display: none;
+	}
+	#dropfood{
+		display: none;
+	}
+	#dropswim{
+		display:inline;
+	}
+	#dropmovement{
+		display: none;
+	}
+	
 }
-@media (max-width: 800px){
+@media screen and (max-width: 1200px) and (min-width: 769px) {
+
 	.dropbutton{
+		display: inline;
+	}
+	.swimstats{
 		display: none;
 	}
 	.Movement{
-		display:inline;
-	}
-	.bikestats{
-		display:inline;
-	}
-	.swimstats{
-		display: inline; 
-	}
-	.allstats{
-		display:inline;
-	}
+ 		display:none;
+   }
+	
 	.userinputs{
-		display: inline;
+		display: none;
 	}
 	.exercise{
-		display: inline;
+		display: none;
 	}
-	.alcohol{
-		display: inline;
+	.bikestats{
+		display: none;
 	}
-	.food{
-		display: inline;
+	#dropalcohol{
+		display: none;
 	}
-	#dropmovement{
+	#dropfood{
+		display: none;
+	}
+	#dropswim{
 		display:inline;
 	}
-
+	#dropmovement{
+		display: none;
+	}
+	#dropmovement{
+ 		display: inline;
+	}
+.alcohol{
+ 		display: none;
+	}
+		#dropalcohol{
+ 		display: inline;
 }
+.food{
+ 		display: none;
+	}
+
+#dropfood{
+ 		display: inline;
+	}
+}
+
+
+@media screen and (max-width: 768px) and (min-width: 481px) {
+
+	.dropbutton{
+		display: inline;
+	}
+	.swimstats{
+		display: none;
+	}
+	.Movement{
+ 		display:none;
+   }
+   .sleep{
+		display:none ;
+	}
+	.steps{
+		display:none ;
+	}
+	#dropsteps{
+		display: inline ;
+	}
+	#dropsleep{
+		display: inline ;
+	}
+	
+	.userinputs{
+		display: none;
+	}
+	.exercise{
+		display: none;
+	}
+	.bikestats{
+		display: none;
+	}
+	#dropalcohol{
+		display: none;
+	}
+	#dropfood{
+		display: none;
+	}
+	#dropswim{
+		display:inline;
+	}
+	#dropmovement{
+		display: none;
+	}
+	#dropmovement{
+ 		display: inline;
+	}
+.alcohol{
+ 		display: none;
+	}
+		#dropalcohol{
+ 		display: inline;
+}
+.food{
+ 		display: none;
+	}
+
+#dropfood{
+ 		display: inline;
+	}
+}
+
+
+
+
+
+// @media (max-width: 1100px){
+// 	.dropbutton{
+// 		display: inline;
+// 	}
+// 	.Movement{
+// 		display:none;
+// 	}
+// 	.alcohol{
+// 		display: none;
+// 	}
+// 	.food{
+// 		display: none;
+// 	}
+	
+// 	#dropalcohol{
+// 		display: inline;
+// 	}
+// 	#dropfood{
+// 		display: inline;
+// 	}
+// 	#dropmovement{
+// 		display: inline;
+// 	}
+
+
+// }
+// @media (max-width: 800px){
+// 	.dropbutton{
+// 		display: none;
+// 	}
+// 	.Movement{
+// 		display:inline;
+// 	}
+// 	.bikestats{
+// 		display:inline;
+// 	}
+// 	.swimstats{
+// 		display: inline; 
+// 	}
+// 	.allstats{
+// 		display:inline;
+// 	}
+// 	.userinputs{
+// 		display: inline;
+// 	}
+// 	.exercise{
+// 		display: inline;
+// 	}
+// 	.alcohol{
+// 		display: inline;
+// 	}
+// 	.food{
+// 		display: inline;
+// 	}
+// 	#dropmovement{
+// 		display:inline;
+// 	}
+
+// }
 .calendar2 tr,td,th{
 	width: 40px;
 }
-.date_range_btn{
-	padding-right: 12px;
-	padding-left: 12px
+// .date_range_btn{
+// 	padding-right: 12px;
+// 	padding-left: 12px
+// }
+.btn3, .date_range_btn{
+	margin-left:4px;
+	display:inline;
+}
+#abbri{
+	background:none;
+}
+.text_color{
+	color:white !important;
+}
+@media screen and (max-width: 768px) and (min-width: 481px) {
+.position_abs{
+	position:absolute;
+	top:7px;
+}
+.img_width{
+	max-width:150px !important;
+}
+}
+
+
+@media screen and (max-width: 480px) and (min-width: 320px) {
+
+.position_abs{
+	position:absolute;
+	top:7px;
+}
+.img_width{
+	max-width:120px !important;
+}
+}
+
+
+
+
+ @media screen and (max-width: 667px) and (min-width: 375px) and (orientation: portrait){
+
+.dropbutton{
+	display:none;
+}
+#nav3 .navbar{
+	   padding-top: 0px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+}
+.btn_tglr{
+	position: absolute;
+    top: 0;
+    right: 20px;
+}
+.btn2{
+	position: absolute;
+    top: 20px;
+    right: 8px;
+}
+#daterange,#nav-btn{
+	margin-top:5px;
+}
+
+}
+@media screen and (max-width: 667px) and (min-width: 375px) and (orientation: landscape){
+
+#nav3 .navbar{
+	    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
 }
