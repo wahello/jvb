@@ -94,7 +94,17 @@ def _get_lst(lst,i,default = None):
 def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss"):
 	'''
 		Expect duration in this format - "hh:mm:ss"
-		convert in into hours 
+		convert in into hours, min or sec
+		
+		Arguments
+		- str_duration : type String, time in format 'hh:mm:ss'
+
+		- time_format: type String, possible values are [hour, minute, seconds]
+		  specified in what format time to be converted
+		  
+		- time_pattern: type String, possible values are subtring of "hh:mm:ss"
+		  specify the position of hour, minute and second in the str_duration
+
 	'''
 	if str_duration:
 		hms = str_duration.split(":")

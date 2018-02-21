@@ -211,59 +211,61 @@ class AllStats1 extends Component{
 			for(let cat of Object.keys(data).sort()){
 				if (cat !== "created_at"){
 					for(let key of Object.keys(data[cat]).sort()){
-                        let value = data[cat][key];
+            let value = data[cat][key];
 
-                        if (key == 'movement_consistency'|| key == 'movement_consistency_score'){
-                            let mc = value;
-                            if( mc != undefined && mc != "" && mc != "-"){
-                                mc = JSON.parse(mc);
-                                all_data.push({value:mc.inactive_hours,
-                                               style:{}});
-                            }
-                            else{
-                                all_data.push({value:'-',
-                                               style:{}});
-                            }
-                        }
-                         else if(key === 'overall_health_gpa_before_panalty' ){
-                                   var i = parseFloat(value);
-                                   if(isNaN(i)) { i = 0.00; }
-                                   var minus = '';
-                                   if(i < 0) { minus = '-'; }
-                                   i = Math.abs(i);
-                                   i = parseInt((i + .005) * 100);
-                                   i = i / 100;
-                                   var s = new String(i);
-                                   if(s.indexOf('.') < 0) { s += '.00'; }
-                                   if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
-                                   s = minus + s;
-                                   all_data.push({value: s,
-                                                  style:this.getStylesGpaBeforePanalities(parseFloat(s))});
-                                }
-                        
-                           else if(key === 'prcnt_non_processed_food'){
-                              if(value !=='-' && value !==0){
-                                        
-                              all_data.push({value:value+'%',
-                                       style:this.getStylesNonProcessedFood(value)});
-                                
-                            }
-                          }
-                       else if(key === 'overall_health_gpa'){
-                           var i = parseFloat(value);
-                           if(isNaN(i)) { i = 0.00; }
-                           var minus = '';
-                           if(i < 0) { minus = '-'; }
-                           i = Math.abs(i);
-                           i = parseInt((i + .005) * 100);
-                           i = i / 100;
-                           var s = new String(i);
-                           if(s.indexOf('.') < 0) { s += '.00'; }
-                           if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
-                           s = minus + s;
-                           all_data.push({value: s});
-                        }
-                         else  if(key === 'exercise_consistency_score' ){
+            if (key == 'movement_consistency'|| key == 'movement_consistency_score'){
+                let mc = value;
+                if( mc != undefined && mc != "" && mc != "-"){
+                    mc = JSON.parse(mc);
+                    all_data.push({value:mc.inactive_hours,
+                                   style:{}});
+                }
+                else{
+                    all_data.push({value:'-',
+                                   style:{}});
+                }
+            }
+             else if(key === 'overall_health_gpa_before_panalty' ){
+                       var i = parseFloat(value);
+                       if(isNaN(i)) { i = 0.00; }
+                       var minus = '';
+                       if(i < 0) { minus = '-'; }
+                       i = Math.abs(i);
+                       i = parseInt((i + .005) * 100);
+                       i = i / 100;
+                       var s = new String(i);
+                       if(s.indexOf('.') < 0) { s += '.00'; }
+                       if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+                       s = minus + s;
+                       all_data.push({value: s,
+                                      style:this.getStylesGpaBeforePanalities(parseFloat(s))});
+                    }
+            
+              else if(key === 'prcnt_non_processed_food'){
+                  if(value !=='-' && value !==0){
+                  all_data.push({value:value+'%',
+                                style:this.getStylesNonProcessedFood(value)});
+                  }
+                  else{
+                    all_data.push({value:'Not Reported',
+                                   style:{}});
+                  }
+              }
+           else if(key === 'overall_health_gpa'){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               all_data.push({value: s});
+            }
+             else  if(key === 'exercise_consistency_score' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
                var minus = '';
@@ -278,65 +280,65 @@ class AllStats1 extends Component{
                all_data.push({value: s});
             }
 
-                        else if(value !== '-' && value !== undefined && 
-                           value !== "" && (key == 'deep_sleep' ||
-                            key == 'light_sleep' || key == 'awake_time' ||
-                            key == 'sleep_per_wearable')){
-                            let hm = value.split(':');
-                            let time_str = `${hm[0]}:${hm[1]}`;
-                            all_data.push({value:time_str,
-                                          style:{}});
-                        }
+            else if(value !== '-' && value !== undefined && 
+               value !== "" && (key == 'deep_sleep' ||
+                key == 'light_sleep' || key == 'awake_time' ||
+                key == 'sleep_per_wearable')){
+                let hm = value.split(':');
+                let time_str = `${hm[0]}:${hm[1]}`;
+                all_data.push({value:time_str,
+                              style:{}});
+            }
 
-                        else if(value !== '-' && value !== undefined &&
-                            key == 'workout_duration'){
-                            let hms = value.split(':');
-                            let time_str = `${hms[0]}:${hms[1]}:${hms[2]}`;
-                            all_data.push({value:time_str,
-                                          style:{}});
-                        }
+            else if(value !== '-' && value !== undefined &&
+                key == 'workout_duration'){
+                let hms = value.split(':');
+                let time_str = `${hms[0]}:${hms[1]}:${hms[2]}`;
+                all_data.push({value:time_str,
+                              style:{}});
+            }
 
-                        else if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
-                            let avgHrJson = JSON.parse(value);
-                            for(let act of avgHrKeys)
-                                all_data.push({value:avgHrJson[act],
-                                               style:{}});
-                        }
-                        else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){     
-                            for(let act of avgHrKeys)
-                                all_data.push({value:'-',
-                                               style:{}});
-                        }
-                        else if ((key == 'dew_point' && value === null) ||
-                                 (key == 'temperature' && value === null) ||
-                                 (key == 'humidity' && value === null)||
-                                 (key == 'temperature_feels_like' && value === null) ||
-                                 (key == 'wind' && value === null)){
-                            all_data.push({value:'Not Reported',
-                                           style:{}});
-                        }
-                        else if((key == 'dew_point' && (value && value != '-')) ||       
-                                (key == 'temperature' && (value && value != '-'))||    
-                                (key == 'temperature_feels_like' && (value && value != '-'))){   
-                            all_data.push({value:value,   
-                                           style:{}});    
-                        }
-                       
-                        else{
-                        value += '';
-                        var x = value.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                            all_data.push({value:x1 + x2,   
-                                           style:obj[value]});     
-                        }
+            else if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
+                let avgHrJson = JSON.parse(value);
+                for(let act of avgHrKeys)
+                    all_data.push({value:avgHrJson[act],
+                                   style:{}});
+            }
+            else if (key == 'avg_heartrate' && this.isEmpty(JSON.parse(value))){     
+                for(let act of avgHrKeys)
+                    all_data.push({value:'-',
+                                   style:{}});
+            }
+            else if ((key == 'dew_point' && value === null) ||
+                     (key == 'temperature' && value === null) ||
+                     (key == 'humidity' && value === null)||
+                     (key == 'temperature_feels_like' && value === null) ||
+                     (key == 'wind' && value === null)){
+                all_data.push({value:'Not Reported',
+                               style:{}});
+            }
+            else if((key == 'dew_point' && (value && value != '-')) ||       
+                    (key == 'temperature' && (value && value != '-'))||    
+                    (key == 'temperature_feels_like' && (value && value != '-'))){   
+                all_data.push({value:value,   
+                               style:{}});    
+            }
+           
+            else{
+            value += '';
+            var x = value.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            all_data.push({value:x1 + x2,   
+                               style:obj[value]});     
+            }
 
-                        if(pushKeytoggle)
-                            keys.push(key);   
+            if(pushKeytoggle)
+                keys.push(key);   
 					}
 				}
 			}
