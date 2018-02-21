@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Button} from "reactstrap";
+import {Button,Popover,PopoverBody,} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
+import FontAwesome from "react-fontawesome";
 
 import {fetchMovementConsistency} from '../../network/quick';
 var CalendarWidget = require('react-calendar-widget');  
@@ -20,6 +21,7 @@ class Movementquick extends Component{
     this.successMCFetch = this.successMCFetch.bind(this);
     this.processDate = this.processDate.bind(this);
     this.renderTableColumns = this.renderTableColumns.bind(this);
+     this.toggle = this.toggle.bind(this);
 
      this.state = {
        tableAttrColumn: [
@@ -53,6 +55,7 @@ class Movementquick extends Component{
         {name: 'Sleeping Hours'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
+        popoverOpen: false,
        mc_data:[],
        selectedDate: new Date()                      
       };
@@ -181,6 +184,11 @@ class Movementquick extends Component{
       this.errorMCFetch(data);
     }
   }
+  toggle() {
+    this.setState({
+      popoverOpen: !this.state.popoverOpen
+    });
+  }
 
   getSortKeysAccordingTime(data){
     const sortedDate = ["12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM",
@@ -253,7 +261,16 @@ render(){
   return(
     <div className="row justify-content-center">
     <div>
-     <CalendarWidget onDaySelect={this.processDate}/>,
+              <span id="navlink" onClick={this.toggle} id="progress" style={{paddingRight:"20px"}}>
+                <FontAwesome
+                    name = "calendar"
+                    size = "2x"
+
+                />
+      </span>   
+      <Popover placement="bottom" isOpen={this.state.popoverOpen} target="progress" toggle={this.toggle}>
+          <PopoverBody> <CalendarWidget onDaySelect={this.processDate}/></PopoverBody>
+        </Popover>
     </div>
      <Table
           rowsCount={rowsCount}
