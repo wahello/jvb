@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({ 
   getHeight: function(element) {
-    return window.innerHeight - 335;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

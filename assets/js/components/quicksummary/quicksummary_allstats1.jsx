@@ -207,6 +207,7 @@ class AllStats1 extends Component{
         }
 
 		for(let [date,data] of Object.entries(dateWiseData)){
+      console.log(date);
 			let all_data = [];
 			for(let cat of Object.keys(data).sort()){
 				if (cat !== "created_at"){

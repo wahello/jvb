@@ -553,23 +553,17 @@ onLogoutSuccess(response){
 		<div className="hori">
 		<div className="container-fluid">
 
+
+
 		 <Navbar toggleable
          fixed={fix ? 'top' : ''}
           className="navbar navbar-expand-sm navbar-inverse ">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
-           <FontAwesome
-                 name = "bars"
-                 size = "1x"
-
-             />
-
-          </NavbarToggler>
-
-          <Link to='/' >
+         
+          <Link to='/'  className="position_abs">
             <NavbarBrand
               className="navbar-brand float-sm-left"
-              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-              <img className="img-fluid"
+              id="navbarTogglerDemo" style={{fontSize:"16px"}}>
+              <img className="img-fluid img_width"
                style={{maxWidth:"200px"}}
                src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
             </NavbarBrand>
@@ -583,6 +577,17 @@ onLogoutSuccess(response){
             </h2>
             </span>
              
+
+
+
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
+           <FontAwesome
+                 name = "bars"
+                 size = "1x"
+
+             />
+
+          </NavbarToggler>
 
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
@@ -642,10 +647,15 @@ onLogoutSuccess(response){
                            </PopoverBody>
                            </Popover>
 
+
+
+
+
+
 			             <div id="nav3">
 			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
-						  <Navbar light toggleable className="navbar nav2 nav5">
-                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+						  <Navbar light toggleable className="navbar nav2 nav5 pad0">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up btn_tglr" onClick={this.toggle}>
                                     <div className="toggler">
                                     <FontAwesome
                                           name = "bars"
@@ -654,7 +664,7 @@ onLogoutSuccess(response){
                                         />
                                     </div>
                                </NavbarToggler>
-
+<div>
                                   <span id="calendar1"
                                   onClick={this.toggleCalendar}>
                                   <span id="spa" >
@@ -692,8 +702,12 @@ onLogoutSuccess(response){
                                             </div>
                                            </a>
                                           </abbr>
-                                          </span>                                    
+                                          </span> 
+</div>
+
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
+
+
                                   <Nav className="nav navbar-nav" navbar className="fonts">
 
                                   			 <NavItem onClick={this.toggle} className="allstats">
@@ -718,7 +732,7 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem>
 
-                                         <NavItem onClick={this.toggle}>
+                                         <NavItem onClick={this.toggle} className="steps">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Steps">
                                             <NavLink id="headernames" href="#" className={class_steps}  value="steps"
@@ -731,7 +745,7 @@ onLogoutSuccess(response){
 
                                        	
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="sleep">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Sleep">
                                             <NavLink id="headernames" href="#" className={class_sleep}  value="sleep"
@@ -829,7 +843,11 @@ onLogoutSuccess(response){
 									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"10px"}}>
 									          More
 									        </DropdownToggle>
-									        <DropdownMenu>									                                                     						    		 													         									         								         									         
+									        <DropdownMenu>
+									        <DropdownItem style={{paddingLeft:"30px"}} id="dropsteps"  className={class_steps}  value="steps"
+						    		 				 onClick={this.activateTab.bind(this,"steps")}>Steps</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropsleep"  className={class_sleep} value="sleep"
+						    		 				 onClick={this.activateTab.bind(this,"sleep")}>sleep</DropdownItem>									                                                     						    		 													         									         								         									         
 									          <DropdownItem style={{paddingLeft:"30px"}} id="dropfood"  className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
@@ -869,6 +887,30 @@ onLogoutSuccess(response){
 
 						 </div>
 			      		</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			      			<Popover
                             placement="bottom"
                             isOpen={this.state.calendarOpen}
