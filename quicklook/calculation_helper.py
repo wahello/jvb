@@ -746,7 +746,6 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 				start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
 				hour_start = datetime.utcfromtimestamp(start_time)
 				time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
-
 				steps_in_interval = movement_consistency[time_interval].get('steps')
 				status = "sleeping"
 
@@ -758,7 +757,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 					status = "sleeping"
 				elif(hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
 						today_bedtime and 
-						(hour_start >= datetime.combine(hour_start.date(),time(today_bedtime.hour)))):
+						(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
 					status = "sleeping"
 				elif(user_input_strength_start_time and user_input_strength_end_time and
 					hour_start >= user_input_strength_start_time and
@@ -775,7 +774,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 		total_steps = 0
 		sleeping_hours = 0
 		strength_hours = 0
-
+		
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -847,6 +846,8 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 					for x in duration.split(':')])
 		return hours * 3600 + mins * 60
 
+	_sec_min = lambda x: divmod(x,60)[0]
+
 	_tobj = {
 		"6:00":_to_sec("6:00"),
 		"6:29":_to_sec("6:29"),
@@ -863,28 +864,51 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		"12:00":_to_sec("12:00"),
 	}
 
-	GRADES = {0:"F",1:"D",2:"C",3:"B",4:"A"}
-
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
+	grades = 'F'
 
 	if sleep_duration < _tobj["6:00"] or sleep_duration > _tobj["12:00"]:
-		points = 0
+		if sleep_duration > _tobj["12:00"]:
+			points = 0
+		else: 
+			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
+		grades = 'F'
 
 	elif sleep_duration >= _tobj["7:30"] and sleep_duration <= _tobj["10:00"]:
 	   points = 4
+	   grades = 'A'
 
 	elif ((sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:01"] and sleep_duration <= _tobj["10:30"])) :
-		points = 3
+
+		if (sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]):
+			points = round(_sec_min(sleep_duration - _tobj["7:00"]) * 0.03333 + 3, 5)
+		elif(sleep_duration == _tobj["10:30"]):
+			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
+		else:
+			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 3,5)
+		grades = 'B'
 
 	elif ((sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:31"] and sleep_duration <= _tobj["11:00"])) :
-	   	points = 2
+
+		if(sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["6:59"]):
+			points = round(_sec_min(sleep_duration - _tobj["6:30"]) * 0.03333 + 2, 5)
+		elif(sleep_duration == _tobj["11:00"]):
+			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
+		else:
+			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
+		grades = 'C'
 
 	elif ((sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]) or \
 		(sleep_duration >= _tobj["11:30"] and sleep_duration <= _tobj["12:00"])) :
-	   	points = 1
+
+		if(sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]):
+	   		points = round(_sec_min(sleep_duration - _tobj["6:00"]) * 0.03333 + 1, 5)
+		else:
+			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
+		grades = 'D'
 	
 	if sleep_aid_taken == "yes":
 		if points >= 2:
@@ -892,7 +916,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		else:
 			points = 0
 
-	return (GRADES[points],points)
+	return (grades,points)
  
 def cal_unprocessed_food_grade(prcnt_food):
 	def _point_advantage(current_prcnt, range_min_prcnt, per_prcnt_pt):
@@ -1472,7 +1496,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['hrr_time_to_99'] = safe_get(daily_encouraged,"time_to_99","") 
 		exercise_calculated_data['hrr_starting_point'] = safe_get(daily_encouraged,"hr_level",0)
 		exercise_calculated_data['hrr_beats_lowered_first_minute'] = safe_get(
-			daily_encouraged,"lowest_hr_first_minute",0)
+			daily_encouraged,"hr_level",0)-safe_get(daily_encouraged,"lowest_hr_first_minute",0)
 		exercise_calculated_data['resting_hr_last_night'] = safe_get_dict(dailies_json,
 			'restingHeartRateInBeatsPerMinute',0)
 		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
