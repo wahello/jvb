@@ -498,7 +498,24 @@ background-color: #777777;
 #daterange,#nav-btn{
 	margin-top:5px;
 }
+.user_input_icon{
+	position: absolute;
+    top: 8px;
+    right: 89px;
+}
+.user_viewbtn{
+	right: 7px;
+    position: absolute;
+    top: 0px;
 
+}
+.user_clndr{
+	padding-right: 0px;
+    padding-left: 0px;
+}
+.user_nav{
+	height:60px;
+}
 }
 @media screen and (max-width: 667px) and (min-width: 375px) and (orientation: landscape){
 
