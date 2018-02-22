@@ -210,8 +210,10 @@ def connect_receive_token(request):
 	# create new entry in the database
 	try:
 		token = GarminConnectToken.objects.get(user = request.user)
-		if token:    
-			token.save(token=access_token,token_secret=access_token_secret)
+		if token:
+			setattr(token, "token", access_token)
+			setattr(token, "token_secret", access_token_secret)
+			token.save()    
 
 	except GarminConnectToken.DoesNotExist:
 		GarminConnectToken.objects.create(user=request.user,token=access_token,

@@ -105,7 +105,9 @@ def receive_token(request):
     try:
       token = GarminToken.objects.get(user = request.user)
       if token:
-        token.save(token=access_token, token_secret = access_token_secret)
+        setattr(token, "token", access_token)
+        setattr(token, "token_secret", access_token_secret)
+        token.save()
     except GarminToken.DoesNotExist:
       GarminToken.objects.create(user=request.user,token=access_token,
                                  token_secret=access_token_secret)
