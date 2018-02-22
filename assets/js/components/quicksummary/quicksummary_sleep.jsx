@@ -18,7 +18,7 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
           {name: 'Sleep Comments'},
           {name: 'Sleep Aid taken?'},
-          {name: 'Resting Heart Rate (RHR)'} ,
+          {name: 'Resting Heart Rate (RHR)'},
           {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
           {name: 'Sleep Bed Time'}, 
           {name: 'Sleep Awake Time'},
@@ -29,12 +29,14 @@ import { StyleSheet, css } from 'aphrodite';
     };
   }
 getStylesGpaBeforePanalities(score){	
-      if (score<50)
+      if (score>=76)
         return {background:'red',color:'black'};
-      else if (score>=50 && score<70)
+      else if (score>=63 && score<=75)
         return {background:'yellow',color:'black'};
-      else if (score > 7 && score <= 10.5)
+      else if (score >=30 && score <= 62)
         return {background:'green',color:'white'};
+      if (score<30)
+        return {background:'red',color:'black'};
       
     }
 renderTableColumns(dateWiseData,category,classes=""){
@@ -53,7 +55,11 @@ renderTableColumns(dateWiseData,category,classes=""){
 						let time_str = `${hm[0]}:${hm[1]}`;
 
 						all_data.push({value:time_str,
-									   style:this.getStylesGpaBeforePanalities(time_str)});						
+									   style:''});						
+					}
+					else if(key == 'resting_heart_rate'){
+						all_data.push({value:value,
+										style:this.getStylesGpaBeforePanalities(value)})
 					}
 					else all_data.push({value:value,
 										style:''});
@@ -64,7 +70,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
+				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
@@ -108,15 +114,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 const styles = StyleSheet.create({
   newTableHeader: {
-  	textAlign:'center',
-    color: '#111111', 
+  	textAlign:'center', 
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
   },
   newTableBody:{
   	textAlign:'center',
-    color: '#5e5e5e',
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',

@@ -48,7 +48,8 @@ export default class DietType extends Component{
 								    	<div className="input1">
 											<Textarea
 											id="placeholder"				                          
-				                            className="form-control" 
+				                            className="form-control"
+				                            name="diet_type" 
 				                            value={this.state.diet_type}
 					                          onChange={this.handleChangeDiet}
 					                          onBlur = {this.handleOnBlurDiet} />	                      

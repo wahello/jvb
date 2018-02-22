@@ -44,7 +44,8 @@ export default class PrescriptionSleepAids extends Component{
 									<Textarea
 									id="placeholder" 		                            
 		                            className="form-control"
-		                            rows="5" cols="5" 
+		                            rows="5" cols="5"
+		                            name="sleep_aid_taken" 
 		                            value={this.state.sleep_aid_taken}
 		                          onChange={this.handleChangePrescriptionSleep} />	                           
 		                            

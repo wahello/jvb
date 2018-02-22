@@ -70,6 +70,7 @@ export default class UnprocesedFoodModal extends Component{
 					                        </div>
 					                        <div className="unprocess_food">
 						                        <Input type="checkbox"
+						                        id="unprocess_check"
 					                           	onClick={this.onClickFoodList}
 					                           	checked={this.state.enter_food ? 'checked':''}
 					                           	/>                           		  
