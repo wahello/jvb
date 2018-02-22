@@ -863,6 +863,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	_tobj = {
 		"6:00":_to_sec("6:00"),
 		"6:29":_to_sec("6:29"),
+		"6:59":_to_sec("6:59"),
 		"6:30":_to_sec("6:30"),
 		"7:00":_to_sec("7:00"),
 		"7:29":_to_sec("7:29"),
