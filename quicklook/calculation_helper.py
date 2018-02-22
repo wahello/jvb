@@ -846,6 +846,18 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 					for x in duration.split(':')])
 		return hours * 3600 + mins * 60
 
+	def _get_grade(point):
+		if point < 1:
+			return 'F'
+		elif point >= 1 and point < 2:
+			return 'D'
+		elif point >= 2 and point < 3:
+			return 'C'
+		elif point >= 3 and point < 4:
+			return 'B'
+		else:
+			return 'A'
+
 	_sec_min = lambda x: divmod(x,60)[0]
 
 	_tobj = {
@@ -866,18 +878,15 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
-	grades = 'F'
 
 	if sleep_duration < _tobj["6:00"] or sleep_duration > _tobj["12:00"]:
 		if sleep_duration > _tobj["12:00"]:
 			points = 0
 		else: 
 			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
-		grades = 'F'
 
 	elif sleep_duration >= _tobj["7:30"] and sleep_duration <= _tobj["10:00"]:
 	   points = 4
-	   grades = 'A'
 
 	elif ((sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:01"] and sleep_duration <= _tobj["10:30"])) :
@@ -888,7 +897,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
 		else:
 			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 3,5)
-		grades = 'B'
 
 	elif ((sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:31"] and sleep_duration <= _tobj["11:00"])) :
@@ -899,7 +907,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
-		grades = 'C'
 
 	elif ((sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]) or \
 		(sleep_duration >= _tobj["11:30"] and sleep_duration <= _tobj["12:00"])) :
@@ -908,7 +915,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	   		points = round(_sec_min(sleep_duration - _tobj["6:00"]) * 0.03333 + 1, 5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
-		grades = 'D'
 	
 	if sleep_aid_taken == "yes":
 		if points >= 2:
@@ -916,7 +922,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		else:
 			points = 0
 
-	return (grades,points)
+	return (_get_grade(points),points)
  
 def cal_unprocessed_food_grade(prcnt_food):
 	def _point_advantage(current_prcnt, range_min_prcnt, per_prcnt_pt):
@@ -1292,21 +1298,19 @@ def get_overall_workout_grade(wout_duration_pt, wout_effortlvl_pt, avg_exercise_
 
 def get_overall_grade(grades):
 	GRADES = {'A':4,'B':3,'C':2,'D':1,'F':0,'':0,'N/A':0}
-	non_exercise_step_grade = grades.get('movement_non_exercise_steps_grade')
+	non_exercise_step_gpa = grades.get('movement_non_exercise_steps_gpa')
 	movement_consistency_grade = grades.get('movement_consistency_grade')
-	avg_sleep_per_night_grade = grades.get('avg_sleep_per_night_grade')
+	avg_sleep_per_night_gpa = grades.get('avg_sleep_per_night_gpa')
 	exercise_consistency_grade = grades.get('exercise_consistency_grade')
-	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
+	prcnt_unprocessed_food_gpa = grades.get('prcnt_unprocessed_food_consumed_gpa')
 	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
-	penalty = grades.get('sleep_aid_penalty')+\
-				grades.get('ctrl_subs_penalty')+\
-				grades.get('smoke_penalty')
+	penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
 
-	gpa = round((GRADES[non_exercise_step_grade]+
+	gpa = round((non_exercise_step_gpa +
 		   GRADES[movement_consistency_grade]+
-		   GRADES[avg_sleep_per_night_grade]+
+		   avg_sleep_per_night_gpa +
 		   GRADES[exercise_consistency_grade]+
-		   GRADES[prcnt_unprocessed_food_grade]+
+		   prcnt_unprocessed_food_gpa+
 		   GRADES[alcoholic_drink_per_week_grade]+
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)

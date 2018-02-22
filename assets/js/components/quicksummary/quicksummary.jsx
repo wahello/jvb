@@ -115,11 +115,12 @@ class Quicklook extends Component{
 
 	updateDateState(data,user_input_data){
 				let grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
-				let overall_health_gpa_before_panalty = (grade_point[data.grades_ql.movement_non_exercise_steps_grade]+
-					grade_point[data.grades_ql.movement_consistency_grade]+
-					grade_point[data.grades_ql.avg_sleep_per_night_grade]+
+				let overall_health_gpa_before_panalty = (
+					data.grades_ql.movement_non_exercise_steps_gpa + 
+					grade_point[data.grades_ql.movement_consistency_grade] +
+					data.grades_ql.avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty) +
 					grade_point[data.grades_ql.exercise_consistency_grade]+
-					grade_point[data.grades_ql.prcnt_unprocessed_food_consumed_grade]+
+					data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
 					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
 
        			var properties={
