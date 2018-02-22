@@ -1013,8 +1013,8 @@ handleScroll() {
                            
                         <div className="nav3">
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
-                           <Navbar light toggleable className="navbar nav1">
-                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+                           <Navbar light toggleable className="navbar nav1 user_nav">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle}>
                                     <div className="toggler">
                                     <FontAwesome 
                                           name = "bars"
@@ -1043,7 +1043,7 @@ handleScroll() {
 
                                   <span onClick={this.toggleInfo2} id="info2">
                                    <span id="spa">
-                                        <NavLink id="navlink" href="#">
+                                        <NavLink id="navlink" href="#" className="user_input_icon">
                                               <FontAwesome
                                                   name = "info-circle"
                                                   size = "1x"
@@ -1051,7 +1051,7 @@ handleScroll() {
                                         </NavLink>                                  
                                    </span>
                                    </span>
-                                   <span className="btn2">
+                                   <span className="btn2 user_viewbtn">
                                    <Button 
                                    id="nav-btn"
                                       size="sm"
