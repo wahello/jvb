@@ -30,10 +30,10 @@ const attrVerboseName = {
     humidity: 'Humidity (in %)',  
     temperature_feels_like: 'Temperature Feels Like (in °F)',
     wind: 'Wind (in miles per hour)',
-    hrr: 'HRR',
-    hrr_start_point: 'HRR Start Point',  
-    hrr_beats_lowered: 'HRR Beats Lowered',
-    sleep_resting_hr_last_night: 'Sleep Resting Hr Last Night',
+    hrr_time_to_99: 'HRR - Time to 99 (mm:ss)',
+    hrr_starting_point: 'HRR Starting Point',  
+    hrr_beats_lowered_first_minute: 'HRR - Beats Lowered in First Minute',
+    resting_hr_last_night: 'Resting HR Last Night',
     vo2_max: 'Vo2 Max',
     running_cadence: 'Running Cadence',
     nose_breath_prcnt_workout: 'Percent Breath through Nose During Workout',
@@ -119,12 +119,12 @@ renderTableColumns(dateWiseData,category,classes=""){
                      (key == 'humidity' && value === null)||
                      (key == 'temperature_feels_like' && value === null) ||
                      (key == 'wind' && value === null)){
-                all_data.push('No GPS data');
+                all_data.push('Not Reported');
             }
             else if((key == 'dew_point' && (value && value != '-')) ||
                     (key == 'temperature' && (value && value != '-'))||
                     (key == 'temperature_feels_like' && (value && value != '-'))){
-                all_data.push(this.toFahrenheit(value).toFixed(2));
+                all_data.push(value);
             }
             else if(key == 'workout_duration' && value && (value != '-' && value != '')){
                 let hms = value.split(':');
@@ -147,7 +147,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 			              {all_data[props.rowIndex]}
 			            </Cell>
 			          )}
-		        width={200}
+		        width={170}
 			/>
 		);
         pushKeytoggle = false;
@@ -173,7 +173,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		let rowsCount = this.state.tableAttrColumn.length;
 
 		return(
-			<div className="quick3"
+			<div 
             >
 			 <Table
 		        rowsCount={rowsCount}
@@ -204,8 +204,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 const styles = StyleSheet.create({
   newTableHeader: {
     textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+    color: '#111111',  
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -223,7 +222,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

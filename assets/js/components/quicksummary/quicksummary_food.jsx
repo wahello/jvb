@@ -13,7 +13,7 @@ import { StyleSheet, css } from 'aphrodite';
 	constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
-
+	 this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 	 this.state = {
       myTableData: [
         {name: '% Non Processed Food'},
@@ -23,7 +23,15 @@ import { StyleSheet, css } from 'aphrodite';
       ],
     };
   }
-
+getStylesGpaBeforePanalities(score){
+      if (score<50)
+        return {background:'red',color:'black'};
+      else if (score>=50 && score<70)
+        return {background:'yellow',color:'black'};
+      else if (score >= 70)
+        return {background:'green',color:'white'};
+      
+    }
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -35,12 +43,15 @@ renderTableColumns(dateWiseData,category,classes=""){
 					if(key === 'prcnt_non_processed_food'){
 						if(value !=='-' && value !==0){
 											
-						all_data.push(value+'%');
+						all_data.push({value:value+'%',
+									   style:this.getStylesGpaBeforePanalities(value)});
 							
 					}
-					else all_data.push(value);
+					else all_data.push({value:value,
+										style:''});
 					}
-					else all_data.push(value);
+					else all_data.push({value:value,
+										style:''});
 				}
 			}
 
@@ -48,8 +59,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
-				              {all_data[props.rowIndex]}
+				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
+				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
 			        width={200}
@@ -63,7 +74,7 @@ render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3"
+			<div 
 			 >
 			 <Table
 		        rowsCount={rowsCount}
@@ -80,7 +91,7 @@ render(){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={150}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"food_ql")}
@@ -96,14 +107,12 @@ const styles = StyleSheet.create({
   newTableHeader: {
   	textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
   },
   newTableBody:{
   	textAlign:'center',
-    color: '#5e5e5e',
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',
@@ -115,7 +124,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 410;
+    return window.innerHeight - 170;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

@@ -91,7 +91,7 @@ class UserQuickLookSerializer(serializers.ModelSerializer):
 		with old data
 		'''
 
-		fields = [f.name for f in instance._meta_get_fields()]
+		fields = [f.name for f in instance._meta._get_fields()]
 		for f in fields:
 			setattr(instance,f,
 					validated_data.get(f,getattr(instance,f)))

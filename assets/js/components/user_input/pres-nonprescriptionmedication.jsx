@@ -70,6 +70,7 @@ export default class PrescriptionMedication extends Component{
 											<Textarea
 											id="placeholder" 				                           
 				                            className="form-control" 
+				                            name="medications_taken_list"
 				                            value={this.state.medications_taken_list}
 				                            rows="5" cols="5"
 				                          onChange={this.handleChangeMedications}>	</Textarea>		                           
@@ -93,6 +94,7 @@ export default class PrescriptionMedication extends Component{
 							<Label check className="btn  radio1">
 								<Input type="radio" name="controlled_uncontrolled_substance"
 									value="yes"
+									id="controlled_yes"
 								 	checked={this.state.controlled_uncontrolled_substance === 'yes'}
 								 	onChange={this.handleChange}/> &nbsp;
 								Yes
@@ -101,6 +103,7 @@ export default class PrescriptionMedication extends Component{
 							<Label check className="btn  radio1">
 								<Input type="radio" name="controlled_uncontrolled_substance" 
 									value="no"
+									id="controlled_no"
 									checked={this.state.controlled_uncontrolled_substance === 'no'}
 									onChange={this.handleChange}/> &nbsp;
 								No
@@ -108,6 +111,7 @@ export default class PrescriptionMedication extends Component{
 							<Label check className="btn radio1">
 								<Input type="radio" name="controlled_uncontrolled_substance" 
 									value="decline"
+									id="controlled_decline"
 									checked={this.state.controlled_uncontrolled_substance === 'decline'}
 									onChange={this.handleChange}/> &nbsp;
 								I Decline to Answer This Question

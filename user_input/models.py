@@ -74,6 +74,17 @@ class DailyUserInputStrong(models.Model):
     NO_WORKOUT = 'no workout today'
     NOT_YET = 'not yet'
     DECLINE = 'decline'
+
+    REASON_NO_WORKOUT_CHOICES = (
+        ("rest day","Rest Day"),
+        ("sick", "Sick"),
+        ("too busy/not enough time","Too Busy/Not Enough Time"),
+        ("didn’t feel like it","Didn’t Feel Like It"),
+        ("work got in the way","Work Got in the Way"),
+        ("travel day","Travel Day"),
+        ("weather","Weather"),
+        ("other","Other"),
+    )
  
     WORK_OUT_EASY_OR_HARD_CHOICES = (
     ('','-'),
@@ -131,11 +142,21 @@ class DailyUserInputStrong(models.Model):
         blank=True
     )
 
+    no_exercise_reason = models.CharField(
+        max_length = 100,
+        choices = REASON_NO_WORKOUT_CHOICES,
+         blank=True
+    )
+    no_exercise_comment = models.TextField(blank=True)
+
     workout_type = models.CharField(
         max_length = 10,
         choices = WORKOUT_TYPE_CHOICES,
         blank = True
     )
+
+    strength_workout_start = models.CharField(max_length = 10, blank=True)
+    strength_workout_end = models.CharField(max_length = 10, blank=True)
 
     workout_input_type = models.CharField(
         max_length = 10,
@@ -388,8 +409,7 @@ class DailyUserInputOptional(models.Model):
         validators = [CharMinValueValidator(1),CharMaxValueValidator(100)],
         blank = True,null = True)
 
-    type_of_diet_eaten = models.CharField(
-        max_length=100,
+    type_of_diet_eaten = models.TextField(
         blank=True)
 
     general_comment = models.TextField(blank=True)

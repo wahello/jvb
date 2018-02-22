@@ -2,7 +2,6 @@ import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import { Link,withRouter } from 'react-router-dom';
 import NavbarMenu from '../navbar';
-
 class Dashboard extends Component {
 
 	constructor(props){
@@ -16,7 +15,7 @@ class Dashboard extends Component {
 				<div>
 					  <div className="row">
 						<div className="col-sm-6 col-sm-offset-3 social-login" style={{marginTop:"80px"}}>
-						  <h3 id="link_style">user Inputs</h3>
+						  <h3 id="link_style">User Inputs</h3>
 						  <div className="social-login-buttons">
 	  
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
@@ -30,13 +29,15 @@ class Dashboard extends Component {
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							   	<h3 id="link_style">Raw Data</h3>		  
 							   <Link to='/rawdata'>Raw Data</Link><br/>
+							   <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
+							   <Link to='/rawdata#grades'>Grades</Link><br/>
 								
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 							  <h3 id="link_style">Set up Links to Garmin</h3>
 							  <a href='/users/request_token'>Garmin Health Connect</a><br/>
 							  <a href='/users/connect_request_token'>Garmin Connect</a><br/>
 							  <h3 id="link_style">Other</h3>
-							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>	
+							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>							 
 						  </div>
 						</div>
 					</div>

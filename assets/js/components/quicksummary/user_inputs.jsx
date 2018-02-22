@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
   newTableHeader: {
   	textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -158,7 +157,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 217;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

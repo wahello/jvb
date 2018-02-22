@@ -46,7 +46,8 @@ export default class AlcoholModal extends Component{
 									<div className="input1">
 			                            <Textarea 
 			                            	id="placeholder"				                            
-				                            className="form-control" 
+				                            className="form-control"
+				                            name="alcohol_drink_consumed_list" 
 				                            value={this.state.alcohol_drink_consumed_list}
 				                            rows="5" cols="5"
 				                            onChange={this.handleChange}

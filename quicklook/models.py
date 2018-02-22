@@ -32,11 +32,12 @@ class Grades(models.Model,):
 	overall_health_gpa = models.FloatField(blank=True,null=True)
 	movement_non_exercise_steps_grade = models.CharField(choices=GRADE_CHOICES,
 														 max_length=3,blank=True)
+	movement_non_exercise_steps_gpa = models.FloatField(blank=True,null=True)
 	movement_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
 	avg_sleep_per_night_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
 	avg_sleep_per_night_gpa = models.FloatField(blank=True,null=True)
 	exercise_consistency_grade = models.CharField(choices=GRADE_CHOICES, max_length=3, blank=True)
-	exercise_consistency_gpa = models.FloatField(blank=True, null=True)
+	exercise_consistency_score = models.FloatField(blank=True, null=True)
 	overall_workout_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
 	overall_workout_gpa = models.FloatField(blank=True, null=True)
 	workout_duration_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
@@ -47,6 +48,7 @@ class Grades(models.Model,):
 	avg_exercise_hr_gpa = models.FloatField(blank=True, null=True)
 	prcnt_unprocessed_food_consumed_grade = models.CharField(choices=GRADE_CHOICES,
 															 max_length=3, blank=True)
+	prcnt_unprocessed_food_consumed_gpa = models.FloatField(blank=True, null=True)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
 	sleep_aid_penalty = models.FloatField(blank=True, null=True)
 	ctrl_subs_penalty = models.FloatField(blank=True, null=True)
@@ -129,6 +131,7 @@ class ExerciseAndReporting(models.Model):
 	# pace = models.TimeField()
 
 	avg_heartrate = models.TextField(blank=True)
+	avg_exercise_heartrate = models.FloatField(blank=True,null=True)
 	elevation_gain = models.IntegerField(blank=True,null=True)
 	elevation_loss = models.IntegerField(blank=True,null=True)
 	effort_level = models.PositiveIntegerField(blank=True,null=True)
@@ -138,12 +141,13 @@ class ExerciseAndReporting(models.Model):
 	temperature_feels_like = models.FloatField(blank=True,null=True)
 	wind = models.FloatField(blank=True,null=True)
 
-	hrr  = models.CharField(max_length=10,blank=True)
-	# hrr  = models.TimeField()
+	hrr_time_to_99  = models.CharField(max_length=10,blank=True)
+	hrr_starting_point = models.IntegerField(blank=True,null=True)
+	hrr_beats_lowered_first_minute = models.IntegerField(blank=True,null=True)
+	resting_hr_last_night = models.IntegerField(blank=True,null=True)
+	lowest_hr_during_hrr = models.IntegerField(blank=True, null=True)
+	highest_hr_first_minute = models.IntegerField(blank=True, null=True)
 
-	hrr_start_point = models.IntegerField(blank=True,null=True)
-	hrr_beats_lowered = models.IntegerField(blank=True,null=True)
-	sleep_resting_hr_last_night = models.IntegerField(blank=True,null=True)
 	vo2_max = models.FloatField(blank=True,null=True)
 	running_cadence = models.IntegerField(blank=True,null=True)
 	nose_breath_prcnt_workout = models.FloatField(
@@ -237,6 +241,7 @@ class Food(models.Model):
 		blank=True,null=True)
 
 	non_processed_food = models.TextField(blank=True)
+	processed_food = models.TextField(blank=True)
 
 	# choices are not provided, will be choice field in the future
 	diet_type = models.TextField(blank=True)

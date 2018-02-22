@@ -10,30 +10,33 @@ import NumberFormat from 'react-number-format';
 
  class Grades extends Component{
 
+
 	constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
+   this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 
-	 this.state = {
+   this.state = {
       myTableData: [
         {name: 'Overall Health Grade'},
         {name: 'Overall Health GPA'},
-        {name: 'Movement Non Exercise steps Grade'},   
-        {name: 'Movement Non Exercise steps'},
+        {name: 'Non Exercise steps Grade'},   
+        {name: 'Non Exercise steps'},
         {name: 'Movement Consistency Grade'},
         {name: 'Movement Consistency Score'}, 
         {name: 'Avg Sleep Per Night Grade'},
         {name: 'Avg Sleep Per Night'},
         {name: 'Exercise Consistency Grade'},
-        {name: 'Did you Workout Today'},
+        {name: 'Did You Workout Today'},
         {name: 'Exercise Consistency Score'},
-        {name: 'Percentage of Unprocessed Food Grade'},
-        {name: 'Percentage of Unprocessed Food'}, 
+        {name: '% Unprocessed Food Grade'},
+        {name: '% Unprocessed Food'}, 
         {name: 'Alcoholic Drink Per Week Grade'},
         {name: '# of Drinks Consumed Over the Last 7 Days'},
         {name: 'Sleep Aid Penalty'},
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
+        {name:'Overall Health GPA Before Penalties'},
         
         // {name:'NOT GRADED CATEGORIES'},
         // {name:'Resting Heart Rate'},
@@ -56,25 +59,31 @@ import NumberFormat from 'react-number-format';
       ],
     };
   }
+getStylesGpaBeforePanalities(score){
+      if (score<1)
+        return {background:'red',color:'black'};
+      else if (score >= 1 && score < 3)
+        return {background:'yellow',color:'black'};
+      else if (score >= 3)
+        return {background:'green',color:'black'};
+    }
 
 renderTableColumns(dateWiseData,category,classes=""){
-    console.log(dateWiseData);
     let columns = [];
     const obj = {
-        A: { background: 'green', color: 'black'},
-        B: { background: 'green', color: 'black' },
+        A: { background: 'green', color: 'white'},
+        B: { background: 'green', color: 'white' },
         C: { background: 'yellow', color:'black' },
         D: { background: 'yellow', color:'black' },
         F: { background: 'red', color: 'black' },
-        yes:{background: 'red', color: 'black' },        
+        penalty:{background: 'red', color: 'black' },        
     };
-
     for(let [date,data] of Object.entries(dateWiseData)){
 
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
             if(key !== 'id' && key !== 'user_ql'){
-
+            
             if(key == "resting_hr" || key == "overall_workout_grade"){
               all_data.push({
                   value:'',
@@ -82,6 +91,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
             }
 
+           
             if(key === 'overall_health_gpa' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -95,6 +105,44 @@ renderTableColumns(dateWiseData,category,classes=""){
                if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
                s = minus + s;
                all_data.push({value: s});
+            }
+
+           else if(key =='movement_non_exercise_steps' ){
+              all_data.push({
+                    value: value.toLocaleString(),
+                    style: obj[value]
+                });
+            }
+            // else if((key =='movement_consistency_grade' || key =='overall_health_grade' || 
+            //   key =='overall_health_gpa' ||  key =='movement_non_exercise_steps_grade' || 
+            //   key =='movement_non_exercise_steps' ||  key =='movement_consistency_score' || 
+            //   key =='avg_sleep_per_night_grade' ||  key =='avg_sleep_per_night' || 
+            //   key =='exercise_consistency_grade' ||  key =='workout_today' || 
+            //   key =='exercise_consistency_score' ||  key =='prcnt_unprocessed_food_consumed_grade' || 
+            //   key =='prcnt_unprocessed_food_consumed' ||  key =='alcoholic_drink_per_week_grade' || 
+            //   key =='alcoholic_drink_per_week' ||  key =='sleep_aid_penalty' || 
+            //   key =='ctrl_subs_penalty' ||  key =='smoke_penalty' || 
+            //   key =='overall_health_gpa_before_panalty'  ) && (value ==' ' )){
+            //      all_data.push({
+            //         value: 'Not Reported',
+            //         style: obj[value]
+            //     });
+            // }
+            else if(key === 'overall_health_gpa_before_panalty' ){
+               var i = parseFloat(value);
+               if(isNaN(i)) { i = 0.00; }
+               var minus = '';
+               if(i < 0) { minus = '-'; }
+               i = Math.abs(i);
+               i = parseInt((i + .005) * 100);
+               i = i / 100;
+               var s = new String(i);
+               if(s.indexOf('.') < 0) { s += '.00'; }
+               if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+               s = minus + s;
+               console.log(this.getStylesGpaBeforePanalities(parseFloat(s)));
+               all_data.push({value: s,
+                style:this.getStylesGpaBeforePanalities(parseFloat(s))});
             }
             else  if(key === 'exercise_consistency_score' ){
                var i = parseFloat(value);
@@ -110,31 +158,24 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
-            // else if(key ==='movement_non_exercise_steps'){
-            //   value += '';
-            //       var x = value.split('.');
-            //       var x1 = x[0];
-            //       var x2 = x.length > 1 ? '.' + x[1] : '';
-            //       var rgx = /(\d+)(\d{3})/;
-            //       while (rgx.test(x1)) {
-            //     x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            //       }
-            //   all_data.push(x1 + x2)
-
-            // }
+            
             else if(key == 'smoke_penalty' || key ==  'ctrl_subs_penalty' || key == 'sleep_aid_penalty'){
               if(value && value != "-"){
                 all_data.push({
                   value:'Yes',
-                  style:obj['yes']
+                  style:obj['penalty']
                 });
-              }else{
+              }
+               
+
+              else{
                 all_data.push({
                   value:'No',
                   style:''
                 });
               }
             }
+
             else if(key == 'movement_consistency_score'){
               let mc = value;
               if( mc != undefined && mc != "" && mc != "-"){
@@ -145,8 +186,14 @@ renderTableColumns(dateWiseData,category,classes=""){
                   });
               }else
                 all_data.push({
-                  value:'',
+                  value:'Not Reported',
                   style:''
+                });
+            }
+            else if(value == ''  ){
+                all_data.push({
+                    value: 'Not Reported',
+                    style: obj[value]
                 });
             }
             else {
@@ -166,51 +213,50 @@ renderTableColumns(dateWiseData,category,classes=""){
                         {all_data[props.rowIndex].value}
                     </Cell>
                 )}
-               width={135}
+               width={100}
             />
         )
     }
     return columns;
 }
 
-	
-	render(){
-		const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		let rowsCount = this.state.myTableData.length;
-		return(
-			<div className="quick3">
-			 <Table
-			 	className="responsive"
-		        rowsCount={rowsCount}
-		        rowHeight={65}
-		        headerHeight={50}
-		        width={containerWidth}
-        		height={containerHeight}
-        		touchScrollEnabled={true}
+  
+  render(){
+    const {height, width, containerHeight, containerWidth, ...props} = this.props;
+    let rowsCount = this.state.myTableData.length;
+    return(
+      <div>
+       <Table
+        className="responsive"
+            rowsCount={rowsCount}
+            rowHeight={65}
+            headerHeight={50}
+            width={containerWidth}
+            height={containerHeight}
+            touchScrollEnabled={true}
                 
-        		{...props}>
-		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
-		          cell={props => (
-		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
-		              {this.state.myTableData[props.rowIndex].name}
-		            </Cell>
-		          )}
-		          width={280}
-		          fixed={true}
-		        />
-			    {this.renderTableColumns(this.props.data,"grades_ql")}
-      		</Table>
-			</div>
+            {...props}>
+            <Column
+              header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
+              cell={props => (
+                <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
+                  {this.state.myTableData[props.rowIndex].name}
+                </Cell>
+              )}
+              width={170}
+              fixed={true}
+            />
+          {this.renderTableColumns(this.props.data,"grades_ql")}
+          </Table>
+      </div>
 
-			);
-	}
+      );
+  }
 }
 const styles = StyleSheet.create({
   newTableHeader: {
     textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -225,7 +271,7 @@ const styles = StyleSheet.create({
 });
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

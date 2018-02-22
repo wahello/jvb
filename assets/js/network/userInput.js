@@ -5,7 +5,39 @@ import 'moment-timezone';
 
 axiosRetry(axios, { retries: 3}); 
 
+function createMomentObj(dt,hour,min,am_pm){
+  if(dt && hour && min && am_pm){
+	  hour = hour ? parseInt(hour) : 0;
+	  min = min ? parseInt(min) : 0;
+
+	  if(am_pm == 'am' && hour && hour == 12){
+	    hour = 0
+	  }
+	  if (am_pm == 'pm' && hour && hour != 12){
+	    hour = parseInt(hour)+12;
+	  }
+	  let y = dt.year();
+	  let m = dt.month();
+	  let d = dt.date();
+	  let date_format = moment({
+	    year :y,
+	    month :m,
+	    day :d,
+	    hour :hour,
+	    minute :min
+	  });
+	  return date_format;
+	}
+  return null
+}
+
+function createString(hour,min,pm_am){
+	if(hour && min && pm_am)
+		return hour+':'+min+' '+pm_am;
+	return '';
+}
 function formatJSON(data){   
+
 	/* This function will format the form
 		 data into JSON acceptable by API.
 		 example - 
@@ -18,6 +50,8 @@ function formatJSON(data){
 		        "id": 1,
 		        "user_input": 18,
 		        "workout":"yes",
+		        "no_exercise_reason":"sick",
+		        "no_exercise_comment":"sick of cold",
 		        "workout_type":"cardio",
 		        "workout_input_type":"strength",
 		        "work_out_easy_or_hard": "easy",
@@ -89,20 +123,39 @@ function formatJSON(data){
 		    }
 	}
 	*/
-	const d = data.selected_date.getDate();
-    const m = data.selected_date.getMonth()+1;
-    const y = data.selected_date.getFullYear();
-    const created_at = y+"-"+m+"-"+d;
+
+    const created_at = moment(data.selected_date).format("YYYY-MM-DD");
+   
+	const sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
+		data.sleep_hours_bed_time,
+		data.sleep_mins_bed_time,
+		data.sleep_bedtime_am_pm);
+	const  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
+		data.sleep_hours_awake_time,
+		data.sleep_mins_awake_time,
+		data.sleep_awake_time_am_pm);
+
+	const strength_workout_start = createString(data.strength_workout_start_hour,
+		data.strength_workout_start_min,
+		data.strength_workout_start_am_pm);
+	const strength_workout_end = createString(data.strength_workout_end_hour,
+		data.strength_workout_end_min,
+		data.strength_workout_end_am_pm);
 
 	let json_data = {
 		"created_at":created_at,
 		"timezone":moment.tz.guess(),
 		"strong_input":{},   
 		"encouraged_input":{},
-		"optional_input":{}
+		"optional_input":{},
 	};
+
 	json_data.strong_input['workout'] = data.workout;
+	json_data.strong_input['no_exercise_reason'] = data.no_exercise_reason,
+	json_data.strong_input['no_exercise_comment'] = data.no_exercise_comment,
 	json_data.strong_input['workout_type'] = data.workout_type;
+	json_data.strong_input['strength_workout_start'] = strength_workout_start;
+	json_data.strong_input['strength_workout_end'] = strength_workout_end;
 	json_data.strong_input['workout_input_type'] = data.workout_input_type;
 	json_data.strong_input['work_out_easy_or_hard'] = data.workout_easy; 
 	json_data.strong_input['workout_effort_level'] = data.workout_effort; 
@@ -113,8 +166,8 @@ function formatJSON(data){
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
 	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
-	json_data.strong_input['sleep_bedtime'] = data.sleep_bedtime;
-	json_data.strong_input['sleep_awake_time'] = data.sleep_awake_time;
+	json_data.strong_input['sleep_bedtime'] = sleep_bedtime;
+	json_data.strong_input['sleep_awake_time'] = sleep_awake_time;
 	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;

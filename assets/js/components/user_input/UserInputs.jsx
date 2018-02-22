@@ -14,7 +14,7 @@ import { Container, Select, option, Option, Row, Col, Button,
          ButtonGroup, Form,FormGroup, Label, Input, FormText,
          className, Modal,ModalHeader, ModalBody, ModalFooter,
          Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand,Popover,PopoverBody} from 'reactstrap';
+         NavbarBrand,Popover,PopoverBody,PopoverHeader} from 'reactstrap';
 import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
@@ -72,6 +72,12 @@ class UserInputs extends React.Component{
         workout:'',
         workout_type:'',
         workout_input_type:'',
+        strength_workout_start_hour:'',
+        strength_workout_start_min:'',
+        strength_workout_start_am_pm:'',
+        strength_workout_end_hour:'',
+        strength_workout_end_min:'',        
+        strength_workout_end_am_pm:'',
         workout_easy:'',
         workout_enjoyable:'',
         workout_effort:'',
@@ -116,8 +122,14 @@ class UserInputs extends React.Component{
 
         sleep_hours_last_night:'',
         sleep_mins_last_night:'',
-        sleep_bedtime:null,
-        sleep_awake_time:null,
+        sleep_bedtime_date:null,
+        sleep_hours_bed_time:'',
+        sleep_mins_bed_time:'',
+        sleep_bedtime_am_pm:'',
+        sleep_awake_time_date:null,
+        sleep_hours_awake_time:'',
+        sleep_mins_awake_time:'',
+        sleep_awake_time_am_pm:'',
         awake_hours:'',
         awake_mins:'',
         sleep_comment:'',
@@ -168,7 +180,9 @@ class UserInputs extends React.Component{
       this.handleWeatherCheck = handlers.handleWeatherCheck.bind(this);
       this.handleChangeHrr = handlers.handleChangeHrr.bind(this);
       this.handleChangeSleepLast = handlers.handleChangeSleepLast.bind(this);
+      this.handleChangeSleepHoursMin = handlers.handleChangeSleepHoursMin.bind(this);
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
+      this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -217,7 +231,8 @@ class UserInputs extends React.Component{
       this.toggleComment=this.toggleComment.bind(this);
       this.toggleAlcohol=this.toggleAlcohol.bind(this);
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
-      this.onFetchGarminSuccess = this.onFetchGarminSuccess.bind(this);
+      this.onFetchGarminSuccessSleep = this.onFetchGarminSuccessSleep.bind(this);
+      this.onFetchGarminSuccessWorkout = this.onFetchGarminSuccessWorkout.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
@@ -227,12 +242,64 @@ class UserInputs extends React.Component{
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     }
     
-    onFetchSuccess(data,clone_form=undefined){
+    _extractDateTimeInfo(dateObj){
+      let datetimeInfo = {
+        calendarDate:null,
+        hour:'',
+        min:'',
+        meridiem:''
+      }
+
+      if(dateObj){
+        dateObj = moment(dateObj);
+        datetimeInfo['calendarDate'] = moment({ 
+          year :dateObj.year(),
+          month :dateObj.month(),
+          day :dateObj.date()
+        });
+
+        let hour = dateObj.hour();
+        if(hour < 12){
+          if(hour == 0)
+            hour = 12;
+          datetimeInfo['hour'] = hour;
+          datetimeInfo['meridiem'] = 'am';
+        }
+        else if(hour >= 12){
+          if(hour > 12)
+            hour -= 12;
+          datetimeInfo['hour'] = hour;
+          datetimeInfo['meridiem'] = 'pm';
+        }
+        let mins = dateObj.minute();
+        mins = (mins < 10) ? '0'+mins : mins;
+        datetimeInfo['min'] = mins;
+      }
+      return datetimeInfo;
+    }
+
+    _extractDurationInfo(duration){
+      // extract hour, min, am/pm info from string eg "7:30 am"
+      let durationInfo = {
+        hour:'',
+        min:'',
+        meridiem:''
+      }
+      if(duration){
+        durationInfo["hour"] = duration.split(":")[0];
+        durationInfo["min"] = duration.split(":")[1].split(" ")[0];
+        durationInfo["meridiem"] = duration.split(":")[1].split(" ")[1]; 
+      }
+      return durationInfo;
+    }
+    
+    onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
         userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
       }
       else {
-        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat','pescetarian',
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
@@ -264,9 +331,25 @@ class UserInputs extends React.Component{
           has_calories_data = true;
         }
 
+        let sleep_bedtime_info = this._extractDateTimeInfo(null);
+        if(have_strong_input && data.data.strong_input.sleep_bedtime && canUpdateForm)
+          sleep_bedtime_info = this._extractDateTimeInfo(data.data.strong_input.sleep_bedtime);
+
+        let sleep_awake_time_info = this._extractDateTimeInfo(null);
+        if(have_strong_input && data.data.strong_input.sleep_awake_time && canUpdateForm)
+          sleep_awake_time_info = this._extractDateTimeInfo(data.data.strong_input.sleep_awake_time);
+
+        let strength_start_info = this._extractDurationInfo(null);
+        if(have_strong_input && data.data.strong_input.strength_workout_start) 
+          strength_start_info = this._extractDurationInfo(data.data.strong_input.strength_workout_start);
+
+        let strength_end_info = this._extractDurationInfo(null);
+        if(have_strong_input && data.data.strong_input.strength_workout_end)
+          strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
+
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
-          update_form:clone_form,
+          update_form:canUpdateForm,
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           cloning_data:false,
           fetching_data:false,
@@ -275,7 +358,15 @@ class UserInputs extends React.Component{
           editable: was_cloning ? true : false,
 
           workout:have_strong_input?data.data.strong_input.workout:'',
+          no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
+          no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
           workout_type:have_strong_input?data.data.strong_input.workout_type:'',
+          strength_workout_start_hour:strength_start_info.hour,
+          strength_workout_start_min:strength_start_info.min,
+          strength_workout_start_am_pm:strength_start_info.meridiem,
+          strength_workout_end_hour:strength_end_info.hour,
+          strength_workout_end_min:strength_end_info.min,        
+          strength_workout_end_am_pm:strength_end_info.meridiem,
           workout_input_type:have_strong_input?data.data.strong_input.workout_input_type:'',
           workout_easy:have_strong_input?data.data.strong_input.work_out_easy_or_hard:'',
           workout_enjoyable:have_optional_input?data.data.optional_input.workout_enjoyable:'',
@@ -300,32 +391,42 @@ class UserInputs extends React.Component{
           calories:have_optional_input? data.data.optional_input.calories_consumed_during_workout: '',
           calories_item:have_optional_input?data.data.optional_input.food_ate_during_workout:'',
 
-          indoor_temperature:have_strong_input?data.data.strong_input.indoor_temperature:'',
-          outdoor_temperature:have_strong_input?data.data.strong_input.outdoor_temperature:'',
-          temperature_feels_like:have_strong_input?data.data.strong_input.temperature_feels_like:'',
-          wind:have_strong_input?data.data.strong_input.wind:'',
-          dewpoint:have_strong_input?data.data.strong_input.dewpoint:'',
-          humidity:have_strong_input?data.data.strong_input.humidity:'',
-          weather_comment:have_strong_input?data.data.strong_input.weather_comment:'',
+          indoor_temperature:(have_strong_input&&canUpdateForm)?data.data.strong_input.indoor_temperature:'',
+          outdoor_temperature:(have_strong_input&&canUpdateForm)?data.data.strong_input.outdoor_temperature:'',
+          temperature_feels_like:(have_strong_input&&canUpdateForm)?data.data.strong_input.temperature_feels_like:'',
+          wind:(have_strong_input&&canUpdateForm)?data.data.strong_input.wind:'',
+          dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
+          humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
+          weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
 
 
-          measured_hr:have_encouraged_input?data.data.encouraged_input.measured_hr:'',
-          hr_down_99:have_encouraged_input?data.data.encouraged_input.hr_down_99:'',
-          time_to_99_min:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[0]:'',
-          time_to_99_sec:have_encouraged_input?data.data.encouraged_input.time_to_99.split(':')[1]:'',
-          hr_level:have_encouraged_input?data.data.encouraged_input.hr_level:'',
-          lowest_hr_first_minute:have_encouraged_input?data.data.encouraged_input.lowest_hr_first_minute:'',
-          lowest_hr_during_hrr:have_encouraged_input?data.data.encouraged_input.lowest_hr_during_hrr:'',
-          time_to_lowest_point_min:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
-          time_to_lowest_point_sec:have_encouraged_input?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
+          measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
+          hr_down_99:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.hr_down_99:'',
+          time_to_99_min:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_99.split(':')[0]:'',
+          time_to_99_sec:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_99.split(':')[1]:'',
+          hr_level:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.hr_level:'',
+          lowest_hr_first_minute:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.lowest_hr_first_minute:'',
+          lowest_hr_during_hrr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.lowest_hr_during_hrr:'',
+          time_to_lowest_point_min:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
+          time_to_lowest_point_sec:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
 
 
-          sleep_hours_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
-          sleep_mins_last_night:have_strong_input?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
-          sleep_bedtime:data.data.strong_input.sleep_bedtime? moment(data.data.strong_input.sleep_bedtime):null,
-          sleep_awake_time:data.data.strong_input.sleep_awake_time ? moment(data.data.strong_input.sleep_awake_time):null,
-          awake_hours:data.data.strong_input.awake_time.split(':')[0],
-          awake_mins:data.data.strong_input.awake_time.split(':')[1],
+          sleep_hours_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
+          sleep_mins_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
+         
+          sleep_bedtime_date:sleep_bedtime_info.calendarDate,
+          sleep_hours_bed_time:sleep_bedtime_info.hour,
+          sleep_mins_bed_time:sleep_bedtime_info.min,
+          sleep_bedtime_am_pm:sleep_bedtime_info.meridiem,
+
+          sleep_awake_time_date:sleep_awake_time_info.calendarDate,
+          sleep_hours_awake_time:sleep_awake_time_info.hour,
+          sleep_mins_awake_time:sleep_awake_time_info.min,
+          sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
+         
+          awake_hours:(have_strong_input&&canUpdateForm)?data.data.strong_input.awake_time.split(':')[0]:'',
+          awake_mins:(have_strong_input&&canUpdateForm)?data.data.strong_input.awake_time.split(':')[1]:'',
+
           sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
           prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
           sleep_aid_taken:have_strong_input?data.data.strong_input.sleep_aid_taken:'',
@@ -343,12 +444,14 @@ class UserInputs extends React.Component{
           breath_sleep:have_optional_input?data.data.optional_input.percent_breath_nose_last_night:'',
           breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
-          no_exercise_reason:have_optional_input?data.data.optional_input.no_exercise_reason:'',
-          no_exercise_comment:have_optional_input?data.data.optional_input.no_exercise_comment:'',
+          general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          if(!this.state.sleep_bedtime && !this.state.sleep_awake_time){
-            fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
+              this.state.workout == 'no' || this.state.workout == 'not yet'){
+            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+            else if(this.state.workout == 'no' || this.state.workout == 'not yet')
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
           } 
           window.scrollTo(0,0);
         });
@@ -363,7 +466,8 @@ class UserInputs extends React.Component{
         let have_encouraged_input = data.data.encouraged_input?true:false;
         let other_diet = true;
         const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
-                          'high carb','ketogenic diet','whole foods/mostly unprocessed'];
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
+
         for(let diet of DIET_TYPE){
           if(data.data.optional_input.type_of_diet_eaten === diet)
             other_diet = false;
@@ -387,22 +491,32 @@ class UserInputs extends React.Component{
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
-          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccess, this.onFetchGarminFailure);
+          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         this.onFetchFailure(data)
       }
     }
 
-    onFetchGarminSuccess(data){
-      let sleep_bedtime = data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null;
-      let sleep_awake_time = data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null;
-      let awake_hours = data.data.awake_time?data.data.awake_time.split(':')[0]:'';
+    onFetchGarminSuccessSleep(data){
+      let workout_status = this.state.workout;
+      let sleep_stats = data.data.sleep_stats;
+      let have_activities = data.data.have_activities;
+
+      let sleep_bedtime = sleep_stats.sleep_bed_time?moment(sleep_stats.sleep_bed_time):null;
+      let sleep_awake_time = sleep_stats.sleep_awake_time?moment(sleep_stats.sleep_awake_time):null;
+
+      let sleep_bedtime_info = this._extractDateTimeInfo(sleep_bedtime);
+      let sleep_awake_time_info = this._extractDateTimeInfo(sleep_awake_time);
+
+      let awake_hours = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[0]:'';
       awake_hours = awake_hours?parseInt(awake_hours):0
-      let awake_mins = data.data.awake_time?data.data.awake_time.split(':')[1]:'';
+      let awake_mins = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'';
       awake_mins = awake_mins?parseInt(awake_mins):0
       let awake_time_in_mins = awake_hours*60 + awake_mins;
+
       if(sleep_bedtime && sleep_awake_time){
         let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
         let hours = Math.floor(diff/60);
@@ -411,24 +525,85 @@ class UserInputs extends React.Component{
            mins = `0${mins}`;
 
         this.setState({
-          sleep_bedtime:data.data.sleep_bed_time?moment(data.data.sleep_bed_time):null,
-          sleep_awake_time:data.data.sleep_awake_time?moment(data.data.sleep_awake_time):null,
-          awake_hours:data.data.awake_time?data.data.awake_time.split(':')[0]:'',
-          awake_mins:data.data.awake_time?data.data.awake_time.split(':')[1]:'',
+          sleep_bedtime_date:sleep_bedtime_info.calendarDate,
+          sleep_hours_bed_time:sleep_bedtime_info.hour,
+          sleep_mins_bed_time:sleep_bedtime_info.min,
+          sleep_bedtime_am_pm:sleep_bedtime_info.meridiem,
+
+          sleep_awake_time_date:sleep_awake_time_info.calendarDate,
+          sleep_hours_awake_time:sleep_awake_time_info.hour,
+          sleep_mins_awake_time:sleep_awake_time_info.min,
+          sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
+
+          awake_hours:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[0]:'',
+          awake_mins:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'',
           sleep_hours_last_night:hours,
-          sleep_mins_last_night:mins
+          sleep_mins_last_night:mins,
+          workout:have_activities?'yes':workout_status
       });
      }
     }
+    
+  onFetchGarminSuccessWorkout(data){
+    let workout_status = this.state.workout;
+    let have_activities = data.data.have_activities;
+    this.setState({
+      workout: have_activities?'yes':workout_status
+    });
+  }
+
+getDTMomentObj(dt,hour,min,am_pm){
+  hour = hour ? parseInt(hour) : 0;
+  min = min ? parseInt(min) : 0;
+
+  if(am_pm == 'am' && hour && hour == 12){
+    hour = 0
+  }
+  if (am_pm == 'pm' && hour && hour != 12){
+    hour = hour + 12;
+  }
+  let y = dt.year();
+  let m = dt.month();
+  let d = dt.date();
+  let sleep_bedtime_dt = moment({ 
+    year :y,
+    month :m,
+    day :d,
+    hour :hour,
+    minute :min
+  });
+  return sleep_bedtime_dt;
+}
 
 getTotalSleep(){
-     let sleep_bedtime = this.state.sleep_bedtime;
-     let sleep_awake_time = this.state.sleep_awake_time;
+     let sleep_bedtime_date = this.state.sleep_bedtime_date;
+     let sleep_hours_bed_time=this.state.sleep_hours_bed_time;
+     let sleep_mins_bed_time=this.state.sleep_mins_bed_time;
+     let sleep_bedtime_am_pm = this.state.sleep_bedtime_am_pm;
+     let sleep_bedtime_dt = null;
+     if (sleep_bedtime_date && sleep_hours_bed_time
+         && sleep_mins_bed_time && sleep_bedtime_am_pm){
+        sleep_bedtime_dt = this.getDTMomentObj(sleep_bedtime_date,sleep_hours_bed_time,
+          sleep_mins_bed_time,sleep_bedtime_am_pm)
+     }
+     
+     let sleep_awake_time_date = this.state.sleep_awake_time_date;
+     let sleep_hours_awake_time=this.state.sleep_hours_awake_time;
+     let sleep_mins_awake_time=this.state.sleep_mins_awake_time;
+     let sleep_awake_time_am_pm = this.state.sleep_awake_time_am_pm;
+     let sleep_awake_time_dt = null;
+     if (sleep_awake_time_date && sleep_hours_awake_time
+         && sleep_mins_awake_time && sleep_awake_time_am_pm){
+        sleep_awake_time_dt = this.getDTMomentObj(sleep_awake_time_date,sleep_hours_awake_time,
+          sleep_mins_awake_time,sleep_awake_time_am_pm)
+     }
+
      let awake_hours = this.state.awake_hours?parseInt(this.state.awake_hours):0;
      let awake_mins = this.state.awake_mins?parseInt(this.state.awake_mins):0;
      let awake_time_in_mins = awake_hours*60 + awake_mins;
-     if(sleep_bedtime && sleep_awake_time){
-       let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins;
+     
+     if(sleep_bedtime_dt && sleep_awake_time_dt){
+       let diff = sleep_awake_time_dt.diff(sleep_bedtime_dt,'minutes')-awake_time_in_mins;
        let hours = Math.floor(diff/60);
        let mins = diff % 60;
        if(mins < 10)
@@ -456,7 +631,8 @@ getTotalSleep(){
     processDate(date){
       this.setState({
         selected_date:date,
-        fetching_data:true
+        fetching_data:true,
+        calendarOpen:!this.state.calendarOpen
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -642,19 +818,19 @@ handleScroll() {
     });
    }
    infoPrint(){
-    var mywindow = window.open('', 'PRINT');
+    var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
         '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
         '.print {visibility: hidden;}' +
         '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
-        '</style><title>' + document.title  + '</title>');
+        '</style><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
-    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById('modal1').innerHTML);
     mywindow.document.write('</body></html>');
 
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
 
     mywindow.print();
     mywindow.close();
@@ -794,15 +970,12 @@ handleScroll() {
                             isOpen={this.state.infoButton}
                             target="infobutton" 
                             toggle={this.toggleInfo}>
-                            <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
+                            <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
+                            <div >                      
+                            <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a>
+                            </div>
                             </ModalHeader>
-                              <ModalBody className="modalcontent" id="modal1">
+                              <ModalBody className="modalcontent" id="modal1" >
                                 <div>
                                   <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
                                   to your results and our hope is that you will make healthier
@@ -841,8 +1014,8 @@ handleScroll() {
                            
                         <div className="nav3">
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
-                           <Navbar light toggleable className="navbar nav1">
-                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+                           <Navbar light toggleable className="navbar nav1 user_nav">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle}>
                                     <div className="toggler">
                                     <FontAwesome 
                                           name = "bars"
@@ -871,7 +1044,7 @@ handleScroll() {
 
                                   <span onClick={this.toggleInfo2} id="info2">
                                    <span id="spa">
-                                        <NavLink id="navlink" href="#">
+                                        <NavLink id="navlink" href="#" className="user_input_icon">
                                               <FontAwesome
                                                   name = "info-circle"
                                                   size = "1x"
@@ -879,7 +1052,7 @@ handleScroll() {
                                         </NavLink>                                  
                                    </span>
                                    </span>
-                                   <span className="btn2">
+                                   <span className="btn2 user_viewbtn">
                                    <Button 
                                    id="nav-btn"
                                       size="sm"
@@ -966,9 +1139,9 @@ handleScroll() {
                             placement="bottom" 
                             isOpen={this.state.calendarOpen}
                             target="calendar" 
-                            toggle={this.toggleCalendar}>
-                              <PopoverBody>
-                                <CalendarWidget onDaySelect={this.processDate}/>
+                            toggle={this.toggleCalendar}>       
+                              <PopoverBody toggle={this.toggleCalendar}>
+                                <CalendarWidget  onDaySelect={this.processDate}/>
                               </PopoverBody>
                            </Popover> 
 
@@ -978,10 +1151,7 @@ handleScroll() {
                             isOpen={this.state.infoBtn}
                             target="info2" 
                             toggle={this.toggleInfo2}>
-                            <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                            <ModalHeader toggle={this.toggleInfo2}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1083,11 +1253,8 @@ handleScroll() {
                             isOpen={this.state.infoWorkout}
                             target="workoutinfo" 
                             toggle={this.toggleInfoworkout}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
+                             <ModalHeader toggle={this.toggleInfoworkout}>
+                           <span>
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
@@ -1123,14 +1290,15 @@ handleScroll() {
                                         name="no_exercise_reason"
                                         value={this.state.no_exercise_reason}                                       
                                         onChange={this.handleChangeNoExerciseReason}>
-                                                <option value="other">Other</option>
+                                                <option value=" ">Select</option>                                        
                                                 <option value="rest day">Rest Day</option> 
                                                 <option value="sick">Sick</option>
                                                 <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
                                                 <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
                                                 <option value="work got in the way">Work Got in the Way</option>
                                                 <option value="travel day">Travel Day</option>
-                                                <option value="weather">Weather</option>                                                                                                                                                                            
+                                                <option value="weather">Weather</option>
+                                                <option value="other">Other</option>                                                                                                                                                                            
                                       </Input>
                                     </div>
                                   }
@@ -1187,21 +1355,21 @@ handleScroll() {
                                     name="workout_type" 
                                     value="cardio" 
                                     checked={this.state.workout_type === 'cardio'}
-                                    onChange={this.handleChange}/> Cardio
+                                    onChange={this.handleChangeWorkoutType}/> Cardio
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="strength"
                                     checked={this.state.workout_type === 'strength'}
-                                    onChange={this.handleChange}/> Strength
+                                    onChange={this.handleChangeWorkoutType}/> Strength
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
                                     name="workout_type" 
                                     value="both"
                                     checked={this.state.workout_type === 'both'}
-                                    onChange={this.handleChange}/> Both
+                                    onChange={this.handleChangeWorkoutType}/> Both
                                   </Label>
                                 </div>
                               }
@@ -1221,10 +1389,7 @@ handleScroll() {
                             isOpen={this.state.infoWorkoutType}
                             target="workouttypeinfo" 
                             toggle={this.toggleInfoworkoutType}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleInfoworkoutType}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1247,7 +1412,140 @@ handleScroll() {
                               exercises, pull ups, etc.  
                                </div>
                               </ModalBody>
-                           </Modal>                         
+                           </Modal> 
+                           {(this.state.workout_type =="strength" || 
+                           this.state.workout_type =="both") &&
+                           <FormGroup>
+                            <Label className="padding">1.1.1 Enter the time your strength workout started.</Label>
+                            {this.state.editable &&
+                              <div className="display_flex">
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="strength_workout_start_hour"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.strength_workout_start_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hour</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="strength_workout_start_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.strength_workout_start_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minute</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="strength_workout_start_am_pm"                                  
+                                     value={this.state.strength_workout_start_am_pm}
+                                     onChange={this.handleChange} >
+                                       <option value="">AM or PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                            }
+                            </FormGroup> 
+                            }                           
+                            <FormGroup>
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                          
+                              {(this.state.strength_workout_start_hour &&
+                               this.state.strength_workout_start_min &&
+                               this.state.strength_workout_start_am_pm) &&
+                               <p>{this.state.strength_workout_start_hour}:{this.state.strength_workout_start_min}  {this.state.strength_workout_start_am_pm}</p>}
+                          
+                              </div>
+                            } 
+                            </FormGroup> 
+
+                        
+                         {(this.state.workout_type =="strength" ||  this.state.workout_type == "both") &&
+                         <FormGroup>
+                            <Label className="padding">1.1.2 Enter the Time your Strength Workout Ended.</Label>
+                            {this.state.editable &&
+                              <div className = "display_flex">
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="strength_workout_end_hour"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.strength_workout_end_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="strength_workout_end_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.strength_workout_end_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="strength_workout_end_am_pm"                                  
+                                     value={this.state.strength_workout_end_am_pm}
+                                     onChange={this.handleChange} >
+                                       <option value="">AM or PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                            }
+                            </FormGroup>
+                          }
+                            <FormGroup>
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                
+                              {(this.state.strength_workout_end_hour &&
+                               this.state.strength_workout_end_min &&
+                               this.state.strength_workout_end_am_pm) &&
+                               <p>{this.state.strength_workout_end_hour}:{this.state.strength_workout_end_min}  {this.state.strength_workout_end_am_pm}</p>}
+                              
+                              </div>
+                            } 
+                            </FormGroup> 
+
+                        
 
                             {(this.state.workout == "yes" || this.state.workout == "") &&
                               <FormGroup>   
@@ -1309,10 +1607,7 @@ handleScroll() {
                             isOpen={this.state.easyorhardInfo}
                             target="easyorhard" 
                             toggle={this.toggleEasyorHard}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleEasyorHard}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1399,14 +1694,11 @@ handleScroll() {
                                     isOpen={this.state.enjoybleInfo}
                                     target="enjoyble" 
                                     toggle={this.toggleEnjoyble}>
-                                     <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
-                            </ModalHeader>
+                                     <ModalHeader toggle={this.toggleEnjoyble}>                            
+                                     <span >
+                                      <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                                      </span>
+                                </ModalHeader>
                                       <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                         We encourage people to enjoy their workouts! When they do,
@@ -1473,14 +1765,11 @@ handleScroll() {
                                     isOpen={this.state.workoutlevelInfo}
                                     target="workoutlevel" 
                                     toggle={this.toggleWorkoutLevel}>
-                                     <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
-                            <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
-                            </span>
-                            </ModalHeader>
+                                     <ModalHeader toggle={this.toggleWorkoutLevel}>                            
+                                   <span >
+                                    <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+                                    </span>
+                                  </ModalHeader>
                                       <ModalBody className="modalcontent" id="modal1">
                                        <div>
                                          As a general guideline, an effort level of 1-2 is super easy,
@@ -1547,10 +1836,7 @@ handleScroll() {
                             isOpen={this.state.painInfo}
                             target="pain" 
                             toggle={this.togglePain}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.togglePain}>
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1617,10 +1903,7 @@ handleScroll() {
                             isOpen={this.state.waterInfo}
                             target="water" 
                             toggle={this.toggleWater}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleWater}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1692,10 +1975,7 @@ handleScroll() {
                             isOpen={this.state.chaiseedsInfo}
                             target="chaiseeds" 
                             toggle={this.toggleChaiseeds}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleChaiseeds}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1767,10 +2047,7 @@ handleScroll() {
                             isOpen={this.state.breatheInfo}
                             target="breathe" 
                             toggle={this.toggleBreathe}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleBreathe}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1809,6 +2086,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? 
+
                             <span id="fast"
                              onClick={this.toggleFasted} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -1826,14 +2104,14 @@ handleScroll() {
                                 <div className="input">
                                   
                                     <Label check className="btn btn-secondary radio1">
-                                      <Input type="radio" name="fasted" 
+                                      <Input type="radio" name="fasted" id="radio_yes" 
                                       value="yes"
                                       checked={this.state.fasted === 'yes'}
                                       onChange={this.handleChangeFasted}/>{' '}
                                       Yes
                                    </Label>
                                    <Label check className="btn btn-secondary radio1">
-                                     <Input type="radio" name="fasted" 
+                                     <Input type="radio" name="fasted" id="radio_no"
                                           value="no"
                                           checked={this.state.fasted === 'no'}
                                           onChange={this.handleChangeFasted}/>{' '}
@@ -1849,6 +2127,7 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.fasted == 'yes' &&
+
                                 <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
                                   <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
@@ -1867,11 +2146,8 @@ handleScroll() {
                             isOpen={this.state.fastedInfo}
                             target="fast" 
                             toggle={this.toggleFasted}>
-                             <ModalHeader >
+                             <ModalHeader toggle={this.toggleFasted}>                           
                             <span >
-                          <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
-                           <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
                             </ModalHeader>
@@ -1937,10 +2213,7 @@ handleScroll() {
                             isOpen={this.state.commentInfo}
                             target="general" 
                             toggle={this.toggleComment}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader  toggle={this.toggleComment}>                           
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -1962,12 +2235,13 @@ handleScroll() {
                                 <div className="input1">
                                 <Input
                                 className = "radio1"
-                                type="checkbox" 
+                                type="checkbox"
+                                name = "weather_check" 
                                 checked = {this.state.weather_check}                                            
                                 onClick={this.handleWeatherCheck}
                                 >
                                 </Input>
-                                <Label className="LAbel">1.11 I want to manually enter in weather information for my workout
+                                <Label className="LAbel" style={{paddingLeft:"25px"}}>1.11 I want to manually enter in weather information for my workout
                                  <span id="wether"
                              onClick={this.toggleWeather} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -2006,10 +2280,7 @@ handleScroll() {
                             isOpen={this.state.weatherInfo}
                             target="wether" 
                             toggle={this.toggleWeather}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleWeather}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint}  style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2222,6 +2493,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                         <Input type="radio" name="measured_hr" 
                                         value="yes"
+                                        id="m_yes"
                                         checked={this.state.measured_hr === 'yes'}
                                         onChange={this.handleChangeHrr}/>{' '}
                                         Yes
@@ -2229,6 +2501,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                        <Input type="radio" name="measured_hr" 
                                             value="no"
+                                            id="m_no"
                                             checked={this.state.measured_hr === 'no'}
                                             onChange={this.handleChangeHrr}/>{' '}
                                           No
@@ -2254,10 +2527,7 @@ handleScroll() {
                             isOpen={this.state.hrrInfo}
                             target="hrr" 
                             toggle={this.toggleHrr}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleHrr}>                            
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2295,14 +2565,15 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                         <FormGroup>
                           {this.state.editable &&
-                          <div className="input1">
+                          <div className="input1" style={{paddingLeft:"25px"}}>
                           <Input
                           type="checkbox"
+                          name="calories_item_check"
                           checked = {this.state.calories_item_check}
                           onClick={this.handleCaloriesItemCheck}
                           >
                           </Input>
-                          <Label className="LAbel">I did a long workout and want to enter what I ate/calories consumed</Label>
+                          <Label className="LAbel">I Want to Enter What I Ate and The Calories Consumed During My Workout</Label>
                           </div>
                           }
                          
@@ -2334,7 +2605,7 @@ handleScroll() {
                             {
                               !this.state.editable && 
                               <div className="input">
-                                <p>{this.state.calories === null ?this.state.calories : this.state.calories="NotEntered"}</p>
+                                <p>{this.state.calories ? this.state.calories : "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -2357,7 +2628,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >{this.state.calories_item ?this.state.calories_item:this.state.calories_item="NotEntered"}</p>
+                                <p >{this.state.calories_item ? this.state.calories_item: "Not Entered"}</p>
                               </div>
                             }
                           </FormGroup>
@@ -2416,63 +2687,163 @@ handleScroll() {
                           
                             <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="input1">
+                              <div className=" display_flex" >
+                              <div className="align_width align_width1">
+                              <div className="input ">
                                 <DatePicker
                                     id="datepicker"
-                                    name = "sleep_bedtime"
-                                    selected={this.state.sleep_bedtime}
+                                    name = "sleep_bedtime_date"
+                                    selected={this.state.sleep_bedtime_date}
                                     onChange={this.handleChangeSleepBedTime}
-                                    showTimeSelect
-                                    excludeTimes={[moment().hours(17).minutes(0), moment().hours(18).minutes(0), moment().hours(19).minutes(0)], moment().hours(17).minutes(0)}
-                                    timeIntervals={1}
-                                    dateFormat="LLL"
+                                    
+                                    dateFormat="LL"
                                     isClearable={true}
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
+                              </div>
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="sleep_hours_bed_time"
+                                id="bed_hr"
+
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_bed_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="sleep_mins_bed_time"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_bed_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="sleep_bedtime_am_pm"                                  
+                                     value={this.state.sleep_bedtime_am_pm}
+                                     onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
                             }
-                            {
+
+                           {
                               !this.state.editable &&
                               <div className="input">
-                                <p>
-                                  {
-                                    this.state.sleep_bedtime != null?
-                                    this.state.sleep_bedtime.format('MMMM Do YYYY, h:mm a'): ''
-                                  }
-                                </p>
+                              {(this.state.sleep_bedtime_date && this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time && this.state.sleep_bedtime_am_pm) &&
+                                <p>{this.state.sleep_bedtime_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_bed_time}:{this.state.sleep_mins_bed_time}  {this.state.sleep_bedtime_am_pm}</p>
+                              }
                               </div>
-                            }                          
+                            }     
+
+
+
+
+
+
+
+
+                                                
                           </FormGroup>
                            <FormGroup>
                           
                             <Label className="padding">2.2 Time Woke Up As Per Wearable.</Label>
                             {this.state.editable &&
-                              <div className="input1">
+                              <div className="display_flex ">
+                              <div className="align_width align_width1">
+                              <div className="input " id="date_pickr">
                                 <DatePicker
                                     id="datepicker"
-                                    name = "sleep_awake_time"
-                                    selected={this.state.sleep_awake_time}
+                                    name = "sleep_awake_time_date"
+                                    selected={this.state.sleep_awake_time_date}
                                     onChange={this.handleChangeSleepAwakeTime}
-                                    showTimeSelect
-                                     excludeTimes={[moment().hours(17).minutes(0), moment().hours(18).minutes(0), moment().hours(19).minutes(0)], moment().hours(17).minutes(0)}
-                                    timeIntervals={1}
-                                    dateFormat="LLL"
+                                   
+                                    dateFormat="LL"
                                     isClearable={true}
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
+                              </div>  
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="sleep_hours_awake_time"
+                                id="bed_hr"
+                                className="form-control custom-select"
+                                value={this.state.sleep_hours_awake_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="sleep_mins_awake_time"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.sleep_mins_awake_time}
+                                onChange={this.handleChangeSleepHoursMin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control input_width"
+                                     id="tme_typ"
+                                     name="sleep_awake_time_am_pm"                                  
+                                     value={this.state.sleep_awake_time_am_pm}
+                                     onChange={this.handleChangeSleepHoursMin} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                               </div>      
+
+                              </div>
+                              </div>
                             }
+
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p >
-                                  {
-                                    this.state.sleep_awake_time != null?
-                                    this.state.sleep_awake_time.format('MMMM Do YYYY, h:mm a'): ''
-                                  }
-                                </p>
+                                  {(this.state.sleep_awake_time_date && this.state.sleep_hours_awake_time && this.state.sleep_mins_awake_time && this.state.sleep_awake_time_am_pm) &&
+                                  <p>{this.state.sleep_awake_time_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_awake_time}:{this.state.sleep_mins_awake_time}  {this.state.sleep_awake_time_am_pm}</p>
+                              }
                               </div>
-                            }                          
+                            }     
+
+
+
+
+
+
+                   
                           </FormGroup>
                            <FormGroup>
                           
@@ -2509,8 +2880,8 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                              {(this.state.awake_hours && this.state.awake_mins) &&
-                                <p>{this.state.awake_hours} hours {this.state.awake_mins} minutes</p>
+                              {
+                                <p>{this.state.awake_hours?this.state.awake_hours:0} hours {this.state.awake_mins?this.state.awake_mins:0} minutes</p>
                               }
                               </div>
                             }                          
@@ -2545,6 +2916,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="prescription_sleep_aids" 
                                       value="yes"
+                                      id="prescription_yes"
                                       checked={this.state.prescription_sleep_aids === 'yes'}
                                       onChange={this.handleChangeSleepAids}/>{' '}
                                       Yes
@@ -2552,6 +2924,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="prescription_sleep_aids" 
                                           value="no"
+                                          id="prescription_no"
                                           checked={this.state.prescription_sleep_aids === 'no'}
                                           onChange={this.handleChangeSleepAids}/>{' '}
                                         No
@@ -2573,7 +2946,7 @@ handleScroll() {
                         <div id="food">
                         <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
-                          <FormGroup className="food">
+                          <FormGroup className="un_process_food">
                             
                             <Label className="padding">5. What % of The Food You Consumed Yesterday Was &nbsp; 
                              <span style={{fontWeight:"bold"}}>
@@ -2622,10 +2995,7 @@ handleScroll() {
                             isOpen={this.state.unprocessedInfo}
                             target="unprocessedinfo" 
                             toggle={this.toggleUnprocessedInfo}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleUnprocessedInfo}>                     
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2794,10 +3164,7 @@ handleScroll() {
                             isOpen={this.state.alcoholInfo}
                             target="alcoholinfo" 
                             toggle={this.toggleAlcohol}>
-                             <ModalHeader >
-                            <span >
-                           <a href="#" target="_blank" style={{fontSize:"15px",color:"black"}}> <i className="fa fa-share-square" aria-hidden="true">Share</i></a>
-                           </span>
+                             <ModalHeader toggle={this.toggleAlcohol}>                           
                            <span >
                             <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
                             </span>
@@ -2842,6 +3209,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="smoke_substances" 
                                       value="yes"
+                                      id="smoke_yes"
                                       checked={this.state.smoke_substances === 'yes'}
                                       onChange={this.handleChangeSmokeSubstance}/>{' '}
                                       Yes
@@ -2849,6 +3217,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="smoke_substances" 
                                           value="no"
+                                          id="smoke_no"
                                           checked={this.state.smoke_substances === 'no'}
                                           onChange={this.handleChangeSmokeSubstance}/>{' '}
                                         No
@@ -2875,6 +3244,7 @@ handleScroll() {
                                      <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="medications" 
                                       value="yes"
+                                      id="medication_yes"
                                       checked={this.state.medications === 'yes'}
                                       onChange={this.handleChangePrescription}/>{' '}
                                       Yes
@@ -2882,6 +3252,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="medications" 
                                           value="no"
+                                          id="medication_no"
                                           checked={this.state.medications === 'no'}
                                           onChange={this.handleChangePrescription}/>{' '}
                                         No
@@ -2911,6 +3282,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="stress" 
                                     value="low"
+                                    id="stress_low"
                                     checked={this.state.stress === 'low'}
                                     onChange={this.handleChange}/>{' '}
                                     Low
@@ -2918,6 +3290,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stress" 
                                         value="medium"
+                                        id="stress_medium"
                                         checked={this.state.stress === 'medium'}
                                         onChange={this.handleChange}/>{' '}
                                       Medium
@@ -2925,6 +3298,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="stress" 
                                         value="high"
+                                        id="stress_heigh"
                                         checked={this.state.stress === 'high'}
                                         onChange={this.handleChange}/>{' '}
                                       High
@@ -2947,6 +3321,7 @@ handleScroll() {
                                   <Label check className="btn btn-secondary radio1">
                                     <Input type="radio" name="sick" 
                                     value="yes"
+                                    id="sick_yes"
                                     checked={this.state.sick === 'yes'}
                                     onChange={this.handleChangeSick}/>{' '}
                                     Yes
@@ -2954,6 +3329,7 @@ handleScroll() {
                                  <Label check className="btn btn-secondary radio1">
                                    <Input type="radio" name="sick" 
                                         value="no"
+                                        id="sick_no"
                                         checked={this.state.sick === 'no'}
                                         onChange={this.handleChangeSick}/>{' '}
                                       No
@@ -3059,6 +3435,7 @@ handleScroll() {
                                         <Input 
                                         type="select" 
                                         className="custom-select form-control" 
+                                        id="diet"
                                         name="diet_type"
                                         value={this.state.diet_to_show}
                                         onChange={this.handleChangeDietModel}>
@@ -3070,8 +3447,8 @@ handleScroll() {
                                                 <option value="paleo">Paleo</option>                                              
                                                 <option value="vegan">Vegan</option>
                                                 <option value="vegetarian">Vegetarian</option>
-                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>                                                                                                                                                                            
-                                      </Input>
+                                                <option value="whole foods/mostly unprocessed">Whole Foods/Mostly Unprocessed</option>
+                                                <option value="pescetarian">Pescetarian</option>                                                                                                                                                                                                                  </Input>
                                     </div>
                                   }
                                   {
@@ -3095,6 +3472,7 @@ handleScroll() {
                                     <Label check className="btn btn-secondary radio1">
                                       <Input type="radio" name="stand" 
                                       value="yes"
+                                      id="stand_yes"
                                       checked={this.state.stand === 'yes'}
                                       onChange={this.handleChange}/>{' '}
                                       Yes
@@ -3102,6 +3480,7 @@ handleScroll() {
                                    <Label check className="btn btn-secondary radio1">
                                      <Input type="radio" name="stand" 
                                           value="no"
+                                          id="stand_no"
                                           checked={this.state.stand === 'no'}
                                           onChange={this.handleChange}/>{' '}
                                         No
@@ -3143,7 +3522,7 @@ handleScroll() {
                               id="btn1" 
                               type="submit"
                               color="info" 
-                              className="btn btn-block btn-primary">
+                              className="btn btn-block btn-primary submit_form">
                                 Submit
                             </Button>
                           }

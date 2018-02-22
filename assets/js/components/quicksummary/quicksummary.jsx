@@ -33,6 +33,7 @@ import Exercise from './quicksummary_exercise';
 import User from './user_inputs';
 import AllStats1 from './quicksummary_allstats1';
 import Movementquick from './movement-consistency';
+import MovementHistorical from './movement_consistency_historical_data';
 
 
 
@@ -41,6 +42,23 @@ axiosRetry(axios, { retries: 3});
 
 var ReactDOM = require('react-dom'); 
 
+
+let hashComponentMapping = {
+	"movementconsistency":"movement",
+	"allstats":"allstats1",
+	"grades":"grade",
+	"swimstats":"swim",
+	"bikestats":"bike",
+	"steps":"steps",
+	"sleep":"sleep",
+	"food":"food",
+	"alcohol":"alcohol",
+	"exercisereporting":"exercise",
+	"userinputs":"user",
+	"mchistorical":""
+
+
+} 
 
 class Quicklook extends Component{
 
@@ -74,7 +92,6 @@ class Quicklook extends Component{
 
 		let initial_state = getInitialState(moment().subtract(7,'days'),
 											moment());
-
 		this.state = {
 			today_date:moment(),
 			start_date:moment().subtract(7,'days').toDate(),
@@ -97,6 +114,15 @@ class Quicklook extends Component{
 	}
 
 	updateDateState(data,user_input_data){
+				let grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
+				let overall_health_gpa_before_panalty = (
+					data.grades_ql.movement_non_exercise_steps_gpa + 
+					grade_point[data.grades_ql.movement_consistency_grade] +
+					data.grades_ql.avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty) +
+					grade_point[data.grades_ql.exercise_consistency_grade]+
+					data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
+					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
+
        			var properties={
        			created_at:data.created_at,
 				grades_ql: {
@@ -107,10 +133,10 @@ class Quicklook extends Component{
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        movement_consistency_score:data.steps_ql.movement_consistency,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
-			        avg_sleep_per_night:data.sleep_ql.sleep_per_user_input,
+			        avg_sleep_per_night:data.sleep_ql.sleep_per_wearable,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
-			        did_you_workout_today:data.grades_ql.did_you_workout_today,
-			        exercise_consistency_score:data.grades_ql.exercise_consistency_gpa,
+			        workout_today: user_input_data.strong_input.workout,
+			        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
 			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 			        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,
 			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
@@ -118,6 +144,7 @@ class Quicklook extends Component{
 			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
 			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
 			        smoke_penalty:data.grades_ql.smoke_penalty,
+			        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
 	        
 			     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
 			     //    stress_level:data.exercise_reporting_ql.stress_level,
@@ -130,7 +157,7 @@ class Quicklook extends Component{
 				    // workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
 				    // workout_effortlvl:user_input_data.strong_input.workout_effort_level,
 				    // avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
-				    // avg_exercise_hr:data.grades_ql.avg_exercise_hr_gpa,
+				    // avg_exercise_hr:data.exercise_reporting_ql.avg_exercise_heartrate,
 				    // time_to_99:user_input_data.encouraged_input.time_to_99,
 				    // lowest_hr_first_minute:user_input_data.encouraged_input.lowest_hr_first_minute,
 				    // vo2_max:data.exercise_reporting_ql.vo2_max,
@@ -159,10 +186,10 @@ class Quicklook extends Component{
 			        humidity: data.exercise_reporting_ql.humidity,
 			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,
 			        wind:data.exercise_reporting_ql.wind,
-			        hrr: data.exercise_reporting_ql.hrr,
-			        hrr_start_point: data.exercise_reporting_ql.hrr_start_point,
-			        hrr_beats_lowered:data.exercise_reporting_ql.hrr_beats_lowered,
-			        sleep_resting_hr_last_night:data.exercise_reporting_ql.sleep_resting_hr_last_night,
+			        hrr_time_to_99: data.exercise_reporting_ql.hrr_time_to_99,
+			        hrr_starting_point: data.exercise_reporting_ql.hrr_starting_point,
+			        hrr_beats_lowered_first_minute:data.exercise_reporting_ql.hrr_beats_lowered_first_minute,
+			        resting_hr_last_night:data.exercise_reporting_ql.resting_hr_last_night,
 			        vo2_max:data.exercise_reporting_ql.vo2_max,
 			        running_cadence: data.exercise_reporting_ql.running_cadence,
 			        nose_breath_prcnt_workout: data.exercise_reporting_ql.nose_breath_prcnt_workout,
@@ -207,7 +234,7 @@ class Quicklook extends Component{
 			    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
 			    	sleep_comments: data.sleep_ql.sleep_comments,
 			    	sleep_aid: data.sleep_ql.sleep_aid,
-			        resting_heart_rate: data.exercise_reporting_ql.sleep_resting_hr_last_night,
+			        resting_heart_rate: data.exercise_reporting_ql.resting_hr_last_night,
                     sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
 			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
 			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
@@ -218,7 +245,7 @@ class Quicklook extends Component{
 			    },
 			    food_ql: {
 			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        processed_food_consumed: user_input_data.strong_input.list_of_processed_food_consumed_yesterday ,
+			        processed_food_consumed: data.food_ql.processed_food ,
 			        non_processed_food: data.food_ql.non_processed_food,
 			        diet_type: data.food_ql.diet_type
 			    },
@@ -296,6 +323,12 @@ class Quicklook extends Component{
        		}
 
 	successquick(data,start_dt,end_dt){
+		let targetTab = 'allstats1'
+		if (location.hash)
+			targetTab = hashComponentMapping[location.hash.split('#')[1]];
+		
+		if (!targetTab)
+			targetTab = 'allstats1';
 
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
@@ -314,16 +347,18 @@ class Quicklook extends Component{
 				data:initial_state,
 				visible:false,
 				fetching_ql:false,
-				error:true
+				error:true,
+				activeTab:targetTab
 			});
 	     }
 	     else{
 	     		this.setState({
-	     			 selected_date:this.state.selected_date,
+	     		selected_date:this.state.selected_date,
 				data:initial_state,
 				visible:true,
 				fetching_ql:false,
-				error:false
+				error:false,
+				activeTab:targetTab
 			});
 	     }
 	}
@@ -518,27 +553,22 @@ onLogoutSuccess(response){
         const class_exercise=`nav-link ${activeTab === "exercise" ? 'active':''}`;
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;
         const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;
+        const class_movementHistorical=`nav-link ${activeTab === "movementhistorical" ? 'active':''}`;
 	return(
 		<div className="hori">
 		<div className="container-fluid">
 
+
+
 		 <Navbar toggleable
          fixed={fix ? 'top' : ''}
           className="navbar navbar-expand-sm navbar-inverse ">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
-           <FontAwesome
-                 name = "bars"
-                 size = "1x"
-
-             />
-
-          </NavbarToggler>
-
-          <Link to='/' >
+         
+          <Link to='/'  className="position_abs">
             <NavbarBrand
               className="navbar-brand float-sm-left"
-              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-              <img className="img-fluid"
+              id="navbarTogglerDemo" style={{fontSize:"16px"}}>
+              <img className="img-fluid img_width"
                style={{maxWidth:"200px"}}
                src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
             </NavbarBrand>
@@ -552,6 +582,17 @@ onLogoutSuccess(response){
             </h2>
             </span>
              
+
+
+
+          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggleNav} >
+           <FontAwesome
+                 name = "bars"
+                 size = "1x"
+
+             />
+
+          </NavbarToggler>
 
 
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
@@ -611,10 +652,15 @@ onLogoutSuccess(response){
                            </PopoverBody>
                            </Popover>
 
+
+
+
+
+
 			             <div id="nav3">
 			            <div className="nav2" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
-						  <Navbar light toggleable className="navbar nav2 nav5">
-                                <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+						  <Navbar light toggleable className="navbar nav2 nav5 pad0">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up btn_tglr" onClick={this.toggle}>
                                     <div className="toggler">
                                     <FontAwesome
                                           name = "bars"
@@ -623,7 +669,7 @@ onLogoutSuccess(response){
                                         />
                                     </div>
                                </NavbarToggler>
-
+<div>
                                   <span id="calendar1"
                                   onClick={this.toggleCalendar}>
                                   <span id="spa" >
@@ -661,8 +707,12 @@ onLogoutSuccess(response){
                                             </div>
                                            </a>
                                           </abbr>
-                                          </span>                                    
+                                          </span> 
+</div>
+
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
+
+
                                   <Nav className="nav navbar-nav" navbar className="fonts">
 
                                   			 <NavItem onClick={this.toggle} className="allstats">
@@ -687,7 +737,7 @@ onLogoutSuccess(response){
                                           </span>
                                         </NavItem>
 
-                                         <NavItem onClick={this.toggle}>
+                                         <NavItem onClick={this.toggle} className="steps">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Steps">
                                             <NavLink id="headernames" href="#" className={class_steps}  value="steps"
@@ -700,7 +750,7 @@ onLogoutSuccess(response){
 
                                        	
 
-                                        <NavItem onClick={this.toggle}>
+                                        <NavItem onClick={this.toggle} className="sleep">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Sleep">
                                             <NavLink id="headernames" href="#" className={class_sleep}  value="sleep"
@@ -743,7 +793,17 @@ onLogoutSuccess(response){
                                           </abbr>
                                           </span>
                                        </NavItem>
-                                       
+
+                                     {/* <NavItem onClick={this.toggle} className="Movement">
+                                        <span id="spa">
+                                          <abbr  id="abbri"  title="Movement Consistency Historical Data">
+                                            <NavLink id="headernames" href="#" className={class_movementHistorical} value="movementhistorical"
+						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>
+						    		 		 Movement Consistency Historical
+                                            </NavLink>
+                                          </abbr>
+                                          </span>
+                                       </NavItem>*/}
 
                                         <NavItem onClick={this.toggle} className="bikestats">
                                         <span id="spa">
@@ -798,7 +858,11 @@ onLogoutSuccess(response){
 									        <DropdownToggle caret style={{backgroundColor:"#777777",borderColor:"#777777",paddingTop:"10px"}}>
 									          More
 									        </DropdownToggle>
-									        <DropdownMenu>									                                                     						    		 													         									         								         									         
+									        <DropdownMenu>
+									        <DropdownItem style={{paddingLeft:"30px"}} id="dropsteps"  className={class_steps}  value="steps"
+						    		 				 onClick={this.activateTab.bind(this,"steps")}>Steps</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropsleep"  className={class_sleep} value="sleep"
+						    		 				 onClick={this.activateTab.bind(this,"sleep")}>sleep</DropdownItem>									                                                     						    		 													         									         								         									         
 									          <DropdownItem style={{paddingLeft:"30px"}} id="dropfood"  className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
@@ -806,15 +870,15 @@ onLogoutSuccess(response){
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
                                             </DropdownItem>
-						    		 		 
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
-							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>	
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
+						    		 		 <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
+							    		 			onClick={this.activateTab.bind(this,"bike")}>Bike Stats</DropdownItem>
+							    		 	  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
+						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropswim" className={class_swim}  value="swim"
-						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>
+						    		 		 
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>
@@ -838,6 +902,30 @@ onLogoutSuccess(response){
 
 						 </div>
 			      		</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			      			<Popover
                             placement="bottom"
                             isOpen={this.state.calendarOpen}
@@ -863,6 +951,7 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data}/>}
 
 
 			</div>

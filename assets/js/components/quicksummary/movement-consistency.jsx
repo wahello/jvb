@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import {Button} from "reactstrap";
+import {Button,Popover,PopoverBody,} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
+import FontAwesome from "react-fontawesome";
 
 import {fetchMovementConsistency} from '../../network/quick';
 var CalendarWidget = require('react-calendar-widget');  
@@ -20,6 +21,7 @@ class Movementquick extends Component{
     this.successMCFetch = this.successMCFetch.bind(this);
     this.processDate = this.processDate.bind(this);
     this.renderTableColumns = this.renderTableColumns.bind(this);
+     this.toggle = this.toggle.bind(this);
 
      this.state = {
        tableAttrColumn: [
@@ -49,9 +51,11 @@ class Movementquick extends Component{
         {name: '11:00 PM - 11:59 AM'},
         {name: 'Active Hours'},
         {name: 'Inactive Hours'},
+        {name: 'Strength Hours'},
         {name: 'Sleeping Hours'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
+        popoverOpen: false,
        mc_data:[],
        selectedDate: new Date()                      
       };
@@ -160,6 +164,7 @@ class Movementquick extends Component{
            }, 
            active_hours:'-',
            inactive_hours:'-',
+           strength_hours:'-',
            sleeping_hours:'-',
            total_steps:'-'
          }
@@ -178,6 +183,11 @@ class Movementquick extends Component{
     }else{
       this.errorMCFetch(data);
     }
+  }
+  toggle() {
+    this.setState({
+      popoverOpen: !this.state.popoverOpen
+    });
   }
 
   getSortKeysAccordingTime(data){
@@ -200,7 +210,7 @@ class Movementquick extends Component{
   }
 
   componentDidMount(){
-    fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
+    fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);  
   }
 
  renderTableColumns(dateWiseData){
@@ -209,13 +219,12 @@ class Movementquick extends Component{
       let steps_data = [];
       let status_data = [];
       for(let slot of this.getSortKeysAccordingTime()){
-       
           steps_data.push(data['movement_consistency'][slot].steps);
-          console.log(data['movement_consistency']);
           status_data.push(data['movement_consistency'][slot].status);
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
+      steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
       steps_data.push(data['movement_consistency'].total_steps);
       
@@ -252,7 +261,16 @@ render(){
   return(
     <div className="row justify-content-center">
     <div>
-     <CalendarWidget onDaySelect={this.processDate}/>,
+              <span id="navlink" onClick={this.toggle} id="progress" style={{paddingRight:"20px"}}>
+                <FontAwesome
+                    name = "calendar"
+                    size = "2x"
+
+                />
+      </span>   
+      <Popover placement="bottom" isOpen={this.state.popoverOpen} target="progress" toggle={this.toggle}>
+          <PopoverBody> <CalendarWidget onDaySelect={this.processDate}/></PopoverBody>
+        </Popover>
     </div>
      <Table
           rowsCount={rowsCount}
@@ -269,7 +287,7 @@ render(){
                 {this.state.tableAttrColumn[props.rowIndex].name}
               </Cell>
             )}
-            width={130}
+            width={190}
             fixed={true}
           />
          {this.renderTableColumns(this.state.mc_data)}
@@ -284,7 +302,6 @@ const styles = StyleSheet.create({
   newTableHeader: {
     textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -304,7 +321,7 @@ export default Dimensions({
     return window.innerHeight - 192;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :1000;
+    var widthOffset = window.innerWidth < 1024 ? 0 :950;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);

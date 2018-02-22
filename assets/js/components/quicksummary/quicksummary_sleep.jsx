@@ -12,13 +12,13 @@ import { StyleSheet, css } from 'aphrodite';
 	constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
-
+	 this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 	 this.state = {
       myTableData: [
           {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
           {name: 'Sleep Comments'},
           {name: 'Sleep Aid taken?'},
-          {name: 'Resting Heart Rate (RHR)'} ,
+          {name: 'Resting Heart Rate (RHR)'},
           {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
           {name: 'Sleep Bed Time'}, 
           {name: 'Sleep Awake Time'},
@@ -28,7 +28,17 @@ import { StyleSheet, css } from 'aphrodite';
       ],
     };
   }
-
+getStylesGpaBeforePanalities(score){	
+      if (score>=76)
+        return {background:'red',color:'black'};
+      else if (score>=63 && score<=75)
+        return {background:'yellow',color:'black'};
+      else if (score >=30 && score <= 62)
+        return {background:'green',color:'white'};
+      if (score<30)
+        return {background:'red',color:'black'};
+      
+    }
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -43,9 +53,16 @@ renderTableColumns(dateWiseData,category,classes=""){
 						key == 'sleep_per_wearable')){
 						let hm = value.split(':');
 						let time_str = `${hm[0]}:${hm[1]}`;
-						all_data.push(time_str);
+
+						all_data.push({value:time_str,
+									   style:''});						
 					}
-					else all_data.push(value);
+					else if(key == 'resting_heart_rate'){
+						all_data.push({value:value,
+										style:this.getStylesGpaBeforePanalities(value)})
+					}
+					else all_data.push({value:value,
+										style:''});
 				}
 			}
 
@@ -53,11 +70,11 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
 			        cell={props => (
-				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
-				              {all_data[props.rowIndex]}
+				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
+				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -68,8 +85,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 	 	const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3"
-			 >
+			<div>
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={65}
@@ -85,7 +101,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={250}
+		          width={225}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"sleep_ql")}
@@ -98,16 +114,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 const styles = StyleSheet.create({
   newTableHeader: {
-  	textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+  	textAlign:'center', 
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
   },
   newTableBody:{
   	textAlign:'center',
-    color: '#5e5e5e',
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',
@@ -117,7 +130,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 235;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

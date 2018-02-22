@@ -39,26 +39,22 @@ componentDidMount(){
 
  	renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
-    let A=[8,7];
-		 const obj = {
-        [8]: { background: 'green', color: 'black'},
-        B: { background: 'green', color: 'black' },
-        C: { background: 'yellow', color:'black' },
-        D: { background: 'yellow', color:'black' },
-        F: { background: 'red', color: 'black' },
-    }; 
-   var x=$( this );
+   
+		 
 		for(let [date,data] of Object.entries(dateWiseData)){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){  
-			 console.log(value);
        			if(key !== 'id' && key !== 'user_ql' ){
+
+              if((key == 'alcohol_day' || key == 'alcohol_week') && (value == ''  && value != '0')) {
+              
+                value ='Not Reported';
+                 all_data.push(value);
+            }else{
               all_data.push(value);
-           
-}
-
-
-				
+           }
+          }    
+              
 			}
 
 			columns.push(
@@ -69,7 +65,7 @@ componentDidMount(){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -80,7 +76,7 @@ componentDidMount(){
 		 const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3">			
+			<div>			
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={65}
@@ -96,7 +92,7 @@ componentDidMount(){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={165}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"alcohol_ql")}
@@ -110,8 +106,7 @@ componentDidMount(){
 const styles = StyleSheet.create({
   newTableHeader: {
   	textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+    color: '#111111',  
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -128,7 +123,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 380;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth <1024 ? 0 : 3;

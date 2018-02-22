@@ -137,13 +137,15 @@ toggle() {
 		                              <Label className="btn  radio1">
                                     <Input type="radio"
                                     name="hr_down_99"                                                                   
-                                    value="yes" 
+                                    value="yes"
+                                    id="hr_down_yes" 
                                     checked={this.state.hr_down_99 === 'yes'}
                                     onChange={this.handleChangeDown99}/> Yes
                                   </Label>
                                   <Label className="btn  radio1">
                                     <Input type="radio" name="hr_down_99" 
                                     value="no"
+                                    id="hr_down_no" 
                                     checked={this.state.hr_down_99 === 'no'}
                                     onChange={this.handleChangeDown99}/> No
                                   </Label>
@@ -243,7 +245,7 @@ toggle() {
 		                        value={this.state.lowest_hr_first_minute}
 		                        onChange={this.handleChange} >
 		                         <option key="select" value="">Select</option>
-	                             {this.createSleepDropdown(60,220,true)}                             
+	                             {this.createSleepDropdown(70,220,true)}                             
 	                        </Input>
                         </div>
                        }
@@ -258,9 +260,9 @@ toggle() {
 				}
 
 				{ (this.state.hr_down_99 == "yes") &&
-				  (this.state.lowest_hr_first_minute >= "60") &&
+				  (this.state.lowest_hr_first_minute >= "70") &&
 
-				 <div  className="table-responsive input1">			       			       			    
+				 <div  className="table-responsive input1 tablecenter1">			       			       			    
 			         <table className="table table-bordered">
 			         <thead>
 			         <th>HRR time to 99</th>
@@ -404,7 +406,7 @@ toggle() {
 				{ (this.state.hr_down_99 == "no") &&
 				  (this.state.lowest_hr_first_minute >= "70") &&
 				<FormGroup>
-				 <div className="table-responsive input1">			       			       			         
+				 <div className="table-responsive input1 tablecenter1">			       			       			         
 			         <table className="table table-bordered">
 			         <thead>
 			         <th>HRR Time to 99</th>

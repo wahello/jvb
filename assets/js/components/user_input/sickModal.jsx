@@ -47,6 +47,7 @@ export default class SickModal extends Component{
 		                            <Textarea
 		                                id="placeholder"			                           
 			                            className="form-control" 
+			                            name="sickness"
 			                            value={this.state.sickness}
 			                            rows="5" cols="5"
 			                            onChange={this.handleChange}

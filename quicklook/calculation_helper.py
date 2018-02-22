@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone,time
 from collections import OrderedDict,namedtuple
+from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
 
@@ -32,24 +33,26 @@ from quicklook.models import UserQuickLook,\
 
 from quicklook.serializers import UserQuickLookSerializer
 
-def get_activities():
-	activities = [
-	'ALL','UNCATEGORIZED','SEDENTARY','SLEEP','RUNNING','STREET_RUNNING','TRACK_RUNNING',
-	'TRAIL_RUNNING','TREADMILL_RUNNING','CYCLING','CYCLOCROSS','DOWNHILL_BIKING',
-	'INDOOR_CYCLING','MOUNTAIN_BIKING','RECUMBENT_CYCLING','ROAD_BIKING','TRACK_CYCLING',
-	'FITNESS_EQUIPMENT','ELLIPTICAL','INDOOR_CARDIO','INDOOR_ROWING','STAIR_CLIMBING',
-	'STRENGTH_TRAINING','HIKING','SWIMMING','LAP_SWIMMING','OPEN_WATER_SWIMMING','WALKING',
-	'CASUAL_WALKING','SPEED_WALKING','TRANSITION','SWIMTOBIKETRANSITION','BIKETORUNTRANSITION',
-	'RUNTOBIKETRANSITION','MOTORCYCLING','OTHER','BACKCOUNTRY_SKIING_SNOWBOARDING',
-	'BOATING','CROSS_COUNTRY_SKIING','DRIVING_GENERAL','FLYING','GOLF','HORSEBACK_RIDING',
-	'INLINE_SKATING','MOUNTAINEERING','PADDLING','RESORT_SKIING_SNOWBOARDING','ROWING',
-	'SAILING','SKATE_SKIING','SKATING','SNOWMOBILING','SNOW_SHOE','STAND_UP_PADDLEBOARDING',
-	'WHITEWATER_RAFTING_KAYAKING','FLOOR_CLIMBING','YOGA']
-	return activities
-
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
+
+def _str_duration_to_dt(dobj,str_duration):
+	'''
+	Convert string duration to datetime having date as dobj
+
+	type dobj: Datetime
+	type str_duration: string eg "7:30 AM"
+	'''
+	if dobj and str_duration:
+		hour,minute = map(int, str_duration.split(' ')[0].split(":"))
+		meridiem = str_duration.split(' ')[1]
+		if hour == 12 and meridiem.lower() == 'am':
+			hour = 0
+		elif hour != 12 and meridiem.lower() == 'pm':
+			hour += 12
+		return datetime.combine(dobj.date(),time(hour,minute))
+	return None
 
 def sec_to_hours_min_sec(seconds,include_sec = True):
 	seconds = int(seconds)
@@ -137,11 +140,12 @@ def get_blank_model_fields(model):
 			'overall_health_grade':'',
 			'overall_health_gpa':0,
 			'movement_non_exercise_steps_grade':'',
+			'movement_non_exercise_steps_gpa':'',
 			'movement_consistency_grade': '',
 			'avg_sleep_per_night_grade':'',
 			'avg_sleep_per_night_gpa':0,
 			'exercise_consistency_grade':'',
-			'exercise_consistency_gpa':0,
+			'exercise_consistency_score':0,
 			'overall_workout_grade':'',
 			'overall_workout_gpa':0,
 			'workout_duration_grade':'',
@@ -151,6 +155,7 @@ def get_blank_model_fields(model):
 			'avg_exercise_hr_grade':'',
 			'avg_exercise_hr_gpa':0,
 			'prcnt_unprocessed_food_consumed_grade':'',
+			'prcnt_unprocessed_food_consumed_gpa':0,
 			'alcoholic_drink_per_week_grade':'' ,
 			'sleep_aid_penalty':0,
 			'ctrl_subs_penalty':0,
@@ -173,6 +178,7 @@ def get_blank_model_fields(model):
 			'distance_other':0,
 			'pace': '',
 			'avg_heartrate':json.dumps({}),
+			'avg_exercise_heartrate':0,
 			'elevation_gain':0,
 			'elevation_loss':0,
 			'effort_level':0,
@@ -182,10 +188,14 @@ def get_blank_model_fields(model):
 			'humidity': 0,
 			'temperature_feels_like':0,
 			'wind': 0,
-			'hrr': '',
-			'hrr_start_point': 0,
-			'hrr_beats_lowered': 0,
-			'sleep_resting_hr_last_night': 0,
+
+			'hrr_time_to_99': '',
+			'hrr_starting_point': 0,
+			'hrr_beats_lowered_first_minute': 0,
+			'resting_hr_last_night': 0,
+			'lowest_hr_during_hrr':0,
+			'highest_hr_first_minute':0,
+
 			'vo2_max': 0,
 			'running_cadence':0,
 			'nose_breath_prcnt_workout': 0,
@@ -254,6 +264,7 @@ def get_blank_model_fields(model):
 		fields = {
 			'prcnt_non_processed_food':0,
 			'non_processed_food': '',
+			'processed_food':'',
 			'diet_type':'',
 		}
 		return fields
@@ -375,18 +386,13 @@ def fetch_weather_data(latitude,longitude,date):
 
 def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 					user_input_bedtime = None, user_input_awake_time = None,
-					user_input_timezone = None,str_dt = True):
-	# If str_dt is True then string reperesentation of sleep and awake
-	# time is returned otherwise datetime Object or None if no sleep data.
+					user_input_timezone = None,str_dt = True,bed_time_today=None):
+	"""
+	If str_dt is True then string reperesentation of sleep and awake
+	time is returned otherwise datetime Object or None if no sleep data.
 
-	def _get_awake_time(data):
-		max_duration = 0
-		sleep_level_maps = data.get('sleepLevelsMap')
-		for lvl_data in sleep_level_maps.values():
-			max_end_time = max(int(d.get('endTimeInSeconds')) for d in lvl_data)
-			max_duration = max_end_time if max_end_time >= max_duration else max_duration
-		return max_duration
-
+	If bed_time_today is True, that's mean we are tying to find out today's bedtime
+	"""
 	def _get_actual_sleep_start_time(data):
 		min_duration = None
 		sleep_level_maps = data.get('sleepLevelsMap')
@@ -396,6 +402,14 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 				min_duration = min_start_time
 			min_duration = min_start_time if min_start_time <= min_duration else min_duration
 		return min_duration
+
+	def _get_deep_light_awake_sleep_duration(data):
+		durations = {'deep':0,'light':0,'awake':0}
+		sleep_level_maps = data.get('sleepLevelsMap')
+		for lvl_type,lvl_data in sleep_level_maps.items():
+			durations[lvl_type] += sum([(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+				- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds for d in lvl_data])
+		return durations
 
 	recent_auto_manual = None
 	recent_auto_final = None
@@ -419,7 +433,6 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 		# If manual sleep bedtime last night and awake time is submitted then we'll
 		# user this sleep bedtime time and awake time. We'll convert these time in
 		# timezone from where user input was submitted by user
-
 		user_submitted_sleep = True
 		target_tz = pytz.timezone(user_input_timezone)
 		local_user_input_bedtime = user_input_bedtime.astimezone(target_tz)
@@ -433,9 +446,11 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			next_day_midnight = datetime.combine((start_time+timedelta(days=1)).date(),time(0))
 			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
 			if end_time > next_day_midnight:
-				if obj.get('validation',None) == 'AUTO_MANUAL':
+				if 'MANUAL' in obj.get('validation',None):
 					recent_auto_manual = obj
-					break
+					break;
+				# if obj.get('validation',None) == 'AUTO_MANUAL':
+				# 	recent_auto_manual = obj
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
 					recent_auto_final = obj
 				elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
@@ -449,80 +464,109 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 			target_sleep_data = recent_auto_tentative
 
 	if not target_sleep_data:
+		max_end_time = None
 		for obj in today_sleep_data[::-1]:
 			start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0) +
 													   obj.get('startTimeOffsetInSeconds',0))
 			midnight = datetime.combine(start_time.date(),time(0))
-			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
 			if start_time >= midnight:
-				if not target_sleep_data:
-					# most earliest record of the day at start of loop
-					target_sleep_data = obj
 
-				if (obj.get('validation',None) == 'AUTO_MANUAL' and
-					obj.get('startTimeInSeconds',0) == target_sleep_data.get('startTimeInSeconds',0)):
+				obj_start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds')+
+					obj.get('startTimeOffsetInSeconds'))
+				obj_end_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(obj)+
+				   obj.get('startTimeOffsetInSeconds',0)+
+				   obj.get('durationInSeconds'))
+
+				if not target_sleep_data:
+					# most earliest(or recent if trying to find bedtime today) record of the day
+					# at start of loop
 					target_sleep_data = obj
-					break
+					max_end_time = obj_end_time
+					# the most recent record on any date will be used to determine the bedtime
+					# on that day, so once we get it no need to look further
+					if bed_time_today:
+						break
+					continue
+
+				if (obj.get('validation',None) == 'AUTO_TENTATIVE' and
+					obj_start_time < max_end_time):
+					target_sleep_data = obj
+					max_end_time = obj_end_time
+
+				elif ('MANUAL' in obj.get('validation',None) and
+					obj_start_time < max_end_time):
+					target_sleep_data = obj
+					max_end_time = obj_end_time
+
+				# elif (obj.get('validation',None) == 'AUTO_MANUAL' and
+				# 	obj_start_time < max_end_time):
+				# 	target_sleep_data = obj
+				# 	max_end_time = obj_end_time
 
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and
-					  obj.get('startTimeInSeconds',0) == target_sleep_data.get('startTimeInSeconds',0) and
+					  obj_start_time < max_end_time and
 					  target_sleep_data.get('validation',None) == 'AUTO_TENTATIVE'):
 					target_sleep_data = obj
+					max_end_time = obj_end_time
 
 	if target_sleep_data:
-		sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('deepSleepDurationInSeconds'),
-									include_sec=False)
-		sleep_stats['light_sleep'] = sec_to_hours_min_sec(
-									target_sleep_data.get('lightSleepDurationInSeconds'),
-									include_sec=False)
-		sleep_stats['awake_time'] = sec_to_hours_min_sec(
-									target_sleep_data.get('awakeDurationInSeconds'),
+		if target_sleep_data.get('validation',None) == 'MANUAL':
+			sleep_info = _get_deep_light_awake_sleep_duration(target_sleep_data)
+			sleep_stats['deep_sleep'] = sec_to_hours_min_sec(sleep_info['deep'],include_sec = False)
+			sleep_stats['light_sleep'] = sec_to_hours_min_sec(sleep_info['light'], include_sec = False)
+			sleep_stats['awake_time'] = sec_to_hours_min_sec(sleep_info['awake'],include_sec = False)
+		else:
+			sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
+										target_sleep_data.get('deepSleepDurationInSeconds',0),
+										include_sec=False)
+			sleep_stats['light_sleep'] = sec_to_hours_min_sec(
+										target_sleep_data.get('lightSleepDurationInSeconds',0),
+										include_sec=False)
+			sleep_stats['awake_time'] = sec_to_hours_min_sec(
+										target_sleep_data.get('awakeDurationInSeconds',0),
 									include_sec=False)
 
-		if yesterday_sleep_data and user_submitted_sleep:
+		if yesterday_sleep_data is not None and user_submitted_sleep:
 			# Here trying to get bedtime last night and awake time. If user submitted
 			# manual bedtime and awake time then, we'll use that timezone aware bedtime 
 			# and awake time and get the naive datetime object
 			bed_time = local_user_input_bedtime.replace(tzinfo = None)
 			awake_time = local_user_input_awake_time.replace(tzinfo = None)
 
-		elif (not yesterday_sleep_data and today_sleep_data and user_input_timezone):
+		elif (yesterday_sleep_data is None and today_sleep_data and user_input_timezone):
 			# Here trying to get todays bedtime, we'll assume that sleep data was recorded
 			# in same timezone as of user input submitted by user today. Thus we'll convert 
 			# bedtime and awake time in same timezone and get the naive datetime object
 			target_tz = pytz.timezone(user_input_timezone)
 			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
 						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
-			# awake_time = _get_awake_time(target_sleep_data)
-			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-			# 				awake_time)).astimezone(target_tz).replace(tzinfo = None)
 
-			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-						_get_actual_sleep_start_time(target_sleep_data)+
-						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
-			
 			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-			# 			target_sleep_data.get('startTimeInSeconds')+
+			# 			_get_actual_sleep_start_time(target_sleep_data)+
 			# 			target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+			
+			awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
+						target_sleep_data.get('startTimeInSeconds')+
+						target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
 
 		else:
 			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
 				target_sleep_data.get('startTimeOffsetInSeconds'))
-			# awake_time = _get_awake_time(target_sleep_data)
-			# awake_time = datetime.utcfromtimestamp(awake_time + 
-			# 	target_sleep_data.get('startTimeOffsetInSeconds',0))
 
-			awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
-												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-												   target_sleep_data.get('durationInSeconds'))
-
-			# awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+			# awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
 			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
 			# 									   target_sleep_data.get('durationInSeconds'))
 
-		sleep_per_wearable = (awake_time-bed_time).seconds\
-							 - target_sleep_data.get('awakeDurationInSeconds',0)
+			awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
+												   target_sleep_data.get('startTimeOffsetInSeconds',0)+
+												   target_sleep_data.get('durationInSeconds'))
+
+		if target_sleep_data.get('validation',None) == 'MANUAL':
+			awake_duration = _get_deep_light_awake_sleep_duration(target_sleep_data).get('awake',0)
+		else:
+			awake_duration = target_sleep_data.get('awakeDurationInSeconds',0)
+		sleep_per_wearable = (awake_time-bed_time).seconds - awake_duration
+
 		# sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
 		# 					 - target_sleep_data.get('awakeDurationInSeconds',0)
 		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
@@ -555,7 +599,6 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"longitude":None
 	}
 
-	# activities_hr = {act:{"hr":0,"count":0} for act in get_activities()}
 	activities_hr = {}
 
 	# If same summary is edited manually then give it more preference.
@@ -649,11 +692,21 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 
 def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 					user_input_bedtime = None, user_input_awake_time = None,
-					user_input_timezone = None):
+					user_input_timezone = None,user_input_strength_start_time=None,
+					user_input_strength_end_time=None):
 	
 	'''
 		Calculate the movement consistency summary
 	'''
+	if user_input_strength_start_time and user_input_strength_end_time:
+		# Stretching strength start and end time to full hour eg. 
+		# Strength start time is 8:30 AM then it'll consider 8:00 AM
+		# Strength end time is 9:25 AM then it'll consider 9:59 AM
+		user_input_strength_start_time = datetime.combine(user_input_strength_start_time.date(),
+			time(user_input_strength_start_time.hour))
+		user_input_strength_end_time = datetime.combine(user_input_strength_end_time.date(),
+			time(user_input_strength_end_time.hour,59))
+
 	movement_consistency = OrderedDict()
 	sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,
 		user_input_bedtime = user_input_bedtime,
@@ -661,7 +714,7 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 		user_input_timezone = user_input_timezone ,str_dt=False)
 
 	sleeps_today_stats = get_sleep_stats(None,sleeps_today_json[::-1],
-		user_input_timezone = user_input_timezone,str_dt=False)
+		user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
 
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
@@ -693,7 +746,6 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 				start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
 				hour_start = datetime.utcfromtimestamp(start_time)
 				time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
-
 				steps_in_interval = movement_consistency[time_interval].get('steps')
 				status = "sleeping"
 
@@ -705,8 +757,12 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 					status = "sleeping"
 				elif(hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
 						today_bedtime and 
-						(hour_start >= datetime.combine(hour_start.date(),time(today_bedtime.hour)))):
+						(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
 					status = "sleeping"
+				elif(user_input_strength_start_time and user_input_strength_end_time and
+					hour_start >= user_input_strength_start_time and
+					hour_start <= user_input_strength_end_time):
+					status = "strength"
 				else:
 					status = "active" if data.get('steps') + steps_in_interval > 300 else "inactive"
 
@@ -717,10 +773,12 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 		inactive_hours = 0
 		total_steps = 0
 		sleeping_hours = 0
+		strength_hours = 0
+		
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
-			if am_or_pm == 'PM' and int(hour) < 12:
+			if am_or_pm == 'PM' and int(hour) != 12:
 				hour = int(hour) + 12
 			elif am_or_pm == 'AM' and int(hour) == 12:
 				hour = 0
@@ -729,18 +787,25 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 				
 			hour_start = datetime.combine(today_awake_time.date(),time(hour))
 			if hour_start < datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)):
+				# if user slept after midnight say 01:30 AM and there are no steps then interval
+				# 12:00 - 12:59 should be marked as "inactive" instead of "sleeping" 
 				if(movement_consistency[interval]['status'] == 'sleeping' and  
 					not movement_consistency[interval]['steps']):
 					movement_consistency[interval]['status'] = 'inactive'
 					movement_consistency[interval]['steps'] = 0
 
 			elif hour_start >= today_awake_time:
-				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
-					movement_consistency[interval]['status'] = 'sleeping'
-				else:
-					if not movement_consistency[interval]['steps']:
+				if not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
+
+				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
+					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
+					movement_consistency[interval]['status'] = 'sleeping'
+
+				elif(user_input_strength_end_time and user_input_strength_start_time):
+					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
+						movement_consistency[interval]['status'] = 'strength'
 
 			if values['status'] == 'active': 
 				active_hours += 1 
@@ -748,11 +813,14 @@ def cal_movement_consistency_summary(epochs_json,sleeps_json,sleeps_today_json,
 				inactive_hours += 1
 			elif values['status'] == 'sleeping':
 				sleeping_hours += 1
+			elif values['status'] == 'strength':
+				strength_hours += 1
 			total_steps += values['steps']
 
 		movement_consistency['active_hours'] = active_hours
 		movement_consistency['inactive_hours'] = inactive_hours
 		movement_consistency['sleeping_hours'] = sleeping_hours
+		movement_consistency['strength_hours'] = strength_hours
 		movement_consistency['total_steps'] = total_steps
 
 		return movement_consistency
@@ -778,9 +846,24 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 					for x in duration.split(':')])
 		return hours * 3600 + mins * 60
 
+	def _get_grade(point):
+		if point < 1:
+			return 'F'
+		elif point >= 1 and point < 2:
+			return 'D'
+		elif point >= 2 and point < 3:
+			return 'C'
+		elif point >= 3 and point < 4:
+			return 'B'
+		else:
+			return 'A'
+
+	_sec_min = lambda x: divmod(x,60)[0]
+
 	_tobj = {
 		"6:00":_to_sec("6:00"),
 		"6:29":_to_sec("6:29"),
+		"6:59":_to_sec("6:59"),
 		"6:30":_to_sec("6:30"),
 		"7:00":_to_sec("7:00"),
 		"7:29":_to_sec("7:29"),
@@ -794,28 +877,45 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		"12:00":_to_sec("12:00"),
 	}
 
-	GRADES = {0:"F",1:"D",2:"C",3:"B",4:"A"}
-
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
 
 	if sleep_duration < _tobj["6:00"] or sleep_duration > _tobj["12:00"]:
-		points = 0
+		if sleep_duration > _tobj["12:00"]:
+			points = 0
+		else: 
+			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
 
 	elif sleep_duration >= _tobj["7:30"] and sleep_duration <= _tobj["10:00"]:
 	   points = 4
 
 	elif ((sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:01"] and sleep_duration <= _tobj["10:30"])) :
-		points = 3
+
+		if (sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]):
+			points = round(_sec_min(sleep_duration - _tobj["7:00"]) * 0.03333 + 3, 5)
+		elif(sleep_duration == _tobj["10:30"]):
+			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
+		else:
+			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 3,5)
 
 	elif ((sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:31"] and sleep_duration <= _tobj["11:00"])) :
-	   	points = 2
+
+		if(sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["6:59"]):
+			points = round(_sec_min(sleep_duration - _tobj["6:30"]) * 0.03333 + 2, 5)
+		elif(sleep_duration == _tobj["11:00"]):
+			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
+		else:
+			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
 
 	elif ((sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]) or \
 		(sleep_duration >= _tobj["11:30"] and sleep_duration <= _tobj["12:00"])) :
-	   	points = 1
+
+		if(sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]):
+	   		points = round(_sec_min(sleep_duration - _tobj["6:00"]) * 0.03333 + 1, 5)
+		else:
+			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
 	
 	if sleep_aid_taken == "yes":
 		if points >= 2:
@@ -823,21 +923,32 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		else:
 			points = 0
 
-	return (GRADES[points],points)
+	return (_get_grade(points),points)
  
 def cal_unprocessed_food_grade(prcnt_food):
- 	prcnt_food = int(prcnt_food)
- 	
- 	if (prcnt_food >= 80 and prcnt_food <= 100):
- 		return 'A'
- 	elif (prcnt_food >= 70 and prcnt_food <= 79):
- 		return 'B'
- 	elif (prcnt_food >= 60 and prcnt_food <= 69):
- 		return 'C'
- 	elif (prcnt_food >= 50 and prcnt_food <= 59):
- 		return 'D'
- 	elif (prcnt_food < 50):
- 		return 'F'
+	def _point_advantage(current_prcnt, range_min_prcnt, per_prcnt_pt):
+		return (current_prcnt - range_min_prcnt) * per_prcnt_pt
+
+	point = 0
+	grade = 'F'
+	prcnt_food = int(Decimal(prcnt_food).quantize(0,ROUND_HALF_DOWN))
+	
+	if (prcnt_food >= 80):
+		grade = 'A'
+		point = 4
+	elif (prcnt_food >= 70 and prcnt_food < 80):
+		grade = 'B'
+		point = 3 + _point_advantage(prcnt_food,70,0.1)
+	elif (prcnt_food >= 60 and prcnt_food < 70):
+		grade = 'C'
+		point = 2 + _point_advantage(prcnt_food,60,0.1)
+	elif (prcnt_food >= 50 and prcnt_food < 60):
+		grade = 'D'
+		point = 1 + _point_advantage(prcnt_food,50,0.1)
+	elif (prcnt_food < 50):
+		grade = 'F'
+		point = 0 + _point_advantage(prcnt_food,0,0.02)
+	return (grade,point)
 
 def cal_alcohol_drink_grade(drink_avg, gender):
 	'''
@@ -871,16 +982,28 @@ def cal_alcohol_drink_grade(drink_avg, gender):
 	return (grade,round(drink_avg,2))
 
 def cal_non_exercise_step_grade(steps):
+
+	def _point_advantage(current_steps, range_min_steps, per_step_pt):
+		return (current_steps - range_min_steps) * per_step_pt
+
+	point = 0
+	grade = 'F'
 	if steps >= 10000:
-		return 'A'
+		grade = 'A'
+		point = 4
 	elif (steps <= 9999 and steps >= 7500):
-		return 'B'
+		grade = 'B'
+		point = 3 + _point_advantage(steps,7500,0.0004)
 	elif (steps <= 7499 and steps >= 5000):
-		return 'C'
+		grade = 'C'
+		point = 2 + _point_advantage(steps,5000,0.0004)
 	elif (steps <= 4999 and steps >= 3500):
-		return 'D'
+		grade = 'D'
+		point = 1 + _point_advantage(steps,3500,0.00067)
 	elif steps < 3500:
-		return 'F'
+		grade = 'F'
+		point = 0 + _point_advantage(steps,0,0.00029)
+	return (grade, round(point,2))
 
 def cal_movement_consistency_grade(hours_inactive):
 	if hours_inactive <= 4.5:
@@ -1048,18 +1171,19 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 		elif avg_heartrate <= prange[0].min or avg_heartrate >= prange[0].max:
 			grade = 'F'
 			point = 0
-		return (grade, point)
-	return (None, None)
+		return (grade, point, avg_heartrate)
+	return (None, None, None)
 
-def get_avg_sleep_grade(daily_strong,current_date):
-	for q in daily_strong:
-		if (q.user_input.created_at == current_date.date() and 
-			q.sleep_time_excluding_awake_time != '' and
-			q.sleep_time_excluding_awake_time != None):
-			grade_point = cal_average_sleep_grade(
-				  q.sleep_time_excluding_awake_time,
-				  q.prescription_or_non_prescription_sleep_aids_last_night)
-			return grade_point
+def get_avg_sleep_grade(yesterday_sleep_data,today_sleep_data,
+	user_input_bedtime, user_input_awake_time,user_input_timezone,sleep_aid):
+
+	sleep_stats = get_sleep_stats(yesterday_sleep_data,today_sleep_data,
+		user_input_bedtime,user_input_awake_time, user_input_timezone)
+	if sleep_stats['sleep_per_wearable']:
+		grade_point = cal_average_sleep_grade(
+			  sleep_stats['sleep_per_wearable'],
+			  sleep_aid)
+		return grade_point
 	return (None,None)
 
 def get_unprocessed_food_grade(daily_strong,current_date):
@@ -1067,15 +1191,12 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 		if (q.user_input.created_at == current_date.date() and
 			q.prcnt_unprocessed_food_consumed_yesterday != '' and
 			q.prcnt_unprocessed_food_consumed_yesterday != None):
-			grade = cal_unprocessed_food_grade(
+			grade_pt = cal_unprocessed_food_grade(
 					q.prcnt_unprocessed_food_consumed_yesterday)
-			return grade
-	return ''
+			return grade_pt
+	return (None,None)
 
-def get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user):
-
-	if todays_daily_strong:
-		daily_strong.append(todays_daily_strong[0])
+def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 
 	alcoholic_drink_last_week = [q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
@@ -1089,20 +1210,21 @@ def get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user):
 	alcohol_stats = cal_alcohol_drink_grade(drink_avg,user.profile.gender)
 	return alcohol_stats
 
-def get_exercise_consistency_grade(workout_over_period,weekly_activities,
-								   weekly_manual_activities,period):
-	activity_weekly_stats = []
-	for (act,manual_act) in zip(list(weekly_activities.values()),
-								list(weekly_manual_activities.values())):
-		manual_act_indexed = {dic.get('summaryId'):dic for dic in manual_act }
-		activity_weekly_stats.append(get_activity_stats(act,manual_act_indexed))
+def get_exercise_consistency_grade(workout_over_period,period):
+	# activity_weekly_stats = []
+	# for (act,manual_act) in zip(list(weekly_activities.values()),
+	# 							list(weekly_manual_activities.values())):
+	# 	manual_act_indexed = {dic.get('summaryId'):dic for dic in manual_act }
+	# 	activity_weekly_stats.append(get_activity_stats(act,manual_act_indexed))
 
-	hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
+	# hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
 
 	points = 0
-	for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
-		if hr_over_90: points += 1
-		elif workout == 'yes': points += 1
+	# for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
+	# 	if hr_over_90: points += 1
+	# 	elif workout == 'yes': points += 1
+	for w in workout_over_period:
+		if w == 'yes' : points += 1
 	avg_point_week = points / (period/7)
 
 	grade_point = cal_exercise_consistency_grade(avg_point_week)
@@ -1162,7 +1284,7 @@ def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updat
 		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
 		return cal_avg_exercise_heartrate_grade(avg_hr,workout_easy_hard,age)
 	else:
-		return (None, None)
+		return (None, None, None)
 
 def get_overall_workout_grade(wout_duration_pt, wout_effortlvl_pt, avg_exercise_hr_pt):
 	if avg_exercise_hr_pt:
@@ -1177,21 +1299,19 @@ def get_overall_workout_grade(wout_duration_pt, wout_effortlvl_pt, avg_exercise_
 
 def get_overall_grade(grades):
 	GRADES = {'A':4,'B':3,'C':2,'D':1,'F':0,'':0,'N/A':0}
-	non_exercise_step_grade = grades.get('movement_non_exercise_steps_grade')
+	non_exercise_step_gpa = grades.get('movement_non_exercise_steps_gpa')
 	movement_consistency_grade = grades.get('movement_consistency_grade')
-	avg_sleep_per_night_grade = grades.get('avg_sleep_per_night_grade')
+	avg_sleep_per_night_gpa = grades.get('avg_sleep_per_night_gpa')
 	exercise_consistency_grade = grades.get('exercise_consistency_grade')
-	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
+	prcnt_unprocessed_food_gpa = grades.get('prcnt_unprocessed_food_consumed_gpa')
 	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
-	penalty = grades.get('sleep_aid_penalty')+\
-				grades.get('ctrl_subs_penalty')+\
-				grades.get('smoke_penalty')
+	penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
 
-	gpa = round((GRADES[non_exercise_step_grade]+
+	gpa = round((non_exercise_step_gpa +
 		   GRADES[movement_consistency_grade]+
-		   GRADES[avg_sleep_per_night_grade]+
+		   avg_sleep_per_night_gpa +
 		   GRADES[exercise_consistency_grade]+
-		   GRADES[prcnt_unprocessed_food_grade]+
+		   prcnt_unprocessed_food_gpa+
 		   GRADES[alcoholic_drink_per_week_grade]+
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
@@ -1256,7 +1376,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 	SERIALIZED_DATA = []
 
 	while current_date <= to_dt:
-		last_seven_days_date = current_date - timedelta(days=7)
+		last_seven_days_date = current_date - timedelta(days=6)
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
 
@@ -1283,7 +1403,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Already parsed from json to python objects
 		weekly_manual_activities = get_weekly_data(manually_updated,current_date,last_seven_days_date)
 		
-		todays_manually_updated = weekly_manual_activities.pop(current_date.strftime('%Y-%m-%d'))
+		todays_manually_updated = weekly_manual_activities.get(current_date.strftime('%Y-%m-%d'))
 
 		# pull data for past 7 days (incuding today)
 		activities = get_garmin_model_data(UserGarminDataActivity,user,
@@ -1292,7 +1412,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Already parsed from json to python objects
 		weekly_activities = get_weekly_data(activities,current_date,last_seven_days_date)
-		todays_activities = weekly_activities.pop(current_date.strftime('%Y-%m-%d'))
+		todays_activities = weekly_activities.get(current_date.strftime('%Y-%m-%d'))
 			
 
 		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
@@ -1314,7 +1434,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		todays_daily_strong = []
 		for i,q in enumerate(daily_strong):
 			if q.user_input.created_at == current_date.date():
-				todays_daily_strong.append(daily_strong.pop(i))
+				todays_daily_strong.append(daily_strong[i])
 				break
 
 		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
@@ -1378,8 +1498,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['humidity'] = weather_data['humidity']
 		exercise_calculated_data['temperature_feels_like'] = weather_data['apparentTemperature']
 		exercise_calculated_data['wind'] = weather_data['windSpeed']
-		exercise_calculated_data['sleep_resting_hr_last_night'] = safe_get_dict(dailies_json,
-															'restingHeartRateInBeatsPerMinute',0)
+		exercise_calculated_data['hrr_time_to_99'] = safe_get(daily_encouraged,"time_to_99","") 
+		exercise_calculated_data['hrr_starting_point'] = safe_get(daily_encouraged,"hr_level",0)
+		exercise_calculated_data['hrr_beats_lowered_first_minute'] = safe_get(
+			daily_encouraged,"hr_level",0)-safe_get(daily_encouraged,"lowest_hr_first_minute",0)
+		exercise_calculated_data['resting_hr_last_night'] = safe_get_dict(dailies_json,
+			'restingHeartRateInBeatsPerMinute',0)
+		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
+			daily_encouraged,"lowest_hr_during_hrr",0)
+		# exercise_calculated_data['highest_hr_first_minute'] = f
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
 		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
 											'averageRunCadenceInStepsPerMinute')
@@ -1413,12 +1540,12 @@ def create_quick_look(user,from_date=None,to_date=None):
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)
 		user_input_awake_time = safe_get(todays_daily_strong,"sleep_awake_time",None)
 		user_input_timezone = todays_user_input.timezone if todays_user_input else None
-
+		
 		sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,
 									  user_input_bedtime = user_input_bedtime,
 									  user_input_awake_time = user_input_awake_time,
 									  user_input_timezone = user_input_timezone)
-
+		
 		sleeps_calculated_data['sleep_aid'] = safe_get(todays_daily_strong,
 					 "prescription_or_non_prescription_sleep_aids_last_night", "")
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
@@ -1437,6 +1564,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 									   "prcnt_unprocessed_food_consumed_yesterday", 0)
 		food_calculated_data['non_processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_unprocessed_food_consumed_yesterday", "")
+		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
+								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
 
 		# Alcohol
@@ -1462,7 +1591,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
-			if avg_exercise_hr_grade_pts[1] else 0  
+			if avg_exercise_hr_grade_pts[1] else 0
+		exercise_calculated_data['avg_exercise_heartrate'] = avg_exercise_hr_grade_pts[2]\
+			if avg_exercise_hr_grade_pts[2] else 0
 
 		# Overall workout grade calculation
 		overall_workout_grade_pt = get_overall_workout_grade(
@@ -1473,25 +1604,46 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['overall_workout_gpa'] = overall_workout_grade_pt[1]
 
 		# Average sleep per night grade calculation
-		grade_point = get_avg_sleep_grade(todays_daily_strong, current_date)
+
+		user_input_sleep_aid = safe_get(
+			todays_daily_strong,"prescription_or_non_prescription_sleep_aids_last_night",''
+		)
+		grade_point = get_avg_sleep_grade(
+			sleeps_json,
+			sleeps_today_json,
+			user_input_bedtime = user_input_bedtime,
+			user_input_awake_time = user_input_awake_time,
+			user_input_timezone = user_input_timezone,
+			sleep_aid = user_input_sleep_aid
+			)
 		grades_calculated_data['avg_sleep_per_night_grade'] = grade_point[0] if grade_point[0] else ''
 		grades_calculated_data['avg_sleep_per_night_gpa'] = grade_point[1] if grade_point[1] else 0
 
 		# Unprocessed food grade calculation 
-		grade  = get_unprocessed_food_grade(todays_daily_strong, current_date)
-		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = grade
+		prcnt_unprocessed_food_grade_pt  = get_unprocessed_food_grade(todays_daily_strong, current_date)
+		grades_calculated_data['prcnt_unprocessed_food_consumed_grade'] = prcnt_unprocessed_food_grade_pt[0] \
+			if prcnt_unprocessed_food_grade_pt[0] else ''
+		grades_calculated_data['prcnt_unprocessed_food_consumed_gpa'] = prcnt_unprocessed_food_grade_pt[1] \
+			if prcnt_unprocessed_food_grade_pt[1] else 0 
 	
 		# Alcohol drink consumed grade and avg alcohol per week
-		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(todays_daily_strong, daily_strong,user)
+		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
 		alcohol_calculated_data['alcohol_week'] = avg_alcohol
 
 		# Movement consistency and movement consistency grade calculation
+		user_input_strength_start_time = safe_get(todays_daily_strong,"strength_workout_start",None)
+		user_input_strength_end_time = safe_get(todays_daily_strong,"strength_workout_end",None)
+		if user_input_strength_start_time and user_input_strength_end_time:
+			user_input_strength_start_time = _str_duration_to_dt(current_date,user_input_strength_start_time)
+			user_input_strength_end_time = _str_duration_to_dt(current_date,user_input_strength_end_time)
 		movement_consistency_summary = cal_movement_consistency_summary(epochs_json,sleeps_json,
 										sleeps_today_json,
 										user_input_bedtime = user_input_bedtime,
 									  	user_input_awake_time = user_input_awake_time,
-									  	user_input_timezone = user_input_timezone)
+									  	user_input_timezone = user_input_timezone,
+									  	user_input_strength_start_time = user_input_strength_start_time,
+									  	user_input_strength_end_time = user_input_strength_end_time)
 		if movement_consistency_summary:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
 			inactive_hours = movement_consistency_summary.get("inactive_hours")
@@ -1506,15 +1658,17 @@ def create_quick_look(user,from_date=None,to_date=None):
 		steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps
 
-		grades_calculated_data['movement_non_exercise_steps_grade'] = \
-		cal_non_exercise_step_grade(total_steps - exercise_steps)
+		moment_non_exercise_steps_grade_point = cal_non_exercise_step_grade(total_steps - exercise_steps)
+		grades_calculated_data['movement_non_exercise_steps_grade'] = moment_non_exercise_steps_grade_point[0]
+		grades_calculated_data['movement_non_exercise_steps_gpa'] = moment_non_exercise_steps_grade_point[1]
+		
 
 		# Exercise Consistency grade calculation over period of 7 days
 		exercise_consistency_grade_point = get_exercise_consistency_grade(
-			[q.workout for q in daily_strong],weekly_activities,weekly_manual_activities,7)
+			[q.workout for q in daily_strong],7)
 
 		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade_point[0]
-		grades_calculated_data['exercise_consistency_gpa'] = exercise_consistency_grade_point[1]
+		grades_calculated_data['exercise_consistency_score'] = exercise_consistency_grade_point[1]
 
 		# Penalty calculation
 		penalties = cal_penalty(

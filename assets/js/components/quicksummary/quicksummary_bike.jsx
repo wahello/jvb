@@ -45,7 +45,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -57,7 +57,7 @@ render(){
 		const {height, width, containerHeight, containerWidth, ...props} = this.props;
 		let rowsCount = this.state.myTableData.length;
 		return(
-			<div className="quick3"
+			<div 
 			 >
 			 <Table
 		        rowsCount={rowsCount}
@@ -77,7 +77,7 @@ render(){
 		          width={167}
 		          fixed={true}
 		        />
-			    {this.renderTableColumns(this.props.data,"bike_stats_ql")}
+			    {this.renderTableColumns(this.props.data,"bike_stats_ql")}  
       		</Table>
 			</div>
 
@@ -85,27 +85,26 @@ render(){
 	}
 }
 const styles = StyleSheet.create({
-  newTableHeader: {
-  	textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+  newTableHeader: {  
+  	textAlign:'center', 
+    color: '#111111', 
+    border: 'none', 
+    fontFamily:'Proxima-Nova', 
+    fontStyle:'normal' 
+  }, 
+  newTableBody:{ 
+  	textAlign:'center', 
+    color: '#5e5e5e', 
+    fontSize: '16px',  
     border: 'none',
-    fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
-  },
-  newTableBody:{
-  	textAlign:'center',
-    color: '#5e5e5e',
-    fontSize: '16px', 
-    border: 'none',
-    fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
-  }
-});
+    fontFamily:'Proxima-Nova', 
+    fontStyle:'normal' 
+  } 
+}); 
 
-export default Dimensions({
+export default Dimensions({ 
   getHeight: function(element) {
-    return window.innerHeight - 405;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

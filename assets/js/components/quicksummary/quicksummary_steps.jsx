@@ -63,7 +63,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -78,8 +78,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		let rowsCount = this.state.myTableData.length;
 		return(
 			<div>
-			 <div className="quick3"
-			  >
+			 <div>
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={65}
@@ -95,7 +94,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		              {this.state.myTableData[props.rowIndex].name}
 		            </Cell>
 		          )}
-		          width={167}
+		          width={150}
 		          fixed={true}
 		        />
 			    {this.renderTableColumns(this.props.data,"steps_ql")}
@@ -110,8 +109,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 const styles = StyleSheet.create({
   newTableHeader: {
   	textAlign:'center',
-    color: '#111111',
-    fontSize: '18px',   
+    color: '#111111',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -128,7 +126,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 275;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;

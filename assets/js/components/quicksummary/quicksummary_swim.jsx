@@ -40,7 +40,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 				              {all_data[props.rowIndex]}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={100}
 				/>
 			)
 		}
@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
   newTableHeader: {
   	textAlign:'center',
     color: '#111111',
-    fontSize: '18px',   
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'
@@ -101,7 +100,7 @@ const styles = StyleSheet.create({
 
 export default Dimensions({
   getHeight: function(element) {
-    return window.innerHeight - 483;
+    return window.innerHeight - 172;
   },
   getWidth: function(element) {
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;
