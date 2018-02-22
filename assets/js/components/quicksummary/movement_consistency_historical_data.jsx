@@ -9,42 +9,54 @@ import { StyleSheet, css } from 'aphrodite';
 
 class MovementHistorical extends Component{
 	constructor(props){
-	super(props);
-	 this.renderTableColumns = this.renderTableColumns.bind(this);
+  super(props);
+   this.renderTableColumns = this.renderTableColumns.bind(this);
   }
-   renderTableColumns(dateWiseData){
+
+renderTableColumns(dateWiseData,category,classes=""){
     let columns = [];
-   
-    return columns;
+    for(let [date,data] of Object.entries(dateWiseData)){
+      console.log(date);
+      columns.push(
+        <Column 
+          cell={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+              width={100}
+        />
+      )
+    }
+
+    
+  return columns;
+
+}
+
+ render(){
+    const {height, width, containerHeight, containerWidth, ...props} = this.props;
+    let rowsCount = this.renderTableColumns.length;
+    return(
+      <div>
+       <div>
+       <Table
+            rowsCount={rowsCount}
+            rowHeight={65}
+            headerHeight={50}
+            width={containerWidth}
+            height={containerHeight}
+            touchScrollEnabled={true}
+            {...props}>
+            <Column
+              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
+              width={150}
+              fixed={true}
+            />
+          {this.renderTableColumns(this.props.data,"steps_ql")}
+          </Table>
+      </div>
+      </div>
+
+      );
   }
 
-	 render(){
-	 	const {height, width, containerHeight, containerWidth, ...props} = this.props;
-		return(
-			<div>
-			 <Table
-		        rowsCount={10}
-		        rowHeight={65}
-		        headerHeight={65}
-		        width={containerWidth}
-        		height={containerHeight}
-        		touchScrollEnabled={true}
-        		{...props}>
-		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
-		          cell={props => (
-		            <Cell>
-		            </Cell>
-		          )}
-		          width={225}
-		          fixed={true}
-		        />
-			    
-      		</Table>
-			</div>
-
-			);
-	}
 }
 
 const styles = StyleSheet.create({
