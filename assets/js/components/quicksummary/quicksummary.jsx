@@ -794,7 +794,7 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                     <NavItem onClick={this.toggle} className="Movement">
+                                     {/*<NavItem onClick={this.toggle} className="Movement">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Movement Consistency Historical Data">
                                             <NavLink id="headernames" href="#" className={class_movementHistorical} value="movementhistorical"
@@ -803,7 +803,7 @@ onLogoutSuccess(response){
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>
+                                       </NavItem>*/}
 
                                         <NavItem onClick={this.toggle} className="bikestats">
                                         <span id="spa">
