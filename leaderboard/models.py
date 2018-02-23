@@ -12,7 +12,35 @@ class Rank(Func):
 	def __init__(self, expressions, sort_order = 'DESC', **extra):
 		super().__init__(expressions,sort_order,**extra)
 
-class LeaderBoard(models.Model):
+class LeaderboardManager(models.Manager):
+	def generate(self,date,category=None):
+		'''
+		Generate leaderboard for given category and date
+		If category is not provided, then generate leaderboard for each category
+		'''
+		qs = super().get_queryset()
+
+		# lb = Scores.objects.annotate(
+		# 	category_rank = Rank('score')
+		# ).filter(category=self.category, created_at=self.created_at)
+
+		where_condition = ''
+		if category and date:
+			where_condition = "WHERE s1.category = '{}' AND s1.created_at = '{}'".format(category,date)
+		elif not category and date:
+			where_condition = "WHERE s1.created_at = '{}'".format(date)
+
+		SQL = """SELECT s1.id, s1.user_id, s1.category,s1.score,COUNT(s2.score) AS category_rank
+FROM leaderboard_score s1 JOIN leaderboard_score s2 
+ON ((s1.score < s2.score OR (s1.user_id = s2.user_id AND s1.score = s2.score))
+AND s1.category = s2.category AND s1.created_at == s2.created_at)
+{}
+GROUP BY s1.id ORDER BY s1.category,category_rank""".format(where_condition)
+				
+		lb = qs.raw(SQL)
+		return lb
+		
+class Score(models.Model):
 	OVERALL_HEALTH_GPA = 'oh_gpa'
 	MOVEMENT_NON_EXERCISE_GPA = 'mne_gpa'
 	MOVEMENT_CONSISTENCY = 'mc'
@@ -47,6 +75,8 @@ class LeaderBoard(models.Model):
 	created_at = models.DateField()
 	updated_at = models.DateTimeField(auto_now=True)
 
+	leaderboard = LeaderboardManager()
+
 	class Meta:
 		unique_together = ("user","category","created_at")
 		indexes = [
@@ -63,31 +93,9 @@ class LeaderBoard(models.Model):
 		'''
 		Calculate rank in it's own category
 		'''
-		min_rank = LeaderBoard.objects.filter(
+		min_rank = Score.objects.filter(
 			Q(score__gt = self.score) & Q(created_at = self.created_at) &
 			Q(category = self.category)
 		).count() + 1
 
 		return min_rank
-
-	@property
-	def category_leaderboard(self):
-		'''
-		Generate leaderboard in it's category
-		'''
-
-		# lb = LeaderBoard.objects.annotate(
-		# 	category_rank = Rank('score')
-		# ).filter(category=self.category, created_at=self.created_at)
-		# print(lb.query)
-		# return lb
-
-		SQL = """SELECT s1.id, s1.user_id, s1.score,COUNT(s2.score) AS category_rank
-FROM leaderboard_leaderboard s1 JOIN leaderboard_leaderboard s2 
-ON ((s1.score < s2.score OR (s1.user_id = s2.user_id AND s1.score = s2.score))
-AND s1.category = s2.category AND s1.created_at == s2.created_at)
-WHERE s1.category = '{}' AND s1.created_at = '{}'
-GROUP BY s1.id ORDER BY category_rank""".format(self.category, self.created_at)
-				
-		lb = LeaderBoard.objects.raw(SQL)
-		return lb

@@ -1,7 +1,7 @@
 from django.contrib import admin
-from leaderboard.models import LeaderBoard
+from leaderboard.models import Score
 
-@admin.register(LeaderBoard)
+@admin.register(Score)
 class LeaderBoardAdmin(admin.ModelAdmin):
 	list_display=('user',"category","score",'created_at','updated_at')
 	ordering = ('-created_at',)
