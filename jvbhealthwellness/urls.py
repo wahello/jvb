@@ -8,6 +8,7 @@ from garmin import urls as garminUrls
 from garmin import views as garmin_views
 from quicklook import urls as quicklookUrls
 from progress_analyzer import urls as progressUrls
+from leaderboard import urls as leaderboardUrls
 
 
 urlpatterns = [
@@ -42,6 +43,7 @@ urlpatterns = [
     url(r'^garmin/',include(garminUrls)),
     url(r'^quicklook/',include(quicklookUrls)),
     url(r'^progress/',include(progressUrls)),
+    url(r'^leaderboard/', include(leaderboardUrls)),
     url(r'^users/',include(userInputUrls)),
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
