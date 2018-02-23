@@ -9,19 +9,42 @@ import { StyleSheet, css } from 'aphrodite';
 
 class MovementHistorical extends Component{
 	constructor(props){
-  super(props);
-   this.renderTableColumns = this.renderTableColumns.bind(this);
+    super(props);
+    console.log('----------------------', this.props)
+    this.renderTableColumns = this.renderTableColumns.bind(this);
+
+    this.state = {
+      myTableData: []
+    }
+
+    var p = this.props.data;
+
+    for(var key in p) {
+      this.state.myTableData.push({name: key})
+    }
   }
 
 renderTableColumns(dateWiseData,category,classes=""){
     let columns = [];
+    console.log(dateWiseData)
     for(let [date,data] of Object.entries(dateWiseData)){
-      console.log(date);
+      let all_data = [];
+      for(let [key,value] of Object.entries(data[category])){
+        if(key !== 'id' && key !== 'user_ql'){
+          all_data.push(value);
+        }
+      }
+
+      //console.log('=====',all_data)
       columns.push(
-      <Column    
-         cell= {<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
-          />
-             
+        <Column 
+          cell={props => (
+                    <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
+                      {all_data[props.rowIndex]}
+                    </Cell>
+                  )}
+              width={100}
+        />
       )
     }
 
@@ -31,6 +54,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
  render(){
     const {height, width, containerHeight, containerWidth, ...props} = this.props;
+    let rowsCount = this.state.myTableData.length;
     return(
       <div>
        <div>
@@ -44,7 +68,15 @@ renderTableColumns(dateWiseData,category,classes=""){
             {...props}>
             <Column
               header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
+<<<<<<< HEAD
               cell={<Cell data={this.renderTableColumns}></Cell>}
+=======
+              cell={props => (
+                <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
+                  {this.state.myTableData[props.rowIndex].name}
+                </Cell>
+                )}
+>>>>>>> d014bed93a01c6a2171af7400342bb73f9014d7d
               width={150}
               fixed={true}
             />

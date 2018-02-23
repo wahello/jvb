@@ -365,7 +365,7 @@ def _get_nutrition_cum_sum(today_ql_data, yday_cum_data=None):
 	
 	elif today_ql_data:
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed_gpa'] = _safe_get_mobj(
-			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_grade",0)
+			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_gpa",0)
 
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed'] = _safe_get_mobj(
 			today_ql_data.food_ql,"prcnt_non_processed_food",0)
