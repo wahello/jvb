@@ -68,15 +68,13 @@ renderTableColumns(dateWiseData,category,classes=""){
             {...props}>
             <Column
               header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
-<<<<<<< HEAD
-              cell={<Cell data={this.renderTableColumns}></Cell>}
-=======
+
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
                   {this.state.myTableData[props.rowIndex].name}
                 </Cell>
                 )}
->>>>>>> d014bed93a01c6a2171af7400342bb73f9014d7d
+
               width={150}
               fixed={true}
             />
