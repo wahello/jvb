@@ -123,6 +123,10 @@ class Quicklook extends Component{
 					data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
 					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
 
+				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
+				let avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":")?
+				ui_sleep_duration:data.sleep_ql.sleep_per_wearable;
+
        			var properties={
        			created_at:data.created_at,
 				grades_ql: {
@@ -133,7 +137,7 @@ class Quicklook extends Component{
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        movement_consistency_score:data.steps_ql.movement_consistency,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
-			        avg_sleep_per_night:data.sleep_ql.sleep_per_wearable,
+			        avg_sleep_per_night:avg_sleep_per_night,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
 			        workout_today: user_input_data.strong_input.workout,
 			        exercise_consistency_score:data.grades_ql.exercise_consistency_score,

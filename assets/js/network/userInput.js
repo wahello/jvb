@@ -165,7 +165,12 @@ function formatJSON(data){
 	json_data.strong_input['list_of_processed_food_consumed_yesterday'] =data.processed_food_list;
 	json_data.strong_input['number_of_alcohol_consumed_yesterday'] = data.alchol_consumed; 
 	json_data.strong_input['alcohol_drink_consumed_list'] = data.alcohol_drink_consumed_list;
-	json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
+
+	if(data.sleep_hours_last_night && data.sleep_mins_last_night)
+		json_data.strong_input['sleep_time_excluding_awake_time'] = data.sleep_hours_last_night+":"+data.sleep_mins_last_night;
+	else
+		json_data.strong_input['sleep_time_excluding_awake_time'] = "";
+	
 	json_data.strong_input['sleep_bedtime'] = sleep_bedtime;
 	json_data.strong_input['sleep_awake_time'] = sleep_awake_time;
 	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;

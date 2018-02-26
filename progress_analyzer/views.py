@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from itertools import zip_longest
+
 from django.db.models import Q
 
 from rest_framework.views import APIView
@@ -12,33 +14,64 @@ from progress_analyzer.models import CumulativeSum
 from progress_analyzer.helpers.helper_classes import ToCumulativeSum
 	
 class ProgressReportView(APIView):
+	'''Generate Progress Analyzer Reports on the fly'''
+
 	permission_classes = (IsAuthenticated,)
+
+	def grouped(self,iterable,n,fillvalue):
+		'''
+		Return grouped data for any iterable
+		"s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ..."
+
+		Arguments
+		- n: type int, number of item in group
+		- fillvalue: type obj, If the iterables are of uneven length, missing values
+		  are filled-in with fillvalue
+
+		example -
+		>>> l = [1,2,3,4,5,6,7]
+		>>> list(pairwise(l,2,None))
+		>>> [(1,2), (3,4), (5,6), (7,None)]
+		'''
+		a = iter(iterable)
+		return zip_longest(*[a]*n, fillvalue=fillvalue)
 
 	def _initialize(self):
 		self.summary_type = ['overall_health','non_exercise','sleep','mc','ec',
 		'nutrition','exercise','alcohol','other']
 		self.duration_type = ['today','yesterday','week','month','year']
-
-		# Custom date range for which report is to be created
-		# expected format of the date is 'YYYY-MM-DD'
 		self.current_date = self._str_to_dt(self.request.query_params.get('date',None))
-		self.from_dt = self._str_to_dt(self.request.query_params.get('from',None))
-		self.to_dt = self._str_to_dt(self.request.query_params.get('to',None))
-		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
-			for q in self._get_cum_queryset()}
-		self.ql_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
-			for q in self._get_ql_queryset()}
+		# Custom date range(s) for which report is to be created
+		# expected format of the date is 'YYYY-MM-DD'
+		self.custom_ranges = self.request.query_params.get('custom_ranges',None)
 		self.duration_denominator = {
 			'today':1,'yesterday':1, 'week':7, "month":30, "year":365
 		}
+
+		if self.current_date:
+			self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
+				for q in self._get_cum_queryset()}
+			self.ql_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
+				for q in self._get_ql_queryset()}
+
 		self.custom_daterange = False
+		if self.custom_ranges:
+			# it'll be list of tuples, where first item of tuple is the start of range
+			# and second is end of the range. For example - 
+			# [("2018-02-12","2018-02-17"), ("2018-02-01, 2018-02-29"), ...]
 
-		if self.from_dt and self.to_dt:
+			self.custom_ranges = [(self._str_to_dt(r[0]),self._str_to_dt(r[1]))
+				for r in list(self.grouped(self.custom_ranges.split(","),2,None))
+				if r[0] and r[1]]
+
 			self.cumulative_datewise_data_custom_range = {q.created_at.strftime("%Y-%m-%d"):q 
-				for q in self._get_cum_queryset_custom_range(self.from_dt, self.to_dt)}
+				for q in self._get_cum_queryset_custom_range(self.custom_ranges)}
+			if not self.current_date:
+				self.duration_type = []
 
-			custom_range_denominator = (self.to_dt - self.from_dt).days + 1
-			self.duration_denominator['custom_range'] = custom_range_denominator
+			for r in self.custom_ranges: 
+				str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
+				self.duration_denominator[str_range] = (r[1] - r[0]).days + 1
 			self.custom_daterange = True
 
 
@@ -51,7 +84,7 @@ class ProgressReportView(APIView):
 				self.summary_type.pop(self.summary_type.index(s))
 
 		duration = self.request.query_params.get('duration',None)
-		if duration:
+		if duration and self.current_date:
 			duration = [item.strip() for item in duration.strip().split(',')]
 			allowed = set(duration)
 			existing = set(self.duration_type)
@@ -128,10 +161,13 @@ class ProgressReportView(APIView):
 		)
 		return ql_data_qs
 
-	def _get_cum_queryset_custom_range(self,from_dt, to_dt):
+	def _get_cum_queryset_custom_range(self,custom_ranges):
 		user = self.request.user
-		day_before_from_date = from_dt - timedelta(days=1)
-		filters = Q(created_at=to_dt.date()) | Q(created_at=day_before_from_date.date())
+		filters = Q()
+		for r in custom_ranges:
+			day_before_from_date = r[0] - timedelta(days=1)
+			filters |= Q(Q(created_at=r[1].date()) | Q (created_at=day_before_from_date.date()))
+
 		related_fields = self._get_model_related_fields_names(CumulativeSum)
 		cumulative_data_qs = CumulativeSum.objects.select_related(*related_fields).filter(
 			filters, user = user
@@ -142,54 +178,103 @@ class ProgressReportView(APIView):
 		duration = {
 			'today': current_date.date(),
 			'yesterday':(current_date - timedelta(days=1)).date(),
-			'week':(current_date - timedelta(days=7)).date(),
-			'month':(current_date - timedelta(days=30)).date(),
-			'year':(current_date - timedelta(days=365)).date()
+			# Avg excluding today
+			'week':(current_date - timedelta(days=8)).date(),
+			'month':(current_date - timedelta(days=31)).date(),
+			'year':(current_date - timedelta(days=366)).date()
 		}
 		return duration
 
 	def _generic_custom_range_calculator(self,key,alias,summary_type,custom_avg_calculator):
+		custom_average_data = {}
 
-		#for select related
-		to_select_related = lambda x : "_{}_cache".format(x)
+		for r in self.custom_ranges:
+			print(r)
+			#for select related
+			to_select_related = lambda x : "_{}_cache".format(x)
 
-		day_before_from_date = self.from_dt - timedelta(days=1)
-		range_start_data = self.cumulative_datewise_data_custom_range.get(
-			day_before_from_date.strftime("%Y-%m-%d"),None
-		)
-		range_end_data = self.cumulative_datewise_data_custom_range.get(
-			self.to_dt.strftime("%Y-%m-%d"),None
-		)
-		
-		format_summary_name = True
-		if not range_end_data and self.to_dt == self.current_date:
-			yesterday_cum_data = self.cumulative_datewise_data.get(
-				(self.to_dt-timedelta(days=1)).strftime("%Y-%m-%d"),None
+			day_before_from_date = r[0] - timedelta(days=1)
+			range_start_data = self.cumulative_datewise_data_custom_range.get(
+				day_before_from_date.strftime("%Y-%m-%d"),None
 			)
-			range_end_data = self.ql_datewise_data.get(
-				self.to_dt.strftime("%Y-%m-%d"),None
+			range_end_data = self.cumulative_datewise_data_custom_range.get(
+				r[1].strftime("%Y-%m-%d"),None
 			)
-			if range_end_data and yesterday_cum_data:
-				range_end_data = ToCumulativeSum(range_end_data,yesterday_cum_data)
-				format_summary_name = False
-
-		if range_start_data and range_end_data:
-			range_start_data = range_start_data.__dict__.get(to_select_related(summary_type))
 			
-			if format_summary_name:
-				summary_type = to_select_related(summary_type)
-			range_end_data = range_end_data.__dict__.get(summary_type)
-			return {
-				"from_dt":self.from_dt.strftime("%Y-%m-%d"),
-				"to_dt":self.to_dt.strftime("%Y-%m-%d"),
-				"data":custom_avg_calculator(key,alias,range_end_data,range_start_data)
-			}
+			format_summary_name = True
+			if not range_end_data and r[1] == self.current_date:
+				yesterday_cum_data = self.cumulative_datewise_data.get(
+					(r[1]-timedelta(days=1)).strftime("%Y-%m-%d"),None
+				)
+				range_end_data = self.ql_datewise_data.get(
+					r[1].strftime("%Y-%m-%d"),None
+				)
+				if range_end_data and yesterday_cum_data:
+					range_end_data = ToCumulativeSum(range_end_data,yesterday_cum_data)
+					format_summary_name = False
 
-		return {
-			"from_dt":self.from_dt.strftime("%Y-%m-%d"),
-			"to_dt":self.to_dt.strftime("%Y-%m-%d"),
-			"data":None
-		}
+			str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
+			if range_start_data and range_end_data:
+				range_start_data = range_start_data.__dict__.get(to_select_related(summary_type))
+				
+				tmp_summary_type = summary_type
+				if format_summary_name:
+					tmp_summary_type = to_select_related(summary_type)
+				range_end_data = range_end_data.__dict__.get(tmp_summary_type)
+				ravg = {
+					"from_dt":r[0].strftime("%Y-%m-%d"),
+					"to_dt":r[1].strftime("%Y-%m-%d"),
+					"data":custom_avg_calculator(key,str_range,range_end_data,range_start_data)
+				}
+
+			else:
+				ravg = {
+					"from_dt":r[0].strftime("%Y-%m-%d"),
+					"to_dt":r[1].strftime("%Y-%m-%d"),
+					"data":None
+				}
+
+			custom_average_data[str_range] = ravg
+
+		return custom_average_data
+
+	def _generic_summary_calculator(self,calculated_data_dict,avg_calculator,summary_type):
+		todays_data = self.ql_datewise_data.get(
+				self.current_date.strftime("%Y-%m-%d"),None)
+		yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
+		day_before_yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+
+		if todays_data:
+			if yesterday_data:
+				todays_data = ToCumulativeSum(todays_data,yesterday_data).__dict__.get(summary_type)
+			else:
+				todays_data = ToCumulativeSum(todays_data).__dict__.get(summary_type)
+		if yesterday_data:
+			# Because of select related, attribute names become "_attrname_cache"
+			cached_summary_type = "_{}_cache".format(summary_type)
+			yesterday_data = yesterday_data.__dict__.get(cached_summary_type)
+
+		if day_before_yesterday_data:
+			cached_summary_type = "_{}_cache".format(summary_type)
+			day_before_yesterday_data = day_before_yesterday_data.__dict__.get(cached_summary_type)
+	
+		for key in calculated_data_dict.keys():
+			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
+				if alias in self.duration_type:
+					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					if current_data:
+						cached_summary_type = "_{}_cache".format(summary_type)
+						current_data = current_data.__dict__.get(cached_summary_type)
+					if alias == 'today' and yesterday_data:
+						calculated_data_dict[key][alias] = avg_calculator(key,alias,todays_data,yesterday_data)
+						continue
+					elif alias == 'yesterday' and day_before_yesterday_data:
+						calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,day_before_yesterday_data)
+						continue
+					# Avg excluding today, that's why subtract from yesterday's cum sum
+					calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,current_data)
 
 	def _get_summary_calculator_binding(self):
 		SUMMARY_CALCULATOR_BINDING = {
@@ -239,45 +324,16 @@ class ProgressReportView(APIView):
 			'rank':{d:None for d in self.duration_type},
 			'overall_health_gpa_grade':{d:None for d in self.duration_type}
 		}
+		summary_type = "overall_health_grade_cum"
 
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "overall_health_grade_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias, summary_type, _calculate
 				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).overall_health_grade_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).overall_health_grade_cum
-		if yesterday_data:
-			yesterday_data = yesterday_data.overall_health_grade_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.overall_health_grade_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.overall_health_grade_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
 		return calculated_data
 
@@ -319,45 +375,17 @@ class ProgressReportView(APIView):
 			'non_exericse_steps_gpa':{d:None for d in self.duration_type},
 			'total_steps':{d:None for d in self.duration_type}
 		}
+		summary_type = "non_exercise_steps_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "non_exercise_steps_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).non_exercise_steps_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).non_exercise_steps_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.non_exercise_steps_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.non_exercise_steps_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.non_exercise_steps_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_sleep_summary(self,custom_daterange = False):
@@ -413,45 +441,17 @@ class ProgressReportView(APIView):
 			'prcnt_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
 			'overall_sleep_gpa':{d:None for d in self.duration_type},
 		}
+		summary_type = "sleep_per_night_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "sleep_per_night_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).sleep_per_night_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).sleep_per_night_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.sleep_per_night_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.sleep_per_night_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.sleep_per_night_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_movement_consistency_summary(self,custom_daterange = False):
@@ -484,45 +484,17 @@ class ProgressReportView(APIView):
 			'movement_consistency_grade':{d:None for d in self.duration_type},
 			'movement_consistency_gpa':{d:None for d in self.duration_type},
 		}
+		summary_type = "movement_consistency_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "movement_consistency_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).movement_consistency_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).movement_consistency_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.movement_consistency_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.movement_consistency_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.movement_consistency_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_exercise_consistency_summary(self,custom_daterange = False):
@@ -543,8 +515,8 @@ class ProgressReportView(APIView):
 				elif key == 'exercise_consistency_grade':
 					return calculation_helper.cal_exercise_consistency_grade(
 						self._get_average(
-							todays_data.cum_exercise_consistency_gpa,
-							current_data.cum_exercise_consistency_gpa,alias
+							todays_data.cum_avg_exercise_day,
+							current_data.cum_avg_exercise_day,alias
 						)
 					)[0]
 			return None
@@ -555,45 +527,17 @@ class ProgressReportView(APIView):
 			'exercise_consistency_grade':{d:None for d in self.duration_type},
 			'exercise_consistency_gpa':{d:None for d in self.duration_type},
 		}
+		summary_type = "exercise_consistency_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "exercise_consistency_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_consistency_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).exercise_consistency_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.exercise_consistency_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.exercise_consistency_cum
-		
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.exercise_consistency_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_nutrition_summary(self, custom_daterange = False):
@@ -613,8 +557,8 @@ class ProgressReportView(APIView):
 				elif key == 'prcnt_unprocessed_food_grade':
 					return calculation_helper.cal_unprocessed_food_grade(
 						self._get_average(
-							todays_data.cum_prcnt_unprocessed_food_consumed_gpa,
-							current_data.cum_prcnt_unprocessed_food_consumed_gpa,alias
+							todays_data.cum_prcnt_unprocessed_food_consumed,
+							current_data.cum_prcnt_unprocessed_food_consumed,alias
 						)
 					)[0]
 			return None
@@ -625,45 +569,18 @@ class ProgressReportView(APIView):
 			'prcnt_unprocessed_food_grade':{d:None for d in self.duration_type},
 			'prcnt_unprocessed_food_gpa':{d:None for d in self.duration_type},
 		}
+		summary_type = "nutrition_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "nutrition_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
 
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).nutrition_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).nutrition_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.nutrition_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.nutrition_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.nutrition_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_exercise_summary(self, custom_daterange = False):
@@ -706,6 +623,8 @@ class ProgressReportView(APIView):
 			'avg_exercise_heart_rate':{d:None for d in self.duration_type},
 			'vo2_max':{d:None for d in self.duration_type}
 		}
+		summary_type = "exercise_stats_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
 			summary_type = "exercise_stats_cum"
@@ -713,38 +632,9 @@ class ProgressReportView(APIView):
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_stats_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).exercise_stats_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.exercise_stats_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.exercise_stats_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.exercise_stats_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_alcohol_summary(self, custom_daterange = False):
@@ -776,47 +666,18 @@ class ProgressReportView(APIView):
 			'alcoholic_drinks_per_week_grade':{d:None for d in self.duration_type},
 			'alcoholic_drinks_per_week_gpa':{d:None for d in self.duration_type},
 		}
+		summary_type = "alcohol_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "alcohol_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
 
-		
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).alcohol_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).alcohol_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.alcohol_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.alcohol_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.alcohol_cum
-
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def _cal_other_summary(self, custom_daterange = False):
@@ -863,47 +724,18 @@ class ProgressReportView(APIView):
 			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
 			'floors_climbed':{d:None for d in self.duration_type}
 		}
+		summary_type = "other_stats_cum"
+
 		if custom_daterange:
 			alias = "custom_range"
-			summary_type = "other_stats_cum"
 			for key in calculated_data.keys():
 				calculated_data[key][alias] = self._generic_custom_range_calculator(
 					key, alias,summary_type, _calculate
 				)
 
-		
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
 
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).other_stats_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).other_stats_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.other_stats_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.other_stats_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.other_stats_cum
-
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
 		return calculated_data
 
 	def get(self, request, format="json"):
@@ -912,6 +744,7 @@ class ProgressReportView(APIView):
 		DATA = {'summary':{}, "created_at":None}
 		for summary in self.summary_type:
 			DATA['summary'][summary] = SUMMARY_CALCULATOR_BINDING[summary](self.custom_daterange)
-		DATA['created_at'] = self.current_date.strftime("%Y-%m-%d")
+		if self.current_date:
+			DATA['created_at'] = self.current_date.strftime("%Y-%m-%d")
 
 		return Response(DATA,status=status.HTTP_200_OK)
