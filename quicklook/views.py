@@ -3,7 +3,7 @@ import calendar
 import ast
 import time
 import json
-import xlsxwriter	
+import xlsxwriter
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -31,6 +31,19 @@ from .models import UserQuickLook,\
 					Food,\
 					Alcohol,\
 					ExerciseAndReporting
+
+from progress_analyzer.models import OverallHealthGradeCumulative, \
+                                     NonExerciseStepsCumulative,\
+                                     SleepPerNightCumulative,\
+                                     MovementConsistencyCumulative,\
+                                     ExerciseConsistencyCumulative,\
+                                     NutritionCumulative,\
+                                     ExerciseStatsCumulative,\
+                                     AlcoholCumulative,\
+                                     OtherStatsCumulative
+
+
+
 
 
 class UserQuickLookView(generics.ListCreateAPIView):
@@ -373,6 +386,12 @@ def export_users_xls(request):
 	user_input_strong_datewise = {q.user_input.created_at.strftime("%Y-%m-%d"):q
 		 for q in user_input_strong }
 
+	health_grade_cum = OverallHealthGradeCumulative.objects.filter(
+		user_cum__created_at__range=(from_date, to_date),
+		user_cum__user = request.user).order_by('-user_cum__created_at')
+	health_grade_cum_datewise = {q.user_cum.created_at.strftime("%Y-%m-%d"):q
+		 for q in health_grade_cum }
+
 
 	current_date = to_date
 	r = 0
@@ -400,7 +419,8 @@ def export_users_xls(request):
 		alcohol_data = alcohol_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		exercise_data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		user_input_strong_data = user_input_strong_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-		
+		health_grade_cum = health_grade_cum_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		# print(health_grade_cum)
 		if steps_data and grades_data and exercise_data and food_data and alcohol_data and sleep_data:
 			if user_input_strong_data:
 				user_input_strong_data = user_input_strong_data.__dict__
@@ -410,12 +430,12 @@ def export_users_xls(request):
 			exercise_data = exercise_data.__dict__
 			alcohol_data = alcohol_data.__dict__
 			food_data = food_data.__dict__
-			
+			# health_grade_cum = health_grade_cum.__dict__
 			# logic
-
+			# print(health_grade_cum)
 			row_num += 1
 			for i,key in enumerate(columns):
-			
+		
 				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout' and key != 'overall_gpa_without_penalties':
 					if grades_data[key] == 'A':
 						sheet9.write(i+3,row_num, grades_data[key],format_green)
@@ -448,7 +468,15 @@ def export_users_xls(request):
 				elif i == 5 and key == 'movement_consistency' and steps_data[key]:
 					sheet9.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format)
 				elif i == 7:
-					sheet9.write(i+3,row_num, sleep_data[key],format1)
+					if user_input_strong_data:
+						sheet9.write(i+3,row_num, user_input_strong_data['sleep_time_excluding_awake_time'],format1)
+						print(user_input_strong_data['sleep_time_excluding_awake_time'])
+					else:
+						sheet9.write(i+3,row_num, sleep_data[key],format1)
+					# if user_input_strong_data:
+					# 	print("exists")
+					# else:
+					# 	print("Does not exits")
 				elif key == 'workout' and i == 9:
 					if user_input_strong_data:
 						sheet9.write(i+3, row_num, user_input_strong_data[key],format)
@@ -1090,7 +1118,10 @@ def export_users_xls(request):
 				elif i == 5 and key == 'movement_consistency' and steps_data[key]:
 					sheet1.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format)
 				elif i == 7:
-					sheet1.write(i+3,row_num, sleep_data[key],format1)
+					if user_input_strong_data:
+						sheet1.write(i+3,row_num, user_input_strong_data['sleep_time_excluding_awake_time'],format1)
+					else:
+						sheet1.write(i+3,row_num, sleep_data[key],format1)
 				elif key == 'workout':
 					if user_input_strong_data:
 						sheet1.write(i+3, row_num, user_input_strong_data[key],format)
@@ -2195,7 +2226,12 @@ def export_users_xls(request):
 			sheet11.write(row,col,'')
 		current_date -= timedelta(days=1)
 
-	
+	#Progress Analyzer
+
+	json_cum = open('/home/normsoftware/WORK/JVB/pa_dummy.json')
+	json_cum_str = json_cum.read()
+	json_cum1 = json.loads(json_cum_str)
+	# print(json_cum1['summary']['nutrition']['prcnt_unprocessed_food_gpa']['custom_range']['2018-02-12 to 2018-02-18'])
 
 	book.close()
 	return response

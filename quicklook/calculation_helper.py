@@ -126,9 +126,6 @@ def update_helper(instance,data_dict):
 	'''
 		Helper function to update the instance
 		with provided key,value pair
-
-		Warning: This will not trigger any signals
-				 like post or pre save
 	'''
 	for attr, value in data_dict.items():
 		setattr(instance,attr,value)
@@ -1175,14 +1172,18 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 	return (None, None, None)
 
 def get_avg_sleep_grade(yesterday_sleep_data,today_sleep_data,
-	user_input_bedtime, user_input_awake_time,user_input_timezone,sleep_aid):
+	user_input_bedtime, user_input_awake_time,user_input_sleep_duration,
+	user_input_timezone,sleep_aid):
 
 	sleep_stats = get_sleep_stats(yesterday_sleep_data,today_sleep_data,
 		user_input_bedtime,user_input_awake_time, user_input_timezone)
-	if sleep_stats['sleep_per_wearable']:
-		grade_point = cal_average_sleep_grade(
-			  sleep_stats['sleep_per_wearable'],
-			  sleep_aid)
+	sleep_per_wearable = sleep_stats['sleep_per_wearable']
+
+	if user_input_sleep_duration and user_input_sleep_duration != ":":
+		grade_point = cal_average_sleep_grade(user_input_sleep_duration,sleep_aid)
+		return grade_point
+	elif sleep_per_wearable:
+		grade_point = cal_average_sleep_grade(sleep_per_wearable,sleep_aid)
 		return grade_point
 	return (None,None)
 
@@ -1539,6 +1540,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Sleeps
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)
 		user_input_awake_time = safe_get(todays_daily_strong,"sleep_awake_time",None)
+		user_input_sleep_duration = safe_get(todays_daily_strong,"sleep_time_excluding_awake_time",None)
 		user_input_timezone = todays_user_input.timezone if todays_user_input else None
 		
 		sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,
@@ -1613,6 +1615,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 			sleeps_today_json,
 			user_input_bedtime = user_input_bedtime,
 			user_input_awake_time = user_input_awake_time,
+			user_input_sleep_duration = user_input_sleep_duration,
 			user_input_timezone = user_input_timezone,
 			sleep_aid = user_input_sleep_aid
 			)
