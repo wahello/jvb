@@ -124,9 +124,10 @@ class Quicklook extends Component{
 					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
 
 				let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
-				if(user_input_data.length){
+				if(user_input_data){
 					let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
-					let avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":")?ui_sleep_duration:data.sleep_ql.sleep_per_wearable;
+					avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
+						&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
 				}
        			var properties={
        			created_at:data.created_at,
