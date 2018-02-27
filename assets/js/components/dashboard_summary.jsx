@@ -562,13 +562,6 @@ constructor(props){
   
   }
 
-customRangeData(value){
-    var obj={
-        
-    data:value.data''
-    }
-    return obj;
-}
 
   successProgress(data){
     console.log(data);
@@ -586,7 +579,11 @@ customRangeData(value){
                         week:parseFloat(data.data.summary.overall_health.overall_health_gpa.week).toFixed(2),
                         yesterday:parseFloat(data.data.summary.overall_health.overall_health_gpa.yesterday).toFixed(2),
                         month:parseFloat(data.data.summary.overall_health.overall_health_gpa.month).toFixed(2),            
-                        custom_range :this.customRangeData(haveCustomData?data.data.summary.overall_health.overall_health_gpa.custom_range),
+                         custom_range:{
+                               [custom_date]:{                     
+                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:parseFloat(data.data.summary.overall_health.overall_health_gpa.today).toFixed(2),
                         year:parseFloat(data.data.summary.overall_health.overall_health_gpa.year).toFixed(2)
 
@@ -597,7 +594,7 @@ customRangeData(value){
                         month:data.data.summary.overall_health.overall_health_gpa_grade.month,
                         custom_range:{
                                [custom_date]:{                     
-                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa_grade.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.overall_health.overall_health_gpa_grade.today,
@@ -610,7 +607,7 @@ customRangeData(value){
                         month:data.data.summary.overall_health.rank.month,
                         custom_range:{ 
                         [custom_date]:{                   
-                           data:haveCustomData?data.data.summary.overall_health.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.overall_health.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.overall_health.rank.today,
@@ -623,7 +620,7 @@ customRangeData(value){
                         month:data.data.summary.overall_health.total_gpa_point.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.overall_health.total_gpa_point.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.overall_health.total_gpa_point.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.overall_health.total_gpa_point.today,
@@ -637,8 +634,8 @@ customRangeData(value){
                         yesterday:data.data.summary.ec.avg_no_of_days_exercises_per_week.yesterday,
                         month:data.data.summary.ec.avg_no_of_days_exercises_per_week.month,
                         custom_range:{
-                        [custom_date]{      
-                           data:haveCustomData?data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range[custom_date].data''
+                        [custom_date]:{      
+                           data:haveCustomData?data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.ec.avg_no_of_days_exercises_per_week.today,
@@ -650,7 +647,7 @@ customRangeData(value){
                         month:data.data.summary.ec.exercise_consistency_grade.month,
                         custom_range:{
                         [custom_date]:{             
-                           data:haveCustomData?data.data.summary.ec.exercise_consistency_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.ec.exercise_consistency_grade.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.ec.exercise_consistency_grade.today,
@@ -662,7 +659,7 @@ customRangeData(value){
                         month:data.data.summary.ec.rank.month,
                         custom_range:{
                         [custom_date]:{                     
-                           data:haveCustomData?data.data.summary.ec.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.ec.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.ec.rank.today,
@@ -674,7 +671,7 @@ customRangeData(value){
                         month:parseFloat(data.data.summary.ec.exercise_consistency_gpa.month).toFixed(2),
                         custom_range:{
                         [custom_date]:{       
-                           data:parseFloat(haveCustomData?data.data.summary.ec.exercise_consistency_gpa.custom_range[custom_date].data'').toFixed(2)
+                           data:parseFloat(haveCustomData?data.data.summary.ec.exercise_consistency_gpa.custom_range[custom_date].data:'').toFixed(2)
                         }
                     },
                         today:parseFloat(data.data.summary.ec.exercise_consistency_gpa.today).toFixed(2),
@@ -688,7 +685,7 @@ customRangeData(value){
                         month:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month).toFixed(2),
                         custom_range:{
                         [custom_date]:{      
-                           data:parseFloat(haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range[custom_date].data'').toFixed(2)
+                           data:parseFloat(haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range[custom_date].data:'').toFixed(2)
                         }
                     },
                         today:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today).toFixed(2),
@@ -700,7 +697,7 @@ customRangeData(value){
                         month:data.data.summary.nutrition.prcnt_unprocessed_food_grade.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.nutrition.prcnt_unprocessed_food_grade.today,
@@ -712,7 +709,7 @@ customRangeData(value){
                         month:data.data.summary.nutrition.rank.month,
                         custom_range:{
                         [custom_date]:{                  
-                           data:haveCustomData?data.data.summary.nutrition.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.nutrition.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.nutrition.rank.today,
@@ -724,7 +721,7 @@ customRangeData(value){
                         month:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.today,
@@ -739,7 +736,7 @@ customRangeData(value){
                         month:parseFloat(data.data.summary.mc.movement_consistency_gpa.month).toFixed(2),
                         custom_range:{
                             [custom_date]:{ 
-                           data:parseFloat(haveCustomData?data.data.summary.mc.movement_consistency_gpa.custom_range[custom_date].data'').toFixed(2)
+                           data:parseFloat(haveCustomData?data.data.summary.mc.movement_consistency_gpa.custom_range[custom_date].data:'').toFixed(2)
                         }
                     },
                         today:parseFloat(data.data.summary.mc.movement_consistency_gpa.today).toFixed(2),
@@ -751,7 +748,7 @@ customRangeData(value){
                         month:data.data.summary.mc.movement_consistency_grade.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.mc.movement_consistency_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.mc.movement_consistency_grade.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.mc.movement_consistency_grade.today,
@@ -763,7 +760,7 @@ customRangeData(value){
                         month:data.data.summary.mc.rank.month,
                         custom_range:{ 
                         [custom_date]:{                         
-                           data:haveCustomData?data.data.summary.mc.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.mc.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.mc.rank.today,
@@ -775,7 +772,7 @@ customRangeData(value){
                         month:data.data.summary.mc.movement_consistency_score.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.mc.movement_consistency_score.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.mc.movement_consistency_score.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.mc.movement_consistency_score.today,
@@ -789,7 +786,7 @@ customRangeData(value){
                         month:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.month).toFixed(2),
                         custom_range:{
                             [custom_date]:{ 
-                           data:parseFloat(haveCustomData?data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range[custom_date].data'').toFixed(2)
+                           data:parseFloat(haveCustomData?data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range[custom_date].data:'').toFixed(2)
                         }
                     },
                         today:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.today).toFixed(2),
@@ -801,7 +798,7 @@ customRangeData(value){
                         month:data.data.summary.non_exercise.rank.month,
                         custom_range:{ 
                         [custom_date]:{              
-                           data:haveCustomData?data.data.summary.non_exercise.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.non_exercise.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.non_exercise.rank.today,
@@ -813,7 +810,7 @@ customRangeData(value){
                         month:data.data.summary.non_exercise.movement_non_exercise_step_grade.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range[custom_date].data:''
                         }
                             },
                         today:data.data.summary.non_exercise.movement_non_exercise_step_grade.today,
@@ -825,7 +822,7 @@ customRangeData(value){
                         month:data.data.summary.non_exercise.non_exercise_steps.month,
                         custom_range:{ 
                         [custom_date]:{          
-                           data:haveCustomData?data.data.summary.non_exercise.non_exercise_steps.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.non_exercise.non_exercise_steps.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.non_exercise.non_exercise_steps.today,
@@ -837,7 +834,7 @@ customRangeData(value){
                         month:data.data.summary.non_exercise.total_steps.month,
                         custom_range:{
                         [custom_date]:{                  
-                           data:haveCustomData?data.data.summary.non_exercise.total_steps.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.non_exercise.total_steps.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.non_exercise.total_steps.today,
@@ -851,7 +848,7 @@ customRangeData(value){
                         month:data.data.summary.exercise.workout_duration_hours_min.month,
                         custom_range:{
                         [custom_date]:{       
-                           data:haveCustomData?data.data.summary.exercise.workout_duration_hours_min.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.exercise.workout_duration_hours_min.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.exercise.workout_duration_hours_min.today,
@@ -863,7 +860,7 @@ customRangeData(value){
                         month:data.data.summary.exercise.avg_exercise_heart_rate.month,
                         custom_range:{
                         [custom_date]:{         
-                           data:haveCustomData?data.data.summary.exercise.avg_exercise_heart_rate.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.exercise.avg_exercise_heart_rate.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.exercise.avg_exercise_heart_rate.today,
@@ -875,7 +872,7 @@ customRangeData(value){
                         month:data.data.summary.exercise.workout_effort_level.month,
                         custom_range:{
                         [custom_date]:{            
-                           data:haveCustomData?data.data.summary.exercise.workout_effort_level.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.exercise.workout_effort_level.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.exercise.workout_effort_level.today,
@@ -887,7 +884,7 @@ customRangeData(value){
                         month:data.data.summary.exercise.vo2_max.month,
                         custom_range:{
                         [custom_date]:{            
-                           data:haveCustomData?data.data.summary.exercise.vo2_max.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.exercise.vo2_max.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.exercise.vo2_max.today,
@@ -901,7 +898,7 @@ customRangeData(value){
                         month:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.month,
                         custom_range:{
                         [custom_date]:{                
-                           data:haveCustomData?data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today,
@@ -913,7 +910,7 @@ customRangeData(value){
                         month:data.data.summary.sleep.average_sleep_grade.month,
                         custom_range:{
                         [custom_date]:{                
-                           data:haveCustomData?data.data.summary.sleep.average_sleep_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.sleep.average_sleep_grade.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.sleep.average_sleep_grade.today,
@@ -925,7 +922,7 @@ customRangeData(value){
                         month:data.data.summary.sleep.rank.month,
                         custom_range:{
                         [custom_date]:{                    
-                           data:haveCustomData?data.data.summary.sleep.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.sleep.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.sleep.rank.today,
@@ -937,7 +934,7 @@ customRangeData(value){
                         month:data.data.summary.sleep.total_sleep_in_hours_min.month,
                         custom_range:{
                         [custom_date]:{           
-                           data:haveCustomData?data.data.summary.sleep.total_sleep_in_hours_min.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.sleep.total_sleep_in_hours_min.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.sleep.total_sleep_in_hours_min.today,
@@ -949,7 +946,7 @@ customRangeData(value){
                         month:parseFloat(data.data.summary.sleep.overall_sleep_gpa.month).toFixed(2),
                         custom_range:{
                         [custom_date]:{                    
-                           data:parseFloat(haveCustomData?data.data.summary.sleep.overall_sleep_gpa.custom_range[custom_date].data'').toFixed(2)
+                           data:parseFloat(haveCustomData?data.data.summary.sleep.overall_sleep_gpa.custom_range[custom_date].data:'').toFixed(2)
                         }
                     },
                         today:parseFloat(data.data.summary.sleep.overall_sleep_gpa.today).toFixed(2),
@@ -961,7 +958,7 @@ customRangeData(value){
                         month:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.month,
                         custom_range:{
                         [custom_date]:{                    
-                           data:haveCustomData?data.data.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.today,
@@ -975,7 +972,7 @@ customRangeData(value){
                         month:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.month,
                         custom_range:{
                             [custom_date]:{ 
-                           data:haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.today,
@@ -987,7 +984,7 @@ customRangeData(value){
                         month:data.data.summary.alcohol.avg_drink_per_week.month,
                         custom_range:{
                         [custom_date]:{                 
-                           data:haveCustomData?data.data.summary.alcohol.avg_drink_per_week.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.alcohol.avg_drink_per_week.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.alcohol.avg_drink_per_week.today,
@@ -999,7 +996,7 @@ customRangeData(value){
                         month:data.data.summary.alcohol.rank.month,
                         custom_range:{
                         [custom_date]:{               
-                           data:haveCustomData?data.data.summary.alcohol.rank.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.alcohol.rank.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.alcohol.rank.today,
@@ -1011,7 +1008,7 @@ customRangeData(value){
                         month:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month).toFixed(2),
                         custom_range:{
                         [custom_date]:{     
-                           data:parseFloat(haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range[custom_date].data'').toFixed(2)
+                           data:parseFloat(haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range[custom_date].data:'').toFixed(2)
                         }
                     },
                         today:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today).toFixed(2),
@@ -1025,7 +1022,7 @@ customRangeData(value){
                         month:data.data.summary.other.hrr_beats_lowered_in_first_min.month,
                         custom_range:{ 
                         [custom_date]:{    
-                           data:haveCustomData?data.data.summary.other.hrr_beats_lowered_in_first_min.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.other.hrr_beats_lowered_in_first_min.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.other.hrr_beats_lowered_in_first_min.today,
@@ -1037,7 +1034,7 @@ customRangeData(value){
                         month:data.data.summary.other.hrr_highest_hr_in_first_min.month,
                         custom_range:{
                         [custom_date]:{     
-                           data:haveCustomData?data.data.summary.other.hrr_highest_hr_in_first_min.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.other.hrr_highest_hr_in_first_min.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.other.hrr_highest_hr_in_first_min.today,
@@ -1049,7 +1046,7 @@ customRangeData(value){
                         month:data.data.summary.other.hrr_lowest_hr_point.month,
                         custom_range:{
                         [custom_date]:{     
-                           data:haveCustomData?data.data.summary.other.hrr_lowest_hr_point.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.other.hrr_lowest_hr_point.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.other.hrr_lowest_hr_point.today,
@@ -1061,7 +1058,7 @@ customRangeData(value){
                         month:data.data.summary.other.floors_climbed.month,
                         custom_range:{
                         [custom_date]:{     
-                           data:haveCustomData?data.data.summary.other.floors_climbed.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.other.floors_climbed.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.other.floors_climbed.today,
@@ -1073,7 +1070,7 @@ customRangeData(value){
                         month:data.data.summary.other.resting_hr.month,
                         custom_range:{
                         [custom_date]:{     
-                           data:haveCustomData?data.data.summary.other.resting_hr.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.other.resting_hr.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.other.resting_hr.today,
@@ -1085,7 +1082,7 @@ customRangeData(value){
                         month:data.data.summary.other.hrr_time_to_99.month,
                         custom_range:{
                         [custom_date]:{    
-                           data:haveCustomData?data.data.summary.other.hrr_time_to_99.custom_range[custom_date].data''
+                           data:haveCustomData?data.data.summary.other.hrr_time_to_99.custom_range[custom_date].data:''
                         }
                     },
                         today:data.data.summary.other.hrr_time_to_99.today,
