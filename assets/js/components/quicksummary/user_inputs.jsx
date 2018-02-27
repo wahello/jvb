@@ -99,7 +99,6 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			        width={200}
 				/>
 			);
-			console.log(keys);
 		}
 		return columns;
 	}
