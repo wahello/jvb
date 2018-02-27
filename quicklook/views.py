@@ -2228,9 +2228,9 @@ def export_users_xls(request):
 
 	#Progress Analyzer
 
-	json_cum = open('/home/normsoftware/WORK/JVB/pa_dummy.json')
-	json_cum_str = json_cum.read()
-	json_cum1 = json.loads(json_cum_str)
+	# json_cum = open('/home/normsoftware/WORK/JVB/pa_dummy.json')
+	# json_cum_str = json_cum.read()
+	# json_cum1 = json.loads(json_cum_str)
 	# print(json_cum1['summary']['nutrition']['prcnt_unprocessed_food_gpa']['custom_range']['2018-02-12 to 2018-02-18'])
 
 	book.close()
