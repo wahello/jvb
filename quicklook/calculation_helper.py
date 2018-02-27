@@ -126,9 +126,6 @@ def update_helper(instance,data_dict):
 	'''
 		Helper function to update the instance
 		with provided key,value pair
-
-		Warning: This will not trigger any signals
-				 like post or pre save
 	'''
 	for attr, value in data_dict.items():
 		setattr(instance,attr,value)
@@ -846,11 +843,24 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 					for x in duration.split(':')])
 		return hours * 3600 + mins * 60
 
+	def _get_grade(point):
+		if point < 1:
+			return 'F'
+		elif point >= 1 and point < 2:
+			return 'D'
+		elif point >= 2 and point < 3:
+			return 'C'
+		elif point >= 3 and point < 4:
+			return 'B'
+		else:
+			return 'A'
+
 	_sec_min = lambda x: divmod(x,60)[0]
 
 	_tobj = {
 		"6:00":_to_sec("6:00"),
 		"6:29":_to_sec("6:29"),
+		"6:59":_to_sec("6:59"),
 		"6:30":_to_sec("6:30"),
 		"7:00":_to_sec("7:00"),
 		"7:29":_to_sec("7:29"),
@@ -866,18 +876,15 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
-	grades = 'F'
 
 	if sleep_duration < _tobj["6:00"] or sleep_duration > _tobj["12:00"]:
 		if sleep_duration > _tobj["12:00"]:
 			points = 0
 		else: 
 			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
-		grades = 'F'
 
 	elif sleep_duration >= _tobj["7:30"] and sleep_duration <= _tobj["10:00"]:
 	   points = 4
-	   grades = 'A'
 
 	elif ((sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:01"] and sleep_duration <= _tobj["10:30"])) :
@@ -888,7 +895,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
 		else:
 			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 3,5)
-		grades = 'B'
 
 	elif ((sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:31"] and sleep_duration <= _tobj["11:00"])) :
@@ -899,7 +905,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
-		grades = 'C'
 
 	elif ((sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]) or \
 		(sleep_duration >= _tobj["11:30"] and sleep_duration <= _tobj["12:00"])) :
@@ -908,7 +913,6 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	   		points = round(_sec_min(sleep_duration - _tobj["6:00"]) * 0.03333 + 1, 5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
-		grades = 'D'
 	
 	if sleep_aid_taken == "yes":
 		if points >= 2:
@@ -916,7 +920,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		else:
 			points = 0
 
-	return (grades,points)
+	return (_get_grade(points),points)
  
 def cal_unprocessed_food_grade(prcnt_food):
 	def _point_advantage(current_prcnt, range_min_prcnt, per_prcnt_pt):
@@ -1168,14 +1172,18 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 	return (None, None, None)
 
 def get_avg_sleep_grade(yesterday_sleep_data,today_sleep_data,
-	user_input_bedtime, user_input_awake_time,user_input_timezone,sleep_aid):
+	user_input_bedtime, user_input_awake_time,user_input_sleep_duration,
+	user_input_timezone,sleep_aid):
 
 	sleep_stats = get_sleep_stats(yesterday_sleep_data,today_sleep_data,
 		user_input_bedtime,user_input_awake_time, user_input_timezone)
-	if sleep_stats['sleep_per_wearable']:
-		grade_point = cal_average_sleep_grade(
-			  sleep_stats['sleep_per_wearable'],
-			  sleep_aid)
+	sleep_per_wearable = sleep_stats['sleep_per_wearable']
+
+	if user_input_sleep_duration and user_input_sleep_duration != ":":
+		grade_point = cal_average_sleep_grade(user_input_sleep_duration,sleep_aid)
+		return grade_point
+	elif sleep_per_wearable:
+		grade_point = cal_average_sleep_grade(sleep_per_wearable,sleep_aid)
 		return grade_point
 	return (None,None)
 
@@ -1292,21 +1300,19 @@ def get_overall_workout_grade(wout_duration_pt, wout_effortlvl_pt, avg_exercise_
 
 def get_overall_grade(grades):
 	GRADES = {'A':4,'B':3,'C':2,'D':1,'F':0,'':0,'N/A':0}
-	non_exercise_step_grade = grades.get('movement_non_exercise_steps_grade')
+	non_exercise_step_gpa = grades.get('movement_non_exercise_steps_gpa')
 	movement_consistency_grade = grades.get('movement_consistency_grade')
-	avg_sleep_per_night_grade = grades.get('avg_sleep_per_night_grade')
+	avg_sleep_per_night_gpa = grades.get('avg_sleep_per_night_gpa')
 	exercise_consistency_grade = grades.get('exercise_consistency_grade')
-	prcnt_unprocessed_food_grade = grades.get('prcnt_unprocessed_food_consumed_grade')
+	prcnt_unprocessed_food_gpa = grades.get('prcnt_unprocessed_food_consumed_gpa')
 	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
-	penalty = grades.get('sleep_aid_penalty')+\
-				grades.get('ctrl_subs_penalty')+\
-				grades.get('smoke_penalty')
+	penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
 
-	gpa = round((GRADES[non_exercise_step_grade]+
+	gpa = round((non_exercise_step_gpa +
 		   GRADES[movement_consistency_grade]+
-		   GRADES[avg_sleep_per_night_grade]+
+		   avg_sleep_per_night_gpa +
 		   GRADES[exercise_consistency_grade]+
-		   GRADES[prcnt_unprocessed_food_grade]+
+		   prcnt_unprocessed_food_gpa+
 		   GRADES[alcoholic_drink_per_week_grade]+
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
@@ -1534,6 +1540,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Sleeps
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)
 		user_input_awake_time = safe_get(todays_daily_strong,"sleep_awake_time",None)
+		user_input_sleep_duration = safe_get(todays_daily_strong,"sleep_time_excluding_awake_time",None)
 		user_input_timezone = todays_user_input.timezone if todays_user_input else None
 		
 		sleep_stats = get_sleep_stats(sleeps_json,sleeps_today_json,
@@ -1608,6 +1615,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 			sleeps_today_json,
 			user_input_bedtime = user_input_bedtime,
 			user_input_awake_time = user_input_awake_time,
+			user_input_sleep_duration = user_input_sleep_duration,
 			user_input_timezone = user_input_timezone,
 			sleep_aid = user_input_sleep_aid
 			)

@@ -365,7 +365,7 @@ def _get_nutrition_cum_sum(today_ql_data, yday_cum_data=None):
 	
 	elif today_ql_data:
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed_gpa'] = _safe_get_mobj(
-			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_grade",0)
+			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_gpa",0)
 
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed'] = _safe_get_mobj(
 			today_ql_data.food_ql,"prcnt_non_processed_food",0)
@@ -481,8 +481,10 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	from_dt = _str_to_datetime(from_dt)
 	to_dt = _str_to_datetime(to_dt)
-	quicklook_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q for q in _get_queryset(UserQuickLook,user,from_dt,to_dt)}
-	cum_sum_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q for q in _get_queryset(CumulativeSum,user,from_dt,to_dt)}
+	quicklook_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q 
+		for q in _get_queryset(UserQuickLook,user,from_dt,to_dt)}
+	cum_sum_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
+		for q in _get_queryset(CumulativeSum,user,from_dt,to_dt)}
 	current_date = from_dt
 	while current_date <= to_dt:
 		data = {"created_at":current_date.strftime("%Y-%m-%d")}
@@ -491,7 +493,8 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 		yday_cum_data = cum_sum_datewise_data.get(yday_dt.strftime('%Y-%m-%d'),None)
 
 		if not yday_cum_data:
-			yday_cum_data = {q.created_at.strftime("%Y-%m-%d"):q for q in _get_queryset(CumulativeSum,user,yday_dt,yday_dt)}
+			yday_cum_data = {q.created_at.strftime("%Y-%m-%d"):q 
+				for q in _get_queryset(CumulativeSum,user,yday_dt,yday_dt)}
 			yday_cum_data = yday_cum_data.get(yday_dt.strftime('%Y-%m-%d'),None)
 
 		if today_ql_data and yday_cum_data:

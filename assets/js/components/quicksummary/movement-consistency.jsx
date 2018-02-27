@@ -287,7 +287,7 @@ render(){
                 {this.state.tableAttrColumn[props.rowIndex].name}
               </Cell>
             )}
-            width={130}
+            width={190}
             fixed={true}
           />
          {this.renderTableColumns(this.state.mc_data)}

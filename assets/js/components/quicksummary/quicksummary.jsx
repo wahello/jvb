@@ -115,12 +115,17 @@ class Quicklook extends Component{
 
 	updateDateState(data,user_input_data){
 				let grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
-				let overall_health_gpa_before_panalty = (grade_point[data.grades_ql.movement_non_exercise_steps_grade]+
-					grade_point[data.grades_ql.movement_consistency_grade]+
-					grade_point[data.grades_ql.avg_sleep_per_night_grade]+
+				let overall_health_gpa_before_panalty = (
+					data.grades_ql.movement_non_exercise_steps_gpa + 
+					grade_point[data.grades_ql.movement_consistency_grade] +
+					data.grades_ql.avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty) +
 					grade_point[data.grades_ql.exercise_consistency_grade]+
-					grade_point[data.grades_ql.prcnt_unprocessed_food_consumed_grade]+
+					data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
 					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
+
+				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
+				let avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":")?
+				ui_sleep_duration:data.sleep_ql.sleep_per_wearable;
 
        			var properties={
        			created_at:data.created_at,
@@ -132,7 +137,7 @@ class Quicklook extends Component{
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        movement_consistency_score:data.steps_ql.movement_consistency,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
-			        avg_sleep_per_night:data.sleep_ql.sleep_per_wearable,
+			        avg_sleep_per_night:avg_sleep_per_night,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
 			        workout_today: user_input_data.strong_input.workout,
 			        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
@@ -793,7 +798,8 @@ onLogoutSuccess(response){
                                           </span>
                                        </NavItem>
 
-                                       {/* <NavItem onClick={this.toggle} className="Movement">
+                                    
+                                     <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Movement Consistency Historical Data">
                                             <NavLink id="headernames" href="#" className={class_movementHistorical} value="movementhistorical"
@@ -802,7 +808,7 @@ onLogoutSuccess(response){
                                             </NavLink>
                                           </abbr>
                                           </span>
-                                       </NavItem>*/}
+                                       </NavItem>
 
                                         <NavItem onClick={this.toggle} className="bikestats">
                                         <span id="spa">
