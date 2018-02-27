@@ -952,7 +952,7 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
-                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date}/>}
 
 
 			</div>
