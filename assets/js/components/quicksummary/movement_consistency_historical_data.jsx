@@ -81,7 +81,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         
         let start_dt = moment(this.props.start_date);
         let end_dt = moment(this.props.end_date);
-        let duration = end_dt.diff(start_dt,'days');
+        let duration = end_dt.diff(start_dt,'days') + 1;
 
     for(let [date,data] of Object.entries(dateWiseData)){
        for(let [key,value] of Object.entries(data[category])){
@@ -172,7 +172,6 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
       }
       col.splice(0, 0,{value:prcnt_active_steps,
                        style:""});
-      console.log('++++++',col[0]);
        columns.push(
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>{verbose_name[key]}</Cell>}
