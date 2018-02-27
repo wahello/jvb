@@ -485,6 +485,8 @@ constructor(props){
   successProgress(data){
     console.log(data);
     let haveCustomData = (this.state.start_date && this.state.end_date)?true:false;
+    let from_d = moment().format(this.state.start_date);
+console.log("========",from_d);
     this.setState({
         created_at:data.data.created_at,
         summary:{
@@ -493,8 +495,8 @@ constructor(props){
                         week:parseFloat(data.data.summary.overall_health.overall_health_gpa.week).toFixed(2),
                         yesterday:parseFloat(data.data.summary.overall_health.overall_health_gpa.yesterday).toFixed(2),
                         month:parseFloat(data.data.summary.overall_health.overall_health_gpa.month).toFixed(2),            
-                        custom_range:{
-                           data:parseFloat(haveCustomData?data.data.summary.overall_health.overall_health_gpa.custom_range.data:'').toFixed(2)
+                        custom_range:{                       
+                                    data:parseFloat(haveCustomData?data.data.summary.overall_health.overall_health_gpa.custom_range.data:'').toFixed(2)
                         },
                         today:parseFloat(data.data.summary.overall_health.overall_health_gpa.today).toFixed(2),
                         year:parseFloat(data.data.summary.overall_health.overall_health_gpa.year).toFixed(2)

@@ -177,7 +177,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>{verbose_name[key]}</Cell>}
            cell={props => (
-                    <Cell style={col[props.rowIndex].style} {...{'title':col[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
+                    <Cell style={col[props.rowIndex].style} {...{'title':col[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
                       {col[props.rowIndex].value}
                     </Cell>
                   )}
