@@ -469,8 +469,11 @@ def export_users_xls(request):
 					sheet9.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format)
 				elif i == 7:
 					if user_input_strong_data:
-						sheet9.write(i+3,row_num, user_input_strong_data['sleep_time_excluding_awake_time'],format1)
-						print(user_input_strong_data['sleep_time_excluding_awake_time'])
+						avg_sleep = user_input_strong_data['sleep_time_excluding_awake_time']
+						if avg_sleep and avg_sleep != ":":
+							sheet9.write(i+3,row_num, user_input_strong_data['sleep_time_excluding_awake_time'],format1)
+						else:
+							sheet9.write(i+3,row_num, sleep_data[key],format1)
 					else:
 						sheet9.write(i+3,row_num, sleep_data[key],format1)
 					# if user_input_strong_data:
@@ -1119,7 +1122,11 @@ def export_users_xls(request):
 					sheet1.write(i+3,row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format)
 				elif i == 7:
 					if user_input_strong_data:
-						sheet1.write(i+3,row_num, user_input_strong_data['sleep_time_excluding_awake_time'],format1)
+						avg_sleep = user_input_strong_data['sleep_time_excluding_awake_time']
+						if avg_sleep and avg_sleep != ":":
+							sheet1.write(i+3,row_num, user_input_strong_data['sleep_time_excluding_awake_time'],format1)
+						else:
+							sheet1.write(i+3,row_num, sleep_data[key],format1)
 					else:
 						sheet1.write(i+3,row_num, sleep_data[key],format1)
 				elif key == 'workout':
