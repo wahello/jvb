@@ -799,12 +799,12 @@ onLogoutSuccess(response){
                                        </NavItem>
 
                                     
-                                     <NavItem onClick={this.toggle}>
+                                     <NavItem onClick={this.toggle} className="mchistorical">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Movement Consistency Historical Data">
                                             <NavLink id="headernames" href="#" className={class_movementHistorical} value="movementhistorical"
 						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>
-						    		 		 Movement Consistency Historical
+						    		 		 Movement Consistency Historical Data
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -864,14 +864,17 @@ onLogoutSuccess(response){
 									          More
 									        </DropdownToggle>
 									        <DropdownMenu>
+									        
 									        <DropdownItem style={{paddingLeft:"30px"}} id="dropsteps"  className={class_steps}  value="steps"
 						    		 				 onClick={this.activateTab.bind(this,"steps")}>Steps</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropsleep"  className={class_sleep} value="sleep"
-						    		 				 onClick={this.activateTab.bind(this,"sleep")}>sleep</DropdownItem>									                                                     						    		 													         									         								         									         
+						    		 				 onClick={this.activateTab.bind(this,"sleep")}>Sleep</DropdownItem>									                                                     						    		 													         									         								         									         
 									          <DropdownItem style={{paddingLeft:"30px"}} id="dropfood"  className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
+						    		 		   <DropdownItem style={{paddingLeft:"30px"}} id="dropmchistorical"  className={class_movementHistorical} value="movementhistorical"
+						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>Movement Consistency Historical Data</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
                                             </DropdownItem>
@@ -956,7 +959,7 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
-                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date}/>}
 
 
 			</div>

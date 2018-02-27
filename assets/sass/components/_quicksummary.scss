@@ -142,7 +142,9 @@ background-color: #777777;
 	.swimstats{
 		display: none;
 	}
-	
+	.mchistorical{
+		display: none;
+	}
 	.userinputs{
 		display: none;
 	}
@@ -151,6 +153,9 @@ background-color: #777777;
 	}
 	.bikestats{
 		display: none;
+	}
+	#dropmchistorical{
+		display: inline;
 	}
 	#dropalcohol{
 		display: none;

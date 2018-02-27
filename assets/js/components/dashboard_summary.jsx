@@ -36,7 +36,7 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{                            
                            "data":"-"
                         },
                         "today":"-",
@@ -485,19 +485,21 @@ constructor(props){
   successProgress(data){
     console.log(data);
     let haveCustomData = (this.state.start_date && this.state.end_date)?true:false;
+    let from_d = moment().format(this.state.start_date);
+console.log("========",from_d);
     this.setState({
         created_at:data.data.created_at,
         summary:{
             overall_health:{
                overall_health_gpa:{
-                        week:data.data.summary.overall_health.overall_health_gpa.week,
-                        yesterday:data.data.summary.overall_health.overall_health_gpa.yesterday,
-                        month:data.data.summary.overall_health.overall_health_gpa.month,            
-                        custom_range:{
-                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa.custom_range.data:''
+                        week:parseFloat(data.data.summary.overall_health.overall_health_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.overall_health.overall_health_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.overall_health.overall_health_gpa.month).toFixed(2),            
+                        custom_range:{                       
+                                    data:parseFloat(haveCustomData?data.data.summary.overall_health.overall_health_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.overall_health.overall_health_gpa.today,
-                        year:data.data.summary.overall_health.overall_health_gpa.year
+                        today:parseFloat(data.data.summary.overall_health.overall_health_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.overall_health.overall_health_gpa.year).toFixed(2)
 
                      },
                  overall_health_gpa_grade:{
@@ -566,26 +568,26 @@ constructor(props){
                         year:data.data.summary.ec.rank.year
                      },
                    exercise_consistency_gpa:{
-                        week:data.data.summary.ec.exercise_consistency_gpa.week,
-                        yesterday:data.data.summary.ec.exercise_consistency_gpa.yesterday,
-                        month:data.data.summary.ec.exercise_consistency_gpa.month,
+                        week:parseFloat(data.data.summary.ec.exercise_consistency_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.ec.exercise_consistency_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.ec.exercise_consistency_gpa.month).toFixed(2),
                         custom_range:{      
-                           data:haveCustomData?data.data.summary.ec.exercise_consistency_gpa.custom_range.data:''
+                           data:parseFloat(haveCustomData?data.data.summary.ec.exercise_consistency_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.ec.exercise_consistency_gpa.today,
-                        year:data.data.summary.ec.exercise_consistency_gpa.year
+                        today:parseFloat(data.data.summary.ec.exercise_consistency_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.ec.exercise_consistency_gpa.year).toFixed(2)
                      }
                  },
                 nutrition:{
                    prcnt_unprocessed_food_gpa:{
-                       week:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.week,
-                        yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday,
-                        month:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month,
+                       week:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month).toFixed(2),
                         custom_range:{     
-                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.data:''
+                           data:parseFloat(haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today,
-                        year:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.year
+                        today:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.year).toFixed(2)
                      },
                  prcnt_unprocessed_food_grade:{
                          week:data.data.summary.nutrition.prcnt_unprocessed_food_grade.week,
@@ -621,14 +623,14 @@ constructor(props){
                   },
             mc:{
                 movement_consistency_gpa:{
-                        week:data.data.summary.mc.movement_consistency_gpa.week,
-                        yesterday:data.data.summary.mc.movement_consistency_gpa.yesterday,
-                        month:data.data.summary.mc.movement_consistency_gpa.month,
+                        week:parseFloat(data.data.summary.mc.movement_consistency_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.mc.movement_consistency_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.mc.movement_consistency_gpa.month).toFixed(2),
                         custom_range:{
-                           data:haveCustomData?data.data.summary.mc.movement_consistency_gpa.custom_range.data:''
+                           data:parseFloat(haveCustomData?data.data.summary.mc.movement_consistency_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.mc.movement_consistency_gpa.today,
-                        year:data.data.summary.mc.movement_consistency_gpa.year
+                        today:parseFloat(data.data.summary.mc.movement_consistency_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.mc.movement_consistency_gpa.year).toFixed(2)
                      },
                      movement_consistency_grade:{
                         week:data.data.summary.mc.movement_consistency_grade.week,
@@ -663,14 +665,14 @@ constructor(props){
                   },
             non_exercise:{
                  non_exericse_steps_gpa:{
-                        week:data.data.summary.non_exercise.non_exericse_steps_gpa.week,
-                        yesterday:data.data.summary.non_exercise.non_exericse_steps_gpa.yesterday,
-                        month:data.data.summary.non_exercise.non_exericse_steps_gpa.month,
+                        week:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.month).toFixed(2),
                         custom_range:{
-                           data:haveCustomData?data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.data:''
+                           data:parseFloat(haveCustomData?data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.non_exercise.non_exericse_steps_gpa.today,
-                        year:data.data.summary.non_exercise.non_exericse_steps_gpa.year
+                        today:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.year).toFixed(2)
                      },
                  rank:{
                         week:data.data.summary.non_exercise.rank.week,
@@ -797,14 +799,14 @@ constructor(props){
                         year:data.data.summary.sleep.total_sleep_in_hours_min.year
                     },
             overall_sleep_gpa: {
-                        week:data.data.summary.sleep.overall_sleep_gpa.week,
-                        yesterday:data.data.summary.sleep.overall_sleep_gpa.yesterday,
-                        month:data.data.summary.sleep.overall_sleep_gpa.month,
+                        week:parseFloat(data.data.summary.sleep.overall_sleep_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.sleep.overall_sleep_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.sleep.overall_sleep_gpa.month).toFixed(2),
                         custom_range:{                   
-                           data:haveCustomData?data.data.summary.sleep.overall_sleep_gpa.custom_range.data:''
+                           data:parseFloat(haveCustomData?data.data.summary.sleep.overall_sleep_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.sleep.overall_sleep_gpa.today,
-                        year:data.data.summary.sleep.overall_sleep_gpa.year
+                        today:parseFloat(data.data.summary.sleep.overall_sleep_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.sleep.overall_sleep_gpa.year).toFixed(2)
                      },
             num_days_sleep_aid_taken_in_period: {
                         week:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.week,
@@ -849,14 +851,14 @@ constructor(props){
                         year:data.data.summary.alcohol.rank.year
             },
             alcoholic_drinks_per_week_gpa: {
-                        week:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.week,
-                        yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday,
-                        month:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month,
+                        week:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month).toFixed(2),
                         custom_range:{    
-                           data:haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.data:''
+                           data:parseFloat(haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.data:'').toFixed(2)
                         },
-                        today:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today,
-                        year:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year
+                        today:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year).toFixed(2)
             }
         },
         other: {
@@ -936,6 +938,7 @@ constructor(props){
     processDate(selectedDate,fromDate,toDate){ 
     this.setState({
       selectedDate: selectedDate,
+      calendarOpen:!this.state.calendarOpen                                    
     },()=>{
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
     });
