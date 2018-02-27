@@ -172,15 +172,15 @@ class Command(BaseCommand):
 
 			if not options['all'] and options['email']:
 				for email in options['email']:
-					# print(options)
+					print(options)
 					if self._validate_token(email,options):
-						print(from_date,to_date)
+						# print(sess,from_date,to_date)
 						self._is_valid(sess,from_date,to_date)
 
 			elif options['all'] and not options['email']:
 				for token in GarminToken.objects.all():
 					if self._validate_token(token.user.email,options):
-						self._is_valid(to_date,from_date)
+						self._is_valid(sess,to_date,from_date)
 			else:
 				raise CommandError('Provide either --all or --email, not both')
 
