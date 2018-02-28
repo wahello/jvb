@@ -24,7 +24,7 @@ class MovementHistorical extends Component{
       this.state.myTableData.push({name: key})
     }
   }
-
+  
 mcHistoricalData(score,status){
       if(status == "sleeping")
         return {background:'rgb(0,176,240)',color:'white'}
