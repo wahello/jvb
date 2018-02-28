@@ -26,7 +26,7 @@ class GarminData(APIView):
 		sleep_data_parsed = get_weekly_data(sleep_data,current_date,yesterday_date)
 		todays_sleep_data = sleep_data_parsed[current_date.strftime('%Y-%m-%d')]
 		yesterday_sleep_data = sleep_data_parsed[yesterday_date.strftime('%Y-%m-%d')]
-		return get_sleep_stats(yesterday_sleep_data, todays_sleep_data,str_dt=False)
+		return get_sleep_stats(current_date,yesterday_sleep_data, todays_sleep_data,str_dt=False)
 
 	def _have_activity_record(self, target_date):
 		current_date = str_to_datetime(target_date)

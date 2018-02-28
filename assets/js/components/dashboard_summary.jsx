@@ -28,7 +28,6 @@ constructor(props){
         isOpen: false,
         calendarOpen:false,
         dateRange:false,
-
         "created_at":"-",
         "summary":{
             "overall_health":{
@@ -36,8 +35,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -47,8 +48,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -58,8 +61,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{
+                        "custom_date":{                            
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -69,8 +74,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                               }
                         },
                         "today":"-",
                         "year":"-"
@@ -82,8 +89,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{ 
+                        "custom_date":{                          
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -92,8 +101,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -102,8 +113,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -112,8 +125,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{ 
+                        "custom_date":{                          
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -124,8 +139,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{ 
+                        "custom_date":{                          
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -134,8 +151,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -144,8 +163,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -154,8 +175,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -167,8 +190,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{ 
+                        "custom_date":{                          
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -177,8 +202,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{  
+                        "custom_date":{                         
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -187,8 +214,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -197,8 +226,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{
+                        "custom_date":{                            
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -209,8 +240,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{
+                        "custom_date":{                            
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -219,8 +252,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -229,8 +264,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -239,8 +276,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -249,8 +288,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -261,8 +302,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{
+                        "custom_date":{                            
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -271,8 +314,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                          
+                        "custom_range":{ 
+                        "custom_date":{                          
                            "data":"-"
+                               }
                         },
                         "today":"-",
                         "year":"-"
@@ -281,8 +326,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{ 
+                        "custom_date":{                           
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -291,8 +338,10 @@ constructor(props){
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
-                        "custom_range":{                           
+                        "custom_range":{
+                        "custom_date":{                            
                            "data":"-"
+                       }
                         },
                         "today":"-",
                         "year":"-"
@@ -301,9 +350,9 @@ constructor(props){
          "sleep": {
              "prcnt_days_sleep_aid_taken_in_period": {
                 "custom_range": {
-                    "to_dt": "-",
-                    "from_dt": "-",
+                    "custom_date":{ 
                     "data": "-"
+                }
                 },
                 "year": "-",
                 "yesterday": "-",
@@ -316,7 +365,9 @@ constructor(props){
                 "yesterday": "-",
                 "month": "-",
                 "custom_range": {
+                    "custom_date":{ 
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -325,8 +376,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                   
+                "custom_range": {
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -335,8 +388,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -345,8 +400,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -355,8 +412,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": {
+                "custom_date":{                     
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -367,8 +426,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -377,8 +438,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -387,8 +450,10 @@ constructor(props){
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -397,8 +462,10 @@ constructor(props){
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": {  
+                "custom_date":{                   
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -409,8 +476,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -419,8 +488,10 @@ constructor(props){
                 "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -429,8 +500,10 @@ constructor(props){
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": {
+                "custom_date":{                     
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -439,8 +512,10 @@ constructor(props){
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": {
+                "custom_date":{                     
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -449,8 +524,10 @@ constructor(props){
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": { 
+                "custom_date":{                    
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -459,8 +536,10 @@ constructor(props){
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": {                    
+                "custom_range": {
+                "custom_date":{                     
                     "data": "-"
+                }
                 },
                 "today": "-",
                 "year": "-"
@@ -480,33 +559,44 @@ constructor(props){
    this.toggleDate = this.toggleDate.bind(this);
    this.onSubmitDate = this.onSubmitDate.bind(this);
    this.handleChange = this.handleChange.bind(this);
-   this.printDocument = this.printDocument.bind(this);
+  
   }
+
+
   successProgress(data){
     console.log(data);
     let haveCustomData = (this.state.start_date && this.state.end_date)?true:false;
+    let from_d = moment(this.state.start_date).format("YYYY-MM-DD");
+    let to_d = moment(this.state.end_date).format("YYYY-MM-DD");
+    let custom_date = moment().format(from_d+ " to " +to_d);
+   
     this.setState({
+
         created_at:data.data.created_at,
         summary:{
             overall_health:{
                overall_health_gpa:{
-                        week:data.data.summary.overall_health.overall_health_gpa.week,
-                        yesterday:data.data.summary.overall_health.overall_health_gpa.yesterday,
-                        month:data.data.summary.overall_health.overall_health_gpa.month,            
-                        custom_range:{
-                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.overall_health.overall_health_gpa.today,
-                        year:data.data.summary.overall_health.overall_health_gpa.year
+                        week:parseFloat(data.data.summary.overall_health.overall_health_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.overall_health.overall_health_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.overall_health.overall_health_gpa.month).toFixed(2),            
+                         custom_range:{
+                               [custom_date]:{                     
+                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa_grade.custom_range[custom_date].data:''
+                        }
+                    },
+                        today:parseFloat(data.data.summary.overall_health.overall_health_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.overall_health.overall_health_gpa.year).toFixed(2)
 
                      },
                  overall_health_gpa_grade:{
                         week:data.data.summary.overall_health.overall_health_gpa_grade.week,
                         yesterday:data.data.summary.overall_health.overall_health_gpa_grade.yesterday,
                         month:data.data.summary.overall_health.overall_health_gpa_grade.month,
-                        custom_range:{                          
-                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa_grade.custom_range.data:''
-                        },
+                        custom_range:{
+                               [custom_date]:{                     
+                           data:haveCustomData?data.data.summary.overall_health.overall_health_gpa_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.overall_health.overall_health_gpa_grade.today,
                         year:data.data.summary.overall_health.overall_health_gpa_grade.year
 
@@ -515,9 +605,11 @@ constructor(props){
                          week:data.data.summary.overall_health.rank.week,
                         yesterday:data.data.summary.overall_health.rank.yesterday,
                         month:data.data.summary.overall_health.rank.month,
-                        custom_range:{                   
-                           data:haveCustomData?data.data.summary.overall_health.rank.custom_range.data:''
-                        },
+                        custom_range:{ 
+                        [custom_date]:{                   
+                           data:haveCustomData?data.data.summary.overall_health.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.overall_health.rank.today,
                         year:data.data.summary.overall_health.rank.year
 
@@ -527,8 +619,10 @@ constructor(props){
                         yesterday:data.data.summary.overall_health.total_gpa_point.yesterday,
                         month:data.data.summary.overall_health.total_gpa_point.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.overall_health.total_gpa_point.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.overall_health.total_gpa_point.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.overall_health.total_gpa_point.today,
                         year:data.data.summary.overall_health.total_gpa_point.year
                      }
@@ -539,9 +633,11 @@ constructor(props){
                         week:data.data.summary.ec.avg_no_of_days_exercises_per_week.week,
                         yesterday:data.data.summary.ec.avg_no_of_days_exercises_per_week.yesterday,
                         month:data.data.summary.ec.avg_no_of_days_exercises_per_week.month,
-                        custom_range:{     
-                           data:haveCustomData?data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{      
+                           data:haveCustomData?data.data.summary.ec.avg_no_of_days_exercises_per_week.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.ec.avg_no_of_days_exercises_per_week.today,
                         year:data.data.summary.ec.avg_no_of_days_exercises_per_week.year
                      },
@@ -549,9 +645,11 @@ constructor(props){
                         week:data.data.summary.ec.exercise_consistency_grade.week,
                         yesterday:data.data.summary.ec.exercise_consistency_grade.yesterday,
                         month:data.data.summary.ec.exercise_consistency_grade.month,
-                        custom_range:{            
-                           data:haveCustomData?data.data.summary.ec.exercise_consistency_grade.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{             
+                           data:haveCustomData?data.data.summary.ec.exercise_consistency_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.ec.exercise_consistency_grade.today,
                         year:data.data.summary.ec.exercise_consistency_grade.year
                      },
@@ -559,41 +657,49 @@ constructor(props){
                         week:data.data.summary.ec.rank.week,
                         yesterday:data.data.summary.ec.rank.yesterday,
                         month:data.data.summary.ec.rank.month,
-                        custom_range:{                    
-                           data:haveCustomData?data.data.summary.ec.rank.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                     
+                           data:haveCustomData?data.data.summary.ec.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.ec.rank.today,
                         year:data.data.summary.ec.rank.year
                      },
                    exercise_consistency_gpa:{
-                        week:data.data.summary.ec.exercise_consistency_gpa.week,
-                        yesterday:data.data.summary.ec.exercise_consistency_gpa.yesterday,
-                        month:data.data.summary.ec.exercise_consistency_gpa.month,
-                        custom_range:{      
-                           data:haveCustomData?data.data.summary.ec.exercise_consistency_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.ec.exercise_consistency_gpa.today,
-                        year:data.data.summary.ec.exercise_consistency_gpa.year
+                        week:parseFloat(data.data.summary.ec.exercise_consistency_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.ec.exercise_consistency_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.ec.exercise_consistency_gpa.month).toFixed(2),
+                        custom_range:{
+                        [custom_date]:{       
+                           data:parseFloat(haveCustomData?data.data.summary.ec.exercise_consistency_gpa.custom_range[custom_date].data:'').toFixed(2)
+                        }
+                    },
+                        today:parseFloat(data.data.summary.ec.exercise_consistency_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.ec.exercise_consistency_gpa.year).toFixed(2)
                      }
                  },
                 nutrition:{
                    prcnt_unprocessed_food_gpa:{
-                       week:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.week,
-                        yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday,
-                        month:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month,
-                        custom_range:{     
-                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today,
-                        year:data.data.summary.nutrition.prcnt_unprocessed_food_gpa.year
+                       week:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.month).toFixed(2),
+                        custom_range:{
+                        [custom_date]:{      
+                           data:parseFloat(haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range[custom_date].data:'').toFixed(2)
+                        }
+                    },
+                        today:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.nutrition.prcnt_unprocessed_food_gpa.year).toFixed(2)
                      },
                  prcnt_unprocessed_food_grade:{
                          week:data.data.summary.nutrition.prcnt_unprocessed_food_grade.week,
                         yesterday:data.data.summary.nutrition.prcnt_unprocessed_food_grade.yesterday,
                         month:data.data.summary.nutrition.prcnt_unprocessed_food_grade.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_food_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.nutrition.prcnt_unprocessed_food_grade.today,
                         year:data.data.summary.nutrition.prcnt_unprocessed_food_grade.year
                      },
@@ -601,9 +707,11 @@ constructor(props){
                          week:data.data.summary.nutrition.rank.week,
                         yesterday:data.data.summary.nutrition.rank.yesterday,
                         month:data.data.summary.nutrition.rank.month,
-                        custom_range:{                 
-                           data:haveCustomData?data.data.summary.nutrition.rank.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                  
+                           data:haveCustomData?data.data.summary.nutrition.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.nutrition.rank.today,
                         year:data.data.summary.nutrition.rank.year
                      },
@@ -612,8 +720,10 @@ constructor(props){
                         yesterday:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.yesterday,
                         month:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.today,
                         year:data.data.summary.nutrition.prcnt_unprocessed_volume_of_food.year
                      }
@@ -621,22 +731,26 @@ constructor(props){
                   },
             mc:{
                 movement_consistency_gpa:{
-                        week:data.data.summary.mc.movement_consistency_gpa.week,
-                        yesterday:data.data.summary.mc.movement_consistency_gpa.yesterday,
-                        month:data.data.summary.mc.movement_consistency_gpa.month,
+                        week:parseFloat(data.data.summary.mc.movement_consistency_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.mc.movement_consistency_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.mc.movement_consistency_gpa.month).toFixed(2),
                         custom_range:{
-                           data:haveCustomData?data.data.summary.mc.movement_consistency_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.mc.movement_consistency_gpa.today,
-                        year:data.data.summary.mc.movement_consistency_gpa.year
+                            [custom_date]:{ 
+                           data:parseFloat(haveCustomData?data.data.summary.mc.movement_consistency_gpa.custom_range[custom_date].data:'').toFixed(2)
+                        }
+                    },
+                        today:parseFloat(data.data.summary.mc.movement_consistency_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.mc.movement_consistency_gpa.year).toFixed(2)
                      },
                      movement_consistency_grade:{
                         week:data.data.summary.mc.movement_consistency_grade.week,
                         yesterday:data.data.summary.mc.movement_consistency_grade.yesterday,
                         month:data.data.summary.mc.movement_consistency_grade.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.mc.movement_consistency_grade.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.mc.movement_consistency_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.mc.movement_consistency_grade.today,
                         year:data.data.summary.mc.movement_consistency_grade.year
                      },
@@ -644,9 +758,11 @@ constructor(props){
                        week:data.data.summary.mc.rank.week,
                         yesterday:data.data.summary.mc.rank.yesterday,
                         month:data.data.summary.mc.rank.month,
-                        custom_range:{                         
-                           data:haveCustomData?data.data.summary.mc.rank.custom_range.data:''
-                        },
+                        custom_range:{ 
+                        [custom_date]:{                         
+                           data:haveCustomData?data.data.summary.mc.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.mc.rank.today,
                         year:data.data.summary.mc.rank.year
                      },
@@ -655,30 +771,36 @@ constructor(props){
                         yesterday:data.data.summary.mc.movement_consistency_score.yesterday,
                         month:data.data.summary.mc.movement_consistency_score.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.mc.movement_consistency_score.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.mc.movement_consistency_score.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.mc.movement_consistency_score.today,
                         year:data.data.summary.mc.movement_consistency_score.year
                      }
                   },
             non_exercise:{
                  non_exericse_steps_gpa:{
-                        week:data.data.summary.non_exercise.non_exericse_steps_gpa.week,
-                        yesterday:data.data.summary.non_exercise.non_exericse_steps_gpa.yesterday,
-                        month:data.data.summary.non_exercise.non_exericse_steps_gpa.month,
+                        week:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.month).toFixed(2),
                         custom_range:{
-                           data:haveCustomData?data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.non_exercise.non_exericse_steps_gpa.today,
-                        year:data.data.summary.non_exercise.non_exericse_steps_gpa.year
+                            [custom_date]:{ 
+                           data:parseFloat(haveCustomData?data.data.summary.non_exercise.non_exericse_steps_gpa.custom_range[custom_date].data:'').toFixed(2)
+                        }
+                    },
+                        today:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.non_exercise.non_exericse_steps_gpa.year).toFixed(2)
                      },
                  rank:{
                         week:data.data.summary.non_exercise.rank.week,
                         yesterday:data.data.summary.non_exercise.rank.yesterday,
                         month:data.data.summary.non_exercise.rank.month,
-                        custom_range:{              
-                           data:haveCustomData?data.data.summary.non_exercise.rank.custom_range.data:''
-                        },
+                        custom_range:{ 
+                        [custom_date]:{              
+                           data:haveCustomData?data.data.summary.non_exercise.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.non_exercise.rank.today,
                         year:data.data.summary.non_exercise.rank.year
                      },
@@ -687,8 +809,10 @@ constructor(props){
                         yesterday:data.data.summary.non_exercise.movement_non_exercise_step_grade.yesterday,
                         month:data.data.summary.non_exercise.movement_non_exercise_step_grade.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.non_exercise.movement_non_exercise_step_grade.custom_range[custom_date].data:''
+                        }
+                            },
                         today:data.data.summary.non_exercise.movement_non_exercise_step_grade.today,
                         year:data.data.summary.non_exercise.movement_non_exercise_step_grade.year
                      },
@@ -696,9 +820,11 @@ constructor(props){
                         week:data.data.summary.non_exercise.non_exercise_steps.week,
                         yesterday:data.data.summary.non_exercise.non_exercise_steps.yesterday,
                         month:data.data.summary.non_exercise.non_exercise_steps.month,
-                        custom_range:{          
-                           data:haveCustomData?data.data.summary.non_exercise.non_exercise_steps.custom_range.data:''
-                        },
+                        custom_range:{ 
+                        [custom_date]:{          
+                           data:haveCustomData?data.data.summary.non_exercise.non_exercise_steps.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.non_exercise.non_exercise_steps.today,
                         year:data.data.summary.non_exercise.non_exercise_steps.year
                      },
@@ -706,9 +832,11 @@ constructor(props){
                          week:data.data.summary.non_exercise.total_steps.week,
                         yesterday:data.data.summary.non_exercise.total_steps.yesterday,
                         month:data.data.summary.non_exercise.total_steps.month,
-                        custom_range:{                 
-                           data:haveCustomData?data.data.summary.non_exercise.total_steps.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                  
+                           data:haveCustomData?data.data.summary.non_exercise.total_steps.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.non_exercise.total_steps.today,
                         year:data.data.summary.non_exercise.total_steps.year
                      },     
@@ -718,9 +846,11 @@ constructor(props){
                         week:data.data.summary.exercise.workout_duration_hours_min.week,
                         yesterday:data.data.summary.exercise.workout_duration_hours_min.yesterday,
                         month:data.data.summary.exercise.workout_duration_hours_min.month,
-                        custom_range:{      
-                           data:haveCustomData?data.data.summary.exercise.workout_duration_hours_min.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{       
+                           data:haveCustomData?data.data.summary.exercise.workout_duration_hours_min.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.exercise.workout_duration_hours_min.today,
                         year:data.data.summary.exercise.workout_duration_hours_min.year
                      },   
@@ -728,9 +858,11 @@ constructor(props){
                         week:data.data.summary.exercise.avg_exercise_heart_rate.week,
                         yesterday:data.data.summary.exercise.avg_exercise_heart_rate.yesterday,
                         month:data.data.summary.exercise.avg_exercise_heart_rate.month,
-                        custom_range:{        
-                           data:haveCustomData?data.data.summary.exercise.avg_exercise_heart_rate.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{         
+                           data:haveCustomData?data.data.summary.exercise.avg_exercise_heart_rate.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.exercise.avg_exercise_heart_rate.today,
                         year:data.data.summary.exercise.avg_exercise_heart_rate.year
                      },    
@@ -738,9 +870,11 @@ constructor(props){
                         week:data.data.summary.exercise.workout_effort_level.week,
                         yesterday:data.data.summary.exercise.workout_effort_level.yesterday,
                         month:data.data.summary.exercise.workout_effort_level.month,
-                        custom_range:{           
-                           data:haveCustomData?data.data.summary.exercise.workout_effort_level.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{            
+                           data:haveCustomData?data.data.summary.exercise.workout_effort_level.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.exercise.workout_effort_level.today,
                         year:data.data.summary.exercise.workout_effort_level.year
                      },
@@ -748,9 +882,11 @@ constructor(props){
                         week:data.data.summary.exercise.vo2_max.week,
                         yesterday:data.data.summary.exercise.vo2_max.yesterday,
                         month:data.data.summary.exercise.vo2_max.month,
-                        custom_range:{           
-                           data:haveCustomData?data.data.summary.exercise.vo2_max.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{            
+                           data:haveCustomData?data.data.summary.exercise.vo2_max.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.exercise.vo2_max.today,
                         year:data.data.summary.exercise.vo2_max.year
                      }                               
@@ -760,9 +896,11 @@ constructor(props){
                         week:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.week,
                         yesterday:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.yesterday,
                         month:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.month,
-                        custom_range:{               
-                           data:haveCustomData?data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                
+                           data:haveCustomData?data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today,
                         year:data.data.summary.sleep.prcnt_days_sleep_aid_taken_in_period.year
                      },
@@ -770,9 +908,11 @@ constructor(props){
                         week:data.data.summary.sleep.average_sleep_grade.week,
                         yesterday:data.data.summary.sleep.average_sleep_grade.yesterday,
                         month:data.data.summary.sleep.average_sleep_grade.month,
-                        custom_range:{               
-                           data:haveCustomData?data.data.summary.sleep.average_sleep_grade.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                
+                           data:haveCustomData?data.data.summary.sleep.average_sleep_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.sleep.average_sleep_grade.today,
                         year:data.data.summary.sleep.average_sleep_grade.year
                      },
@@ -780,9 +920,11 @@ constructor(props){
                         week:data.data.summary.sleep.rank.week,
                         yesterday:data.data.summary.sleep.rank.yesterday,
                         month:data.data.summary.sleep.rank.month,
-                        custom_range:{                   
-                           data:haveCustomData?data.data.summary.sleep.rank.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                    
+                           data:haveCustomData?data.data.summary.sleep.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.sleep.rank.today,
                         year:data.data.summary.sleep.rank.year
                     },
@@ -790,29 +932,35 @@ constructor(props){
                         week:data.data.summary.sleep.total_sleep_in_hours_min.week,
                         yesterday:data.data.summary.sleep.total_sleep_in_hours_min.yesterday,
                         month:data.data.summary.sleep.total_sleep_in_hours_min.month,
-                        custom_range:{          
-                           data:haveCustomData?data.data.summary.sleep.total_sleep_in_hours_min.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{           
+                           data:haveCustomData?data.data.summary.sleep.total_sleep_in_hours_min.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.sleep.total_sleep_in_hours_min.today,
                         year:data.data.summary.sleep.total_sleep_in_hours_min.year
                     },
             overall_sleep_gpa: {
-                        week:data.data.summary.sleep.overall_sleep_gpa.week,
-                        yesterday:data.data.summary.sleep.overall_sleep_gpa.yesterday,
-                        month:data.data.summary.sleep.overall_sleep_gpa.month,
-                        custom_range:{                   
-                           data:haveCustomData?data.data.summary.sleep.overall_sleep_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.sleep.overall_sleep_gpa.today,
-                        year:data.data.summary.sleep.overall_sleep_gpa.year
+                        week:parseFloat(data.data.summary.sleep.overall_sleep_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.sleep.overall_sleep_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.sleep.overall_sleep_gpa.month).toFixed(2),
+                        custom_range:{
+                        [custom_date]:{                    
+                           data:parseFloat(haveCustomData?data.data.summary.sleep.overall_sleep_gpa.custom_range[custom_date].data:'').toFixed(2)
+                        }
+                    },
+                        today:parseFloat(data.data.summary.sleep.overall_sleep_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.sleep.overall_sleep_gpa.year).toFixed(2)
                      },
             num_days_sleep_aid_taken_in_period: {
                         week:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.week,
                         yesterday:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.yesterday,
                         month:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.month,
-                        custom_range:{                   
-                           data:haveCustomData?data.data.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                    
+                           data:haveCustomData?data.data.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.today,
                         year:data.data.summary.sleep.num_days_sleep_aid_taken_in_period.year
                      }
@@ -823,8 +971,10 @@ constructor(props){
                         yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.yesterday,
                         month:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.month,
                         custom_range:{
-                           data:haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.data:''
-                        },
+                            [custom_date]:{ 
+                           data:haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.today,
                         year:data.data.summary.alcohol.alcoholic_drinks_per_week_grade.year
             },
@@ -832,9 +982,11 @@ constructor(props){
                         week:data.data.summary.alcohol.avg_drink_per_week.week,
                         yesterday:data.data.summary.alcohol.avg_drink_per_week.yesterday,
                         month:data.data.summary.alcohol.avg_drink_per_week.month,
-                        custom_range:{                
-                           data:haveCustomData?data.data.summary.alcohol.avg_drink_per_week.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{                 
+                           data:haveCustomData?data.data.summary.alcohol.avg_drink_per_week.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.alcohol.avg_drink_per_week.today,
                         year:data.data.summary.alcohol.avg_drink_per_week.year
             },
@@ -842,21 +994,25 @@ constructor(props){
                        week:data.data.summary.alcohol.rank.week,
                         yesterday:data.data.summary.alcohol.rank.yesterday,
                         month:data.data.summary.alcohol.rank.month,
-                        custom_range:{              
-                           data:haveCustomData?data.data.summary.alcohol.rank.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{               
+                           data:haveCustomData?data.data.summary.alcohol.rank.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.alcohol.rank.today,
                         year:data.data.summary.alcohol.rank.year
             },
             alcoholic_drinks_per_week_gpa: {
-                        week:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.week,
-                        yesterday:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday,
-                        month:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.data:''
-                        },
-                        today:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today,
-                        year:data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year
+                        week:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.week).toFixed(2),
+                        yesterday:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday).toFixed(2),
+                        month:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.month).toFixed(2),
+                        custom_range:{
+                        [custom_date]:{     
+                           data:parseFloat(haveCustomData?data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range[custom_date].data:'').toFixed(2)
+                        }
+                    },
+                        today:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.today).toFixed(2),
+                        year:parseFloat(data.data.summary.alcohol.alcoholic_drinks_per_week_gpa.year).toFixed(2)
             }
         },
         other: {
@@ -864,9 +1020,11 @@ constructor(props){
                         week:data.data.summary.other.hrr_beats_lowered_in_first_min.week,
                         yesterday:data.data.summary.other.hrr_beats_lowered_in_first_min.yesterday,
                         month:data.data.summary.other.hrr_beats_lowered_in_first_min.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.other.hrr_beats_lowered_in_first_min.custom_range.data:''
-                        },
+                        custom_range:{ 
+                        [custom_date]:{    
+                           data:haveCustomData?data.data.summary.other.hrr_beats_lowered_in_first_min.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.other.hrr_beats_lowered_in_first_min.today,
                         year:data.data.summary.other.hrr_beats_lowered_in_first_min.year
             },
@@ -874,9 +1032,11 @@ constructor(props){
                         week:data.data.summary.other.hrr_highest_hr_in_first_min.week,
                         yesterday:data.data.summary.other.hrr_highest_hr_in_first_min.yesterday,
                         month:data.data.summary.other.hrr_highest_hr_in_first_min.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.other.hrr_highest_hr_in_first_min.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{     
+                           data:haveCustomData?data.data.summary.other.hrr_highest_hr_in_first_min.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.other.hrr_highest_hr_in_first_min.today,
                         year:data.data.summary.other.hrr_highest_hr_in_first_min.year
             },
@@ -884,9 +1044,11 @@ constructor(props){
                         week:data.data.summary.other.hrr_lowest_hr_point.week,
                         yesterday:data.data.summary.other.hrr_lowest_hr_point.yesterday,
                         month:data.data.summary.other.hrr_lowest_hr_point.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.other.hrr_lowest_hr_point.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{     
+                           data:haveCustomData?data.data.summary.other.hrr_lowest_hr_point.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.other.hrr_lowest_hr_point.today,
                         year:data.data.summary.other.hrr_lowest_hr_point.year
             },
@@ -894,9 +1056,11 @@ constructor(props){
                         week:data.data.summary.other.floors_climbed.week,
                         yesterday:data.data.summary.other.floors_climbed.yesterday,
                         month:data.data.summary.other.floors_climbed.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.other.floors_climbed.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{     
+                           data:haveCustomData?data.data.summary.other.floors_climbed.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.other.floors_climbed.today,
                         year:data.data.summary.other.floors_climbed.year
             },
@@ -904,9 +1068,11 @@ constructor(props){
                         week:data.data.summary.other.resting_hr.week,
                         yesterday:data.data.summary.other.resting_hr.yesterday,
                         month:data.data.summary.other.resting_hr.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.other.resting_hr.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{     
+                           data:haveCustomData?data.data.summary.other.resting_hr.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.other.resting_hr.today,
                         year:data.data.summary.other.resting_hr.year
             },
@@ -914,9 +1080,11 @@ constructor(props){
                         week:data.data.summary.other.hrr_time_to_99.week,
                         yesterday:data.data.summary.other.hrr_time_to_99.yesterday,
                         month:data.data.summary.other.hrr_time_to_99.month,
-                        custom_range:{    
-                           data:haveCustomData?data.data.summary.other.hrr_time_to_99.custom_range.data:''
-                        },
+                        custom_range:{
+                        [custom_date]:{    
+                           data:haveCustomData?data.data.summary.other.hrr_time_to_99.custom_range[custom_date].data:''
+                        }
+                    },
                         today:data.data.summary.other.hrr_time_to_99.today,
                         year:data.data.summary.other.hrr_time_to_99.year
             }
@@ -936,6 +1104,7 @@ constructor(props){
     processDate(selectedDate,fromDate,toDate){ 
     this.setState({
       selectedDate: selectedDate,
+      calendarOpen:!this.state.calendarOpen                                    
     },()=>{
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
     });
@@ -986,18 +1155,6 @@ handleChange(event){
         [name]: value
       });
     }
- printDocument() {
-    const input = document.getElementById('divToPrint');
-    html2canvas(input)
-      .then((canvas) => {
-        const imgData = canvas.toDataURL('http://127.0.0.1:8000/progressanalyzer');
-        const pdf = new jsPDF();
-        pdf.addImage(imgData, 'json', 0, 0);
-        // pdf.output('dataurlnewwindow');
-        pdf.save("download.pdf");
-      })
-    ;
-  }
 	render(){
 		const {fix} = this.props;
    let haveCustomData = (this.state.start_date && this.state.end_date)?true:false;
@@ -1149,7 +1306,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td >Total GPA Points</td>
-              {haveCustomData && <td>{this.state.summary.overall_health.total_gpa_point.custom_range.data}</td>}
+              {haveCustomData && <td>{this.state.summary.overall_health.total_gpa_point.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.overall_health.total_gpa_point.today}</td>
                 <td>{this.state.summary.overall_health.total_gpa_point.yesterday}</td>
                 <td>{this.state.summary.overall_health.total_gpa_point.week}</td>
@@ -1158,7 +1315,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td >Overall Health GPA</td>
-                {haveCustomData &&<td>{this.state.summary.overall_health.overall_health_gpa.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.overall_health.overall_health_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.overall_health.overall_health_gpa.today}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa.yesterday}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa.week}</td>
@@ -1167,7 +1324,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td >Rank against other users</td>
-                 {haveCustomData &&<td>{this.state.summary.overall_health.rank.custom_range.data}</td>}
+                 {haveCustomData &&<td>{this.state.summary.overall_health.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.overall_health.rank.today}</td>
                 <td>{this.state.summary.overall_health.rank.yesterday}</td>
                 <td>{this.state.summary.overall_health.rank.week}</td>
@@ -1176,7 +1333,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Overall Health GPA Grade</td>
-                {haveCustomData &&<td>{this.state.summary.overall_health.overall_health_gpa_grade.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.overall_health.overall_health_gpa_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.overall_health.overall_health_gpa_grade.today}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa_grade.yesterday}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa_grade.week}</td>
@@ -1207,7 +1364,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Movement Consistency Score</td>
-               {haveCustomData && <td>{this.state.summary.mc.movement_consistency_score.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.mc.movement_consistency_score.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.mc.movement_consistency_score.today}</td>
                 <td>{this.state.summary.mc.movement_consistency_score.yesterday}</td>
                 <td>{this.state.summary.mc.movement_consistency_score.week}</td>
@@ -1216,7 +1373,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-               {haveCustomData && <td> {this.state.summary.mc.rank.custom_range.data}</td>}
+               {haveCustomData && <td> {this.state.summary.mc.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.mc.rank.today}</td>
                 <td>{this.state.summary.mc.rank.yesterday}</td>
                 <td>{this.state.summary.mc.rank.week}</td>
@@ -1225,7 +1382,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Movement Consistency Grade</td>
-                {haveCustomData &&<td>{this.state.summary.mc.movement_consistency_grade.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.mc.movement_consistency_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.mc.movement_consistency_grade.today}</td>
                 <td>{this.state.summary.mc.movement_consistency_grade.yesterday}</td>
                 <td>{this.state.summary.mc.movement_consistency_grade.week}</td>
@@ -1234,7 +1391,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Movement Consistency GPA</td>
-                {haveCustomData &&<td>{this.state.summary.mc.movement_consistency_gpa.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.mc.movement_consistency_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.mc.movement_consistency_gpa.today}</td>
                 <td>{this.state.summary.mc.movement_consistency_gpa.yesterday}</td>
                 <td>{this.state.summary.mc.movement_consistency_gpa.week}</td>
@@ -1266,7 +1423,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Non Exercise Steps</td>
-              {haveCustomData &&<td>{this.state.summary.non_exercise.non_exercise_steps.custom_range.data}</td>}
+              {haveCustomData &&<td>{this.state.summary.non_exercise.non_exercise_steps.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.non_exercise.non_exercise_steps.today}</td>
                 <td>{this.state.summary.non_exercise.non_exercise_steps.yesterday}</td>
                 <td>{this.state.summary.non_exercise.non_exercise_steps.week}</td>
@@ -1275,7 +1432,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-               {haveCustomData &&<td>{this.state.summary.non_exercise.rank.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.non_exercise.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.non_exercise.rank.today}</td>
                 <td>{this.state.summary.non_exercise.rank.yesterday}</td>
                 <td>{this.state.summary.non_exercise.rank.week}</td>
@@ -1284,7 +1441,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Movement-Non Exercise Steps Grade</td>
-                {haveCustomData &&<td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.today}</td>
                 <td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.yesterday}</td>
                 <td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.week}</td>
@@ -1293,7 +1450,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Non Exercise Steps GPA</td>
-              {haveCustomData && <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.custom_range.data}</td>}
+              {haveCustomData && <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.today}</td>
                 <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.yesterday}</td>
                 <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.week}</td>
@@ -1302,7 +1459,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Total Steps</td>
-               {haveCustomData && <td>{this.state.summary.non_exercise.total_steps.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.non_exercise.total_steps.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.non_exercise.total_steps.today}</td>
                 <td>{this.state.summary.non_exercise.total_steps.yesterday}</td>
                 <td>{this.state.summary.non_exercise.total_steps.week}</td>
@@ -1333,7 +1490,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>% of Unprocessed Food Consumed</td>
-               {haveCustomData && <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.today}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.yesterday}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.week}</td>
@@ -1342,7 +1499,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-               {haveCustomData &&<td>{this.state.summary.nutrition.rank.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.nutrition.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.nutrition.rank.today}</td>
                 <td>{this.state.summary.nutrition.rank.yesterday}</td>
                 <td>{this.state.summary.nutrition.rank.week}</td>
@@ -1351,7 +1508,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>% Non Processed Food Consumed Grade</td>
-             {haveCustomData && <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.data}</td>}
+             {haveCustomData && <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.today}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.yesterday}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.week}</td>
@@ -1360,7 +1517,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>% Non Processed Food Consumed GPA</td>
-                {haveCustomData &&<td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.today}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.week}</td>
@@ -1392,7 +1549,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Average Drinks Per Week (7 Days)</td>
-                {haveCustomData &&<td>{this.state.summary.alcohol.avg_drink_per_week.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.alcohol.avg_drink_per_week.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.alcohol.avg_drink_per_week.today}</td>
                 <td>{this.state.summary.alcohol.avg_drink_per_week.yesterday}</td>
                 <td>{this.state.summary.alcohol.avg_drink_per_week.week}</td>
@@ -1401,7 +1558,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {haveCustomData &&<td>{this.state.summary.alcohol.rank.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.alcohol.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.alcohol.rank.today}</td>
                 <td>{this.state.summary.alcohol.rank.yesterday}</td>
                 <td>{this.state.summary.alcohol.rank.week}</td>
@@ -1410,7 +1567,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Alcoholic drinks per week Grade</td>
-                {haveCustomData &&<td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.today}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.yesterday}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.week}</td>
@@ -1419,7 +1576,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Alcoholic drinks per week GPA</td>
-                {haveCustomData &&<td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.today}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.week}</td>
@@ -1450,7 +1607,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Avg # of Days Exercised/Week</td>
-               {haveCustomData && <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.today}</td>
                 <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.yesterday}</td>
                 <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.week}</td>
@@ -1459,7 +1616,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {haveCustomData &&<td>{this.state.summary.ec.rank.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.ec.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.ec.rank.today}</td>
                 <td>{this.state.summary.ec.rank.yesterday}</td>
                 <td>{this.state.summary.ec.rank.week}</td>
@@ -1468,7 +1625,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Exercise Consistency Grade</td>
-                {haveCustomData &&<td>{this.state.summary.ec.exercise_consistency_grade.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.ec.exercise_consistency_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.ec.exercise_consistency_grade.today}</td>
                 <td>{this.state.summary.ec.exercise_consistency_grade.yesterday}</td>
                 <td>{this.state.summary.ec.exercise_consistency_grade.week}</td>
@@ -1477,7 +1634,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Exercise Consistency GPA</td>
-              {haveCustomData && <td>{this.state.summary.ec.exercise_consistency_gpa.custom_range.data}</td>}
+              {haveCustomData && <td>{this.state.summary.ec.exercise_consistency_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.ec.exercise_consistency_gpa.today}</td>
                 <td>{this.state.summary.ec.exercise_consistency_gpa.yesterday}</td>
                 <td>{this.state.summary.ec.exercise_consistency_gpa.week}</td>
@@ -1507,7 +1664,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Workout Duration (hours:minutes)</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.workout_duration_hours_min.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.exercise.workout_duration_hours_min.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.exercise.workout_duration_hours_min.today}</td>
                 <td>{this.state.summary.exercise.workout_duration_hours_min.yesterday}</td>
                 <td>{this.state.summary.exercise.workout_duration_hours_min.week}</td>
@@ -1516,7 +1673,7 @@ handleChange(event){
             </tr>
             <tr>
             	<td>Workout Effort Level</td>
-                {haveCustomData &&<td>{this.state.summary.exercise.workout_effort_level.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.exercise.workout_effort_level.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.exercise.workout_effort_level.today}</td>
                 <td>{this.state.summary.exercise.workout_effort_level.yesterday}</td>
                 <td>{this.state.summary.exercise.workout_effort_level.week}</td>
@@ -1525,7 +1682,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Average Exercise Heart Rate</td>
-               {haveCustomData && <td>{this.state.summary.exercise.avg_exercise_heart_rate.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.exercise.avg_exercise_heart_rate.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.today}</td>
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.yesterday}</td>
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.week}</td>
@@ -1534,7 +1691,7 @@ handleChange(event){
             </tr>
              <tr>
             	<td>VO2 Max</td>
-               {haveCustomData && <td>{this.state.summary.exercise.vo2_max.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.exercise.vo2_max.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.exercise.vo2_max.today}</td>
                 <td>{this.state.summary.exercise.vo2_max.yesterday}</td>
                 <td>{this.state.summary.exercise.vo2_max.week}</td>
@@ -1567,7 +1724,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Resting Heart Rate (RHR)</td>
-               {haveCustomData &&<td>{this.state.summary.other.resting_hr.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.other.resting_hr.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.other.resting_hr.today}</td>
                 <td>{this.state.summary.other.resting_hr.yesterday}</td>
                 <td>{this.state.summary.other.resting_hr.week}</td>
@@ -1576,7 +1733,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>HRR (time to 99)</td>
-               {haveCustomData &&<td>{this.state.summary.other.hrr_time_to_99.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.other.hrr_time_to_99.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.other.hrr_time_to_99.today}</td>
                 <td>{this.state.summary.other.hrr_time_to_99.yesterday}</td>
                 <td>{this.state.summary.other.hrr_time_to_99.week}</td>
@@ -1585,7 +1742,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>HRR (heart beats lowered in 1st minute)</td>
-               {haveCustomData &&<td>{this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.today}</td>
                 <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.yesterday}</td>
                 <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.week}</td>
@@ -1594,7 +1751,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>HRR (higest heart rate in 1st minute)</td>
-                {haveCustomData &&<td>{this.state.summary.other.hrr_highest_hr_in_first_min.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.other.hrr_highest_hr_in_first_min.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.other.hrr_highest_hr_in_first_min.today}</td>
                 <td>{this.state.summary.other.hrr_highest_hr_in_first_min.yesterday}</td>
                 <td>{this.state.summary.other.hrr_highest_hr_in_first_min.week}</td>
@@ -1603,7 +1760,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>HRR (lowest heart rate point)</td>
-               {haveCustomData &&<td>{this.state.summary.other.hrr_lowest_hr_point.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.other.hrr_lowest_hr_point.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.other.hrr_lowest_hr_point.today}</td>
                 <td>{this.state.summary.other.hrr_lowest_hr_point.yesterday}</td>
                 <td>{this.state.summary.other.hrr_lowest_hr_point.week}</td>
@@ -1612,7 +1769,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Floors Climbed</td>
-               {haveCustomData &&<td>{this.state.summary.other.floors_climbed.custom_range.data}</td>}
+               {haveCustomData &&<td>{this.state.summary.other.floors_climbed.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.other.floors_climbed.today}</td>
                 <td>{this.state.summary.other.floors_climbed.yesterday}</td>
                 <td>{this.state.summary.other.floors_climbed.week}</td>
@@ -1642,7 +1799,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Total Sleep in hours:minutes</td>
-               {haveCustomData && <td>{this.state.summary.sleep.total_sleep_in_hours_min.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.sleep.total_sleep_in_hours_min.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.sleep.total_sleep_in_hours_min.today}</td>
                 <td>{this.state.summary.sleep.total_sleep_in_hours_min.yesterday}</td>
                 <td>{this.state.summary.sleep.total_sleep_in_hours_min.week}</td>
@@ -1651,7 +1808,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {haveCustomData &&<td>{this.state.summary.sleep.rank.custom_range.data}</td>}
+                {haveCustomData &&<td>{this.state.summary.sleep.rank.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.sleep.rank.today}</td>
                 <td>{this.state.summary.sleep.rank.yesterday}</td>
                 <td>{this.state.summary.sleep.rank.week}</td>
@@ -1660,7 +1817,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Average Sleep Grage</td>
-                {haveCustomData && <td>{this.state.summary.sleep.average_sleep_grade.custom_range.data}</td>}
+                {haveCustomData && <td>{this.state.summary.sleep.average_sleep_grade.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.sleep.average_sleep_grade.today}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.yesterday}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.week}</td>
@@ -1669,7 +1826,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td># of Days Sleep Aid Taken in Period</td>
-                {haveCustomData && <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range.data}</td>}
+                {haveCustomData && <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.today}</td>
                 <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.yesterday}</td>
                 <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.week}</td>
@@ -1678,7 +1835,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>% of Days Sleep Aid Taken in Period</td>
-                {haveCustomData && <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range.data}</td>}
+                {haveCustomData && <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today}</td>
                 <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.yesterday}</td>
                 <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.week}</td>
@@ -1687,7 +1844,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Overall Sleep GPA</td>
-               {haveCustomData && <td>{this.state.summary.sleep.overall_sleep_gpa.custom_range.data}</td>}
+               {haveCustomData && <td>{this.state.summary.sleep.overall_sleep_gpa.custom_range.custom_date.data}</td>}
                 <td>{this.state.summary.sleep.overall_sleep_gpa.today}</td>
                 <td>{this.state.summary.sleep.overall_sleep_gpa.yesterday}</td>
                 <td>{this.state.summary.sleep.overall_sleep_gpa.week}</td>

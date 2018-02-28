@@ -123,6 +123,12 @@ class Quicklook extends Component{
 					data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
 					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
 
+				let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
+				if(user_input_data){
+					let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
+					avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
+						&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
+				}
        			var properties={
        			created_at:data.created_at,
 				grades_ql: {
@@ -133,7 +139,7 @@ class Quicklook extends Component{
 			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
 			        movement_consistency_score:data.steps_ql.movement_consistency,
 			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
-			        avg_sleep_per_night:data.sleep_ql.sleep_per_wearable,
+			        avg_sleep_per_night:avg_sleep_per_night,
 			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
 			        workout_today: user_input_data.strong_input.workout,
 			        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
@@ -338,7 +344,6 @@ class Quicklook extends Component{
          if (data.data.length > 0){
 		 	 for(var dataitem of data.data){
 		      	const date = moment(dataitem.created_at).format('M-D-YY');
-		      	console.log(this.state.userInputData);
 		      	let obj = this.updateDateState(dataitem,this.state.userInputData[date]);
 		      	initial_state[date] = obj;
 		      }
@@ -795,12 +800,12 @@ onLogoutSuccess(response){
                                        </NavItem>
 
                                     
-                                     <NavItem onClick={this.toggle}>
+                                     <NavItem onClick={this.toggle} className="mchistorical">
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Movement Consistency Historical Data">
                                             <NavLink id="headernames" href="#" className={class_movementHistorical} value="movementhistorical"
 						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>
-						    		 		 Movement Consistency Historical
+						    		 		 Movement Consistency Historical Data
                                             </NavLink>
                                           </abbr>
                                           </span>
@@ -860,14 +865,17 @@ onLogoutSuccess(response){
 									          More
 									        </DropdownToggle>
 									        <DropdownMenu>
+									        
 									        <DropdownItem style={{paddingLeft:"30px"}} id="dropsteps"  className={class_steps}  value="steps"
 						    		 				 onClick={this.activateTab.bind(this,"steps")}>Steps</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropsleep"  className={class_sleep} value="sleep"
-						    		 				 onClick={this.activateTab.bind(this,"sleep")}>sleep</DropdownItem>									                                                     						    		 													         									         								         									         
+						    		 				 onClick={this.activateTab.bind(this,"sleep")}>Sleep</DropdownItem>									                                                     						    		 													         									         								         									         
 									          <DropdownItem style={{paddingLeft:"30px"}} id="dropfood"  className={class_food}  value="food"
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
+						    		 		   <DropdownItem style={{paddingLeft:"30px"}} id="dropmchistorical"  className={class_movementHistorical} value="movementhistorical"
+						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>Movement Consistency Historical Data</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
 						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
                                             </DropdownItem>
@@ -952,7 +960,7 @@ onLogoutSuccess(response){
 	                    	 <User  data={this.state.userInputData}/>
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
-                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date}/>}
 
 
 			</div>

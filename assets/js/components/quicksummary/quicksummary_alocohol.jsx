@@ -33,7 +33,6 @@ onProfileSuccessFetch(data){
 componentDidMount(){
      
       getUserProfile(this.onProfileSuccessFetch);
-      console.log(getUserProfile);
       
     }
 
