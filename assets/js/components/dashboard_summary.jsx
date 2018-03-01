@@ -776,6 +776,10 @@ constructor(props){
 
 renderCustomRangeTD(custom_data){
     let td=[];
+    if(!custom_data){
+        console.log("++++++++++++++++++++++",custom_data)
+        return td;
+    }
     for (let[key,val] of Object.entries(custom_data)){
         td.push(<td>{val.data}</td>)
     }
