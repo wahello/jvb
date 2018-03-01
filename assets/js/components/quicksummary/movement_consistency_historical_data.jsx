@@ -218,6 +218,17 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             {this.renderTableColumns(this.props.data,"steps_ql")}
          
           </Table>
+         
+            <div className="rd_mch_color_legend color_legend_green"></div>
+            <span className="rd_mch_color_legend_label">Active</span>
+            <div className="rd_mch_color_legend color_legend_red"></div>
+            <span className="rd_mch_color_legend_label">Inactive</span>
+            <div className="rd_mch_color_legend color_legend_pink"></div>
+            <span className="rd_mch_color_legend_label">Strength</span>
+            <div className="rd_mch_color_legend color_legend_blue"></div>
+            <span className="rd_mch_color_legend_label">Sleeping</span>
+         
+
       </div>
       </div>
 
