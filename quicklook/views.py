@@ -1506,7 +1506,9 @@ def export_users_xls(request):
 						sheet3.write(i + 2, row_num, exercise_data[key], format_green)
 					if exercise_data[key] <= 30:
 						sheet3.write(i + 2, row_num, exercise_data[key], format_red)
-				elif i != 0:
+	
+			
+				if i != 0 and i != 3:
 					sheet3.write(i + 2, row_num, sleep_data[key], format)
 		else:
 			row_num += 1
