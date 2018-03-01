@@ -774,15 +774,16 @@ constructor(props){
 
   }
 
-renderCustomRangeTD(custom_data){
+renderCustomRangeTD(custom_data, toReturn="data"){
     let td=[];
     if(!custom_data){
-        console.log("++++++++++++++++++++++",custom_data)
         return td;
     }
     for (let[key,val] of Object.entries(custom_data)){
-        td.push(<th>{key}</th>);
-        td.push(<td>{val.data}</td>);
+        if(toReturn == "data")
+            td.push(<td>{val.data}</td>);
+        else if(toReturn == "key")
+            td.push(<th>{key}</th>);
     }
     return td;
 }
@@ -806,6 +807,14 @@ renderCustomRangeTD(custom_data){
       dateRange1:!this.state.dateRange1,
     },()=>{
         let custom_ranges = [];
+        if(this.state.cr2_start_date && this.state.cr2_end_date){
+            custom_ranges.push(this.state.cr2_start_date);
+            custom_ranges.push(this.state.cr2_end_date);
+        }
+         if(this.state.cr3_start_date && this.state.cr3_end_date){
+            custom_ranges.push(this.state.cr3_start_date);
+            custom_ranges.push(this.state.cr3_end_date);
+        }
         custom_ranges.push(this.state.cr1_start_date);
         custom_ranges.push(this.state.cr1_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
@@ -817,6 +826,15 @@ renderCustomRangeTD(custom_data){
       dateRange2:!this.state.dateRange2,
     },()=>{
          let custom_ranges = [];
+        if(this.state.cr1_start_date && this.state.cr1_end_date){
+            custom_ranges.push(this.state.cr1_start_date);
+            custom_ranges.push(this.state.cr1_end_date);
+        }
+         if(this.state.cr3_start_date && this.state.cr3_end_date){
+            custom_ranges.push(this.state.cr3_start_date);
+            custom_ranges.push(this.state.cr3_end_date);
+        }
+
         custom_ranges.push(this.state.cr2_start_date);
         custom_ranges.push(this.state.cr2_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
@@ -828,6 +846,14 @@ renderCustomRangeTD(custom_data){
       dateRange3:!this.state.dateRange3,
     },()=>{
          let custom_ranges = [];
+         if(this.state.cr1_start_date && this.state.cr1_end_date){
+            custom_ranges.push(this.state.cr1_start_date);
+            custom_ranges.push(this.state.cr1_end_date);
+        }
+        if(this.state.cr2_start_date && this.state.cr2_end_date){
+            custom_ranges.push(this.state.cr2_start_date);
+            custom_ranges.push(this.state.cr2_end_date);
+        }
         custom_ranges.push(this.state.cr3_start_date);
         custom_ranges.push(this.state.cr3_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
@@ -1122,7 +1148,7 @@ handleChange(event){
          <thead>
             <tr>
                 <th >Overall Health Grade</th>
-                 {haveCustomData && <th>Custom Date Range</th>}
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1133,7 +1159,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td >Total GPA Points</td>
-                 {this.renderCustomRangeTD(haveCustomData && this.state.summary.overall_health.total_gpa_point.custom_range)}
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range)}
                 <td>{this.state.summary.overall_health.total_gpa_point.today}</td>
                 <td>{this.state.summary.overall_health.total_gpa_point.yesterday}</td>
                 <td>{this.state.summary.overall_health.total_gpa_point.week}</td>
@@ -1142,7 +1168,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td >Overall Health GPA</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.overall_health.overall_health_gpacustom_range)}
+                { this.renderCustomRangeTD(this.state.summary.overall_health.overall_health_gpa.custom_range)}
                 <td>{this.state.summary.overall_health.overall_health_gpa.today}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa.yesterday}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa.week}</td>
@@ -1151,7 +1177,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td >Rank against other users</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.overall_health.rankcustom_range)}
+                {this.renderCustomRangeTD( this.state.summary.overall_health.rank.custom_range)}
                 <td>{this.state.summary.overall_health.rank.today}</td>
                 <td>{this.state.summary.overall_health.rank.yesterday}</td>
                 <td>{this.state.summary.overall_health.rank.week}</td>
@@ -1160,7 +1186,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Overall Health GPA Grade</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.overall_health.overall_health_gpa_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.overall_health.overall_health_gpa_grade.custom_range)}
                 <td>{this.state.summary.overall_health.overall_health_gpa_grade.today}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa_grade.yesterday}</td>
                 <td>{this.state.summary.overall_health.overall_health_gpa_grade.week}</td>
@@ -1179,7 +1205,7 @@ handleChange(event){
            
                 <tr>
                 <th>Movement Consistency</th>
-                {haveCustomData && <th>Custom Date Range</th>}
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1191,7 +1217,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Movement Consistency Score</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.mc.movement_consistency_score.custom_range)}
+                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_score.custom_range)}
                 <td>{this.state.summary.mc.movement_consistency_score.today}</td>
                 <td>{this.state.summary.mc.movement_consistency_score.yesterday}</td>
                 <td>{this.state.summary.mc.movement_consistency_score.week}</td>
@@ -1200,7 +1226,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.mc.rankcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.mc.rank.custom_range)}
                 <td>{this.state.summary.mc.rank.today}</td>
                 <td>{this.state.summary.mc.rank.yesterday}</td>
                 <td>{this.state.summary.mc.rank.week}</td>
@@ -1209,7 +1235,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Movement Consistency Grade</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.mc.movement_consistency_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_grade.custom_range)}
                 <td>{this.state.summary.mc.movement_consistency_grade.today}</td>
                 <td>{this.state.summary.mc.movement_consistency_grade.yesterday}</td>
                 <td>{this.state.summary.mc.movement_consistency_grade.week}</td>
@@ -1218,7 +1244,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Movement Consistency GPA</td>
-                {this.renderCustomRangeTD(haveCustomData &&this.state.summary.mc.movement_consistency_gpacustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_gpa.custom_range)}
                 <td>{this.state.summary.mc.movement_consistency_gpa.today}</td>
                 <td>{this.state.summary.mc.movement_consistency_gpa.yesterday}</td>
                 <td>{this.state.summary.mc.movement_consistency_gpa.week}</td>
@@ -1238,7 +1264,7 @@ handleChange(event){
             <tr>
                 
                 <th>Non Exercise Steps</th>    
-                 {haveCustomData && <th>Custom Date Range</th>}
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1250,7 +1276,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Non Exercise Steps</td>
-              {this.renderCustomRangeTD(haveCustomData && this.state.summary.non_exercise.non_exercise_stepscustom_range)}
+              {this.renderCustomRangeTD(this.state.summary.non_exercise.non_exercise_steps.custom_range)}
                 <td>{this.state.summary.non_exercise.non_exercise_steps.today}</td>
                 <td>{this.state.summary.non_exercise.non_exercise_steps.yesterday}</td>
                 <td>{this.state.summary.non_exercise.non_exercise_steps.week}</td>
@@ -1259,7 +1285,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-               {this.renderCustomRangeTD(haveCustomData && this.state.summary.non_exercise.rankcustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.non_exercise.rank.custom_range)}
                 <td>{this.state.summary.non_exercise.rank.today}</td>
                 <td>{this.state.summary.non_exercise.rank.yesterday}</td>
                 <td>{this.state.summary.non_exercise.rank.week}</td>
@@ -1268,7 +1294,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Movement-Non Exercise Steps Grade</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.non_exercise.movement_non_exercise_step_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.non_exercise.movement_non_exercise_step_grade.custom_range)}
                 <td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.today}</td>
                 <td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.yesterday}</td>
                 <td>{this.state.summary.non_exercise.movement_non_exercise_step_grade.week}</td>
@@ -1277,7 +1303,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Non Exercise Steps GPA</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.non_exercise.non_exericse_steps_gpacustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.non_exercise.non_exericse_steps_gpa.custom_range)}
                 <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.today}</td>
                 <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.yesterday}</td>
                 <td>{this.state.summary.non_exercise.non_exericse_steps_gpa.week}</td>
@@ -1286,7 +1312,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Total Steps</td>
-               {this.renderCustomRangeTD(haveCustomData && this.state.summary.non_exercise.total_stepscustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.non_exercise.total_steps.custom_range)}
                 <td>{this.state.summary.non_exercise.total_steps.today}</td>
                 <td>{this.state.summary.non_exercise.total_steps.yesterday}</td>
                 <td>{this.state.summary.non_exercise.total_steps.week}</td>
@@ -1305,7 +1331,7 @@ handleChange(event){
             <tr>
                 
                 <th>Nutrition</th>
-                 {haveCustomData && <th>Custom Date Range</th>}
+                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1317,7 +1343,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>% of Unprocessed Food Consumed</td>
-               {this.renderCustomRangeTD(haveCustomData && this.state.summary.nutrition.prcnt_unprocessed_volume_of_foodcustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range)}
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.today}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.yesterday}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.week}</td>
@@ -1326,7 +1352,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-               {this.renderCustomRangeTD(haveCustomData &&this.state.summary.nutrition.rankcustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.nutrition.rank.custom_range)}
                 <td>{this.state.summary.nutrition.rank.today}</td>
                 <td>{this.state.summary.nutrition.rank.yesterday}</td>
                 <td>{this.state.summary.nutrition.rank.week}</td>
@@ -1335,7 +1361,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>% Non Processed Food Consumed Grade</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.nutrition.prcnt_unprocessed_food_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_food_grade.custom_range)}
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.today}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.yesterday}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_grade.week}</td>
@@ -1344,7 +1370,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>% Non Processed Food Consumed GPA</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.nutrition.prcnt_unprocessed_food_gpacustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range)}
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.today}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday}</td>
                 <td>{this.state.summary.nutrition.prcnt_unprocessed_food_gpa.week}</td>
@@ -1364,7 +1390,7 @@ handleChange(event){
             <tr>
                 
                 <th>Alcohol</th>
-                 {haveCustomData && <th>Custom Date Range</th>}
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1376,7 +1402,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Average Drinks Per Week (7 Days)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.alcohol.avg_drink_per_weekcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.alcohol.avg_drink_per_week.custom_range)}
                 <td>{this.state.summary.alcohol.avg_drink_per_week.today}</td>
                 <td>{this.state.summary.alcohol.avg_drink_per_week.yesterday}</td>
                 <td>{this.state.summary.alcohol.avg_drink_per_week.week}</td>
@@ -1385,7 +1411,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.alcohol.rankcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.alcohol.rank.custom_range)}
                 <td>{this.state.summary.alcohol.rank.today}</td>
                 <td>{this.state.summary.alcohol.rank.yesterday}</td>
                 <td>{this.state.summary.alcohol.rank.week}</td>
@@ -1394,7 +1420,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Alcoholic drinks per week Grade</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.alcohol.alcoholic_drinks_per_week_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range)}
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.today}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.yesterday}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.week}</td>
@@ -1403,7 +1429,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Alcoholic drinks per week GPA</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.alcohol.alcoholic_drinks_per_week_gpacustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range)}
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.today}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday}</td>
                 <td>{this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.week}</td>
@@ -1422,7 +1448,7 @@ handleChange(event){
             <tr>
                 
                 <th>Exercise Consistency</th>
-                 {haveCustomData && <th>Custom Date Range</th>}
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1434,7 +1460,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Avg # of Days Exercised/Week</td>
-               {this.renderCustomRangeTD(haveCustomData && this.state.summary.ec.avg_no_of_days_exercises_per_weekcustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.ec.avg_no_of_days_exercises_per_week.custom_range)}
                 <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.today}</td>
                 <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.yesterday}</td>
                 <td>{this.state.summary.ec.avg_no_of_days_exercises_per_week.week}</td>
@@ -1443,7 +1469,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.ec.rankcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.ec.rankcustom_range)}
                 <td>{this.state.summary.ec.rank.today}</td>
                 <td>{this.state.summary.ec.rank.yesterday}</td>
                 <td>{this.state.summary.ec.rank.week}</td>
@@ -1452,7 +1478,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Exercise Consistency Grade</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.ec.exercise_consistency_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.ec.exercise_consistency_grade.custom_range)}
                 <td>{this.state.summary.ec.exercise_consistency_grade.today}</td>
                 <td>{this.state.summary.ec.exercise_consistency_grade.yesterday}</td>
                 <td>{this.state.summary.ec.exercise_consistency_grade.week}</td>
@@ -1461,7 +1487,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Exercise Consistency GPA</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.ec.exercise_consistency_gpacustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.ec.exercise_consistency_gpa.custom_range)}
                 <td>{this.state.summary.ec.exercise_consistency_gpa.today}</td>
                 <td>{this.state.summary.ec.exercise_consistency_gpa.yesterday}</td>
                 <td>{this.state.summary.ec.exercise_consistency_gpa.week}</td>
@@ -1479,7 +1505,7 @@ handleChange(event){
             <tr>
                 
                 <th>Exercise Stats</th>
-                {haveCustomData && <th>Custom Date Range</th>}
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1491,7 +1517,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Workout Duration (hours:minutes)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.exercise.workout_duration_hours_mincustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range)}
                 <td>{this.state.summary.exercise.workout_duration_hours_min.today}</td>
                 <td>{this.state.summary.exercise.workout_duration_hours_min.yesterday}</td>
                 <td>{this.state.summary.exercise.workout_duration_hours_min.week}</td>
@@ -1500,7 +1526,7 @@ handleChange(event){
             </tr>
             <tr>
             	<td>Workout Effort Level</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.exercise.workout_effort_levelcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
                 <td>{this.state.summary.exercise.workout_effort_level.today}</td>
                 <td>{this.state.summary.exercise.workout_effort_level.yesterday}</td>
                 <td>{this.state.summary.exercise.workout_effort_level.week}</td>
@@ -1509,7 +1535,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Average Exercise Heart Rate</td>
-               {this.renderCustomRangeTD(haveCustomData && this.state.summary.exercise.avg_exercise_heart_ratecustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.exercise.avg_exercise_heart_rate.custom_range)}
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.today}</td>
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.yesterday}</td>
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.week}</td>
@@ -1518,7 +1544,7 @@ handleChange(event){
             </tr>
              <tr>
             	<td>VO2 Max</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.exercise.vo2_maxcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
                 <td>{this.state.summary.exercise.vo2_max.today}</td>
                 <td>{this.state.summary.exercise.vo2_max.yesterday}</td>
                 <td>{this.state.summary.exercise.vo2_max.week}</td>
@@ -1539,7 +1565,7 @@ handleChange(event){
             <tr>
                 
                 <th>Other Stats</th>
-                 {haveCustomData && <th>Custom Date Range</th>}
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1551,7 +1577,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Resting Heart Rate (RHR)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.other.resting_hrcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.other.resting_hr.custom_range)}
                 <td>{this.state.summary.other.resting_hr.today}</td>
                 <td>{this.state.summary.other.resting_hr.yesterday}</td>
                 <td>{this.state.summary.other.resting_hr.week}</td>
@@ -1560,7 +1586,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>HRR (time to 99)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.other.hrr_time_to_99custom_range)}
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_time_to_99.custom_range)}
                 <td>{this.state.summary.other.hrr_time_to_99.today}</td>
                 <td>{this.state.summary.other.hrr_time_to_99.yesterday}</td>
                 <td>{this.state.summary.other.hrr_time_to_99.week}</td>
@@ -1569,7 +1595,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>HRR (heart beats lowered in 1st minute)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.other.hrr_beats_lowered_in_first_mincustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range)}
                 <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.today}</td>
                 <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.yesterday}</td>
                 <td>{this.state.summary.other.hrr_beats_lowered_in_first_min.week}</td>
@@ -1578,7 +1604,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>HRR (higest heart rate in 1st minute)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.other.hrr_highest_hr_in_first_mincustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_highest_hr_in_first_min.custom_range)}
                 <td>{this.state.summary.other.hrr_highest_hr_in_first_min.today}</td>
                 <td>{this.state.summary.other.hrr_highest_hr_in_first_min.yesterday}</td>
                 <td>{this.state.summary.other.hrr_highest_hr_in_first_min.week}</td>
@@ -1587,7 +1613,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>HRR (lowest heart rate point)</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.other.hrr_lowest_hr_pointcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_lowest_hr_point.custom_range)}
                 <td>{this.state.summary.other.hrr_lowest_hr_point.today}</td>
                 <td>{this.state.summary.other.hrr_lowest_hr_point.yesterday}</td>
                 <td>{this.state.summary.other.hrr_lowest_hr_point.week}</td>
@@ -1596,7 +1622,7 @@ handleChange(event){
             </tr>
              <tr>
                 <td>Floors Climbed</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.other.floors_climbedcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.other.floors_climbed.custom_range)}
                 <td>{this.state.summary.other.floors_climbed.today}</td>
                 <td>{this.state.summary.other.floors_climbed.yesterday}</td>
                 <td>{this.state.summary.other.floors_climbed.week}</td>
@@ -1614,7 +1640,7 @@ handleChange(event){
              
                 <tr>
                   <th>Sleep Per Night(excluding awake time)</th>
-               {haveCustomData && <th>Custom Date Range</th>}
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today</th>
                 <th>Yesterday</th>
                 <th>Avg Last 7 Days</th>
@@ -1626,7 +1652,7 @@ handleChange(event){
         <tbody>
             <tr>
                 <td>Total Sleep in hours:minutes</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.sleep.total_sleep_in_hours_mincustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.sleep.total_sleep_in_hours_min.custom_range)}
                 <td>{this.state.summary.sleep.total_sleep_in_hours_min.today}</td>
                 <td>{this.state.summary.sleep.total_sleep_in_hours_min.yesterday}</td>
                 <td>{this.state.summary.sleep.total_sleep_in_hours_min.week}</td>
@@ -1635,7 +1661,7 @@ handleChange(event){
             </tr>
             <tr>
                <td>Rank against other users</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.sleep.rankcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.sleep.rank.custom_range)}
                 <td>{this.state.summary.sleep.rank.today}</td>
                 <td>{this.state.summary.sleep.rank.yesterday}</td>
                 <td>{this.state.summary.sleep.rank.week}</td>
@@ -1644,7 +1670,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Average Sleep Grage</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.sleep.average_sleep_gradecustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.sleep.average_sleep_grade.custom_range)}
                 <td>{this.state.summary.sleep.average_sleep_grade.today}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.yesterday}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.week}</td>
@@ -1653,7 +1679,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td># of Days Sleep Aid Taken in Period</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.sleep.num_days_sleep_aid_taken_in_periodcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range)}
                 <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.today}</td>
                 <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.yesterday}</td>
                 <td>{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.week}</td>
@@ -1662,7 +1688,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>% of Days Sleep Aid Taken in Period</td>
-                {this.renderCustomRangeTD(haveCustomData && this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_periodcustom_range)}
+                {this.renderCustomRangeTD(this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range)}
                 <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today}</td>
                 <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.yesterday}</td>
                 <td>{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.week}</td>
@@ -1671,7 +1697,7 @@ handleChange(event){
             </tr>
             <tr>
                 <td>Overall Sleep GPA</td>
-               {this.renderCustomRangeTD(haveCustomData && this.state.summary.sleep.overall_sleep_gpacustom_range)}
+               {this.renderCustomRangeTD(this.state.summary.sleep.overall_sleep_gpa.custom_range)}
                 <td>{this.state.summary.sleep.overall_sleep_gpa.today}</td>
                 <td>{this.state.summary.sleep.overall_sleep_gpa.yesterday}</td>
                 <td>{this.state.summary.sleep.overall_sleep_gpa.week}</td>
