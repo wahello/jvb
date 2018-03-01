@@ -103,7 +103,7 @@ class Quicklook extends Component{
 			scrollingLock: false,
 			isOpen: false,
 			isOpen1:false,
-			activeTab : 'allstats1',
+			activeTab : 'grade',
 			fetching_ql:false,
 			creating_ql:false,
 			dateRange:false,
@@ -329,12 +329,12 @@ class Quicklook extends Component{
        		}
 
 	successquick(data,start_dt,end_dt){
-		let targetTab = 'allstats1'
+		let targetTab = 'grade'
 		if (location.hash)
 			targetTab = hashComponentMapping[location.hash.split('#')[1]];
 		
 		if (!targetTab)
-			targetTab = 'allstats1';
+			targetTab = 'grade';
 
 		const dates = [];
 		let initial_state = getInitialState(start_dt,end_dt);
@@ -718,19 +718,7 @@ onLogoutSuccess(response){
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
 
 
-                                  <Nav className="nav navbar-nav" navbar className="fonts">
-
-                                  			 <NavItem onClick={this.toggle} className="allstats">
-                                          <span id="spa">
-                                            <abbr id="abbri"  title="All Stats">
-                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
-						    								 onClick={this.activateTab.bind(this,"allstats1")}>
-                                               All Stats
-                                              </NavLink>
-                                            </abbr>
-                                            </span>
-                                          </NavItem>
-
+                                  <Nav className="nav navbar-nav" navbar className="fonts">                          
                                   			 <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Grades">
@@ -854,6 +842,17 @@ onLogoutSuccess(response){
                                           </abbr>
                                           </span>
                                         </NavItem>
+
+                                         <NavItem onClick={this.toggle} className="allstats">
+                                          <span id="spa">
+                                            <abbr id="abbri"  title="All Stats">
+                                              <NavLink id="headernames" href="#" className={class_allstats1} value="allstats1"
+						    								 onClick={this.activateTab.bind(this,"allstats1")}>
+                                               All Stats
+                                              </NavLink>
+                                            </abbr>
+                                            </span>
+                                          </NavItem>
                                        
 
                                        <span className="dropbutton">
@@ -874,11 +873,12 @@ onLogoutSuccess(response){
 						    		 				 onClick={this.activateTab.bind(this,"food")}>Food</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropalcohol"  className={class_alcohol} value="alcohol"
 						    		 				 onClick={this.activateTab.bind(this,"alcohol")}>Alcohol</DropdownItem>
-						    		 		   <DropdownItem style={{paddingLeft:"30px"}} id="dropmchistorical"  className={class_movementHistorical} value="movementhistorical"
-						    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>Movement Consistency Historical Data</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropmovement" className={class_movement} value="movement"
-						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency
-                                            </DropdownItem>
+						    		 				onClick={this.activateTab.bind(this,"movement")}>Movement Consistency</DropdownItem>
+					    		 		      <DropdownItem style={{paddingLeft:"30px"}} id="dropmchistorical"  className={class_movementHistorical} value="movementhistorical"
+					    		 				onClick={this.activateTab.bind(this,"movementhistorical")}>Movement Consistency Historical Data</DropdownItem>
+				    		 				 <DropdownItem style={{paddingLeft:"30px"}} id="drop_allstats" className={class_allstats1} value="allstats1"
+				    								 onClick={this.activateTab.bind(this,"allstats1")}>All Stats</DropdownItem>
 						    		 		 <DropdownItem style={{paddingLeft:"30px"}} id="dropexercise" className={class_exercise} value="exercise"
 						    		 				  onClick={this.activateTab.bind(this,"exercise")}>Exercise Reporting</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropbike"  className={class_bike} value="bike"
@@ -887,7 +887,6 @@ onLogoutSuccess(response){
 						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		 
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>

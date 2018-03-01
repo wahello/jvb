@@ -18,7 +18,6 @@ export default function fetchProgress(successProgress,errorProgress,selectedDate
    url:URL,
    withCredentials: true
   };
-
   axios(config).then((response)=>{
    successProgress(response);
   }).catch(function(error){
