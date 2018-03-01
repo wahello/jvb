@@ -3,9 +3,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-# from progress_analyzer.helpers
-
 from leaderboard.models import Score
+from progress_analyzer.helpers.helper_classes import ProgressReport
+
 # Pagination not working on RawQuerySet
 # from leaderboard.pagination import LeaderboardPageNumberPagination,CustomPaginationMixin
 
@@ -86,4 +86,9 @@ class LeaderboardSnapshotAPIView(APIView):
 			}
 			return Response(response, status = status.HTTP_400_BAD_REQUEST)
 
-# class LeaderBoardAPIView
+class LeaderBoardAPIView(APIView):
+	permission_classes = (IsAuthenticated, )
+	def get(self, request, format="Json"):
+		query_params = {"date":"2018-02-19","custom_ranges" : "2018-02-12,2018-02-16,2018-02-13,2018-02-18"}
+		r = ProgressReport(request.user, query_params).get_progress_report()
+		return Response(r, status=status.HTTP_200_OK)
