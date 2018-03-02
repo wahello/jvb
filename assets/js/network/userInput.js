@@ -126,11 +126,11 @@ function formatJSON(data){
 
     const created_at = moment(data.selected_date).format("YYYY-MM-DD");
    
-	const sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
+	let sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
 		data.sleep_hours_bed_time,
 		data.sleep_mins_bed_time,
 		data.sleep_bedtime_am_pm);
-	const  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
+	let  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
 		data.sleep_hours_awake_time,
 		data.sleep_mins_awake_time,
 		data.sleep_awake_time_am_pm);
@@ -141,6 +141,13 @@ function formatJSON(data){
 	const strength_workout_end = createString(data.strength_workout_end_hour,
 		data.strength_workout_end_min,
 		data.strength_workout_end_am_pm);
+
+	// let newTimezone = "America/New_York"
+	// sleep_bedtime = moment.tz(sleep_bedtime.format('YYYY-MM-DDTHH:mm:ss'),
+	// 	 'YYYY-MM-DDTHH:mm:ss','America/New_York');
+	// sleep_awake_time = moment.tz(sleep_awake_time.format('YYYY-MM-DDTHH:mm:ss'),
+	// 	 'YYYY-MM-DDTHH:mm:ss','America/New_York');
+
 
 	let json_data = {
 		"created_at":created_at,
