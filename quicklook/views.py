@@ -503,18 +503,22 @@ def export_users_xls(request):
 					# sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
 					# ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
 					# smoke_penalty_cal = grades_data['smoke_penalty']
-					grades_steps = grades_data['movement_non_exercise_steps_grade']
-					grades_consistency = grades_data['movement_consistency_grade']
-					grades_sleep = grades_data['avg_sleep_per_night_grade']
-					grades_consistency_exe = grades_data['exercise_consistency_grade']
-					grades_food = grades_data['prcnt_unprocessed_food_consumed_grade']
-					grades_alcohol = grades_data['alcoholic_drink_per_week_grade']
-					overall_workout_gpa_without_penalty = (grades_data['movement_non_exercise_steps_gpa'] +
+					# grades_steps = grades_data['movement_non_exercise_steps_grade']
+					# grades_consistency = grades_data['movement_consistency_grade']
+					# grades_sleep = grades_data['avg_sleep_per_night_grade']
+					# grades_consistency_exe = grades_data['exercise_consistency_grade']
+					# grades_food = grades_data['prcnt_unprocessed_food_consumed_grade']
+					# grades_alcohol = grades_data['alcoholic_drink_per_week_grade']
+					
+					unprocessed_gpa = grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0
+					steps_gpa = grades_data['movement_non_exercise_steps_gpa'] if grades_data['movement_non_exercise_steps_gpa'] else 0
+
+					overall_workout_gpa_without_penalty = round((steps_gpa +
 						grade_point[grades_data['movement_consistency_grade']] +
 						grades_data['avg_sleep_per_night_gpa'] + abs(grades_data["sleep_aid_penalty"]) +
 						grade_point[grades_data['exercise_consistency_grade']] +
-						grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0 +
-						grade_point[grades_data['alcoholic_drink_per_week_grade']])/ 6
+						unprocessed_gpa +
+						grade_point[grades_data['alcoholic_drink_per_week_grade']])/6,2)
 
 					if overall_workout_gpa_without_penalty >= 3:
 						sheet9.write(i+3,row_num,overall_workout_gpa_without_penalty,format_green_overall)
@@ -1157,18 +1161,21 @@ def export_users_xls(request):
 					# sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
 					# ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
 					# smoke_penalty_cal = grades_data['smoke_penalty']
-					grades_steps = grades_data['movement_non_exercise_steps_grade']
-					grades_consistency = grades_data['movement_consistency_grade']
-					grades_sleep = grades_data['avg_sleep_per_night_grade']
-					grades_consistency_exe = grades_data['exercise_consistency_grade']
-					grades_food = grades_data['prcnt_unprocessed_food_consumed_grade']
-					grades_alcohol = grades_data['alcoholic_drink_per_week_grade']
-					overall_workout_gpa_without_penalty = (grades_data['movement_non_exercise_steps_gpa'] +
+					# grades_steps = grades_data['movement_non_exercise_steps_grade']
+					# grades_consistency = grades_data['movement_consistency_grade']
+					# grades_sleep = grades_data['avg_sleep_per_night_grade']
+					# grades_consistency_exe = grades_data['exercise_consistency_grade']
+					# grades_food = grades_data['prcnt_unprocessed_food_consumed_grade']
+					# grades_alcohol = grades_data['alcoholic_drink_per_week_grade']
+					unprocessed_gpa = grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0
+					steps_gpa = grades_data['movement_non_exercise_steps_gpa'] if grades_data['movement_non_exercise_steps_gpa'] else 0
+
+					overall_workout_gpa_without_penalty = round((steps_gpa +
 						grade_point[grades_data['movement_consistency_grade']] +
 						grades_data['avg_sleep_per_night_gpa'] + abs(grades_data["sleep_aid_penalty"]) +
 						grade_point[grades_data['exercise_consistency_grade']] +
-						grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0 +
-						grade_point[grades_data['alcoholic_drink_per_week_grade']])/ 6
+						unprocessed_gpa +
+						grade_point[grades_data['alcoholic_drink_per_week_grade']])/6,2)
 					if overall_workout_gpa_without_penalty >= 3:
 						sheet1.write(i+3,row_num,overall_workout_gpa_without_penalty,format_green_overall)
 					elif overall_workout_gpa_without_penalty >= 1 and overall_workout_gpa_without_penalty < 3:
