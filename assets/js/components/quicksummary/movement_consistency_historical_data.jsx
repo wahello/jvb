@@ -22,6 +22,7 @@ class MovementHistorical extends Component{
 
     for(var key in p) {
       this.state.myTableData.push({name: key})
+     console.log("---------",key);
     }
   }
   
