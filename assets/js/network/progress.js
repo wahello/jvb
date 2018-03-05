@@ -6,8 +6,6 @@ axiosRetry(axios, { retries: 4});
 
 export default function fetchProgress(successProgress,errorProgress,selectedDate,custom_ranges=undefined){   
   selectedDate = moment(selectedDate);
-  if(custom_ranges)
-    console.log("*****************",custom_ranges);
   const URL=`/progress/user/report`;
   const config={
    method:"get",
