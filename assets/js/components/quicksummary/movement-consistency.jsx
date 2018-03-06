@@ -219,15 +219,38 @@ class Movementquick extends Component{
       let steps_data = [];
       let status_data = [];
       for(let slot of this.getSortKeysAccordingTime()){
-          steps_data.push(data['movement_consistency'][slot].steps);
+         let value = data['movement_consistency'][slot].steps;
+         
+         if(value != undefined){
+          value += '';
+                  var x = value.split('.');
+                  var x1 = x[0];
+                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                  var rgx = /(\d+)(\d{3})/;
+                  while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+               steps_data.push(x1 + x2);
+         }
+         
           status_data.push(data['movement_consistency'][slot].status);
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
       steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
-      steps_data.push(data['movement_consistency'].total_steps);
-      
+     let totalSteps =data['movement_consistency'].total_steps;
+       if(totalSteps != undefined){
+          totalSteps += '';
+                  var x = totalSteps.split('.');
+                  var x1 = x[0];
+                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                  var rgx = /(\d+)(\d{3})/;
+                  while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+               steps_data.push(x1 + x2);
+         }
       columns.push(
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>Steps</Cell>}
@@ -274,7 +297,7 @@ render(){
     </div>
      <Table
           rowsCount={rowsCount}
-          rowHeight={65}
+          rowHeight={50}
           headerHeight={65}
           width={containerWidth}
           maxHeight={containerHeight}

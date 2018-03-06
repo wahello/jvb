@@ -1291,7 +1291,8 @@ handleScroll() {
                                         value={this.state.no_exercise_reason}                                       
                                         onChange={this.handleChangeNoExerciseReason}>
                                                 <option value=" ">Select</option>                                        
-                                                <option value="rest day">Rest Day</option> 
+                                                <option value="rest day">Rest Day</option>
+                                                <option value="injured">Injured</option>  
                                                 <option value="sick">Sick</option>
                                                 <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
                                                 <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
@@ -2470,7 +2471,9 @@ handleScroll() {
                           </FormGroup>   
                        }
                        </Collapse>
-                     
+                        </div>      
+                            
+                      
                         { (this.state.workout == "yes" || this.state.workout == "") &&
                           <FormGroup>   
                               <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
@@ -2558,8 +2561,8 @@ handleScroll() {
                               exercise recommendations to help you achieve your goals.
                                </div>                             
                               </ModalBody>
-                           </Modal>       
-
+                           </Modal> 
+                          <div id="sleep">
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
@@ -2587,7 +2590,8 @@ handleScroll() {
                           }                    
                         </FormGroup>
                        }
-
+                      
+                       
                         <Collapse isOpen={this.state.calories_item_check}>
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
@@ -2610,6 +2614,7 @@ handleScroll() {
                             }
                           </FormGroup>
                         }
+
                                                 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
@@ -2635,9 +2640,9 @@ handleScroll() {
                             }
                              </Collapse>
 
-                      </div>
                      
-                            <div id="sleep">
+                     
+                            
                             <h3><strong>Sleep Input</strong></h3>
                          
                           
@@ -2907,7 +2912,9 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-
+                           </div>
+                        
+                           
                            <FormGroup>
                              <Label className="padding">4. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
                               {this.state.editable &&
@@ -2937,13 +2944,14 @@ handleScroll() {
                                   <p>{this.state.prescription_sleep_aids}</p>
                                 </div>
                               }
+                              </FormGroup>
+                              <div id="food">
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionSleepAids()}
                               </FormGroup>
-                          </FormGroup>
-                          </div>
+                          
+                         
                         
-                        <div id="food">
                         <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
                           <FormGroup className="un_process_food">
@@ -3265,14 +3273,13 @@ handleScroll() {
                                     <p>{this.state.medications}</p>
                                   </div>
                                 }
+                                 </FormGroup>
+                                 </div>
+                                
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
-                          </FormGroup>
-                         
-
-                          </div>
-
+         
                           <div id="stress">
                            <h3><strong>Stress/Illness Inputs</strong></h3>
                           <FormGroup>
@@ -3342,17 +3349,13 @@ handleScroll() {
                                 <p>{this.state.sick}</p>
                               </div>
                             }
-
+                            </FormGroup>
+                             </div>
+                             <div id="daily">
                             <FormGroup id="padd"> 
                             {this.renderPainSick()}
                             </FormGroup>
-                          </FormGroup>
-
-                          
-
-                          </div>
-                         
-                         <div id="daily">
+                        
                           <h3><strong>Extra Inputs</strong></h3>
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>

@@ -406,6 +406,7 @@ constructor(props){
    this.onSubmitDate3 = this.onSubmitDate3.bind(this);
    this.handleChange = this.handleChange.bind(this);
    this.renderCustomRangeTD = this.renderCustomRangeTD.bind(this);
+   this.nonExerciseSteps = this.nonExerciseSteps.bind(this);
    
   }
     
@@ -773,7 +774,20 @@ constructor(props){
 
 
   }
-
+nonExerciseSteps(steps){
+let value = steps;
+if(value != undefined){
+      value += '';
+              var x = value.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+     }
+}
 renderCustomRangeTD(custom_data, toReturn="data"){
     let td=[];
     if(!custom_data){
@@ -1277,11 +1291,11 @@ handleChange(event){
             <tr>
                 <td>Non Exercise Steps</td>
               {this.renderCustomRangeTD(this.state.summary.non_exercise.non_exercise_steps.custom_range)}
-                <td>{this.state.summary.non_exercise.non_exercise_steps.today}</td>
-                <td>{this.state.summary.non_exercise.non_exercise_steps.yesterday}</td>
-                <td>{this.state.summary.non_exercise.non_exercise_steps.week}</td>
-                <td>{this.state.summary.non_exercise.non_exercise_steps.month}</td>
-                <td>{this.state.summary.non_exercise.non_exercise_steps.year}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.today)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.yesterday)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.week)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.month)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.year)}</td>
             </tr>
             <tr>
                <td>Rank against other users</td>
@@ -1313,11 +1327,11 @@ handleChange(event){
              <tr>
                 <td>Total Steps</td>
                {this.renderCustomRangeTD(this.state.summary.non_exercise.total_steps.custom_range)}
-                <td>{this.state.summary.non_exercise.total_steps.today}</td>
-                <td>{this.state.summary.non_exercise.total_steps.yesterday}</td>
-                <td>{this.state.summary.non_exercise.total_steps.week}</td>
-                <td>{this.state.summary.non_exercise.total_steps.month}</td>
-                <td>{this.state.summary.non_exercise.total_steps.year}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.today)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.yesterday)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.week)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.month)}</td>
+                <td>{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.year)}</td>
             </tr>
         </tbody>
     </table>
