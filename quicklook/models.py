@@ -251,3 +251,8 @@ class Alcohol(models.Model):
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "alcohol_ql")
 	alcohol_day = models.CharField(max_length = 4,blank=True)
 	alcohol_week = models.FloatField(blank=True,null=True)
+
+
+class Running(models.Model):
+	user_ql = models.OneToOneField(UserQuickLook, related_name = "running_ql")
+	running_distance = models.PositiveIntegerField(blank=True, null=True)
