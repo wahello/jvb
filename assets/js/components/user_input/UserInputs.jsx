@@ -151,8 +151,8 @@ class UserInputs extends React.Component{
         diet_type:'',
         travel:'no',
         travel_destination:'',
-        travel_purpose:'',
-        travel_purpose_checked:'',
+        travel_purpose:"",
+        travel_purpose_checked:"",
         general_comment:'',
 
         no_exercise_reason:'',
@@ -163,7 +163,7 @@ class UserInputs extends React.Component{
     }
 
     constructor(props){
-      super(props);
+       super(props);
       this.state = this.getInitialState();
       this.handleChange = handlers.handleChange.bind(this);
       this.handleChangeSleepBedTime = handlers.handleChangeSleepBedTime.bind(this);
@@ -187,6 +187,7 @@ class UserInputs extends React.Component{
       this.handleChangeSleepHoursMin = handlers.handleChangeSleepHoursMin.bind(this);
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
       this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
+      this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -307,7 +308,9 @@ class UserInputs extends React.Component{
                           'high carb','ketogenic diet','whole foods/mostly unprocessed'];
         const WEATHER_FIELDS = ['indoor_temperature','outdoor_temperature','temperature_feels_like',
                                 'wind','dewpoint','humidity','weather_comment'];
+        const TRAVEL_PURPOSE = ['','work','vacation']
         let other_diet = true;
+        let travel_purpose_other = true;
         let was_cloning = this.state.cloning_data;
         let has_weather_data = false;
         let has_calories_data = false;
@@ -319,7 +322,10 @@ class UserInputs extends React.Component{
           if(data.data.optional_input.type_of_diet_eaten === diet)
             other_diet = false;
         }
-        
+         for(let travel of TRAVEL_PURPOSE){
+          if(data.data.optional_input.travel_purpose === travel)
+            travel_purpose_other = false;
+        }
         for(let field of WEATHER_FIELDS){
           if(!has_weather_data){
             if((data.data.strong_input[field] != '') &&
@@ -355,6 +361,8 @@ class UserInputs extends React.Component{
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
+          travel_purpose_checked:travel_purpose_other ? 'other':data.data.optional_input.travel_purpose,
+
           cloning_data:false,
           fetching_data:false,
           weather_check: has_weather_data,
@@ -3563,23 +3571,23 @@ handleScroll() {
                               
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
-                                    name="travel_purpose_checked" 
+                                    name="travel_purpose" 
                                     value="work" 
                                     checked={this.state.travel_purpose_checked === 'work'}
-                                    onChange={this.handleChange}/> Work
+                                    onChange={this.handleChangeTravelPurpose}/> Work
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
-                                    <Input type="radio" name="travel_purpose_checked" 
+                                    <Input type="radio" name="travel_purpose" 
                                     value="vacation"
                                     checked={this.state.travel_purpose_checked === 'vacation'}
-                                    onChange={this.handleChange}/> Vacation
+                                    onChange={this.handleChangeTravelPurpose}/> Vacation
                                   </Label>
                                   <Label className="btn btn-secondary radio1">
                                     <Input type="radio" 
-                                    name="travel_purpose_checked" 
+                                    name="travel_purpose" 
                                     value="other"
                                     checked={this.state.travel_purpose_checked === 'other'}
-                                    onChange={this.handleChange}/> Other
+                                    onChange={this.handleChangeTravelPurpose}/> Other
                                   </Label>
                                 </div>
                               }
@@ -3592,11 +3600,7 @@ handleScroll() {
                           </FormGroup>
                         }
                         {
-                         (this.state.travel_purpose_checked != "work") &&
-                         (this.state.travel_purpose_checked != "vacation") &&
                          (this.state.travel_purpose_checked == "other") &&
-
-
                           <FormGroup>              
                               {this.state.editable &&
                                 <div className="input1">

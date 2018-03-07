@@ -14,7 +14,7 @@ export function renderQlFetchOverlay(){
 							name='spinner' 
 							size='3x'
 							pulse spin
-							className="mx-auto"
+							className="mx-auto"   
 						/>
 					</div>
 					<br/>
