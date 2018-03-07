@@ -512,13 +512,13 @@ def export_users_xls(request):
 					
 					unprocessed_gpa = grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0
 					steps_gpa = grades_data['movement_non_exercise_steps_gpa'] if grades_data['movement_non_exercise_steps_gpa'] else 0
-
+					alcoho_gpa = grades_data['alcoholic_drink_per_week_gpa'] if grades_data['alcoholic_drink_per_week_gpa'] else 0
 					overall_workout_gpa_without_penalty = round((steps_gpa +
 						grade_point[grades_data['movement_consistency_grade']] +
 						grades_data['avg_sleep_per_night_gpa'] + abs(grades_data["sleep_aid_penalty"]) +
 						grade_point[grades_data['exercise_consistency_grade']] +
 						unprocessed_gpa +
-						grade_point[grades_data['alcoholic_drink_per_week_grade']])/6,2)
+						alcoho_gpa)/6,2)
 
 					if overall_workout_gpa_without_penalty >= 3:
 						sheet9.write(i+3,row_num,overall_workout_gpa_without_penalty,format_green_overall)
