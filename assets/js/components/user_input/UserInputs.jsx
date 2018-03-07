@@ -149,6 +149,10 @@ class UserInputs extends React.Component{
         breath_sleep:'',
         breath_day:'',
         diet_type:'',
+        travel:'no',
+        travel_destination:'',
+        travel_purpose:'',
+        travel_purpose_checked:'',
         general_comment:'',
 
         no_exercise_reason:'',
@@ -444,6 +448,9 @@ class UserInputs extends React.Component{
           breath_sleep:have_optional_input?data.data.optional_input.percent_breath_nose_last_night:'',
           breath_day:have_optional_input?data.data.optional_input.percent_breath_nose_all_day_not_exercising:'',
           diet_type:have_optional_input?data.data.optional_input.type_of_diet_eaten:'',
+          travel:have_optional_input?data.data.optional_input.travel:'',
+          travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
+          travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
@@ -3498,8 +3505,119 @@ handleScroll() {
                               }
                           </FormGroup>
 
+                          <FormGroup>     
+                            <Label className="padding">15. Did you Travel Somewhere Today (Away From the City You Live In)? </Label>
+
+                              {this.state.editable &&
+                                <div className="input1">
+                                  
+                                    <Label check className="btn btn-secondary radio1">
+                                      <Input type="radio" name="travel" 
+                                      value="yes"
+                                      checked={this.state.travel === 'yes'}
+                                      onChange={this.handleChange}/>{' '}
+                                      Yes
+                                   </Label>
+                                   <Label check className="btn btn-secondary radio1">
+                                     <Input type="radio" name="travel" 
+                                          value="no"                                        
+                                          checked={this.state.travel === 'no'}
+                                          onChange={this.handleChange}/>{' '}
+                                        No
+                                  </Label>
+                                  </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.travel}</p>
+                                </div>
+                              }
+                          </FormGroup>
+
+                          {(this.state.travel == "yes") &&
+                          <FormGroup>      
+                            <Label className="padding">15.1 Where Did You Travel To</Label>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Textarea  name="travel_destination" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.travel_destination}
+                                     onChange={this.handleChange}></Textarea>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.travel_destination}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                        }
+                          {(this.state.travel == "yes") &&
+                           <FormGroup>   
+                            <Label className="padding">15.2 Was your Travel for work, vacation, or other?</Label>
+                            {this.state.editable &&
+                              <div className="input">                           
+                              
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="travel_purpose_checked" 
+                                    value="work" 
+                                    checked={this.state.travel_purpose_checked === 'work'}
+                                    onChange={this.handleChange}/> Work
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" name="travel_purpose_checked" 
+                                    value="vacation"
+                                    checked={this.state.travel_purpose_checked === 'vacation'}
+                                    onChange={this.handleChange}/> Vacation
+                                  </Label>
+                                  <Label className="btn btn-secondary radio1">
+                                    <Input type="radio" 
+                                    name="travel_purpose_checked" 
+                                    value="other"
+                                    checked={this.state.travel_purpose_checked === 'other'}
+                                    onChange={this.handleChange}/> Other
+                                  </Label>
+                                </div>
+                              }
+                              {!this.state.editable && 
+                                <div className="input">
+                                  <p>{this.state.travel_purpose_checked}</p>
+                                </div>
+                              }
+                           
+                          </FormGroup>
+                        }
+                        {
+                         (this.state.travel_purpose_checked != "work") &&
+                         (this.state.travel_purpose_checked != "vacation") &&
+                         (this.state.travel_purpose_checked == "other") &&
+
+
+                          <FormGroup>              
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Textarea  name="travel_purpose" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.travel_purpose}
+                                     onChange={this.handleChange}></Textarea>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.travel_purpose}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                        }
                            <FormGroup>      
-                            <Label className="padding">15. General Comments</Label>
+                            <Label className="padding">16. General Comments</Label>
                               {this.state.editable &&
                                 <div className="input1">
                                      <Textarea  name="general_comment" 

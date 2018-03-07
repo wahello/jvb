@@ -228,6 +228,9 @@ function formatJSON(data){
 	json_data.optional_input['percent_breath_nose_last_night'] = data.breath_sleep; 
 	json_data.optional_input['percent_breath_nose_all_day_not_exercising'] = data.breath_day;
 	json_data.optional_input['type_of_diet_eaten'] = data.diet_type;
+	json_data.optional_input['travel'] = data.travel;
+	json_data.optional_input['travel_destination'] = data.travel_destination;
+	json_data.optional_input['travel_purpose'] = data.travel_purpose;
 	json_data.optional_input['general_comment'] = data.general_comment;
 	return json_data;
 }
