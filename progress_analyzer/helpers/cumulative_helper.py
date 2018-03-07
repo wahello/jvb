@@ -217,8 +217,7 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.grades_ql,"movement_consistency_grade",'F')]\
 			+ GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_grade",'F')]\
-			+ GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"alcoholic_drink_per_week_grade",'F')]\
+			+ _safe_get_mobj(today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0)\
 			+ GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_grade","F")]\
 			+ _safe_get_mobj(today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)\
@@ -407,23 +406,22 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None):
 
 def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 	alcohol_cum_data = _get_blank_pa_model_fields("alcohol")
-	GRADE_POINT = _get_grading_sheme()
-
+	
 	if today_ql_data and yday_cum_data:
 		alcohol_cum_data['cum_average_drink_per_week'] = _safe_get_mobj(
 			today_ql_data.alcohol_ql,"alcohol_week",0) \
 			+ _safe_get_mobj(yday_cum_data.alcohol_cum,"cum_average_drink_per_week",0)
 
-		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"alcoholic_drink_per_week_grade","F")] \
+		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = _safe_get_mobj(
+			today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0) \
 			+ _safe_get_mobj(yday_cum_data.alcohol_cum, "cum_alcohol_drink_per_week_gpa",0)
 	
 	elif today_ql_data:
 		alcohol_cum_data['cum_average_drink_per_week'] = _safe_get_mobj(
 			today_ql_data.alcohol_ql,"alcohol_week",0) 
 
-		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"alcoholic_drink_per_week_grade","F")] 
+		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = _safe_get_mobj(
+			today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0) 
 	return alcohol_cum_data
 
 def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):

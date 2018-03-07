@@ -153,7 +153,8 @@ def get_blank_model_fields(model):
 			'avg_exercise_hr_gpa':0,
 			'prcnt_unprocessed_food_consumed_grade':'',
 			'prcnt_unprocessed_food_consumed_gpa':0,
-			'alcoholic_drink_per_week_grade':'' ,
+			'alcoholic_drink_per_week_grade':'',
+			'alcoholic_drink_per_week_gpa':0,
 			'sleep_aid_penalty':0,
 			'ctrl_subs_penalty':0,
 			'smoke_penalty':0,
@@ -964,33 +965,59 @@ def cal_unprocessed_food_grade(prcnt_food):
 def cal_alcohol_drink_grade(drink_avg, gender):
 	'''
 	Calculate Average alcohol dring a week and grade
-	return tuple (grade,average drink)
+	return tuple (grade,average drink,point)
 	'''
-	grade = ''
+	def item_in_range(max_avg,current_avg):
+		max_avg = round(max_avg,1)
+		current_avg = round(current_avg,1)
+		dec_current_avg = int((round(current_avg - int(current_avg),1))*10)
+		dec_max_avg = 9 - int((round(max_avg - int(max_avg),1))*10)
+		x = (int(max_avg) - int(current_avg))+ 1
+		return x*10 - dec_current_avg - dec_max_avg
+
+	grade = 'F'
+	point = 0
 	if gender == 'M':
-		if (drink_avg >= 0 and drink_avg <= 5):
+		if (drink_avg <= 5):
 			grade = 'A'
+			point = 4
 		elif (drink_avg > 5 and drink_avg < 12):
+			point = 3 + (item_in_range(11.90,drink_avg) - 1) * 0.01449
 			grade = 'B'
 		elif (drink_avg >= 12 and drink_avg < 15):
+			point = 2 + (item_in_range(14.90,drink_avg) - 1) * 0.03333
 			grade = 'C'
 		elif (drink_avg >= 15 and drink_avg < 16):
+			point = 1 + (item_in_range(15.90,drink_avg) - 1) * 0.1
 			grade = 'D'
-		elif (drink_avg >= 16):
+		elif (drink_avg >= 16 and drink_avg <= 21):
+			point = 0 + item_in_range(21.00,drink_avg) * 0.01923
+			grade = 'F'
+		elif drink_avg > 21:
+			point = 0
 			grade = 'F'
 
 	else:
-		if (drink_avg >= 0 and drink_avg <= 3):
+		if (drink_avg <= 3):
+			point = 4
 			grade = 'A'
 		elif (drink_avg > 3 and drink_avg <= 5):
+			point = 3 + (item_in_range(5.00,drink_avg) - 1) * 0.05
 			grade = 'B'
 		elif (drink_avg > 5 and drink_avg <= 7):
+			point = 2 + (item_in_range(7.00,drink_avg) - 1) * 0.05
 			grade = 'C'
-		elif (drink_avg > 7 and drink_avg < 9):
+		elif (drink_avg > 7 and drink_avg <= 9):
+			point = 1 + (item_in_range(9.00,drink_avg) - 1) * 0.05
 			grade = 'D'
-		elif (drink_avg >= 9):
+		elif (drink_avg > 9 and drink_avg <= 14):
+			point = 0 + item_in_range(14.00,drink_avg) * 0.01961
 			grade = 'F'
-	return (grade,round(drink_avg,2))
+		elif drink_avg > 14:
+			point = 0
+			grade = 'F'
+
+	return (grade,round(drink_avg,2),round(point,2))
 
 def cal_non_exercise_step_grade(steps):
 
@@ -1319,7 +1346,7 @@ def get_overall_grade(grades):
 	avg_sleep_per_night_gpa = grades.get('avg_sleep_per_night_gpa')
 	exercise_consistency_grade = grades.get('exercise_consistency_grade')
 	prcnt_unprocessed_food_gpa = grades.get('prcnt_unprocessed_food_consumed_gpa')
-	alcoholic_drink_per_week_grade = grades.get('alcoholic_drink_per_week_grade')
+	alcoholic_drink_per_week_gpa = grades.get('alcoholic_drink_per_week_gpa')
 	penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
 
 	gpa = round((non_exercise_step_gpa +
@@ -1327,7 +1354,7 @@ def get_overall_grade(grades):
 		   avg_sleep_per_night_gpa +
 		   GRADES[exercise_consistency_grade]+
 		   prcnt_unprocessed_food_gpa+
-		   GRADES[alcoholic_drink_per_week_grade]+
+		   alcoholic_drink_per_week_gpa+
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
 
@@ -1645,9 +1672,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 			if prcnt_unprocessed_food_grade_pt[1] else 0 
 	
 		# Alcohol drink consumed grade and avg alcohol per week
-		grade,avg_alcohol = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
+		grade,avg_alcohol,avg_alcohol_gpa = get_alcohol_grade_avg_alcohol_week(daily_strong,user)
 		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
 		alcohol_calculated_data['alcohol_week'] = avg_alcohol
+		grades_calculated_data['alcoholic_drink_per_week_gpa'] = avg_alcohol_gpa
 
 		# Movement consistency and movement consistency grade calculation
 		user_input_strength_start_time = safe_get(todays_daily_strong,"strength_workout_start",None)

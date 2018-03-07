@@ -126,11 +126,11 @@ function formatJSON(data){
 
     const created_at = moment(data.selected_date).format("YYYY-MM-DD");
    
-	const sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
+	let sleep_bedtime = createMomentObj(data.sleep_bedtime_date,
 		data.sleep_hours_bed_time,
 		data.sleep_mins_bed_time,
 		data.sleep_bedtime_am_pm);
-	const  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
+	let  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
 		data.sleep_hours_awake_time,
 		data.sleep_mins_awake_time,
 		data.sleep_awake_time_am_pm);
@@ -141,6 +141,13 @@ function formatJSON(data){
 	const strength_workout_end = createString(data.strength_workout_end_hour,
 		data.strength_workout_end_min,
 		data.strength_workout_end_am_pm);
+
+	// let newTimezone = "America/New_York"
+	// sleep_bedtime = moment.tz(sleep_bedtime.format('YYYY-MM-DDTHH:mm:ss'),
+	// 	 'YYYY-MM-DDTHH:mm:ss','America/New_York');
+	// sleep_awake_time = moment.tz(sleep_awake_time.format('YYYY-MM-DDTHH:mm:ss'),
+	// 	 'YYYY-MM-DDTHH:mm:ss','America/New_York');
+
 
 	let json_data = {
 		"created_at":created_at,
@@ -221,6 +228,9 @@ function formatJSON(data){
 	json_data.optional_input['percent_breath_nose_last_night'] = data.breath_sleep; 
 	json_data.optional_input['percent_breath_nose_all_day_not_exercising'] = data.breath_day;
 	json_data.optional_input['type_of_diet_eaten'] = data.diet_type;
+	json_data.optional_input['travel'] = data.travel;
+	json_data.optional_input['travel_destination'] = data.travel_destination;
+	json_data.optional_input['travel_purpose'] = data.travel_purpose;
 	json_data.optional_input['general_comment'] = data.general_comment;
 	return json_data;
 }

@@ -78,7 +78,7 @@ render(){
 			 >
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={68}
+		        rowHeight={50}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}

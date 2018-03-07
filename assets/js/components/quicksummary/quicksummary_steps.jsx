@@ -17,7 +17,7 @@ class Steps extends Component{
       myTableData: [
 	    {name: 'Movement Consistency'},
         {name: 'Non Exercise Steps'},
-        {name: 'Exercise Steps'},
+        {name: 'Exercise Steps'},  
         {name: 'Total Steps'},
         {name: 'Floors Climed'}
       ],
@@ -80,7 +80,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 			 <div>
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={65}
+		        rowHeight={50}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
