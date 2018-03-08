@@ -123,20 +123,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                          }
                                       }
                                       else{
-                                        let value = mCdata.steps;
-                                         if(value != undefined){
-                                          value += '';
-                                                  var x = value.split('.');
-                                                  var x1 = x[0];
-                                                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                                                  var rgx = /(\d+)(\d{3})/;
-                                                  while (rgx.test(x1)) {
-                                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                              }
-                                              obj[time].push({value:x1 + x2,
-                                                        style:this.mcHistoricalData(value,mCdata.status)});
-                                         }
-                                          
+                                          obj[time].push({value:mCdata.steps,
+                                                        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
                                       }
             
 
@@ -194,11 +182,23 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
          key != "total_steps" && key != "dmc"){
         let active_days = 0;
         for(let step of col){
-          if(step.value >= 300)
-            active_days += 1;
+          if(step.value >= 300){
+              let value = step.value;
+              if(value != undefined){
+                value += '';
+                var x = value.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1))
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                step.value = x1+x2;
+              }
+              active_days += 1;
         }
         prcnt_active_steps = parseFloat((active_days / duration) * 100).toFixed(2) +"%";
       }
+    }
       col.splice(0, 0,{value:prcnt_active_steps,
                        style:""});
        columns.push(
