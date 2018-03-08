@@ -50,6 +50,7 @@ class Grades(models.Model,):
 															 max_length=3, blank=True)
 	prcnt_unprocessed_food_consumed_gpa = models.FloatField(blank=True, null=True)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	alcoholic_drink_per_week_gpa = models.FloatField(blank=True,null=True)
 	sleep_aid_penalty = models.FloatField(blank=True, null=True)
 	ctrl_subs_penalty = models.FloatField(blank=True, null=True)
 	smoke_penalty = models.FloatField(blank=True, null=True)

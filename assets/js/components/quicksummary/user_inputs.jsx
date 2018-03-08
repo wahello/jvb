@@ -111,7 +111,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			 <Table
 			 	className="responsive"
 		        rowsCount={rowsCount}
-		        rowHeight={80}
+		        rowHeight={50}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}

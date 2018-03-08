@@ -328,7 +328,7 @@ class AllStats1 extends Component{
             value += '';
             var x = value.split('.');
             var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var x2 = x.length > 1 ? '.' + x[1] : '';  
             var rgx = /(\d+)(\d{3})/;
             while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -353,6 +353,7 @@ class AllStats1 extends Component{
 				            </Cell>
 				          )}
 			        width={100}
+
 
 
 				/>
@@ -383,7 +384,7 @@ class AllStats1 extends Component{
 			<div>
 			 <Table
 		        rowsCount={rowsCount}    
-		        rowHeight={65}  
+		        rowHeight={50}  
 		        headerHeight={50}   
 		        width={containerWidth}    
         		maxHeight={containerHeight}

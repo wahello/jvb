@@ -7,6 +7,7 @@ export function handleChange(event){
   });
 }
 
+
 export function handleChangeWorkoutType(event){
   const name = event.target.name;
   const value = event.target.value;
@@ -322,6 +323,24 @@ export function handleChangeDietModel(event){
 	diet_type:value
   });
 }
+
+export function handleChangeTravelPurpose(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
+  const TRAVEL_PURPOSE = ['','work','vacation']
+  let travel_purpose_other =true;
+  for(let travel of TRAVEL_PURPOSE){
+    if(value === travel)
+      travel_purpose_other = false;
+  }
+
+  this.setState({
+  [name]: value,
+  travel_purpose_checked:travel_purpose_other?'other':value
+  });
+}
+
 
 export function handleChangeSmokeSubstance(event){
   const target = event.target;

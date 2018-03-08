@@ -22,9 +22,10 @@ class MovementHistorical extends Component{
 
     for(var key in p) {
       this.state.myTableData.push({name: key})
+     console.log("---------",key);
     }
   }
-
+  
 mcHistoricalData(score,status){
       if(status == "sleeping")
         return {background:'rgb(0,176,240)',color:'white'}
@@ -91,7 +92,6 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                             if( mc != undefined && mc != "" && mc != "-"){
                                 mc = JSON.parse(mc);                       
                                 for(let [time,mCdata] of Object.entries(mc)){
-                                  console.log('=====',mCdata);
                                       if(time == "inactive_hours"){
                                         obj[time].push({value:mc.inactive_hours,
                                                         style:this.dailyMC(value)});
@@ -107,12 +107,41 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                       else if (time == "sleeping_hours")
                                         obj[time].push({value:mc.sleeping_hours,
                                                         style:this.mcHistoricalData(value)});
-                                      else if (time == "total_steps")
-                                        obj[time].push({value:mc.total_steps,
+                                      else if (time == "total_steps"){
+                                        let totalSteps = mc.total_steps;
+                                         if(totalSteps != undefined){
+                                          totalSteps += '';
+                                                  var x = totalSteps.split('.');
+                                                  var x1 = x[0];
+                                                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                                                  var rgx = /(\d+)(\d{3})/;
+                                                  while (rgx.test(x1)) {
+                                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                              }
+                                              obj[time].push({value:x1 + x2,
                                                         style:this.mcHistoricalData(value)});
-                                      else                                                                                       
-                                        obj[time].push({value:mCdata.steps,
-                                                        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});                                    
+                                         }
+                                      }
+                                      else{
+                                        let value = mCdata.steps;
+                                         if(value != undefined){
+                                          value += '';
+                                                  var x = value.split('.');
+                                                  var x1 = x[0];
+                                                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                                                  var rgx = /(\d+)(\d{3})/;
+                                                  while (rgx.test(x1)) {
+                                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                              }
+                                              obj[time].push({value:x1 + x2,
+                                                        style:this.mcHistoricalData(value,mCdata.status)});
+                                         }
+                                          
+                                      }
+            
+
+                                                                                                                           
+                                                                            
                                 }
                             }else{
                               for(let [time,mCdata] of Object.entries(obj)){
@@ -180,7 +209,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                       {col[props.rowIndex].value}
                     </Cell>
                   )}
-          width ={128}
+          width ={100}
           
         />
       )
@@ -197,7 +226,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
        <div>
        <Table
             rowsCount={rowsCount}
-            rowHeight={65}
+            rowHeight={50}
             headerHeight={90}
             width={containerWidth}
             height={containerHeight}
@@ -218,6 +247,17 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             {this.renderTableColumns(this.props.data,"steps_ql")}
          
           </Table>
+         
+            <div className="rd_mch_color_legend color_legend_green"></div>
+            <span className="rd_mch_color_legend_label">Active</span>
+            <div className="rd_mch_color_legend color_legend_red"></div>
+            <span className="rd_mch_color_legend_label">Inactive</span>
+            <div className="rd_mch_color_legend color_legend_pink"></div>
+            <span className="rd_mch_color_legend_label">Strength</span>
+            <div className="rd_mch_color_legend color_legend_blue"></div>
+            <span className="rd_mch_color_legend_label">Sleeping</span>
+         
+
       </div>
       </div>
 
