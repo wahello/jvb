@@ -610,7 +610,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"latitude":None,
 		"longitude":None
 	}
-
+	
 	activities_hr = {}
 
 	# If same summary is edited manually then give it more preference.
@@ -776,7 +776,7 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 					hour_start <= user_input_strength_end_time):
 					status = "strength"
 				else:
-					status = "active" if data.get('steps') + steps_in_interval > 300 else "inactive"
+					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
