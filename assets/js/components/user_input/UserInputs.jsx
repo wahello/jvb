@@ -923,32 +923,27 @@ handleScroll() {
 
       var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
       var scrollHeight = b + document.getElementById('workout').offsetTop;
-      console.log("+++++++++",scrollHeight);
       window.scrollTo(0, scrollHeight-100);
     }
     sleepTab(){
       var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
       var scrollHeight = b + document.getElementById('sleep').offsetTop;
-      console.log("+++++++++",scrollHeight);
-      window.scrollTo(0, scrollHeight-100);
+      window.scrollTo(0, scrollHeight-80);
     }
     foodTab(){
       var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
       var scrollHeight = b + document.getElementById('food').offsetTop;
-      console.log("+++++++++",scrollHeight);
-      window.scrollTo(0, scrollHeight-100);
+      window.scrollTo(0, scrollHeight-80);
     }
     stressTab(){
       var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
       var scrollHeight = b + document.getElementById('stress').offsetTop;
-      console.log("+++++++++",scrollHeight);
-      window.scrollTo(0, scrollHeight-100);
+      window.scrollTo(0, scrollHeight-80);
     }
     extraTab(){
       var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
       var scrollHeight = b + document.getElementById('daily').offsetTop;
-      console.log("+++++++++",scrollHeight);
-      window.scrollTo(0, scrollHeight-100);
+      window.scrollTo(0, scrollHeight-80);
     }
     render(){
        const {fix} = this.props;
