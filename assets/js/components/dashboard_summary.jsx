@@ -12,7 +12,7 @@ import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import fetchProgress from '../network/progress';
-import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay} from './dashboard_healpers';
+import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay} from './dashboard_healpers';
 
 var CalendarWidget = require('react-calendar-widget');  
 
@@ -38,6 +38,7 @@ constructor(props){
         fetching_ql1:false,
         fetching_ql2:false,
         fetching_ql3:false,
+        fetching_ql4:false,
         "created_at":"-",
         "summary":{
             "overall_health":{
@@ -416,6 +417,7 @@ constructor(props){
    this.renderProgressFetchOverlay = renderProgressFetchOverlay.bind(this);
    this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
    this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
+   this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
   }
     
   successProgress(data){
@@ -424,6 +426,7 @@ constructor(props){
         fetching_ql1:false,
         fetching_ql2:false,
         fetching_ql3:false,
+        fetching_ql4:false,
         created_at:data.data.created_at,
         summary:data.data.summary,
     });
@@ -513,6 +516,7 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
             fetching_ql1:false,
             fetching_ql2:false,
             fetching_ql3:false,
+            fetching_ql4:false,
         });
     }
 
@@ -520,9 +524,7 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
     this.setState({
       selectedDate: selectedDate,
       calendarOpen:!this.state.calendarOpen,
-      fetching_ql1 :true,
-      fetching_ql2:true,
-      fetching_ql3:true,                                 
+      fetching_ql4 :true,                               
     },()=>{
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
     });
@@ -1443,6 +1445,7 @@ handleChange(event){
 {this.renderProgressFetchOverlay()}
 {this.renderProgress2FetchOverlay()}
 {this.renderProgress3FetchOverlay()}
+{this.renderProgressSelectedDateFetchOverlay()}
 </div>		
 			
 			)
