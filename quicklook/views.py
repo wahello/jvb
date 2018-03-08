@@ -512,13 +512,13 @@ def export_users_xls(request):
 					
 					unprocessed_gpa = grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0
 					steps_gpa = grades_data['movement_non_exercise_steps_gpa'] if grades_data['movement_non_exercise_steps_gpa'] else 0
-
+					alcoho_gpa = grades_data['alcoholic_drink_per_week_gpa'] if grades_data['alcoholic_drink_per_week_gpa'] else 0
 					overall_workout_gpa_without_penalty = round((steps_gpa +
 						grade_point[grades_data['movement_consistency_grade']] +
 						grades_data['avg_sleep_per_night_gpa'] + abs(grades_data["sleep_aid_penalty"]) +
 						grade_point[grades_data['exercise_consistency_grade']] +
 						unprocessed_gpa +
-						grade_point[grades_data['alcoholic_drink_per_week_grade']])/6,2)
+						alcoho_gpa)/6,2)
 
 					if overall_workout_gpa_without_penalty >= 3:
 						sheet9.write(i+3,row_num,overall_workout_gpa_without_penalty,format_green_overall)
@@ -770,20 +770,56 @@ def export_users_xls(request):
 			# logic
 			i1 = 31
 			row_num += 1
+			# for i, key in enumerate(columns5):
+			# 	if user_input_strong_data:
+			# 		if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+			# 		elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'B':
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+			# 		elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'C':
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
+			# 		elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'D':
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
+			# 		elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'F':
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_red)
+			# 	elif i == 1:
+			# 		sheet9.write(i1 + i + 1, row_num - num_4, sleep_data[key], format2)
+			# 	elif i == 3:
+			# 		if exercise_data[key] >= 76:
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
+			# 		if exercise_data[key] >= 63 and exercise_data[key] <= 75:
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_yellow)
+			# 		if exercise_data[key] > 30 and exercise_data[key] <= 62:
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_green)
+			# 		if exercise_data[key] <= 30:
+			# 			sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
+			# 	elif i != 0:
+			# 		sheet9.write(i1 + i + 1, row_num - num_4, sleep_data[key], format)
 			for i, key in enumerate(columns5):
 				if user_input_strong_data:
+					
 					if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
-						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+						sheet3.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'B':
 						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'C':
 						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'D':
-						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
+						sheet9.write(i1 + i + 1, row_num - num_4,user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'F':
-						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_red)
+						sheet9.write(i1 + i + 1, row_num - num_4,user_input_strong_data['sleep_time_excluding_awake_time'], format_red)
+					elif i == 3:
+						if exercise_data[key] >= 76:
+							sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
+						if exercise_data[key] >= 63 and exercise_data[key] <= 75:
+							sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_yellow)
+						if exercise_data[key] > 30 and exercise_data[key] <= 62:
+							sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_green)
+						if exercise_data[key] <= 30:
+							sheet9.write(i + 2, row_num, exercise_data[key], format_red)
 				elif i == 1:
-					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data[key], format2)
+					sheet9.write(i1 + i + 1, row_num - num_4,sleep_data[key], format2)
+				
 				elif i == 3:
 					if exercise_data[key] >= 76:
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
@@ -793,7 +829,8 @@ def export_users_xls(request):
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_green)
 					if exercise_data[key] <= 30:
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
-				elif i != 0:
+			
+				if i != 0 and i != 3:
 					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data[key], format)
 		else:
 			row_num += 1
@@ -1511,8 +1548,18 @@ def export_users_xls(request):
 						sheet3.write(i + 2, row_num,user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'F':
 						sheet3.write(i + 2, row_num,user_input_strong_data['sleep_time_excluding_awake_time'], format_red)
+					elif i == 3:
+						if exercise_data[key] >= 76:
+							sheet3.write(i + 2, row_num, exercise_data[key], format_red)
+						if exercise_data[key] >= 63 and exercise_data[key] <= 75:
+							sheet3.write(i + 2, row_num, exercise_data[key], format_yellow)
+						if exercise_data[key] > 30 and exercise_data[key] <= 62:
+							sheet3.write(i + 2, row_num, exercise_data[key], format_green)
+						if exercise_data[key] <= 30:
+							sheet3.write(i + 2, row_num, exercise_data[key], format_red)
 				elif i == 1:
 					sheet3.write(i + 2, row_num,sleep_data[key], format2)
+				
 				elif i == 3:
 					if exercise_data[key] >= 76:
 						sheet3.write(i + 2, row_num, exercise_data[key], format_red)
@@ -1522,7 +1569,6 @@ def export_users_xls(request):
 						sheet3.write(i + 2, row_num, exercise_data[key], format_green)
 					if exercise_data[key] <= 30:
 						sheet3.write(i + 2, row_num, exercise_data[key], format_red)
-	
 			
 				if i != 0 and i != 3:
 					sheet3.write(i + 2, row_num, sleep_data[key], format)
