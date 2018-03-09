@@ -25,6 +25,7 @@ import Quicklook from '../components/quicksummary/quicksummary';
 import Movement from '../components/movement_consistency';
 import DashboardSummary from '../components/dashboard_summary';
 import TermsConditions from '../components/terms_and_conditions';
+import ServiceConnect_fitBit from '../components/serviceConnect_fitbit';
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -51,6 +52,7 @@ function initializeLocalState(){
 			        <Route path='/register' component={Register} />
 			        <Route path='/UserInputs' component={RequireAuth(UserInputs)} />
 			        <Route path='/service_connect' component={RequireAuth(ServiceConnect)} />
+			        <Route path='/service_connect_fitbit' component={RequireAuth(ServiceConnect_fitBit)} />
 					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
 					{/*<Route path='/nes' component={RequireAuth(Nes)} /> */}
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}

@@ -70,3 +70,25 @@ export function renderProgress3FetchOverlay(){
 		);
 	}
 }
+export function renderProgressSelectedDateFetchOverlay(){
+	if(this.state.fetching_ql4){
+		let selectedDate = moment(this.state.selectedDate);
+		
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Progress Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}

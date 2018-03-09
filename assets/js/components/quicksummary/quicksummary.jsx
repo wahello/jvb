@@ -151,6 +151,7 @@ class Quicklook extends Component{
 		        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
 		        smoke_penalty:data.grades_ql.smoke_penalty,
 		        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
+		        submitted_user_input:user_input_data.have_data?"Yes":"No",
         
 		     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
 		     //    stress_level:data.exercise_reporting_ql.stress_level,
@@ -265,6 +266,7 @@ class Quicklook extends Component{
 
     updateUserInputDateState(data){
        			var properties={
+       				have_data:true,
 					strong_input:{
 	                    workout:data.strong_input.workout,
 	                    workout_type:data.strong_input.workout_type,

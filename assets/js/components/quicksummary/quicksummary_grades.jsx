@@ -15,6 +15,8 @@ import NumberFormat from 'react-number-format';
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
    this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
+   this.getDayWithDate = this.getDayWithDate.bind(this); 
+   this.userInputsColor = this.userInputsColor.bind(this);
 
    this.state = {
       myTableData: [
@@ -37,7 +39,7 @@ import NumberFormat from 'react-number-format';
         {name: 'Controlled Substance Penalty'},
         {name: 'Smoking Penalty'}, 
         {name:'Overall Health GPA Before Penalties'},
-        
+        {name:'Did you Report your Inputs Today?'},
         // {name:'NOT GRADED CATEGORIES'},
         // {name:'Resting Heart Rate'},
         // {name:'Stress Level'},
@@ -59,6 +61,12 @@ import NumberFormat from 'react-number-format';
       ],
     };
   }
+  getDayWithDate(date){
+    let d = new Date(date);
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.getDay()] ;
+   return date +"\n"+ dayName;
+  }
 getStylesGpaBeforePanalities(score){
       if (score<1)
         return {background:'red',color:'black'};
@@ -67,6 +75,10 @@ getStylesGpaBeforePanalities(score){
       else if (score >= 3)
         return {background:'green',color:'black'};
     }
+userInputsColor(value){
+  if(value == "No")
+    return {background:'red',color:'black'};
+}
 
 renderTableColumns(dateWiseData,category,classes=""){
     let columns = [];
@@ -78,8 +90,8 @@ renderTableColumns(dateWiseData,category,classes=""){
         F: { background: 'red', color: 'black' },
         penalty:{background: 'red', color: 'black' },        
     };
+  
     for(let [date,data] of Object.entries(dateWiseData)){
-
         let all_data = [];
         for(let [key,value] of Object.entries(data[category])){
             if(key !== 'id' && key !== 'user_ql'){
@@ -90,8 +102,6 @@ renderTableColumns(dateWiseData,category,classes=""){
                   style:''
                 });
             }
-
-           
             if(key === 'overall_health_gpa' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -106,7 +116,6 @@ renderTableColumns(dateWiseData,category,classes=""){
                s = minus + s;
                all_data.push({value: s});
             }
-
            else if(key =='movement_non_exercise_steps' ){
               all_data.push({
                     value: value.toLocaleString(),
@@ -165,8 +174,6 @@ renderTableColumns(dateWiseData,category,classes=""){
                   style:obj['penalty']
                 });
               }
-               
-
               else{
                 all_data.push({
                   value:'No',
@@ -174,7 +181,12 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
               }
             }
-
+            else if(key == 'submitted_user_input'){
+                all_data.push({
+                  value:value,
+                  style:this.userInputsColor(value)
+                });
+            }
             else if(key == 'movement_consistency_score'){
               let mc = value;
               if( mc != undefined && mc != "" && mc != "-"){
@@ -206,7 +218,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
         columns.push(
             <Column
-                header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+                header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
                 cell={props => (
                     <Cell style={all_data[props.rowIndex].style}  {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
                         {all_data[props.rowIndex].value}
@@ -229,7 +241,7 @@ renderTableColumns(dateWiseData,category,classes=""){
         className="responsive"
             rowsCount={rowsCount}
             rowHeight={50}
-            headerHeight={50}
+            headerHeight={60}
             width={containerWidth}
             height={containerHeight}
             touchScrollEnabled={true}
@@ -248,7 +260,6 @@ renderTableColumns(dateWiseData,category,classes=""){
           {this.renderTableColumns(this.props.data,"grades_ql")}
           </Table>
       </div>
-
       );
   }
 }

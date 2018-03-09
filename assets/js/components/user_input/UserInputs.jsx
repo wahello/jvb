@@ -142,7 +142,7 @@ class UserInputs extends React.Component{
         controlled_uncontrolled_substance:'',
         stand:'',
         food_consumed:'',
-        weight:'',
+        weight:'i do not weigh myself today',
         waist:'',
         clothes_size:'',
         heart_variability:'',
@@ -245,6 +245,11 @@ class UserInputs extends React.Component{
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+    this.workoutTab = this.workoutTab.bind(this);
+    this.sleepTab = this.sleepTab.bind(this);
+    this.foodTab = this.foodTab.bind(this);
+    this.stressTab = this.stressTab.bind(this);
+    this.extraTab = this.extraTab.bind(this);
     }
     
     _extractDateTimeInfo(dateObj){
@@ -780,11 +785,11 @@ componentWillUnmount() {
 
 handleScroll() {
 
-  if (window.scrollY >= 200 && !this.state.scrollingLock) {
+  if (window.scrollY >= 150 && !this.state.scrollingLock) {
     this.setState({
       scrollingLock: true
     });
-  } else if(window.scrollY < 200 && this.state.scrollingLock) {                                               
+  } else if(window.scrollY < 100 && this.state.scrollingLock) {                                               
     this.setState({
       scrollingLock: false
     });
@@ -914,7 +919,32 @@ handleScroll() {
          editable:!this.state.editable
        });
     }
+    workoutTab(){
 
+      var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
+      var scrollHeight = b + document.getElementById('workout').offsetTop;
+      window.scrollTo(0, scrollHeight-100);
+    }
+    sleepTab(){
+      var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
+      var scrollHeight = b + document.getElementById('sleep').offsetTop;
+      window.scrollTo(0, scrollHeight-80);
+    }
+    foodTab(){
+      var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
+      var scrollHeight = b + document.getElementById('food').offsetTop;
+      window.scrollTo(0, scrollHeight-80);
+    }
+    stressTab(){
+      var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
+      var scrollHeight = b + document.getElementById('stress').offsetTop;
+      window.scrollTo(0, scrollHeight-80);
+    }
+    extraTab(){
+      var b = document.getElementById('hambergar').clientHeight + document.getElementById('bottom-nav').clientHeight;
+      var scrollHeight = b + document.getElementById('daily').offsetTop;
+      window.scrollTo(0, scrollHeight-80);
+    }
     render(){
        const {fix} = this.props;
 
@@ -1027,7 +1057,7 @@ handleScroll() {
                            </Modal> 
                                   
                            
-                        <div className="nav3">
+                        <div className="nav3" id='bottom-nav'>
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1 user_nav">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle}>
@@ -1081,7 +1111,7 @@ handleScroll() {
                                           <NavItem onClick={this.toggle}>
                                           <span id="spa">
                                             <abbr id="abbri"  title="Workout Inputs">
-                                              <NavLink id="navlink" href="#workout">
+                                              <NavLink id="navlink" href="#" onClick={this.workoutTab}>
                                                <FontAwesome
                                                   name = "heartbeat"
                                                   size = "1x"
@@ -1094,7 +1124,7 @@ handleScroll() {
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Sleep Inputs">
-                                            <NavLink id="navlink" href="#sleep">
+                                            <NavLink id="navlink" href="#" onClick={this.sleepTab}>
                                               <FontAwesome
                                                 name = "bed"
                                                 size = "1x"
@@ -1107,7 +1137,7 @@ handleScroll() {
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Nutrition and Lifestyle Inputs">
-                                            <NavLink id="navlink" href="#food">
+                                            <NavLink id="navlink" href="#" onClick={this.foodTab}>
                                               <FontAwesome
                                                 name = "cutlery"
                                                 size = "1x"
@@ -1120,7 +1150,7 @@ handleScroll() {
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Stress/Illness Inputs">
-                                            <NavLink id="navlink" href="#stress">
+                                            <NavLink id="navlink" href="#" onClick={this.stressTab}>
                                               <FontAwesome
                                                 name = "stethoscope"
                                                 size = "1x"
@@ -1133,7 +1163,7 @@ handleScroll() {
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
                                           <abbr  id="abbri"  title="Extra Inputs">
-                                            <NavLink id="navlink" href="#daily">
+                                            <NavLink id="navlink" href="#" onClick={this.extraTab}>
                                               <FontAwesome
                                                 name = "plus-circle"
                                                 size = "1x"
@@ -2486,7 +2516,7 @@ handleScroll() {
                           </FormGroup>   
                        }
                        </Collapse>
-                        </div>      
+                           
                             
                       
                         { (this.state.workout == "yes" || this.state.workout == "") &&
@@ -2577,7 +2607,7 @@ handleScroll() {
                                </div>                             
                               </ModalBody>
                            </Modal> 
-                          <div id="sleep">
+                         
                          { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
@@ -2654,9 +2684,9 @@ handleScroll() {
                           </FormGroup>
                             }
                              </Collapse>
-
+                             </div>  
                      
-                     
+                          <div id="sleep">
                             
                             <h3><strong>Sleep Input</strong></h3>
                          
@@ -2774,16 +2804,7 @@ handleScroll() {
                                 <p>{this.state.sleep_bedtime_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_bed_time}:{this.state.sleep_mins_bed_time}  {this.state.sleep_bedtime_am_pm}</p>
                               }
                               </div>
-                            }     
-
-
-
-
-
-
-
-
-                                                
+                            }                          
                           </FormGroup>
                            <FormGroup>
                           
@@ -2857,13 +2878,6 @@ handleScroll() {
                               }
                               </div>
                             }     
-
-
-
-
-
-
-                   
                           </FormGroup>
                            <FormGroup>
                           
@@ -2927,8 +2941,7 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-                           </div>
-                        
+                           
                            
                            <FormGroup>
                              <Label className="padding">4. Did You Take Any Prescription or Non Prescription Sleep Aids Last Night?</Label>
@@ -2960,13 +2973,14 @@ handleScroll() {
                                 </div>
                               }
                               </FormGroup>
-                              <div id="food">
+                             
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionSleepAids()}
                               </FormGroup>
-                          
-                         
+                          </div>
                         
+                         
+                         <div id="food">
                         <h3><strong>Nutrition and Lifestyle Inputs</strong></h3>
                         
                           <FormGroup className="un_process_food">
@@ -3288,12 +3302,11 @@ handleScroll() {
                                     <p>{this.state.medications}</p>
                                   </div>
                                 }
-                                 </FormGroup>
-                                 </div>
-                                
+                                 </FormGroup> 
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
+                               </div>
          
                           <div id="stress">
                            <h3><strong>Stress/Illness Inputs</strong></h3>
@@ -3365,12 +3378,12 @@ handleScroll() {
                               </div>
                             }
                             </FormGroup>
-                             </div>
-                             <div id="daily">
                             <FormGroup id="padd"> 
                             {this.renderPainSick()}
                             </FormGroup>
-                        
+                            </div>
+
+                           <div id="daily">
                           <h3><strong>Extra Inputs</strong></h3>
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>
@@ -3381,9 +3394,8 @@ handleScroll() {
                                      name="weight"                                  
                                      value={this.state.weight}
                                      onChange={this.handleChange} >
-                                      <option key = "" value="">select</option>
                                       <option key = "no-weigh" value="i do not weigh myself today">
-                                        I did not weigh myself today
+                                        I Did Not Weigh Myself Today
                                       </option> 
                                      {this.createDropdown(30,300)}
                                      </Input>

@@ -61,6 +61,7 @@ class Exercise extends Component {
 constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
+     this.getDayWithDate = this.getDayWithDate.bind(this);
      let cols = this.renderTableColumns(props.data,"exercise_reporting_ql");
 	 this.state = {
       tableAttrColumn: cols[1],
@@ -82,7 +83,12 @@ isEmpty(obj){
 toFahrenheit(tempInCelcius){
     return (tempInCelcius * 1.8) + 32;
 }
-
+getDayWithDate(date){
+    let d = new Date(date);
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.getDay()] ;
+   return date +"\n"+ dayName;
+  }
 renderTableColumns(dateWiseData,category,classes=""){
 	let columns = [];
     let avgHrKeys =  [];
@@ -141,7 +147,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 		columns.push(
 			<Column 
-				header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+				header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 		        cell={props => (
 			            <Cell {...{'title':all_data[props.rowIndex]}}  {...props} className={css(styles.newTableBody)}>
 			              {all_data[props.rowIndex]}
