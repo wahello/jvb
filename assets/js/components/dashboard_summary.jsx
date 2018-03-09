@@ -12,7 +12,7 @@ import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import fetchProgress from '../network/progress';
-import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay} from './dashboard_healpers';
+import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay    } from './dashboard_healpers';
 
 var CalendarWidget = require('react-calendar-widget');  
 

@@ -142,7 +142,7 @@ class UserInputs extends React.Component{
         controlled_uncontrolled_substance:'',
         stand:'',
         food_consumed:'',
-        weight:'',
+        weight:'i do not weigh myself today',
         waist:'',
         clothes_size:'',
         heart_variability:'',
@@ -3394,9 +3394,8 @@ handleScroll() {
                                      name="weight"                                  
                                      value={this.state.weight}
                                      onChange={this.handleChange} >
-                                      <option key = "" value="">select</option>
                                       <option key = "no-weigh" value="i do not weigh myself today">
-                                        I did not weigh myself today
+                                        I Did Not Weigh Myself Today
                                       </option> 
                                      {this.createDropdown(30,300)}
                                      </Input>
