@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
@@ -76,9 +77,9 @@ import { Alert } from 'reactstrap';
 	
 }
 getDayWithDate(date){
-    let d = new Date(date);
+   let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-   let dayName = days[d.getDay()] ;
+   let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
 renderTableColumns(dateWiseData,category=undefined,classes=""){

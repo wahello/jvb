@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -79,6 +80,7 @@ const attrVerboseName = {
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
     overall_health_gpa_before_panalty:'Overall Health GPA Before Penalties',
+    submitted_user_input:'Did you Report your Inputs Today?',
 
     // resting_hr:'Resting Heart Rate',
     // stress_level:'Stress Level',
@@ -180,9 +182,9 @@ class AllStats1 extends Component{
       
     }
 getDayWithDate(date){
-    let d = new Date(date);
+   let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-   let dayName = days[d.getDay()] ;
+   let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
  	renderTableColumns(dateWiseData,category=undefined,classes=""){

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -6,7 +7,6 @@ import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
-import moment from 'moment';
 
 class MovementHistorical extends Component{
 	constructor(props){
@@ -26,9 +26,9 @@ class MovementHistorical extends Component{
     }
   }
   getDayWithDate(date){
-    let d = new Date(date);
+   let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-   let dayName = days[d.getDay()] ;
+   let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
 mcHistoricalData(score,status){

@@ -12,10 +12,10 @@ export function getInitialStateUserInput(start_dt, end_dt){
 		var dt = tmp_end_date.subtract(1,'days');  
 		var current_dt = dt.format('M-D-YY');
 		initial_state[current_dt]={};
-		initial_state['have_data']=false;
  	}
 
  	let blank_properties={
+ 		'have_data':false,
 	    "strong_input":{    	
 	    	"workout":'-',
 	    	"workout_type":"-",
