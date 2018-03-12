@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'quicklook',
     'progress_analyzer',
     'leaderboard',
+    'fitbit',
 ]
 
 MIDDLEWARE = [
