@@ -481,14 +481,14 @@ def export_users_xls(request):
 					# else:
 					# 	print("Does not exits")
 				elif key == 'did_workout' and i == 9:
-					if user_input_strong_data:
+					if exercise_data[key]:
 						sheet9.write(i+3, row_num, exercise_data[key],format)
 						# if key == 19:
 						# 	sheet9.write(i+3,row_num,"Yes")
 						# else:
 						# 	sheet9.write(i+3,row_num,"No",format_red)
 					else:
-						sheet9.write(i+3, row_num," ",format)
+						sheet9.write(i+3, row_num,"Not Reported",format)
 				elif i == 12:
 					if food_data[key] == '':
 						
@@ -1180,7 +1180,7 @@ def export_users_xls(request):
 					else:
 						sheet1.write(i+3,row_num, sleep_data[key],format1)
 				elif key == 'did_workout':
-					if user_input_strong_data:
+					if exercise_data[key]:
 						sheet1.write(i+3, row_num, exercise_data[key],format)
 					else:
 						sheet1.write(i+3, row_num,"Not Reported",format)
