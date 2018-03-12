@@ -1,5 +1,4 @@
 import json
-import pandas as pd 
 import datetime
 import base64
 import requests
@@ -80,15 +79,15 @@ def fetching_data_fitbit(request):
            authorize_url='https://www.fitbit.com/oauth2/authorize',
            base_url='https://fitbit.com/api')
 	tokens = FitbitConnectToken.objects.get(user = request.user)
-	print(tokens)
-	# access_token = tokens.access_token
-	# session = service.get_session(access_token)
-	# #The date in the format yyyy-MM-dd
-	# date = '2018-03-07'
-	# user_id = tokens.user_id_fitbit
-	# esponse = session.get("https://api.fitbit.com/1/user/-/activities/date/2018-03-07.json")
-	# a = esponse.json()
-	# print(pprint.pprint(a))
+	# print(tokens)
+	access_token = tokens.access_token
+	session = service.get_session(access_token)
+	#The date in the format yyyy-MM-dd
+	date = '2018-03-07'
+	user_id = tokens.user_id_fitbit
+	esponse = session.get("https://api.fitbit.com/1/user/-/activities/date/2018-03-07.json")
+	a = esponse.json()
+	print(pprint.pprint(a))
 
 	# mail = EmailMessage()
 	# mail.subject = ""
