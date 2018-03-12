@@ -4,6 +4,7 @@ import datetime
 import base64
 import requests
 import webbrowser
+import pprint
 
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -69,7 +70,7 @@ def receive_token_fitbit(request):
     except FitbitConnectToken.DoesNotExist:
       FitbitConnectToken.objects.create(user=request.user,refresh_token=a['refresh_token'],
                                  access_token=a['access_token'],user_id_fitbit=a['user_id'])
-    return redirect('/service_connect')
+    return redirect('/service_connect_fitbit')
 
 def fetching_data_fitbit(request):
 	service = OAuth2Service(
@@ -79,13 +80,21 @@ def fetching_data_fitbit(request):
            authorize_url='https://www.fitbit.com/oauth2/authorize',
            base_url='https://fitbit.com/api')
 	tokens = FitbitConnectToken.objects.get(user = request.user)
-	access_token = tokens.access_token
-	session = service.get_session(access_token)
-	#The date in the format yyyy-MM-dd
-	date = '2018-03-07'
-	user_id = tokens.user_id_fitbit
-	esponse = session.get("https://api.fitbit.com/1/user/-/activities/date/2018-03-07.json")
-	print(esponse)
-	print(esponse.json())
+	print(tokens)
+	# access_token = tokens.access_token
+	# session = service.get_session(access_token)
+	# #The date in the format yyyy-MM-dd
+	# date = '2018-03-07'
+	# user_id = tokens.user_id_fitbit
+	# esponse = session.get("https://api.fitbit.com/1/user/-/activities/date/2018-03-07.json")
+	# a = esponse.json()
+	# print(pprint.pprint(a))
+
+	# mail = EmailMessage()
+	# mail.subject = ""
+	# mail.body = str(a)
+	# mail.to = ['dileepk@s7inc.co']
+	# mail.send()
+
 	return redirect('/')
 
