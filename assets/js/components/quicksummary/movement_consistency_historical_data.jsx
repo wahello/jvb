@@ -14,6 +14,7 @@ class MovementHistorical extends Component{
     this.renderTableColumns = this.renderTableColumns.bind(this);
     this.mcHistoricalData = this.mcHistoricalData.bind(this);
     this.dailyMC = this.dailyMC.bind(this);
+    this.getDayWithDate = this.getDayWithDate.bind(this);
     this.state = {
       myTableData: [{name:"% of Days User Get 300 Steps in the Hour"}]
     }
@@ -22,10 +23,14 @@ class MovementHistorical extends Component{
 
     for(var key in p) {
       this.state.myTableData.push({name: key})
-     console.log("---------",key);
     }
   }
-  
+  getDayWithDate(date){
+    let d = new Date(date);
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.getDay()] ;
+   return date +"\n"+ dayName;
+  }
 mcHistoricalData(score,status){
       if(status == "sleeping")
         return {background:'rgb(0,176,240)',color:'white'}
@@ -237,11 +242,11 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
 
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
-                  {this.state.myTableData[props.rowIndex].name}
+                  {this.getDayWithDate(this.state.myTableData[props.rowIndex].name)}
                 </Cell>
                 )}
 
-              width={150}
+              width={115}
               fixed={true}
             />
             {this.renderTableColumns(this.props.data,"steps_ql")}

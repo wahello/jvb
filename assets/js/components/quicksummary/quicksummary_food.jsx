@@ -14,6 +14,7 @@ import { StyleSheet, css } from 'aphrodite';
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 	 this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
+	 this.getDayWithDate = this.getDayWithDate.bind(this);
 	 this.state = {
       myTableData: [
         {name: '% Non Processed Food'},
@@ -32,6 +33,12 @@ getStylesGpaBeforePanalities(score){
         return {background:'green',color:'white'};
       
     }
+    getDayWithDate(date){
+    let d = new Date(date);
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = date +"\n"+ days[d.getDay()] ;
+   return  dayName;
+  }
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -57,13 +64,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 			columns.push(
 				<Column 
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 			        cell={props => (
 				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
-			        width={200}
+			        width={160}
 				/>
 			)
 		}

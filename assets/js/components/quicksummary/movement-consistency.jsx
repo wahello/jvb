@@ -7,6 +7,7 @@ import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import FontAwesome from "react-fontawesome";
+import moment from 'moment';
 
 import {fetchMovementConsistency} from '../../network/quick';
 var CalendarWidget = require('react-calendar-widget');  
@@ -204,6 +205,7 @@ class Movementquick extends Component{
   processDate(selectedDate){
     this.setState({
       selectedDate: selectedDate,
+      popoverOpen: !this.state.popoverOpen,
     },()=>{
       fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
     });
@@ -304,7 +306,9 @@ render(){
               touchScrollEnabled={true}
               {...props}>
           <Column
-            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency</Cell>}
+            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency
+            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')}</span>
+            </Cell>}
             cell={props => (
               <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
                 {this.state.tableAttrColumn[props.rowIndex].name}

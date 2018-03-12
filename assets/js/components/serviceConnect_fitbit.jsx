@@ -4,7 +4,7 @@ import { Container, Select, Option, option, Row, Col, Button, Form, FormGroup, L
 import NavbarMenu from './navbar';
 import Iframe from 'react-iframe';
 
-class ServiceConnect extends React.Component {
+class ServiceConnect_fitBit extends React.Component {
 
   onRegisterSuccess(response){
 
@@ -18,7 +18,7 @@ class ServiceConnect extends React.Component {
       <br/>
       <br/>
       <br/>
-      <p style={{textAlign:"center",marginTop:"150px",fontSize:"25px",fontWeight:"bold"}}>You have succesfully registered your Garmin Connect</p>
+      <p style={{textAlign:"center",marginTop:"150px",fontSize:"25px",fontWeight:"bold"}}>You have succesfully registered to your Fitbit</p>
 
    
     </div>
@@ -27,4 +27,4 @@ class ServiceConnect extends React.Component {
 
 }
 
-export default ServiceConnect; 
+export default ServiceConnect_fitBit; 

@@ -14,6 +14,7 @@ class Alcohol extends Component{
     super(props);
     this.renderTableColumns = this.renderTableColumns.bind(this);  
 this.onProfileSuccessFetch=this.onProfileSuccessFetch.bind(this);
+this.getDayWithDate = this.getDayWithDate.bind(this);
     this.state = {
     	gender:'M',
       myTableData: [
@@ -35,7 +36,12 @@ componentDidMount(){
       getUserProfile(this.onProfileSuccessFetch);
       
     }
-
+getDayWithDate(date){
+    let d = new Date(date);
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.getDay()] ;
+   return date +"\n"+ dayName;
+  }
  	renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
    
@@ -58,7 +64,7 @@ componentDidMount(){
 
 			columns.push(
 				<Column 
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 			        cell={props => (
 				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
@@ -79,7 +85,7 @@ componentDidMount(){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={50}
+		        headerHeight={60}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
