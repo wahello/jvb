@@ -109,6 +109,7 @@ class ExerciseAndReporting(models.Model):
 	)
 
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "exercise_reporting_ql")
+	did_workout = models.CharField(choices = YN_CHOICES,max_length=10, blank=True) 
 	workout_easy_hard = models.CharField(choices=EH_CHOICES, max_length=10, blank=True)
 	workout_type = models.CharField(choices=WORKOUT_TYPE, max_length=20, blank=True)
 

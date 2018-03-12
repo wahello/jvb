@@ -163,6 +163,7 @@ def get_blank_model_fields(model):
 
 	elif model == "exercise":
 		fields = {
+			'did_workout':'',
 			'workout_easy_hard':'',
 			'workout_type': '',
 			'workout_time': '',
@@ -328,6 +329,17 @@ def get_weekly_data(data,to_date,from_date):
 											+obj.get('startTimeOffsetInSeconds',0))
 		weekly_data[obj_starttime.strftime('%Y-%m-%d')].append(obj)
 	return weekly_data
+
+def get_weekly_user_input_data(qobj_lst,to_date,from_date):
+	weekly_data = OrderedDict()
+	while(from_date <= to_date):
+		weekly_data[from_date.strftime('%Y-%m-%d')] = None
+		from_date += timedelta(days=1)
+	for obj in qobj_lst:
+		weekly_data[obj.user_input.created_at.strftime("%Y-%m-%d")] = obj
+
+	return weekly_data
+
 
 def extract_weather_data(data):
 	'''
@@ -599,6 +611,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 def get_activity_stats(activities_json,manually_updated_json):
 	activity_stats = {
+		"have_activity":False,
 		"distance_run_miles": 0,
 		"distance_bike_miles": 0,
 		"distance_swim_yards": 0,
@@ -622,6 +635,8 @@ def get_activity_stats(activities_json,manually_updated_json):
 		avg_run_speed_mps = 0
 		for obj in activities_json:
 			obj = manually_edited(obj)
+			if not activity_stats['have_activity']:
+				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
 
 			if not activities_hr.get(obj_act, None):
@@ -1252,7 +1267,7 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 	alcohol_stats = cal_alcohol_drink_grade(drink_avg,user.profile.gender)
 	return alcohol_stats
 
-def get_exercise_consistency_grade(workout_over_period,period):
+def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
 	# activity_weekly_stats = []
 	# for (act,manual_act) in zip(list(weekly_activities.values()),
 	# 							list(weekly_manual_activities.values())):
@@ -1265,10 +1280,12 @@ def get_exercise_consistency_grade(workout_over_period,period):
 	# for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
 	# 	if hr_over_90: points += 1
 	# 	elif workout == 'yes': points += 1
-	for w in workout_over_period:
-		if w == 'yes' : points += 1
+	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
+		if strong_obj and strong_obj.workout == 'yes':
+			points += 1
+		elif not strong_obj and activity_list:
+			points += 1
 	avg_point_week = points / (period/7)
-
 	grade_point = cal_exercise_consistency_grade(avg_point_week)
 	return grade_point 
 
@@ -1401,6 +1418,14 @@ def get_weather_data(todays_daily_strong,todays_activities,
 			}
 			return DATA
 
+def did_workout_today(have_activities,user_did_workout):
+	if user_did_workout:
+		return user_did_workout
+	elif have_activities:
+		return "yes"
+	else:
+		return ""
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -1517,9 +1542,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
 		# Exercise
+		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json)
+		exercise_calculated_data['did_workout'] = did_workout_today(
+				activity_stats['have_activity'],
+				safe_get(todays_daily_strong,"workout","")
+			)
 		exercise_calculated_data['workout_easy_hard'] = safe_get(todays_daily_strong,
 														 "work_out_easy_or_hard",'')
-		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json)
 		exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 		exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
 		exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
@@ -1711,8 +1740,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 		
 
 		# Exercise Consistency grade calculation over period of 7 days
+		weekly_daily_strong = get_weekly_user_input_data(daily_strong,current_date,last_seven_days_date)
 		exercise_consistency_grade_point = get_exercise_consistency_grade(
-			[q.workout for q in daily_strong],7)
+			weekly_daily_strong,weekly_activities,7)
 
 		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade_point[0]
 		grades_calculated_data['exercise_consistency_score'] = exercise_consistency_grade_point[1]
