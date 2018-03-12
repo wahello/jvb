@@ -319,7 +319,7 @@ def export_users_xls(request):
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
-			   'workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
+			   'did_workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
 			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty','overall_gpa_without_penalties']
 	columnsw = ['Overall Health Grade','Overall Health Gpa','Non Exercise Steps Grade','Non Exercise Steps',
 			   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
@@ -436,7 +436,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns):
 		
-				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout' and key != 'overall_gpa_without_penalties':
+				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'did_workout' and key != 'overall_gpa_without_penalties':
 					if grades_data[key] == 'A':
 						sheet9.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
@@ -480,9 +480,9 @@ def export_users_xls(request):
 					# 	print("exists")
 					# else:
 					# 	print("Does not exits")
-				elif key == 'workout' and i == 9:
+				elif key == 'did_workout' and i == 9:
 					if user_input_strong_data:
-						sheet9.write(i+3, row_num, user_input_strong_data[key],format)
+						sheet9.write(i+3, row_num, exercise_data[key],format)
 						# if key == 19:
 						# 	sheet9.write(i+3,row_num,"Yes")
 						# else:
@@ -1142,7 +1142,7 @@ def export_users_xls(request):
 			row_num += 1
 			for i,key in enumerate(columns):
 			
-				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'workout' and key != 'overall_gpa_without_penalties':
+				if key != 'non_exercise_steps' and key != 'movement_consistency' and key != 'sleep_per_wearable' and key != 'prcnt_non_processed_food' and key != 'alcohol_week' and key != 'did_workout' and key != 'overall_gpa_without_penalties':
 					if grades_data[key] == 'A':
 						sheet1.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
@@ -1179,9 +1179,9 @@ def export_users_xls(request):
 							sheet1.write(i+3,row_num, sleep_data[key],format1)
 					else:
 						sheet1.write(i+3,row_num, sleep_data[key],format1)
-				elif key == 'workout':
+				elif key == 'did_workout':
 					if user_input_strong_data:
-						sheet1.write(i+3, row_num, user_input_strong_data[key],format)
+						sheet1.write(i+3, row_num, exercise_data[key],format)
 					else:
 						sheet1.write(i+3, row_num,"Not Reported",format)
 				elif i == 12:
