@@ -241,6 +241,7 @@ class UserInputs extends React.Component{
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
+      this.createWindDropdown = this.createWindDropdown.bind(this)
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -734,6 +735,22 @@ createDropdown(start_num , end_num, step=1){
     let i = start_num;
     while(i<=end_num){
       elements.push(<option key={i} value={i}>{i}</option>);
+      i=i+step;
+    }
+    return elements;
+  }
+
+  createWindDropdown(start_num , end_num, step=1){
+    let elements = [];
+    let i = start_num;
+    while(i<=end_num){
+      if(i < 1)
+        elements.push(
+          <option key={0} value={0}>CALM</option>
+          );
+      else
+        elements.push(
+          <option key={i} value={i}>{i}</option>);
       i=i+step;
     }
     return elements;
@@ -2457,14 +2474,14 @@ handleScroll() {
                                      value={this.state.wind}
                                      onChange={this.handleChange} >
                                      <option key="select" value="">Select</option>                                    
-                                     {this.createDropdown(0,350)}
+                                     {this.createWindDropdown(0,350)}
                                      </Input>
                               </div>
                             }
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.wind}</p>
+                                <p>{this.state.wind<1 ? 'calm' : this.state.wind}</p>
                               </div>
                             }
                           </FormGroup> 

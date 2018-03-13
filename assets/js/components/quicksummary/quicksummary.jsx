@@ -898,7 +898,7 @@ onLogoutSuccess(response){
                                   </Nav>
                                 </Collapse>
 
-                                         <span className="btn2 btn4">
+                                        <span className="btn2 btn4">
 	                                  <Button
 	                                   id="nav-btn"
 	                                  style={{backgroundColor:"#ed9507"}}
@@ -912,29 +912,6 @@ onLogoutSuccess(response){
 
 						 </div>
 			      		</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 			      			<Popover
                             placement="bottom"
