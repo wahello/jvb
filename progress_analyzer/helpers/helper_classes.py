@@ -129,8 +129,14 @@ class ProgressReport():
 		# Custom date range(s) for which report is to be created
 		# expected format of the date is 'YYYY-MM-DD'
 		self.custom_ranges = query_params.get('custom_ranges',None)
+
+		year_denominator = 365
+		if self.current_date:
+			year_start = datetime(self.current_date.year,1,1)
+			year_denominator = (self.current_date - year_start).days + 1
+
 		self.duration_denominator = {
-			'today':1,'yesterday':1, 'week':7, "month":30, "year":365
+			'today':1,'yesterday':1, 'week':7, "month":30, "year":year_denominator
 		}
 
 		if self.current_date:
@@ -266,7 +272,8 @@ class ProgressReport():
 			# Avg excluding today
 			'week':(current_date - timedelta(days=8)).date(),
 			'month':(current_date - timedelta(days=31)).date(),
-			'year':(current_date - timedelta(days=366)).date()
+			#from start of the year to current date
+			'year':(datetime(current_date.year,1,1) - timedelta(days=1)).date()
 		}
 		return duration
 
@@ -343,7 +350,7 @@ class ProgressReport():
 		if day_before_yesterday_data:
 			cached_summary_type = "_{}_cache".format(summary_type)
 			day_before_yesterday_data = day_before_yesterday_data.__dict__.get(cached_summary_type)
-	
+
 		for key in calculated_data_dict.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
 				if alias in self.duration_type:
@@ -352,10 +359,12 @@ class ProgressReport():
 						cached_summary_type = "_{}_cache".format(summary_type)
 						current_data = current_data.__dict__.get(cached_summary_type)
 					if alias == 'today' and yesterday_data:
-						calculated_data_dict[key][alias] = avg_calculator(key,alias,todays_data,yesterday_data)
+						calculated_data_dict[key][alias] = avg_calculator(key,alias,todays_data,
+							yesterday_data)
 						continue
 					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,day_before_yesterday_data)
+						calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,
+							day_before_yesterday_data)
 						continue
 					# Avg excluding today, that's why subtract from yesterday's cum sum
 					calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,current_data)
@@ -824,10 +833,18 @@ class ProgressReport():
 
 	def get_progress_report(self):
 		SUMMARY_CALCULATOR_BINDING = self._get_summary_calculator_binding()
-		DATA = {'summary':{}, "created_at":None}
+		DATA = {'summary':{}, "report_date":None}
 		for summary in self.summary_type:
 			DATA['summary'][summary] = SUMMARY_CALCULATOR_BINDING[summary](self.custom_daterange)
 		if self.current_date:
-			DATA['created_at'] = self.current_date.strftime("%Y-%m-%d")
+			duration = self._get_duration_datetime(self.current_date)
+			duration_dt = {}
+			for dur in self.duration_type:
+				if dur == 'today' or dur == 'yesterday':
+					duration_dt[dur] = duration[dur].strftime("%Y-%m-%d")
+				else:
+					duration_dt[dur] = (duration[dur] + timedelta(days=1)).strftime("%Y-%m-%d")
+			DATA['duration_date'] = duration_dt
+			DATA['report_date'] = self.current_date.strftime("%Y-%m-%d")
 
 		return DATA

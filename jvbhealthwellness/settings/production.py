@@ -55,10 +55,10 @@ CELERY_RESULT_BACKEND = config('REDIS_URL')
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BEAT_SCHEDULE = {
-    #execute every day at 12:01 AM EST (America/New_york)
+    #execute every day at 1:00 AM EST (America/New_york)
     'create-cumulative-sum':{
         'task':'progress_analyzer.generate_cumulative_instances',
-        'schedule':crontab(minute=1, hour=0)
+        'schedule':crontab(minute=0, hour=1)
     },
 }
 
