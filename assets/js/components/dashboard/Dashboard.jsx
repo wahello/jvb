@@ -36,6 +36,8 @@ class Dashboard extends Component {
 							  <h3 id="link_style">Set up Links to Garmin</h3>
 							  <a href='/users/request_token'>Garmin Health Connect</a><br/>
 							  <a href='/users/connect_request_token'>Garmin Connect</a><br/>
+							  <h3 id="link_style">Set up Link to Fitbit</h3>
+							   <a href='/fitbit/request_token_fitbit'>Connect to Fitbit</a><br/>
 							  <h3 id="link_style">Other</h3>
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>							 
 						  </div>

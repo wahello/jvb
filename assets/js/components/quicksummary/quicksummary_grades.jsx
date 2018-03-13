@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -62,9 +63,9 @@ import NumberFormat from 'react-number-format';
     };
   }
   getDayWithDate(date){
-    let d = new Date(date);
+   let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-   let dayName = days[d.getDay()] ;
+   let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
 getStylesGpaBeforePanalities(score){

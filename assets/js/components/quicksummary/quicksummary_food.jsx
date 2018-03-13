@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -34,10 +35,10 @@ getStylesGpaBeforePanalities(score){
       
     }
     getDayWithDate(date){
-    let d = new Date(date);
+   let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-   let dayName = date +"\n"+ days[d.getDay()] ;
-   return  dayName;
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
   }
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
