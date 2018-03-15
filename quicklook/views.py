@@ -44,7 +44,7 @@ from progress_analyzer.models import OverallHealthGradeCumulative, \
 
 
 
-
+from progress_analyzer.helpers.helper_classes import ProgressReport
 
 class UserQuickLookView(generics.ListCreateAPIView):
 	'''
@@ -299,7 +299,15 @@ def export_users_xls(request):
 			# sheet9.write(0, r, current_date,date_format)
 			current_date -= timedelta(days = 1)
 
-	
+	query_params = {
+	"duration":"week,month,year",
+	"custom_ranges":"2018-03-01,2018-03-12,",
+	"summary":"overall_health,alcohol",
+	}
+	DATA = ProgressReport(request.user, query_params).get_progress_report()
+
+	print(DATA)
+
 	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
 	format_red_con = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0','font_color': 'white'})
 	format_green = book.add_format({'align':'left', 'bg_color': 'green','num_format': '#,##0','font_color': 'white'})
@@ -316,6 +324,7 @@ def export_users_xls(request):
 	format_red_overall = book.add_format({'align':'left', 'bg_color': 'red','num_format': '0.00'})
 	format_green_overall = book.add_format({'align':'left', 'bg_color': 'green','num_format': '0.00','font_color': 'white'})
 	format_yellow_overall= book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '0.00'})
+	format_points= book.add_format({'align':'left','num_format': '0.000'})
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
@@ -542,6 +551,8 @@ def export_users_xls(request):
 					sheet9.write(22,row_num,"Yes")
 				else:
 					sheet9.write(22,row_num,"No",format_red)
+
+
 		else:
 			row_num += 1
 			sheet9.write(i+3,row_num, '')
@@ -1117,6 +1128,18 @@ def export_users_xls(request):
 	for col_num in range(len(columnsw)):
 		col_num1 = col_num1 + 1
 		sheet1.write(col_num1, row_num, columnsw[col_num])
+	sheet1.write(col_num1+2, row_num, "Points",bold)
+	sheet1.write(col_num1+3, row_num, "Non Exercise Steps Points")
+	sheet1.write(col_num1+4, row_num, "Movement Consistency Points")
+	sheet1.write(col_num1+5, row_num, "Avg Sleep Per Night Points")
+	sheet1.write(col_num1+6, row_num, "Exercise Consistency Points")
+	sheet1.write(col_num1+7, row_num, "% of Unprocessed Food Consumed Points")
+	sheet1.write(col_num1+8, row_num, "Alcohol Drinks Consumed Per Last 7 Days Points")
+	sheet1.write(col_num1+9, row_num, "Sleep Aid Penalty Points")
+	sheet1.write(col_num1+10, row_num, "Controlled Substance Penalty Points")
+	sheet1.write(col_num1+11, row_num, "Smoking Penalty Points")
+	sheet1.write(col_num1+12, row_num, "Total Points")
+
 	current_date = to_date
 	i = 0
 	while (current_date >= from_date):
@@ -1138,7 +1161,7 @@ def export_users_xls(request):
 			alcohol_data = alcohol_data.__dict__
 			food_data = food_data.__dict__
 			# logic
-
+			grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0,None:0}
 			row_num += 1
 			for i,key in enumerate(columns):
 			
@@ -1193,7 +1216,7 @@ def export_users_xls(request):
 				elif i == 14:
 					sheet1.write(i+3,row_num, alcohol_data[key],format_exe)
 				elif i == 18:
-					grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0,None:0}
+					# grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0,None:0}
 					# overall_workout_gpa_cal = grades_data['overall_health_gpa']
 					# sleep_aid_penalty_cal = grades_data['sleep_aid_penalty']
 					# ctrl_subs_penalty_cal = grades_data['ctrl_subs_penalty']
@@ -1223,11 +1246,46 @@ def export_users_xls(request):
 					# sheet1.write(i+3,row_num,overall_workout_gpa_without_penalty,format1)
 				else:
 					sheet1.write(i+3,row_num,'Not Reported')
+
+				
+				steps_gpa = grades_data['movement_non_exercise_steps_gpa'] if grades_data['movement_non_exercise_steps_gpa'] else 0
+				# if grades_data['movement_non_exercise_steps_gpa'] = None:
+				# 	alcohol_points = 0
+				# else:
+				# 	alcohol_points = grades_data['movement_non_exercise_steps_gpa']
+
+				alcohol_points = grades_data['alcoholic_drink_per_week_gpa'] if grades_data['alcoholic_drink_per_week_gpa'] else 0
+				food_points = grades_data['prcnt_unprocessed_food_consumed_gpa'] if grades_data['prcnt_unprocessed_food_consumed_gpa'] else 0
+				mc_points = grade_point[grades_data['movement_consistency_grade']]
+				ec_points = grade_point[grades_data['exercise_consistency_grade']]
+				sleep_points = grades_data['avg_sleep_per_night_gpa']
+				#ec_points = grades_data['exercise_consistency_score']
+				#food_points = grades_data['prcnt_unprocessed_food_consumed_gpa']
+				#alcohol_points = grades_data['alcoholic_drink_per_week_gpa']
+				sp_points = grades_data['sleep_aid_penalty']
+				cs_points = grades_data['ctrl_subs_penalty']
+				smoke_points = grades_data['smoke_penalty']
+				#print(current_date,steps_gpa,mc_points,sleep_points,ec_points,food_points,alcohol_points,sp_points,cs_points,smoke_points)
+
+				total_points = steps_gpa+mc_points+sleep_points+ec_points+food_points+alcohol_points+sp_points+cs_points+smoke_points
+
+				#print(current_date,steps_gpa,mc_points,sleep_points,ec_points,food_points,alcohol_points,sp_points,cs_points,smoke_points)
+				sheet1.write(25,row_num,steps_gpa,format_points)
+				sheet1.write(26,row_num,mc_points,format_points)
+				sheet1.write(27,row_num,grades_data['avg_sleep_per_night_gpa'],format_points)
+				sheet1.write(28,row_num,ec_points,format_points)
+				sheet1.write(29,row_num,food_points,format_points)
+				sheet1.write(30,row_num,alcohol_points,format_points)
+				sheet1.write(31,row_num,grades_data['sleep_aid_penalty'],format_points)
+				sheet1.write(32,row_num,grades_data['ctrl_subs_penalty'],format_points)
+				sheet1.write(33,row_num,grades_data['smoke_penalty'],format_points)
+				sheet1.write(34,row_num,total_points,format_points)
 			for i,key in enumerate(colunn_work):
 				if user_input_strong_data:
 					sheet1.write(22,row_num,"Yes")
 				else:
 					sheet1.write(22,row_num,"No",format_red)
+
 		else:
 			row_num += 1
 			sheet1.write(i+3,row_num, '')
