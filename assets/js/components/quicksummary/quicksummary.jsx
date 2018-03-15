@@ -130,7 +130,12 @@ class Quicklook extends Component{
 
 			let exercise_consistency_points = (
 				grade_point[data.grades_ql.exercise_consistency_grade]);
-
+			let total_points = (
+					data.grades_ql.movement_non_exercise_steps_gpa + movement_consistency_points + 
+					data.grades_ql.avg_sleep_per_night_gpa + exercise_consistency_points +
+					 data.grades_ql.prcnt_unprocessed_food_consumed_gpa + data.grades_ql.alcoholic_drink_per_week_gpa +
+					 data.grades_ql.sleep_aid_penalty + data.grades_ql.ctrl_subs_penalty + data.grades_ql.smoke_penalty
+				)
 			if(user_input_data){
 				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
 				avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
@@ -160,15 +165,17 @@ class Quicklook extends Component{
 		        smoke_penalty:data.grades_ql.smoke_penalty,
 		        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
 		        submitted_user_input:user_input_data.have_data?"Yes":"No",		      
-		        movement_non_exercise_steps_gpa:data.grades_ql.movement_non_exercise_steps_gpa,
-		        movement_consistency_points:movement_consistency_points,		       
-		        avg_sleep_per_night_gpa:data.grades_ql.avg_sleep_per_night_gpa,
-		        exercise_consistency_points:exercise_consistency_points,
-		        prcnt_unprocessed_food_consumed_gpa:data.grades_ql.prcnt_unprocessed_food_consumed_gpa,
-		        alcoholic_drink_per_week_gpa:data.grades_ql.alcoholic_drink_per_week_gpa,
-		        sleep_aid_penalty_points:data.grades_ql.sleep_aid_penalty,
-		        ctrl_subs_penalty_points:data.grades_ql.ctrl_subs_penalty,
-		        smoke_penalty_points:data.grades_ql.smoke_penalty,
+		        movement_non_exercise_steps_gpa:parseFloat(data.grades_ql.movement_non_exercise_steps_gpa).toFixed(2),
+		        movement_consistency_points:parseFloat(movement_consistency_points).toFixed(2),		       
+		        avg_sleep_per_night_gpa:parseFloat(data.grades_ql.avg_sleep_per_night_gpa).toFixed(2),
+		        exercise_consistency_points:parseFloat(exercise_consistency_points).toFixed(2),
+		        prcnt_unprocessed_food_consumed_gpa:parseFloat(data.grades_ql.prcnt_unprocessed_food_consumed_gpa).toFixed(2),
+		        alcoholic_drink_per_week_gpa:parseFloat(data.grades_ql.alcoholic_drink_per_week_gpa).toFixed(2),
+		        sleep_aid_penalty_points:parseFloat(data.grades_ql.sleep_aid_penalty).toFixed(2),
+		        ctrl_subs_penalty_points:parseFloat(data.grades_ql.ctrl_subs_penalty).toFixed(2),
+		        smoke_penalty_points:parseFloat(data.grades_ql.smoke_penalty).toFixed(2),
+		        total_points:parseFloat(total_points).toFixed(2), 
+
         
 		     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
 		     //    stress_level:data.exercise_reporting_ql.stress_level,
