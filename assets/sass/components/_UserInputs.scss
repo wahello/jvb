@@ -9,7 +9,9 @@ body{
 	color:#5e5e5e;
 
 }
-
+#sleep,#food,#stress,#daily{
+	margin-top: 60px;
+}
 #placeholder{
 	font-family: proxima-nova;
 	font-style: normal;
@@ -33,6 +35,8 @@ padding-top: 10px;
 	align-items: center;
 	background-size: cover;
 	color: rgba(0,0,0,0.5);
+	margin-top: 50px;
+	
 }
 #header{
 	margin-left:24%;
@@ -415,16 +419,11 @@ margin-left:2%;
 .unprocess_food{
 	padding: 20px 20px 10px 43px;
 }
-
 #calendar{
 	width:152px;
 	color:#fff;
 	padding-left: 5px;
 }
-.nav3{
-	padding:0px 0px 20px 0px;
-}
-
 .toast-popup{
 	z-index: 101;
 }

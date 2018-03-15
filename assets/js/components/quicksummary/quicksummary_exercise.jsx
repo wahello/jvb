@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -61,6 +62,7 @@ class Exercise extends Component {
 constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
+     this.getDayWithDate = this.getDayWithDate.bind(this);
      let cols = this.renderTableColumns(props.data,"exercise_reporting_ql");
 	 this.state = {
       tableAttrColumn: cols[1],
@@ -82,7 +84,12 @@ isEmpty(obj){
 toFahrenheit(tempInCelcius){
     return (tempInCelcius * 1.8) + 32;
 }
-
+getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
 renderTableColumns(dateWiseData,category,classes=""){
 	let columns = [];
     let avgHrKeys =  [];
@@ -141,7 +148,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 		columns.push(
 			<Column 
-				header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+				header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 		        cell={props => (
 			            <Cell {...{'title':all_data[props.rowIndex]}}  {...props} className={css(styles.newTableBody)}>
 			              {all_data[props.rowIndex]}
@@ -177,7 +184,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             >
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={65}
+		        rowHeight={50}
 		        headerHeight={50}
 		         width={containerWidth}
                 height={containerHeight}

@@ -7,6 +7,7 @@ import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import FontAwesome from "react-fontawesome";
+import moment from 'moment';
 
 import {fetchMovementConsistency} from '../../network/quick';
 var CalendarWidget = require('react-calendar-widget');  
@@ -204,6 +205,7 @@ class Movementquick extends Component{
   processDate(selectedDate){
     this.setState({
       selectedDate: selectedDate,
+      popoverOpen: !this.state.popoverOpen,
     },()=>{
       fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
     });
@@ -219,15 +221,38 @@ class Movementquick extends Component{
       let steps_data = [];
       let status_data = [];
       for(let slot of this.getSortKeysAccordingTime()){
-          steps_data.push(data['movement_consistency'][slot].steps);
+         let value = data['movement_consistency'][slot].steps;
+         
+         if(value != undefined){
+          value += '';
+                  var x = value.split('.');
+                  var x1 = x[0];
+                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                  var rgx = /(\d+)(\d{3})/;
+                  while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+               steps_data.push(x1 + x2);
+         }
+         
           status_data.push(data['movement_consistency'][slot].status);
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
       steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
-      steps_data.push(data['movement_consistency'].total_steps);
-      
+     let totalSteps =data['movement_consistency'].total_steps;
+       if(totalSteps != undefined){
+          totalSteps += '';
+                  var x = totalSteps.split('.');
+                  var x1 = x[0];
+                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                  var rgx = /(\d+)(\d{3})/;
+                  while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+               steps_data.push(x1 + x2);
+         }
       columns.push(
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>Steps</Cell>}
@@ -274,14 +299,16 @@ render(){
     </div>
      <Table
           rowsCount={rowsCount}
-          rowHeight={65}
+          rowHeight={50}
           headerHeight={65}
           width={containerWidth}
           maxHeight={containerHeight}
               touchScrollEnabled={true}
               {...props}>
           <Column
-            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency</Cell>}
+            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency
+            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')}</span>
+            </Cell>}
             cell={props => (
               <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
                 {this.state.tableAttrColumn[props.rowIndex].name}

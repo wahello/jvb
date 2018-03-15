@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
@@ -15,6 +16,7 @@ import { Alert } from 'reactstrap';
 	constructor(props){
 	super(props);
 	this.renderTableColumns = this.renderTableColumns.bind(this);
+	this.getDayWithDate = this.getDayWithDate.bind(this);
 	this.state = {
 		columnAttributeName: [
 		{name: 'Heart rate down to 99'},
@@ -74,7 +76,12 @@ import { Alert } from 'reactstrap';
 	};
 	
 }
-
+getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
 renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -90,7 +97,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 
 			columns.push(
 				<Column 
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 			        cell={props => (
 				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
@@ -111,7 +118,7 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			 <Table
 			 	className="responsive"
 		        rowsCount={rowsCount}
-		        rowHeight={80}
+		        rowHeight={50}
 		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}

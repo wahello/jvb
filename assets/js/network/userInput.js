@@ -180,7 +180,10 @@ function formatJSON(data){
 	
 	json_data.strong_input['sleep_bedtime'] = sleep_bedtime;
 	json_data.strong_input['sleep_awake_time'] = sleep_awake_time;
-	json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
+	if(data.awake_hours && data.awake_mins)
+		json_data.strong_input['awake_time'] = data.awake_hours+":"+data.awake_mins;
+	else
+		json_data.strong_input['awake_time'] = "";
 	json_data.strong_input['sleep_comment'] = data.sleep_comment;
 	json_data.strong_input['sleep_aid_taken'] = data.sleep_aid_taken;
 	json_data.strong_input['prescription_or_non_prescription_sleep_aids_last_night'] = data.prescription_sleep_aids; 
@@ -204,12 +207,17 @@ function formatJSON(data){
 	json_data.encouraged_input['pain_area'] = data.pain_area; 
 	json_data.encouraged_input['measured_hr'] = data.measured_hr;
 	json_data.encouraged_input['hr_down_99'] = data.hr_down_99;
-	json_data.encouraged_input['time_to_99'] = data.time_to_99_min+":"+data.time_to_99_sec;
+	if(data.time_to_99_min && data.time_to_99_sec)
+		json_data.encouraged_input['time_to_99'] = data.time_to_99_min+":"+data.time_to_99_sec;
+	else
+		json_data.encouraged_input['time_to_99'] = "";
 	json_data.encouraged_input['hr_level'] = data.hr_level;
 	json_data.encouraged_input['lowest_hr_first_minute'] = data.lowest_hr_first_minute;
 	json_data.encouraged_input['lowest_hr_during_hrr'] = data.lowest_hr_during_hrr;
-	json_data.encouraged_input['time_to_lowest_point'] = data.time_to_lowest_point_min+":"+data.time_to_lowest_point_sec;
-
+	if(data.time_to_lowest_point_min && data.time_to_lowest_point_sec)
+		json_data.encouraged_input['time_to_lowest_point'] = data.time_to_lowest_point_min+":"+data.time_to_lowest_point_sec;
+	else
+		json_data.encouraged_input['time_to_lowest_point'] ="";
 	json_data.optional_input['list_of_processed_food_consumed_yesterday'] = data.food_consumed; 
 	json_data.optional_input['chia_seeds_consumed_during_workout'] = data.chia_seeds; 
 	json_data.optional_input['fasted_during_workout'] = data.fasted; 
@@ -228,6 +236,9 @@ function formatJSON(data){
 	json_data.optional_input['percent_breath_nose_last_night'] = data.breath_sleep; 
 	json_data.optional_input['percent_breath_nose_all_day_not_exercising'] = data.breath_day;
 	json_data.optional_input['type_of_diet_eaten'] = data.diet_type;
+	json_data.optional_input['travel'] = data.travel;
+	json_data.optional_input['travel_destination'] = data.travel_destination;
+	json_data.optional_input['travel_purpose'] = data.travel_purpose;
 	json_data.optional_input['general_comment'] = data.general_comment;
 	return json_data;
 }

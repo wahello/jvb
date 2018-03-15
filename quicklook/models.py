@@ -50,6 +50,7 @@ class Grades(models.Model,):
 															 max_length=3, blank=True)
 	prcnt_unprocessed_food_consumed_gpa = models.FloatField(blank=True, null=True)
 	alcoholic_drink_per_week_grade = models.CharField(choices=GRADE_CHOICES, max_length=3,blank=True)
+	alcoholic_drink_per_week_gpa = models.FloatField(blank=True,null=True)
 	sleep_aid_penalty = models.FloatField(blank=True, null=True)
 	ctrl_subs_penalty = models.FloatField(blank=True, null=True)
 	smoke_penalty = models.FloatField(blank=True, null=True)
@@ -108,6 +109,7 @@ class ExerciseAndReporting(models.Model):
 	)
 
 	user_ql = models.OneToOneField(UserQuickLook, related_name = "exercise_reporting_ql")
+	did_workout = models.CharField(choices = YN_CHOICES,max_length=10, blank=True) 
 	workout_easy_hard = models.CharField(choices=EH_CHOICES, max_length=10, blank=True)
 	workout_type = models.CharField(choices=WORKOUT_TYPE, max_length=20, blank=True)
 

@@ -114,157 +114,159 @@ class Quicklook extends Component{
 	}
 
 	updateDateState(data,user_input_data){
-				let grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
-				let overall_health_gpa_before_panalty = (
-					data.grades_ql.movement_non_exercise_steps_gpa + 
-					grade_point[data.grades_ql.movement_consistency_grade] +
-					data.grades_ql.avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty) +
-					grade_point[data.grades_ql.exercise_consistency_grade]+
-					data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
-					grade_point[data.grades_ql.alcoholic_drink_per_week_grade])/6
+			let grade_point = {"A":4,"B":3,"C":2,"D":1,"F":0,"":0}
+			let overall_health_gpa_before_panalty = (
+				data.grades_ql.movement_non_exercise_steps_gpa + 
+				grade_point[data.grades_ql.movement_consistency_grade] +
+				data.grades_ql.avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty) +
+				grade_point[data.grades_ql.exercise_consistency_grade]+
+				data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
+				data.grades_ql.alcoholic_drink_per_week_gpa)/6
 
-				let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
-				if(user_input_data){
-					let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
-					avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
-						&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
-				}
-       			var properties={
-       			created_at:data.created_at,
-				grades_ql: {
-			        overall_health_grade: data.grades_ql.overall_health_grade,
-			        overall_health_gpa: data.grades_ql.overall_health_gpa,
-			        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,
-			        movement_non_exercise_steps:data.steps_ql.non_exercise_steps,
-			        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
-			        movement_consistency_score:data.steps_ql.movement_consistency,
-			        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
-			        avg_sleep_per_night:avg_sleep_per_night,
-			        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
-			        workout_today: user_input_data.strong_input.workout,
-			        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
-			        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
-			        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,
-			        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
-			        alcoholic_drink_per_week:data.alcohol_ql.alcohol_week,
-			        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
-			        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
-			        smoke_penalty:data.grades_ql.smoke_penalty,
-			        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
-	        
-			     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
-			     //    stress_level:data.exercise_reporting_ql.stress_level,
-			     //    stand_three_hours:user_input_data.optional_input.stand_for_three_hours, 
+			let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
+			if(user_input_data){
+				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
+				avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
+					&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
+			}
+   			var properties={
+   			created_at:data.created_at,
+			grades_ql: {
+		        overall_health_grade: data.grades_ql.overall_health_grade,
+		        overall_health_gpa: data.grades_ql.overall_health_gpa,
+		        movement_non_exercise_steps_grade: data.grades_ql.movement_non_exercise_steps_grade,
+		        movement_non_exercise_steps:data.steps_ql.non_exercise_steps,
+		        movement_consistency_grade: data.grades_ql.movement_consistency_grade,
+		        movement_consistency_score:data.steps_ql.movement_consistency,
+		        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
+		        avg_sleep_per_night:avg_sleep_per_night,
+		        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
+		        workout_today: data.exercise_reporting_ql.did_workout,
+		        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
+		        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
+		        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,
+		        alcoholic_drink_per_week_grade: data.grades_ql.alcoholic_drink_per_week_grade,
+		        alcoholic_drink_per_week:data.alcohol_ql.alcohol_week,
+		        sleep_aid_penalty:data.grades_ql.sleep_aid_penalty,
+		        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
+		        smoke_penalty:data.grades_ql.smoke_penalty,
+		        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
+		        submitted_user_input:user_input_data.have_data?"Yes":"No",
+        
+		     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
+		     //    stress_level:data.exercise_reporting_ql.stress_level,
+		     //    stand_three_hours:user_input_data.optional_input.stand_for_three_hours, 
 
-			     //    overall_workout_grade:data.grades_ql.overall_workout_grade,
-			     //    overall_workout_score:data.grades_ql.overall_workout_gpa,
-				    // workout_duration_grade:data.grades_ql.workout_duration_grade,
-				    // workout_duration:data.exercise_reporting_ql.workout_duration,
-				    // workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
-				    // workout_effortlvl:user_input_data.strong_input.workout_effort_level,
-				    // avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
-				    // avg_exercise_hr:data.exercise_reporting_ql.avg_exercise_heartrate,
-				    // time_to_99:user_input_data.encouraged_input.time_to_99,
-				    // lowest_hr_first_minute:user_input_data.encouraged_input.lowest_hr_first_minute,
-				    // vo2_max:data.exercise_reporting_ql.vo2_max,
-				    // floor_climed:data.steps_ql.floor_climed,
-	    		},
+		     //    overall_workout_grade:data.grades_ql.overall_workout_grade,
+		     //    overall_workout_score:data.grades_ql.overall_workout_gpa,
+			    // workout_duration_grade:data.grades_ql.workout_duration_grade,
+			    // workout_duration:data.exercise_reporting_ql.workout_duration,
+			    // workout_effortlvl_grade:data.grades_ql.workout_effortlvl_grade,
+			    // workout_effortlvl:user_input_data.strong_input.workout_effort_level,
+			    // avg_exercise_hr_grade:data.grades_ql.avg_exercise_hr_grade,
+			    // avg_exercise_hr:data.exercise_reporting_ql.avg_exercise_heartrate,
+			    // time_to_99:user_input_data.encouraged_input.time_to_99,
+			    // lowest_hr_first_minute:user_input_data.encouraged_input.lowest_hr_first_minute,
+			    // vo2_max:data.exercise_reporting_ql.vo2_max,
+			    // floor_climed:data.steps_ql.floor_climed,
+    		},
 
-			    exercise_reporting_ql: {
-			        workout_easy_hard: data.exercise_reporting_ql.workout_easy_hard,
-			        workout_type:data.exercise_reporting_ql.workout_type,
-			        workout_time: data.exercise_reporting_ql.workout_time,
-			        workout_location:data.exercise_reporting_ql.workout_location,
-			        workout_duration: data.exercise_reporting_ql.workout_duration,
-			        maximum_elevation_workout:data.exercise_reporting_ql.maximum_elevation_workout,
-			        minutes_walked_before_workout:data.exercise_reporting_ql.minutes_walked_before_workout,
-			        distance_run:data.exercise_reporting_ql.distance_run,
-			        distance_bike:data.exercise_reporting_ql.distance_bike,
-			        distance_swim:data.exercise_reporting_ql.distance_swim,
-			        distance_other:data.exercise_reporting_ql.distance_other,
-			        pace: data.exercise_reporting_ql.pace,
-			        avg_heartrate: data.exercise_reporting_ql.avg_heartrate,
-			        elevation_gain: data.exercise_reporting_ql.elevation_gain,
-			        elevation_loss: data.exercise_reporting_ql.elevation_loss,
-			        effort_level: data.exercise_reporting_ql.effort_level,
-			        dew_point: data.exercise_reporting_ql.dew_point,
-			        temperature: data.exercise_reporting_ql.temperature,
-			        humidity: data.exercise_reporting_ql.humidity,
-			        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,
-			        wind:data.exercise_reporting_ql.wind,
-			        hrr_time_to_99: data.exercise_reporting_ql.hrr_time_to_99,
-			        hrr_starting_point: data.exercise_reporting_ql.hrr_starting_point,
-			        hrr_beats_lowered_first_minute:data.exercise_reporting_ql.hrr_beats_lowered_first_minute,
-			        resting_hr_last_night:data.exercise_reporting_ql.resting_hr_last_night,
-			        vo2_max:data.exercise_reporting_ql.vo2_max,
-			        running_cadence: data.exercise_reporting_ql.running_cadence,
-			        nose_breath_prcnt_workout: data.exercise_reporting_ql.nose_breath_prcnt_workout,
-			        water_consumed_workout: data.exercise_reporting_ql.water_consumed_workout,
-			        chia_seeds_consumed_workout: data.exercise_reporting_ql. chia_seeds_consumed_workout,
-			        fast_before_workout: data.exercise_reporting_ql.fast_before_workout,
-			        pain: data.exercise_reporting_ql.pain,
-			        pain_area: data.exercise_reporting_ql.pain_area,
-			        stress_level: data.exercise_reporting_ql.stress_level,
-			        sick: data.exercise_reporting_ql.sick,
-			        drug_consumed: data.exercise_reporting_ql.drug_consumed,
-			        drug: data.exercise_reporting_ql.drug,
-			        medication: data.exercise_reporting_ql.medication,
-			        smoke_substance: data.exercise_reporting_ql.smoke_substance,
-			        exercise_fifteen_more: data.exercise_reporting_ql.exercise_fifteen_more,
-			        workout_elapsed_time: data.exercise_reporting_ql.workout_elapsed_time,
-			        timewatch_paused_workout: data.exercise_reporting_ql.timewatch_paused_workout,
-			        exercise_consistency:data.exercise_reporting_ql.exercise_consistency,
-			        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
-			        fitness_age:data.exercise_reporting_ql.fitness_age,
-			        workout_comment:data.exercise_reporting_ql.workout_comment
-			    },
-			    swim_stats_ql: {
-			        pace_per_100_yard: data.swim_stats_ql.pace_per_100_yard,
-			        total_strokes: data.swim_stats_ql.total_strokes
-			    },
-			     "bike_stats_ql": {
-			        avg_speed: data.bike_stats_ql.avg_speed,
-			        avg_power: data.bike_stats_ql.avg_power,
-			        avg_speed_per_mile: data.bike_stats_ql.avg_speed_per_mile,
-			        avg_cadence: data.bike_stats_ql.avg_cadence
-			    },
-			    "steps_ql": {
-			    	"movement_consistency": data.steps_ql.movement_consistency,
-			        "non_exercise_steps": data.steps_ql.non_exercise_steps,
-			        "exercise_steps": data.steps_ql.exercise_steps,
-			        "total_steps": data.steps_ql.total_steps,
-			        "floor_climed": data.steps_ql.floor_climed,
-			    },
-			    sleep_ql: {
+		    exercise_reporting_ql: {
+		        workout_easy_hard: data.exercise_reporting_ql.workout_easy_hard,
+		        workout_type:data.exercise_reporting_ql.workout_type,
+		        workout_time: data.exercise_reporting_ql.workout_time,
+		        workout_location:data.exercise_reporting_ql.workout_location,
+		        workout_duration: data.exercise_reporting_ql.workout_duration,
+		        maximum_elevation_workout:data.exercise_reporting_ql.maximum_elevation_workout,
+		        minutes_walked_before_workout:data.exercise_reporting_ql.minutes_walked_before_workout,
+		        distance_run:data.exercise_reporting_ql.distance_run,
+		        distance_bike:data.exercise_reporting_ql.distance_bike,
+		        distance_swim:data.exercise_reporting_ql.distance_swim,
+		        distance_other:data.exercise_reporting_ql.distance_other,
+		        pace: data.exercise_reporting_ql.pace,
+		        avg_heartrate: data.exercise_reporting_ql.avg_heartrate,
+		        elevation_gain: data.exercise_reporting_ql.elevation_gain,
+		        elevation_loss: data.exercise_reporting_ql.elevation_loss,
+		        effort_level: data.exercise_reporting_ql.effort_level,
+		        dew_point: data.exercise_reporting_ql.dew_point,
+		        temperature: data.exercise_reporting_ql.temperature,
+		        humidity: data.exercise_reporting_ql.humidity,
+		        temperature_feels_like: data.exercise_reporting_ql.temperature_feels_like,
+		        wind:data.exercise_reporting_ql.wind,
+		        hrr_time_to_99: data.exercise_reporting_ql.hrr_time_to_99,
+		        hrr_starting_point: data.exercise_reporting_ql.hrr_starting_point,
+		        hrr_beats_lowered_first_minute:data.exercise_reporting_ql.hrr_beats_lowered_first_minute,
+		        resting_hr_last_night:data.exercise_reporting_ql.resting_hr_last_night,
+		        vo2_max:data.exercise_reporting_ql.vo2_max,
+		        running_cadence: data.exercise_reporting_ql.running_cadence,
+		        nose_breath_prcnt_workout: data.exercise_reporting_ql.nose_breath_prcnt_workout,
+		        water_consumed_workout: data.exercise_reporting_ql.water_consumed_workout,
+		        chia_seeds_consumed_workout: data.exercise_reporting_ql. chia_seeds_consumed_workout,
+		        fast_before_workout: data.exercise_reporting_ql.fast_before_workout,
+		        pain: data.exercise_reporting_ql.pain,
+		        pain_area: data.exercise_reporting_ql.pain_area,
+		        stress_level: data.exercise_reporting_ql.stress_level,
+		        sick: data.exercise_reporting_ql.sick,
+		        drug_consumed: data.exercise_reporting_ql.drug_consumed,
+		        drug: data.exercise_reporting_ql.drug,
+		        medication: data.exercise_reporting_ql.medication,
+		        smoke_substance: data.exercise_reporting_ql.smoke_substance,
+		        exercise_fifteen_more: data.exercise_reporting_ql.exercise_fifteen_more,
+		        workout_elapsed_time: data.exercise_reporting_ql.workout_elapsed_time,
+		        timewatch_paused_workout: data.exercise_reporting_ql.timewatch_paused_workout,
+		        exercise_consistency:data.exercise_reporting_ql.exercise_consistency,
+		        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
+		        fitness_age:data.exercise_reporting_ql.fitness_age,
+		        workout_comment:data.exercise_reporting_ql.workout_comment
+		    },
+		    swim_stats_ql: {
+		        pace_per_100_yard: data.swim_stats_ql.pace_per_100_yard,
+		        total_strokes: data.swim_stats_ql.total_strokes
+		    },
+		     "bike_stats_ql": {
+		        avg_speed: data.bike_stats_ql.avg_speed,
+		        avg_power: data.bike_stats_ql.avg_power,
+		        avg_speed_per_mile: data.bike_stats_ql.avg_speed_per_mile,
+		        avg_cadence: data.bike_stats_ql.avg_cadence
+		    },
+		    "steps_ql": {
+		    	"movement_consistency": data.steps_ql.movement_consistency,
+		        "non_exercise_steps": data.steps_ql.non_exercise_steps,
+		        "exercise_steps": data.steps_ql.exercise_steps,
+		        "total_steps": data.steps_ql.total_steps,
+		        "floor_climed": data.steps_ql.floor_climed,
+		    },
+		    sleep_ql: {
 
-			    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
-			    	sleep_comments: data.sleep_ql.sleep_comments,
-			    	sleep_aid: data.sleep_ql.sleep_aid,
-			        resting_heart_rate: data.exercise_reporting_ql.resting_hr_last_night,
-                    sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
-			        sleep_bed_time: data.sleep_ql.sleep_bed_time,
-			        sleep_awake_time: data.sleep_ql.sleep_awake_time,
-			        deep_sleep: data.sleep_ql.deep_sleep,
-			        light_sleep: data.sleep_ql.light_sleep,
-			        awake_time: data.sleep_ql.awake_time
-			       
-			    },
-			    food_ql: {
-			        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
-			        processed_food_consumed: data.food_ql.processed_food ,
-			        non_processed_food: data.food_ql.non_processed_food,
-			        diet_type: data.food_ql.diet_type
-			    },
-			    alcohol_ql: {
-			        alcohol_day: data.alcohol_ql.alcohol_day,
-			        alcohol_week: data.alcohol_ql.alcohol_week
-			    }
-             };
-             return properties;
-       		}
+		    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
+		    	sleep_comments: data.sleep_ql.sleep_comments,
+		    	sleep_aid: data.sleep_ql.sleep_aid,
+		        resting_heart_rate: data.exercise_reporting_ql.resting_hr_last_night,
+                sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
+		        sleep_bed_time: data.sleep_ql.sleep_bed_time,
+		        sleep_awake_time: data.sleep_ql.sleep_awake_time,
+		        deep_sleep: data.sleep_ql.deep_sleep,
+		        light_sleep: data.sleep_ql.light_sleep,
+		        awake_time: data.sleep_ql.awake_time
+		       
+		    },
+		    food_ql: {
+		        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
+		        processed_food_consumed: data.food_ql.processed_food ,
+		        non_processed_food: data.food_ql.non_processed_food,
+		        diet_type: data.food_ql.diet_type
+		    },
+		    alcohol_ql: {
+		        alcohol_day: data.alcohol_ql.alcohol_day,
+		        alcohol_week: data.alcohol_ql.alcohol_week
+		    }
+         };
+         return properties;
+    }
 
     updateUserInputDateState(data){
        			var properties={
+       				have_data:true,
 					strong_input:{
 	                    workout:data.strong_input.workout,
 	                    workout_type:data.strong_input.workout_type,
