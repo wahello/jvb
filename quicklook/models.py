@@ -131,6 +131,7 @@ class ExerciseAndReporting(models.Model):
 	# pace = models.TimeField()
 
 	avg_heartrate = models.TextField(blank=True)
+	activities_duration = models.TextField(blank=True) 
 	avg_exercise_heartrate = models.FloatField(blank=True,null=True)
 	elevation_gain = models.IntegerField(blank=True,null=True)
 	elevation_loss = models.IntegerField(blank=True,null=True)
@@ -253,6 +254,4 @@ class Alcohol(models.Model):
 	alcohol_week = models.FloatField(blank=True,null=True)
 
 
-class Running(models.Model):
-	user_ql = models.OneToOneField(UserQuickLook, related_name = "running_ql")
-	running_distance = models.PositiveIntegerField(blank=True, null=True)
+
