@@ -199,6 +199,11 @@ renderTableColumns(dateWiseData,category,classes=""){
                   value:'No',
                   style:''
                 });
+               else if(value == "not yet")
+                all_data.push({
+                  value:'Not Yet',
+                  style:''
+                });
                else
                 all_data.push({
                   value:'Not Reported',
