@@ -105,10 +105,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 						}
 					}
 					else if(key == "sleep_per_user_input"){
-						if(value != " " && value != "-" && value != undefined){
 							all_data.push({value:value,
 										   style:this.getStylesForUserinputSleep(value)});
-						}
 					}
 					else if(key == 'resting_heart_rate'){
 						all_data.push({value:value,
