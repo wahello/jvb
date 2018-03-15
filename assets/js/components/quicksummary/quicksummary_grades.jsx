@@ -41,6 +41,16 @@ import NumberFormat from 'react-number-format';
         {name: 'Smoking Penalty'}, 
         {name:'Overall Health GPA Before Penalties'},
         {name:'Did you Report your Inputs Today?'},
+        {name: 'Non Exercise Steps Points'},
+        {name: 'Movement Consistency Points'},
+        {name: 'Avg Sleep Per Night Points'},
+        {name: 'Exercise Consistency Points'}, 
+        {name: '% of Unprocessed Food Consumed Points'},
+        {name: 'Alcohol Drinks Consumed Per Last 7 Days'},
+        {name: 'Sleep Aid Penalty Points'},
+        {name: 'Controlled Substance Penalty Points'},
+        {name: 'Smoking Penalty Points'},
+
         // {name:'NOT GRADED CATEGORIES'},
         // {name:'Resting Heart Rate'},
         // {name:'Stress Level'},
@@ -123,21 +133,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                     style: obj[value]
                 });
             }
-            // else if((key =='movement_consistency_grade' || key =='overall_health_grade' || 
-            //   key =='overall_health_gpa' ||  key =='movement_non_exercise_steps_grade' || 
-            //   key =='movement_non_exercise_steps' ||  key =='movement_consistency_score' || 
-            //   key =='avg_sleep_per_night_grade' ||  key =='avg_sleep_per_night' || 
-            //   key =='exercise_consistency_grade' ||  key =='workout_today' || 
-            //   key =='exercise_consistency_score' ||  key =='prcnt_unprocessed_food_consumed_grade' || 
-            //   key =='prcnt_unprocessed_food_consumed' ||  key =='alcoholic_drink_per_week_grade' || 
-            //   key =='alcoholic_drink_per_week' ||  key =='sleep_aid_penalty' || 
-            //   key =='ctrl_subs_penalty' ||  key =='smoke_penalty' || 
-            //   key =='overall_health_gpa_before_panalty'  ) && (value ==' ' )){
-            //      all_data.push({
-            //         value: 'Not Reported',
-            //         style: obj[value]
-            //     });
-            // }
+            
             else if(key === 'overall_health_gpa_before_panalty' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -153,6 +149,8 @@ renderTableColumns(dateWiseData,category,classes=""){
                all_data.push({value: s,
                 style:this.getStylesGpaBeforePanalities(parseFloat(s))});
             }
+
+
             else  if(key === 'exercise_consistency_score' ){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
@@ -182,6 +180,24 @@ renderTableColumns(dateWiseData,category,classes=""){
                 });
               }
             }
+            else if(key == "workout_today"){
+              if(value == "yes")
+                 all_data.push({
+                  value:'Yes',
+                  style:''
+                });
+              else if(value == "no")
+                 all_data.push({
+                  value:'No',
+                  style:''
+                });
+               else
+                all_data.push({
+                  value:'Not Reported',
+                  style:''
+                })
+              
+            }
             else if(key == 'submitted_user_input'){
                 all_data.push({
                   value:value,
@@ -200,12 +216,6 @@ renderTableColumns(dateWiseData,category,classes=""){
                 all_data.push({
                   value:'Not Reported',
                   style:''
-                });
-            }
-            else if(value == ''  ){
-                all_data.push({
-                    value: 'Not Reported',
-                    style: obj[value]
                 });
             }
             else {

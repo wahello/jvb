@@ -3543,7 +3543,7 @@ handleScroll() {
                           </FormGroup>
 
                           <FormGroup>     
-                            <Label className="padding">15. Did you Travel Somewhere Today (Away From the City You Live In)? </Label>
+                            <Label className="padding">15. Did you travel somewhere today and/or spend the day today away from the city you live in? </Label>
 
                               {this.state.editable &&
                                 <div className="input1">
@@ -3574,7 +3574,7 @@ handleScroll() {
 
                           {(this.state.travel == "yes") &&
                           <FormGroup>      
-                            <Label className="padding">15.1 Where Did You Travel To</Label>
+                            <Label className="padding">15.1 Where did you travel to or stay?</Label>
                               {this.state.editable &&
                                 <div className="input1">
                                      <Textarea  name="travel_destination" 
