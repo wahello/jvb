@@ -47,7 +47,7 @@ import NumberFormat from 'react-number-format';
         {name: 'Avg Sleep Per Night Points'},
         {name: 'Exercise Consistency Points'}, 
         {name: '% of Unprocessed Food Consumed Points'},
-        {name: 'Alcohol Drinks Consumed Per Last 7 Days'},
+        {name: 'Alcohol Drinks Consumed Per Last 7 Days Points'},
         {name: 'Sleep Aid Penalty Points'},
         {name: 'Controlled Substance Penalty Points'},
         {name: 'Smoking Penalty Points'},
@@ -197,6 +197,11 @@ renderTableColumns(dateWiseData,category,classes=""){
               else if(value == "no")
                  all_data.push({
                   value:'No',
+                  style:''
+                });
+               else if(value == "not yet")
+                all_data.push({
+                  value:'Not Yet',
                   style:''
                 });
                else
