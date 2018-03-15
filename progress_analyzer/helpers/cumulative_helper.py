@@ -78,6 +78,15 @@ def _get_blank_pa_model_fields(model):
 		}
 		return fields
 
+	elif model == "meta":
+		fields = {
+			"workout_days_count":None,
+			"resting_hr_days_count":None,
+			"effort_level_days_count":None,
+			"vo2_max_days_count":None
+		}
+		return fields
+
 def _str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
@@ -102,7 +111,7 @@ def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss
 		- time_format: type String, possible values are [hour, minute, seconds]
 		  specified in what format time to be converted
 		  
-		- time_pattern: type String, possible values are subtring of "hh:mm:ss"
+		- time_pattern: type String, possible values are substring of "hh:mm:ss"
 		  specify the position of hour, minute and second in the str_duration
 
 	'''
@@ -475,6 +484,60 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return other_stats_cum_data
 
+# def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
+# 	meta_cum_data = _get_blank_pa_model_fields("meta")
+	
+# 	if today_ql_data and yday_cum_data:
+# 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"workout_duration",None
+# 		))
+# 		workout_dur = 1 if workout_dur else 0
+# 		meta_cum_data['workout_days_count'] = workout_dur \
+# 			+ _safe_get_mobj(yday_cum_data.meta_cum,"workout_days_count",0)
+
+# 		resting_hr = _safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0
+# 		)
+# 		resting_hr = 1 if resting_hr else 0
+# 		meta_cum_data['resting_hr_days_count'] = resting_hr \
+# 			+ _safe_get_mobj(yday_cum_data.meta_cum, "resting_hr_days_count",0)
+
+# 		effort_level = _safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"effort_level",0
+# 		)
+# 		effort_level = 1 if effort_level else 0
+# 		meta_cum_data['effort_level_days_count'] = effort_level \
+# 			+ _safe_get_mobj(yday_cum_data.meta_cum,"effort_level_days_count",0)
+
+# 		vo2_max = _safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"vo2_max",0
+# 		)
+# 		vo2_max = 1 if vo2_max else 0
+# 		meta_cum_data['vo2_max_days_count'] = vo2_max \
+# 			+ _safe_get_mobj(yday_cum_data.meta_cum,"vo2_max_days_count",0)
+	
+# 	elif today_ql_data:
+# 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"workout_duration",None
+# 		))
+# 		meta_cum_data['workout_days_count'] = 1 if workout_dur else 0
+
+# 		resting_hr = _safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0
+# 		)
+# 		meta_cum_data['resting_hr_days_count'] = 1 if resting_hr else 0
+
+# 		effort_level = _safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"effort_level",0
+# 		)
+# 		meta_cum_data['effort_level_days_count'] = 1 if effort_level else 0
+
+# 		vo2_max = _safe_get_mobj(
+# 			today_ql_data.exercise_reporting_ql,"vo2_max",0
+# 		)
+# 		meta_cum_data['vo2_max_days_count'] = 1 if vo2_max else 0
+
+# 	return meta_cum_data
 
 def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	from_dt = _str_to_datetime(from_dt)
