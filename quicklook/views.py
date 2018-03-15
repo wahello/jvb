@@ -324,7 +324,7 @@ def export_users_xls(request):
 	format_red_overall = book.add_format({'align':'left', 'bg_color': 'red','num_format': '0.00'})
 	format_green_overall = book.add_format({'align':'left', 'bg_color': 'green','num_format': '0.00','font_color': 'white'})
 	format_yellow_overall= book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '0.00'})
-	format_points= book.add_format({'align':'left','num_format': '0.000'})
+	format_points= book.add_format({'align':'left','num_format': '0.00'})
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
 			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
