@@ -37,7 +37,17 @@ export function getInitialState(start_dt, end_dt){
 	        "ctrl_subs_penalty":'-',
 	        "smoke_penalty":'-',
 	        "overall_health_gpa_before_panalty":'-',
-	        "submitted_user_input":"-",
+	        "submitted_user_input":"-",	        
+	        "movement_non_exercise_steps_gpa":'-',
+	        "movement_consistency_points":'-',
+	        "avg_sleep_per_night_gpa":'-',
+	        "exercise_consistency_points":'-',
+			"prcnt_unprocessed_food_consumed_gpa":'-',
+	        "alcoholic_drink_per_week_gpa":'-',
+	        "sleep_aid_penalty_points":'-',
+	        "ctrl_subs_penalty_points":'-',
+	        "smoke_penalty_points":'-',
+
 
 	        
 	     //    "resting_hr":'-',
