@@ -146,7 +146,7 @@ def store_garmin_health_push(data):
 			upload_end_time = int(re.search('uploadEndTimeInSeconds=(\d+)*',
 								callback_url).group(1))
 
-			callback_url = callback_url.split('?')[0]+"/"
+			callback_url = callback_url.split('?')[0]
 
 			data = {
 				'uploadStartTimeInSeconds': upload_start_time,
