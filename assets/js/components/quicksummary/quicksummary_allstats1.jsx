@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -79,6 +80,7 @@ const attrVerboseName = {
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
     overall_health_gpa_before_panalty:'Overall Health GPA Before Penalties',
+    submitted_user_input:'Did you Report your Inputs Today?',
 
     // resting_hr:'Resting Heart Rate',
     // stress_level:'Stress Level',
@@ -138,6 +140,7 @@ class AllStats1 extends Component{
         this.renderTableColumns = this.renderTableColumns.bind(this);
         this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
         this.getStylesNonProcessedFood = this.getStylesNonProcessedFood.bind(this);
+        this.getDayWithDate = this.getDayWithDate.bind(this);
         let cols = this.renderTableColumns(props.data);
         this.state = {
             columns:cols[0],
@@ -178,7 +181,12 @@ class AllStats1 extends Component{
         return {background:'green',color:'white'};
       
     }
-
+getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
@@ -346,7 +354,7 @@ class AllStats1 extends Component{
 			columns.push(
 				<Column 
                 style={{wordWrap:"break-word"}}      
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}     
+					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}     
 			        cell={props => (
 				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex].value}
@@ -385,16 +393,12 @@ class AllStats1 extends Component{
 			 <Table
 		        rowsCount={rowsCount}    
 		        rowHeight={50}  
-		        headerHeight={50}   
+		        headerHeight={60}   
 		        width={containerWidth}    
         		maxHeight={containerHeight}
-                touchScrollEnabled={true}      
-            
-         
-               
+            touchScrollEnabled={true}                  
                 {...props}>
-		        <Column
-                
+		        <Column 
 		          header={<Cell className={css(styles.newTableHeader)}>All Stats</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
@@ -404,8 +408,6 @@ class AllStats1 extends Component{
 		          )}
 		          width={225}
 		          fixed={true}
-
-
 		        />
 			    {this.state.columns}              
       		</Table>   

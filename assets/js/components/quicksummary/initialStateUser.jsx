@@ -15,6 +15,7 @@ export function getInitialStateUserInput(start_dt, end_dt){
  	}
 
  	let blank_properties={
+ 		'have_data':false,
 	    "strong_input":{    	
 	    	"workout":'-',
 	    	"workout_type":"-",

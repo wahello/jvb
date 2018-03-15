@@ -334,10 +334,15 @@ export function handleChangeTravelPurpose(event){
     if(value === travel)
       travel_purpose_other = false;
   }
-
+if(value == 'other')
+  this.setState({
+  travel_purpose:'',
+  travel_purpose_checked:travel_purpose_other?'other':value,
+  });
+else
   this.setState({
   [name]: value,
-  travel_purpose_checked:travel_purpose_other?'other':value
+  travel_purpose_checked:value
   });
 }
 

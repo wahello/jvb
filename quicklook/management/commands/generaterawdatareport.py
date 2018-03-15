@@ -147,6 +147,15 @@ class Command(BaseCommand):
 			help = 'Create report from date of first health data received (including today)'
 		)
 
+		parser.add_argument(
+			'--ignore',
+			'-i',
+			nargs = '+',
+			type = str,
+			dest = 'ignore',
+			help = 'Email(s) to ignore'
+		)
+
 	def handle(self, *args, **options):
 		if self._validate_options(options):
 			today = datetime.now().date()
@@ -181,28 +190,30 @@ class Command(BaseCommand):
 				emails = [e for e in options['email']]
 				user_qs = User.objects.filter(email__in = emails)
 				for user in user_qs:
-					self.stdout.write(self.style.WARNING('\nCreating Raw data report for user "%s"' % user.username))
-					if self.date_range_flag == 'origin':
-						date_of_oldest_record = self._get_origin_date(user)
-						if date_of_oldest_record:
-							from_date = date_of_oldest_record.strftime("%Y-%m-%d")
-							to_date = datetime.now().strftime("%Y-%m-%d")
-							generate_quicklook(user.id,from_date,to_date)
-						else:
-							self.stdout.write(self.style.ERROR('\nNo health record found for user "%s"' % user.username))
-						continue
-					generate_quicklook(user.id,from_date,to_date)
+					if not options['ignore'] or (options['ignore'] and user.email not in options['ignore']): 
+						self.stdout.write(self.style.WARNING('\nCreating Raw data report for user "%s"' % user.username))
+						if self.date_range_flag == 'origin':
+							date_of_oldest_record = self._get_origin_date(user)
+							if date_of_oldest_record:
+								from_date = date_of_oldest_record.strftime("%Y-%m-%d")
+								to_date = datetime.now().strftime("%Y-%m-%d")
+								generate_quicklook(user.id,from_date,to_date)
+							else:
+								self.stdout.write(self.style.ERROR('\nNo health record found for user "%s"' % user.username))
+							continue
+						generate_quicklook(user.id,from_date,to_date)
 			else:
 				user_qs = User.objects.all()
 				for user in user_qs:
-					self.stdout.write(self.style.WARNING('\nCreating Raw data report for user "%s"' % user.username))
-					if self.date_range_flag == 'origin':
-						date_of_oldest_record = self._get_origin_date(user)
-						if date_of_oldest_record:
-							from_date = date_of_oldest_record.strftime("%Y-%m-%d")
-							to_date = datetime.now().strftime("%Y-%m-%d")
-							generate_quicklook(user.id,from_date,to_date)
-						else:
-							self.stdout.write(self.style.ERROR('\nNo health record found for user "%s"' % user.username))
-						continue
-					generate_quicklook(user.id,from_date,to_date)
+					if not options['ignore'] or (options['ignore'] and user.email not in options['ignore']): 
+						self.stdout.write(self.style.WARNING('\nCreating Raw data report for user "%s"' % user.username))
+						if self.date_range_flag == 'origin':
+							date_of_oldest_record = self._get_origin_date(user)
+							if date_of_oldest_record:
+								from_date = date_of_oldest_record.strftime("%Y-%m-%d")
+								to_date = datetime.now().strftime("%Y-%m-%d")
+								generate_quicklook(user.id,from_date,to_date)
+							else:
+								self.stdout.write(self.style.ERROR('\nNo health record found for user "%s"' % user.username))
+							continue
+						generate_quicklook(user.id,from_date,to_date)

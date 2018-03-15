@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -6,7 +7,6 @@ import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
-import moment from 'moment';
 
 class MovementHistorical extends Component{
 	constructor(props){
@@ -14,6 +14,7 @@ class MovementHistorical extends Component{
     this.renderTableColumns = this.renderTableColumns.bind(this);
     this.mcHistoricalData = this.mcHistoricalData.bind(this);
     this.dailyMC = this.dailyMC.bind(this);
+    this.getDayWithDate = this.getDayWithDate.bind(this);
     this.state = {
       myTableData: [{name:"% of Days User Get 300 Steps in the Hour"}]
     }
@@ -22,10 +23,14 @@ class MovementHistorical extends Component{
 
     for(var key in p) {
       this.state.myTableData.push({name: key})
-     console.log("---------",key);
     }
   }
-  
+  getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
 mcHistoricalData(score,status){
       if(status == "sleeping")
         return {background:'rgb(0,176,240)',color:'white'}
@@ -123,20 +128,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                          }
                                       }
                                       else{
-                                        let value = mCdata.steps;
-                                         if(value != undefined){
-                                          value += '';
-                                                  var x = value.split('.');
-                                                  var x1 = x[0];
-                                                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                                                  var rgx = /(\d+)(\d{3})/;
-                                                  while (rgx.test(x1)) {
-                                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                              }
-                                              obj[time].push({value:x1 + x2,
-                                                        style:this.mcHistoricalData(value,mCdata.status)});
-                                         }
-                                          
+                                          obj[time].push({value:mCdata.steps,
+                                                        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
                                       }
             
 
@@ -194,11 +187,23 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
          key != "total_steps" && key != "dmc"){
         let active_days = 0;
         for(let step of col){
-          if(step.value >= 300)
-            active_days += 1;
+          if(step.value >= 300){
+              let value = step.value;
+              if(value != undefined){
+                value += '';
+                var x = value.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1))
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                step.value = x1+x2;
+              }
+              active_days += 1;
         }
         prcnt_active_steps = parseFloat((active_days / duration) * 100).toFixed(2) +"%";
       }
+    }
       col.splice(0, 0,{value:prcnt_active_steps,
                        style:""});
        columns.push(
@@ -237,11 +242,11 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
 
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
-                  {this.state.myTableData[props.rowIndex].name}
+                  {this.getDayWithDate(this.state.myTableData[props.rowIndex].name)}
                 </Cell>
                 )}
 
-              width={150}
+              width={115}
               fixed={true}
             />
             {this.renderTableColumns(this.props.data,"steps_ql")}

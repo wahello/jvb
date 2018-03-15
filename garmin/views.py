@@ -1,6 +1,7 @@
 import re
 import urllib
 import time
+import json
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.core.mail import EmailMessage
@@ -34,7 +35,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataStressDetails,\
 					UserGarminDataMetrics,\
 					UserGarminDataMoveIQ,\
-					GarminConnectToken
+					GarminConnectToken, \
+					GarminFitFiles
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -136,7 +138,18 @@ class GarminConnectPing(APIView):
 			store in database 
 		'''
 		file = request.FILES['file']
-
+		file_name = request.data['uploadMetaData']
+		file_name_db = file_name.json()
+		file_name_db_str = str(file_name_db)
+		file_oauth = file_name_db['oauthToken']
+		# FILE_db = open(str(file_name),"rb")
+		# fit_file= FILE_db.read()
+		try:
+			user = User.objects.get(garmin_connect_token__token = file_oauth)
+		except User.DoesNotExist:
+			user = None
+		if user:
+			GarminFitFiles.objects.create(user=request.user,fit_file=file,meta_data_fitfile=file_name_db_str)
 		mail = EmailMessage()
 		mail.subject = "Garmin connect Push | Files"
 		mail.body = request.data['uploadMetaData']

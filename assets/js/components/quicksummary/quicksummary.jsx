@@ -123,14 +123,22 @@ class Quicklook extends Component{
 				data.grades_ql.prcnt_unprocessed_food_consumed_gpa+
 				data.grades_ql.alcoholic_drink_per_week_gpa)/6
 
+			let movement_consistency_points = (
+				grade_point[data.grades_ql.movement_consistency_grade]);
+
 			let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
+
+			let exercise_consistency_points = (
+				grade_point[data.grades_ql.exercise_consistency_grade]);
+
 			if(user_input_data){
 				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
 				avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
 					&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
 			}
+
    			var properties={
-   			created_at:data.created_at,
+   			created_at:data.created_at, 
 			grades_ql: {
 		        overall_health_grade: data.grades_ql.overall_health_grade,
 		        overall_health_gpa: data.grades_ql.overall_health_gpa,
@@ -141,7 +149,7 @@ class Quicklook extends Component{
 		        avg_sleep_per_night_grade: data.grades_ql.avg_sleep_per_night_grade,
 		        avg_sleep_per_night:avg_sleep_per_night,
 		        exercise_consistency_grade: data.grades_ql.exercise_consistency_grade,
-		        workout_today: user_input_data.strong_input.workout,
+		        workout_today: data.exercise_reporting_ql.did_workout,
 		        exercise_consistency_score:data.grades_ql.exercise_consistency_score,
 		        prcnt_unprocessed_food_consumed_grade: data.grades_ql.prcnt_unprocessed_food_consumed_grade,
 		        prcnt_unprocessed_food_consumed:data.food_ql.prcnt_non_processed_food,
@@ -151,6 +159,16 @@ class Quicklook extends Component{
 		        ctrl_subs_penalty:data.grades_ql.ctrl_subs_penalty,
 		        smoke_penalty:data.grades_ql.smoke_penalty,
 		        overall_health_gpa_before_panalty:overall_health_gpa_before_panalty,
+		        submitted_user_input:user_input_data.have_data?"Yes":"No",		      
+		        movement_non_exercise_steps_gpa:data.grades_ql.movement_non_exercise_steps_gpa,
+		        movement_consistency_points:movement_consistency_points,		       
+		        avg_sleep_per_night_gpa:data.grades_ql.avg_sleep_per_night_gpa,
+		        exercise_consistency_points:exercise_consistency_points,
+		        prcnt_unprocessed_food_consumed_gpa:data.grades_ql.prcnt_unprocessed_food_consumed_gpa,
+		        alcoholic_drink_per_week_gpa:data.grades_ql.alcoholic_drink_per_week_gpa,
+		        sleep_aid_penalty_points:data.grades_ql.sleep_aid_penalty,
+		        ctrl_subs_penalty_points:data.grades_ql.ctrl_subs_penalty,
+		        smoke_penalty_points:data.grades_ql.smoke_penalty,
         
 		     //    resting_hr:data.exercise_reporting_ql.sleep_resting_hr_last_night,
 		     //    stress_level:data.exercise_reporting_ql.stress_level,
@@ -216,7 +234,7 @@ class Quicklook extends Component{
 		        exercise_consistency:data.exercise_reporting_ql.exercise_consistency,
 		        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
 		        fitness_age:data.exercise_reporting_ql.fitness_age,
-		        workout_comment:data.exercise_reporting_ql.workout_comment
+		        workout_comment:data.exercise_reporting_ql.workout_comment 
 		    },
 		    swim_stats_ql: {
 		        pace_per_100_yard: data.swim_stats_ql.pace_per_100_yard,
@@ -237,7 +255,7 @@ class Quicklook extends Component{
 		    },
 		    sleep_ql: {
 
-		    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input,
+		    	sleep_per_user_input: data.sleep_ql.sleep_per_user_input, 
 		    	sleep_comments: data.sleep_ql.sleep_comments,
 		    	sleep_aid: data.sleep_ql.sleep_aid,
 		        resting_heart_rate: data.exercise_reporting_ql.resting_hr_last_night,
@@ -265,6 +283,7 @@ class Quicklook extends Component{
 
     updateUserInputDateState(data){
        			var properties={
+       				have_data:true,
 					strong_input:{
 	                    workout:data.strong_input.workout,
 	                    workout_type:data.strong_input.workout_type,
@@ -896,7 +915,7 @@ onLogoutSuccess(response){
                                   </Nav>
                                 </Collapse>
 
-                                         <span className="btn2 btn4">
+                                        <span className="btn2 btn4">
 	                                  <Button
 	                                   id="nav-btn"
 	                                  style={{backgroundColor:"#ed9507"}}
@@ -910,29 +929,6 @@ onLogoutSuccess(response){
 
 						 </div>
 			      		</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 			      			<Popover
                             placement="bottom"
