@@ -5,7 +5,7 @@ class FitbitConnectToken(models.Model):
 
 	user = models.OneToOneField('auth.User',related_name="fitbit_refresh_token")
 	refresh_token = models.CharField(max_length=250)
-	access_token = models.CharField(max_length=250,null=True)
+	access_token = models.TextField(null=True)
 	user_id_fitbit = models.CharField(max_length=250,null=True)
 	
 	def __str__(self):
