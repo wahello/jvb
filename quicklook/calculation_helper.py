@@ -620,7 +620,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"total_duration":0,
 		"pace":'',
 		"avg_heartrate":json.dumps({}),
-		"activities_duration": {},
+		"activities_duration":json.dumps({}),
 		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
 		"latitude":None,
 		"longitude":None
@@ -701,7 +701,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 		if runs_count:
 			activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
 
-		activity_stats['activities_duration'] = activities_duration
+		activity_stats['activities_duration'] = json.dumps(activities_duration)
 		#print(activity_stats)
 			
 	return activity_stats
