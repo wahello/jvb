@@ -26,6 +26,8 @@ class ToSleepPerNightCumulative(object):
 		self.cum_total_sleep_in_hours = raw_data["cum_total_sleep_in_hours"]
 		self.cum_overall_sleep_gpa = raw_data["cum_overall_sleep_gpa"]
 		self.cum_days_sleep_aid_taken = raw_data["cum_days_sleep_aid_taken"]
+		self.cum_deep_sleep_in_hours = raw_data["cum_deep_sleep_in_hours"]
+		self.cum_awake_duration_in_hours = raw_data["cum_awake_duration_in_hours"]
 
 class ToMovementConsistencyCumulative(object):
 	def __init__(self,raw_data):
@@ -63,6 +65,13 @@ class ToOtherStatsCumulative(object):
 		self.cum_hrr_lowest_hr_point = raw_data["cum_hrr_lowest_hr_point"]
 		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
 
+class ToMetaCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_workout_days_count = raw_data["cum_workout_days_count"]
+		self.cum_resting_hr_days_count = raw_data["cum_resting_hr_days_count"]
+		self.cum_effort_level_days_count = raw_data["cum_effort_level_days_count"]
+		self.cum_vo2_max_days_count = raw_data["cum_vo2_max_days_count"]
+
 class ToCumulativeSum(object):
 	'''
 	Convert a quicklook object to cumulative sum object
@@ -97,6 +106,9 @@ class ToCumulativeSum(object):
 		)
 		self.other_stats_cum = ToOtherStatsCumulative(
 			cum_raw_data["other_stats_cum"]
+		)
+		self.meta_cum = ToMetaCumulative(
+			cum_raw_data["meta_cum"]
 		)
 	
 class ProgressReport():
@@ -677,6 +689,11 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_exercise_summary(self, custom_daterange = False):
+		def _cal_workout_dur_average(self, stat1, stat2,workout_days):
+			if not stat1 == None and not stat2 == None and workout_days:
+				avg = (stat1 - stat2)/workout_days
+				return avg
+			return 0
 
 		def _calculate(key,alias,todays_data,current_data):
 			if todays_data and current_data:

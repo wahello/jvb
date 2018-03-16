@@ -36,6 +36,8 @@ class SleepPerNightCumulative(models.Model):
 	cum_total_sleep_in_hours = models.FloatField(blank=True, null=True)
 	cum_overall_sleep_gpa = models.FloatField(blank=True, null=True)
 	cum_days_sleep_aid_taken = models.IntegerField(blank=True, null=True)
+	cum_deep_sleep_in_hours = models.FloatField(blank=True, null=True)
+	cum_awake_duration_in_hours = models.FloatField(blank=True, null=True)
 
 class MovementConsistencyCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="movement_consistency_cum")
@@ -72,3 +74,10 @@ class OtherStatsCumulative(models.Model):
 	cum_highest_hr_in_first_min = models.IntegerField(blank=True,null=True)
 	cum_hrr_lowest_hr_point = models.IntegerField(blank=True, null=True)
 	cum_floors_climbed = models.IntegerField(blank=True,null=True)
+
+class MetaCumulative(models.Model):
+	user_cum = models.OneToOneField(CumulativeSum, related_name='meta_cum')
+	cum_workout_days_count = models.IntegerField(blank=True,null=True)
+	cum_resting_hr_days_count = models.IntegerField(blank=True,null=True)
+	cum_effort_level_days_count = models.IntegerField(blank=True,null=True)
+	cum_vo2_max_days_count = models.IntegerField(blank=True,null=True)

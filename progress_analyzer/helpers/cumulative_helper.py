@@ -13,7 +13,8 @@ from progress_analyzer.models import CumulativeSum,\
 	NutritionCumulative, \
 	ExerciseStatsCumulative, \
 	AlcoholCumulative,\
-	OtherStatsCumulative
+	OtherStatsCumulative,\
+	MetaCumulative
 
 def _get_blank_pa_model_fields(model):
 	if model == "overall_health_grade":
@@ -33,6 +34,9 @@ def _get_blank_pa_model_fields(model):
 		fields = {
 			"cum_total_sleep_in_hours":None,
 			"cum_overall_sleep_gpa":None,
+			"cum_days_sleep_aid_taken":None,
+			"cum_deep_sleep_in_hours":None,
+			"cum_awake_duration_in_hours":None
 		}
 		return fields
 	elif model == "mc":
@@ -80,10 +84,10 @@ def _get_blank_pa_model_fields(model):
 
 	elif model == "meta":
 		fields = {
-			"workout_days_count":None,
-			"resting_hr_days_count":None,
-			"effort_level_days_count":None,
-			"vo2_max_days_count":None
+			"cum_workout_days_count":None,
+			"cum_resting_hr_days_count":None,
+			"cum_effort_level_days_count":None,
+			"cum_vo2_max_days_count":None
 		}
 		return fields
 
@@ -201,6 +205,7 @@ def _update_cumulative_instance(instance, data):
 	_update_helper(instance.exercise_stats_cum, data['exercise_stats_cum'])
 	_update_helper(instance.alcohol_cum, data['alcohol_cum'])
 	_update_helper(instance.other_stats_cum, data['other_stats_cum'])
+	_update_helper(instance.meta_cum, data['meta_cum'])
 
 @transaction.atomic
 def _create_cumulative_instance(user, data):
@@ -215,6 +220,7 @@ def _create_cumulative_instance(user, data):
 	ExerciseStatsCumulative.objects.create(user_cum = user_cum,**data['exercise_stats_cum'])
 	AlcoholCumulative.objects.create(user_cum = user_cum,**data['alcohol_cum'])
 	OtherStatsCumulative.objects.create(user_cum = user_cum, **data['other_stats_cum'])
+	MetaCumulative.objects.create(user_cum = user_cum, **data['meta_cum'])
 
 def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 	overall_health_grade_cal_data = _get_blank_pa_model_fields("overall_health_grade")
@@ -300,6 +306,18 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 		sleep_per_night_cum_data['cum_days_sleep_aid_taken'] = sleep_aid_taken \
 			+ _safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_days_sleep_aid_taken",0)
 
+		sleep_per_night_cum_data['cum_deep_sleep_in_hours'] = round(
+			_str_to_hours_min_sec(
+				_safe_get_mobj(today_ql_data.sleep_ql,"deep_sleep",None),time_pattern="hh:mm"
+			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_deep_sleep_in_hours",0),0
+		)
+
+		sleep_per_night_cum_data['cum_awake_duration_in_hours'] = round(
+			_str_to_hours_min_sec(
+				_safe_get_mobj(today_ql_data.sleep_ql,"awake_time",None),time_pattern="hh:mm"
+			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_awake_duration_in_hours",0),0
+		)
+
 	elif today_ql_data:
 		sleep_per_night_cum_data['cum_overall_sleep_gpa'] =_safe_get_mobj(
 			today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)
@@ -308,6 +326,18 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 
 		sleep_aid_taken = 1 if _safe_get_mobj(today_ql_data.sleep_ql,"sleep_aid","no") == "yes" else 0
 		sleep_per_night_cum_data['cum_days_sleep_aid_taken'] = sleep_aid_taken
+
+		sleep_per_night_cum_data['cum_deep_sleep_in_hours'] = round(
+			_str_to_hours_min_sec(
+				_safe_get_mobj(today_ql_data.sleep_ql,"deep_sleep",None),time_pattern="hh:mm"
+			),0
+		)
+
+		sleep_per_night_cum_data['cum_awake_duration_in_hours'] = round(
+			_str_to_hours_min_sec(
+				_safe_get_mobj(today_ql_data.sleep_ql,"awake_time",None),time_pattern="hh:mm"
+			),0
+		)
 
 	return sleep_per_night_cum_data
 
@@ -484,60 +514,60 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return other_stats_cum_data
 
-# def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
-# 	meta_cum_data = _get_blank_pa_model_fields("meta")
+def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
+	meta_cum_data = _get_blank_pa_model_fields("meta")
 	
-# 	if today_ql_data and yday_cum_data:
-# 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"workout_duration",None
-# 		))
-# 		workout_dur = 1 if workout_dur else 0
-# 		meta_cum_data['workout_days_count'] = workout_dur \
-# 			+ _safe_get_mobj(yday_cum_data.meta_cum,"workout_days_count",0)
+	if today_ql_data and yday_cum_data:
+		workout_dur = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"did_workout",None
+		)
+		workout_dur = 1 if (workout_dur and workout_dur == 'yes') else 0
+		meta_cum_data['cum_workout_days_count'] = workout_dur \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_workout_days_count",0)
 
-# 		resting_hr = _safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0
-# 		)
-# 		resting_hr = 1 if resting_hr else 0
-# 		meta_cum_data['resting_hr_days_count'] = resting_hr \
-# 			+ _safe_get_mobj(yday_cum_data.meta_cum, "resting_hr_days_count",0)
+		resting_hr = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0
+		)
+		resting_hr = 1 if resting_hr else 0
+		meta_cum_data['cum_resting_hr_days_count'] = resting_hr \
+			+ _safe_get_mobj(yday_cum_data.meta_cum, "cum_resting_hr_days_count",0)
 
-# 		effort_level = _safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"effort_level",0
-# 		)
-# 		effort_level = 1 if effort_level else 0
-# 		meta_cum_data['effort_level_days_count'] = effort_level \
-# 			+ _safe_get_mobj(yday_cum_data.meta_cum,"effort_level_days_count",0)
+		effort_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"effort_level",0
+		)
+		effort_level = 1 if effort_level else 0
+		meta_cum_data['cum_effort_level_days_count'] = effort_level \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_effort_level_days_count",0)
 
-# 		vo2_max = _safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"vo2_max",0
-# 		)
-# 		vo2_max = 1 if vo2_max else 0
-# 		meta_cum_data['vo2_max_days_count'] = vo2_max \
-# 			+ _safe_get_mobj(yday_cum_data.meta_cum,"vo2_max_days_count",0)
+		vo2_max = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"vo2_max",0
+		)
+		vo2_max = 1 if vo2_max else 0
+		meta_cum_data['cum_vo2_max_days_count'] = vo2_max \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_vo2_max_days_count",0)
 	
-# 	elif today_ql_data:
-# 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"workout_duration",None
-# 		))
-# 		meta_cum_data['workout_days_count'] = 1 if workout_dur else 0
+	elif today_ql_data:
+		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"workout_duration",None
+		))
+		meta_cum_data['cum_workout_days_count'] = 1 if workout_dur else 0
 
-# 		resting_hr = _safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0
-# 		)
-# 		meta_cum_data['resting_hr_days_count'] = 1 if resting_hr else 0
+		resting_hr = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0
+		)
+		meta_cum_data['cum_resting_hr_days_count'] = 1 if resting_hr else 0
 
-# 		effort_level = _safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"effort_level",0
-# 		)
-# 		meta_cum_data['effort_level_days_count'] = 1 if effort_level else 0
+		effort_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"effort_level",0
+		)
+		meta_cum_data['cum_effort_level_days_count'] = 1 if effort_level else 0
 
-# 		vo2_max = _safe_get_mobj(
-# 			today_ql_data.exercise_reporting_ql,"vo2_max",0
-# 		)
-# 		meta_cum_data['vo2_max_days_count'] = 1 if vo2_max else 0
+		vo2_max = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"vo2_max",0
+		)
+		meta_cum_data['cum_vo2_max_days_count'] = 1 if vo2_max else 0
 
-# 	return meta_cum_data
+	return meta_cum_data
 
 def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	from_dt = _str_to_datetime(from_dt)
@@ -568,6 +598,7 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
 			data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
+			data["meta_cum"] = _get_meta_cum_sum(today_ql_data, yday_cum_data)
 
 		elif today_ql_data:
 			# Very begining when there is no quick look data yesterday
@@ -581,6 +612,7 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
 			data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data)
+			data["meta_cum"] = _get_meta_cum_sum(today_ql_data)
 		else:
 			# Insufficient data, do not create cumulative sum for current date
 			current_date += timedelta(days = 1)
@@ -606,6 +638,7 @@ def create_cum_raw_data(today_ql_data, yday_cum_data=None):
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
 		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
+		data["meta_cum"] = _get_meta_cum_sum(today_ql_data, yday_cum_data)
 
 	elif today_ql_data:
 		# get current quicklook data and create cumulative sum
@@ -618,5 +651,6 @@ def create_cum_raw_data(today_ql_data, yday_cum_data=None):
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
 		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data)
+		data["meta_cum"] = _get_meta_cum_sum(today_ql_data)
 
 	return data
