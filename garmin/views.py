@@ -139,6 +139,7 @@ class GarminConnectPing(APIView):
 		'''
 		file = request.FILES['file']
 		file2 = file.read()
+		
 		#print(file2)
 		file_name = request.data['uploadMetaData']
 		oauthToken_fitfile = json.loads(file_name)
