@@ -122,7 +122,7 @@ class GarminConnectToken(models.Model):
 
 class GarminFitFiles(models.Model):
 	user = models.ForeignKey('auth.user', on_delete=models.CASCADE, related_name="garmin_fit_files")
-	updated_at = models.DateTimeField(auto_now=True)
+	created_at = models.DateTimeField(auto_now=True)
 	fit_file = models.BinaryField(blank=True)
 	meta_data_fitfile = models.TextField()
 	# _data = models.TextField(
