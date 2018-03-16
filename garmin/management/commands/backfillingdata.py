@@ -44,8 +44,8 @@ class Command(BaseCommand):
 
 	def _is_valid(self,session,from_date=None,to_date=None):
 		# if to_date and from_date:
-			print(to_date)
-			print(from_date)
+			# print(to_date)
+			# print(from_date)
 			uploadStartTimeInSeconds = int(datetime.datetime.strptime(from_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			uploadEndTimeInSeconds = int(datetime.datetime.strptime(to_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			data = {
