@@ -177,7 +177,7 @@ def get_blank_model_fields(model):
 			'distance_other':0,
 			'pace': '',
 			'avg_heartrate':json.dumps({}),
-			'activity_type' : json.dumps({}),
+			'activities_duration':json.dumps({}),
 			'avg_exercise_heartrate':0,
 			'elevation_gain':0,
 			'elevation_loss':0,
@@ -702,7 +702,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 			activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
 
 		activity_stats['activities_duration'] = activities_duration
-		print(activity_stats)
+		#print(activity_stats)
 			
 	return activity_stats
 
