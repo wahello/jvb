@@ -51,14 +51,7 @@ getDayWithDate(date){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){  
        			if(key !== 'id' && key !== 'user_ql' ){
-
-              if((key == 'alcohol_day' || key == 'alcohol_week') && (value == ''  && value != '0')) {
-              
-                value ='Not Reported';
-                 all_data.push(value);
-            }else{
               all_data.push(value);
-           }
           }    
               
 			}

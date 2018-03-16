@@ -15,6 +15,8 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 	 this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 	 this.getDayWithDate = this.getDayWithDate.bind(this);
+	 this.getStylesForUserinputSleep = this.getStylesForUserinputSleep.bind(this);
+	 this.strToSecond = this.strToSecond.bind(this);
 	 this.state = {
       myTableData: [
           {name: 'Sleep Per User Input (excluding awake time) (hh:mm)'},
@@ -41,6 +43,29 @@ getStylesGpaBeforePanalities(score){
         return {background:'red',color:'black'};
       
     }
+    strToSecond(value){
+    	let time = value.split(':');
+    	let hours = parseInt(time[0])*3600;
+    	let min = parseInt(time[1])*60;
+    	let s_time = hours + min;
+    	return s_time;
+}
+	getStylesForUserinputSleep(value){
+		value = this.strToSecond(value);
+		if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00"))
+			return {background:'red',color:'black'};
+		else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00"))
+			return {background:'green',color:'black'};
+    	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
+    	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30")))
+    		return {background:'green',color:'black'};
+    	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("7:29"))
+    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00")))
+    		return {background:'yellow',color:'black'};
+    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
+    	 || (this.strToSecond("11:30")<=value && value<= this.strToSecond("12:00")))
+    		return {background:'yellow',color:'black'};	
+    }
    getDayWithDate(date){
    let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -64,6 +89,24 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 						all_data.push({value:time_str,
 									   style:''});						
+					}
+					else if(key == "sleep_aid"){
+						if(value == "yes"){
+							all_data.push({value:"Yes",
+									   style:''});	
+						}
+						else if(value == "no"){
+							all_data.push({value:"No",
+									   style:''});	
+						}
+						else{
+						 all_data.push({value:value,
+										style:''});
+						}
+					}
+					else if(key == "sleep_per_user_input"){
+							all_data.push({value:value,
+										   style:this.getStylesForUserinputSleep(value)});
 					}
 					else if(key == 'resting_heart_rate'){
 						all_data.push({value:value,

@@ -23,7 +23,7 @@ def request_token_fitbit(request):
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -51,17 +51,17 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
 		
 		a = r.json()
-		print(print(a))
+		#print(print(a))
 
 		try:
 			token = FitbitConnectToken.objects.get(user = request.user)
-			print(token)
+			#print(token)
 			if token:
 				setattr(token, "refresh_token", a['refresh_token'])
 				setattr(token, "access_token", a['access_token'])
@@ -80,9 +80,9 @@ def fetching_data_fitbit(request):
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
 	tokens = FitbitConnectToken.objects.get(user = request.user)
-	print(tokens)
+	#print(tokens)
 	access_token = tokens.access_token
-	print(access_token)
+	#print(access_token)
 	session = service.get_session(access_token)
 	#The date in the format yyyy-MM-dd
 	date_fitbit = '2018-03-12'
@@ -144,7 +144,7 @@ def fetching_data_fitbit(request):
 
 	return redirect('/')
 
-def refresf_token_fitbit(request):
+def refresh_token_fitbit(request):
 	client_id='22CN2D'
 	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
@@ -161,6 +161,6 @@ def refresf_token_fitbit(request):
 	}
 	r = requests.post(access_token_url,headers=headers,data=data)
 	a = r.json()
-	print(type(a))
+	#print(type(a))
 
 
