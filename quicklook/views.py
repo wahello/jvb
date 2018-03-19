@@ -299,14 +299,14 @@ def export_users_xls(request):
 			# sheet9.write(0, r, current_date,date_format)
 			current_date -= timedelta(days = 1)
 
-	query_params = {
-	"duration":"week,month,year",
-	"custom_ranges":"2018-03-01,2018-03-12,",
-	"summary":"overall_health,alcohol",
-	}
-	DATA = ProgressReport(request.user, query_params).get_progress_report()
+	# query_params = {
+	# "duration":"week,month,year",
+	# "custom_ranges":"2018-03-01,2018-03-12,",
+	# "summary":"overall_health,alcohol",
+	# }
+	# DATA = ProgressReport(request.user, query_params).get_progress_report()
 
-	print(DATA)
+	# print(DATA)
 
 	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
 	format_red_con = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0','font_color': 'white'})

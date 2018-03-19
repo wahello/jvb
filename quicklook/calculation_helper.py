@@ -177,6 +177,7 @@ def get_blank_model_fields(model):
 			'distance_other':0,
 			'pace': '',
 			'avg_heartrate':json.dumps({}),
+			'activities_duration':json.dumps({}),
 			'avg_exercise_heartrate':0,
 			'elevation_gain':0,
 			'elevation_loss':0,
@@ -619,14 +620,15 @@ def get_activity_stats(activities_json,manually_updated_json):
 		"total_duration":0,
 		"pace":'',
 		"avg_heartrate":json.dumps({}),
+		"activities_duration":json.dumps({}),
 		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
 		"latitude":None,
 		"longitude":None
 	}
 	
 	activities_hr = {}
+	activities_duration = {}
 
-	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
 	max_duration = 0
 
@@ -639,6 +641,8 @@ def get_activity_stats(activities_json,manually_updated_json):
 				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
 
+			activities_duration[obj['activityType']] = obj['durationInSeconds']
+			
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = {}
 				activities_hr[obj_act]['hr'] = 0
@@ -656,6 +660,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 					activity_stats['latitude'] = obj.get('startingLatitudeInDegree',None)
 					activity_stats['longitude'] = obj.get('startingLongitudeInDegree',None)
 					max_duration = obj.get('durationInSeconds',0)
+					
 
 			if not activity_stats['hr90_duration_15min']:
 				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
@@ -696,6 +701,9 @@ def get_activity_stats(activities_json,manually_updated_json):
 		if runs_count:
 			activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
 
+		activity_stats['activities_duration'] = json.dumps(activities_duration)
+		#print(activity_stats)
+			
 	return activity_stats
 
 def _get_avg_hr_points_range(age,workout_easy_hard):
@@ -746,7 +754,7 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
 	today_bedtime = sleeps_today_stats['sleep_bed_time']
-
+ 
 	# If user slept after midnight and again went to bed after next midnight
 	# In that case we have same yesterday_bedtime and today_bedtime 
 	if today_bedtime and today_bedtime <= today_awake_time:
@@ -1556,6 +1564,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['pace'] = activity_stats['pace']
 		exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 		exercise_calculated_data['workout_duration'] = sec_to_hours_min_sec(activity_stats['total_duration'])
+		exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
 
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(todays_activities_json,
@@ -1577,7 +1586,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 			'restingHeartRateInBeatsPerMinute',0)
 		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
 			daily_encouraged,"lowest_hr_during_hrr",0)
+		
 		# exercise_calculated_data['highest_hr_first_minute'] = f
+		
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
 		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
 											'averageRunCadenceInStepsPerMinute')
