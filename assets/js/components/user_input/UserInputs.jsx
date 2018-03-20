@@ -142,7 +142,7 @@ class UserInputs extends React.Component{
         controlled_uncontrolled_substance:'',
         stand:'',
         food_consumed:'',
-        weight:'i do not weigh myself today',
+        weight:'',
         waist:'',
         clothes_size:'',
         heart_variability:'',
@@ -238,6 +238,7 @@ class UserInputs extends React.Component{
       this.onFetchRecentSuccess = this.onFetchRecentSuccess.bind(this);
       this.onFetchGarminSuccessSleep = this.onFetchGarminSuccessSleep.bind(this);
       this.onFetchGarminSuccessWorkout = this.onFetchGarminSuccessWorkout.bind(this);
+      this.onFetchGarminSuccessWeight = this.onFetchGarminSuccessWeight.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
@@ -468,11 +469,14 @@ class UserInputs extends React.Component{
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
-              this.state.workout == 'no' || this.state.workout == 'not yet'){
+              this.state.workout == 'no' || this.state.workout == 'not yet' || !this.state.weight){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             else if(this.state.workout == 'no' || this.state.workout == 'not yet')
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
+            else if(!this.state.weight)
+              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
+            
           } 
           window.scrollTo(0,0);
         });
@@ -560,7 +564,8 @@ class UserInputs extends React.Component{
           awake_mins:sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'',
           sleep_hours_last_night:hours,
           sleep_mins_last_night:mins,
-          workout:have_activities?'yes':workout_status
+          workout:have_activities?'yes':workout_status,
+          weight: have_activities?weight_status:"i do not weigh myself today"
       });
      }
     }
@@ -572,6 +577,15 @@ class UserInputs extends React.Component{
       workout: have_activities?'yes':workout_status
     });
   }
+
+  onFetchGarminSuccessWeight(data){
+    let weight_status = this.state.weight;
+    let have_activities = data.data.have_activities;
+    this.setState({
+      weight: have_activities?weight_status:"i do not weigh myself today"
+    });
+  }
+  
 
 getDTMomentObj(dt,hour,min,am_pm){
   hour = hour ? parseInt(hour) : 0;
