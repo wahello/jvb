@@ -523,6 +523,18 @@ class ProgressReport():
 						current_data.cum_total_sleep_in_hours,alias)
 					return self._hours_to_hours_min(val)
 
+				if key == 'deep_sleep_in_hours_min':
+					val = self._get_average(
+						todays_data.cum_deep_sleep_in_hours,
+						current_data.cum_deep_sleep_in_hours,alias)
+					return self._hours_to_hours_min(val)
+
+				if key == 'awake_duration_in_hours_min':
+					val = self._get_average(
+						todays_data.cum_awake_duration_in_hours,
+						current_data.cum_awake_duration_in_hours,alias)
+					return self._hours_to_hours_min(val)
+
 				elif key == 'overall_sleep_gpa':
 					val = self._get_average(
 						todays_data.cum_overall_sleep_gpa,
@@ -560,6 +572,8 @@ class ProgressReport():
 
 		calculated_data = {
 			'total_sleep_in_hours_min':{d:None for d in self.duration_type},
+			'deep_sleep_in_hours_min':{d:None for d in self.duration_type},
+			'awake_duration_in_hours_min':{d:None for d in self.duration_type},
 			'rank':{d:None for d in self.duration_type},
 			'average_sleep_grade':{d:None for d in self.duration_type},
 			'num_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
@@ -923,7 +937,9 @@ class ProgressReport():
 				if dur == 'today' or dur == 'yesterday':
 					duration_dt[dur] = duration[dur].strftime("%Y-%m-%d")
 				else:
-					duration_dt[dur] = (duration[dur] + timedelta(days=1)).strftime("%Y-%m-%d")
+					dt_str = (duration[dur] + timedelta(days=1)).strftime("%Y-%m-%d") +\
+					" to " + duration['yesterday'].strftime("%Y-%m-%d")
+					duration_dt[dur] = dt_str
 			DATA['duration_date'] = duration_dt
 			DATA['report_date'] = self.current_date.strftime("%Y-%m-%d")
 
