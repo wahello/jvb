@@ -309,14 +309,15 @@ def export_users_xls(request):
 			# sheet9.write(0, r, current_date,date_format)
 			current_date -= timedelta(days = 1)
 
-	query_params = {
-	"duration":"week,month,year",
-	"custom_ranges":"2018-03-01,2018-03-12,",
-	"summary":"overall_health,alcohol",
-	}
-	DATA = ProgressReport(request.user, query_params).get_progress_report()
+	# query_params = {
+	# "duration":"week,month,year",
+	# "custom_ranges":"2018-03-01,2018-03-12,",
+	# "summary":"overall_health,alcohol",
+	# }
+	# DATA = ProgressReport(request.user, query_params).get_progress_report()
 
-	#print(DATA)
+	# print(DATA)
+
 
 	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
 	format_red_con = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0','font_color': 'white'})
@@ -335,7 +336,7 @@ def export_users_xls(request):
 	format_green_overall = book.add_format({'align':'left', 'bg_color': 'green','num_format': '0.00','font_color': 'white'})
 	format_yellow_overall= book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '0.00'})
 
-	format_points= book.add_format({'align':'left','num_format': '0.000'})
+	format_points= book.add_format({'align':'left','num_format': '0.00'})
 
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',

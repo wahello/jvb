@@ -1406,7 +1406,7 @@ handleChange(event){
          <thead>
              
                 <tr>
-                  <th>Sleep Per Night(excluding awake time)</th>
+                  <th>Sleep Per Night (excluding awake time)</th>
                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
@@ -1436,7 +1436,7 @@ handleChange(event){
                 <td>{this.state.summary.sleep.rank.year}</td>
             </tr>
             <tr>
-                <td>Average Sleep Grage</td>
+                <td>Average Sleep Grade</td>
                 {this.renderCustomRangeTD(this.state.summary.sleep.average_sleep_grade.custom_range)}
                 <td>{this.state.summary.sleep.average_sleep_grade.today}</td>
                 <td>{this.state.summary.sleep.average_sleep_grade.yesterday}</td>

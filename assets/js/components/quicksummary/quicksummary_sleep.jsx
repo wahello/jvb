@@ -55,10 +55,10 @@ getStylesGpaBeforePanalities(score){
 		if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00"))
 			return {background:'red',color:'black'};
 		else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00"))
-			return {background:'green',color:'black'};
+			return {background:'green',color:'white'};
     	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
     	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30")))
-    		return {background:'green',color:'black'};
+    		return {background:'green',color:'white'};
     	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("7:29"))
     	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00")))
     		return {background:'yellow',color:'black'};
@@ -105,10 +105,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 						}
 					}
 					else if(key == "sleep_per_user_input"){
-						if(value != " " && value != "-" && value != undefined){
 							all_data.push({value:value,
 										   style:this.getStylesForUserinputSleep(value)});
-						}
 					}
 					else if(key == 'resting_heart_rate'){
 						all_data.push({value:value,

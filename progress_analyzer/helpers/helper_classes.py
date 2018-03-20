@@ -26,6 +26,8 @@ class ToSleepPerNightCumulative(object):
 		self.cum_total_sleep_in_hours = raw_data["cum_total_sleep_in_hours"]
 		self.cum_overall_sleep_gpa = raw_data["cum_overall_sleep_gpa"]
 		self.cum_days_sleep_aid_taken = raw_data["cum_days_sleep_aid_taken"]
+		self.cum_deep_sleep_in_hours = raw_data["cum_deep_sleep_in_hours"]
+		self.cum_awake_duration_in_hours = raw_data["cum_awake_duration_in_hours"]
 
 class ToMovementConsistencyCumulative(object):
 	def __init__(self,raw_data):
@@ -63,6 +65,13 @@ class ToOtherStatsCumulative(object):
 		self.cum_hrr_lowest_hr_point = raw_data["cum_hrr_lowest_hr_point"]
 		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
 
+class ToMetaCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_workout_days_count = raw_data["cum_workout_days_count"]
+		self.cum_resting_hr_days_count = raw_data["cum_resting_hr_days_count"]
+		self.cum_effort_level_days_count = raw_data["cum_effort_level_days_count"]
+		self.cum_vo2_max_days_count = raw_data["cum_vo2_max_days_count"]
+
 class ToCumulativeSum(object):
 	'''
 	Convert a quicklook object to cumulative sum object
@@ -97,6 +106,9 @@ class ToCumulativeSum(object):
 		)
 		self.other_stats_cum = ToOtherStatsCumulative(
 			cum_raw_data["other_stats_cum"]
+		)
+		self.meta_cum = ToMetaCumulative(
+			cum_raw_data["meta_cum"]
 		)
 	
 class ProgressReport():
@@ -189,13 +201,15 @@ class ProgressReport():
 			return None
 
 	def _hours_to_hours_min(self,hours):
-		mins = hours * 60
-		hours,mins = divmod(mins,60)
-		hours = round(hours)
-		mins = round(mins)
-		if mins < 10:
-			mins = "{:02d}".format(mins) 
-		return "{}:{}".format(hours,mins)
+		if hours:
+			mins = hours * 60
+			hours,mins = divmod(mins,60)
+			hours = round(hours)
+			mins = round(mins)
+			if mins < 10:
+				mins = "{:02d}".format(mins) 
+			return "{}:{}".format(hours,mins)
+		return None
 
 	def _min_to_min_sec(self,mins):
 		seconds = mins * 60
@@ -306,16 +320,21 @@ class ProgressReport():
 
 			str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
 			if range_start_data and range_end_data:
+				range_start_meta_data = range_start_data.__dict__.get(to_select_related("meta_cum"))
 				range_start_data = range_start_data.__dict__.get(to_select_related(summary_type))
 				
 				tmp_summary_type = summary_type
+				tmp_meta_summary = "meta_cum"
 				if format_summary_name:
 					tmp_summary_type = to_select_related(summary_type)
+					tmp_meta_summary = to_select_related(tmp_meta_summary)
+				range_end_meta_data = range_end_data.__dict__.get(tmp_meta_summary)
 				range_end_data = range_end_data.__dict__.get(tmp_summary_type)
 				ravg = {
 					"from_dt":r[0].strftime("%Y-%m-%d"),
 					"to_dt":r[1].strftime("%Y-%m-%d"),
-					"data":custom_avg_calculator(key,str_range,range_end_data,range_start_data)
+					"data":custom_avg_calculator(key,str_range,range_end_data,range_start_data,
+						range_end_meta_data,range_start_meta_data)
 				}
 
 			else:
@@ -332,42 +351,52 @@ class ProgressReport():
 	def _generic_summary_calculator(self,calculated_data_dict,avg_calculator,summary_type):
 		todays_data = self.ql_datewise_data.get(
 				self.current_date.strftime("%Y-%m-%d"),None)
+		todays_meta_data = None
 		yesterday_data = self.cumulative_datewise_data.get(
 			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
+		yesterday_meta_data = None
 		day_before_yesterday_data = self.cumulative_datewise_data.get(
 			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+		day_before_yesterday_meta_data = None
 
 		if todays_data:
 			if yesterday_data:
+				todays_meta_data = ToCumulativeSum(todays_data,yesterday_data).__dict__.get("meta_cum")
 				todays_data = ToCumulativeSum(todays_data,yesterday_data).__dict__.get(summary_type)
 			else:
+				todays_meta_data = ToCumulativeSum(todays_data).__dict__.get(summary_type)
 				todays_data = ToCumulativeSum(todays_data).__dict__.get(summary_type)
 		if yesterday_data:
 			# Because of select related, attribute names become "_attrname_cache"
 			cached_summary_type = "_{}_cache".format(summary_type)
+			yesterday_meta_data = yesterday_data.__dict__.get("_meta_cum_cache")
 			yesterday_data = yesterday_data.__dict__.get(cached_summary_type)
 
 		if day_before_yesterday_data:
 			cached_summary_type = "_{}_cache".format(summary_type)
+			day_before_yesterday_meta_data = day_before_yesterday_data.__dict__.get("_meta_cum_cache")
 			day_before_yesterday_data = day_before_yesterday_data.__dict__.get(cached_summary_type)
 
 		for key in calculated_data_dict.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
 				if alias in self.duration_type:
 					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
+					current_meta_data = None
 					if current_data:
 						cached_summary_type = "_{}_cache".format(summary_type)
+						current_meta_data = current_data.__dict__.get("_meta_cum_cache")
 						current_data = current_data.__dict__.get(cached_summary_type)
 					if alias == 'today' and yesterday_data:
 						calculated_data_dict[key][alias] = avg_calculator(key,alias,todays_data,
-							yesterday_data)
+							yesterday_data,todays_meta_data,yesterday_meta_data)
 						continue
 					elif alias == 'yesterday' and day_before_yesterday_data:
 						calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,
-							day_before_yesterday_data)
+							day_before_yesterday_data,yesterday_meta_data,day_before_yesterday_meta_data)
 						continue
 					# Avg excluding today, that's why subtract from yesterday's cum sum
-					calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,current_data)
+					calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,
+						current_data,yesterday_meta_data,current_meta_data)
 
 	def _get_summary_calculator_binding(self):
 		SUMMARY_CALCULATOR_BINDING = {
@@ -386,7 +415,8 @@ class ProgressReport():
 
 	def _cal_overall_health_summary(self,custom_daterange = False):
 
-		def _calculate(key,alias,todays_data,current_data):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='total_gpa_point':
 					val = self._get_average(
@@ -432,7 +462,8 @@ class ProgressReport():
 
 	def _cal_non_exercise_summary(self,custom_daterange = False):
 
-		def _calculate(key, alias,todays_data,current_data):
+		def _calculate(key, alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='non_exercise_steps':
 					val =  self._get_average(
@@ -483,12 +514,25 @@ class ProgressReport():
 
 	def _cal_sleep_summary(self,custom_daterange = False):
 
-		def _calculate(key,alias,todays_data,current_data):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key == 'total_sleep_in_hours_min':
 					val = self._get_average(
 						todays_data.cum_total_sleep_in_hours,
 						current_data.cum_total_sleep_in_hours,alias)
+					return self._hours_to_hours_min(val)
+
+				if key == 'deep_sleep_in_hours_min':
+					val = self._get_average(
+						todays_data.cum_deep_sleep_in_hours,
+						current_data.cum_deep_sleep_in_hours,alias)
+					return self._hours_to_hours_min(val)
+
+				if key == 'awake_duration_in_hours_min':
+					val = self._get_average(
+						todays_data.cum_awake_duration_in_hours,
+						current_data.cum_awake_duration_in_hours,alias)
 					return self._hours_to_hours_min(val)
 
 				elif key == 'overall_sleep_gpa':
@@ -528,6 +572,8 @@ class ProgressReport():
 
 		calculated_data = {
 			'total_sleep_in_hours_min':{d:None for d in self.duration_type},
+			'deep_sleep_in_hours_min':{d:None for d in self.duration_type},
+			'awake_duration_in_hours_min':{d:None for d in self.duration_type},
 			'rank':{d:None for d in self.duration_type},
 			'average_sleep_grade':{d:None for d in self.duration_type},
 			'num_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
@@ -549,7 +595,8 @@ class ProgressReport():
 
 	def _cal_movement_consistency_summary(self,custom_daterange = False):
 
-		def _calculate(key,alias,todays_data,current_data):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='movement_consistency_score':
 					val = self._get_average(
@@ -592,7 +639,8 @@ class ProgressReport():
 
 	def _cal_exercise_consistency_summary(self,custom_daterange = False):
 
-		def _calculate(key,alias,todays_data,current_data):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='avg_no_of_days_exercises_per_week':
 					val = self._get_average(
@@ -635,7 +683,8 @@ class ProgressReport():
 
 	def _cal_nutrition_summary(self, custom_daterange = False):
 		
-		def _calculate(key,alias,todays_data,current_data):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='prcnt_unprocessed_volume_of_food':
 					val = self._get_average(
@@ -677,22 +726,49 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_exercise_summary(self, custom_daterange = False):
+		def _cal_workout_dur_average(stat1, stat2,workout_days):
+			if not stat1 == None and not stat2 == None and workout_days:
+				avg = (stat1 - stat2)/workout_days
+				return avg
+			return 0
 
-		def _calculate(key,alias,todays_data,current_data):
+		def _cal_effort_lvl_average(stat1, stat2, effort_lvl_days):
+			if not stat1 == None and not stat2 == None and effort_lvl_days:
+				avg = (stat1 - stat2)/effort_lvl_days
+				return avg
+			return 0
+
+		def _cal_vo2max_average(stat1, stat2, vo2max_days):
+			if not stat1 == None and not stat2 == None and vo2max_days:
+				avg = (stat1 - stat2)/vo2max_days
+				return avg
+			return 0
+
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='workout_duration_hours_min':
-					avg_hours = self._get_average(
-						todays_data.cum_workout_duration_in_hours,
-						current_data.cum_workout_duration_in_hours,alias
-					)
-					return self._hours_to_hours_min(avg_hours)
+					if todays_meta_data and current_meta_data:
+						workout_days = (todays_meta_data.cum_workout_days_count - 
+							current_meta_data.cum_workout_days_count)
+						avg_hours = _cal_workout_dur_average(
+							todays_data.cum_workout_duration_in_hours,
+							current_data.cum_workout_duration_in_hours,
+							workout_days
+						)
+						return self._hours_to_hours_min(avg_hours)
+					return None
 
 				elif key == 'workout_effort_level':
-					val = self._get_average(
-						todays_data.cum_workout_effort_level,
-						current_data.cum_workout_effort_level,alias
-					)
-					return round(val,2)
+					if todays_meta_data and current_meta_data:
+						effort_lvl_days = (todays_meta_data.cum_effort_level_days_count - 
+							current_meta_data.cum_effort_level_days_count)
+						val = _cal_effort_lvl_average(
+							todays_data.cum_workout_effort_level,
+							current_data.cum_workout_effort_level,
+							effort_lvl_days
+						)
+						return round(val,2)
 
 				elif key == 'avg_exercise_heart_rate':
 					val = self._get_average(
@@ -702,12 +778,16 @@ class ProgressReport():
 					return round(val)
 
 				elif key == 'vo2_max':
-					val = self._get_average(
-						todays_data.cum_vo2_max,
-						current_data.cum_vo2_max,alias
-					)
-					return round(val)
-
+					if todays_meta_data and current_meta_data:
+						vo2max_days = (todays_meta_data.cum_vo2_max_days_count - 
+							current_meta_data.cum_vo2_max_days_count)
+						val = _cal_vo2max_average(
+							todays_data.cum_vo2_max,
+							current_data.cum_vo2_max,
+							vo2max_days
+						)
+						return round(val)
+					return None
 			return None
 
 		calculated_data = {
@@ -731,7 +811,8 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_alcohol_summary(self, custom_daterange = False):
-		def _calculate(key,alias,todays_data,current_data):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='avg_drink_per_week':
 					val = self._get_average(
@@ -774,13 +855,26 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_other_summary(self, custom_daterange = False):
-		def _calculate(key,alias,todays_data,current_data):
+
+		def _cal_resting_hr_average(stat1, stat2,resting_hr_days):
+			if not stat1 == None and not stat2 == None and resting_hr_days:
+				avg = (stat1 - stat2)/resting_hr_days
+				return avg
+			return 0
+
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='resting_hr':
-					val = self._get_average(
-						todays_data.cum_resting_hr,
-						current_data.cum_resting_hr,alias)
-					return round(val)
+					if todays_meta_data and current_meta_data:
+						resting_hr_days = (todays_meta_data.cum_resting_hr_days_count - 
+							current_meta_data.cum_resting_hr_days_count)
+						val = _cal_resting_hr_average(
+							todays_data.cum_resting_hr,
+							current_data.cum_resting_hr,
+							resting_hr_days)
+						return round(val)
+					return None
 
 				elif key == 'hrr_time_to_99':
 					val = self._min_to_min_sec(self._get_average(
@@ -843,7 +937,9 @@ class ProgressReport():
 				if dur == 'today' or dur == 'yesterday':
 					duration_dt[dur] = duration[dur].strftime("%Y-%m-%d")
 				else:
-					duration_dt[dur] = (duration[dur] + timedelta(days=1)).strftime("%Y-%m-%d")
+					dt_str = (duration[dur] + timedelta(days=1)).strftime("%Y-%m-%d") +\
+					" to " + duration['yesterday'].strftime("%Y-%m-%d")
+					duration_dt[dur] = dt_str
 			DATA['duration_date'] = duration_dt
 			DATA['report_date'] = self.current_date.strftime("%Y-%m-%d")
 

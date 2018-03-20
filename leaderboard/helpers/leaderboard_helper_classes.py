@@ -100,10 +100,6 @@ class LeaderboardOverview(object):
 		if not self.current_date:
 			self.duration_type = []
 
-		self.categories.pop('awake_time')
-		self.categories.pop('deep_sleep')
-
-
 		categories = query_params.get('category',None)
 		if categories:
 			categories = [item.strip() for item in categories.strip().split(',')]
@@ -145,6 +141,56 @@ class LeaderboardOverview(object):
 		'''
 		a = iter(iterable)
 		return zip_longest(*[a]*n, fillvalue=fillvalue)
+
+	def _get_lst(self,lst,i,default = None):
+		""" get method for list similar to dictionary's get method """
+		try:
+			return lst[i];
+		except IndexError:
+			return default
+		except TypeError:
+			return default
+
+	def _str_to_hours_min_sec(self,str_duration,time_format='hour',time_pattern="hh:mm:ss"):
+		'''
+			Expect duration in this format - "hh:mm:ss"
+			convert in into hours, min or sec
+			
+			Arguments
+			- str_duration : type String, time in format 'hh:mm:ss'
+
+			- time_format: type String, possible values are [hour, minute, seconds]
+			  specified in what format time to be converted
+			  
+			- time_pattern: type String, possible values are substring of "hh:mm:ss"
+			  specify the position of hour, minute and second in the str_duration
+
+		'''
+		if str_duration:
+			hms = str_duration.split(":")
+			pattern_lst = time_pattern.split(":")
+			pattern_indexed = {
+				"hour":pattern_lst.index("hh") if "hh" in pattern_lst else None,
+				"minute":pattern_lst.index("mm") if "mm" in pattern_lst else None,
+				"second":pattern_lst.index("ss") if "ss" in pattern_lst else None
+			}
+
+			h = int(self._get_lst(hms,pattern_indexed["hour"],0))\
+				if self._get_lst(hms,pattern_indexed["hour"],0) else 0
+			m = int(self._get_lst(hms,pattern_indexed["minute"],0))\
+				if self._get_lst(hms,pattern_indexed["minute"],0) else 0
+			s = int(self._get_lst(hms,pattern_indexed["second"],0))\
+				if self._get_lst(hms,pattern_indexed["second"],0) else 0
+
+			t = 0
+			if time_format == 'hour':
+				t = h + (m/60) + (s/3600)
+			elif time_format == 'minute':
+				t = (h*60) + m + (s/60)
+			else:
+				t = (h * 3600) + (m * 60) + s
+			return round(t,3)
+		return 0
 
 	def _get_custom_range_info(self,query_params):
 		custom_ranges = query_params.get('custom_ranges',None)
@@ -209,10 +255,14 @@ class LeaderboardOverview(object):
 						score = data['other']['resting_hr'][dtype]
 						score = score if score else 0
 						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
-					# if catg == 'deep_sleep':
-					# 	pass
-					# if catg == 'awake_time':
-					# 	pass
+					if catg == 'deep_sleep':
+						score = data['sleep']['deep_sleep_in_hours_min'][dtype]
+						score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
+						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+					if catg == 'awake_time':
+						score = data['sleep']['awake_duration_in_hours_min'][dtype]
+						score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
+						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
 
 				if self.custom_ranges:
 					if not category_wise_data[catg].get('custom_range',None):
@@ -263,10 +313,14 @@ class LeaderboardOverview(object):
 							score = data['other']['resting_hr']['custom_range'][str_range]['data']
 							score = score if score else 0
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
-						# if catg == 'deep_sleep':
-						# 	pass
-						# if catg == 'awake_time':
-						# 	pass
+						if catg == 'deep_sleep':
+							score = data['sleep']['deep_sleep_in_hours_min']['custom_range'][str_range]['data']
+							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+						if catg == 'awake_time':
+							score = data['sleep']['awake_duration_in_hours_min']['custom_range'][str_range]['data']
+							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
 		# import pprint 
 		# pprint.pprint(category_wise_data)
 		return category_wise_data
