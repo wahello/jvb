@@ -141,11 +141,11 @@ class GarminConnectPing(APIView):
 		'''
 		file = request.FILES['file']
 		file2 = file.read()
-		file.seek(0)
-		file_handle = io.BytesIO(file.read())
-		print(file_handle.read())
-		print(type(file_handle))
-		print(type(str(file_handle)))
+		# file.seek(0)
+		# file_handle = io.BytesIO(file.read())
+		# print(file_handle.read())
+		# print(type(file_handle))
+		# print(type(str(file_handle)))
 		#print(file2)
 		file_name = request.data['uploadMetaData']
 		oauthToken_fitfile = json.loads(file_name)
@@ -163,7 +163,7 @@ class GarminConnectPing(APIView):
 		except User.DoesNotExist:
 			user = None
 		if user:
-			GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
+			GarminFitFiles.objects.create(user=user,fit_file=file,meta_data_fitfile=oauthToken_fitfile)
 		mail = EmailMessage()
 		mail.subject = "Garmin connect Push | Files"
 		mail.body = request.data['uploadMetaData']
