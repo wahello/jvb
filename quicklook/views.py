@@ -225,6 +225,12 @@ def export_users_xls(request):
 	to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
 
+	to_date2 = request.GET.get('to_date',None)
+	from_date2 = request.GET.get('from_date', None)
+
+	to_date_A = datetime.strptime(to_date1, "%m-%d-%Y").date()
+	from_date_A = datetime.strptime(from_date1, "%m-%d-%Y").date()
+
 	x= to_date.strftime('%m-%d-%y')
 	# print(type(x))
 	y= x.split("-")
@@ -310,7 +316,7 @@ def export_users_xls(request):
 	}
 	DATA = ProgressReport(request.user, query_params).get_progress_report()
 
-	print(DATA)
+	#print(DATA)
 
 	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
 	format_red_con = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0','font_color': 'white'})
@@ -2377,9 +2383,11 @@ def export_users_xls(request):
 	sheet10.set_column('B:B',35)
 	sheet10.set_column('L:L',45)
 	sheet10.set_column('K:K',1)
-	sheet10.set_column('C:I',10)
-	sheet10.set_column('M:T',10)
-	sheet10.set_row(0,40)
+	sheet10.set_column('C:E',13)
+	sheet10.set_column('F:I',10)
+	sheet10.set_column('M:O',13)
+	sheet10.set_column('P:T',10)
+	sheet10.set_row(0,45)
 	
 	sheet10.set_landscape()
 
@@ -2427,31 +2435,50 @@ def export_users_xls(request):
 	date_format1 = book.add_format({'num_format': 'mm-dd-yyyy','bold':True})
 	today= date.today()
 	yesterday=date.today()-timedelta(days=1)
-	custom_range_len= ['from date','to date','data']
+	week = date.today()-timedelta(days = 7)
+	custom_range1='{} to {}'.format(from_date,to_date)
+	custom_range2='{} to {}'.format(from_date,to_date)
+	custom_range3='{} to {}'.format(from_date,to_date)
+
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
+	format_align = book.add_format({'align':'left'})
+	ranges =[custom_range1,custom_range2,custom_range3]
+	c = 1
+	for i in range(len(ranges)):
+		c = c+1
+		sheet10.write(0,c,ranges[i],format)
+		sheet10.write(0,c+10,ranges[i],format)
+	'''custom_range_len= ['from date','to date','data']
 	c = 1
 	for i in range(len(custom_range_len)):
 		c = c+1
 		sheet10.write(0,c,custom_range_len[i],bold)
-		sheet10.write(0,c+10,custom_range_len[i],bold)
+		sheet10.write(0,c+10,custom_range_len[i],bold)'''
+	sheet10.write(0,2,custom_range1,format)
+	datem = datetime(today.year, today.month, 1)
+	print(datem)
 
 	
-	#sheet10.write(0,5,today,date_format1)
+	sheet10.write(0,5,'{}\n{}'.format('Today',today),bold)
+	sheet10.write(0,6,'{}\n{}'.format('Yesterday',yesterday),bold)
+	sheet10.write(0,7,'{}\n{}'.format('Avg Last 7 days',week),format)
+	sheet10.write(0,15,'{}\n{}'.format('Today',today),bold)
+	sheet10.write(0,16,'{}\n{}'.format('Yesterday',yesterday),bold)
+	sheet10.write(0,17,'{}\n{}'.format('Avg Last 7 days',week),format)
 	#sheet10.write(0,6,yesterday,date_format1)
 	#sheet10.write(0,15,today,date_format1)
 	#sheet10.write(0,16,yesterday,date_format1)
-	format = book.add_format({'bold': True})
-	format.set_text_wrap()
-	format_align = book.add_format({'align':'left'})
-
+	
 	#print(from_date)
 	#sheet10.write(0,2,custom_range,format)
 	
-	duration=['Today','yesterday','Avg Last 7 days','Avg Last 30 days','Avg Year to Date']
+	'''duration=['Today','yesterday','Avg Last 7 days','Avg Last 30 days','Avg Year to Date']
 	c=4
 	for i in range(len(duration)):
 		c=c+1
 		sheet10.write(0,c,duration[i],format)
-		sheet10.write(0,c+10,duration[i],format)
+		sheet10.write(0,c+10,duration[i],format)'''
 
 	# Row headers
 	columns1=['Total GPA Points','Rank against other users','Overall Health GPA grade','overall_health_gpa']
@@ -2524,14 +2551,17 @@ def export_users_xls(request):
 	#print(custom_range)
 	#print(from_date,to_date)
 	#print(date1)
-
-	custom_range='{},{}'.format(from_date,to_date)
+	custom_range = '{},{}'.format(from_date,to_date)
+	custom_range_A='{},{}'.format(from_date_A,to_date_A)
+	cust_range = '{},{}'.format(custom_range,custom_range_A)
 	date1='{}'.format(today)
+	print(custom_range_A)
+
 	
 	query_params = {
 	"date":date1,
 	"duration":"today,yesterday,week,month,year",
-	"custom_ranges":custom_range,
+	"custom_ranges":'2018-02-22,2018-02-28,2018-02-23,2018-02-15,2018-02-25,2018-02-17',
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
@@ -2597,7 +2627,8 @@ def export_users_xls(request):
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 
 	range1='{} to {}'.format(from_date,to_date)
-	keys = ['from_dt','to_dt','data']
+	#keys = ['from_dt','to_dt','data']
+	keys=['data']
 
 	c=1
 	for i in range(len(keys)):
@@ -2605,8 +2636,8 @@ def export_users_xls(request):
 		r=2
 		for n in range(len(nutri)):
 			r= r+1
-			sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range'][range1][keys[i]],format_align)
-		r=2
+			sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range']['2018-02-25 to 2018-02-17'][keys[i]],format_align)
+		'''r=2
 		for n in range(len(non_exe)):
 			r= r+1	
 			sheet10.write(r,c+10,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][range1][keys[i]],format_align)
@@ -2642,7 +2673,7 @@ def export_users_xls(request):
 		for n in range(len(other1)):
 			r= r+1
 			sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][range1][keys[i]],format_align)
-		
+		'''
 		# color formatting based on grades
 		green = book.add_format({'align':'left', 'bg_color': 'green'})
 		yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})

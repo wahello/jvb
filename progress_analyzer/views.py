@@ -41,19 +41,16 @@ def progress_excel_export(request):
 	book = Workbook(response,{'in_memory': True})
 	sheet10 = book.add_worksheet('Progress Analyzer')
 
-
-
-
-
-
 	sheet10.freeze_panes(1,1)
 	sheet10.set_column('A:A',1)
 	sheet10.set_column('B:B',35)
 	sheet10.set_column('L:L',45)
 	sheet10.set_column('K:K',1)
-	sheet10.set_column('C:I',10)
-	sheet10.set_column('M:T',10)
-	sheet10.set_row(0,40)
+	sheet10.set_column('C:E',13)
+	sheet10.set_column('F:I',10)
+	sheet10.set_column('M:O',13)
+	sheet10.set_column('P:T',10)
+	sheet10.set_row(0,45)
 	
 	sheet10.set_landscape()
 
@@ -72,8 +69,6 @@ def progress_excel_export(request):
 	sheet10.write(23,11,'Alcohol',bold)
 
 	#table borders
-
-	
 	border_format=book.add_format({
                             'border':1,
                             'align':'left',
@@ -104,22 +99,33 @@ def progress_excel_export(request):
 	date_format1 = book.add_format({'num_format': 'mm-dd-yyyy','bold':True})
 	today= date.today()
 	yesterday=date.today()-timedelta(days=1)
-	custom_range_len= ['from date','to date','data']
+	custom_range1='{} to {}'.format(from_date,to_date)
+	custom_range2='{} to {}'.format(from_date,to_date)
+	custom_range3='{} to {}'.format(from_date,to_date)
+
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
+	format_align = book.add_format({'align':'left'})
+	ranges =[custom_range1,custom_range2,custom_range3]
+	c = 1
+	for i in range(len(ranges)):
+		c = c+1
+		sheet10.write(0,c,ranges[i],format)
+		sheet10.write(0,c+10,ranges[i],format)
+	'''custom_range_len= ['from date','to date','data']
 	c = 1
 	for i in range(len(custom_range_len)):
 		c = c+1
 		sheet10.write(0,c,custom_range_len[i],bold)
-		sheet10.write(0,c+10,custom_range_len[i],bold)
+		sheet10.write(0,c+10,custom_range_len[i],bold)'''
+	#sheet10.write(0,2,custom_range1,format)
 
 	
-	#sheet10.write(0,5,today,date_format1)
+	sheet10.write(0,5,'{} + {}'.format('today',today))
 	#sheet10.write(0,6,yesterday,date_format1)
 	#sheet10.write(0,15,today,date_format1)
 	#sheet10.write(0,16,yesterday,date_format1)
-	format = book.add_format({'bold': True})
-	format.set_text_wrap()
-	format_align = book.add_format({'align':'left'})
-
+	
 	#print(from_date)
 	#sheet10.write(0,2,custom_range,format)
 	
@@ -203,12 +209,18 @@ def progress_excel_export(request):
 	#print(date1)
 
 	custom_range='{},{}'.format(from_date,to_date)
+	cr1 = '{},{}'.format('2018-02-22','2018-02-28')
+	cr2 = '{},{}'.format('2018-02-23','2018-02-15')
+	cr3 = '{},{}'.format('2018-02-25','2018-02-17')
+	cust_range = '{},{},{}'.format(cr1,cr2,cr3)
+
+
 	date1='{}'.format(today)
 	
 	query_params = {
 	"date":date1,
 	"duration":"today,yesterday,week,month,year",
-	"custom_ranges":custom_range,
+	"custom_ranges":cust_range,
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
@@ -274,9 +286,10 @@ def progress_excel_export(request):
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 
 	range1='{} to {}'.format(from_date,to_date)
-	keys = ['from_dt','to_dt','data']
+	#keys = ['from_dt','to_dt','data']
+	keys=['data']
 
-	c=1
+	'''c=1
 	for i in range(len(keys)):
 		c = c + 1
 		r=2
@@ -350,7 +363,11 @@ def progress_excel_export(request):
 												'criteria':'==', 
 												'value': '"F"', 
 												'format': red},
-												)
-
+												)'''
+												
+	
 	book.close()
 	return response
+
+
+

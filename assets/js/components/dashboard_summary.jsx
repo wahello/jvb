@@ -459,6 +459,7 @@ if(value != undefined){
           return x1 + x2;
      }
 }
+
 renderCustomRangeTD(custom_data, toReturn="data"){
     let td=[];
     if(!custom_data){
@@ -572,12 +573,14 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
         if(this.state.cr2_start_date && this.state.cr2_end_date){
             custom_ranges.push(this.state.cr2_start_date);
             custom_ranges.push(this.state.cr2_end_date);
+
         }
          if(this.state.cr3_start_date && this.state.cr3_end_date){
             custom_ranges.push(this.state.cr3_start_date);
             custom_ranges.push(this.state.cr3_end_date);
         }
         custom_ranges.push(this.state.cr1_start_date);
+
         custom_ranges.push(this.state.cr1_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
     });
@@ -734,7 +737,9 @@ handleChange(event){
                 />
       </span>               
             <span className="pdf_button" id="pdf_button">
-            <Button className="btn createbutton mb5" onClick={this.printDocument}>Create PDF</Button>
+            <a href={`/progress/print/progress/excel?from_date=${moment(this.state.cr1_start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.cr1_end_date).format('MM-DD-YYYY')}`}>
+            <Button className="btn createbutton mb5">Create PDF</Button>
+            </a>
             </span>
 
             <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
