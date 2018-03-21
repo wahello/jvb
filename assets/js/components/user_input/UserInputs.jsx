@@ -469,12 +469,12 @@ class UserInputs extends React.Component{
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
-              this.state.workout == 'no' || this.state.workout == 'not yet' || !this.state.weight){
+              !this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet' || (!this.state.weight || this.state.weight == "i do not weigh myself today")){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
-            else if(this.state.workout == 'no' || this.state.workout == 'not yet')
+            else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet')
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
-            else if(!this.state.weight)
+            else if(!this.state.weight || this.state.weight == "i do not weigh myself today")
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             
           } 
@@ -530,7 +530,7 @@ class UserInputs extends React.Component{
       let sleep_stats = data.data.sleep_stats;
       let have_activities = data.data.have_activities;
       let weight = this.state.weight;
-      if(!weight){
+      if(!weight || weight == "i do not weigh myself today"){
         weight = Math.round((data.data.weight.value)*0.00220462);
       }
 
@@ -575,22 +575,26 @@ class UserInputs extends React.Component{
     }
     
   onFetchGarminSuccessWorkout(data){
+    let weight = this.state.weight;
+    if(data.data.weight.value)
+      weight = Math.round(weight*0.00220462);
     let workout_status = this.state.workout;
     let have_activities = data.data.have_activities;
     this.setState({
-      workout: have_activities?'yes':workout_status
+      workout: have_activities?'yes':workout_status,
+      weight: weight?weight:"i do not weigh myself today"
     });
   }
 
   onFetchGarminSuccessWeight(data){
-    let weight = data.data.weight.value;
-    if(weight){
+    let weight = this.state.weight;
+    if(data.data.weight.value)
       // convert to pound
-      let weight = Math.round(weight*0.00220462);
-      this.setState({
-      weight: weight?weight:"i do not weigh myself today"
+      weight = Math.round(data.data.weight.value*0.00220462);
+
+    this.setState({
+       weight: weight?weight:"i do not weigh myself today"
     });
-    } 
   }
   
 
