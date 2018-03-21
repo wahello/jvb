@@ -225,12 +225,13 @@ def export_users_xls(request):
 	to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
 	from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
 
-	to_date2 = request.GET.get('to_date',None)
-	from_date2 = request.GET.get('from_date', None)
+	#date2 = request.GET.get('date',None)
+	#crs = request.GET.get('custom_ranges',None)
 
-	to_date_A = datetime.strptime(to_date1, "%m-%d-%Y").date()
-	from_date_A = datetime.strptime(from_date1, "%m-%d-%Y").date()
+	#date = datetime.strptime(date2,'%m-%d-%Y').date()
+	#custom_ranges = datetime.strptime(crs, "%m-%d-%Y").date()
 
+	
 	x= to_date.strftime('%m-%d-%y')
 	# print(type(x))
 	y= x.split("-")
@@ -2553,20 +2554,22 @@ def export_users_xls(request):
 	#print(from_date,to_date)
 	#print(date1)
 	custom_range = '{},{}'.format(from_date,to_date)
-	custom_range_A='{},{}'.format(from_date_A,to_date_A)
-	cust_range = '{},{}'.format(custom_range,custom_range_A)
+	cr1 = '{},{}'.format('2018-02-22','2018-02-28')
+	cr2 = '{},{}'.format('2018-02-23','2018-02-15')
+	cr3 = '{},{}'.format('2018-02-25','2018-02-17')
+	cust_range = '{},{},{}'.format(cr1,cr2,cr3)
 	date1='{}'.format(today)
-	print(custom_range_A)
+	
 
 	
 	query_params = {
-	"date":date1,
+	"date":'2018-03-17',
 	"duration":"today,yesterday,week,month,year",
-	"custom_ranges":'2018-02-22,2018-02-28,2018-02-23,2018-02-15,2018-02-25,2018-02-17',
+	"custom_ranges":cust_range,
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
-	print(pprint.pprint(DATA))
+	#print(pprint.pprint(DATA))
 	#print(query_params['custom_ranges'])
 	#sheet10.write(6,2,json_cum1['summary']['nutrition']['prcnt_unprocessed_food_gpa']['custom_range']['2018-02-12 to 2018-02-18']['to_dt'])
 	

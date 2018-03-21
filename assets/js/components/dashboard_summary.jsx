@@ -641,7 +641,7 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
     this.setState({
       dateRange1:!this.state.dateRange1
     });
-   }
+   }custom_ranges
  toggleDate2(){
     this.setState({
       dateRange2:!this.state.dateRange2
@@ -737,9 +737,9 @@ handleChange(event){
                 />
       </span>               
             <span className="pdf_button" id="pdf_button">
-            <a href={`/progress/print/progress/excel?from_date=${moment(this.state.cr1_start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.cr1_end_date).format('MM-DD-YYYY')}`}>
+            {/*<a href={`/progress/print/progress/excel?date=${this.state.selectedDate}&custom_ranges=${this.state.cr1_start_date,this.state.cr1_end_date}`}>*/}
             <Button className="btn createbutton mb5">Create PDF</Button>
-            </a>
+            
             </span>
 
             <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
