@@ -425,6 +425,7 @@ constructor(props){
    this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
    this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
    this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
+   this.headerDates = this.headerDates.bind(this);
   }
     
   successProgress(data){
@@ -627,6 +628,16 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
     });
   }
 
+headerDates(value){
+    let str = value;
+            let d = str.split(" ");
+            let d1 = d[0];
+            let date1 =moment(d1).format('MMM DD, YYYY');
+            let d2 = d[2];
+            let date2 =moment(d2).format('MMM DD, YYYY');
+            let date = date1 + ' to ' + date2;
+            return date;
+}
 
     componentDidMount(){
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
@@ -920,9 +931,9 @@ handleChange(event){
                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+                <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             </tr>
         </thead>
         <tbody>
@@ -977,9 +988,9 @@ handleChange(event){
                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             </tr>
            
         </thead>
@@ -1036,9 +1047,9 @@ handleChange(event){
                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+                <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             
             </tr>
         </thead>
@@ -1103,9 +1114,9 @@ handleChange(event){
                   {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             
             </tr>
         </thead>
@@ -1162,9 +1173,9 @@ handleChange(event){
                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             </tr>
         </thead>
         <tbody>
@@ -1219,10 +1230,9 @@ handleChange(event){
                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
-            
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             </tr>
         </thead>
         <tbody>
@@ -1276,9 +1286,9 @@ handleChange(event){
                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             </tr>
         </thead>
         <tbody>
@@ -1335,9 +1345,9 @@ handleChange(event){
                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             
             </tr>
         </thead>
@@ -1410,9 +1420,9 @@ handleChange(event){
                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th>Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th>Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 7 Days<br/>{moment(this.state.duration_date.week).format('MMM DD, YYYY')}</th>
-                <th>Avg Last 30 Days<br/>{moment(this.state.duration_date.month).format('MMM DD, YYYY')}</th>
-                <th>Avg Year to Date<br/>{moment(this.state.duration_date.year).format('MMM DD, YYYY')}</th>
+               <th>Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th>Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th>Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
             </tr>
             
         </thead>
@@ -1497,4 +1507,4 @@ export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(D
 Navbar.propTypes={
     fixed: PropTypes.string,
     color: PropTypes.string,
-}
+} 
