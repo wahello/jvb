@@ -133,6 +133,24 @@ renderTableColumns(dateWiseData,category,classes=""){
                     (key == 'temperature_feels_like' && (value && value != '-'))){
                 all_data.push(value);
             }
+            else if(key == "workout_duration"){
+                if(value == "0:00:00")
+                    all_data.push("No Workout");
+                else
+                    all_data.push(value);
+            }
+            else if(key == "effort_level"){
+                if(value == 0)
+                    all_data.push("No Workout");
+                else
+                    all_data.push(value);
+            }
+            else if(key == "vo2_max"){
+                if(value == 0)
+                    all_data.push("Not Provided");
+                else
+                    all_data.push(value);
+            }
             else if(key == 'workout_duration' && value && (value != '-' && value != '')){
                 let hms = value.split(':');
                 let time_str = `${hms[0]} : ${hms[1]} : ${hms[2]} `;
