@@ -130,7 +130,18 @@ const attrVerboseName = {
     total_strokes: 'Total Strokes',
 
     alcohol_day: '# of Alcohol Drinks Consumed Yesterday',
-    alcohol_week: '# of Drinks Consumed Over the Last 7 Days', 
+    alcohol_week: '# of Drinks Consumed Over the Last 7 Days',
+
+    movement_non_exercise_steps_gpa: 'Non Exercise Steps Points',
+    movement_consistency_points: 'Movement Consistency Points',
+    avg_sleep_per_night_gpa: 'Avg Sleep Per Night Points',
+    exercise_consistency_points: 'Exercise Consistency Points', 
+    prcnt_unprocessed_food_consumed_gpa: '% of Unprocessed Food Consumed Points',
+    alcoholic_drink_per_week_gpa: 'Alcohol Drinks Consumed Per Last 7 Days Points',
+    sleep_aid_penalty_points: 'Sleep Aid Penalty Points',
+    ctrl_subs_penalty_points: 'Controlled Substance Penalty Points',
+    smoke_penalty_points: 'Smoking Penalty Points',
+    total_points: 'Total Points',
 }
 
 class AllStats1 extends Component{
@@ -259,7 +270,7 @@ getDayWithDate(date){
                                    style:{}});
                   }
               }
-           else if(key === 'overall_health_gpa'){
+            else if(key === 'overall_health_gpa'){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
                var minus = '';
@@ -302,10 +313,29 @@ getDayWithDate(date){
                 key == 'workout_duration'){
                 let hms = value.split(':');
                 let time_str = `${hms[0]}:${hms[1]}:${hms[2]}`;
-                all_data.push({value:time_str,
-                              style:{}});
+                if(time_str =="0:00:00")
+                 all_data.push({value:"No Workout",
+                                    style:{}});
+                else
+                 all_data.push({value:time_str,
+                                    style:{}});
             }
-
+            else if(key == "effort_level"){
+                if(value == 0)
+                    all_data.push({value:"No Workout",
+                                    style:{}});
+                else
+                    all_data.push({value:value,
+                                     style:{}});
+            }
+            else if(key == "vo2_max"){
+                if(value == 0)
+                    all_data.push({value:"Not Provided",
+                                    style:{}});
+                else
+                    all_data.push({value:value,
+                                    style:{}});
+            }
             else if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
                 let avgHrJson = JSON.parse(value);
                 for(let act of avgHrKeys)
