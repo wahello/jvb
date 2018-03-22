@@ -1009,6 +1009,13 @@ def export_users_xls(request):
 				elif i == 14:
 					if 'OTHER' in json2_data:
 						sheet9.write(i1+i+1,row_num - num_11,json2_data['OTHER'],format)
+				elif i == 4:
+					if data[key] == "0:00:00":
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
+
+
 				elif data[key] == None:
 					sheet9.write(i1+i+1,row_num - num_11,'Not Reported')
 				elif key != 'avg_heartrate':
@@ -1823,6 +1830,12 @@ def export_users_xls(request):
 				elif i == 14:
 					if 'OTHER' in json2_data:
 						sheet6.write(i+2,row_num,json2_data['OTHER'],format)
+				elif i == 4:
+					if data[key] == "0:00:00":
+						sheet6.write(i + 2, row_num,'No Workout')
+					else:
+						sheet6.write(i + 2, row_num,data[key])
+
 				elif data[key] == None:
 					sheet6.write(i + 2, row_num,'Not Reported')
 				elif key != 'avg_heartrate':
