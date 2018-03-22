@@ -1,5 +1,6 @@
 import re
 import pprint
+from datetime import timedelta
 from .custom_signals import user_input_post_save,user_input_notify
 
 from rest_framework import serializers
@@ -155,11 +156,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# Goals.objects.create(user_input=user_input_obj,
 		# 								 **goals_data)
 
-		#sending signal to calculate quicklook
+		#sending signal to calculate/update quicklook for today and yesterday
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
-		 	from_date=validated_data['created_at'],
+		 	from_date=validated_data['created_at']-timedelta(days=1),
 		 	to_date=validated_data['created_at'])
 
 		# send signal to notify admins by sending email about 
@@ -194,11 +195,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# goals_obj = instance.goals
 		# self._update_helper(goals_obj, goals_data)
 
-		#sending signal to calculate quicklook
+		#sending signal to calculate/update quicklook for today and yesterday
 		user_input_post_save.send(
 			sender=self.__class__,
 		 	request=self.context['request'],
-		 	from_date=validated_data['created_at'],
+		 	from_date=validated_data['created_at']-timedelta(days=1),
 		 	to_date=validated_data['created_at'])
 
 		# send signal to notify admins by sending email about 

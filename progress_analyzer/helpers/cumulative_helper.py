@@ -309,20 +309,20 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 		sleep_per_night_cum_data['cum_deep_sleep_in_hours'] = round(
 			_str_to_hours_min_sec(
 				_safe_get_mobj(today_ql_data.sleep_ql,"deep_sleep",None),time_pattern="hh:mm"
-			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_deep_sleep_in_hours",0),0
+			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_deep_sleep_in_hours",0),3
 		)
 
 		sleep_per_night_cum_data['cum_awake_duration_in_hours'] = round(
 			_str_to_hours_min_sec(
 				_safe_get_mobj(today_ql_data.sleep_ql,"awake_time",None),time_pattern="hh:mm"
-			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_awake_duration_in_hours",0),0
+			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_awake_duration_in_hours",0),3
 		)
 
 	elif today_ql_data:
 		sleep_per_night_cum_data['cum_overall_sleep_gpa'] =_safe_get_mobj(
 			today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)
 			
-		sleep_per_night_cum_data['cum_total_sleep_in_hours'] = round(_get_sleep_in_hours(today_ql_data),0)
+		sleep_per_night_cum_data['cum_total_sleep_in_hours'] = round(_get_sleep_in_hours(today_ql_data),3)
 
 		sleep_aid_taken = 1 if _safe_get_mobj(today_ql_data.sleep_ql,"sleep_aid","no") == "yes" else 0
 		sleep_per_night_cum_data['cum_days_sleep_aid_taken'] = sleep_aid_taken
@@ -330,13 +330,13 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 		sleep_per_night_cum_data['cum_deep_sleep_in_hours'] = round(
 			_str_to_hours_min_sec(
 				_safe_get_mobj(today_ql_data.sleep_ql,"deep_sleep",None),time_pattern="hh:mm"
-			),0
+			),3
 		)
 
 		sleep_per_night_cum_data['cum_awake_duration_in_hours'] = round(
 			_str_to_hours_min_sec(
 				_safe_get_mobj(today_ql_data.sleep_ql,"awake_time",None),time_pattern="hh:mm"
-			),0
+			),3
 		)
 
 	return sleep_per_night_cum_data

@@ -404,6 +404,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	If bed_time_today is True, that's mean we are tying to find out today's bedtime
 	"""
+
 	def _get_actual_sleep_start_time(data):
 		min_duration = None
 		sleep_level_maps = data.get('sleepLevelsMap')
@@ -726,9 +727,9 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 	return point_range
 
 def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleeps_today_json,
-					user_input_bedtime = None, user_input_awake_time = None,
-					user_input_timezone = None,user_input_strength_start_time=None,
-					user_input_strength_end_time=None):
+					user_input_todays_bedtime,user_input_bedtime = None,
+					user_input_awake_time = None,user_input_timezone = None,
+					user_input_strength_start_time=None,user_input_strength_end_time=None):
 	
 	'''
 		Calculate the movement consistency summary
@@ -748,13 +749,18 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 		user_input_awake_time = user_input_awake_time,
 		user_input_timezone = user_input_timezone ,str_dt=False)
 
-	sleeps_today_stats = get_sleep_stats(calendar_date,None,sleeps_today_json[::-1],
-		user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
+	today_bedtime = None
+	if user_input_todays_bedtime and user_input_timezone:
+		target_tz = pytz.timezone(user_input_timezone)
+		today_bedtime = user_input_todays_bedtime.astimezone(target_tz).replace(tzinfo=None)
+	else:
+		sleeps_today_stats = get_sleep_stats(calendar_date,None,sleeps_today_json[::-1],
+			user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
+		today_bedtime = sleeps_today_stats['sleep_bed_time']
 
 	yesterday_bedtime = sleep_stats['sleep_bed_time']
 	today_awake_time = sleep_stats['sleep_awake_time']
-	today_bedtime = sleeps_today_stats['sleep_bed_time']
- 
+
 	# If user slept after midnight and again went to bed after next midnight
 	# In that case we have same yesterday_bedtime and today_bedtime 
 	if today_bedtime and today_bedtime <= today_awake_time:
@@ -833,11 +839,11 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 				if not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
-
+						
 				if today_bedtime and hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)):
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
-
+					
 				elif(user_input_strength_end_time and user_input_strength_start_time):
 					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
 						movement_consistency[interval]['status'] = 'strength'
@@ -932,7 +938,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		elif(sleep_duration == _tobj["10:30"]):
 			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
 		else:
-			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 3,5)
+			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:01"]) * 0.03333) + 3,5)
 
 	elif ((sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["7:29"]) or \
 		(sleep_duration >= _tobj["10:31"] and sleep_duration <= _tobj["11:00"])) :
@@ -1288,10 +1294,12 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
 	# for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
 	# 	if hr_over_90: points += 1
 	# 	elif workout == 'yes': points += 1
+	
 	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
 		if strong_obj and strong_obj.workout == 'yes':
 			points += 1
-		elif not strong_obj and activity_list:
+		elif ((not strong_obj or (strong_obj and strong_obj.workout != 'yes'))
+			and activity_list):
 			points += 1
 	avg_point_week = points / (period/7)
 	grade_point = cal_exercise_consistency_grade(avg_point_week)
@@ -1428,6 +1436,8 @@ def get_weather_data(todays_daily_strong,todays_activities,
 
 def did_workout_today(have_activities,user_did_workout):
 	if user_did_workout:
+		if have_activities and user_did_workout != 'yes':
+			return "yes"
 		return user_did_workout
 	elif have_activities:
 		return "yes"
@@ -1501,11 +1511,16 @@ def create_quick_look(user,from_date=None,to_date=None):
 			user_input__user = user).order_by('user_input__created_at'))
 
 		try:
-			todays_user_input = UserDailyInput.objects.select_related(
-				'strong_input','encouraged_input','optional_input').get(
-				created_at = current_date,user=user)
+			tomorrow_date = current_date + timedelta(days=1)
+			user_inputs_qs = UserDailyInput.objects.select_related(
+				'strong_input','encouraged_input','optional_input').filter(
+				created_at__range = (current_date,tomorrow_date),user=user)
+			user_inputs = {q.created_at.strftime("%Y-%m-%d"):q for q in user_inputs_qs}
+			todays_user_input = user_inputs.get(current_date.strftime("%Y-%m-%d"))
+			tomorrows_user_input = user_inputs.get(tomorrow_date.strftime("%Y-%m-%d"))
 		except UserDailyInput.DoesNotExist:
 			todays_user_input = None
+			tomorrows_user_input = None
 
 		todays_daily_strong = []
 		for i,q in enumerate(daily_strong):
@@ -1724,9 +1739,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		if user_input_strength_start_time and user_input_strength_end_time:
 			user_input_strength_start_time = _str_duration_to_dt(current_date,user_input_strength_start_time)
 			user_input_strength_end_time = _str_duration_to_dt(current_date,user_input_strength_end_time)
+
+		todays_bedtime = None
+		if tomorrows_user_input and tomorrows_user_input.strong_input:
+			todays_bedtime = tomorrows_user_input.strong_input.sleep_bedtime
+
 		movement_consistency_summary = cal_movement_consistency_summary(current_date,
 										epochs_json,sleeps_json,
 										sleeps_today_json,
+										user_input_todays_bedtime = todays_bedtime,
 										user_input_bedtime = user_input_bedtime,
 									  	user_input_awake_time = user_input_awake_time,
 									  	user_input_timezone = user_input_timezone,

@@ -39,16 +39,31 @@ class RankedScore(object):
 
 	def as_dict(self):
 		verbose_category = {c[0]:c[1] for c in s.CATEGORY_CHOICES}
+		score = self._score
+		if self._category in ["awake_time","deep_sleep"]:
+			score = self._hours_to_hours_min(score)
 		d = {
 			'username':self.user.username,
-			'score':self._score,
+			'score':score,
 			'category':verbose_category[self._category],
 			'rank':self._rank
 		}
-		return d			
+		return d
+
+	def _hours_to_hours_min(self,hours):
+		if hours:
+			mins = hours * 60
+			hours,mins = divmod(mins,60)
+			hours = round(hours)
+			mins = round(mins)
+			if mins < 10:
+				mins = "{:02d}".format(mins) 
+			return "{}:{}".format(hours,mins)
+		return None			
 
 class Leaderboard(object):
-	def __init__(self,scores,score_priority='lowest_last'):
+	def __init__(self,user,scores,score_priority='lowest_last'):
+		self.user = user
 		self.priorities = ["lowest_last","lowest_first"]
 		self.scores = scores
 		self._score_priority = score_priority
@@ -76,7 +91,7 @@ class Leaderboard(object):
 		previous_score = None
 		sorted_scores = sorted(self.scores,key=attrgetter('_score'),reverse=to_reverse)
 		for i,score in enumerate(sorted_scores):
-			if previous_score and (previous_score != score._score):
+			if previous_score is not None and (previous_score != score._score):
 				rank_to_award = i+1
 			score.rank = rank_to_award
 			ranked_scores.append(score)
@@ -84,8 +99,19 @@ class Leaderboard(object):
 		return ranked_scores
 
 	def get_leaderboard(self,format = 'dict'):
+		lb = {
+			"user_rank":None,
+			"all_rank":None
+		}
 		if format == 'dict':
-			lb = [x.as_dict() for x in self.ranked_scores]
+			user_rank = None
+			dict_scores = []
+			for score in self.ranked_scores:
+				if score.user == self.user:
+					user_rank = score.as_dict()
+				dict_scores.append(score.as_dict())
+			lb['user_rank'] = user_rank
+			lb['all_rank'] = dict_scores
 			return lb
 		else:
 			return self.ranked_scores
@@ -97,6 +123,8 @@ class LeaderboardOverview(object):
 		self.categories = {x[0]:x[1] for x in s.CATEGORY_CHOICES}
 		self.duration_type = ['today','yesterday','week','month','year']
 		self.custom_ranges = self._get_custom_range_info(query_params)
+		self.catg_score_priority = self._get_catg_score_priority()
+
 		if not self.current_date:
 			self.duration_type = []
 
@@ -126,18 +154,18 @@ class LeaderboardOverview(object):
 
 	def grouped(self,iterable,n,fillvalue):
 		'''
-		Return grouped data for any iterable
-		"s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ..."
+			Return grouped data for any iterable
+			"s -> (s0,s1,s2,...sn-1), (sn,sn+1,sn+2,...s2n-1), (s2n,s2n+1,s2n+2,...s3n-1), ..."
 
-		Arguments
-		- n: type int, number of item in group
-		- fillvalue: type obj, If the iterables are of uneven length, missing values
-		  are filled-in with fillvalue
+			Arguments
+			- n: type int, number of item in group
+			- fillvalue: type obj, If the iterables are of uneven length, missing values
+			  are filled-in with fillvalue
 
-		example -
-		>>> l = [1,2,3,4,5,6,7]
-		>>> list(pairwise(l,2,None))
-		>>> [(1,2), (3,4), (5,6), (7,None)]
+			example -
+			>>> l = [1,2,3,4,5,6,7]
+			>>> list(pairwise(l,2,None))
+			>>> [(1,2), (3,4), (5,6), (7,None)]
 		'''
 		a = iter(iterable)
 		return zip_longest(*[a]*n, fillvalue=fillvalue)
@@ -192,6 +220,17 @@ class LeaderboardOverview(object):
 			return round(t,3)
 		return 0
 
+	def _get_catg_score_priority(self):
+		categories = [x[0] for x in s.CATEGORY_CHOICES]
+		catg_score_priority = {}
+		lowest_first_categories = ['mc','alcohol_drink','resting_hr','awake_time']
+		for category in categories:
+			if category in lowest_first_categories:
+				catg_score_priority[category] = 'lowest_first'
+			else:
+				catg_score_priority[category] = 'lowest_last'
+		return catg_score_priority
+
 	def _get_custom_range_info(self,query_params):
 		custom_ranges = query_params.get('custom_ranges',None)
 		if custom_ranges:
@@ -224,7 +263,7 @@ class LeaderboardOverview(object):
 						score = score if score else 0
 						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
 					elif catg == 'mc':
-						score = data['mc']['movement_consistency_gpa'][dtype]
+						score = data['mc']['movement_consistency_score'][dtype]
 						score = score if score else 0
 						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
 					elif catg == 'avg_sleep':
@@ -282,7 +321,7 @@ class LeaderboardOverview(object):
 							score = score if score else 0
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
 						elif catg == 'mc':
-							score = data['mc']['movement_consistency_gpa']['custom_range'][str_range]['data']
+							score = data['mc']['movement_consistency_score']['custom_range'][str_range]['data']
 							score = score if score else 0
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
 						elif catg == 'avg_sleep':
@@ -321,15 +360,15 @@ class LeaderboardOverview(object):
 							score = data['sleep']['awake_duration_in_hours_min']['custom_range'][str_range]['data']
 							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
-		# import pprint 
-		# pprint.pprint(category_wise_data)
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):
 		duration_lb = {}
 		for dtype in self.duration_type:
 			duration_lb[dtype] = Leaderboard(
-				self.category_wise_data[category][dtype]
+				self.user,
+				self.category_wise_data[category][dtype],
+				self.catg_score_priority[category]
 			).get_leaderboard(format=format)
 
 		if self.custom_ranges:
@@ -337,7 +376,9 @@ class LeaderboardOverview(object):
 			for r in self.custom_ranges:
 				str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
 				custom_range_lb[str_range] = Leaderboard(
-					self.category_wise_data[category]['custom_range'][str_range]
+					self.user,
+					self.category_wise_data[category]['custom_range'][str_range],
+					self.catg_score_priority[category]
 				).get_leaderboard(format = format)
 			duration_lb['custom_range'] = custom_range_lb
 
