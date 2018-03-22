@@ -1014,7 +1014,16 @@ def export_users_xls(request):
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,data[key])
-
+				elif i == 17:
+					if data[key] == 0:
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
+				elif i == 27:
+					if data[key] == 0:
+						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 
 				elif data[key] == None:
 					sheet9.write(i1+i+1,row_num - num_11,'Not Reported')
@@ -1274,7 +1283,7 @@ def export_users_xls(request):
 				smoke_points = grades_data['smoke_penalty']
 				#print(current_date,steps_gpa,mc_points,sleep_points,ec_points,food_points,alcohol_points,sp_points,cs_points,smoke_points)
 
-				total_points = steps_gpa+mc_points+sleep_points+ec_points+food_points+alcohol_points+sp_points+cs_points+smoke_points
+				total_points = steps_gpa+mc_points+sleep_points+ec_points+food_points+alcohol_points+cs_points+smoke_points
 
 				#print(current_date,steps_gpa,mc_points,sleep_points,ec_points,food_points,alcohol_points,sp_points,cs_points,smoke_points)
 				sheet1.write(25,row_num,steps_gpa,format_points)
@@ -1835,7 +1844,16 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,'No Workout')
 					else:
 						sheet6.write(i + 2, row_num,data[key])
-
+				elif i == 17:
+					if data[key] == 0:
+						sheet6.write(i + 2, row_num,'No Workout')
+					else:
+						sheet6.write(i + 2, row_num,data[key])
+				elif i == 27:
+					if data[key] == 0:
+						sheet6.write(i + 2, row_num,'Not provided')
+					else:
+						sheet6.write(i + 2, row_num,data[key])
 				elif data[key] == None:
 					sheet6.write(i + 2, row_num,'Not Reported')
 				elif key != 'avg_heartrate':
