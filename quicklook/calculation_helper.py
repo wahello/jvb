@@ -1444,6 +1444,7 @@ def did_workout_today(have_activities,user_did_workout):
 	else:
 		return ""
 
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range

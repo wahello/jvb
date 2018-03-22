@@ -13,8 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from user_input.models import DailyUserInputOptional ,\
-                              DailyUserInputEncouraged,\
-                              DailyUserInputStrong
+															DailyUserInputEncouraged,\
+															DailyUserInputStrong
 
 from .serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
@@ -33,14 +33,14 @@ from .models import UserQuickLook,\
 					ExerciseAndReporting
 
 from progress_analyzer.models import OverallHealthGradeCumulative, \
-                                     NonExerciseStepsCumulative,\
-                                     SleepPerNightCumulative,\
-                                     MovementConsistencyCumulative,\
-                                     ExerciseConsistencyCumulative,\
-                                     NutritionCumulative,\
-                                     ExerciseStatsCumulative,\
-                                     AlcoholCumulative,\
-                                     OtherStatsCumulative
+																		 NonExerciseStepsCumulative,\
+																		 SleepPerNightCumulative,\
+																		 MovementConsistencyCumulative,\
+																		 ExerciseConsistencyCumulative,\
+																		 NutritionCumulative,\
+																		 ExerciseStatsCumulative,\
+																		 AlcoholCumulative,\
+																		 OtherStatsCumulative
 
 
 
@@ -51,8 +51,8 @@ class UserQuickLookView(generics.ListCreateAPIView):
 		- Create the quick look instance
 		- List all the quick look instance
 		- If query parameters "to" and "from" are provided
-		  then filter the quick look data for provided date interval
-		  and return the list
+			then filter the quick look data for provided date interval
+			and return the list
 	'''
 	permission_classes = (IsAuthenticated,)
 	serializer_class = UserQuickLookSerializer
@@ -65,8 +65,8 @@ class UserQuickLookView(generics.ListCreateAPIView):
 
 		if start_dt and end_dt:
 			queryset = UserQuickLook.objects.filter(Q(created_at__gte=start_dt)&
-							  Q(created_at__lte=end_dt),
-							  user=user)
+								Q(created_at__lte=end_dt),
+								user=user)
 		else:
 			queryset = UserQuickLook.objects.all()
 
@@ -146,8 +146,8 @@ class GradeWeeklyListView(generics.ListAPIView):
 			week_start_dt = current_dt
 		
 		qs = Grades.objects.filter(Q(user_ql__created_at__gte=week_start_dt)&
-								   Q(user_ql__created_at__lte=current_dt),
-								   user_ql__user=user,)
+									 Q(user_ql__created_at__lte=current_dt),
+									 user_ql__user=user,)
 		return qs
 
 class GradeListView(generics.ListCreateAPIView):
@@ -327,14 +327,14 @@ def export_users_xls(request):
 	format_points= book.add_format({'align':'left','num_format': '0.00'})
 	# Grades
 	columns = ['overall_health_grade','overall_health_gpa','movement_non_exercise_steps_grade','non_exercise_steps',
-			   'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
-			   'did_workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
-			   'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty','overall_gpa_without_penalties']
+				 'movement_consistency_grade','movement_consistency','avg_sleep_per_night_grade','sleep_per_wearable','exercise_consistency_grade',
+				 'did_workout','exercise_consistency_score','prcnt_unprocessed_food_consumed_grade','prcnt_non_processed_food','alcoholic_drink_per_week_grade','alcohol_week',
+				 'sleep_aid_penalty','ctrl_subs_penalty','smoke_penalty','overall_gpa_without_penalties']
 	columnsw = ['Overall Health Grade','Overall Health Gpa','Non Exercise Steps Grade','Non Exercise Steps',
-			   'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
-			   'Exercise Consistency Grade',"Did you Workout Today",'Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
-			   'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
-			   ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty','Overall Health Grade Before Penalties','Did You Report Your Inputs Today?']
+				 'Movement Consistency Grade','Movement Consistency Score','Avg Sleep Per Night Grade','Average Sleep Per Night',
+				 'Exercise Consistency Grade',"Did you Workout Today",'Exercise Consistency Score','Percentage of Unprocessed Food Consumed Grade',
+				 'Percentage of Unprocessed Food Consumed','Alcohol Drinks Consumed Per Last 7 Days Grade','Alcohol Drinks Consumed Per Last 7 Days'
+				 ,'Sleep Aid Penalty','Controlled Substance Penalty','Smoking Penalty','Overall Health Grade Before Penalties','Did You Report Your Inputs Today?']
 
 	colunn_work = ['workout']
 	grades_qs = Grades.objects.filter(
@@ -810,7 +810,7 @@ def export_users_xls(request):
 				if user_input_strong_data:
 					
 					if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
-						sheet3.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'B':
 						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'C':
@@ -906,8 +906,8 @@ def export_users_xls(request):
 	col_num2 = 49
 	# a = len(rows_of_grades) + len(rows3) + len(rows4) + len(rows5)
 	for col_num in range(len(columns7W)):
-		   col_num2 = col_num2 + 1
-		   sheet9.write(col_num2, row_num - num_6, columns7W[col_num])
+			 col_num2 = col_num2 + 1
+			 sheet9.write(col_num2, row_num - num_6, columns7W[col_num])
 
 	# alcohol_qs = Alcohol.objects.filter(
 	# 	user_ql__created_at__range=(from_date, to_date),
@@ -998,17 +998,24 @@ def export_users_xls(request):
 				
 				if i == 12:
 					if 'RUNNING' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['RUNNING'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['RUNNING'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 13:
 					if 'ELLIPTICAL' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['ELLIPTICAL'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['ELLIPTICAL'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 14:
 					if 'OTHER' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['OTHER'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['OTHER'],format)
+				elif i == 4:
+					if data[key] == "0:00:00":
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
+
+
 				elif data[key] == None:
 					sheet9.write(i1+i+1,row_num - num_11,'Not Reported')
 				elif key != 'avg_heartrate':
@@ -1548,7 +1555,7 @@ def export_users_xls(request):
 	sheet3.repeat_columns(0)
 	sheet3.set_row(0,30)
 	columns = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
-			   'deep_sleep','light_sleep','awake_time']
+				 'deep_sleep','light_sleep','awake_time']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -1812,17 +1819,23 @@ def export_users_xls(request):
 				
 				if i == 12:
 					if 'RUNNING' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
+						sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
 					else:
-					 	sheet6.write(i+2,row_num,"",format)
+						sheet6.write(i+2,row_num,"",format)
 				elif i == 13:
 					if 'ELLIPTICAL' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
+						sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
 					else:
-					 	sheet6.write(i+2,row_num,"",format)
+						sheet6.write(i+2,row_num,"",format)
 				elif i == 14:
 					if 'OTHER' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['OTHER'],format)
+						sheet6.write(i+2,row_num,json2_data['OTHER'],format)
+				elif i == 4:
+					if data[key] == "0:00:00":
+						sheet6.write(i + 2, row_num,'No Workout')
+					else:
+						sheet6.write(i + 2, row_num,data[key])
+
 				elif data[key] == None:
 					sheet6.write(i + 2, row_num,'Not Reported')
 				elif key != 'avg_heartrate':
