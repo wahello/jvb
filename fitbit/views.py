@@ -23,7 +23,7 @@ def request_token_fitbit(request):
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+		'redirect_uri':' https://app.jvbwellness.com/callbacks/fitbit ',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -51,7 +51,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+			'redirect_uri':' https://app.jvbwellness.com/callbacks/fitbit ',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -85,14 +85,14 @@ def fetching_data_fitbit(request):
 	#print(access_token)
 	session = service.get_session(access_token)
 	#The date in the format yyyy-MM-dd
-	date_fitbit = '2018-03-12'
+	date_fitbit = '2018-03-15'
 	# user_id = tokens.user_id_fitbit
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
 	# activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
 	# body_fitbit = session.get("https://api.fitbit.com/1/user/-/body/log/fat/date/{}.json".format(date_fitbit))
 	# food_fitbit = session.get("https://api.fitbit.com/1/user/-/foods/log/date/{}.json".format(date_fitbit))
 	# hrr_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
-	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
+	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1m.json".format(date_fitbit))
 	# try:
 	# 	esponse = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/2018-02-11.json")
 	# 	a = esponse.json()
@@ -111,7 +111,7 @@ def fetching_data_fitbit(request):
 	# print(pprint.pprint(body_fitbit))
 	# print(pprint.pprint(food_fitbit))
 	# print(pprint.pprint(hrr_fitbit))
-	print(pprint.pprint(steps_fitbit))
+	#print(pprint.pprint(steps_fitbit))
 	if b == 401:
 		if a['errors'][0]['errorType'] == 'expired_token':
 			client_id='22CN2D'
@@ -130,7 +130,7 @@ def fetching_data_fitbit(request):
 			}
 			r = requests.post(access_token_url,headers=headers,data=data)
 			c = r.json()
-			print(pprint.pprint(c))
+			#print(pprint.pprint(c))
 	# else:
 	# 	pass
 	# print(pprint.pprint(a))

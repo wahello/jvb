@@ -10,3 +10,12 @@ class FitbitConnectToken(models.Model):
 	
 	def __str__(self):
 		return "%s"%(self.user.username)
+
+class UserFitbitDataSleep(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="fitbit_sleep_data")
+	date_of_sleep = models.TextField()
+	data = models.TextField()
+
+	def __str__(self):
+		return "%S"%(self.user.username)
+
