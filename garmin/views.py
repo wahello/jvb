@@ -140,7 +140,7 @@ class GarminConnectPing(APIView):
 			store in database 
 		'''
 		file = request.FILES['file']
-		file2 = file.read()
+		# file2 = file.read()
 		# file.seek(0)
 		# file_handle = io.BytesIO(file.read())
 		# print(file_handle.read())
