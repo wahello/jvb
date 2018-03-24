@@ -426,6 +426,7 @@ constructor(props){
    this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
    this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
    this.headerDates = this.headerDates.bind(this);
+   this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
   }
     
   successProgress(data){
@@ -460,7 +461,6 @@ if(value != undefined){
           return x1 + x2;
      }
 }
-
 renderCustomRangeTD(custom_data, toReturn="data"){
     let td=[];
     if(!custom_data){
@@ -574,14 +574,12 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
         if(this.state.cr2_start_date && this.state.cr2_end_date){
             custom_ranges.push(this.state.cr2_start_date);
             custom_ranges.push(this.state.cr2_end_date);
-
         }
          if(this.state.cr3_start_date && this.state.cr3_end_date){
             custom_ranges.push(this.state.cr3_start_date);
             custom_ranges.push(this.state.cr3_end_date);
         }
         custom_ranges.push(this.state.cr1_start_date);
-
         custom_ranges.push(this.state.cr1_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
     });
@@ -652,7 +650,7 @@ headerDates(value){
     this.setState({
       dateRange1:!this.state.dateRange1
     });
-   }custom_ranges
+   }
  toggleDate2(){
     this.setState({
       dateRange2:!this.state.dateRange2
@@ -683,15 +681,37 @@ handleChange(event){
         [name]: value
       });
     }
-	render(){
-		const {fix} = this.props;
+createExcelPrintURL(){
+    // code
+    let custom_ranges = [];
+    let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
+    if(this.state.cr1_start_date && this.state.cr1_end_date){
+        custom_ranges.push(this.state.cr1_start_date);
+        custom_ranges.push(this.state.cr1_end_date);
+    }
+
+    if(this.state.cr2_start_date && this.state.cr2_end_date){
+        custom_ranges.push(this.state.cr2_start_date);
+        custom_ranges.push(this.state.cr2_end_date);
+    }
+     if(this.state.cr3_start_date && this.state.cr3_end_date){
+        custom_ranges.push(this.state.cr3_start_date);
+        custom_ranges.push(this.state.cr3_end_date);
+    }
+    custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
+    console.log(custom_ranges);
+    let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
+    return excelURL;
+}
+    render(){
+        const {fix} = this.props;
    let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
-		return(
-			<div className="dashboard">
-		<div className="container-fluid">
+        return(
+            <div className="dashboard">
+        <div className="container-fluid">
         
 
-		 <Navbar toggleable
+         <Navbar toggleable
          fixed={fix ? 'top' : ''}
           className="navbar navbar-expand-sm navbar-inverse nav6">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
@@ -748,9 +768,9 @@ handleChange(event){
                 />
       </span>               
             <span className="pdf_button" id="pdf_button">
-            {/*<a href={`/progress/print/progress/excel?date=${this.state.selectedDate}&custom_ranges=${this.state.cr1_start_date,this.state.cr1_end_date}`}>*/}
-            <Button className="btn createbutton mb5">Create PDF</Button>
-            
+            <a href={this.createExcelPrintURL()}>
+            <Button className="btn createbutton mb5" onClick={this.printDocument}>Create PDF</Button>
+            </a>
             </span>
 
             <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
@@ -921,10 +941,10 @@ handleChange(event){
                        </PopoverBody>
                     </Popover>
        <div id="divToPrint" className="mt4">
-			<div className="col-sm-12 col-md-12 col-lg-12 padding">
-			<div className="row justify-content-center">
-			<div className="table-responsive tablecenter"> 
-   		 <table className="table table-bordered">
+            <div className="col-sm-12 col-md-12 col-lg-12 padding">
+            <div className="row justify-content-center">
+            <div className="table-responsive tablecenter"> 
+         <table className="table table-bordered">
          <thead>
             <tr>
                 <th >Overall Health Grade</th>
@@ -979,7 +999,7 @@ handleChange(event){
 </div>
 
 <div className="row justify-content-center">
-	<div className="table-responsive tablecenter"> 
+    <div className="table-responsive tablecenter"> 
     <table className="table table-bordered ">
          <thead>
            
@@ -1033,7 +1053,7 @@ handleChange(event){
             </tr>
         </tbody>
     </table>
-</div>		
+</div>      
 </div>
 
 
@@ -1302,7 +1322,7 @@ handleChange(event){
                 <td>{this.state.summary.exercise.workout_duration_hours_min.year}</td>
             </tr>
             <tr>
-            	<td>Workout Effort Level</td>
+                <td>Workout Effort Level</td>
                 {this.renderCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
                 <td>{this.state.summary.exercise.workout_effort_level.today}</td>
                 <td>{this.state.summary.exercise.workout_effort_level.yesterday}</td>
@@ -1320,7 +1340,7 @@ handleChange(event){
                 <td>{this.state.summary.exercise.avg_exercise_heart_rate.year}</td>
             </tr>
              <tr>
-            	<td>VO2 Max</td>
+                <td>VO2 Max</td>
                 {this.renderCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
                 <td>{this.state.summary.exercise.vo2_max.today}</td>
                 <td>{this.state.summary.exercise.vo2_max.yesterday}</td>
@@ -1336,7 +1356,7 @@ handleChange(event){
 </div>
 
 <div className="row justify-content-center padding">
-	<div className="table-responsive tablecenter"> 
+    <div className="table-responsive tablecenter"> 
     <table className="table table-bordered">
          <thead>
             <tr>
@@ -1409,7 +1429,7 @@ handleChange(event){
         </tbody>
     </table>
 </div>
-</div>		
+</div>      
 <div className=" row justify-content-center padding">
    <div className="table-responsive tablecenter"> 
     <table className="table table-bordered">
@@ -1491,10 +1511,10 @@ handleChange(event){
 {this.renderProgress2FetchOverlay()}
 {this.renderProgress3FetchOverlay()}
 {this.renderProgressSelectedDateFetchOverlay()}
-</div>		
-			
-			)
-	}
+</div>      
+            
+            )
+    }
 }
 
 function mapStateToProps(state){
