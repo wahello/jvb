@@ -1239,7 +1239,7 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 			grade = 'F'
 			point = 0
 		return (grade, point, avg_heartrate)
-	return (None, None, None)
+	return (None, None, avg_heartrate)
 
 def get_avg_sleep_grade(sleep_calendar_date,yesterday_sleep_data,today_sleep_data,
 	user_input_bedtime, user_input_awake_time,user_input_sleep_duration,

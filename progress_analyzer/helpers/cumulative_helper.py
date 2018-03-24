@@ -87,7 +87,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_workout_days_count":None,
 			"cum_resting_hr_days_count":None,
 			"cum_effort_level_days_count":None,
-			"cum_vo2_max_days_count":None
+			"cum_vo2_max_days_count":None,
+			"cum_avg_exercise_hr_days_count":None
 		}
 		return fields
 
@@ -545,6 +546,13 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		vo2_max = 1 if vo2_max else 0
 		meta_cum_data['cum_vo2_max_days_count'] = vo2_max \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_vo2_max_days_count",0)
+
+		avg_exercise_heartrate = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"avg_exercise_heartrate",0		
+		)
+		avg_exercise_heartrate = 1 if avg_exercise_heartrate else 0
+		meta_cum_data['cum_avg_exercise_hr_days_count'] = avg_exercise_heartrate \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_avg_exercise_hr_days_count",0)
 	
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
@@ -567,6 +575,10 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		)
 		meta_cum_data['cum_vo2_max_days_count'] = 1 if vo2_max else 0
 
+		avg_exercise_heartrate = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"avg_exercise_heartrate",0		
+		)
+		meta_cum_data['cum_avg_exercise_hr_days_count'] = 1 if avg_exercise_heartrate else 0
 	return meta_cum_data
 
 def create_cumulative_instance(user, from_dt=None, to_dt=None):

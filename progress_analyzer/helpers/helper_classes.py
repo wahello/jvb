@@ -71,6 +71,7 @@ class ToMetaCumulative(object):
 		self.cum_resting_hr_days_count = raw_data["cum_resting_hr_days_count"]
 		self.cum_effort_level_days_count = raw_data["cum_effort_level_days_count"]
 		self.cum_vo2_max_days_count = raw_data["cum_vo2_max_days_count"]
+		self.cum_avg_exercise_hr_days_count = raw_data["cum_avg_exercise_hr_days_count"]
 
 class ToCumulativeSum(object):
 	'''
@@ -209,7 +210,7 @@ class ProgressReport():
 			if mins < 10:
 				mins = "{:02d}".format(mins) 
 			return "{}:{}".format(hours,mins)
-		return None
+		return "00:00"
 
 	def _min_to_min_sec(self,mins):
 		seconds = mins * 60
@@ -744,6 +745,12 @@ class ProgressReport():
 				return avg
 			return 0
 
+		def _cal_avg_exercise_hr_average(stat1, stat2, avg_exercise_hr_days):
+			if not stat1 == None and not stat2 == None and avg_exercise_hr_days:
+				avg = (stat1 - stat2)/avg_exercise_hr_days
+				return avg
+			return 0
+
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
@@ -771,11 +778,15 @@ class ProgressReport():
 						return round(val,2)
 
 				elif key == 'avg_exercise_heart_rate':
-					val = self._get_average(
-						todays_data.cum_avg_exercise_hr,
-						current_data.cum_avg_exercise_hr,alias
-					)
-					return round(val)
+					if todays_meta_data and current_meta_data:
+						avg_exercise_hr_days = (todays_meta_data.cum_avg_exercise_hr_days_count - 
+							current_meta_data.cum_avg_exercise_hr_days_count)
+						val = _cal_avg_exercise_hr_average(
+							todays_data.cum_avg_exercise_hr,
+							current_data.cum_avg_exercise_hr,
+							avg_exercise_hr_days
+						)
+						return round(val)
 
 				elif key == 'vo2_max':
 					if todays_meta_data and current_meta_data:

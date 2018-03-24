@@ -107,7 +107,7 @@ class GarminData(APIView):
 			data = {
 				"sleep_stats":sleep_stats,
 				"have_activities":have_activities,
-				"weight":weight,
+				"weight":weight
 			}
 			return Response(data)
 		return Response({})
