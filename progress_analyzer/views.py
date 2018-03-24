@@ -56,14 +56,11 @@ def progress_excel_export(request):
 	# sheet10.set_column('F:G',10)
 	# sheet10.set_column('M:O',13)
 	# sheet10.set_column('P:Q',10)
-
-
-	# sheet10.set_column('R:T',15)
+	# sheet10.set_column('R:T',15)-
 	# sheet10.set_column('H:J',15)
 	
 
 	sheet10.set_row(0,45)
-	
 	sheet10.set_landscape()
 
 	format = book.add_format({'bold': True})
@@ -83,6 +80,7 @@ def progress_excel_export(request):
 	# sheet10.write(17,11,'Nutrition',bold)
 	# sheet10.write(23,11,'Alcohol',bold)
 	# sheet10.write(0,11,'Summary Dashboard',bold)
+
 
 	#table borders
 	border_format=book.add_format({
@@ -227,7 +225,6 @@ def progress_excel_export(request):
 		sheet10.write(17,9,'Nutrition',bold)
 		sheet10.write(23,9,'Alcohol',bold)
 		
-
 
 		sheet10.conditional_format('B4:H7', {'type': 'no_errors',
                                           'format': border_format})
@@ -874,8 +871,6 @@ def progress_excel_export(request):
 		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
-		print(pprint.pprint(DATA))
-
 		time1=['today','yesterday','week','month','year']
 		
 		c = 1
