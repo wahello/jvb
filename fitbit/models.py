@@ -17,5 +17,5 @@ class UserFitbitDataSleep(models.Model):
 	data = models.TextField()
 
 	def __str__(self):
-		return "%S"%(self.user.username)
+		return "%s"%(self.user.username)
 

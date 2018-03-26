@@ -159,7 +159,7 @@ class GarminConnectPing(APIView):
 		# fit_file= FILE_db.read()
 		try:
 			user = User.objects.get(garmin_connect_token__token = file_oauth)
-			#print(user)
+			print(user)
 		except User.DoesNotExist:
 			user = None
 		if user:
