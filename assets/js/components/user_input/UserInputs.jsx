@@ -157,6 +157,7 @@ class UserInputs extends React.Component{
 
         no_exercise_reason:'',
         no_exercise_comment:'',
+        activities:{}
 
       };
       return initialState;
@@ -1342,86 +1343,6 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-
-                          {/* <FormGroup>                            
-                            {this.state.editable &&
-                              <div className=" display_flex" >
-                              <div className="align_width align_width1">
-                              <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
-                              <div className="input ">
-                                 <Input 
-                                  type="select" 
-                                  className="custom-select form-control" 
-                                  name="no_exercise_reason"
-                                  value={this.state.no_exercise_reason}                                       
-                                  onChange={this.handleChangeNoExerciseReason}>
-                                          <option value=" ">Select</option>                                        
-                                          <option value="rest day">Rest Day</option>
-                                          <option value="injured">Injured</option>  
-                                          <option value="sick">Sick</option>
-                                          <option value="too busy/not enough time">Too Busy/Not Enough Time</option>
-                                          <option value="didn’t feel like it">Didn’t Feel Like It</option>                                              
-                                          <option value="work got in the way">Work Got in the Way</option>
-                                          <option value="travel day">Travel Day</option>
-                                          <option value="weather">Weather</option>
-                                          <option value="other">Other</option>                                                                                                                                                                            
-                                      </Input>
-                              </div>
-                              </div>
-                               <div className="align_width_time align_width1 margin_tp">
-                               <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
-                                  <div className="input "> 
-                                <Input type="select" name="sleep_hours_bed_time"
-                                id="bed_hr"
-                                className="form-control custom-select"
-                                value={this.state.sleep_hours_bed_time}
-                                onChange={this.handleChangeSleepHoursMin}>
-                                 <option key="hours" value="">Hours</option>
-                                {this.createSleepDropdown(1,12)}                        
-                                </Input>
-                                </div>
-                                </div>
-
-                                <div className="align_width_time align_width1 margin_tp">
-                                <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
-                               <div className="input ">
-                                <Input type="select" name="sleep_mins_bed_time"
-                                 id="bed_min"
-                                className="form-control custom-select "
-                                value={this.state.sleep_mins_bed_time}
-                                onChange={this.handleChangeSleepHoursMin}>
-                                 <option key="mins" value="">Minutes</option>
-                                {this.createSleepDropdown(0,59,true)}                        
-                                </Input>                        
-                                </div>
-                                </div>
-
-                                <div className="align_width_time align_width1 margin_tp">
-                                <Label className="padding">2.1 Time Fell Asleep As Per Wearable.</Label>
-                                 <div className="input1 ">
-                                  <Input 
-                                    type="text" 
-                                    className="form-control"
-                                    style={{height:"37px"}} 
-                                    placeholder="Between 20 - 60"
-                                    name="waist"                               
-                                    value={this.state.waist}
-                                    onChange={this.handleChange}>
-                                  </Input>
-                                      </div> 
-                              </div>
-                              </div>
-                            }
-
-                           {
-                              !this.state.editable &&
-                              <div className="input">
-                              {(this.state.sleep_bedtime_date && this.state.sleep_hours_bed_time && this.state.sleep_mins_bed_time && this.state.sleep_bedtime_am_pm) &&
-                                <p>{this.state.sleep_bedtime_date.format('MMMM Do YYYY')}, {this.state.sleep_hours_bed_time}:{this.state.sleep_mins_bed_time}  {this.state.sleep_bedtime_am_pm}</p>
-                              }
-                              </div>
-                            }                          
-                          </FormGroup>*/}
                             <Modal 
                             className="pop"
                             id="popover" 

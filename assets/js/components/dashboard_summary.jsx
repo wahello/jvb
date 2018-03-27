@@ -475,6 +475,7 @@ renderCustomRangeTD(custom_data, toReturn="data"){
             let d = str.split(" ");
             let d1 = d[0];
             let date1 =moment(d1).format('MMM DD, YYYY');
+            //console.log("=======",typeof(date1));
             let d2 = d[2];
             let date2 =moment(d2).format('MMM DD, YYYY');
             let date = date1 + ' to ' + date2;
@@ -532,6 +533,7 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
             let str = key;
             let d = str.split(" ");
             let d1 = d[0];
+            console.log("=======",d1);
             let date1 =moment(d1).format('MMM DD, YYYY');
             let d2 = d[2];
             let date2 =moment(d2).format('MMM DD, YYYY');
@@ -553,7 +555,7 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
         });
     }
 
-    processDate(selectedDate,fromDate,toDate){ 
+    processDate(selectedDate){ 
     this.setState({
       selectedDate: selectedDate,
       calendarOpen:!this.state.calendarOpen,
