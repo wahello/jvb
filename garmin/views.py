@@ -149,8 +149,10 @@ class GarminConnectPing(APIView):
 
 		try:
 			user = User.objects.get(garmin_connect_token__token = file_oauth)
+			# print(user)
 		except User.DoesNotExist:
 			user = None
+		print(user)
 		if user:
 			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file_binary=file2,meta_data_fitfile=oauthToken_fitfile)
 
@@ -159,7 +161,7 @@ class GarminConnectPing(APIView):
 		mail.body = request.data['uploadMetaData']
 		mail.to = ['atulk@s7works.io']
 		mail.attach(file.name, file.read(), file.content_type)
-		mail.send()
+		# mail.send()
 		headers={"Location":"/"}
 		return Response(status = status.HTTP_201_CREATED,headers=headers)
 
