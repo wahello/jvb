@@ -2383,28 +2383,27 @@ def export_users_xls(request):
 	sheet10.freeze_panes(1,1)
 	sheet10.set_column('A:A',1)
 	sheet10.set_column('B:B',35)
-	sheet10.set_column('L:L',45)
-	sheet10.set_column('K:K',1)
-	sheet10.set_column('C:E',13)
-	sheet10.set_column('F:I',10)
-	sheet10.set_column('M:O',13)
-	sheet10.set_column('P:T',10)
+	sheet10.set_column('I:I',45)
+	sheet10.set_column('H:H',1)
+	sheet10.set_column('C:G',16)
+	sheet10.set_column('J:N',16)
+	
 	sheet10.set_row(0,45)
 	
 	sheet10.set_landscape()
 
 	#Headings
 	sheet10.write(0,1,'Summary Dashboard',bold)
-	sheet10.write(0,11,'Summary Dashboard',bold)
+	sheet10.write(0,8,'Summary Dashboard',bold)
 	sheet10.write(2,1,'Overall Health Grade',bold)
 	sheet10.write(9,1,'Sleep Per Night (excluding awake time)',bold)
 	sheet10.write(17,1,'Exercise Consistency',bold)
 	sheet10.write(23,1,'Exercise Stats',bold)
 	sheet10.write(30,1,'other stats',bold)
-	sheet10.write(2,11,'Non Exercise Steps',bold)
-	sheet10.write(9,11,'Movement Consistency',bold)
-	sheet10.write(17,11,'Nutrition',bold)
-	sheet10.write(23,11,'Alcohol',bold)
+	sheet10.write(2,8,'Non Exercise Steps',bold)
+	sheet10.write(9,8,'Movement Consistency',bold)
+	sheet10.write(17,8,'Nutrition',bold)
+	sheet10.write(23,8,'Alcohol',bold)
 
 	#table borders
 	border_format=book.add_format({
@@ -2412,25 +2411,26 @@ def export_users_xls(request):
                             'align':'left',
                             'font_size':10
                            })
+	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
 	
 	
-	sheet10.conditional_format('B4:J7', {'type': 'no_errors',
+	sheet10.conditional_format('B4:G7', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('B11:J16', {'type': 'no_errors',
+	sheet10.conditional_format('B11:G15', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('B19:J22', {'type': 'no_errors',
+	sheet10.conditional_format('B19:G22', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('B25:J27', {'type': 'no_errors',
+	sheet10.conditional_format('B25:G27', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('B32:J37', {'type': 'no_errors',
+	sheet10.conditional_format('B32:G37', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('L4:T8', {'type': 'no_errors',
+	sheet10.conditional_format('I4:N8', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('L11:T14', {'type': 'no_errors',
+	sheet10.conditional_format('I11:N14', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('L19:T22', {'type': 'no_errors',
+	sheet10.conditional_format('I19:N22', {'type': 'no_errors',
                                           'format': border_format})
-	sheet10.conditional_format('L25:T28', {'type': 'no_errors',
+	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
                                           'format': border_format})
   
 	#column headings
@@ -2438,50 +2438,43 @@ def export_users_xls(request):
 	today= date.today()
 	yesterday=date.today()-timedelta(days=1)
 	week = date.today()-timedelta(days = 7)
-	custom_range1='{} to {}'.format(from_date,to_date)
-	custom_range2='{} to {}'.format(from_date,to_date)
-	custom_range3='{} to {}'.format(from_date,to_date)
 
 	format = book.add_format({'bold': True})
 	format.set_text_wrap()
 	format_align = book.add_format({'align':'left'})
-	ranges =[custom_range1,custom_range2,custom_range3]
-	c = 1
-	for i in range(len(ranges)):
-		c = c+1
-		sheet10.write(0,c,ranges[i],format)
-		sheet10.write(0,c+10,ranges[i],format)
-	'''custom_range_len= ['from date','to date','data']
-	c = 1
-	for i in range(len(custom_range_len)):
-		c = c+1
-		sheet10.write(0,c,custom_range_len[i],bold)
-		sheet10.write(0,c+10,custom_range_len[i],bold)'''
-	sheet10.write(0,2,custom_range1,format)
-	datem = datetime(today.year, today.month, 1)
-	print(datem)
+	today = date.today()
+	year = to_date.year
+	to_date1 = '{}'.format(to_date)
+	to_datef = to_date.strftime("%b %d,%Y")
+
+	year1 = '{}-{}'.format('Jan 01',year)
+	yesterday=to_date-timedelta(days=1)
+	week = to_date-timedelta(days = 7)
+	month = to_date-timedelta(days=30)
+	today1 = today.strftime("%b %d,%Y")
+	yestf = yesterday.strftime("%b %d,%Y")
+	weekf = week.strftime("%b %d,%Y")
+	monthf = month.strftime("%b %d,%Y")
+	avg_week = '{} to {}'.format(weekf,to_datef)
+	avg_month ='{} to {}'.format(monthf,to_datef)
+	avg_year = '{} to {}'.format(year1,to_datef)
+	date1='{}'.format(today)
+	
+	today1 ='{}\n{}'.format('Today',to_datef)
+	yesterday1 = '{}\n{}'.format('Yesterday',yestf)
+	week1 = '{}\n{}'.format('Avg Last 7 days',avg_week)
+	month1 = '{}\n{}'.format('Avg Last 30 days',avg_month)
+	year1 = '{}\n{}'.format('Avg Year to Date',avg_year)
 
 	
-	sheet10.write(0,5,'{}\n{}'.format('Today',today),bold)
-	sheet10.write(0,6,'{}\n{}'.format('Yesterday',yesterday),bold)
-	sheet10.write(0,7,'{}\n{}'.format('Avg Last 7 days',week),format)
-	sheet10.write(0,15,'{}\n{}'.format('Today',today),bold)
-	sheet10.write(0,16,'{}\n{}'.format('Yesterday',yesterday),bold)
-	sheet10.write(0,17,'{}\n{}'.format('Avg Last 7 days',week),format)
-	#sheet10.write(0,6,yesterday,date_format1)
-	#sheet10.write(0,15,today,date_format1)
-	#sheet10.write(0,16,yesterday,date_format1)
-	
-	#print(from_date)
-	#sheet10.write(0,2,custom_range,format)
-	
-	'''duration=['Today','yesterday','Avg Last 7 days','Avg Last 30 days','Avg Year to Date']
-	c=4
+	duration = [today1,yesterday1,week1,month1,year1]
+	c = 1
 	for i in range(len(duration)):
-		c=c+1
+		c = c+1
 		sheet10.write(0,c,duration[i],format)
-		sheet10.write(0,c+10,duration[i],format)'''
-
+		sheet10.write(0,c+7,duration[i],format)
+	
+	
 	# Row headers
 	columns1=['Total GPA Points','overall_health_gpa','Rank against other users','Overall Health GPA grade',]
 	row=2
@@ -2489,7 +2482,7 @@ def export_users_xls(request):
 		row=row+1
 		sheet10.write(row,1,columns1[i])
 
-	sleep_per_night=['Total Sleep in hours:minutes','Rank against other users','Average Sleep Grade','# of Days Sleep Aid Taken in Period','% of Days Sleep Aid Taken in Period','Overall Sleep GPA']
+	sleep_per_night=['Total Sleep in hours:minutes','Rank against other users','Average Sleep Grade','# of Days Sleep Aid Taken in Period','% of Days Sleep Aid Taken in Period']
 	row=9
 	for i in range(len(sleep_per_night)):
 		row=row+1
@@ -2517,25 +2510,25 @@ def export_users_xls(request):
 	row=2
 	for i in range(len(Non_Exercise_Steps)):
 		row=row+1
-		sheet10.write(row,11,Non_Exercise_Steps[i])
+		sheet10.write(row,8,Non_Exercise_Steps[i])
 
 	Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
 	row=9
 	for i in range(len(Movement_consistency)):
 		row=row+1
-		sheet10.write(row,11,Movement_consistency[i])
+		sheet10.write(row,8,Movement_consistency[i])
 
 	Nutrition=['% Unprocessed Food of the volume of food consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
 	row=17
 	for i in range(len(Nutrition)):
 		row=row+1
-		sheet10.write(row,11,Nutrition[i])
+		sheet10.write(row,8,Nutrition[i])
 
 	alcohol=['# of Drinks Consumed per week(7days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
 	row=23
 	for i in range(len(alcohol)):
 		row = row+1
-		sheet10.write(row,11,alcohol[i])
+		sheet10.write(row,8,alcohol[i])
 
 	Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
 	'Total Exercise time (hours:minutes) the last 7 days',
@@ -2543,7 +2536,7 @@ def export_users_xls(request):
 	row=30
 	for i in range(len(Total)):
 		row = row+1
-		sheet10.write(row,11,Total[i])
+		sheet10.write(row,8,Total[i])
 
 	#Transferring Json data
 	#json_cum = open('/home/normsoftware/Downloads/pa_dummy.json')
@@ -2557,7 +2550,7 @@ def export_users_xls(request):
 	date1='{}'.format(today)
 	
 	query_params = {
-	"date":today,
+	"date":to_date1,
 	"duration":"today,yesterday,week,month,year",
 	"custom_ranges":custom_range,
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
@@ -2569,11 +2562,11 @@ def export_users_xls(request):
 	
 	time1=['today','yesterday','week','month','year']
 	
-	c = 4
+	c = 1
 	for i in range(len(time1)):
 		c = c+1
 		sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
-		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align)																
+		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
 		sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
 		sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
 		sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
@@ -2581,11 +2574,11 @@ def export_users_xls(request):
 		sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
 		sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
-		sheet10.write(15,c,DATA['summary']['sleep']['overall_sleep_gpa'][time1[i]],format_align)
+		sheet10.write(15,c,DATA['summary']['sleep']['overall_sleep_gpa'][time1[i]],format_align1)
 		sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
 		sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
 		sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
-		sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align)
+		sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
 		sheet10.write(24,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 		sheet10.write(26,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
@@ -2596,81 +2589,81 @@ def export_users_xls(request):
 		sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
 		sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
 
-		sheet10.write(3,c+10,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
-		sheet10.write(5,c+10,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
-		sheet10.write(6,c+10,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align)
-		sheet10.write(7,c+10,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
-		sheet10.write(10,c+10,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
-		sheet10.write(11,c+10,DATA['summary']['mc']['rank'][time1[i]],format_align)
-		sheet10.write(12,c+10,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
-		sheet10.write(13,c+10,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]])
-		sheet10.write(18,c+10,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
-		sheet10.write(19,c+10,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
-		sheet10.write(20,c+10,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
-		sheet10.write(21,c+10,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align)
-		sheet10.write(24,c+10,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
-		sheet10.write(25,c+10,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
-		sheet10.write(26,c+10,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
-		sheet10.write(27,c+10,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align)
+		sheet10.write(3,c+7,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+		sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+		sheet10.write(6,c+7,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
+		sheet10.write(7,c+7,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+		sheet10.write(10,c+7,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
+		sheet10.write(11,c+7,DATA['summary']['mc']['rank'][time1[i]],format_align)
+		sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+		sheet10.write(13,c+7,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
+		sheet10.write(18,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
+		sheet10.write(19,c+7,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
+		sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+		sheet10.write(21,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
+		sheet10.write(24,c+7,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
+		sheet10.write(25,c+7,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
+		sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+		sheet10.write(27,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
 	
-	#custom_range=[from_date,to_date,'data']
-	nutri=['prcnt_unprocessed_volume_of_food','rank','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
-	non_exe=['non_exercise_steps','rank','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
-	mc=['movement_consistency_score','rank','movement_consistency_grade','movement_consistency_gpa',]
-	Alc=['avg_drink_per_week','rank','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
-	Ohg=['total_gpa_point','rank','overall_health_gpa_grade','overall_health_gpa']
-	slept=['total_sleep_in_hours_min','rank','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period','overall_sleep_gpa']
-	Ec=['avg_no_of_days_exercises_per_week','rank','exercise_consistency_grade','exercise_consistency_gpa']
-	Es=['workout_effort_level','avg_exercise_heart_rate','vo2_max']
-	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
+	# #custom_range=[from_date,to_date,'data']
+	# nutri=['prcnt_unprocessed_volume_of_food','rank','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
+	# non_exe=['non_exercise_steps','rank','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
+	# mc=['movement_consistency_score','rank','movement_consistency_grade','movement_consistency_gpa',]
+	# Alc=['avg_drink_per_week','rank','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
+	# Ohg=['total_gpa_point','rank','overall_health_gpa_grade','overall_health_gpa']
+	# slept=['total_sleep_in_hours_min','rank','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period','overall_sleep_gpa']
+	# Ec=['avg_no_of_days_exercises_per_week','rank','exercise_consistency_grade','exercise_consistency_gpa']
+	# Es=['workout_effort_level','avg_exercise_heart_rate','vo2_max']
+	# other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 
-	range1='{} to {}'.format(from_date,to_date)
-	#keys = ['from_dt','to_dt','data']
-	keys=['data']
+	# range1='{} to {}'.format(from_date,to_date)
+	# #keys = ['from_dt','to_dt','data']
+	# keys=['data']
 
-	c=1
-	for i in range(len(keys)):
-		c = c + 1
-		r=2
-		for n in range(len(nutri)):
-			r= r+1
-			sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range'][range1][keys[i]],format_align)
-		r=2
-		for n in range(len(non_exe)):
-			r= r+1	
-			sheet10.write(r,c+10,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][range1][keys[i]],format_align)
+	# c=1
+	# for i in range(len(keys)):
+	# 	c = c + 1
+	# 	r=2
+	# 	for n in range(len(nutri)):
+	# 		r= r+1
+	# 		sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range'][range1][keys[i]],format_align)
+	# 	r=2
+	# 	for n in range(len(non_exe)):
+	# 		r= r+1	
+	# 		sheet10.write(r,c+10,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][range1][keys[i]],format_align)
 
-		r=9
-		for n in range(len(mc)):
-			r= r+1	
-			sheet10.write(r,c+10,DATA['summary']['mc'][mc[n]]['custom_range'][range1][keys[i]],format_align)	
-		r=23
-		for n in range(len(Alc)):
-			r= r+1	
-			sheet10.write(r,c+10,DATA['summary']['alcohol'][Alc[n]]['custom_range'][range1][keys[i]],format_align)
+	# 	r=9
+	# 	for n in range(len(mc)):
+	# 		r= r+1	
+	# 		sheet10.write(r,c+10,DATA['summary']['mc'][mc[n]]['custom_range'][range1][keys[i]],format_align)	
+	# 	r=23
+	# 	for n in range(len(Alc)):
+	# 		r= r+1	
+	# 		sheet10.write(r,c+10,DATA['summary']['alcohol'][Alc[n]]['custom_range'][range1][keys[i]],format_align)
 
-		r=2
-		for n in range(len(Ohg)):
-			r= r+1
-			sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][range1][keys[i]],format_align)
-		r=9
-		for n in range(len(slept)):
-			r= r+1
-			sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][range1][keys[i]],format_align)
-		r=17
-		for n in range(len(Ec)):
-			r= r+1
-			sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][range1][keys[i]],format_align)
+	# 	r=2
+	# 	for n in range(len(Ohg)):
+	# 		r= r+1
+	# 		sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][range1][keys[i]],format_align)
+	# 	r=9
+	# 	for n in range(len(slept)):
+	# 		r= r+1
+	# 		sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][range1][keys[i]],format_align)
+	# 	r=17
+	# 	for n in range(len(Ec)):
+	# 		r= r+1
+	# 		sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][range1][keys[i]],format_align)
 		
-		r=23
-		for n in range(len(Es)):
-			r= r+1
-			sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][range1][keys[i]],format_align)
+	# 	r=23
+	# 	for n in range(len(Es)):
+	# 		r= r+1
+	# 		sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][range1][keys[i]],format_align)
 
-		r=30
-		for n in range(len(other1)):
-			r= r+1
-			sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][range1][keys[i]],format_align)
+		# r=30
+		# for n in range(len(other1)):
+		# 	r= r+1
+		# 	sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][range1][keys[i]],format_align)
 		
 		# color formatting based on grades
 		green = book.add_format({'align':'left', 'bg_color': 'green'})
@@ -2703,6 +2696,12 @@ def export_users_xls(request):
 												'value': '"F"', 
 												'format': red},
 												)
+		num_fmt = book.add_format({'num_format': '#,###'})
+
+		sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'>=', 
+												'value': '100', 
+												'format': num_fmt})
 												
 	
 	book.close()
