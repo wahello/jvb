@@ -3,6 +3,8 @@ import urllib
 import time
 import json
 import io
+import base64
+import ast
 
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
@@ -141,29 +143,17 @@ class GarminConnectPing(APIView):
 		'''
 		file = request.FILES['file']
 		file2 = file.read()
-		# file.seek(0)
-		# file_handle = io.BytesIO(file.read())
-		# print(file_handle.read())
-		# print(type(file_handle))
-		# print(type(str(file_handle)))
-		#print(file2)
 		file_name = request.data['uploadMetaData']
-		oauthToken_fitfile = json.loads(file_name)
+		oauthToken_fitfile = ast.literal_eval(file_name)
 		file_oauth = oauthToken_fitfile['oauthToken']
-		#	 file_name = oauthToken_fitfile['uploadId']
-		# print(file_name)
-		# file3 = open(file,'rb')
-		# print(file)
-		#print(file_oauth)
-		# FILE_db = open(str(file_name),"rb")
-		# fit_file= FILE_db.read()
+
 		try:
 			user = User.objects.get(garmin_connect_token__token = file_oauth)
-			print(user)
 		except User.DoesNotExist:
 			user = None
 		if user:
-			GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
+			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file_binary=file2,meta_data_fitfile=oauthToken_fitfile)
+
 		mail = EmailMessage()
 		mail.subject = "Garmin connect Push | Files"
 		mail.body = request.data['uploadMetaData']
