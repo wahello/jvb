@@ -404,6 +404,9 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	If bed_time_today is True, that's mean we are tying to find out today's bedtime
 	"""
+	# print("\nDate:",sleep_calendar_date)
+	# print("Yesterday sleep Data:",yesterday_sleep_data)
+	# print("Today Sleep Data:", today_sleep_data)
 
 	def _get_actual_sleep_start_time(data):
 		min_duration = None
@@ -1468,7 +1471,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch,
 										order_by ='-id',filter_dup = True)
-
 		# Get sleep data for yesterday
 		sleeps = get_garmin_model_data(UserGarminDataSleep,
 									   user,start_epoch-86400,end_epoch-86400,

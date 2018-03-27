@@ -88,7 +88,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_resting_hr_days_count":None,
 			"cum_effort_level_days_count":None,
 			"cum_vo2_max_days_count":None,
-			"cum_avg_exercise_hr_days_count":None
+			"cum_avg_exercise_hr_days_count":None,
+			"cum_hrr_to_99_days_count":None
 		}
 		return fields
 
@@ -227,17 +228,16 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 	overall_health_grade_cal_data = _get_blank_pa_model_fields("overall_health_grade")
 	GRADE_POINT = _get_grading_sheme()
 	def _cal_total_point(ql_data):
-		total_gpa_point = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"movement_non_exercise_steps_grade",'F')]\
+		total_gpa_point = _safe_get_mobj(
+			today_ql_data.grades_ql,"movement_non_exercise_steps_gpa",0)\
 			+ GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"movement_consistency_grade",'F')]\
-			+ GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_grade",'F')]\
+			+ _safe_get_mobj(
+			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_gpa",0)\
 			+ _safe_get_mobj(today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0)\
 			+ GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_grade","F")]\
 			+ _safe_get_mobj(today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)\
-			+ _safe_get_mobj(today_ql_data.grades_ql,"sleep_aid_penalty",0)\
 			+ _safe_get_mobj(today_ql_data.grades_ql,"ctrl_subs_penalty",0)\
 			+ _safe_get_mobj(today_ql_data.grades_ql,"smoke_penalty",0)
 		return total_gpa_point
@@ -249,12 +249,12 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 			yday_cum_data.overall_health_grade_cum,"cum_total_gpa_point",0) + total_gpa_point
 
 		overall_health_grade_cal_data['cum_overall_health_gpa_point'] = _safe_get_mobj(
-			today_ql_data.grades_ql,"overall_health_gpa","0")\
+			today_ql_data.grades_ql,"overall_health_gpa",0)\
 			+ _safe_get_mobj(yday_cum_data.overall_health_grade_cum,"cum_overall_health_gpa_point",0)
 	elif today_ql_data:
-		overall_health_grade_cal_data['cum_total_gpa_point'] = _cal_total_point(today_ql_data.grades_ql)
+		overall_health_grade_cal_data['cum_total_gpa_point'] = _cal_total_point(today_ql_data)
 		overall_health_grade_cal_data['cum_overall_health_gpa_point'] = _safe_get_mobj(
-			today_ql_data.grades_ql,"overall_health_gpa","0")
+			today_ql_data.grades_ql,"overall_health_gpa",0)
 
 	return overall_health_grade_cal_data
 
@@ -263,8 +263,8 @@ def _get_non_exercise_steps_cum_sum(today_ql_data, yday_cum_data=None):
 	GRADE_POINT = _get_grading_sheme()
 
 	if today_ql_data and yday_cum_data:
-		non_exercise_steps_cum_data['cum_non_exercise_steps_gpa'] = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"movement_non_exercise_steps_grade",'F')]\
+		non_exercise_steps_cum_data['cum_non_exercise_steps_gpa'] = _safe_get_mobj(
+			today_ql_data.grades_ql,"movement_non_exercise_steps_gpa",0)\
 			+ _safe_get_mobj(yday_cum_data.non_exercise_steps_cum,"cum_non_exercise_steps_gpa",0)
 
 		non_exercise_steps_cum_data['cum_non_exercise_steps'] = _safe_get_mobj(
@@ -553,6 +553,13 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		avg_exercise_heartrate = 1 if avg_exercise_heartrate else 0
 		meta_cum_data['cum_avg_exercise_hr_days_count'] = avg_exercise_heartrate \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_avg_exercise_hr_days_count",0)
+
+		hrr_to_99 = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"hrr_time_to_99",""
+		)
+		hrr_to_99 = 1 if (hrr_to_99 and hrr_to_99 != ":") else 0
+		meta_cum_data['cum_hrr_to_99_days_count'] = hrr_to_99 \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_to_99_days_count",0)
 	
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
@@ -579,6 +586,12 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.exercise_reporting_ql,"avg_exercise_heartrate",0		
 		)
 		meta_cum_data['cum_avg_exercise_hr_days_count'] = 1 if avg_exercise_heartrate else 0
+
+		hrr_to_99 = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"hrr_time_to_99",""
+		)
+		meta_cum_data['cum_hrr_to_99_days_count'] = 1 if hrr_to_99 else 0
+		
 	return meta_cum_data
 
 def create_cumulative_instance(user, from_dt=None, to_dt=None):

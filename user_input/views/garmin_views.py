@@ -111,39 +111,3 @@ class GarminData(APIView):
 			}
 			return Response(data)
 		return Response({})
-
-	def _weight_in_grams(self,target_date):
-		current_date = str_to_datetime(target_date)
-		yesterday_date = current_date - timedelta(days=1)
-		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
-
-		start_epoch = current_date_epoch - 86400
-		end_epoch = current_date_epoch + 86400
-		weight_data = get_garmin_model_data(UserGarminDataWeight,
-			self.request.user, start_epoch,end_epoch,order_by = '-id')
-		weight_data_parsed = get_weekly_data(weight_data,current_date,yesterday_date)
-		todays_weight_data = weight_data_parsed[current_date.strftime('%Y-%m-%d')]
-		yesterday_weight_data = weight_data_parsed[yesterday_date.strftime('%Y-%m-%d')]
-		return get_weight_stats(current_date,yesterday_weight_data, todays_weight_data,str_dt=False)
-
-	def _have_activity_record(self, target_date):
-		current_date = str_to_datetime(target_date)
-		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
-		start_epoch = current_date_epoch
-		end_epoch = current_date_epoch + 86400
-		activity_records = get_garmin_model_data(UserGarminDataWeight,
-			self.request.user, start_epoch,end_epoch,order_by = '-id')
-
-		return True if activity_records else False
-
-	def get(self, request, format = "json"):
-		target_date = request.query_params.get('date',None)
-		if target_date:
-			sleep_stats = self._weight_in_grams(target_date)
-			have_activities = self._have_activity_record(target_date)
-			data = {
-				"weight_in_grams":weight_in_grams,
-				"have_activities":have_activities
-			}
-			return Response(data)
-		return Response({})
