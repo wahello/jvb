@@ -32,7 +32,7 @@ class Dashboard extends Component {
 							   <Link to='/rawdata'>Raw Data</Link><br/>
 							   <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
 							   <Link to='/rawdata#grades'>Grades</Link><br/>
-							   <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
+							   <a target="_top" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 							  <h3 id="link_style">Set up Links to Garmin</h3>
 							  <a href='/users/request_token'>Garmin Health Connect</a><br/>

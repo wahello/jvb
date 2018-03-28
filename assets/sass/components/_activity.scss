@@ -1,13 +1,27 @@
 #activity_calender{
 	margin-top: 80px;
+	margin-right: 50px;
 }
-#progressActivity{
+.progressActivity{
 	position:relative;
-	right: 40px;
 	top: 10px;
+	padding-right: 20px;
+	padding-left: 20px;
+
 }
 #save_cancel_btn{
 	float: right;
 	padding-top: 30px;
 	padding-right: 30px;
+}
+#add_button{
+	align-items: center;
+	
+	font-size: 16px;
+	border-collapse: collapse;
+	border-color: white;
+}
+.add_button_back{
+	background-color: #F9F8F8;
+	font-weight: bold;
 }
