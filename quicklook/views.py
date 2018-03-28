@@ -399,7 +399,7 @@ def export_users_xls(request):
 	options_user_input = DailyUserInputEncouraged.objects.filter(
 		user_input__created_at__range=(from_date, to_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
-	options_user_input_datewise = {q.user_input.created_at.strftime("%Y-%m-%d"):qraw
+	options_user_input_datewise = {q.user_input.created_at.strftime("%Y-%m-%d"):q
 		 for q in options_user_input }
 
 
@@ -1603,9 +1603,9 @@ def export_users_xls(request):
 					sheet2.write(i + 2, row_num, steps_data[key], format)
 			for i,key in enumerate(col_weight):
 				if options_data:
-					sheet2.write(i + 6, row_num, options_data[key])
+					sheet2.write(i + 7, row_num, options_data[key])
 				else:
-					sheet2.write(i + 6, row_num,"Not Measured")
+					sheet2.write(i + 7, row_num,"Not Measured")
 		else:
 			row_num += 1
 			sheet2.write(i + 2, row_num,'')
