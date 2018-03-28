@@ -71,6 +71,15 @@ class ToMetaCumulative(object):
 		self.cum_vo2_max_days_count = raw_data["cum_vo2_max_days_count"]
 		self.cum_avg_exercise_hr_days_count = raw_data["cum_avg_exercise_hr_days_count"]
 		self.cum_hrr_to_99_days_count = raw_data["cum_hrr_to_99_days_count"]
+		self.cum_hrr_beats_lowered_in_first_min_days_count = raw_data[
+			"cum_hrr_beats_lowered_in_first_min_days_count"
+		]
+		self.cum_highest_hr_in_first_min_days_count = raw_data[
+			"cum_highest_hr_in_first_min_days_count"
+		]
+		self.cum_hrr_lowest_hr_point_days_count = raw_data[
+			"cum_hrr_lowest_hr_point_days_count"
+		]
 
 class ToCumulativeSum(object):
 	'''
@@ -867,17 +876,12 @@ class ProgressReport():
 
 	def _cal_other_summary(self, custom_daterange = False):
 
-		def _cal_resting_hr_average(stat1, stat2,resting_hr_days):
-			if not stat1 == None and not stat2 == None and resting_hr_days:
-				avg = (stat1 - stat2)/resting_hr_days
+		def _cal_custom_average(stat1, stat2,days):
+			if not stat1 == None and not stat2 == None and days:
+				avg = (stat1 - stat2)/days
 				return avg
 			return 0
 
-		def _cal_hrr_to_99_average(stat1, stat2,hrr_time_to_99_days):
-			if not stat1 == None and not stat2 == None and hrr_time_to_99_days:
-				avg = (stat1 - stat2)/hrr_time_to_99_days
-				return avg
-			return 0
 
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
@@ -886,7 +890,7 @@ class ProgressReport():
 					if todays_meta_data and current_meta_data:
 						resting_hr_days = (todays_meta_data.cum_resting_hr_days_count - 
 							current_meta_data.cum_resting_hr_days_count)
-						val = _cal_resting_hr_average(
+						val = _cal_custom_average(
 							todays_data.cum_resting_hr,
 							current_data.cum_resting_hr,
 							resting_hr_days)
@@ -897,27 +901,48 @@ class ProgressReport():
 					if todays_meta_data and current_meta_data:
 						hrr_time_to_99_days = (todays_meta_data.cum_hrr_to_99_days_count - 
 							current_meta_data.cum_hrr_to_99_days_count)
-						val = self._min_to_min_sec(_cal_hrr_to_99_average(
+						val = self._min_to_min_sec(_cal_custom_average(
 							todays_data.cum_hrr_time_to_99_in_mins,
 							current_data.cum_hrr_time_to_99_in_mins,
 							hrr_time_to_99_days))
 						return val
 					return None
 				elif key == 'hrr_beats_lowered_in_first_min':
-					val = self._get_average(
-						todays_data.cum_hrr_beats_lowered_in_first_min,
-						current_data.cum_hrr_beats_lowered_in_first_min,alias)
-					return round(val)
+					if todays_meta_data and current_meta_data:
+						beats_lowered_in_first_min_days = (
+							todays_meta_data.cum_hrr_beats_lowered_in_first_min_days_count - 
+							current_meta_data.cum_hrr_beats_lowered_in_first_min_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_hrr_beats_lowered_in_first_min,
+							current_data.cum_hrr_beats_lowered_in_first_min,
+							beats_lowered_in_first_min_days)
+						return round(val)
+					return None
 				elif key == 'hrr_highest_hr_in_first_min':
-					val = self._get_average(
-						todays_data.cum_highest_hr_in_first_min,
-						current_data.cum_highest_hr_in_first_min,alias)
-					return round(val)
+					if todays_meta_data and current_meta_data:
+						highest_hr_in_first_min_days = (
+							todays_meta_data.cum_highest_hr_in_first_min_days_count - 
+							current_meta_data.cum_highest_hr_in_first_min_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_highest_hr_in_first_min,
+							current_data.cum_highest_hr_in_first_min,
+							highest_hr_in_first_min_days)
+						return round(val)
+					return None
 				elif key == 'hrr_lowest_hr_point':
-					val = self._get_average(
-						todays_data.cum_hrr_lowest_hr_point,
-						current_data.cum_hrr_lowest_hr_point,alias)
-					return round(val)
+					if todays_meta_data and current_meta_data:
+						hrr_lowest_hr_point_days = (
+							todays_meta_data.cum_hrr_lowest_hr_point_days_count - 
+							current_meta_data.cum_hrr_lowest_hr_point_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_hrr_lowest_hr_point,
+							current_data.cum_hrr_lowest_hr_point,
+							hrr_lowest_hr_point_days)
+						return round(val)
+					return None
 				elif key == 'floors_climbed':
 					val = self._get_average(
 						todays_data.cum_floors_climbed,

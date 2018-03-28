@@ -89,7 +89,10 @@ def _get_blank_pa_model_fields(model):
 			"cum_effort_level_days_count":None,
 			"cum_vo2_max_days_count":None,
 			"cum_avg_exercise_hr_days_count":None,
-			"cum_hrr_to_99_days_count":None
+			"cum_hrr_to_99_days_count":None,
+			"cum_hrr_beats_lowered_in_first_min_days_count":None,
+			"cum_highest_hr_in_first_min_days_count":None,
+			"cum_hrr_lowest_hr_point_days_count":None
 		}
 		return fields
 
@@ -560,6 +563,25 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		hrr_to_99 = 1 if (hrr_to_99 and hrr_to_99 != ":") else 0
 		meta_cum_data['cum_hrr_to_99_days_count'] = hrr_to_99 \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_to_99_days_count",0)
+
+		hrr_beats_lowered_in_first_min = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
+		hrr_beats_lowered_in_first_min = 1 if hrr_beats_lowered_in_first_min else 0
+		meta_cum_data['cum_hrr_beats_lowered_in_first_min_days_count'] = hrr_beats_lowered_in_first_min \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_beats_lowered_in_first_min_days_count",0)
+
+		highest_hr_in_first_min = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"highest_hr_first_minute",0)
+		highest_hr_in_first_min = 1 if highest_hr_in_first_min else 0
+		meta_cum_data['cum_highest_hr_in_first_min_days_count'] = highest_hr_in_first_min \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_highest_hr_in_first_min_days_count",0)
+
+		hrr_lowest_hr_point = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
+		hrr_lowest_hr_point = 1 if hrr_lowest_hr_point else 0
+		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = hrr_beats_lowered_in_first_min \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_lowest_hr_point_days_count",0)
+
 	
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
@@ -591,6 +613,18 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.exercise_reporting_ql,"hrr_time_to_99",""
 		)
 		meta_cum_data['cum_hrr_to_99_days_count'] = 1 if hrr_to_99 else 0
+
+		hrr_beats_lowered_in_first_min = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
+		meta_cum_data['cum_hrr_beats_lowered_in_first_min_days_count'] = 1 if hrr_beats_lowered_in_first_min else 0
+
+		highest_hr_in_first_min = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"highest_hr_first_minute",0)
+		meta_cum_data['cum_highest_hr_in_first_min_days_count'] = 1 if highest_hr_in_first_min else 0
+
+		hrr_lowest_hr_point = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
+		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = 1 if hrr_lowest_hr_point else 0
 		
 	return meta_cum_data
 
