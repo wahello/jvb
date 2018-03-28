@@ -667,7 +667,8 @@ def export_users_xls(request):
 	# Steps
 	num_3 = row_num
 	columns4 = ['movement_consistency','non_exercise_steps', 'exercise_steps', 'total_steps', 'floor_climed']
-	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed']
+	columns4W = ['Movement Consistency','Non Exercise Steps', 'Exercise Steps', 'Total Steps', 'Floors Climed','Weight']
+	col_weight = ['weight']
 	sheet9.write(24, 0, "Steps",bold)
 	col_num2 = 24
 	# a = len(rows_of_grades)
@@ -691,7 +692,10 @@ def export_users_xls(request):
 	while (current_date >= from_date):
 		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		grades_data = grades_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		options_data = options_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		if steps_data and grades_data:
+			if options_data:
+				options_data = options_data.__dict__
 			steps_data = steps_data.__dict__
 			grades_data = grades_data.__dict__
 			# logic
@@ -720,6 +724,11 @@ def export_users_xls(request):
 					sheet9.write(i1+i+1,row_num - num_3,ast.literal_eval(steps_data[key])['inactive_hours'], format_red)
 				else:
 					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format)
+			for i,key in enumerate(col_weight):
+				if options_data:
+					sheet9.write(i1+i+6,row_num - num_3, options_data[key])
+				else:
+					sheet9.write(i1+i+6,row_num - num_3,"Not Measured")
 		else:
 			row_num += 1
 			sheet9.write(i1+i+1,row_num - num_3, '')
@@ -1024,7 +1033,23 @@ def export_users_xls(request):
 						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,data[key])
-
+				elif i == 23:
+					if json2_data:
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+				elif i == 24:
+					if json2_data:
+						# print(data['avg_heartrate'])
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+				elif i == 25:
+					if json2_data:
+						# print(data['avg_heartrate'])
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif data[key] == None:
 					sheet9.write(i1+i+1,row_num - num_11,'Not Reported')
 				elif key != 'avg_heartrate':
@@ -1508,6 +1533,7 @@ def export_users_xls(request):
 			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
 			current_date_string = str(current_date_string)
 			sheet2.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			
 			# sheet2.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet2.write(0, 0, "Steps",bold)
@@ -1524,7 +1550,10 @@ def export_users_xls(request):
 	while (current_date >= from_date):
 		steps_data = steps_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		grades_data = grades_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		options_data = options_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		if steps_data and grades_data:
+			if options_data:
+				options_data = options_data.__dict__
 			steps_data = steps_data.__dict__
 			grades_data = grades_data.__dict__
 			# logic
@@ -1553,6 +1582,11 @@ def export_users_xls(request):
 					sheet2.write(i + 2, row_num,ast.literal_eval(steps_data[key])['inactive_hours'], format_red)
 				else:
 					sheet2.write(i + 2, row_num, steps_data[key], format)
+			for i,key in enumerate(col_weight):
+				if options_data:
+					sheet2.write(i + 6, row_num, options_data[key])
+				else:
+					sheet2.write(i + 6, row_num,"Not Measured")
 		else:
 			row_num += 1
 			sheet2.write(i + 2, row_num,'')
@@ -1825,7 +1859,7 @@ def export_users_xls(request):
 			for i,key in enumerate(columns):
 				avg_heart_rate_string = data['avg_heartrate']
 				json2_data = json.loads(avg_heart_rate_string)
-				
+
 				if i == 12:
 					if 'RUNNING' in json2_data:
 						sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
@@ -1854,6 +1888,23 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,'Not provided')
 					else:
 						sheet6.write(i + 2, row_num,data[key])
+				elif i == 23:
+					if json2_data:
+						sheet6.write(i + 2, row_num,data[key])
+					else:
+						sheet6.write(i + 2, row_num,'No Workout')
+				elif i == 24:
+					if json2_data:
+						# print(data['avg_heartrate'])
+						sheet6.write(i + 2, row_num,data[key])
+					else:
+						sheet6.write(i + 2, row_num,'No Workout')
+				elif i == 25:
+					if json2_data:
+						# print(data['avg_heartrate'])
+						sheet6.write(i + 2, row_num,data[key])
+					else:
+						sheet6.write(i + 2, row_num,'No Workout')
 				elif data[key] == None:
 					sheet6.write(i + 2, row_num,'Not Reported')
 				elif key != 'avg_heartrate':
