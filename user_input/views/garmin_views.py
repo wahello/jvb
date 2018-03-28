@@ -84,18 +84,19 @@ class GarminData(APIView):
 		return (activity_data,manually_updated_activity_data)    
 
 	def _create_activity_stat(self,activity_obj):
-		
-		final_act = {}
-		tmp2 = {}
+
 		if activity_obj:
+			tmp = {
+					"summaryId":"",
+					"activityType":"",
+					"durationInSeconds":"",
+					"averageHeartRateInBeatsPerMinute":"",
+					"comments":""
+				}
 			for k, v in activity_obj.items():
-				if k == 'summaryId' or k == 'activityType' or k == 'durationInSeconds' or k == 'averageHeartRateInBeatsPerMinute':
-					tmp_dict = {k:v}
-					tmp2.update(tmp_dict)
-					tmp_dict2 = {activity_obj['summaryId']:tmp2}
-					final_act.update(tmp_dict2)
-		# print(final_act)
-		return final_act
+				if k in tmp.keys():
+					tmp[k] = v
+			return {activity_obj['summaryId']:tmp}
 		
 
 	def _get_activities(self,target_date):
@@ -103,6 +104,7 @@ class GarminData(APIView):
 		activity_data = act_data[0]
 		manually_updated_act_data = act_data[1]
 		final_act_data = {}
+		comments = {}
 		manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
 		manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 		act_obj = {}
@@ -111,7 +113,7 @@ class GarminData(APIView):
 			# print(act_obj)
 			finall = self._create_activity_stat(act_obj)
 			final_act_data.update(finall)
-		# print(final_act_data)
+		print(final_act_data)
 		return final_act_data
 			
 
