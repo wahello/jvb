@@ -64,6 +64,7 @@ class GarminData(APIView):
 
 		return True if activity_records else False
 
+
 	def _get_activities_data(self,target_date):
 		current_date = str_to_datetime(target_date)
 		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -114,7 +115,6 @@ class GarminData(APIView):
 			final_act_data.update(finall)
 		return final_act_data
 			
-	
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)

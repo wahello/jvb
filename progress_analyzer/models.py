@@ -81,3 +81,14 @@ class MetaCumulative(models.Model):
 	cum_resting_hr_days_count = models.IntegerField(blank=True,null=True)
 	cum_effort_level_days_count = models.IntegerField(blank=True,null=True)
 	cum_vo2_max_days_count = models.IntegerField(blank=True,null=True)
+	cum_avg_exercise_hr_days_count = models.IntegerField(blank=True,null=True)
+	cum_hrr_to_99_days_count = models.IntegerField(blank=True,null=True)
+	cum_hrr_beats_lowered_in_first_min_days_count = models.IntegerField(
+		blank=True, null=True
+	)
+	cum_highest_hr_in_first_min_days_count = models.IntegerField(
+		blank=True, null=True
+	)
+	cum_hrr_lowest_hr_point_days_count = models.IntegerField(
+		blank=True, null=True
+	)

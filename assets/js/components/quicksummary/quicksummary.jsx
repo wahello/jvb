@@ -127,6 +127,10 @@ class Quicklook extends Component{
 				grade_point[data.grades_ql.movement_consistency_grade]);
 
 			let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
+			let avg_sleep_per_night_gpa = data.grades_ql.avg_sleep_per_night_gpa;
+			if (avg_sleep_per_night_gpa){
+				avg_sleep_per_night_gpa = avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty)
+			}
 
 			let exercise_consistency_points = (
 				grade_point[data.grades_ql.exercise_consistency_grade]);
@@ -167,7 +171,7 @@ class Quicklook extends Component{
 		        submitted_user_input:user_input_data.have_data?"Yes":"No",		      
 		        movement_non_exercise_steps_gpa:parseFloat(data.grades_ql.movement_non_exercise_steps_gpa).toFixed(2),
 		        movement_consistency_points:parseFloat(movement_consistency_points).toFixed(2),		       
-		        avg_sleep_per_night_gpa:parseFloat(data.grades_ql.avg_sleep_per_night_gpa).toFixed(2),
+		        avg_sleep_per_night_gpa:parseFloat(avg_sleep_per_night_gpa).toFixed(2),
 		        exercise_consistency_points:parseFloat(exercise_consistency_points).toFixed(2),
 		        prcnt_unprocessed_food_consumed_gpa:parseFloat(data.grades_ql.prcnt_unprocessed_food_consumed_gpa).toFixed(2),
 		        alcoholic_drink_per_week_gpa:parseFloat(data.grades_ql.alcoholic_drink_per_week_gpa).toFixed(2),
