@@ -259,6 +259,7 @@ class Quicklook extends Component{
 		        "exercise_steps": data.steps_ql.exercise_steps,
 		        "total_steps": data.steps_ql.total_steps,
 		        "floor_climed": data.steps_ql.floor_climed,
+		        "weight":user_input_data.optional_input.weight,
 		    },
 		    sleep_ql: {
 

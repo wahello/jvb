@@ -156,6 +156,30 @@ renderTableColumns(dateWiseData,category,classes=""){
                 let time_str = `${hms[0]} : ${hms[1]} : ${hms[2]} `;
                 all_data.push(time_str);
             }
+            else if(key == "hrr_time_to_99"){
+                if(value == "" || value == undefined || value == "0:0"){
+                    all_data.push("No Workout")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
+            else if(key == "hrr_starting_point"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push("No Workout")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
+             else if(key == "hrr_beats_lowered_first_minute"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push("No Workout")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
             else
                 all_data.push(value);
 
