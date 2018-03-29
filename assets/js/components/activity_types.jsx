@@ -298,7 +298,9 @@ export default class Activity_Type extends Component{
 	                        target="progressActivity"		                           
 	                        isOpen={this.state.activityEditModal}
 	                        toggle={this.handleChangeModal}>
-	                        <ModalHeader toggle={this.toggleModal}>Edit Activities</ModalHeader>
+	                        <ModalHeader toggle={this.toggleModal}>
+	                        	{this.state.selectedActivityId?'Edit Activity':'Add Activity'}
+	                        </ModalHeader>
 	                            <ModalBody>
 	                       <FormGroup>                            
 	         
