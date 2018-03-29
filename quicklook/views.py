@@ -1319,12 +1319,15 @@ def export_users_xls(request):
 				mc_points = grade_point[grades_data['movement_consistency_grade']]
 				ec_points = grade_point[grades_data['exercise_consistency_grade']]
 				sleep_points = grades_data['avg_sleep_per_night_gpa']
-				#ec_points = grades_data['exercise_consistency_score']
-				#food_points = grades_data['prcnt_unprocessed_food_consumed_gpa']
-				#alcohol_points = grades_data['alcoholic_drink_per_week_gpa']
 				sp_points = grades_data['sleep_aid_penalty']
 				cs_points = grades_data['ctrl_subs_penalty']
 				smoke_points = grades_data['smoke_penalty']
+				
+				if sleep_points:
+					sleep_points += abs(sp_points)
+				#ec_points = grades_data['exercise_consistency_score']
+				#food_points = grades_data['prcnt_unprocessed_food_consumed_gpa']
+				#alcohol_points = grades_data['alcoholic_drink_per_week_gpa']
 				#print(current_date,steps_gpa,mc_points,sleep_points,ec_points,food_points,alcohol_points,sp_points,cs_points,smoke_points)
 
 				total_points = steps_gpa+mc_points+sleep_points+ec_points+food_points+alcohol_points+sp_points+cs_points+smoke_points

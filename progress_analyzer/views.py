@@ -215,14 +215,17 @@ def progress_excel_export(request):
 	if (len(a) == 2):
 		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
 		custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
+		crsf1 = custom_ranges1_start.strftime('%b %d,%Y')
+		cref1= custom_ranges1_end.strftime('%b %d,%Y')
 		custom_range1='{} to {}'.format(custom_ranges1_start,custom_ranges1_end)
-		sheet10.write(0,2,custom_range1,format)
-		sheet10.write(0,10,custom_range1,format)
+		crf1 = '{} to {}'.format(crsf1,cref1)
+		sheet10.write(0,2,crf1,format)
+		sheet10.write(0,10,crf1,format)
 		cr1 = '{},{}'.format(custom_ranges1_start,custom_ranges1_end)
 		sheet10.set_column('J:J',45)
 		sheet10.set_column('I:I',1)
-		sheet10.set_column('C:E',13)
-		sheet10.set_column('K:M',13)
+		sheet10.set_column('C:E',15)
+		sheet10.set_column('K:M',15)
 		sheet10.set_column('N:P',17)
 		sheet10.set_column('F:H',17)
 
@@ -306,24 +309,31 @@ def progress_excel_export(request):
 			for n in range(len(nutri)):
 				r= r+1
 				sheet10.write(r+15,c+8,DATA['summary']['nutrition'][nutri[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(21,c+8,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][custom_range1]['data'],format_align1)
 			r=2
 			for n in range(len(non_exe)):
 				r= r+1	
 				sheet10.write(r,c+8,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(6,c+8,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][custom_range1]['data'],format_align1)
 
 			r=9
 			for n in range(len(mc)):
 				r= r+1	
 				sheet10.write(r,c+8,DATA['summary']['mc'][mc[n]]['custom_range'][custom_range1]['data'],format_align)	
+				sheet10.write(13,c+8,DATA['summary']['mc'][mc[-1]]['custom_range'][custom_range1]['data'],format_align1)	
+
 			r=23
 			for n in range(len(Alc)):
 				r= r+1	
 				sheet10.write(r,c+8,DATA['summary']['alcohol'][Alc[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(27,c+8,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align1)
 
 			r=2
 			for n in range(len(Ohg)):
 				r= r+1
 				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][custom_range1]['data'],format_align1)
+
 			r=9
 			for n in range(len(slept)):
 				r= r+1
@@ -332,7 +342,8 @@ def progress_excel_export(request):
 			for n in range(len(Ec)):
 				r= r+1
 				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][custom_range1]['data'],format_align)
-			
+				sheet10.write(21,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][custom_range1]['data'],format_align1)
+
 			r=23
 			for n in range(len(Es)):
 				r= r+1
@@ -401,6 +412,13 @@ def progress_excel_export(request):
 		custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
 		custom_ranges2_start = datetime.strptime(a[2], "%Y-%m-%d").date()
 		custom_ranges2_end = datetime.strptime(a[3], "%Y-%m-%d").date()
+		crsf1 = custom_ranges1_start.strftime('%b %d,%Y')
+		cref1= custom_ranges1_end.strftime('%b %d,%Y')
+		crsf2 = custom_ranges2_start.strftime('%b %d,%Y')
+		cref2= custom_ranges2_end.strftime('%b %d,%Y')
+		crf1 = '{} to {}'.format(crsf1,cref1)
+		crf2 = '{} to {}'.format(crsf2,cref2)
+
 		cr1='{},{}'.format(custom_ranges1_start,custom_ranges1_end)
 		cr2='{},{}'.format(custom_ranges2_start,custom_ranges2_end)
 		crs1 ='{},{}'.format(cr1,cr2)
@@ -409,8 +427,8 @@ def progress_excel_export(request):
 
 		sheet10.set_column('K:K',45)
 		sheet10.set_column('J:J',1)
-		sheet10.set_column('C:F',13)
-		sheet10.set_column('L:O',13)
+		sheet10.set_column('C:F',15)
+		sheet10.set_column('L:O',15)
 		sheet10.set_column('P:R',17)
 		sheet10.set_column('G:I',17)
 
@@ -441,11 +459,12 @@ def progress_excel_export(request):
 	                                          'format': border_format})
 
 		list1=[custom_range1,custom_range2]
+		range1 = [crf1,crf2]
 		c = 1
-		for i in range(len(list1)):
+		for i in range(len(range1)):
 			c = c+1
-			sheet10.write(0,c,list1[i],format)
-			sheet10.write(0,c+9,list1[i],format)
+			sheet10.write(0,c,range1[i],format)
+			sheet10.write(0,c+9,range1[i],format)
 
 		c = 3
 		for i in range(len(duration)):
@@ -502,24 +521,32 @@ def progress_excel_export(request):
 			for n in range(len(nutri)):
 				r= r+1
 				sheet10.write(r+15,c+9,DATA['summary']['nutrition'][nutri[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(21,c+9,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list1[i]]['data'],format_align1)
+
 			r=2
 			for n in range(len(non_exe)):
 				r= r+1	
 				sheet10.write(r,c+9,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(6,c+9,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list1[i]]['data'],format_align1)
 
 			r=9
 			for n in range(len(mc)):
 				r= r+1	
 				sheet10.write(r,c+9,DATA['summary']['mc'][mc[n]]['custom_range'][list1[i]]['data'],format_align)	
+				sheet10.write(13,c+9,DATA['summary']['mc'][mc[-1]]['custom_range'][list1[i]]['data'],format_align1)	
+
 			r=23
 			for n in range(len(Alc)):
 				r= r+1	
 				sheet10.write(r,c+9,DATA['summary']['alcohol'][Alc[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(27,c+9,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align1)
 
 			r=2
 			for n in range(len(Ohg)):
 				r= r+1
 				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list1[i]]['data'],format_align1)
+
 			r=9
 			for n in range(len(slept)):
 				r= r+1
@@ -528,7 +555,8 @@ def progress_excel_export(request):
 			for n in range(len(Ec)):
 				r= r+1
 				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][list1[i]]['data'],format_align)
-			
+				sheet10.write(21,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list1[i]]['data'],format_align1)
+
 			r=23
 			for n in range(len(Es)):
 				r= r+1
@@ -601,6 +629,16 @@ def progress_excel_export(request):
 		custom_ranges3_start = datetime.strptime(a[4], "%Y-%m-%d").date()
 		custom_ranges3_end = datetime.strptime(a[5], "%Y-%m-%d").date()
 
+		crsf1 = custom_ranges1_start.strftime('%b %d,%Y')
+		cref1 = custom_ranges1_end.strftime('%b %d,%Y')
+		crsf2 = custom_ranges2_start.strftime('%b %d,%Y')
+		cref2 = custom_ranges2_end.strftime('%b %d,%Y')
+		crsf3 = custom_ranges3_start.strftime('%b %d,%Y')
+		cref3 = custom_ranges3_end.strftime('%b %d,%Y')
+		crf1 = '{} to {}'.format(crsf1,cref1)
+		crf2 = '{} to {}'.format(crsf2,cref2)
+		crf3 = '{} to {}'.format(crsf3,cref3)
+
 		cr1='{},{}'.format(custom_ranges1_start,custom_ranges1_end)
 		cr2='{},{}'.format(custom_ranges2_start,custom_ranges2_end)
 		cr3='{},{}'.format(custom_ranges3_start,custom_ranges3_end)
@@ -611,8 +649,8 @@ def progress_excel_export(request):
 		
 		sheet10.set_column('L:L',45)
 		sheet10.set_column('K:K',1)
-		sheet10.set_column('C:G',13)
-		sheet10.set_column('M:Q',13)
+		sheet10.set_column('C:G',15)
+		sheet10.set_column('M:Q',15)
 		sheet10.set_column('R:T',17)
 		sheet10.set_column('H:J',17)
 
@@ -642,11 +680,12 @@ def progress_excel_export(request):
 	                                          'format': border_format})
 
 		list2=[custom_range1,custom_range2,custom_range3]
+		range2=[crf1,crf2,crf3]
 		c = 1
-		for i in range(len(list2)):
+		for i in range(len(range2)):
 			c = c+1
-			sheet10.write(0,c,list2[i],format)
-			sheet10.write(0,c+10,list2[i],format)
+			sheet10.write(0,c,range2[i],format)
+			sheet10.write(0,c+10,range2[i],format)
 
 		c = 4
 		for i in range(len(duration)):
@@ -703,24 +742,32 @@ def progress_excel_export(request):
 			for n in range(len(nutri)):
 				r= r+1
 				sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(21,c+10,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list2[i]]['data'],format_align1)
+
 			r=2
 			for n in range(len(non_exe)):
 				r= r+1	
 				sheet10.write(r,c+10,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(6,c+10,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list2[i]]['data'],format_align1)
 
 			r=9
 			for n in range(len(mc)):
 				r= r+1	
 				sheet10.write(r,c+10,DATA['summary']['mc'][mc[n]]['custom_range'][list2[i]]['data'],format_align)	
+				sheet10.write(13,c+10,DATA['summary']['mc'][mc[-1]]['custom_range'][list2[i]]['data'],format_align1)	
+
 			r=23
 			for n in range(len(Alc)):
 				r= r+1	
 				sheet10.write(r,c+10,DATA['summary']['alcohol'][Alc[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(27,c+10,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align1)
 
 			r=2
 			for n in range(len(Ohg)):
 				r= r+1
 				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list2[i]]['data'],format_align1)
+
 			r=9
 			for n in range(len(slept)):
 				r= r+1
@@ -729,7 +776,8 @@ def progress_excel_export(request):
 			for n in range(len(Ec)):
 				r= r+1
 				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][list2[i]]['data'],format_align)
-			
+				sheet10.write(21,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list2[i]]['data'],format_align1)
+
 			r=23
 			for n in range(len(Es)):
 				r= r+1
