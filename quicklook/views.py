@@ -1335,7 +1335,7 @@ def export_users_xls(request):
 				#print(current_date,steps_gpa,mc_points,sleep_points,ec_points,food_points,alcohol_points,sp_points,cs_points,smoke_points)
 				sheet1.write(25,row_num,steps_gpa,format_points)
 				sheet1.write(26,row_num,mc_points,format_points)
-				sheet1.write(27,row_num,grades_data['avg_sleep_per_night_gpa'],format_points)
+				sheet1.write(27,row_num,sleep_points,format_points)
 				sheet1.write(28,row_num,ec_points,format_points)
 				sheet1.write(29,row_num,food_points,format_points)
 				sheet1.write(30,row_num,alcohol_points,format_points)
