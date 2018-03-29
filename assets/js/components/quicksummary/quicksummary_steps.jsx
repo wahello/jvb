@@ -21,7 +21,8 @@ class Steps extends Component{
         {name: 'Non Exercise Steps'},
         {name: 'Exercise Steps'},  
         {name: 'Total Steps'},
-        {name: 'Floors Climed'}
+        {name: 'Floors Climed'},
+        {name: 'Weight'}
       ],
     };
   }
@@ -47,6 +48,15 @@ renderTableColumns(dateWiseData,category,classes=""){
 	                		all_data.push('-')
 	                	}
 	            	}
+	            	else if(key == "weight"){
+	            		if(value == "i do not weigh myself today" || value == "" || value == undefined){
+	            			all_data.push("Not Measured")
+	            		}
+	            		else{
+	            			all_data.push(value);
+	            		}
+	            	}
+
 	                else{
 						value += '';
 		             	var x = value.split('.');
