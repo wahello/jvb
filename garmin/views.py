@@ -154,14 +154,14 @@ class GarminConnectPing(APIView):
 			user = None
 		print(user)
 		if user:
-			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file_binary=file2,meta_data_fitfile=oauthToken_fitfile)
+			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
 
 		mail = EmailMessage()
 		mail.subject = "Garmin connect Push | Files"
 		mail.body = request.data['uploadMetaData']
 		mail.to = ['atulk@s7works.io']
 		mail.attach(file.name, file.read(), file.content_type)
-		# mail.send()
+		mail.send()
 		headers={"Location":"/"}
 		return Response(status = status.HTTP_201_CREATED,headers=headers)
 
