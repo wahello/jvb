@@ -448,7 +448,7 @@ let value =parseFloat(x).toFixed(2);
 return value;
 }
 exerciseStatsNoWorkOut(value){
-      if(value == undefined || value == 0 || value == ""){
+      if(value == undefined || value == 0 || value == "" || value == "00:00"){
         value = "NO Workout"
       }
       else{
