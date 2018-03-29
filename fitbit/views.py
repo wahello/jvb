@@ -92,7 +92,7 @@ def fetching_data_fitbit(request):
 	# food_fitbit = session.get("https://api.fitbit.com/1/user/-/foods/log/date/{}.json".format(date_fitbit))
 	# hrr_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
-	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&offset=10&limit=10".format(date_fitbit))
+	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1m.json".format(date_fitbit))
 	# try:
 	# 	esponse = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/2018-02-11.json")
@@ -107,7 +107,7 @@ def fetching_data_fitbit(request):
 	# food_fitbit = food_fitbit.json()
 	# hrr_fitbit = hrr_fitbit.json()
 	steps_fitbit = steps_fitbit.json()
-	# heartrate_fitbit = heartrate_fitbit.json()
+	heartrate_fitbit = heartrate_fitbit.json()
 	calories_fitbit = calories_fitbit.json()
 	# print(pprint.pprint(sleep_fitbit))
 	# print(pprint.pprint(activity_fitbit))

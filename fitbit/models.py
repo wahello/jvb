@@ -19,3 +19,18 @@ class UserFitbitDataSleep(models.Model):
 	def __str__(self):
 		return "%s"%(self.user.username)
 
+class UserFitbitDataHeartRate(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="fitbit_heartrate_data")
+	date_of_heartrate = models.TextField()
+	data = models.TextField()
+
+	def __str__(self):
+		return "%s"%(self.user.username)
+
+class UserFitbitDataActivities(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="fitbit_activities_data")
+	date_of_activities = models.TextField()
+	data = models.TextField()
+
+	def __str__(self):
+		return "%s"%(self.user.username)
