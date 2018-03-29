@@ -16,14 +16,14 @@ from .models import FitbitConnectToken
 # Create your views here.
 def request_token_fitbit(request):
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -35,8 +35,8 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN46'
-	client_secret='94d717c6ec36c270ed59cc8b5564166f'
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -51,7 +51,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -73,8 +73,8 @@ def receive_token_fitbit(request):
 
 def fetching_data_fitbit(request):
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -92,7 +92,7 @@ def fetching_data_fitbit(request):
 	# food_fitbit = session.get("https://api.fitbit.com/1/user/-/foods/log/date/{}.json".format(date_fitbit))
 	# hrr_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
-	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&offset=10&limit=10".format(date_fitbit))
+	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1m.json".format(date_fitbit))
 	# try:
 	# 	esponse = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/2018-02-11.json")
@@ -107,7 +107,7 @@ def fetching_data_fitbit(request):
 	# food_fitbit = food_fitbit.json()
 	# hrr_fitbit = hrr_fitbit.json()
 	steps_fitbit = steps_fitbit.json()
-	# heartrate_fitbit = heartrate_fitbit.json()
+	heartrate_fitbit = heartrate_fitbit.json()
 	calories_fitbit = calories_fitbit.json()
 	# print(pprint.pprint(sleep_fitbit))
 	# print(pprint.pprint(activity_fitbit))
@@ -120,7 +120,7 @@ def fetching_data_fitbit(request):
 	if b == 401:
 		if a['errors'][0]['errorType'] == 'expired_token':
 			client_id='22CN46'
-			client_secret='94d717c6ec36c270ed59cc8b5564166f'
+			client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 			access_token_url='https://api.fitbit.com/oauth2/token'
 			token = FitbitConnectToken.objects.get(user = request.user)
 			refresh_token_acc = token.refresh_token

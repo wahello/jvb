@@ -427,6 +427,7 @@ constructor(props){
    this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
    this.headerDates = this.headerDates.bind(this);
    this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
+   this.exerciseStatsNoWorkOut = this.exerciseStatsNoWorkOut.bind(this);
   }
     
   successProgress(data){
@@ -446,7 +447,15 @@ let x = gpa;
 let value =parseFloat(x).toFixed(2);
 return value;
 }
-
+exerciseStatsNoWorkOut(value){
+      if(value == undefined || value == 0 || value == ""){
+        value = "NO Workout"
+      }
+      else{
+        value = value
+      }
+    return value;
+}
 nonExerciseSteps(steps){
 let value = steps;
 if(value != undefined){
@@ -771,7 +780,7 @@ createExcelPrintURL(){
       </span>               
             <span className="pdf_button" id="pdf_button">
             <a href={this.createExcelPrintURL()}>
-            <Button className="btn createbutton mb5" onClick={this.printDocument}>Create PDF</Button>
+            <Button className="btn createbutton mb5" onClick={this.printDocument}>Export Excel</Button>
             </a>
             </span>
 
@@ -1317,8 +1326,8 @@ createExcelPrintURL(){
             <tr className="table_style">
                 <td className="table_style">Workout Duration (hours:minutes)</td>
                 {this.renderCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range)}
-                <td className="table_style">{this.state.summary.exercise.workout_duration_hours_min.today}</td>
-                <td className="table_style">{this.state.summary.exercise.workout_duration_hours_min.yesterday}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.today)}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.yesterday)}</td>
                 <td className="table_style">{this.state.summary.exercise.workout_duration_hours_min.week}</td>
                 <td className="table_style">{this.state.summary.exercise.workout_duration_hours_min.month}</td>
                 <td className="table_style">{this.state.summary.exercise.workout_duration_hours_min.year}</td>
@@ -1326,8 +1335,8 @@ createExcelPrintURL(){
             <tr className="table_style">
                 <td className="table_style">Workout Effort Level</td>
                 {this.renderCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
-                <td className="table_style">{this.state.summary.exercise.workout_effort_level.today}</td>
-                <td className="table_style">{this.state.summary.exercise.workout_effort_level.yesterday}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.today)}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.yesterday)}</td>
                 <td className="table_style">{this.state.summary.exercise.workout_effort_level.week}</td>
                 <td className="table_style">{this.state.summary.exercise.workout_effort_level.month}</td>
                 <td className="table_style">{this.state.summary.exercise.workout_effort_level.year}</td>
@@ -1335,8 +1344,8 @@ createExcelPrintURL(){
              <tr className="table_style">
                 <td className="table_style">Average Exercise Heart Rate</td>
                {this.renderCustomRangeTD(this.state.summary.exercise.avg_exercise_heart_rate.custom_range)}
-                <td className="table_style">{this.state.summary.exercise.avg_exercise_heart_rate.today}</td>
-                <td className="table_style">{this.state.summary.exercise.avg_exercise_heart_rate.yesterday}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.today)}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.yesterday)}</td>
                 <td className="table_style">{this.state.summary.exercise.avg_exercise_heart_rate.week}</td>
                 <td className="table_style">{this.state.summary.exercise.avg_exercise_heart_rate.month}</td>
                 <td className="table_style">{this.state.summary.exercise.avg_exercise_heart_rate.year}</td>
@@ -1344,8 +1353,8 @@ createExcelPrintURL(){
              <tr className="table_style">
                 <td className="table_style">VO2 Max</td>
                 {this.renderCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
-                <td className="table_style">{this.state.summary.exercise.vo2_max.today}</td>
-                <td className="table_style">{this.state.summary.exercise.vo2_max.yesterday}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.vo2_max.today)}</td>
+                <td className="table_style">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.vo2_max.yesterday)}</td>
                 <td className="table_style">{this.state.summary.exercise.vo2_max.week}</td>
                 <td className="table_style">{this.state.summary.exercise.vo2_max.month}</td>
                 <td className="table_style">{this.state.summary.exercise.vo2_max.year}</td>

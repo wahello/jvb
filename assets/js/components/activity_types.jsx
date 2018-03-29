@@ -103,7 +103,6 @@ export default class Activity_Type extends Component{
 		}
 
 		sucessActivity(data){
-		    console.log(data);
 		    this.setState({
 		    	selected_date:this.state.selected_date,
 		      activites:data.data.activites
@@ -272,6 +271,7 @@ export default class Activity_Type extends Component{
 							let min = parseInt(duration/60);
 							let hour = parseInt(min/60);
 							let mins = parseInt(min%60);
+							mins = (mins && mins < 10) ? "0" + mins : mins;
 							let time = hour + ":" + mins;
 							activityData.push(<td id = "add_button">{time}</td>);						
 						}else{
@@ -362,7 +362,7 @@ export default class Activity_Type extends Component{
 	                    </div>
 
 	           			<div className="align_width align_width1">
-	                   <div className="input ">
+	                   <div className="input " style = {{marginLeft:"15px"}}>
 	                    <Input type="select" name="modal_activity_min"
 	                     id="bed_min"
 	                    className="form-control custom-select "	                  
@@ -432,11 +432,11 @@ export default class Activity_Type extends Component{
 							{this.renderTable()}
 							<tr>
 							<td id="add_button" className="add_button_back"></td>
-							<td id="add_button"  className="add_button_back"> 
+							<td id="add_button"  className="add_button_back "> 
 							<span
 							  id="add_button"
 							  data-name=""
-				              className="fa fa-plus-circle fa-1x"
+				              className="fa fa-plus-circle fa-1x add_button"
 				              onClick={this.handleChangeModal}
 				              >
 				              </span>
