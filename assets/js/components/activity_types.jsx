@@ -168,6 +168,7 @@ export default class Activity_Type extends Component{
 						let min = parseInt(activityDuration/60);				
 						hour = parseInt(min/60);				
 						mins = parseInt(min%60);
+						mins = (mins && mins < 10) ? "0" + mins : mins;
 				   }
 				}
 
@@ -349,7 +350,7 @@ export default class Activity_Type extends Component{
 	                   <Label className="padding">3. Exercise Duration (hh:mm).</Label>
 	                   <div className=" display_flex" >
                          <div className="align_width align_width1">
-	                      <div className="input "> 
+	                      <div className="input " style = {{marginLeft:"15px"}}> 
 	                    <Input type="select" name="modal_activity_hour"
 	                    id="bed_hr"
 	                    className="form-control custom-select"
@@ -420,8 +421,9 @@ export default class Activity_Type extends Component{
                               </PopoverBody>
                      </Popover> 
                      </div>
-                      <div id = "activity_calender"> 
-					<table className = "table table-striped table-hover">
+                     <div id = "activity_table">
+                      <div className="table-responsive tableresponsive" >  
+					<table className = "table table-striped table-hover table-responsive">
 						<thead id = "add_button">
 							<td id = "add_button" className="add_button_back">Exercise Type</td>
 							<td id = "add_button" className="add_button_back">Avg Heart Rate</td>
@@ -446,8 +448,8 @@ export default class Activity_Type extends Component{
 						</tbody>
 					</table>
 			{this.renderEditActivityModal()}
-			</div>		
-
+			</div>
+</div>
 				</div>
 				</div>
 

@@ -28,3 +28,12 @@
 .add_button{
 	float: right;
 }
+@media (max-width: 1023px){
+	.tableresponsive{
+		max-width: 370px;
+}
+}
+#activity_table{
+	padding-top: 80px;	
+}
+
