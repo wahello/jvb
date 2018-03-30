@@ -421,9 +421,10 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	def _get_deep_light_awake_sleep_duration(data):
 		durations = {'deep':0,'light':0,'awake':0}
 		sleep_level_maps = data.get('sleepLevelsMap')
-		for lvl_type,lvl_data in sleep_level_maps.items():
-			durations[lvl_type] += sum([(datetime.utcfromtimestamp(d['endTimeInSeconds'])
-				- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds for d in lvl_data])
+		if sleep_level_maps:
+			for lvl_type,lvl_data in sleep_level_maps.items():
+				durations[lvl_type] += sum([(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds for d in lvl_data])
 		return durations
 
 	recent_auto_manual = None
@@ -645,7 +646,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
 
-			activities_duration[obj['activityType']] = obj['durationInSeconds']
+			activities_duration[obj['activityType']] = obj.get('durationInSeconds',0)
 			
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = {}
@@ -766,7 +767,7 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 
 	# If user slept after midnight and again went to bed after next midnight
 	# In that case we have same yesterday_bedtime and today_bedtime 
-	if today_bedtime and today_bedtime <= today_awake_time:
+	if today_bedtime and today_awake_time and today_bedtime <= today_awake_time:
 		today_bedtime = None
 	
 	if epochs_json and yesterday_bedtime and today_awake_time:
