@@ -584,24 +584,22 @@ def get_sleep_stats(yesterday_sleep_data = None,today_sleep_data = None,
 		sleep_stats['sleep_awake_time'] = None
 
 	return sleep_stats
-
 def get_activity_stats(activities_json,manually_updated_json):
 	activity_stats = {
-		"distance_run_miles": 0,
-		"distance_bike_miles": 0,
-		"distance_swim_yards": 0,
+    	"distance_run_miles": 0,
+ 		"distance_bike_miles": 0,
+ 		"distance_swim_yards": 0,
 		"distance_other_miles": 0,
-		"total_duration":0,
+ 		"total_duration":0,
 		"pace":'',
 		"avg_heartrate":json.dumps({}),
-		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
-		"latitude":None,
+ 		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
+ 		"latitude":None,
 		"longitude":None
 	}
 
 	activities_hr = {}
-
-	# If same summary is edited manually then give it more preference.
+    # If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
 	max_duration = 0
 
