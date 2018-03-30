@@ -1,4 +1,5 @@
 # import datetime
+import base64
 
 from django.db import models
 # from django.contrib.postgres.fields import JSONField
@@ -118,3 +119,9 @@ class GarminConnectToken(models.Model):
 
 	def __str__(self):
 		return "%s"%(self.user.username)
+
+class GarminFitFiles(models.Model):
+	user = models.ForeignKey('auth.user', on_delete=models.CASCADE, related_name="garmin_fit_files")
+	created_at = models.DateTimeField(auto_now=True)
+	fit_file = models.BinaryField(blank=True)
+	meta_data_fitfile = models.TextField()

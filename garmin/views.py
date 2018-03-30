@@ -1,6 +1,11 @@
 import re
 import urllib
 import time
+import json
+import io
+import base64
+import ast
+
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.core.mail import EmailMessage
@@ -34,7 +39,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataStressDetails,\
 					UserGarminDataMetrics,\
 					UserGarminDataMoveIQ,\
-					GarminConnectToken
+					GarminConnectToken, \
+					GarminFitFiles
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -136,11 +142,24 @@ class GarminConnectPing(APIView):
 			store in database 
 		'''
 		file = request.FILES['file']
+		file2 = file.read()
+		file_name = request.data['uploadMetaData']
+		oauthToken_fitfile = ast.literal_eval(file_name)
+		file_oauth = oauthToken_fitfile['oauthToken']
+
+		try:
+			user = User.objects.get(garmin_connect_token__token = file_oauth)
+			# print(user)
+		except User.DoesNotExist:
+			user = None
+		print(user)
+		if user:
+			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
 
 		mail = EmailMessage()
 		mail.subject = "Garmin connect Push | Files"
 		mail.body = request.data['uploadMetaData']
-		mail.to = ['atulk@s7inc.co']
+		mail.to = ['atulk@s7works.io']
 		mail.attach(file.name, file.read(), file.content_type)
 		mail.send()
 		headers={"Location":"/"}
@@ -210,8 +229,10 @@ def connect_receive_token(request):
 	# create new entry in the database
 	try:
 		token = GarminConnectToken.objects.get(user = request.user)
-		if token:    
-			token.save(token=access_token,token_secret=access_token_secret)
+		if token:
+			setattr(token, "token", access_token)
+			setattr(token, "token_secret", access_token_secret)
+			token.save()    
 
 	except GarminConnectToken.DoesNotExist:
 		GarminConnectToken.objects.create(user=request.user,token=access_token,

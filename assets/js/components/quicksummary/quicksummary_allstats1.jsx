@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -79,6 +80,7 @@ const attrVerboseName = {
     ctrl_subs_penalty:'Controlled Substance Penalty',
     smoke_penalty:'Smoking Penalty',
     overall_health_gpa_before_panalty:'Overall Health GPA Before Penalties',
+    submitted_user_input:'Did you Report your Inputs Today?',
 
     // resting_hr:'Resting Heart Rate',
     // stress_level:'Stress Level',
@@ -128,7 +130,18 @@ const attrVerboseName = {
     total_strokes: 'Total Strokes',
 
     alcohol_day: '# of Alcohol Drinks Consumed Yesterday',
-    alcohol_week: '# of Drinks Consumed Over the Last 7 Days', 
+    alcohol_week: '# of Drinks Consumed Over the Last 7 Days',
+
+    movement_non_exercise_steps_gpa: 'Non Exercise Steps Points',
+    movement_consistency_points: 'Movement Consistency Points',
+    avg_sleep_per_night_gpa: 'Avg Sleep Per Night Points',
+    exercise_consistency_points: 'Exercise Consistency Points', 
+    prcnt_unprocessed_food_consumed_gpa: '% of Unprocessed Food Consumed Points',
+    alcoholic_drink_per_week_gpa: 'Alcohol Drinks Consumed Per Last 7 Days Points',
+    sleep_aid_penalty_points: 'Sleep Aid Penalty Points',
+    ctrl_subs_penalty_points: 'Controlled Substance Penalty Points',
+    smoke_penalty_points: 'Smoking Penalty Points',
+    total_points: 'Total Points',
 }
 
 class AllStats1 extends Component{
@@ -138,6 +151,7 @@ class AllStats1 extends Component{
         this.renderTableColumns = this.renderTableColumns.bind(this);
         this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
         this.getStylesNonProcessedFood = this.getStylesNonProcessedFood.bind(this);
+        this.getDayWithDate = this.getDayWithDate.bind(this);
         let cols = this.renderTableColumns(props.data);
         this.state = {
             columns:cols[0],
@@ -178,7 +192,12 @@ class AllStats1 extends Component{
         return {background:'green',color:'white'};
       
     }
-
+getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
@@ -251,7 +270,7 @@ class AllStats1 extends Component{
                                    style:{}});
                   }
               }
-           else if(key === 'overall_health_gpa'){
+            else if(key === 'overall_health_gpa'){
                var i = parseFloat(value);
                if(isNaN(i)) { i = 0.00; }
                var minus = '';
@@ -294,10 +313,29 @@ class AllStats1 extends Component{
                 key == 'workout_duration'){
                 let hms = value.split(':');
                 let time_str = `${hms[0]}:${hms[1]}:${hms[2]}`;
-                all_data.push({value:time_str,
-                              style:{}});
+                if(time_str =="0:00:00")
+                 all_data.push({value:"No Workout",
+                                    style:{}});
+                else
+                 all_data.push({value:time_str,
+                                    style:{}});
             }
-
+            else if(key == "effort_level"){
+                if(value == 0)
+                    all_data.push({value:"No Workout",
+                                    style:{}});
+                else
+                    all_data.push({value:value,
+                                     style:{}});
+            }
+            else if(key == "vo2_max"){
+                if(value == 0)
+                    all_data.push({value:"Not Provided",
+                                    style:{}});
+                else
+                    all_data.push({value:value,
+                                    style:{}});
+            }
             else if(key == 'avg_heartrate' && !this.isEmpty(JSON.parse(value))){
                 let avgHrJson = JSON.parse(value);
                 for(let act of avgHrKeys)
@@ -328,7 +366,7 @@ class AllStats1 extends Component{
             value += '';
             var x = value.split('.');
             var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var x2 = x.length > 1 ? '.' + x[1] : '';  
             var rgx = /(\d+)(\d{3})/;
             while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -346,13 +384,14 @@ class AllStats1 extends Component{
 			columns.push(
 				<Column 
                 style={{wordWrap:"break-word"}}      
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}     
+					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}     
 			        cell={props => (
 				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
 			        width={100}
+
 
 
 				/>
@@ -383,17 +422,13 @@ class AllStats1 extends Component{
 			<div>
 			 <Table
 		        rowsCount={rowsCount}    
-		        rowHeight={65}  
-		        headerHeight={50}   
+		        rowHeight={50}  
+		        headerHeight={60}   
 		        width={containerWidth}    
         		maxHeight={containerHeight}
-                touchScrollEnabled={true}      
-            
-         
-               
+            touchScrollEnabled={true}                  
                 {...props}>
-		        <Column
-                
+		        <Column 
 		          header={<Cell className={css(styles.newTableHeader)}>All Stats</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
@@ -403,8 +438,6 @@ class AllStats1 extends Component{
 		          )}
 		          width={225}
 		          fixed={true}
-
-
 		        />
 			    {this.state.columns}              
       		</Table>   

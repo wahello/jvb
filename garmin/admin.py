@@ -9,7 +9,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataStressDetails,\
 					UserGarminDataMetrics,\
 					UserGarminDataMoveIQ, \
-					GarminConnectToken
+					GarminConnectToken, \
+					GarminFitFiles
 
 class UserGarminDataEpochAdmin(admin.ModelAdmin):
 	list_display = ('user','summary_id','record_date_in_seconds','start_time_in_seconds',
@@ -78,6 +79,10 @@ class GarminConnectTokenAdmin(admin.ModelAdmin):
 	list_display = ('user','token','token_secret',)
 	search_fields = ('user__username','user__email','user__first_name',
 					 'user__last_name',)
+class GarminFitFilesAdmin(admin.ModelAdmin):
+	list_display = ('user','created_at','meta_data_fitfile',)
+	search_fields = ('user__username','user__email','user__first_name',
+					 'user__last_name',)
 
 admin.site.register(UserGarminDataEpoch,UserGarminDataEpochAdmin)
 admin.site.register(UserGarminDataSleep,UserGarminDataSleepAdmin)
@@ -88,3 +93,4 @@ admin.site.register(UserGarminDataManuallyUpdated,UserGarminDataManuallyUpdatedA
 admin.site.register(UserGarminDataStressDetails,UserGarminDataStressDetailsAdmin)
 admin.site.register(UserGarminDataMetrics,UserGarminDataMetricsAdmin)
 admin.site.register(UserGarminDataMoveIQ,UserGarminDataMoveIQAdmin)
+admin.site.register(GarminFitFiles,GarminFitFilesAdmin)

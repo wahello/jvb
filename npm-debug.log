@@ -7,8 +7,8 @@
 6 silly lifecycle jvbhealthwellness-frontend@0.0.1~prestart: no script for prestart, continuing
 7 info lifecycle jvbhealthwellness-frontend@0.0.1~start: jvbhealthwellness-frontend@0.0.1
 8 verbose lifecycle jvbhealthwellness-frontend@0.0.1~start: unsafe-perm in lifecycle true
-9 verbose lifecycle jvbhealthwellness-frontend@0.0.1~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/home/atuls7inc/projects/S7inc/jvbhealth/healthtracker/node_modules/.bin:/home/atuls7inc/bin:/home/atuls7inc/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-10 verbose lifecycle jvbhealthwellness-frontend@0.0.1~start: CWD: /home/atuls7inc/projects/S7inc/jvbhealth/healthtracker
+9 verbose lifecycle jvbhealthwellness-frontend@0.0.1~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/home/normsoftware/WORK/healthtracker/node_modules/.bin:/home/normsoftware/bin:/home/normsoftware/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+10 verbose lifecycle jvbhealthwellness-frontend@0.0.1~start: CWD: /home/normsoftware/WORK/healthtracker
 11 silly lifecycle jvbhealthwellness-frontend@0.0.1~start: Args: [ '-c', 'babel-node server.js' ]
 12 silly lifecycle jvbhealthwellness-frontend@0.0.1~start: Returned: code: 1  signal: null
 13 info lifecycle jvbhealthwellness-frontend@0.0.1~start: Failed to exec start script
@@ -23,8 +23,8 @@
 14 verbose stack     at maybeClose (internal/child_process.js:920:16)
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:230:5)
 15 verbose pkgid jvbhealthwellness-frontend@0.0.1
-16 verbose cwd /home/atuls7inc/projects/S7inc/jvbhealth/healthtracker
-17 error Linux 4.13.0-32-generic
+16 verbose cwd /home/normsoftware/WORK/healthtracker
+17 error Linux 4.13.0-36-generic
 18 error argv "/usr/bin/node" "/usr/bin/npm" "start"
 19 error node v6.13.0
 20 error npm  v3.10.10

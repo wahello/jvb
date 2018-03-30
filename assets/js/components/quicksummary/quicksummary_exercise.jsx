@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -61,6 +62,7 @@ class Exercise extends Component {
 constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
+     this.getDayWithDate = this.getDayWithDate.bind(this);
      let cols = this.renderTableColumns(props.data,"exercise_reporting_ql");
 	 this.state = {
       tableAttrColumn: cols[1],
@@ -82,7 +84,12 @@ isEmpty(obj){
 toFahrenheit(tempInCelcius){
     return (tempInCelcius * 1.8) + 32;
 }
-
+getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
 renderTableColumns(dateWiseData,category,classes=""){
 	let columns = [];
     let avgHrKeys =  [];
@@ -126,10 +133,52 @@ renderTableColumns(dateWiseData,category,classes=""){
                     (key == 'temperature_feels_like' && (value && value != '-'))){
                 all_data.push(value);
             }
+            else if(key == "workout_duration"){
+                if(value == "0:00:00")
+                    all_data.push("No Workout");
+                else
+                    all_data.push(value);
+            }
+            else if(key == "effort_level"){
+                if(value == 0)
+                    all_data.push("No Workout");
+                else
+                    all_data.push(value);
+            }
+            else if(key == "vo2_max"){
+                if(value == 0)
+                    all_data.push("Not Provided");
+                else
+                    all_data.push(value);
+            }
             else if(key == 'workout_duration' && value && (value != '-' && value != '')){
                 let hms = value.split(':');
                 let time_str = `${hms[0]} : ${hms[1]} : ${hms[2]} `;
                 all_data.push(time_str);
+            }
+            else if(key == "hrr_time_to_99"){
+                if(value == "" || value == undefined || value == "0:0"){
+                    all_data.push("No Workout")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
+            else if(key == "hrr_starting_point"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push("No Workout")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
+             else if(key == "hrr_beats_lowered_first_minute"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push("No Workout")
+                }
+                else{
+                    all_data.push(value);
+                }
             }
             else
                 all_data.push(value);
@@ -141,7 +190,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 		columns.push(
 			<Column 
-				header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+				header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 		        cell={props => (
 			            <Cell {...{'title':all_data[props.rowIndex]}}  {...props} className={css(styles.newTableBody)}>
 			              {all_data[props.rowIndex]}
@@ -177,7 +226,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             >
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={65}
+		        rowHeight={50}
 		        headerHeight={50}
 		         width={containerWidth}
                 height={containerHeight}

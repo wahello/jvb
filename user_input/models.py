@@ -77,6 +77,7 @@ class DailyUserInputStrong(models.Model):
 
     REASON_NO_WORKOUT_CHOICES = (
         ("rest day","Rest Day"),
+        ("injured","Injured"),
         ("sick", "Sick"),
         ("too busy/not enough time","Too Busy/Not Enough Time"),
         ("didn’t feel like it","Didn’t Feel Like It"),
@@ -413,6 +414,14 @@ class DailyUserInputOptional(models.Model):
         blank=True)
 
     general_comment = models.TextField(blank=True)
+
+    travel = models.CharField(
+        max_length = 3,
+        choices = YN_CHOICE,
+        blank=True)
+
+    travel_destination = models.TextField(blank=True)
+    travel_purpose = models.TextField(blank=True)
 
 
 class InputsChangesFromThirdSources(models.Model):

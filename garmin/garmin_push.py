@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime,timedelta
 
 from django.contrib.auth.models import User
 from rauth import OAuth1Service
@@ -16,6 +16,7 @@ from .models import UserGarminDataEpoch,\
                     # GarminConnectToken
 
 from quicklook.tasks import generate_quicklook
+from progress_analyzer.tasks import generate_cumulative_instances_custom_range
 
 def _get_model_types():
 	MODEL_TYPES = {
@@ -85,7 +86,7 @@ def _get_data_start_time(json_data,data_type):
 			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
 		elif data_type == "userMetrics":
-			start_time = obj.get("calendarDate").strftime("%Y-%m-%d")
+			start_time = obj.get("calendarDate")
 		elif data_type == "bodyComps":
 			start_time = obj.get("measurementTimeInSeconds",0)+_safe_get(obj,"measurementTimeOffsetInSeconds",0)
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
@@ -145,7 +146,7 @@ def store_garmin_health_push(data):
 			upload_end_time = int(re.search('uploadEndTimeInSeconds=(\d+)*',
 								callback_url).group(1))
 
-			callback_url = callback_url.split('?')[0]+"/"
+			callback_url = callback_url.split('?')[0]
 
 			data = {
 				'uploadStartTimeInSeconds': upload_start_time,
@@ -163,4 +164,16 @@ def store_garmin_health_push(data):
 			# Call celery task to calculate/recalculate quick look for date to
 			# which received data belongs for the target user
 			date = _get_data_start_time(r.json(),dtype)
-			generate_quicklook.delay(user.id,date,date)
+			yesterday = datetime.now() - timedelta(days=1)
+
+			if datetime.strptime(date,"%Y-%m-%d").date() == yesterday.date():
+				# if receive yesterday data then update the cumulative sums for yesterday
+				# as well.  
+				yesterday = yesterday.strftime("%Y-%m-%d")
+				chain = (
+					generate_quicklook.si(user.id,date,date)|
+				 	generate_cumulative_instances_custom_range.si(user.id,date,date)
+				)
+				chain.delay()
+			else:
+				generate_quicklook.delay(user.id,date,date)

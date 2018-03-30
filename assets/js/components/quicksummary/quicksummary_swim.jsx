@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Button} from "reactstrap";
@@ -11,7 +12,8 @@ import { StyleSheet, css } from 'aphrodite';
  class Swim extends Component{
 	constructor(props){
 	super(props);
-	 this.renderTableColumns = this.renderTableColumns.bind(this);   
+	 this.renderTableColumns = this.renderTableColumns.bind(this);
+	 this.getDayWithDate = this.getDayWithDate.bind(this);   
 
 	 this.state = {
       myTableData: [
@@ -20,7 +22,12 @@ import { StyleSheet, css } from 'aphrodite';
       ],
     };
   }
-
+getDayWithDate(date){
+   let d = moment(date,'M-D-YY');
+   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+   let dayName = days[d.day()] ;
+   return date +"\n"+ dayName;
+  }
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -34,7 +41,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 
 			columns.push(
 				<Column 
-					header={<Cell className={css(styles.newTableHeader)}>{date}</Cell>}
+					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 			        cell={props => (
 				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
 				              {all_data[props.rowIndex]}
@@ -56,8 +63,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 			
 			 <Table
 		        rowsCount={rowsCount}
-		        rowHeight={65}
-		        headerHeight={50}
+		        rowHeight={50}
+		        headerHeight={60}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}

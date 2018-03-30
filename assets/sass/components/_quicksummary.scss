@@ -1,8 +1,31 @@
 html,body{
 	font-size: 16px;      	
 }
-
-
+.rd_mch_color_legend{
+	border-radius: 120px;
+	height: 10px;
+	width: 10px;
+	border:none;
+	display: inline-block;
+	margin-left: 10px;
+}
+.color_legend_pink{
+	background-color: rgb(255,0,255);
+}
+.color_legend_green{
+	background-color: green;
+}
+.color_legend_red{
+	background-color: red;
+}
+.color_legend_blue{
+	background-color: rgb(0,176,240);
+}
+.rd_mch_color_legend_label{
+	margin-left: 5px;
+	font-size: 12px;
+	font-weight: bold;
+}
 .nav2{
 	  top:0; 
 	  z-index:100;
@@ -124,7 +147,7 @@ background-color: #777777;
 
 @media screen and (min-width: 1200px) {
 
-.sleep{
+   .sleep{
 		display:inline;
 	}
 	.steps{
@@ -142,7 +165,9 @@ background-color: #777777;
 	.swimstats{
 		display: none;
 	}
-	
+	.mchistorical{
+		display: none;
+	}
 	.userinputs{
 		display: none;
 	}
@@ -151,6 +176,15 @@ background-color: #777777;
 	}
 	.bikestats{
 		display: none;
+	}
+	.allstats{
+		display: none;
+	}
+	#drop_allstats{
+		display: inline;
+	}
+	#dropmchistorical{
+		display: inline;
 	}
 	#dropalcohol{
 		display: none;
@@ -167,8 +201,19 @@ background-color: #777777;
 	
 }
 @media screen and (max-width: 2560px) and (min-width: 1201px) {
-
-.sleep{
+	.mchistorical{
+		display: none;
+	}
+	#dropmchistorical{
+		display: inline;
+	}
+	.allstats{
+		display: none;
+	}
+	#drop_allstats{
+		display: inline;
+	}
+   .sleep{
 		display:inline;
 	}
 	.steps{
@@ -211,7 +256,18 @@ background-color: #777777;
 	
 }
 @media screen and (max-width: 1200px) and (min-width: 769px) {
-
+	.mchistorical{
+		display: none;
+	}
+	#dropmchistorical{
+		display: inline;
+	}
+    .allstats{
+		display: none;
+	}
+	#drop_allstats{
+		display: inline;
+	}
 	.dropbutton{
 		display: inline;
 	}
@@ -255,7 +311,18 @@ background-color: #777777;
 	
 }
 @media screen and (max-width: 1200px) and (min-width: 769px) {
-
+	.mchistorical{
+		display: none;
+	}
+	#dropmchistorical{
+		display: inline;
+	}
+   .allstats{
+		display: none;
+	}
+	#drop_allstats{
+		display: inline;
+	}
 	.dropbutton{
 		display: inline;
 	}
@@ -307,7 +374,15 @@ background-color: #777777;
 
 
 @media screen and (max-width: 768px) and (min-width: 481px) {
-
+	.mchistorical{
+		display: none;
+	}
+	.allstats{
+		display: none;
+	}
+	#drop_allstats{
+		display: inline;
+	}
 	.dropbutton{
 		display: inline;
 	}
@@ -492,14 +567,14 @@ background-color: #777777;
 }
 .btn2{
 	position: absolute;
-    top: 20px;
+    top: 42px;
     right: 8px;
 }
 #daterange,#nav-btn{
 	margin-top:5px;
 }
 .user_input_icon{
-	position: absolute;
+	position: absolute; 
     top: 8px;
     right: 89px;
 }
@@ -512,9 +587,6 @@ background-color: #777777;
 .user_clndr{
 	padding-right: 0px;
     padding-left: 0px;
-}
-.user_nav{
-	height:60px;
 }
 }
 @media screen and (max-width: 667px) and (min-width: 375px) and (orientation: landscape){

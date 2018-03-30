@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.db import transaction,DatabaseError
 
 from quicklook.models import UserQuickLook
-from leaderboard.models import LeaderBoard
+from leaderboard.models import Score
 
 def _get_lst(lst,i,default = None):
 	""" get method for list similar to dictionary's get method """
@@ -196,7 +196,7 @@ def _update_scores(ql_data,score_data):
 		old_score_awake_time,cur_score_awake_time)
 
 def _create_score_instance(user,current_date,category,score):
-	return LeaderBoard(user = user, created_at = current_date,
+	return Score(user = user, created_at = current_date,
 		category = category, score = score)
 
 def _create_scores(user,current_date,ql_data):
@@ -281,7 +281,7 @@ def _create_scores(user,current_date,ql_data):
 			"awake_time",cur_score_awake_time))
 
 	# create score instance in bulk
-	LeaderBoard.objects.bulk_create(score_instances)
+	Score.objects.bulk_create(score_instances)
 
 def create_update_score(user, from_date, to_date):
 	'''
@@ -301,16 +301,15 @@ def create_update_score(user, from_date, to_date):
 	quicklook_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q for q
 		in _get_queryset(UserQuickLook,user,from_dt,to_dt,cache=True)}
 
-	score_data = {q for q in _get_queryset(LeaderBoard, user, from_dt, to_dt)}
+	score_data = {q for q in _get_queryset(Score, user, from_dt, to_dt)}
 	score_datewise_data = {}
-	for q in score_datewise_data:
-		created_at = q.strftime("%Y-%m-%d")
+	for q in score_data:
+		created_at = q.created_at.strftime("%Y-%m-%d")
 		if score_datewise_data.get(created_at,None):
 			score_datewise_data.get(created_at)[q.category] = q
 		else:
 			score_datewise_data[created_at]={}
 			score_datewise_data[created_at][q.category] = q
-
 
 	while current_date <= to_dt:
 		ql_data = quicklook_datewise_data.get(current_date.strftime("%Y-%m-%d"),None)

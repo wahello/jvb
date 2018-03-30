@@ -12,18 +12,15 @@ class ServiceConnect extends React.Component {
   }
 
   render() {
-
-    console.log('i am in the render for register');
   return (
-    <div>
-  	<Container>
-  <NavbarMenu/>
+    <div className="container_fluid">
+  <NavbarMenu fix={true}/>
       <br/>
       <br/>
       <br/>
-      <p>You have succesfully registered your Garmin Connect</p>
+      <p style={{textAlign:"center",marginTop:"150px",fontSize:"25px",fontWeight:"bold"}}>You have succesfully registered your Garmin Connect</p>
 
-    </Container>
+   
     </div>
   );
 }

@@ -1,917 +1,1014 @@
-from datetime import datetime, timedelta
-from django.db.models import Q
-
+import pprint
+import xlsxwriter
+from xlsxwriter.workbook import Workbook
+from datetime import datetime, timedelta , date
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from progress_analyzer.helpers.helper_classes import ProgressReport
 
-from quicklook import calculation_helper
-from quicklook.models import UserQuickLook
-from progress_analyzer.models import CumulativeSum
-from progress_analyzer.helpers.helper_classes import ToCumulativeSum
+
+# from quicklook.views import export_users_xls
 	
 class ProgressReportView(APIView):
+	'''Generate Progress Analyzer Reports on the fly'''
+
 	permission_classes = (IsAuthenticated,)
-
-	def _initialize(self):
-		self.summary_type = ['overall_health','non_exercise','sleep','mc','ec',
-		'nutrition','exercise','alcohol','other']
-		self.duration_type = ['today','yesterday','week','month','year']
-
-		# Custom date range for which report is to be created
-		# expected format of the date is 'YYYY-MM-DD'
-		self.current_date = self._str_to_dt(self.request.query_params.get('date',None))
-		self.from_dt = self._str_to_dt(self.request.query_params.get('from',None))
-		self.to_dt = self._str_to_dt(self.request.query_params.get('to',None))
-		self.cumulative_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
-			for q in self._get_cum_queryset()}
-		self.ql_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
-			for q in self._get_ql_queryset()}
-		self.duration_denominator = {
-			'today':1,'yesterday':1, 'week':7, "month":30, "year":365
-		}
-		self.custom_daterange = False
-
-		if self.from_dt and self.to_dt:
-			self.cumulative_datewise_data_custom_range = {q.created_at.strftime("%Y-%m-%d"):q 
-				for q in self._get_cum_queryset_custom_range(self.from_dt, self.to_dt)}
-
-			custom_range_denominator = (self.to_dt - self.from_dt).days + 1
-			self.duration_denominator['custom_range'] = custom_range_denominator
-			self.custom_daterange = True
-
-
-		summaries = self.request.query_params.get('summary',None)
-		if summaries:
-			summaries = [item.strip() for item in summaries.strip().split(',')]
-			allowed = set(summaries)
-			existing = set(self.summary_type)
-			for s in existing-allowed:
-				self.summary_type.pop(self.summary_type.index(s))
-
-		duration = self.request.query_params.get('duration',None)
-		if duration:
-			duration = [item.strip() for item in duration.strip().split(',')]
-			allowed = set(duration)
-			existing = set(self.duration_type)
-			for d in existing-allowed:
-				self.duration_type.pop(self.duration_type.index(d))
-
-	def _str_to_dt(self,dt_str):
-		if dt_str:
-			return datetime.strptime(dt_str, "%Y-%m-%d")
-		else:
-			return None
-
-	def _hours_to_hours_min(self,hours):
-		mins = hours * 60
-		hours,mins = divmod(mins,60)
-		hours = round(hours)
-		mins = round(mins)
-		if mins < 10:
-			mins = "{:02d}".format(mins) 
-		return "{}:{}".format(hours,mins)
-
-	def _min_to_min_sec(self,mins):
-		seconds = mins * 60
-		mins,seconds = divmod(seconds,60)
-		mins = round(mins)
-		seconds = round(seconds)
-		if mins < 10:
-			mins = "{:02d}".format(mins)
-		if seconds < 10:
-			seconds = "{:02d}".format(seconds)
-		return "{}:{}".format(mins,seconds)
-
-	def _get_average(self, stat1, stat2, duration_type):
-		if not stat1 == None and not stat2 == None:
-			avg = (stat1 - stat2)/self.duration_denominator.get(duration_type)
-			return avg
-		return 0
-	
-	def _get_model_related_fields_names(self,model):
-		related_fields_names = [f.name for f in model._meta.get_fields()
-			if (f.one_to_many or f.one_to_one)
-			and f.auto_created and not f.concrete]
-		return related_fields_names
-
-	def _get_cum_queryset(self):
-		"""
-			Returns queryset of CumulativeSum for "today", "yesterday",
-			"day before yesterday","week", "month", "year" according
-			to current date  
-		"""
-		duration_end_dt = self._get_duration_datetime(self.current_date)
-		user = self.request.user
-		# duration_end_dt.pop('today') # no need of today
-		day_before_yesterday = self.current_date - timedelta(days=2)
-		filters = Q(created_at=day_before_yesterday)
-		for d in duration_end_dt.values():
-			filters |= Q(created_at=d)
-		related_fields = self._get_model_related_fields_names(CumulativeSum)
-		cumulative_data_qs = CumulativeSum.objects.select_related(*related_fields).filter(
-			filters,user=user
-		) 
-		return cumulative_data_qs
-
-	def _get_ql_queryset(self):
-		"""
-			Returns queryset of Quicklook for "today"
-			according to current_date	  
-		"""
-		user = self.request.user
-		filters = Q(created_at=self.current_date.date())
-		related_fields = self._get_model_related_fields_names(UserQuickLook)
-		ql_data_qs = UserQuickLook.objects.select_related(*related_fields).filter(
-			filters, user = user
-		)
-		return ql_data_qs
-
-	def _get_cum_queryset_custom_range(self,from_dt, to_dt):
-		user = self.request.user
-		day_before_from_date = from_dt - timedelta(days=1)
-		filters = Q(created_at=to_dt.date()) | Q(created_at=day_before_from_date.date())
-		related_fields = self._get_model_related_fields_names(CumulativeSum)
-		cumulative_data_qs = CumulativeSum.objects.select_related(*related_fields).filter(
-			filters, user = user
-		) 
-		return cumulative_data_qs
-
-	def _get_duration_datetime(self,current_date):
-		duration = {
-			'today': current_date.date(),
-			'yesterday':(current_date - timedelta(days=1)).date(),
-			'week':(current_date - timedelta(days=7)).date(),
-			'month':(current_date - timedelta(days=30)).date(),
-			'year':(current_date - timedelta(days=365)).date()
-		}
-		return duration
-
-	def _generic_custom_range_calculator(self,key,alias,summary_type,custom_avg_calculator):
-
-		#for select related
-		to_select_related = lambda x : "_{}_cache".format(x)
-
-		day_before_from_date = self.from_dt - timedelta(days=1)
-		range_start_data = self.cumulative_datewise_data_custom_range.get(
-			day_before_from_date.strftime("%Y-%m-%d"),None
-		)
-		range_end_data = self.cumulative_datewise_data_custom_range.get(
-			self.to_dt.strftime("%Y-%m-%d"),None
-		)
-		
-		format_summary_name = True
-		if not range_end_data and self.to_dt == self.current_date:
-			yesterday_cum_data = self.cumulative_datewise_data.get(
-				(self.to_dt-timedelta(days=1)).strftime("%Y-%m-%d"),None
-			)
-			range_end_data = self.ql_datewise_data.get(
-				self.to_dt.strftime("%Y-%m-%d"),None
-			)
-			if range_end_data and yesterday_cum_data:
-				range_end_data = ToCumulativeSum(range_end_data,yesterday_cum_data)
-				format_summary_name = False
-
-		if range_start_data and range_end_data:
-			range_start_data = range_start_data.__dict__.get(to_select_related(summary_type))
-			
-			if format_summary_name:
-				summary_type = to_select_related(summary_type)
-			range_end_data = range_end_data.__dict__.get(summary_type)
-			return {
-				"from_dt":self.from_dt.strftime("%Y-%m-%d"),
-				"to_dt":self.to_dt.strftime("%Y-%m-%d"),
-				"data":custom_avg_calculator(key,alias,range_end_data,range_start_data)
-			}
-
-		return {
-			"from_dt":self.from_dt.strftime("%Y-%m-%d"),
-			"to_dt":self.to_dt.strftime("%Y-%m-%d"),
-			"data":None
-		}
-
-	def _get_summary_calculator_binding(self):
-		SUMMARY_CALCULATOR_BINDING = {
-			"overall_health":self._cal_overall_health_summary,
-			"non_exercise":self._cal_non_exercise_summary,
-			"sleep":self._cal_sleep_summary,
-			"mc":self._cal_movement_consistency_summary,
-			"ec":self._cal_exercise_consistency_summary,
-			"nutrition":self._cal_nutrition_summary,
-			"exercise":self._cal_exercise_summary,
-			"alcohol":self._cal_alcohol_summary,
-			"other":self._cal_other_summary
-		}
-		return SUMMARY_CALCULATOR_BINDING
-
-
-	def _cal_overall_health_summary(self,custom_daterange = False):
-
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='total_gpa_point':
-					val = self._get_average(
-						todays_data.cum_total_gpa_point,
-						current_data.cum_total_gpa_point,alias
-					)
-					return round(val,2)
-
-				elif key == 'overall_health_gpa':
-					val = self._get_average(
-						todays_data.cum_overall_health_gpa_point,
-						current_data.cum_overall_health_gpa_point,alias
-					)
-					return round(val,2)
-
-				elif key == 'overall_health_gpa_grade':
-					return calculation_helper.cal_overall_grade(
-						self._get_average(
-							todays_data.cum_overall_health_gpa_point,
-							current_data.cum_overall_health_gpa_point,alias
-						)
-					)[0]
-			return None
-
-		calculated_data = {
-			'total_gpa_point':{d:None for d in self.duration_type},
-			'overall_health_gpa':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'overall_health_gpa_grade':{d:None for d in self.duration_type}
-		}
-
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "overall_health_grade_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias, summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).overall_health_grade_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).overall_health_grade_cum
-		if yesterday_data:
-			yesterday_data = yesterday_data.overall_health_grade_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.overall_health_grade_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.overall_health_grade_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-
-		return calculated_data
-
-	def _cal_non_exercise_summary(self,custom_daterange = False):
-
-		def _calculate(key, alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='non_exercise_steps':
-					val =  self._get_average(
-						todays_data.cum_non_exercise_steps,
-						current_data.cum_non_exercise_steps,alias)
-					return int(val)
-
-				elif key == 'non_exericse_steps_gpa':
-					val = self._get_average(
-						todays_data.cum_non_exercise_steps_gpa,
-						current_data.cum_non_exercise_steps_gpa,alias)
-					return round(val,2)
-
-				elif key == 'total_steps':
-					val = self._get_average(
-						todays_data.cum_total_steps,
-						current_data.cum_total_steps,alias)
-					return int(val)
-
-				elif key == 'movement_non_exercise_step_grade':
-					return calculation_helper.cal_non_exercise_step_grade(
-						self._get_average(
-							todays_data.cum_non_exercise_steps,
-							current_data.cum_non_exercise_steps,alias
-						)
-					)[0]
-			return None
-
-		calculated_data = {
-			'non_exercise_steps':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'movement_non_exercise_step_grade':{d:None for d in self.duration_type},
-			'non_exericse_steps_gpa':{d:None for d in self.duration_type},
-			'total_steps':{d:None for d in self.duration_type}
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "non_exercise_steps_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).non_exercise_steps_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).non_exercise_steps_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.non_exercise_steps_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.non_exercise_steps_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.non_exercise_steps_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_sleep_summary(self,custom_daterange = False):
-
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key == 'total_sleep_in_hours_min':
-					val = self._get_average(
-						todays_data.cum_total_sleep_in_hours,
-						current_data.cum_total_sleep_in_hours,alias)
-					return self._hours_to_hours_min(val)
-
-				elif key == 'overall_sleep_gpa':
-					val = self._get_average(
-						todays_data.cum_overall_sleep_gpa,
-						current_data.cum_overall_sleep_gpa,alias)
-					return round(val,2)
-
-				elif key == 'average_sleep_grade':
-					avg_hours = self._get_average(
-						todays_data.cum_total_sleep_in_hours,
-						current_data.cum_total_sleep_in_hours,alias
-					)
-					avg_hours_str = self._hours_to_hours_min(avg_hours)
-					return calculation_helper.cal_average_sleep_grade(
-						avg_hours_str,None	
-					)[0]
-
-				elif key == 'num_days_sleep_aid_taken_in_period':
-					val = 0
-					if ((todays_data.cum_days_sleep_aid_taken is not None) and 
-						(current_data.cum_days_sleep_aid_taken is not None)):
-						val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
-					return val
-
-				elif key == 'prcnt_days_sleep_aid_taken_in_period':
-					val = 0
-					if((todays_data.cum_days_sleep_aid_taken is not None) and 
-						(current_data.cum_days_sleep_aid_taken is not None)):
-						val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
-					prcnt = 0
-					if val:
-						prcnt = round((val / self.duration_denominator[alias])*100)
-					return prcnt
-
-			return None
-
-		calculated_data = {
-			'total_sleep_in_hours_min':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'average_sleep_grade':{d:None for d in self.duration_type},
-			'num_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
-			'prcnt_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
-			'overall_sleep_gpa':{d:None for d in self.duration_type},
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "sleep_per_night_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).sleep_per_night_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).sleep_per_night_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.sleep_per_night_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.sleep_per_night_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.sleep_per_night_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_movement_consistency_summary(self,custom_daterange = False):
-
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='movement_consistency_score':
-					val = self._get_average(
-						todays_data.cum_movement_consistency_score,
-						current_data.cum_movement_consistency_score,alias)
-					return round(val,2)
-				elif key == 'movement_consistency_gpa':
-					val = self._get_average(
-						todays_data.cum_movement_consistency_gpa,
-						current_data.cum_movement_consistency_gpa,alias)
-					return round(val,2)
-
-				elif key == 'movement_consistency_grade':
-					return calculation_helper.cal_movement_consistency_grade(
-						self._get_average(
-							todays_data.cum_movement_consistency_score,
-							current_data.cum_movement_consistency_score,alias
-						)
-					)
-			return None
-
-		calculated_data = {
-			'movement_consistency_score':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'movement_consistency_grade':{d:None for d in self.duration_type},
-			'movement_consistency_gpa':{d:None for d in self.duration_type},
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "movement_consistency_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).movement_consistency_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).movement_consistency_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.movement_consistency_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.movement_consistency_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.movement_consistency_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_exercise_consistency_summary(self,custom_daterange = False):
-
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='avg_no_of_days_exercises_per_week':
-					val = self._get_average(
-						todays_data.cum_avg_exercise_day,
-						current_data.cum_avg_exercise_day,alias)
-					return round(val,2)
-				elif key == 'exercise_consistency_gpa':
-					val = self._get_average(
-						todays_data.cum_exercise_consistency_gpa,
-						current_data.cum_exercise_consistency_gpa,alias)
-					return round(val,2)
-
-				elif key == 'exercise_consistency_grade':
-					return calculation_helper.cal_exercise_consistency_grade(
-						self._get_average(
-							todays_data.cum_exercise_consistency_gpa,
-							current_data.cum_exercise_consistency_gpa,alias
-						)
-					)[0]
-			return None
-
-		calculated_data = {
-			'avg_no_of_days_exercises_per_week':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'exercise_consistency_grade':{d:None for d in self.duration_type},
-			'exercise_consistency_gpa':{d:None for d in self.duration_type},
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "exercise_consistency_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_consistency_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).exercise_consistency_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.exercise_consistency_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.exercise_consistency_cum
-		
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.exercise_consistency_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_nutrition_summary(self, custom_daterange = False):
-		
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='prcnt_unprocessed_volume_of_food':
-					val = self._get_average(
-						todays_data.cum_prcnt_unprocessed_food_consumed,
-						current_data.cum_prcnt_unprocessed_food_consumed,alias)
-					return round(val)
-				elif key == 'prcnt_unprocessed_food_gpa':
-					val = self._get_average(
-						todays_data.cum_prcnt_unprocessed_food_consumed_gpa,
-						current_data.cum_prcnt_unprocessed_food_consumed_gpa,alias)
-					return round(val,2)
-				elif key == 'prcnt_unprocessed_food_grade':
-					return calculation_helper.cal_unprocessed_food_grade(
-						self._get_average(
-							todays_data.cum_prcnt_unprocessed_food_consumed_gpa,
-							current_data.cum_prcnt_unprocessed_food_consumed_gpa,alias
-						)
-					)[0]
-			return None
-
-		calculated_data = {
-			'prcnt_unprocessed_volume_of_food':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'prcnt_unprocessed_food_grade':{d:None for d in self.duration_type},
-			'prcnt_unprocessed_food_gpa':{d:None for d in self.duration_type},
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "nutrition_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).nutrition_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).nutrition_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.nutrition_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.nutrition_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.nutrition_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_exercise_summary(self, custom_daterange = False):
-
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='workout_duration_hours_min':
-					avg_hours = self._get_average(
-						todays_data.cum_workout_duration_in_hours,
-						current_data.cum_workout_duration_in_hours,alias
-					)
-					return self._hours_to_hours_min(avg_hours)
-
-				elif key == 'workout_effort_level':
-					val = self._get_average(
-						todays_data.cum_workout_effort_level,
-						current_data.cum_workout_effort_level,alias
-					)
-					return round(val,2)
-
-				elif key == 'avg_exercise_heart_rate':
-					val = self._get_average(
-						todays_data.cum_avg_exercise_hr,
-						current_data.cum_avg_exercise_hr,alias
-					)
-					return round(val)
-
-				elif key == 'vo2_max':
-					val = self._get_average(
-						todays_data.cum_vo2_max,
-						current_data.cum_vo2_max,alias
-					)
-					return round(val)
-
-			return None
-
-		calculated_data = {
-			'workout_duration_hours_min':{d:None for d in self.duration_type},
-			'workout_effort_level':{d:None for d in self.duration_type},
-			'avg_exercise_heart_rate':{d:None for d in self.duration_type},
-			'vo2_max':{d:None for d in self.duration_type}
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "exercise_stats_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).exercise_stats_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).exercise_stats_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.exercise_stats_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.exercise_stats_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.exercise_stats_cum
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_alcohol_summary(self, custom_daterange = False):
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='avg_drink_per_week':
-					val = self._get_average(
-						todays_data.cum_average_drink_per_week,
-						current_data.cum_average_drink_per_week,alias)
-					return round(val,2)
-
-				elif key == 'alcoholic_drinks_per_week_gpa':
-					val = self._get_average(
-						todays_data.cum_alcohol_drink_per_week_gpa,
-						current_data.cum_alcohol_drink_per_week_gpa,alias)
-					return round(val)
-				elif key == 'alcoholic_drinks_per_week_grade':
-					return calculation_helper.cal_alcohol_drink_grade(
-						self._get_average(
-							todays_data.cum_average_drink_per_week,
-							current_data.cum_average_drink_per_week,alias
-						),self.request.user.profile.gender
-					)[0]
-			return None
-
-		calculated_data = {
-			'avg_drink_per_week':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
-			'alcoholic_drinks_per_week_grade':{d:None for d in self.duration_type},
-			'alcoholic_drinks_per_week_gpa':{d:None for d in self.duration_type},
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "alcohol_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).alcohol_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).alcohol_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.alcohol_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.alcohol_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.alcohol_cum
-
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
-	def _cal_other_summary(self, custom_daterange = False):
-		def _calculate(key,alias,todays_data,current_data):
-			if todays_data and current_data:
-				if key =='resting_hr':
-					val = self._get_average(
-						todays_data.cum_resting_hr,
-						current_data.cum_resting_hr,alias)
-					return round(val)
-
-				elif key == 'hrr_time_to_99':
-					val = self._min_to_min_sec(self._get_average(
-						todays_data.cum_hrr_time_to_99_in_mins,
-						current_data.cum_hrr_time_to_99_in_mins,alias))
-					return val
-				elif key == 'hrr_beats_lowered_in_first_min':
-					val = self._get_average(
-						todays_data.cum_hrr_beats_lowered_in_first_min,
-						current_data.cum_hrr_beats_lowered_in_first_min,alias)
-					return round(val)
-				elif key == 'hrr_highest_hr_in_first_min':
-					val = self._get_average(
-						todays_data.cum_highest_hr_in_first_min,
-						current_data.cum_highest_hr_in_first_min,alias)
-					return round(val)
-				elif key == 'hrr_lowest_hr_point':
-					val = self._get_average(
-						todays_data.cum_hrr_lowest_hr_point,
-						current_data.cum_hrr_lowest_hr_point,alias)
-					return round(val)
-				elif key == 'floors_climbed':
-					val = self._get_average(
-						todays_data.cum_floors_climbed,
-						current_data.cum_floors_climbed,alias)
-					return round(val)
-			return None
-
-		calculated_data = {
-			'resting_hr':{d:None for d in self.duration_type},
-			'hrr_time_to_99':{d:None for d in self.duration_type},
-			'hrr_beats_lowered_in_first_min':{d:None for d in self.duration_type},
-			'hrr_highest_hr_in_first_min':{d:None for d in self.duration_type},
-			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
-			'floors_climbed':{d:None for d in self.duration_type}
-		}
-		if custom_daterange:
-			alias = "custom_range"
-			summary_type = "other_stats_cum"
-			for key in calculated_data.keys():
-				calculated_data[key][alias] = self._generic_custom_range_calculator(
-					key, alias,summary_type, _calculate
-				)
-
-		
-		todays_data = self.ql_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-
-		if todays_data:
-			if yesterday_data:
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).other_stats_cum
-			else:
-				todays_data = ToCumulativeSum(todays_data).other_stats_cum
-
-		if yesterday_data:
-			yesterday_data = yesterday_data.other_stats_cum
-		if day_before_yesterday_data:
-			day_before_yesterday_data = day_before_yesterday_data.other_stats_cum
-
-		for key in calculated_data.keys():
-			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
-				if alias in self.duration_type:
-					current_data = self.cumulative_datewise_data.get(dtobj.strftime("%Y-%m-%d"),None)
-					if current_data:
-						current_data = current_data.other_stats_cum
-
-					if alias == 'today' and yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,todays_data,yesterday_data)
-						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data[key][alias] = _calculate(key,alias,yesterday_data,day_before_yesterday_data)
-						continue
-					calculated_data[key][alias] = _calculate(key,alias,todays_data,current_data)
-		return calculated_data
-
 	def get(self, request, format="json"):
-		self._initialize()
-		SUMMARY_CALCULATOR_BINDING = self._get_summary_calculator_binding()
-		DATA = {'summary':{}, "created_at":None}
-		for summary in self.summary_type:
-			DATA['summary'][summary] = SUMMARY_CALCULATOR_BINDING[summary](self.custom_daterange)
-		DATA['created_at'] = self.current_date.strftime("%Y-%m-%d")
-
+		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
+
+def progress_excel_export(request):
+	#to_date1 = request.GET.get('to_date',None)
+	#from_date1 = request.GET.get('from_date', None)
+
+	#to_date = datetime.strptime(to_date1, "%m-%d-%Y").date()
+	#from_date = datetime.strptime(from_date1, "%m-%d-%Y").date()
+
+	date2 = request.GET.get('date',None)
+	crs = request.GET.get('custom_ranges',None)
+	a = crs.split(",")
+	
+	date = datetime.strptime(date2,'%Y-%m-%d').date()
+	#custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
+	#custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
+	#custom_ranges2_start = datetime.strptime(a[2], "%Y-%m-%d").date()
+	#custom_ranges2_end = datetime.strptime(a[3], "%Y-%m-%d").date()
+	#custom_ranges3_start = datetime.strptime(a[4], "%Y-%m-%d").date()
+	#custom_ranges3_end = datetime.strptime(a[5], "%Y-%m-%d").date()
+
+	#custom_ranges_list = [custom_ranges1_start,custom_ranges1_end,custom_ranges2_start,custom_ranges2_end,custom_ranges3_start,custom_ranges3_end]
+	
+	filename = '{}_Progress_Analyzer_data.xlsx'.format(request.user.username)
+	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+	response['Content-Disposition'] = "attachment; filename={}".format(filename) 
+	book = Workbook(response,{'in_memory': True})
+	sheet10 = book.add_worksheet('Progress Analyzer')
+
+	sheet10.freeze_panes(1,1)
+	sheet10.set_column('A:A',1)
+	sheet10.set_column('B:B',35)
+	# sheet10.set_column('L:L',45)
+	# sheet10.set_column('K:K',1)
+	# sheet10.set_column('C:E',13)
+	# sheet10.set_column('F:G',10)
+	# sheet10.set_column('M:O',13)
+	# sheet10.set_column('P:Q',10)
+	# sheet10.set_column('R:T',15)-
+	# sheet10.set_column('H:J',15)
+	
+
+	sheet10.set_row(0,45)
+	sheet10.set_landscape()
+
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
+	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
+	format_align = book.add_format({'align':'left'})
+
+
+	#Headings
+	bold = book.add_format({'bold': True})
+	sheet10.write(0,1,'Summary Dashboard',bold)
+	sheet10.write(2,1,'Overall Health Grade',bold)
+	sheet10.write(9,1,'Sleep Per Night (excluding awake time)',bold)
+	sheet10.write(17,1,'Exercise Consistency',bold)
+	sheet10.write(23,1,'Exercise Stats',bold)
+	sheet10.write(30,1,'Other Stats',bold)
+	# sheet10.write(2,11,'Non Exercise Steps',bold)
+	# sheet10.write(9,11,'Movement Consistency',bold)
+	# sheet10.write(17,11,'Nutrition',bold)
+	# sheet10.write(23,11,'Alcohol',bold)
+	# sheet10.write(0,11,'Summary Dashboard',bold)
+
+
+	#table borders
+	border_format=book.add_format({
+                            'border':1,
+                            'align':'left',
+                            'font_size':10
+                           })
+	
+	
+	# sheet10.conditional_format('B4:J7', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('B11:J16', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('B19:J22', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('B25:J27', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('B32:J37', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('L4:T8', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('L11:T14', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('L19:T22', {'type': 'no_errors',
+ #                                          'format': border_format})
+	# sheet10.conditional_format('L25:T28', {'type': 'no_errors',
+ #                                          'format': border_format})
+	
+	dt = date.strftime("%b %d,%Y")
+	year = date.year
+	year1 = '{}-{}'.format('Jan 01',year)
+	yesterday=date-timedelta(days=1)
+	week = date-timedelta(days = 7)
+	month = date-timedelta(days=30)
+	today = date.today()
+	yestf = yesterday.strftime("%b %d,%Y")
+	weekf = week.strftime("%b %d,%Y")
+	monthf = month.strftime("%b %d,%Y")
+	avg_week = '{} to {}'.format(weekf,dt)
+	avg_month ='{} to {}'.format(monthf,dt)
+	avg_year = '{} to {}'.format(year1,dt)
+	date1='{}'.format(today)
+
+	today1 ='{}\n{}'.format('Today',dt)
+	yesterday1 = '{}\n{}'.format('Yesterday',yestf)
+	week1 = '{}\n{}'.format('Avg Last 7 days',avg_week)
+	month1 = '{}\n{}'.format('Avg Last 30 days',avg_month)
+	year1 = '{}\n{}'.format('Avg Year to Date',avg_year)
+
+	
+	duration = [today1,yesterday1,week1,month1,year1]
+
+	# Row headers
+	columns1=['Total GPA Points','Overall Health GPA','Rank against other users','Overall Health GPA Grade']
+	row=2
+	for i in range(len(columns1)):
+		row=row+1
+		sheet10.write(row,1,columns1[i])
+
+	sleep_per_night=['Total Sleep in hours:minutes','Rank against other users','Average Sleep Grade','# of Days Sleep Aid Taken in Period','%  of Days Sleep Aid Taken in Period']
+	row=9
+	for i in range(len(sleep_per_night)):
+		row=row+1
+		sheet10.write(row,1,sleep_per_night[i])
+
+	exercise_consistency=['Avg # of Days Exercised/Week','Rank against other users','Exercise Consistency Grade','Exercise Consistency GPA']
+	row=17
+	for i in range(len(exercise_consistency)):
+		row=row+1
+		sheet10.write(row,1,exercise_consistency[i])
+
+	exercise_stats=['Workout Duration (hours:minutes)','Workout Effort Level','Average Exercise Heart Rate','VO2 Max']
+	row=23
+	for i in range(len(exercise_stats)):
+		row=row+1
+		sheet10.write(row,1,exercise_stats[i])
+
+	other_stats=['Resting Heart Rate(RHR)','HRR (time to 99)','HRR (heart beats lowered in 1st minute)','HRR (highest heart rate in 1st minute)','HRR (lowest heart rate point)','Floors Climbed']
+	row=30
+	for i in range(len(other_stats)):
+		row=row+1
+		sheet10.write(row,1,other_stats[i])
+
+	# Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise steps Grade','Non Exercise Steps GPA','Total Steps']
+	# row=2
+	# for i in range(len(Non_Exercise_Steps)):
+	# 	row=row+1
+	# 	sheet10.write(row,11,Non_Exercise_Steps[i])
+
+	# Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
+	# row=9
+	# for i in range(len(Movement_consistency)):
+	# 	row=row+1
+	# 	sheet10.write(row,11,Movement_consistency[i])
+
+	# Nutrition=['% Unprocessed Food of the volume of food consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
+	# row=17
+	# for i in range(len(Nutrition)):
+	# 	row=row+1
+	# 	sheet10.write(row,11,Nutrition[i])
+
+	# alcohol=['# of Drinks Consumed per week(7days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
+	# row=23
+	# for i in range(len(alcohol)):
+	# 	row = row+1
+	# 	sheet10.write(row,11,alcohol[i])
+
+	# Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
+	# 'Total Exercise time (hours:minutes) the last 7 days',
+	# 'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
+	# row=30
+	# for i in range(len(Total)):
+	# 	row = row+1
+	# 	sheet10.write(row,11,Total[i])
+
+  
+
+	nutri=['prcnt_unprocessed_volume_of_food','rank','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
+	non_exe=['non_exercise_steps','rank','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
+	mc=['movement_consistency_score','rank','movement_consistency_grade','movement_consistency_gpa',]
+	Alc=['avg_drink_per_week','rank','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
+	Ohg=['total_gpa_point','overall_health_gpa','rank','overall_health_gpa_grade']
+	slept=['total_sleep_in_hours_min','rank','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
+	Ec=['avg_no_of_days_exercises_per_week','rank','exercise_consistency_grade','exercise_consistency_gpa']
+	Es=['workout_duration_hours_min','workout_effort_level','avg_exercise_heart_rate','vo2_max']
+	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
+
+	#conditions for custom_ranges
+	if (len(a) == 2):
+		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
+		custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
+		crsf1 = custom_ranges1_start.strftime('%b %d,%Y')
+		cref1= custom_ranges1_end.strftime('%b %d,%Y')
+		custom_range1='{} to {}'.format(custom_ranges1_start,custom_ranges1_end)
+		crf1 = '{} to {}'.format(crsf1,cref1)
+		sheet10.write(0,2,crf1,format)
+		sheet10.write(0,10,crf1,format)
+		cr1 = '{},{}'.format(custom_ranges1_start,custom_ranges1_end)
+		sheet10.set_column('J:J',45)
+		sheet10.set_column('I:I',1)
+		sheet10.set_column('C:E',15)
+		sheet10.set_column('K:M',15)
+		sheet10.set_column('N:P',17)
+		sheet10.set_column('F:H',17)
+
+		sheet10.write(0,9,'Summary Dashboard',bold)
+		sheet10.write(2,9,'Non Exercise Steps',bold)
+		sheet10.write(9,9,'Movement Consistency',bold)
+		sheet10.write(17,9,'Nutrition',bold)
+		sheet10.write(23,9,'Alcohol',bold)
+		
+
+		sheet10.conditional_format('B4:H7', {'type': 'no_errors',
+                                          'format': border_format})
+		sheet10.conditional_format('B11:H15', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B19:H22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B25:H27', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B32:H37', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('J4:P8', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('J11:P14', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('J19:P22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('J25:P28', {'type': 'no_errors',
+	                                          'format': border_format})
+
+		c = 2
+		for i in range(len(duration)):
+			c = c+1
+			sheet10.write(0,c,duration[i],format)
+			sheet10.write(0,c+8,duration[i],format)
+
+		Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise Steps Grade','Non Exercise Steps GPA','Total Steps']
+		row=2
+		for i in range(len(Non_Exercise_Steps)):
+			row=row+1
+			sheet10.write(row,9,Non_Exercise_Steps[i])
+
+		Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
+		row=9
+		for i in range(len(Movement_consistency)):
+			row=row+1
+			sheet10.write(row,9,Movement_consistency[i])
+
+		Nutrition=['% Unprocessed Food Consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
+		row=17
+		for i in range(len(Nutrition)):
+			row=row+1
+			sheet10.write(row,9,Nutrition[i])
+
+		alcohol=['Average Drinks Per Week(7Days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
+		row=23
+		for i in range(len(alcohol)):
+			row = row+1
+			sheet10.write(row,9,alcohol[i])
+
+		# Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
+		# 'Total Exercise time (hours:minutes) the last 7 days',
+		# 'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
+		# row=30
+		# for i in range(len(Total)):
+		# 	row = row+1
+		# 	sheet10.write(row,9,Total[i])
+
+
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"custom_ranges":cr1,
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
+		c=1
+		for i in range(1):
+			c = c + 1
+			r=2
+			for n in range(len(nutri)):
+				r= r+1
+				sheet10.write(r+15,c+8,DATA['summary']['nutrition'][nutri[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(21,c+8,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][custom_range1]['data'],format_align1)
+			r=2
+			for n in range(len(non_exe)):
+				r= r+1	
+				sheet10.write(r,c+8,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(6,c+8,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][custom_range1]['data'],format_align1)
+
+			r=9
+			for n in range(len(mc)):
+				r= r+1	
+				sheet10.write(r,c+8,DATA['summary']['mc'][mc[n]]['custom_range'][custom_range1]['data'],format_align)	
+				sheet10.write(13,c+8,DATA['summary']['mc'][mc[-1]]['custom_range'][custom_range1]['data'],format_align1)	
+
+			r=23
+			for n in range(len(Alc)):
+				r= r+1	
+				sheet10.write(r,c+8,DATA['summary']['alcohol'][Alc[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(27,c+8,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align1)
+
+			r=2
+			for n in range(len(Ohg)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][custom_range1]['data'],format_align1)
+
+			r=9
+			for n in range(len(slept)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][custom_range1]['data'],format_align)
+			r=17
+			for n in range(len(Ec)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(21,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][custom_range1]['data'],format_align1)
+
+			r=23
+			for n in range(len(Es)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][custom_range1]['data'],format_align)
+
+			r=30
+			for n in range(len(other1)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][custom_range1]['data'],format_align)
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+
+
+		time1=['today','yesterday','week','month','year']
+		
+		c = 2
+		for i in range(len(time1)):
+			c = c+1
+			sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
+			sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
+			sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+			sheet10.write(11,c,DATA['summary']['sleep']['rank'][time1[i]],format_align)
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+			sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
+			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+			sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+			sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+			sheet10.write(31,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
+			sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+			sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+			sheet10.write(35,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
+			sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+			sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
+
+			sheet10.write(3,c+8,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+			sheet10.write(5,c+8,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+			sheet10.write(6,c+8,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
+			sheet10.write(7,c+8,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+			sheet10.write(10,c+8,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
+			sheet10.write(11,c+8,DATA['summary']['mc']['rank'][time1[i]],format_align)
+			sheet10.write(12,c+8,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+			sheet10.write(13,c+8,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(18,c+8,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
+			sheet10.write(19,c+8,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
+			sheet10.write(20,c+8,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+			sheet10.write(21,c+8,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c+8,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
+			sheet10.write(25,c+8,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
+			sheet10.write(26,c+8,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+			sheet10.write(27,c+8,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
+			
+	elif (len(a) == 4):
+		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
+		custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
+		custom_ranges2_start = datetime.strptime(a[2], "%Y-%m-%d").date()
+		custom_ranges2_end = datetime.strptime(a[3], "%Y-%m-%d").date()
+		crsf1 = custom_ranges1_start.strftime('%b %d,%Y')
+		cref1= custom_ranges1_end.strftime('%b %d,%Y')
+		crsf2 = custom_ranges2_start.strftime('%b %d,%Y')
+		cref2= custom_ranges2_end.strftime('%b %d,%Y')
+		crf1 = '{} to {}'.format(crsf1,cref1)
+		crf2 = '{} to {}'.format(crsf2,cref2)
+
+		cr1='{},{}'.format(custom_ranges1_start,custom_ranges1_end)
+		cr2='{},{}'.format(custom_ranges2_start,custom_ranges2_end)
+		crs1 ='{},{}'.format(cr1,cr2)
+		custom_range1='{} to {}'.format(custom_ranges1_start,custom_ranges1_end)
+		custom_range2='{} to {}'.format(custom_ranges2_start,custom_ranges2_end)
+
+		sheet10.set_column('K:K',45)
+		sheet10.set_column('J:J',1)
+		sheet10.set_column('C:F',15)
+		sheet10.set_column('L:O',15)
+		sheet10.set_column('P:R',17)
+		sheet10.set_column('G:I',17)
+
+		sheet10.write(0,10,'Summary Dashboard',bold)
+		sheet10.write(2,10,'Non Exercise Steps',bold)
+		sheet10.write(9,10,'Movement Consistency',bold)
+		sheet10.write(17,10,'Nutrition',bold)
+		sheet10.write(23,10,'Alcohol',bold)
+		
+
+		sheet10.conditional_format('B4:I7', {'type': 'no_errors',
+                                          'format': border_format})
+		sheet10.conditional_format('B11:I16', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B19:I22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B25:I27', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B32:I37', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('K4:R8', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('K11:R14', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('K19:R22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('K25:R28', {'type': 'no_errors',
+	                                          'format': border_format})
+
+		list1=[custom_range1,custom_range2]
+		range1 = [crf1,crf2]
+		c = 1
+		for i in range(len(range1)):
+			c = c+1
+			sheet10.write(0,c,range1[i],format)
+			sheet10.write(0,c+9,range1[i],format)
+
+		c = 3
+		for i in range(len(duration)):
+			c = c+1
+			sheet10.write(0,c,duration[i],format)
+			sheet10.write(0,c+9,duration[i],format)
+
+		Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise steps Grade','Non Exercise Steps GPA','Total Steps']
+		row=2
+		for i in range(len(Non_Exercise_Steps)):
+			row=row+1
+			sheet10.write(row,10,Non_Exercise_Steps[i])
+
+		Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
+		row=9
+		for i in range(len(Movement_consistency)):
+			row=row+1
+			sheet10.write(row,10,Movement_consistency[i])
+
+		Nutrition=['% Unprocessed Food of the volume of food consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
+		row=17
+		for i in range(len(Nutrition)):
+			row=row+1
+			sheet10.write(row,10,Nutrition[i])
+
+		alcohol=['# of Drinks Consumed per week(7days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
+		row=23
+		for i in range(len(alcohol)):
+			row = row+1
+			sheet10.write(row,10,alcohol[i])
+
+		# Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
+		# 'Total Exercise time (hours:minutes) the last 7 days',
+		# 'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
+		# row=30
+		# for i in range(len(Total)):
+		# 	row = row+1
+		# 	sheet10.write(row,10,Total[i])
+
+
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"custom_ranges":crs1,
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
+
+		c=1
+		for i in range(len(list1)):
+			c = c + 1
+			r=2
+			for n in range(len(nutri)):
+				r= r+1
+				sheet10.write(r+15,c+9,DATA['summary']['nutrition'][nutri[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(21,c+9,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list1[i]]['data'],format_align1)
+
+			r=2
+			for n in range(len(non_exe)):
+				r= r+1	
+				sheet10.write(r,c+9,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(6,c+9,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list1[i]]['data'],format_align1)
+
+			r=9
+			for n in range(len(mc)):
+				r= r+1	
+				sheet10.write(r,c+9,DATA['summary']['mc'][mc[n]]['custom_range'][list1[i]]['data'],format_align)	
+				sheet10.write(13,c+9,DATA['summary']['mc'][mc[-1]]['custom_range'][list1[i]]['data'],format_align1)	
+
+			r=23
+			for n in range(len(Alc)):
+				r= r+1	
+				sheet10.write(r,c+9,DATA['summary']['alcohol'][Alc[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(27,c+9,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align1)
+
+			r=2
+			for n in range(len(Ohg)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list1[i]]['data'],format_align1)
+
+			r=9
+			for n in range(len(slept)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][list1[i]]['data'],format_align)
+			r=17
+			for n in range(len(Ec)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(21,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list1[i]]['data'],format_align1)
+
+			r=23
+			for n in range(len(Es)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][list1[i]]['data'],format_align)
+
+			r=30
+			for n in range(len(other1)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+
+		time1=['today','yesterday','week','month','year']
+		c = 3
+		for i in range(len(time1)):
+			c = c+1
+			sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
+			sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
+			sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+			sheet10.write(11,c,DATA['summary']['sleep']['rank'][time1[i]],format_align)
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+			sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
+			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+			sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+			sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+			sheet10.write(31,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
+			sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+			sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+			sheet10.write(35,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
+			sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+			sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
+
+			sheet10.write(3,c+9,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+			sheet10.write(5,c+9,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+			sheet10.write(6,c+9,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
+			sheet10.write(7,c+9,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+			sheet10.write(10,c+9,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
+			sheet10.write(11,c+9,DATA['summary']['mc']['rank'][time1[i]],format_align)
+			sheet10.write(12,c+9,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+			sheet10.write(13,c+9,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(18,c+9,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
+			sheet10.write(19,c+9,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
+			sheet10.write(20,c+9,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+			sheet10.write(21,c+9,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c+9,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
+			sheet10.write(25,c+9,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
+			sheet10.write(26,c+9,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+			sheet10.write(27,c+9,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
+			
+			
+
+	elif (len(a) == 6):
+		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
+		custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
+		custom_ranges2_start = datetime.strptime(a[2], "%Y-%m-%d").date()
+		custom_ranges2_end = datetime.strptime(a[3], "%Y-%m-%d").date()
+		custom_ranges3_start = datetime.strptime(a[4], "%Y-%m-%d").date()
+		custom_ranges3_end = datetime.strptime(a[5], "%Y-%m-%d").date()
+
+		crsf1 = custom_ranges1_start.strftime('%b %d,%Y')
+		cref1 = custom_ranges1_end.strftime('%b %d,%Y')
+		crsf2 = custom_ranges2_start.strftime('%b %d,%Y')
+		cref2 = custom_ranges2_end.strftime('%b %d,%Y')
+		crsf3 = custom_ranges3_start.strftime('%b %d,%Y')
+		cref3 = custom_ranges3_end.strftime('%b %d,%Y')
+		crf1 = '{} to {}'.format(crsf1,cref1)
+		crf2 = '{} to {}'.format(crsf2,cref2)
+		crf3 = '{} to {}'.format(crsf3,cref3)
+
+		cr1='{},{}'.format(custom_ranges1_start,custom_ranges1_end)
+		cr2='{},{}'.format(custom_ranges2_start,custom_ranges2_end)
+		cr3='{},{}'.format(custom_ranges3_start,custom_ranges3_end)
+		crs2 = '{},{},{}'.format(cr1,cr2,cr3)
+		custom_range1='{} to {}'.format(custom_ranges1_start,custom_ranges1_end)
+		custom_range2='{} to {}'.format(custom_ranges2_start,custom_ranges2_end)
+		custom_range3='{} to {}'.format(custom_ranges3_start,custom_ranges3_end)
+		
+		sheet10.set_column('L:L',45)
+		sheet10.set_column('K:K',1)
+		sheet10.set_column('C:G',15)
+		sheet10.set_column('M:Q',15)
+		sheet10.set_column('R:T',17)
+		sheet10.set_column('H:J',17)
+
+		sheet10.write(0,11,'Summary Dashboard',bold)
+		sheet10.write(2,11,'Non Exercise Steps',bold)
+		sheet10.write(9,11,'Movement Consistency',bold)
+		sheet10.write(17,11,'Nutrition',bold)
+		sheet10.write(23,11,'Alcohol',bold)
+
+		sheet10.conditional_format('B4:J7', {'type': 'no_errors',
+                                          'format': border_format})
+		sheet10.conditional_format('B11:J15', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B19:J22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B25:J27', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B32:J37', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('L4:T8', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('L11:T14', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('L19:T22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('L25:T28', {'type': 'no_errors',
+	                                          'format': border_format})
+
+		list2=[custom_range1,custom_range2,custom_range3]
+		range2=[crf1,crf2,crf3]
+		c = 1
+		for i in range(len(range2)):
+			c = c+1
+			sheet10.write(0,c,range2[i],format)
+			sheet10.write(0,c+10,range2[i],format)
+
+		c = 4
+		for i in range(len(duration)):
+			c = c+1
+			sheet10.write(0,c,duration[i],format)
+			sheet10.write(0,c+10,duration[i],format)
+
+		Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise steps Grade','Non Exercise Steps GPA','Total Steps']
+		row=2
+		for i in range(len(Non_Exercise_Steps)):
+			row=row+1
+			sheet10.write(row,11,Non_Exercise_Steps[i])
+
+		Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
+		row=9
+		for i in range(len(Movement_consistency)):
+			row=row+1
+			sheet10.write(row,11,Movement_consistency[i])
+
+		Nutrition=['% Unprocessed Food of the volume of food consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
+		row=17
+		for i in range(len(Nutrition)):
+			row=row+1
+			sheet10.write(row,11,Nutrition[i])
+
+		alcohol=['# of Drinks Consumed per week(7days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
+		row=23
+		for i in range(len(alcohol)):
+			row = row+1
+			sheet10.write(row,11,alcohol[i])
+
+		# Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
+		# 'Total Exercise time (hours:minutes) the last 7 days',
+		# 'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
+		# row=30
+		# for i in range(len(Total)):
+		# 	row = row+1
+		# 	sheet10.write(row,11,Total[i])
+
+
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"custom_ranges":crs2,
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
+
+		c=1
+		for i in range(len(list2)):
+			c = c + 1
+			r=2
+			for n in range(len(nutri)):
+				r= r+1
+				sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(21,c+10,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list2[i]]['data'],format_align1)
+
+			r=2
+			for n in range(len(non_exe)):
+				r= r+1	
+				sheet10.write(r,c+10,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(6,c+10,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list2[i]]['data'],format_align1)
+
+			r=9
+			for n in range(len(mc)):
+				r= r+1	
+				sheet10.write(r,c+10,DATA['summary']['mc'][mc[n]]['custom_range'][list2[i]]['data'],format_align)	
+				sheet10.write(13,c+10,DATA['summary']['mc'][mc[-1]]['custom_range'][list2[i]]['data'],format_align1)	
+
+			r=23
+			for n in range(len(Alc)):
+				r= r+1	
+				sheet10.write(r,c+10,DATA['summary']['alcohol'][Alc[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(27,c+10,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align1)
+
+			r=2
+			for n in range(len(Ohg)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list2[i]]['data'],format_align1)
+
+			r=9
+			for n in range(len(slept)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][list2[i]]['data'],format_align)
+			r=17
+			for n in range(len(Ec)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(21,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list2[i]]['data'],format_align1)
+
+			r=23
+			for n in range(len(Es)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][list2[i]]['data'],format_align)
+
+			r=30
+			for n in range(len(other1)):
+				r= r+1
+				sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][list2[i]]['data'],format_align)
+
+	
+	
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
+		#print(query_params['custom_ranges'])
+		#sheet10.write(6,2,json_cum1['summary']['nutrition']['prcnt_unprocessed_food_gpa']['custom_range']['2018-02-12 to 2018-02-18']['to_dt'])
+		
+		time1=['today','yesterday','week','month','year']
+		
+		c = 4
+		for i in range(len(time1)):
+			c = c+1
+			sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
+			sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
+			sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+			sheet10.write(11,c,DATA['summary']['sleep']['rank'][time1[i]],format_align)
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+			sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
+			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+			sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+			sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+			sheet10.write(31,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
+			sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+			sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+			sheet10.write(35,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
+			sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+			sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
+
+			sheet10.write(3,c+10,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+			sheet10.write(5,c+10,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+			sheet10.write(6,c+10,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
+			sheet10.write(7,c+10,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+			sheet10.write(10,c+10,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
+			sheet10.write(11,c+10,DATA['summary']['mc']['rank'][time1[i]],format_align)
+			sheet10.write(12,c+10,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+			sheet10.write(13,c+10,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(18,c+10,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
+			sheet10.write(19,c+10,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
+			sheet10.write(20,c+10,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+			sheet10.write(21,c+10,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c+10,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
+			sheet10.write(25,c+10,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
+			sheet10.write(26,c+10,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+			sheet10.write(27,c+10,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
+		
+			
+	else:
+		sheet10.set_column('I:I',45)
+		sheet10.set_column('H:H',1)
+		sheet10.set_column('C:G',16)
+		sheet10.set_column('J:O',16)
+
+		sheet10.write(0,8,'Summary Dashboard',bold)
+		sheet10.write(2,8,'Non Exercise Steps',bold)
+		sheet10.write(9,8,'Movement Consistency',bold)
+		sheet10.write(17,8,'Nutrition',bold)
+		sheet10.write(23,8,'Alcohol',bold)
+
+		sheet10.conditional_format('B4:G7', {'type': 'no_errors',
+                                          'format': border_format})
+		sheet10.conditional_format('B11:G15', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B19:G22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B25:G27', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('B32:G37', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('I4:N8', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('I11:N14', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('I19:N22', {'type': 'no_errors',
+	                                          'format': border_format})
+		sheet10.conditional_format('I25:N28', {'type': 'no_errors',
+	                                          'format': border_format})
+
+		c = 1
+		for i in range(len(duration)):
+			c = c+1
+			sheet10.write(0,c,duration[i],format)
+			sheet10.write(0,c+7,duration[i],format)
+
+		Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise steps Grade','Non Exercise Steps GPA','Total Steps']
+		row=2
+		for i in range(len(Non_Exercise_Steps)):
+			row=row+1
+			sheet10.write(row,8,Non_Exercise_Steps[i])
+
+		Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
+		row=9
+		for i in range(len(Movement_consistency)):
+			row=row+1
+			sheet10.write(row,8,Movement_consistency[i])
+
+		Nutrition=['% Unprocessed Food of the volume of food consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
+		row=17
+		for i in range(len(Nutrition)):
+			row=row+1
+			sheet10.write(row,8,Nutrition[i])
+
+		alcohol=['# of Drinks Consumed per week(7days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
+		row=23
+		for i in range(len(alcohol)):
+			row = row+1
+			sheet10.write(row,8,alcohol[i])
+
+		# Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
+		# 'Total Exercise time (hours:minutes) the last 7 days',
+		# 'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
+		# row=30
+		# for i in range(len(Total)):
+		# 	row = row+1
+		# 	sheet10.write(row,8,Total[i])
+
+
+		query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		time1=['today','yesterday','week','month','year']
+		
+		c = 1
+		for i in range(len(time1)):
+			c = c+1
+			sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
+			sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
+			sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+			sheet10.write(11,c,DATA['summary']['sleep']['rank'][time1[i]],format_align)
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+			sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+			sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
+			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+			sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+			sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+			sheet10.write(31,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
+			sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+			sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+			sheet10.write(35,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
+			sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+			sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
+
+			sheet10.write(3,c+7,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+			sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+			sheet10.write(6,c+7,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
+			sheet10.write(7,c+7,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+			sheet10.write(10,c+7,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
+			sheet10.write(11,c+7,DATA['summary']['mc']['rank'][time1[i]],format_align)
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+			sheet10.write(13,c+7,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
+			sheet10.write(18,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
+			sheet10.write(19,c+7,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+			sheet10.write(21,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
+			sheet10.write(24,c+7,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
+			sheet10.write(25,c+7,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+			sheet10.write(27,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
+			
+	green = book.add_format({'align':'left', 'bg_color': 'green'})
+	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
+	red = book.add_format({'align':'left', 'bg_color': 'red'})
+	orange = book.add_format({'align':'left', 'bg_color': 'orange'})
+
+	sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'==', 
+												'value': '"A"', 
+												'format': green})
+
+	sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'==', 
+												'value': '"B"', 
+												'format': green})
+
+	sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'==', 
+												'value': '"C"', 
+												'format': yellow})
+
+	sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'==', 
+												'value': '"D"', 
+												'format': orange})
+
+	sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'==', 
+												'value': '"F"', 
+												'format': red})	
+
+	num_fmt = book.add_format({'num_format': '#,###'})
+
+	sheet10.conditional_format('A1:T50', {'type':'cell', 
+												'criteria':'>=', 
+												'value': '100', 
+												'format': num_fmt})
+
+
+	book.close()
+	return response
+
+
+

@@ -39,13 +39,18 @@ class Command(BaseCommand):
 			'email':('email','-e','--email',2),
 			'all':('all','-a','--all',1),
 			'duration':('duration','-d','--duration',6),
+			# 'timestamp':('timestamp','-t','--timestamp'),
 		}
 		return flags
 
 	def _is_valid(self,session,from_date=None,to_date=None):
 		# if to_date and from_date:
-			print(to_date)
-			print(from_date)
+			# print(to_date)
+			# print(from_date)
+			# if type(from_date_timestamp) == int:
+			# uploadStartTimeInSeconds = from_date_timestamp
+			# uploadEndTimeInSeconds = to_date_timestamp
+			# else:
 			uploadStartTimeInSeconds = int(datetime.datetime.strptime(from_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			uploadEndTimeInSeconds = int(datetime.datetime.strptime(to_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
 			data = {
@@ -162,9 +167,26 @@ class Command(BaseCommand):
 			help = 'Range of date [from, to] eg "-d 2017-11-01 2017-11-10"'
 		)
 
+		# parser.add_argument(
+		# 	flags.get('timestamp')[1],
+		# 	flags.get('timestamp')[2],
+		# 	type = int,
+		# 	nargs = 2,
+		# 	dest = flags.get('timestamp')[0],
+		# 	help = 'Range of date [from, to] eg "-d 13154824646 16857229289"'
+		# )
+
 	def handle(self, *args, **options):
+		# if options['duration'][0]:
+		# 	from_date = options['duration'][0]
+		# 	to_date = options['duration'][1]
+		# else:
+		# 	from_date = None
+		# 	to_date = None
 		from_date = options['duration'][0]
 		to_date = options['duration'][1]
+		# from_date_timestamp = options['timestamp'][0]
+		# to_date_timestamp = options['timestamp'][1]
 		if self._validate_options(options):
 
 			if self.date_range_flag == 'duration':
@@ -172,15 +194,15 @@ class Command(BaseCommand):
 
 			if not options['all'] and options['email']:
 				for email in options['email']:
-					# print(options)
+					print(options)
 					if self._validate_token(email,options):
-						print(from_date,to_date)
+						# print(sess,from_date,to_date)
 						self._is_valid(sess,from_date,to_date)
 
 			elif options['all'] and not options['email']:
 				for token in GarminToken.objects.all():
 					if self._validate_token(token.user.email,options):
-						self._is_valid(to_date,from_date)
+						self._is_valid(sess,to_date,from_date)
 			else:
 				raise CommandError('Provide either --all or --email, not both')
 
