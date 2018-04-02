@@ -128,8 +128,11 @@ class Quicklook extends Component{
 
 			let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
 			let avg_sleep_per_night_gpa = data.grades_ql.avg_sleep_per_night_gpa;
+			let total_penalty = data.grades_ql.ctrl_subs_penalty + data.grades_ql.smoke_penalty;
 			if (avg_sleep_per_night_gpa){
-				avg_sleep_per_night_gpa = avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty)
+				avg_sleep_per_night_gpa = avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty);
+			}else{
+				total_penalty +=data.grades_ql.sleep_aid_penalty
 			}
 
 			let exercise_consistency_points = (
@@ -138,7 +141,7 @@ class Quicklook extends Component{
 					data.grades_ql.movement_non_exercise_steps_gpa + movement_consistency_points + 
 					data.grades_ql.avg_sleep_per_night_gpa + exercise_consistency_points +
 					 data.grades_ql.prcnt_unprocessed_food_consumed_gpa + data.grades_ql.alcoholic_drink_per_week_gpa +
-					 data.grades_ql.ctrl_subs_penalty + data.grades_ql.smoke_penalty
+					 total_penalty
 				)
 			if(user_input_data){
 				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;

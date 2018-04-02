@@ -231,6 +231,14 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 	overall_health_grade_cal_data = _get_blank_pa_model_fields("overall_health_grade")
 	GRADE_POINT = _get_grading_sheme()
 	def _cal_total_point(ql_data):
+		avg_sleep_per_night_gpa = _safe_get_mobj(today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)
+
+		total_penalty = _safe_get_mobj(today_ql_data.grades_ql,"ctrl_subs_penalty",0) + \
+			_safe_get_mobj(today_ql_data.grades_ql,"smoke_penalty",0)
+			
+		if not avg_sleep_per_night_gpa:
+			total_penalty += _safe_get_mobj(today_ql_data.grades_ql,"sleep_aid_penalty",0)
+
 		total_gpa_point = _safe_get_mobj(
 			today_ql_data.grades_ql,"movement_non_exercise_steps_gpa",0)\
 			+ GRADE_POINT[_safe_get_mobj(
@@ -240,9 +248,9 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0)\
 			+ GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_grade","F")]\
-			+ _safe_get_mobj(today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)\
-			+ _safe_get_mobj(today_ql_data.grades_ql,"ctrl_subs_penalty",0)\
-			+ _safe_get_mobj(today_ql_data.grades_ql,"smoke_penalty",0)
+			+ avg_sleep_per_night_gpa\
+			+ total_penalty
+
 		return total_gpa_point
 
 	if today_ql_data and yday_cum_data:
