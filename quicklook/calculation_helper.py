@@ -885,23 +885,23 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities):
 
 	return (exercise_steps, total_steps)
 
+def _get_sleep_grade_from_point(point):
+	if point < 1:
+		return 'F'
+	elif point >= 1 and point < 2:
+		return 'D'
+	elif point >= 2 and point < 3:
+		return 'C'
+	elif point >= 3 and point < 4:
+		return 'B'
+	else:
+		return 'A'
+
 def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 	def _to_sec(duration):
 		hours,mins = map(int,[0 if x == '' else x 
 					for x in duration.split(':')])
 		return hours * 3600 + mins * 60
-
-	def _get_grade(point):
-		if point < 1:
-			return 'F'
-		elif point >= 1 and point < 2:
-			return 'D'
-		elif point >= 2 and point < 3:
-			return 'C'
-		elif point >= 3 and point < 4:
-			return 'B'
-		else:
-			return 'A'
 
 	_sec_min = lambda x: divmod(x,60)[0]
 
@@ -968,7 +968,7 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 		else:
 			points = 0
 
-	return (_get_grade(points),points)
+	return (_get_sleep_grade_from_point(points),points)
  
 def cal_unprocessed_food_grade(prcnt_food):
 	def _point_advantage(current_prcnt, range_min_prcnt, per_prcnt_pt):
@@ -1384,7 +1384,13 @@ def get_overall_grade(grades):
 	exercise_consistency_grade = grades.get('exercise_consistency_grade')
 	prcnt_unprocessed_food_gpa = grades.get('prcnt_unprocessed_food_consumed_gpa')
 	alcoholic_drink_per_week_gpa = grades.get('alcoholic_drink_per_week_gpa')
-	penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
+	
+	if avg_sleep_per_night_gpa:
+		penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
+	else:
+		penalty = (grades.get('ctrl_subs_penalty')+
+			grades.get('smoke_penalty')+
+			grades.get('sleep_aid_penalty'))
 
 	gpa = round((non_exercise_step_gpa +
 		   GRADES[movement_consistency_grade]+

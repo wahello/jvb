@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from itertools import zip_longest
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.db.models import Q
 
@@ -153,9 +154,12 @@ class ProgressReport():
 
 		year_denominator = 365
 		if self.current_date:
+			self.year_start = self._get_first_from_year_start_date()
 			yesterday = self.current_date - timedelta(days=1)
-			year_start = datetime(self.current_date.year,1,1)
-			year_denominator = (yesterday - year_start).days + 1
+			if not self.year_start == yesterday:
+				year_denominator = (yesterday - self.year_start).days + 1
+			else:
+				year_denominator = 0
 
 		self.duration_denominator = {
 			'today':1,'yesterday':1, 'week':7, "month":30, "year":year_denominator
@@ -179,12 +183,16 @@ class ProgressReport():
 
 			self.cumulative_datewise_data_custom_range = {q.created_at.strftime("%Y-%m-%d"):q 
 				for q in self._get_cum_queryset_custom_range(self.custom_ranges)}
+
 			if not self.current_date:
 				self.duration_type = []
 
 			for r in self.custom_ranges: 
 				str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
-				self.duration_denominator[str_range] = (r[1] - r[0]).days + 1
+				if not r[1] == r[0]:
+					self.duration_denominator[str_range] = (r[1] - r[0]).days + 1
+				else:
+					self.duration_denominator[str_range] = 0
 			self.custom_daterange = True
 
 
@@ -234,8 +242,10 @@ class ProgressReport():
 
 	def _get_average(self, stat1, stat2, duration_type):
 		if not stat1 == None and not stat2 == None:
-			avg = (stat1 - stat2)/self.duration_denominator.get(duration_type)
-			return avg
+			demominator = self.duration_denominator.get(duration_type)
+			if demominator:
+				avg = (stat1 - stat2)/demominator
+				return avg
 		return 0
 	
 	def _get_model_related_fields_names(self,model):
@@ -243,6 +253,27 @@ class ProgressReport():
 			if (f.one_to_many or f.one_to_one)
 			and f.auto_created and not f.concrete]
 		return related_fields_names
+
+	def _get_first_from_year_start_date(self):
+		'''
+		Return the date of first cumulative sum record from the
+		start of the year(Jan 1,inclusive).If there is no record
+		then returns the default date Jan 1 of the current year. 
+		'''
+		year_start = datetime(self.current_date.year,1,1)
+		year_end = year_start - timedelta(days=1)
+		first_from_year_start = CumulativeSum.objects.filter(
+			created_at__gte=year_end,
+			user = self.user
+		).order_by('created_at')[:1]
+
+		try:
+			qobj = first_from_year_start[0]
+			return datetime(qobj.created_at.year,
+					qobj.created_at.month,
+					qobj.created_at.day) + timedelta(days=1)
+		except IndexError:
+			return year_start
 
 	def _get_cum_queryset(self):
 		"""
@@ -297,7 +328,7 @@ class ProgressReport():
 			'week':(current_date - timedelta(days=8)).date(),
 			'month':(current_date - timedelta(days=31)).date(),
 			#from start of the year to current date
-			'year':(datetime(current_date.year,1,1) - timedelta(days=1)).date()
+			'year':(self.year_start - timedelta(days=1)).date()
 		}
 		return duration
 
@@ -396,13 +427,15 @@ class ProgressReport():
 						cached_summary_type = "_{}_cache".format(summary_type)
 						current_meta_data = current_data.__dict__.get("_meta_cum_cache")
 						current_data = current_data.__dict__.get(cached_summary_type)
-					if alias == 'today' and yesterday_data:
-						calculated_data_dict[key][alias] = avg_calculator(key,alias,todays_data,
-							yesterday_data,todays_meta_data,yesterday_meta_data)
+					if alias == 'today': 
+						if yesterday_data:
+							calculated_data_dict[key][alias] = avg_calculator(key,alias,todays_data,
+								yesterday_data,todays_meta_data,yesterday_meta_data)
 						continue
-					elif alias == 'yesterday' and day_before_yesterday_data:
-						calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,
-							day_before_yesterday_data,yesterday_meta_data,day_before_yesterday_meta_data)
+					elif alias == 'yesterday': 
+						if day_before_yesterday_data:
+							calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,
+								day_before_yesterday_data,yesterday_meta_data,day_before_yesterday_meta_data)
 						continue
 					# Avg excluding today, that's why subtract from yesterday's cum sum
 					calculated_data_dict[key][alias] = avg_calculator(key,alias,yesterday_data,
@@ -479,7 +512,7 @@ class ProgressReport():
 					val =  self._get_average(
 						todays_data.cum_non_exercise_steps,
 						current_data.cum_non_exercise_steps,alias)
-					return round(val)
+					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'non_exericse_steps_gpa':
 					val = self._get_average(
@@ -491,7 +524,7 @@ class ProgressReport():
 					val = self._get_average(
 						todays_data.cum_total_steps,
 						current_data.cum_total_steps,alias)
-					return round(val)
+					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'movement_non_exercise_step_grade':
 					return calculation_helper.cal_non_exercise_step_grade(
@@ -552,14 +585,10 @@ class ProgressReport():
 					return round(val,2)
 
 				elif key == 'average_sleep_grade':
-					avg_hours = self._get_average(
-						todays_data.cum_total_sleep_in_hours,
-						current_data.cum_total_sleep_in_hours,alias
-					)
-					avg_hours_str = self._hours_to_hours_min(avg_hours)
-					return calculation_helper.cal_average_sleep_grade(
-						avg_hours_str,None	
-					)[0]
+					avg_sleep_gpa = round(self._get_average(
+						todays_data.cum_overall_sleep_gpa,
+						current_data.cum_overall_sleep_gpa,alias),2)
+					return calculation_helper._get_sleep_grade_from_point(avg_sleep_gpa)
 
 				elif key == 'num_days_sleep_aid_taken_in_period':
 					val = 0
@@ -575,7 +604,8 @@ class ProgressReport():
 						val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
 					prcnt = 0
 					if val:
-						prcnt = round((val / self.duration_denominator[alias])*100)
+						prcnt = (val / self.duration_denominator[alias])*100
+						prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
 					return prcnt
 
 			return None
@@ -700,7 +730,7 @@ class ProgressReport():
 					val = self._get_average(
 						todays_data.cum_prcnt_unprocessed_food_consumed,
 						current_data.cum_prcnt_unprocessed_food_consumed,alias)
-					return round(val)
+					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 				elif key == 'prcnt_unprocessed_food_gpa':
 					val = self._get_average(
 						todays_data.cum_prcnt_unprocessed_food_consumed_gpa,
@@ -795,7 +825,7 @@ class ProgressReport():
 							current_data.cum_avg_exercise_hr,
 							avg_exercise_hr_days
 						)
-						return round(val)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'vo2_max':
 					if todays_meta_data and current_meta_data:
@@ -806,7 +836,7 @@ class ProgressReport():
 							current_data.cum_vo2_max,
 							vo2max_days
 						)
-						return round(val)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 			return None
 
@@ -844,7 +874,7 @@ class ProgressReport():
 					val = self._get_average(
 						todays_data.cum_alcohol_drink_per_week_gpa,
 						current_data.cum_alcohol_drink_per_week_gpa,alias)
-					return round(val)
+					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 				elif key == 'alcoholic_drinks_per_week_grade':
 					return calculation_helper.cal_alcohol_drink_grade(
 						self._get_average(
@@ -894,7 +924,7 @@ class ProgressReport():
 							todays_data.cum_resting_hr,
 							current_data.cum_resting_hr,
 							resting_hr_days)
-						return round(val)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
 				elif key == 'hrr_time_to_99':
@@ -917,7 +947,7 @@ class ProgressReport():
 							todays_data.cum_hrr_beats_lowered_in_first_min,
 							current_data.cum_hrr_beats_lowered_in_first_min,
 							beats_lowered_in_first_min_days)
-						return round(val)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 				elif key == 'hrr_highest_hr_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -929,7 +959,7 @@ class ProgressReport():
 							todays_data.cum_highest_hr_in_first_min,
 							current_data.cum_highest_hr_in_first_min,
 							highest_hr_in_first_min_days)
-						return round(val)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 				elif key == 'hrr_lowest_hr_point':
 					if todays_meta_data and current_meta_data:
@@ -941,13 +971,13 @@ class ProgressReport():
 							todays_data.cum_hrr_lowest_hr_point,
 							current_data.cum_hrr_lowest_hr_point,
 							hrr_lowest_hr_point_days)
-						return round(val)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 				elif key == 'floors_climbed':
 					val = self._get_average(
 						todays_data.cum_floors_climbed,
 						current_data.cum_floors_climbed,alias)
-					return round(val)
+					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 			return None
 
 		calculated_data = {
