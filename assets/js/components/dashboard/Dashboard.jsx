@@ -33,6 +33,7 @@ class Dashboard extends Component {
 							   <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
 							   <Link to='/rawdata#grades'>Grades</Link><br/>
 							   <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
+							   <Link to='/leaderboard'>Leader Board</Link><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 							  <h3 id="link_style">Set up Links to Garmin</h3>
 							  <a href='/users/request_token'>Garmin Health Connect</a><br/>
@@ -40,7 +41,8 @@ class Dashboard extends Component {
 							  <h3 id="link_style">Set up Link to Fitbit</h3>
 							   <a href='/fitbit/request_token_fitbit'>Connect to Fitbit</a><br/>
 							  <h3 id="link_style">Other</h3>
-							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>							 
+							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
+							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>							 
 						  </div>
 						</div>
 					</div>

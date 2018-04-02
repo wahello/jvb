@@ -11,7 +11,7 @@ axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
-class GarminDataPage extends Component {
+class GarminDataPage extends Component {  
 /*
   getEpoch(dateObj=null){
 
