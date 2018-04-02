@@ -10,8 +10,7 @@ import moment from 'moment';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import fetchProgress from '../network/progress';
+import fetchProgress,{fetchUserRank} from '../network/progress';
 import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay    } from './dashboard_healpers';
 
 var CalendarWidget = require('react-calendar-widget');  
@@ -19,9 +18,29 @@ var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
+
+const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec"];
+const duration = ["week","today","yesterday","year","month","custom_range"];
+
  class DashboardSummary extends Component{
 constructor(props){
     super(props);
+    let rankInitialState = {}
+    for (let catg of catagory){
+        let catInitialState = {}
+        for(let dur of duration){
+          let userRank = {
+            'user_rank':{
+              category:'',
+              rank:'Getting Ranks...',
+              username:'',
+              score:''
+            }
+        };
+         catInitialState[dur] = userRank;
+        }
+        rankInitialState[catg] = catInitialState;
+       };
     this.state ={
         selectedDate: new Date(),
         cr1_start_date:'',
@@ -40,6 +59,7 @@ constructor(props){
         fetching_ql3:false,
         fetching_ql4:false,
         "report_date":"-",
+        "rankData":rankInitialState,
         "summary":{
             "overall_health":{
                "overall_health_gpa":{
@@ -400,8 +420,9 @@ constructor(props){
            "week": "-",
            "today": "-",
            "yesterday": "-"
-       }
+       },
     };
+
     this.successProgress = this.successProgress.bind(this);
     this.errorProgress = this.errorProgress.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -428,6 +449,8 @@ constructor(props){
    this.headerDates = this.headerDates.bind(this);
    this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
    this.exerciseStatsNoWorkOut = this.exerciseStatsNoWorkOut.bind(this);
+   this.successRank = this.successRank.bind(this);
+   this.renderCustomRangeRankTD = this.renderCustomRangeRankTD.bind(this);
   }
     
   successProgress(data){
@@ -442,6 +465,19 @@ constructor(props){
         duration_date:data.data.duration_date,
     });
   }
+  successRank(data){
+    let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
+
+    this.setState({
+        fetching_ql1:false,
+        fetching_ql2:false,
+        fetching_ql3:false,
+        fetching_ql4:false,
+        rankData:data.data,
+      //  duration_date:data.data.duration_date,
+    });
+  }
+
 gpascoreDecimal(gpa){
 let x = gpa;
 let value =parseFloat(x).toFixed(2);
@@ -470,6 +506,31 @@ if(value != undefined){
           return x1 + x2;
      }
 }
+renderCustomRangeRankTD(custom_data, toReturn="data"){
+    let td=[];
+    if(!custom_data){
+        return td;
+    }
+   
+    for (let[key,val] of Object.entries(custom_data)){
+        for(let [key1,val1] of Object.entries(val)){
+          if(key1 == "user_rank"){
+                 td.push(<td className="table_style">{val1.rank}</td>);
+               }
+      }
+        if(toReturn == "key"){
+            let str = key;
+            let d = str.split(" ");
+            let d1 = d[0];
+            let date1 =moment(d1).format('MMM DD, YYYY');
+            let d2 = d[2];
+            let date2 =moment(d2).format('MMM DD, YYYY');
+            let date = date1 + ' to ' + date2;
+            td.push(<th className="table_style">{date}</th>);
+        }
+    }
+    return td;
+}
 renderCustomRangeTD(custom_data, toReturn="data"){
     let td=[];
     if(!custom_data){
@@ -485,7 +546,6 @@ renderCustomRangeTD(custom_data, toReturn="data"){
             let d = str.split(" ");
             let d1 = d[0];
             let date1 =moment(d1).format('MMM DD, YYYY');
-            //console.log("=======",typeof(date1));
             let d2 = d[2];
             let date2 =moment(d2).format('MMM DD, YYYY');
             let date = date1 + ' to ' + date2;
@@ -543,7 +603,6 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
             let str = key;
             let d = str.split(" ");
             let d1 = d[0];
-            console.log("=======",d1);
             let date1 =moment(d1).format('MMM DD, YYYY');
             let d2 = d[2];
             let date2 =moment(d2).format('MMM DD, YYYY');
@@ -572,6 +631,7 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
       fetching_ql4 :true,                               
     },()=>{
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate);
     });
   }
 
@@ -593,6 +653,8 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
         custom_ranges.push(this.state.cr1_start_date);
         custom_ranges.push(this.state.cr1_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,custom_ranges);
+
     });
   }
  onSubmitDate2(event){
@@ -614,6 +676,8 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
         custom_ranges.push(this.state.cr2_start_date);
         custom_ranges.push(this.state.cr2_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,custom_ranges);
+
     });
   }
  onSubmitDate3(event){
@@ -634,6 +698,8 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
         custom_ranges.push(this.state.cr3_start_date);
         custom_ranges.push(this.state.cr3_end_date);
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,custom_ranges);
+
     });
   }
 
@@ -650,6 +716,8 @@ headerDates(value){
 
     componentDidMount(){
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate);
+
     }
   toggle() {
     this.setState({
@@ -988,12 +1056,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                 <td className="table_style">Rank against other users</td>
-                {this.renderCustomRangeTD( this.state.summary.overall_health.rank.custom_range)}
-                <td className="table_style">{this.state.summary.overall_health.rank.today}</td>
-                <td className="table_style">{this.state.summary.overall_health.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.overall_health.rank.week}</td>
-                <td className="table_style">{this.state.summary.overall_health.rank.month}</td>
-                <td className="table_style">{this.state.summary.overall_health.rank.year}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.oh_gpa.custom_range)}
+                <td className="table_style">{this.state.rankData.oh_gpa.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.oh_gpa.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.oh_gpa.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.oh_gpa.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.oh_gpa.year.user_rank.rank}</td>
             </tr>
              <tr className="table_style">
                 <td className="table_style">Overall Health GPA Grade</td>
@@ -1037,12 +1105,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                <td className="table_style">Rank against other users</td>
-                {this.renderCustomRangeTD(this.state.summary.mc.rank.custom_range)}
-                <td className="table_style">{this.state.summary.mc.rank.today}</td>
-                <td className="table_style">{this.state.summary.mc.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.mc.rank.week}</td>
-                <td className="table_style">{this.state.summary.mc.rank.month}</td>
-                <td className="table_style">{this.state.summary.mc.rank .year}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.mc.custom_range)}
+               <td className="table_style">{this.state.rankData.mc.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.mc.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.mc.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.mc.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.mc.year.user_rank.rank}</td>
             </tr>
             <tr className="table_style">
                 <td className="table_style">Movement Consistency Grade</td>
@@ -1096,12 +1164,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                <td className="table_style">Rank against other users</td>
-               {this.renderCustomRangeTD(this.state.summary.non_exercise.rank.custom_range)}
-                <td className="table_style">{this.state.summary.non_exercise.rank.today}</td>
-                <td className="table_style">{this.state.summary.non_exercise.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.non_exercise.rank.week}</td>
-                <td className="table_style">{this.state.summary.non_exercise.rank.month}</td>
-                <td className="table_style">{this.state.summary.non_exercise.rank.year}</td>
+               {this.renderCustomRangeRankTD(this.state.rankData.total_steps.custom_range)}
+                <td className="table_style">{this.state.rankData.total_steps.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.total_steps.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.total_steps.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.total_steps.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.total_steps.year.user_rank.rank}</td>
             </tr>
             <tr className="table_style">
                 <td className="table_style">Movement-Non Exercise Steps Grade</td>
@@ -1163,12 +1231,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                <td className="table_style">Rank against other users</td>
-               {this.renderCustomRangeTD(this.state.summary.nutrition.rank.custom_range)}
-                <td className="table_style">{this.state.summary.nutrition.rank.today}</td>
-                <td className="table_style">{this.state.summary.nutrition.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.nutrition.rank.week}</td>
-                <td className="table_style">{this.state.summary.nutrition.rank.month}</td>
-                <td className="table_style">{this.state.summary.nutrition.rank.year}</td>
+               {this.renderCustomRangeRankTD(this.state.rankData.prcnt_uf.custom_range)}
+                <td className="table_style">{this.state.rankData.prcnt_uf.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.prcnt_uf.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.prcnt_uf.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.prcnt_uf.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.prcnt_uf.year.user_rank.rank}</td>
             </tr>
             <tr className="table_style">
                 <td className="table_style">% Non Processed Food Consumed Grade</td>
@@ -1221,12 +1289,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                <td className="table_style">Rank against other users</td>
-                {this.renderCustomRangeTD(this.state.summary.alcohol.rank.custom_range)}
-                <td className="table_style">{this.state.summary.alcohol.rank.today}</td>
-                <td className="table_style">{this.state.summary.alcohol.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.alcohol.rank.week}</td>
-                <td className="table_style">{this.state.summary.alcohol.rank.month}</td>
-                <td className="table_style">{this.state.summary.alcohol.rank.year}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.alcohol_drink.custom_range)}
+                <td className="table_style">{this.state.rankData.alcohol_drink.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.alcohol_drink.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.alcohol_drink.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.alcohol_drink.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.alcohol_drink.year.user_rank.rank}</td>
             </tr>
             <tr className="table_style">
                 <td className="table_style">Alcoholic drinks per week Grade</td>
@@ -1278,12 +1346,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                <td className="table_style">Rank against other users</td>
-                {this.renderCustomRangeTD(this.state.summary.ec.rankcustom_range)}
-                <td className="table_style">{this.state.summary.ec.rank.today}</td>
-                <td className="table_style">{this.state.summary.ec.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.ec.rank.week}</td>
-                <td className="table_style">{this.state.summary.ec.rank.month}</td>
-                <td className="table_style">{this.state.summary.ec.rank.year}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.ec.custom_range)}
+                <td className="table_style">{this.state.rankData.ec.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.ec.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.ec.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.ec.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.ec.year.user_rank.rank}</td>
             </tr>
             <tr className="table_style">
                 <td className="table_style">Exercise Consistency Grade</td>
@@ -1469,12 +1537,12 @@ createExcelPrintURL(){
             </tr>
             <tr className="table_style">
                <td className="table_style">Rank against other users</td>
-                {this.renderCustomRangeTD(this.state.summary.sleep.rank.custom_range)}
-                <td className="table_style">{this.state.summary.sleep.rank.today}</td>
-                <td className="table_style">{this.state.summary.sleep.rank.yesterday}</td>
-                <td className="table_style">{this.state.summary.sleep.rank.week}</td>
-                <td className="table_style">{this.state.summary.sleep.rank.month}</td>
-                <td className="table_style">{this.state.summary.sleep.rank.year}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.avg_sleep.custom_range)}
+                <td className="table_style">{this.state.rankData.avg_sleep.today.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.avg_sleep.yesterday.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.avg_sleep.week.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.avg_sleep.month.user_rank.rank}</td>
+                <td className="table_style">{this.state.rankData.avg_sleep.year.user_rank.rank}</td>
             </tr>
             <tr className="table_style">
                 <td className="table_style">Average Sleep Grade</td>
