@@ -4,6 +4,8 @@ import base64
 import requests
 import webbrowser
 import pprint
+from datetime import datetime, timedelta , date
+import ast
 
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -11,19 +13,24 @@ from django.shortcuts import redirect
 
 from rauth import OAuth2Service, OAuth2Session
 
-from .models import FitbitConnectToken
+from .models import FitbitConnectToken,\
+					UserFitbitDataSleep,\
+					UserFitbitDataHeartRate,\
+					UserFitbitDataActivities
+
+
 
 # Create your views here.
 def request_token_fitbit(request):
 	service = OAuth2Service(
 					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -35,8 +42,8 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -51,7 +58,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -72,27 +79,26 @@ def receive_token_fitbit(request):
 		return redirect('/service_connect_fitbit')
 
 def fetching_data_fitbit(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%m-%d-%Y").date()
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
 	tokens = FitbitConnectToken.objects.get(user = request.user)
-	#print(tokens)
 	access_token = tokens.access_token
-	#print(access_token)
 	session = service.get_session(access_token)
 	#The date in the format yyyy-MM-dd
-	date_fitbit = '2018-03-18'
-	# user_id = tokens.user_id_fitbit
+	date_fitbit = start_date
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
 	# activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
 	# body_fitbit = session.get("https://api.fitbit.com/1/user/-/body/log/fat/date/{}.json".format(date_fitbit))
 	# food_fitbit = session.get("https://api.fitbit.com/1/user/-/foods/log/date/{}.json".format(date_fitbit))
 	# hrr_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
-	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
+	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities.json")
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1m.json".format(date_fitbit))
 	# try:
 	# 	esponse = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/2018-02-11.json")
@@ -101,12 +107,16 @@ def fetching_data_fitbit(request):
 	# 	print("Dileep")
 	# a = esponse.json()
 	b = sleep_fitbit.status_code
-	# sleep_fitbit = sleep_fitbit.json()
+	sleep_fitbit = sleep_fitbit.json()
+	# sleep_fitbit = ast.literal_eval(sleep_fitbit)
+	# date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
+	# if sleep_fitbit:
+	# 	UserFitbitDataSleep.objects.update_or_create(user=request.user,date_of_sleep=date_of_sleep,data=sleep_fitbit)
 	# activity_fitbit = activity_fitbit.json()
 	# body_fitbit = body_fitbit.json()
 	# food_fitbit = food_fitbit.json()
 	# hrr_fitbit = hrr_fitbit.json()
-	steps_fitbit = steps_fitbit.json()
+	# steps_fitbit = steps_fitbit.json()
 	heartrate_fitbit = heartrate_fitbit.json()
 	calories_fitbit = calories_fitbit.json()
 	# print(pprint.pprint(sleep_fitbit))
@@ -118,9 +128,9 @@ def fetching_data_fitbit(request):
 	# print(pprint.pprint(heartrate_fitbit))
 	print(pprint.pprint(calories_fitbit))
 	if b == 401:
-		if a['errors'][0]['errorType'] == 'expired_token':
+		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
 			client_id='22CN46'
-			client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+			client_secret='94d717c6ec36c270ed59cc8b5564166f'
 			access_token_url='https://api.fitbit.com/oauth2/token'
 			token = FitbitConnectToken.objects.get(user = request.user)
 			refresh_token_acc = token.refresh_token
@@ -135,17 +145,9 @@ def fetching_data_fitbit(request):
 			}
 			r = requests.post(access_token_url,headers=headers,data=data)
 			c = r.json()
-			#print(pprint.pprint(c))
-	# else:
-	# 	pass
-	# print(pprint.pprint(a))
-	# print(pprint.pprint(a))
-	# print(a['errors'][0]['errorType	'])
-	# mail = EmailMessage()
-	# mail.subject = ""
-	# mail.body = str(a)
-	# mail.to = ['dileepk@s7inc.co']
-	# mail.send()
+			# print(pprint.pprint(c))
+			FitbitConnectToken.objects.filter(user=request.user).update(refresh_token=c['refresh_token'],access_token=c['access_token'])
+			fetching_data_fitbit(request)
 
 	return redirect('/')
 

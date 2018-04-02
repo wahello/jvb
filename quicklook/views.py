@@ -14,6 +14,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
+from garmin.models import GarminFitFiles
 from user_input.models import DailyUserInputOptional ,\
                               DailyUserInputEncouraged,\
                               DailyUserInputStrong
@@ -230,8 +231,11 @@ def export_users_xls(request):
 
 	#date = datetime.strptime(date2,'%m-%d-%Y').date()
 	#custom_ranges = datetime.strptime(crs, "%m-%d-%Y").date()
-
-	
+	# print(request.user)
+	# start = "2018-03-28"
+	# end = "2018-03-29"
+	# a = GarminFitFiles.objects.filter(user=request.user,created_at__range=[start, end])
+	# print(a)
 	x= to_date.strftime('%m-%d-%y')
 	# print(type(x))
 	y= x.split("-")
@@ -244,8 +248,8 @@ def export_users_xls(request):
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 	response['Content-Disposition'] = "attachment; filename={}".format(filename) 
 	book = Workbook(response,{'in_memory': True})
-	sheet10 = book.add_worksheet('Progress Analyzer')
 	sheet1 = book.add_worksheet('Grades')
+	sheet10 = book.add_worksheet('Progress Analyzer')
 	sheet2 = book.add_worksheet('Steps')
 	sheet3 = book.add_worksheet('Sleep')
 	sheet4 = book.add_worksheet('Food')
