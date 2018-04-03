@@ -92,7 +92,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_hrr_to_99_days_count":None,
 			"cum_hrr_beats_lowered_in_first_min_days_count":None,
 			"cum_highest_hr_in_first_min_days_count":None,
-			"cum_hrr_lowest_hr_point_days_count":None
+			"cum_hrr_lowest_hr_point_days_count":None,
+			"cum_mc_recorded_days_count":None
 		}
 		return fields
 
@@ -590,7 +591,12 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = hrr_beats_lowered_in_first_min \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_lowest_hr_point_days_count",0)
 
-	
+		have_mc = _safe_get_mobj(
+			today_ql_data.steps_ql,"movement_consistency",None)
+		have_mc = 1 if have_mc else 0
+		meta_cum_data['cum_mc_recorded_days_count'] = have_mc \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_mc_recorded_days_count",0)
+
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"workout_duration",None
@@ -633,6 +639,10 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		hrr_lowest_hr_point = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
 		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = 1 if hrr_lowest_hr_point else 0
+
+		have_mc = _safe_get_mobj(
+			today_ql_data.steps_ql,"movement_consistency",None)
+		meta_cum_data['cum_mc_recorded_days_count'] = 1 if have_mc else 0
 		
 	return meta_cum_data
 

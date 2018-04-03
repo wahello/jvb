@@ -81,6 +81,9 @@ class ToMetaCumulative(object):
 		self.cum_hrr_lowest_hr_point_days_count = raw_data[
 			"cum_hrr_lowest_hr_point_days_count"
 		]
+		self.cum_mc_recorded_days_count = raw_data[
+			"cum_mc_recorded_days_count"
+		]
 
 class ToCumulativeSum(object):
 	'''
@@ -635,27 +638,80 @@ class ProgressReport():
 
 	def _cal_movement_consistency_summary(self,custom_daterange = False):
 
+		def _cal_custom_average(stat1, stat2,days):
+			if not stat1 == None and not stat2 == None and days:
+				avg = (stat1 - stat2)/days
+				return avg
+			return 0
+
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='movement_consistency_score':
-					val = self._get_average(
-						todays_data.cum_movement_consistency_score,
-						current_data.cum_movement_consistency_score,alias)
-					return round(val,2)
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+
+						mc_gpa = _cal_custom_average(
+							todays_data.cum_movement_consistency_gpa,
+							current_data.cum_movement_consistency_gpa,
+							mc_days)
+
+						val = _cal_custom_average(
+							todays_data.cum_movement_consistency_score,
+							current_data.cum_movement_consistency_score,
+							mc_days)
+
+						if mc_gpa:
+							return round(val,2)
+						else:
+							return "Not Reported"
+					return None
+
 				elif key == 'movement_consistency_gpa':
-					val = self._get_average(
-						todays_data.cum_movement_consistency_gpa,
-						current_data.cum_movement_consistency_gpa,alias)
-					return round(val,2)
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_movement_consistency_gpa,
+							current_data.cum_movement_consistency_gpa,
+							mc_days)
+
+						if val:
+							return round(val,2)
+						else:
+							return "Not Reported"
+					return None
 
 				elif key == 'movement_consistency_grade':
-					return calculation_helper.cal_movement_consistency_grade(
-						self._get_average(
-							todays_data.cum_movement_consistency_score,
-							current_data.cum_movement_consistency_score,alias
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
 						)
-					)
+
+						mc_gpa = _cal_custom_average(
+							todays_data.cum_movement_consistency_gpa,
+							current_data.cum_movement_consistency_gpa,
+							mc_days)
+
+						grade =  calculation_helper.cal_movement_consistency_grade(
+							_cal_custom_average(
+								todays_data.cum_movement_consistency_score,
+								current_data.cum_movement_consistency_score,
+								mc_days
+							)
+						)
+						if mc_gpa:
+							return grade
+						else:
+							return "Not Reported"
+					return None
+
 			return None
 
 		calculated_data = {

@@ -963,8 +963,8 @@ def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
 			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
 	
 	if sleep_aid_taken == "yes":
-		if points >= 2:
-			points -= 2
+		if points >= 1.5:
+			points -= 1.5
 		else:
 			points = 0
 
@@ -1139,7 +1139,7 @@ def cal_overall_grade(gpa):
 def cal_penalty(is_smoke,is_ctrl_subs,is_sleep_aid):
 	smoke_penalty = -3.1 if is_smoke == 'yes' else 0
 	ctrl_subs_penalty = -3.1 if is_ctrl_subs == 'yes' else 0
-	sleep_aid_penalty = -2 if is_sleep_aid == 'yes' else 0
+	sleep_aid_penalty = -1.5 if is_sleep_aid == 'yes' else 0
 	penalties = {
 		"smoke_penalty":smoke_penalty,
 		"ctrl_subs_penalty":ctrl_subs_penalty,
