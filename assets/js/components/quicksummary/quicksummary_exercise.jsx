@@ -23,6 +23,7 @@ const attrVerboseName = {
     distance_other: 'Distance (in Miles) - Other',  
     pace: 'Pace (minutes:seconds) (Running)',
     avg_heartrate: 'Average Heartrate',
+    avg_exercise_heartrate:'Overall Average Exercise Heart Rate',
     elevation_gain: 'Elevation Gain(feet)',
     elevation_loss: 'Elevation Loss(feet)',  
     effort_level: 'Effort Level',
