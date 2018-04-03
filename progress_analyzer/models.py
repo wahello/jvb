@@ -92,3 +92,4 @@ class MetaCumulative(models.Model):
 	cum_hrr_lowest_hr_point_days_count = models.IntegerField(
 		blank=True, null=True
 	)
+	cum_mc_recorded_days_count = models.IntegerField(blank=True,null=True)
