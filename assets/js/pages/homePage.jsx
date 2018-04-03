@@ -27,6 +27,9 @@ import DashboardSummary from '../components/dashboard_summary';
 import TermsConditions from '../components/terms_and_conditions';
 import ServiceConnect_fitBit from '../components/serviceConnect_fitbit';
 import Activity_Type from '../components/activity_types';
+import LeaderBoard from '../components/leaderboard';
+import FitBit from '../components/fitbitData';
+
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -50,6 +53,7 @@ function initializeLocalState(){
 			        <Route exact path='/' component={HomePageContainer}/>
 			        <Route path='/users/dashboard' component={RequireAuth(Dashboard)} />
 			        <Route path='/raw/garmin' component={RequireAuth(GarminDataPage)} />
+			        <Route path='/raw/fitbit' component={RequireAuth(FitBit)} />
 			        <Route path='/register' component={Register} />
 			        <Route path='/UserInputs' component={RequireAuth(UserInputs)} />
 			        <Route path='/service_connect' component={RequireAuth(ServiceConnect)} />
@@ -65,7 +69,8 @@ function initializeLocalState(){
 					<Route path='/rawdata' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
-					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />					
+					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />					
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 			    </Switch>
