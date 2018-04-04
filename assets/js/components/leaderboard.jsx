@@ -12,6 +12,7 @@ import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
 
 
+
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
 
