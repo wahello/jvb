@@ -48,10 +48,12 @@ export default class FitBit extends Component{
 	            	<CalendarWidget onDaySelect={this.processDate}/>,
 	            </div>
 	            <div className="row justify-content-center">
+	            	<a href={`/fitbit/fetching_data_fitbit?start_date=${moment(this.state.selectedDate).format('MM-DD-YYYY')}`}>
 	            	<button className ="btn btn-md btn-primary">Submit</button>
+					</a>	            
 	            </div>
           	 </div>
-			</div>
-			)
+				</div>
+				)
 	}
 }

@@ -11,7 +11,7 @@ export default function fetchFitBitData(selectedDate,successCallback, errorCallb
 		const URL = "";
 		const config = {
 			params:{
-   				date: selectedDate.format('YYYY-MM-DD'),
+   				date: selectedDate.format('MM-DD-YYYY'),
  			},
 			method: "get",
 			url: URL,

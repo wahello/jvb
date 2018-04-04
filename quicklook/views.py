@@ -14,6 +14,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
+from garmin.models import GarminFitFiles
 from user_input.models import DailyUserInputOptional ,\
                               DailyUserInputEncouraged,\
                               DailyUserInputStrong
@@ -230,8 +231,11 @@ def export_users_xls(request):
 
 	#date = datetime.strptime(date2,'%m-%d-%Y').date()
 	#custom_ranges = datetime.strptime(crs, "%m-%d-%Y").date()
-
-	
+	# print(request.user)
+	# start = "2018-03-28"
+	# end = "2018-03-29"
+	# a = GarminFitFiles.objects.filter(user=request.user,created_at__range=[start, end])
+	# print(a)
 	x= to_date.strftime('%m-%d-%y')
 	# print(type(x))
 	y= x.split("-")
@@ -244,8 +248,8 @@ def export_users_xls(request):
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 	response['Content-Disposition'] = "attachment; filename={}".format(filename) 
 	book = Workbook(response,{'in_memory': True})
-	sheet10 = book.add_worksheet('Progress Analyzer')
 	sheet1 = book.add_worksheet('Grades')
+	sheet10 = book.add_worksheet('Progress Analyzer')
 	sheet2 = book.add_worksheet('Steps')
 	sheet3 = book.add_worksheet('Sleep')
 	sheet4 = book.add_worksheet('Food')
@@ -977,14 +981,14 @@ def export_users_xls(request):
 	# Exercise Reporting
 
 	columns_of_exercise = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate",
+	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate",'avg_exercise_heartrate',
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
 	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
 	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
-	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate OTHER','Elevation Gain(feet)','Elevation Loss(feet)', 
+	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate OTHER','Overall Average Exercise Heart Rate','Elevation Gain(feet)','Elevation Loss(feet)', 
 	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
 	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
 	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
@@ -1836,16 +1840,15 @@ def export_users_xls(request):
 	sheet6.repeat_columns(0)
 	sheet6.set_row(0,30)
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate",
+	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate","avg_exercise_heartrate",
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
 	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
 	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
-	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate OTHER','Elevation Gain(feet)','Elevation Loss(feet)', 
-	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
-	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
+	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate OTHER','Overall Average Exercise Heart Rate',
+	'Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
 	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
 	
 	current_date = to_date
@@ -1894,6 +1897,7 @@ def export_users_xls(request):
 					 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
 					else:
 					 	sheet6.write(i+2,row_num,"",format)
+				
 				elif i == 14:
 					if 'OTHER' in json2_data:
 
