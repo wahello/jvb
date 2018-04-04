@@ -93,13 +93,13 @@ def fetching_data_fitbit(request):
 	#The date in the format yyyy-MM-dd
 	date_fitbit = start_date
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
-	# activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
+	activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
 	# body_fitbit = session.get("https://api.fitbit.com/1/user/-/body/log/fat/date/{}.json".format(date_fitbit))
 	# food_fitbit = session.get("https://api.fitbit.com/1/user/-/foods/log/date/{}.json".format(date_fitbit))
 	# hrr_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
-	calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities.json")
-	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1m.json".format(date_fitbit))
+	# calories_fitbit = session.get("https://api.fitbit.com/1/user/-/activities.json")
+	# steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1m.json".format(date_fitbit))
 	# try:
 	# 	esponse = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/2018-02-11.json")
 	# 	a = esponse.json()
@@ -108,17 +108,35 @@ def fetching_data_fitbit(request):
 	# a = esponse.json()
 	b = sleep_fitbit.status_code
 	sleep_fitbit = sleep_fitbit.json()
-	# sleep_fitbit = ast.literal_eval(sleep_fitbit)
-	# date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
-	# if sleep_fitbit:
-	# 	UserFitbitDataSleep.objects.update_or_create(user=request.user,date_of_sleep=date_of_sleep,data=sleep_fitbit)
-	# activity_fitbit = activity_fitbit.json()
+	activity_fitbit = activity_fitbit.json()
 	# body_fitbit = body_fitbit.json()
 	# food_fitbit = food_fitbit.json()
 	# hrr_fitbit = hrr_fitbit.json()
 	# steps_fitbit = steps_fitbit.json()
 	heartrate_fitbit = heartrate_fitbit.json()
-	calories_fitbit = calories_fitbit.json()
+	# calories_fitbit = calories_fitbit.json()
+	# sleep_fitbit = ast.literal_eval(sleep_fitbit)
+	try:
+		if sleep_fitbit:
+			date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
+			UserFitbitDataSleep.objects.update_or_create(user=request.user,date_of_sleep=date_of_sleep,data=sleep_fitbit)
+	except (KeyError, IndexError):
+		pass
+
+	try:
+		if heartrate_fitbit:
+			date_of_heartrate = heartrate_fitbit['activities-heart'][0]['dateTime']
+			UserFitbitDataHeartRate.objects.update_or_create(user=request.user,date_of_heartrate=date_of_heartrate,data=heartrate_fitbit)
+	except (KeyError, IndexError):
+		pass
+
+	try:
+		if activity_fitbit:
+			# date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
+			UserFitbitDataActivities.objects.update_or_create(user=request.user,data=activity_fitbit)
+	except (KeyError, IndexError):
+		pass
+
 	# print(pprint.pprint(sleep_fitbit))
 	# print(pprint.pprint(activity_fitbit))
 	# print(pprint.pprint(body_fitbit))
@@ -126,7 +144,7 @@ def fetching_data_fitbit(request):
 	# print(pprint.pprint(hrr_fitbit))
 	# print(pprint.pprint(steps_fitbit))
 	# print(pprint.pprint(heartrate_fitbit))
-	print(pprint.pprint(calories_fitbit))
+	# print(pprint.pprint(calories_fitbit))
 	if b == 401:
 		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
 			client_id='22CN46'
@@ -149,7 +167,7 @@ def fetching_data_fitbit(request):
 			FitbitConnectToken.objects.filter(user=request.user).update(refresh_token=c['refresh_token'],access_token=c['access_token'])
 			fetching_data_fitbit(request)
 
-	return redirect('/')
+	return redirect('/raw/fitbit')
 
 def refresh_token_fitbit(request):
 	client_id='22CN2D'

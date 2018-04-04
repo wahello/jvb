@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { getGarminToken,logoutUser} from '../network/auth';
-import fetchLeaderBoard from '../network/leaderboard';
+import {fetchLeaderBoard} from '../network/leaderBoard';
 
 
 var CalendarWidget = require('react-calendar-widget');  
