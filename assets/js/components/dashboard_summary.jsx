@@ -480,9 +480,9 @@ constructor(props){
   }
 
 gpascoreDecimal(gpa){
-  let value;
+let value;
 let x = gpa;
-if(x && x != "Not Reported"){
+if( x !=  null && x != undefined && x != "Not Reported"){
     value =parseFloat(x).toFixed(2);
  }
  else if(x == "Not Reported"){
@@ -582,7 +582,7 @@ gpascoreCustomRangeTD(custom_data, toReturn="data"){
         if(toReturn == "data"){
             let x = val.data;
             let value;
-            if(x && x != "Not Reported"){
+            if(x !=  null && x != undefined && x != "Not Reported"){
               value =parseFloat(x).toFixed(2);
             td.push(<td className="progress_table">{value}</td>);
           }
