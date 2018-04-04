@@ -41,6 +41,12 @@ class LeaderBoard extends Component{
     };
 		this.state = {
 			selectedDate:new Date(),
+			lb1_start_date:'',
+	        lb1_end_date:'',
+	        lb2_start_date:'',
+	        lb2_end_date:'',
+	        lb3_start_date:'',
+	        lb3_end_date:'',
 			calendarOpen:false,
 			isOpen:false,
 			ranking_data:rankInitialState,
@@ -52,6 +58,7 @@ class LeaderBoard extends Component{
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.renderTablesTd = this.renderTablesTd.bind(this);
+		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
@@ -68,6 +75,67 @@ class LeaderBoard extends Component{
 		},()=>{fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate);
 		});
 	}
+	onSubmitDate1(event){
+    event.preventDefault();
+    this.setState({
+      dateRange1:!this.state.dateRange1,
+      fetching_ql1:true
+    },()=>{
+        let custom_ranges = [];
+        if(this.state.lb2_start_date && this.state.lb2_end_date){
+            custom_ranges.push(this.state.lb2_start_date);
+            custom_ranges.push(this.state.lb2_end_date);
+        }
+         if(this.state.lb3_start_date && this.state.lb3_end_date){
+            custom_ranges.push(this.state.lb3_start_date);
+            custom_ranges.push(this.state.lb3_end_date);
+        }
+        custom_ranges.push(this.state.lb1_start_date);
+        custom_ranges.push(this.state.lb1_end_date);
+      fetchLeaderBoard(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+    });
+  }
+   onSubmitDate2(event){
+    event.preventDefault();
+    this.setState({
+      dateRange2:!this.state.dateRange2,
+      fetching_ql2:true
+    },()=>{
+         let custom_ranges = [];
+        if(this.state.lb1_start_date && this.state.lb1_end_date){
+            custom_ranges.push(this.state.lb1_start_date);
+            custom_ranges.push(this.state.lb1_end_date);
+        }
+         if(this.state.lb3_start_date && this.state.lb3_end_date){
+            custom_ranges.push(this.state.lb3_start_date);
+            custom_ranges.push(this.state.lb3_end_date);
+        }
+
+        custom_ranges.push(this.state.lb2_start_date);
+        custom_ranges.push(this.state.lb2_end_date);
+      fetchLeaderBoard(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+    });
+  }
+ onSubmitDate3(event){
+    event.preventDefault();
+    this.setState({
+      dateRange3:!this.state.dateRange3,
+      fetching_ql3:true
+    },()=>{
+         let custom_ranges = [];
+         if(this.state.lb1_start_date && this.state.lb1_end_date){
+            custom_ranges.push(this.state.cr1_start_date);
+            custom_ranges.push(this.state.cr1_end_date);
+        }
+        if(this.state.cr2_start_date && this.state.cr2_end_date){
+            custom_ranges.push(this.state.cr2_start_date);
+            custom_ranges.push(this.state.cr2_end_date);
+        }
+        custom_ranges.push(this.state.cr3_start_date);
+        custom_ranges.push(this.state.cr3_end_date);
+      fetchLeaderBoard(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+    });
+  }
 	componentDidMount(){
 		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate);
 	}
@@ -86,28 +154,49 @@ class LeaderBoard extends Component{
     	this.props.logoutUser(this.onLogoutSuccess);
   	}
   	renderTablesTd(value){
-	  	let tables = [];
-	  	let th = [];
-	  	for(let [key,val] of Object.entries(value)){
-	  		 for (let [key1,val1] of Object.entries(val)){
-	  		 	let score = [];
-	  		 	let rank = [];
-	  		 	if(key1 == "user_rank"){
-	  		 		for(let[key2,val2] of Object.entries(val1)){
-	  		 			if(key2 == "score"){
-	  		 			 score.push(<td>{val2}</td>);
-	  		 			}
-	  		 			else if(key2 == "rank"){
-	  		 			 rank.push(<td>{val2}</td>);
-	  		 			}
-	  		 		}
-	  		 		tables.push(<tr>{score}</tr>);
-	  		 		tables.push(<tr>{rank}</tr>);
+  		let category = "";
+	  	let durations = [];
+	  	let scores = [];
+	  	let ranks = [];
+	  	let tableRows = [];
+
+	  	for(let [duration,val] of Object.entries(value)){
+	  		durations.push(duration);
+	  		 for (let [key,rankData] of Object.entries(val)){
+	  		 	if(key == "user_rank"){
+	  		 		if(!category)
+	  		 			category = rankData.category;
+	  		 		scores.push(rankData.score);
+	  		 		ranks.push(rankData.rank);
 	  		 	}
 	  		 }
-	  		 
 	  	}
-	  	return tables;
+
+	  	// creating headers for table
+	  	let tableHeaders = [<th className = "lb_table_style_rows">{category}</th>]
+	  	for(let dur of durations){
+	  		tableHeaders.push(<th className = "lb_table_style_rows">{dur}</th>);
+	  	}
+	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
+
+	  	// creating table rows for ranks
+	  	let rankTableData = [<td style={{fontWeight:"bold"}}
+	  							 className = "lb_table_style_rows">
+	  							 {"Ranks"}</td>]
+	  	for(let rank of ranks){
+	  		rankTableData.push(<td className = "lb_table_style_rows">{rank}</td>);
+	  	}
+	  	tableRows.push(<tr className = "lb_table_style_rows">{rankTableData}</tr>)
+
+	  	let scoreTableData = [<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Scores"}</td>]
+	  	for(let score of scores){
+	  		scoreTableData.push(<td className = "lb_table_style_rows">{score}</td>);
+	  	}
+	  	tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>)
+
+	  	return  <table className = "table table-striped table-hover table-responsive lb_table_style_rows">{tableRows}</table>;
   	}
 	render(){
 		 const {fix} = this.props;
@@ -168,9 +257,42 @@ class LeaderBoard extends Component{
 	                <CalendarWidget  onDaySelect={this.processDate}/>
 	              </PopoverBody>
 	        </Popover>
-	        <table>
-	        	{this.renderTablesTd(this.state.ranking_data.oh_gpa)}
-	        </table>
+	        <div className = "row justify-content-center lb_table_style">
+		        {this.renderTablesTd(this.state.ranking_data.oh_gpa)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.alcohol_drink)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.avg_sleep)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.prcnt_uf)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.total_steps)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.mc)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.ec)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.awake_time)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.resting_hr)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.deep_sleep)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.mne_gpa)}
+	        </div>
+	        <div className = "row justify-content-center lb_table_style">
+	        	{this.renderTablesTd(this.state.ranking_data.floor_climbed)}
+	        </div>
 	        </div>
 		)
 	}

@@ -455,7 +455,7 @@ constructor(props){
   }
     
   successProgress(data){
-  let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
+ 
     this.setState({
         fetching_ql1:false,
         fetching_ql2:false,
@@ -467,7 +467,7 @@ constructor(props){
     });
   }
   successRank(data){
-    let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
+   
 
     this.setState({
         fetching_ql1:false,
@@ -812,7 +812,6 @@ createExcelPrintURL(){
 }
     render(){
         const {fix} = this.props;
-   let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
         return(
             <div className="dashboard">
         <div className="container-fluid">
