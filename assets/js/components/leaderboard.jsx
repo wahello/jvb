@@ -9,7 +9,8 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { getGarminToken,logoutUser} from '../network/auth';
-import {fetchLeaderBoard} from '../network/leaderBoard';
+import fetchLeaderBoard from '../network/leaderBoard';
+
 
 
 var CalendarWidget = require('react-calendar-widget');  
@@ -54,11 +55,9 @@ class LeaderBoard extends Component{
 		this.renderTablesTd = this.renderTablesTd.bind(this);
 	}
 	successLeaderBoard(data){
-		console.log(data);
 		this.setState({
 			ranking_data:data.data
 		});
-		console.log("========",this.state.ranking_data);
 	}
 	errorLeaderBoard(error){
 		console.log(error.message);
@@ -87,8 +86,29 @@ class LeaderBoard extends Component{
     handleLogout(){
     	this.props.logoutUser(this.onLogoutSuccess);
   	}
-  	renderTablesTd(){
-  	let td = []; 
+  	renderTablesTd(value){
+	  	let tables = [];
+	  	let th = [];
+	  	for(let [key,val] of Object.entries(value)){
+	  		 for (let [key1,val1] of Object.entries(val)){
+	  		 	let score = [];
+	  		 	let rank = [];
+	  		 	if(key1 == "user_rank"){
+	  		 		for(let[key2,val2] of Object.entries(val1)){
+	  		 			if(key2 == "score"){
+	  		 			 score.push(<td>{val2}</td>);
+	  		 			}
+	  		 			else if(key2 == "rank"){
+	  		 			 rank.push(<td>{val2}</td>);
+	  		 			}
+	  		 		}
+	  		 		tables.push(<tr>{score}</tr>);
+	  		 		tables.push(<tr>{rank}</tr>);
+	  		 	}
+	  		 }
+	  		 
+	  	}
+	  	return tables;
   	}
 	render(){
 		 const {fix} = this.props;
@@ -149,6 +169,9 @@ class LeaderBoard extends Component{
 	                <CalendarWidget  onDaySelect={this.processDate}/>
 	              </PopoverBody>
 	        </Popover>
+	        <table>
+	        	{this.renderTablesTd(this.state.ranking_data.oh_gpa)}
+	        </table>
 	        </div>
 		)
 	}

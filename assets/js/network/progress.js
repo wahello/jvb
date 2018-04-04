@@ -27,6 +27,7 @@ export default function fetchProgress(successProgress,errorProgress,selectedDate
 export function fetchUserRank(successRank,errorProgress,selectedDate,custom_ranges=undefined){   
   selectedDate = moment(selectedDate);
   const URL=`/leaderboard/`;
+  // const URL = `https://app.jvbwellness.com/leaderboard`;
   const config={
    method:"get",
    params:{
@@ -34,7 +35,7 @@ export function fetchUserRank(successRank,errorProgress,selectedDate,custom_rang
    custom_ranges:(custom_ranges && custom_ranges.length) ? custom_ranges.toString(): null
  },
    url:URL,
-   withCredentials: true
+   withCredentials: true,
   };
   axios(config).then((response)=>{
    successRank(response);

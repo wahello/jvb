@@ -82,6 +82,7 @@ export function getInitialState(start_dt, end_dt){
 	        "distance_other":'-',
 	        "pace": '-',
 	        "avg_heartrate": '{}',
+	        "avg_exercise_heartrate":'',
 	        "elevation_gain": '-',
 	        "elevation_loss": '-',
 	        "effort_level": '-',
