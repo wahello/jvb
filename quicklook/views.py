@@ -2553,6 +2553,9 @@ def export_users_xls(request):
                                           'format': border_format})
 	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
                                           'format': border_format})
+
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
 	format_align = book.add_format({'align':'left'})
 	custom_range='{} to {}'.format(from_date,to_date)
 	to_date1 = '{}'.format(to_date)
