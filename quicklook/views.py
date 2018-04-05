@@ -1055,7 +1055,7 @@ def export_users_xls(request):
 						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 				elif i == 29:
 					if data[key] == 0:
-						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
+						sheet9.write(i1+i+1,row_num - num_11,'Not Provided')
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 				elif i == 25:
@@ -1932,7 +1932,7 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,data[key],format)
 				elif i == 29:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'Not provided')
+						sheet6.write(i + 2, row_num,'Not Provided')
 					else:
 						sheet6.write(i + 2, row_num,data[key],format)
 				elif i == 25:
@@ -1961,7 +1961,7 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,'No Workout')
 
 				elif data[key] == None:
-					sheet6.write(i + 2, row_num,'Not provided')
+					sheet6.write(i + 2, row_num,'Not Provided')
 				elif key != 'avg_heartrate':
 					sheet6.write(i + 2, row_num,data[key],format)
 
