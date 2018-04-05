@@ -560,6 +560,18 @@ class ProgressReport():
 
 	def _cal_sleep_summary(self,custom_daterange = False):
 
+		def _get_sleep_grade_from_point_for_ranges(point):
+			if point < 1:
+				return 'F'
+			elif point >= 1 and point < 2:
+				return 'D'
+			elif point >= 2 and point < 2.8:
+				return 'C'
+			elif point >= 2.8 and point < 3.3:
+				return 'B'
+			else:
+				return 'A'
+
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
@@ -591,7 +603,10 @@ class ProgressReport():
 					avg_sleep_gpa = round(self._get_average(
 						todays_data.cum_overall_sleep_gpa,
 						current_data.cum_overall_sleep_gpa,alias),2)
-					return calculation_helper._get_sleep_grade_from_point(avg_sleep_gpa)
+					if alias == 'today' or alias == 'yesterday':
+						return calculation_helper._get_sleep_grade_from_point(avg_sleep_gpa)
+					else:
+						return _get_sleep_grade_from_point_for_ranges(avg_sleep_gpa)
 
 				elif key == 'num_days_sleep_aid_taken_in_period':
 					val = 0
@@ -654,17 +669,12 @@ class ProgressReport():
 							current_meta_data.cum_mc_recorded_days_count
 						)
 
-						mc_gpa = _cal_custom_average(
-							todays_data.cum_movement_consistency_gpa,
-							current_data.cum_movement_consistency_gpa,
-							mc_days)
-
 						val = _cal_custom_average(
 							todays_data.cum_movement_consistency_score,
 							current_data.cum_movement_consistency_score,
 							mc_days)
 
-						if mc_gpa:
+						if mc_days:
 							return round(val,2)
 						else:
 							return "Not Reported"
@@ -681,7 +691,7 @@ class ProgressReport():
 							current_data.cum_movement_consistency_gpa,
 							mc_days)
 
-						if val:
+						if mc_days:
 							return round(val,2)
 						else:
 							return "Not Reported"
@@ -694,11 +704,6 @@ class ProgressReport():
 							current_meta_data.cum_mc_recorded_days_count
 						)
 
-						mc_gpa = _cal_custom_average(
-							todays_data.cum_movement_consistency_gpa,
-							current_data.cum_movement_consistency_gpa,
-							mc_days)
-
 						grade =  calculation_helper.cal_movement_consistency_grade(
 							_cal_custom_average(
 								todays_data.cum_movement_consistency_score,
@@ -706,7 +711,7 @@ class ProgressReport():
 								mc_days
 							)
 						)
-						if mc_gpa:
+						if mc_days:
 							return grade
 						else:
 							return "Not Reported"
