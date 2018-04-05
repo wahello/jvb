@@ -276,16 +276,18 @@ export default class Activity_Type extends Component{
 							let time = hour + ":" + mins;
 							activityData.push(<td id = "add_button">{time}</td>);						
 						}else{
-							activityData.push(<td id = "add_button">{value1}</td>);
-						}
-				 }
-				activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-					              <span name={summaryId}
+							activityData.push(<td id = "add_button" name = {summaryId}>{value1}
+								 <span name={summaryId}
 					              data-name = {summaryId}
 					              className="fa fa-pencil fa-1x progressActivity"
 					              onClick={this.handleChangeModal}
 					              id = "add_button">
 					              </span>
+								</td>);
+						}
+				 }
+				activityRows.push(<tr  id = "add_button">{activityData}
+					             
 								</tr>); 
 			}
 			return activityRows;
@@ -298,7 +300,9 @@ export default class Activity_Type extends Component{
 	                        target="progressActivity"		                           
 	                        isOpen={this.state.activityEditModal}
 	                        toggle={this.handleChangeModal}>
-	                        <ModalHeader toggle={this.toggleModal}>Edit Activities</ModalHeader>
+	                        <ModalHeader toggle={this.toggleModal}>
+	                        	{this.state.selectedActivityId?'Edit Activity':'Add Activity'}
+	                        </ModalHeader>
 	                            <ModalBody>
 	                       <FormGroup>                            
 	         
