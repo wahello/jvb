@@ -1047,23 +1047,23 @@ def export_users_xls(request):
 					if data[key] == "0:00:00":
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 				elif i == 19:
 					if data[key] == 0:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 				elif i == 29:
 					if data[key] == 0:
-						sheet9.write(i1+i+1,row_num - num_11,'Not Provided')
+						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 				elif i == 25:
 					if json2_data:
-						if data[key] == '' or data[key] == ':':
+						if data[key] == '':
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 26:
@@ -1071,7 +1071,7 @@ def export_users_xls(request):
 						if data[key] == 0:
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 27:
@@ -1079,7 +1079,7 @@ def export_users_xls(request):
 						if data[key] == 0:
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 
@@ -1929,12 +1929,12 @@ def export_users_xls(request):
 					if data[key] == 0:
 						sheet6.write(i + 2, row_num,'No Workout')
 					else:
-						sheet6.write(i + 2, row_num,data[key],format)
+						sheet6.write(i + 2, row_num,data[key])
 				elif i == 29:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'Not Provided')
+						sheet6.write(i + 2, row_num,'Not provided')
 					else:
-						sheet6.write(i + 2, row_num,data[key],format)
+						sheet6.write(i + 2, row_num,data[key])
 				elif i == 25:
 					if json2_data:
 						if data[key] == '' or data[key] == ':':
@@ -1961,7 +1961,7 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,'No Workout')
 
 				elif data[key] == None:
-					sheet6.write(i + 2, row_num,'Not Provided')
+					sheet6.write(i + 2, row_num,'Not provided')
 				elif key != 'avg_heartrate':
 					sheet6.write(i + 2, row_num,data[key],format)
 
@@ -2568,7 +2568,7 @@ def export_users_xls(request):
 	to_date1 = '{}'.format(to_date)
 	to_datef = to_date.strftime("%b %d,%Y")
 
-	year1 = '{},{}'.format('Mar 02',year)
+	year1 = '{}-{}'.format('Jan 01',year)
 	yesterday=to_date-timedelta(days=1)
 	week = to_date-timedelta(days = 7)
 	month = to_date-timedelta(days=30)
@@ -2576,9 +2576,9 @@ def export_users_xls(request):
 	yestf = yesterday.strftime("%b %d,%Y")
 	weekf = week.strftime("%b %d,%Y")
 	monthf = month.strftime("%b %d,%Y")
-	avg_week = '{} to {}'.format(weekf,yestf)
-	avg_month ='{} to {}'.format(monthf,yestf)
-	avg_year = '{} to {}'.format(year1,yestf)
+	avg_week = '{} to {}'.format(weekf,to_datef)
+	avg_month ='{} to {}'.format(monthf,to_datef)
+	avg_year = '{} to {}'.format(year1,to_datef)
 	date1='{}'.format(today)
 	
 	today1 ='{}\n{}'.format('Today',to_datef)
@@ -2677,7 +2677,7 @@ def export_users_xls(request):
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
-	print(pprint.pprint(DATA))
+	#print(pprint.pprint(DATA))
 	#print(query_params['custom_ranges'])
 	#sheet10.write(6,2,json_cum1['summary']['nutrition']['prcnt_unprocessed_food_gpa']['custom_range']['2018-02-12 to 2018-02-18']['to_dt'])
 	
