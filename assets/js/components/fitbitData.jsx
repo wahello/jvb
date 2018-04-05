@@ -50,10 +50,10 @@ export default class FitBit extends Component{
 	            <div className="row">
 	            	<CalendarWidget onDaySelect={this.processDate}/>,
 	            </div>
-          	 </div>
-          	 <div>
-          	 	<pre>{JSON.stringify(this.state.fitbit_data, null, 2)}</pre>
-          	 </div>
+          	    <div className = "row">
+          	 	    <pre>{JSON.stringify(this.state.fitbit_data, null, 2)}</pre>
+          	   </div>
+          	  </div>
 			</div>
 
 		)
