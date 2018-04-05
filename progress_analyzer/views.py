@@ -118,7 +118,7 @@ def progress_excel_export(request):
 	
 	dt = date.strftime("%b %d,%Y")
 	year = date.year
-	year1 = '{}-{}'.format('Jan 01',year)
+	year1 = '{},{}'.format('Mar 02',year)
 	yesterday=date-timedelta(days=1)
 	week = date-timedelta(days = 7)
 	month = date-timedelta(days=30)
@@ -126,9 +126,9 @@ def progress_excel_export(request):
 	yestf = yesterday.strftime("%b %d,%Y")
 	weekf = week.strftime("%b %d,%Y")
 	monthf = month.strftime("%b %d,%Y")
-	avg_week = '{} to {}'.format(weekf,dt)
-	avg_month ='{} to {}'.format(monthf,dt)
-	avg_year = '{} to {}'.format(year1,dt)
+	avg_week = '{} to {}'.format(weekf,yestf)
+	avg_month ='{} to {}'.format(monthf,yestf)
+	avg_year = '{} to {}'.format(year1,yestf)
 	date1='{}'.format(today)
 
 	today1 ='{}\n{}'.format('Today',dt)
@@ -305,7 +305,7 @@ def progress_excel_export(request):
 		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
-		#print(pprint.pprint(DATA))
+		print(pprint.pprint(DATA))
 		c=1
 		for i in range(1):
 			c = c + 1
@@ -1843,11 +1843,11 @@ def progress_excel_export(request):
 
 	# from garmin.models import GarminFitFiles
 
-	# start = "2018-04-04"
-	# end = "2018-04-05"
+	# start = "2018-04-03"
+	# end = "2018-04-04"
 	# a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	# for x in a1:
-	# 	print(x)
+	# 	#print(x)
 	# 	from fitparse import FitFile        
 	# 	fitfile = FitFile(x.fit_file)
 	# 	import pprint
@@ -1857,41 +1857,39 @@ def progress_excel_export(request):
 	# 		for record_data in record:
 	# 			if(record_data.name=='timestamp'):
 	# 				a=record_data.value
-	# 				print(record_data.name,record_data.value)
+	# 				#print(record_data.name,record_data.value)
 	# 			if(record_data.name=='heart_rate'):
-	# 	  			print(record_data.name,record_data.value)
+	# 	  			#print(record_data.name,record_data.value)
 	# 	  			b= record_data.value
-	# 		print()
+	# 		#print()
 	# 		dic[a]=b
 	# 		ls=[]
 	# 		ls1=[]
 	# 		ls2=[]
 	# 		for keys in dic.keys():
 	# 			pass
-	# 			age=40
-	# 			if (180-age-30)<dic[keys]<(180-age+5):
-	# 				print('aerobic')
-	# 				print(keys)
-	# 				ls.append(keys)
+	# 		age=40
+	# 		if (180-age-30)<dic[keys]<(180-age+5):
+	# 			print('aerobic')
+	# 			print(keys)
+	# 			ls.append(keys)
 
-	# 			elif (dic[keys]>(180-age+5)):
-	# 				print('anaerobic')
-	# 				print(keys)
-	# 				ls1.append(keys)
-	# 			elif(dic[keys]<(180-age-30)):
-	# 				print('below aerobic')
-	# 				print(keys)
-	# 				ls2.append(keys)
+	# 		elif (dic[keys]>(180-age+5)):
+	# 			print('anaerobic')
+	# 			print(keys)
+	# 			ls1.append(keys)
+	# 		elif(dic[keys]<(180-age-30)):
+	# 			print('below aerobic')
+	# 			print(keys)
+	# 			ls2.append(keys)
 	# 	print(pprint.pprint(dic))
 	# 	x=max(ls)-min(ls)
 	# 	dic1['aerobic']=x
 	# 	y=max(ls1)-min(ls1)
 	# 	dic1['anaerobic']=y
 	# 	z=max(ls2)-min(ls2)
-		
-		
 	# 	dic1['below aerobic']=z
-	# 	print(pprint.pprint(dic1))
+	
 
 	book.close()
 	return response
