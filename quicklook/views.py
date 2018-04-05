@@ -1047,23 +1047,23 @@ def export_users_xls(request):
 					if data[key] == "0:00:00":
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key])
+						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 				elif i == 19:
 					if data[key] == 0:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key])
+						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 				elif i == 29:
 					if data[key] == 0:
 						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key])
+						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 				elif i == 25:
 					if json2_data:
-						if data[key] == '':
+						if data[key] == '' or data[key] == ':':
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key])
+							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 26:
@@ -1071,7 +1071,7 @@ def export_users_xls(request):
 						if data[key] == 0:
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key])
+							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 27:
@@ -1079,7 +1079,7 @@ def export_users_xls(request):
 						if data[key] == 0:
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key])
+							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 
@@ -1929,12 +1929,12 @@ def export_users_xls(request):
 					if data[key] == 0:
 						sheet6.write(i + 2, row_num,'No Workout')
 					else:
-						sheet6.write(i + 2, row_num,data[key])
+						sheet6.write(i + 2, row_num,data[key],format)
 				elif i == 29:
 					if data[key] == 0:
 						sheet6.write(i + 2, row_num,'Not provided')
 					else:
-						sheet6.write(i + 2, row_num,data[key])
+						sheet6.write(i + 2, row_num,data[key],format)
 				elif i == 25:
 					if json2_data:
 						if data[key] == '' or data[key] == ':':
