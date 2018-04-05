@@ -2589,7 +2589,7 @@ def export_users_xls(request):
 		row=row+1
 		sheet10.write(row,1,exercise_consistency[i])
 
-	exercise_stats=['Workout Effort Level','Average Exercise Heart Rate','VO2 Max']
+	exercise_stats=['Workout Duration (hours:minutes)','Workout Effort Level','Average Exercise Heart Rate','VO2 Max']
 	row=23
 	for i in range(len(exercise_stats)):
 		row=row+1
@@ -2663,42 +2663,43 @@ def export_users_xls(request):
 		sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
 		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
 		sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
-		sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
-		sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+		#sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+		# sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
 		sheet10.write(11,c,DATA['summary']['sleep']['rank'][time1[i]],format_align)
 		sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
 		sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
-		sheet10.write(15,c,DATA['summary']['sleep']['overall_sleep_gpa'][time1[i]],format_align1)
+		#sheet10.write(15,c,DATA['summary']['sleep']['overall_sleep_gpa'][time1[i]],format_align1)
 		sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
 		sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
-		sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+		# sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 		sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
-		sheet10.write(24,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
-		sheet10.write(25,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
-		sheet10.write(26,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+		sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+		# sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+		# sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+		# sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
-		sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
-		sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+		# sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+		# sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
 		sheet10.write(35,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
-		sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+		# sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
 		sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
 
 		sheet10.write(3,c+7,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
-		sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+		# sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
 		sheet10.write(6,c+7,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
 		sheet10.write(7,c+7,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
 		sheet10.write(10,c+7,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
 		sheet10.write(11,c+7,DATA['summary']['mc']['rank'][time1[i]],format_align)
-		sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+		# sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
 		sheet10.write(13,c+7,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		sheet10.write(18,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
 		sheet10.write(19,c+7,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
-		sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+		# sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(21,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		sheet10.write(24,c+7,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
 		sheet10.write(25,c+7,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
-		sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+		# sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(27,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
 	
 	# #custom_range=[from_date,to_date,'data']
@@ -2766,31 +2767,144 @@ def export_users_xls(request):
 		red = book.add_format({'align':'left', 'bg_color': 'red'})
 		orange = book.add_format({'align':'left', 'bg_color': 'orange'})
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"A"', 
-												'format': green})
+		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
+		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='B'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
+		elif (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='C'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],yellow)
+		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='D'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],orange)
+		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='F'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],red)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"B"', 
-												'format': green})
+		if (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='A'):
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='B'):
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='C'):
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],yellow)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],orange)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],red)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"C"', 
-												'format': yellow})
+		if (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='A'):
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='B'):
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='C'):
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],yellow)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='D'):
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],orange)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='F'):
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],red)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"D"', 
-												'format': orange})
+		if (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='A'):
+				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],green)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='B'):
+				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],green)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='C'):
+				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],yellow)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='D'):
+				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],orange)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='F'):
+				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],red)
+		
+		if (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='A'):
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],green)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='B'):
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],green)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='C'):
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],yellow)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='D'):
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],orange)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='F'):
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],red)
+		
+		if (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='A'):
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],green)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='B'):
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],green)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='C'):
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],yellow)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='D'):
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],orange)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='F'):
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],red)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"F"', 
-												'format': red},
-												)
+		if (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='A'):	
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='B'):	
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='C'):	
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='D'):	
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='F'):	
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+
+		if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
+			sheet10.write(10,c,'Not provided',format_align)
+		else:
+			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+			
+		if (DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]]=='00:00'):
+			sheet10.write(26,c,'No Workout',format_align)
+		else:
+			sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+
+		if (DATA['summary']['exercise']['workout_effort_level'][time1[i]]==0):
+			sheet10.write(25,c,'No Workout',format_align)
+		else:
+			sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+
+		if (DATA['summary']['exercise']['vo2_max'][time1[i]]==0):
+			sheet10.write(27,c,'Not provided')
+		else:
+			sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+				
+		if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00'):
+				sheet10.write(32,c,'No Workout')
+		else:
+			sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+
+		if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
+			sheet10.write(33,c,'No Workout',format_align)
+		else:
+			sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+			
+		if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
+			sheet10.write(34,c,'No Workout',format_align)
+		else:
+			sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+
+
+		# sheet10.conditional_format('A1:T50', {'type':'cell', 
+		# 										'criteria':'==', 
+		# 										'value': '"A"', 
+		# 										'format': green})
+
+		# sheet10.conditional_format('A1:T50', {'type':'cell', 
+		# 										'criteria':'==', 
+		# 										'value': '"B"', 
+		# 										'format': green})
+
+		# sheet10.conditional_format('A1:T50', {'type':'cell', 
+		# 										'criteria':'==', 
+		# 										'value': '"C"', 
+		# 										'format': yellow})
+
+		# sheet10.conditional_format('A1:T50', {'type':'cell', 
+		# 										'criteria':'==', 
+		# 										'value': '"D"', 
+		# 										'format': orange})
+
+		# sheet10.conditional_format('A1:T50', {'type':'cell', 
+		# 										'criteria':'==', 
+		# 										'value': '"F"', 
+		# 										'format': red},
+		# 										)
 		num_fmt = book.add_format({'num_format': '#,###'})
 
 		sheet10.conditional_format('A1:T50', {'type':'cell', 
