@@ -454,11 +454,18 @@ def progress_excel_export(request):
 				sheet10.write(34,c,'No Workout')
 			else:
 				sheet10.write(34,c,DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data'],format_align)
-
-			if (DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data']==0):
+			
+			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']=='00:00'):
 				sheet10.write(24,c,'No Workout',format_align)
 			else:
-				sheet10.write(24,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(24,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
+
+
+
+			if (DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data']==0):
+				sheet10.write(25,c,'No Workout',format_align)
+			else:
+				sheet10.write(25,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
 			
 			if (DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data']==0):
 				sheet10.write(26,c,'No Workout',format_align)
@@ -466,9 +473,9 @@ def progress_excel_export(request):
 				sheet10.write(26,c,DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data'],format_align)
 
 			if (DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data']=='00:00'):
-				sheet10.write(24,c,'Not provided',format_align)
+				sheet10.write(27,c,'Not provided',format_align)
 			else:
-				sheet10.write(24,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(27,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
 
 
 		query_params = {
@@ -497,7 +504,7 @@ def progress_excel_export(request):
 			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
 			# sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
-			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			# sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 			# sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 			# sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 			# sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
@@ -643,6 +650,10 @@ def progress_excel_export(request):
 			else:
 				sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
 
+			if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+				sheet10.write(24,c,"No Workout",format_align)
+			else:
+				sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
 
 
@@ -904,6 +915,12 @@ def progress_excel_export(request):
 				sheet10.write(34,c,'No Workout',format_align)
 			else:
 				sheet10.write(34,c,DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data'],format_align)
+			
+			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']=='00:00'):
+				sheet10.write(24,c,'No Workout',format_align)
+			else:
+				sheet10.write(24,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
+
 
 			if (DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data']==0):
 				sheet10.write(25,c,'No Workout',format_align)
@@ -945,7 +962,7 @@ def progress_excel_export(request):
 			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
 			# sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
-			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			# sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 			# sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 			# sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 			# sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
@@ -1084,6 +1101,12 @@ def progress_excel_export(request):
 				sheet10.write(34,c,'No Workout',format_align)
 			else:
 				sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+
+			if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+				sheet10.write(24,c,"No Workout",format_align)
+			else:
+				sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+
 
 
 	elif (len(a) == 6):
@@ -1350,6 +1373,12 @@ def progress_excel_export(request):
 			else:
 				sheet10.write(34,c,DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data'],format_align)
 
+			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']=='00:00'):
+				sheet10.write(24,c,'No Workout',format_align)
+			else:
+				sheet10.write(24,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
+
+
 			if (DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data']==0):
 				sheet10.write(25,c,'No Workout',format_align)
 			else:
@@ -1531,6 +1560,12 @@ def progress_excel_export(request):
 			else:
 				sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
 
+			if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+				sheet10.write(24,c,"No Workout",format_align)
+			else:
+				sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+
+
 			
 	else:
 		sheet10.set_column('I:I',45)
@@ -1626,7 +1661,7 @@ def progress_excel_export(request):
 			sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
 			# sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 			sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
-			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			# sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 			# sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 			# sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 			# sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
@@ -1750,8 +1785,8 @@ def progress_excel_export(request):
 			else:
 				sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
 				
-			if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00' or ''):
-				sheet10.write(32,c,'Not recorded',format_align)
+			if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00' ):
+				sheet10.write(32,c,'No Workout',format_align)
 			else:
 				sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
 
@@ -1764,6 +1799,13 @@ def progress_excel_export(request):
 				sheet10.write(34,c,'No Workout',format_align)
 			else:
 				sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+
+
+			if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+				sheet10.write(24,c,"No Workout",format_align)
+			else:
+				sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+
 
 	
 	# sheet10.conditional_format('A1:T50', {'type':'cell', 

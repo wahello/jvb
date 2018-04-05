@@ -2651,13 +2651,13 @@ def export_users_xls(request):
 		row = row+1
 		sheet10.write(row,8,alcohol[i])
 
-	Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
-	'Total Exercise time (hours:minutes) the last 7 days',
-	'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
-	row=30
-	for i in range(len(Total)):
-		row = row+1
-		sheet10.write(row,8,Total[i])
+	# Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
+	# 'Total Exercise time (hours:minutes) the last 7 days',
+	# 'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
+	# row=30
+	# for i in range(len(Total)):
+	# 	row = row+1
+	# 	sheet10.write(row,8,Total[i])
 
 	#Transferring Json data
 	#json_cum = open('/home/normsoftware/Downloads/pa_dummy.json')
@@ -2700,7 +2700,7 @@ def export_users_xls(request):
 		sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
 		# sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 		sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
-		sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+		# sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 		# sheet10.write(25,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 		# sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 		# sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
@@ -2812,7 +2812,7 @@ def export_users_xls(request):
 			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],yellow)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
 			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],orange)
-		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='F'):
 			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],red)
 
 		if (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='A'):
@@ -2871,11 +2871,15 @@ def export_users_xls(request):
 			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
 
 		if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
-			sheet10.write(10,c,'Not provided',format_align)
+			sheet10.write(10,c,'No Workout',format_align)
 		else:
 			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
-			
-		if (DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]]=='00:00'):
+		if(DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+			sheet10.write(24,c,'No Workout',format_align)
+		else:
+			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+
+		if (DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]]==0):
 			sheet10.write(26,c,'No Workout',format_align)
 		else:
 			sheet10.write(26,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
