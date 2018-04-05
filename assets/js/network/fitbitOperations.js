@@ -5,22 +5,22 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 3}); 
 
-export default function fetchFitBitData(selectedDate,successCallback, errorCallback){
+export default function fetchFitBitData(successFitBit, errorFitBit,selectedDate){
 	selectedDate = moment(selectedDate);
-	return function(dispatch){
-		const URL = "";
-		const config = {
-			params:{
-   				date: selectedDate.format('MM-DD-YYYY'),
- 			},
-			method: "get",
-			url: URL,
-          
-		};
-		axios(config).then ((response) => {
-			successCallback(response);
-		}).catch((error) => {
-			errorCallback(error);
-		});
-	}
+	console.log(selectedDate.format('MM-DD-YYYY'));
+	const URL = `/fitbit/fetching_data_fitbit`;
+	const config = {
+		method: "get",
+		params:{
+				start_date: selectedDate.format('MM-DD-YYYY'),
+			},
+		url: URL,
+		withCredentials: true
+      
+	};
+	axios(config).then ((response) => {
+		successFitBit(response);
+	}).catch((error) => {
+		errorFitBit(error);
+	});
 }
