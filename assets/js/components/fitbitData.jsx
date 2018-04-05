@@ -21,10 +21,13 @@ export default class FitBit extends Component{
 	    this.errorFitBit = this.errorFitBit.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
+	    	fitbit_data:{}
 	    };
 	}
 	successFitBit(data){
-
+		this.setState({
+			fitbit_data:data.data
+		});
 	}
 	errorFitBit(error){
 		console.log(error.message)
@@ -33,12 +36,12 @@ export default class FitBit extends Component{
 		this.setState({
 			selectedDate:selectedDate,
 		},()=>{
-			fetchFitBitData(this.successFitBit,this.errorFitBit,this.selectedDate);
+			fetchFitBitData(this.successFitBit,this.errorFitBit,this.state.selectedDate);
 		});
 		
 	}
 	componentDidMount(){
-		fetchFitBitData(this.successFitBit,this.errorFitBit,this.selectedDate);
+		fetchFitBitData(this.successFitBit,this.errorFitBit,this.state.selectedDate);
 	}
 	render(){
 		return(
@@ -47,13 +50,12 @@ export default class FitBit extends Component{
 	            <div className="row">
 	            	<CalendarWidget onDaySelect={this.processDate}/>,
 	            </div>
-	            <div className="row justify-content-center">
-	            	<a href={`/fitbit/fetching_data_fitbit?start_date=${moment(this.state.selectedDate).format('MM-DD-YYYY')}`}>
-	            	<button className ="btn btn-md btn-primary">Submit</button>
-					</a>	            
-	            </div>
           	 </div>
-				</div>
-				)
+          	 <div>
+          	 	<pre>{JSON.stringify(this.state.fitbit_data, null, 2)}</pre>
+          	 </div>
+			</div>
+
+		)
 	}
 }
