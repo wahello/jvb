@@ -133,7 +133,7 @@ def progress_excel_export(request):
 	today1=t1.strftime("%b %d,%Y")
 
 	yesterday=DATA['duration_date']['yesterday']
-	to1=datetime.strptime(today,"%Y-%m-%d")
+	to1=datetime.strptime(yesterday,"%Y-%m-%d")
 	yesterday1=to1.strftime("%b %d,%Y")
 
 	
@@ -147,11 +147,11 @@ def progress_excel_export(request):
 	week1='{} to {}'.format(ys1,ys2)
 
 	month = DATA['duration_date']['month']
-	m1=[x.strip() for x in week.split('to')]
+	m1=[x.strip() for x in month.split('to')]
 	mon1=datetime.strptime(m1[0],"%Y-%m-%d")
 	mon2=datetime.strptime(m1[1],"%Y-%m-%d")
-	ms1=yest1.strftime("%b %d,%Y")
-	ms2=yest2.strftime("%b %d,%Y")
+	ms1=mon1.strftime("%b %d,%Y")
+	ms2=mon2.strftime("%b %d,%Y")
 	month1='{} to {}'.format(ms1,ms2)
 
 
@@ -346,7 +346,7 @@ def progress_excel_export(request):
 		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
-		print(pprint.pprint(DATA))
+		#print(pprint.pprint(DATA))
 		c=1
 		for i in range(1):
 			c = c + 1
@@ -1884,8 +1884,8 @@ def progress_excel_export(request):
 
 	# from garmin.models import GarminFitFiles
 
-	# start = "2018-04-03"
-	# end = "2018-04-04"
+	# start = "2018-03-27"
+	# end = "2018-04-28"
 	# a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	# for x in a1:
 	# 	#print(x)
@@ -1902,27 +1902,28 @@ def progress_excel_export(request):
 	# 			if(record_data.name=='heart_rate'):
 	# 	  			#print(record_data.name,record_data.value)
 	# 	  			b= record_data.value
-	# 		#print()
+			
 	# 		dic[a]=b
 	# 		ls=[]
 	# 		ls1=[]
 	# 		ls2=[]
 	# 		for keys in dic.keys():
 	# 			pass
-	# 		age=40
-	# 		if (180-age-30)<dic[keys]<(180-age+5):
-	# 			print('aerobic')
-	# 			print(keys)
-	# 			ls.append(keys)
+	# 			age=40
+	# 			if (180-age-30)<dic[keys]<(180-age+5):
+	# 				print('aerobic')
+	# 				print(keys)
+	# 				ls.append(keys)
 
-	# 		elif (dic[keys]>(180-age+5)):
-	# 			print('anaerobic')
-	# 			print(keys)
-	# 			ls1.append(keys)
-	# 		elif(dic[keys]<(180-age-30)):
-	# 			print('below aerobic')
-	# 			print(keys)
-	# 			ls2.append(keys)
+	# 			elif (dic[keys]>(180-age+5)):
+	# 				print('anaerobic')
+	# 				print(keys)
+	# 				ls1.append(keys)
+	# 			elif(dic[keys]<(180-age-30)):
+	# 				print('below aerobic')
+	# 				print(keys)
+	# 				ls2.append(keys)
+
 	# 	print(pprint.pprint(dic))
 	# 	x=max(ls)-min(ls)
 	# 	dic1['aerobic']=x
@@ -1930,6 +1931,7 @@ def progress_excel_export(request):
 	# 	dic1['anaerobic']=y
 	# 	z=max(ls2)-min(ls2)
 	# 	dic1['below aerobic']=z
+	# 	print(pprint.pprint(dic1))
 	
 
 	book.close()
