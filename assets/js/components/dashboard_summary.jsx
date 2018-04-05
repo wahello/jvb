@@ -452,6 +452,8 @@ constructor(props){
    this.successRank = this.successRank.bind(this);
    this.renderCustomRangeRankTD = this.renderCustomRangeRankTD.bind(this);
    this.vo2MaxNotReported = this.vo2MaxNotReported.bind(this);
+   this.renderVo2maxCustomRangeTD = this.renderVo2maxCustomRangeTD.bind(this);
+   this.renderExerciseCustomRangeTD = this.renderExerciseCustomRangeTD.bind(this);
   }
     
   successProgress(data){
@@ -504,7 +506,7 @@ exerciseStatsNoWorkOut(value){
 }
 vo2MaxNotReported(value){
       if(value == undefined || value == 0 || value == "" || value == "00:00"){
-        value = "Not Reported"
+        value = "Not Provided"
       }
       else{
         value = value
@@ -556,9 +558,68 @@ renderCustomRangeTD(custom_data, toReturn="data"){
         return td;
     }
     for (let[key,val] of Object.entries(custom_data)){
-
         if(toReturn == "data"){
             td.push(<td className="progress_table">{val.data}</td>);
+        }
+        else if(toReturn == "key"){
+            let str = key;
+            let d = str.split(" ");
+            let d1 = d[0];
+            let date1 =moment(d1).format('MMM DD, YYYY');
+            let d2 = d[2];
+            let date2 =moment(d2).format('MMM DD, YYYY');
+            let date = date1 + ' to ' + date2;
+            td.push(<th className=" progress_table">{date}</th>);
+        }
+    }
+    return td;
+}
+renderVo2maxCustomRangeTD(custom_data, toReturn="data"){
+    let td=[];
+    if(!custom_data){
+        return td;
+    }
+    for (let[key,val] of Object.entries(custom_data)){
+        if(toReturn == "data"){
+            let value = val.data 
+            if(value == undefined || value == 0 || value == "" || value == "00:00"){
+                value = "Not Provided"
+                td.push(<td className="progress_table">{value}</td>);
+            }
+            else{
+                td.push(<td className="progress_table">{value}</td>);
+            }
+            
+        }
+        else if(toReturn == "key"){
+            let str = key;
+            let d = str.split(" ");
+            let d1 = d[0];
+            let date1 =moment(d1).format('MMM DD, YYYY');
+            let d2 = d[2];
+            let date2 =moment(d2).format('MMM DD, YYYY');
+            let date = date1 + ' to ' + date2;
+            td.push(<th className=" progress_table">{date}</th>);
+        }
+    }
+    return td;
+}
+renderExerciseCustomRangeTD(custom_data, toReturn="data"){
+    let td=[];
+    if(!custom_data){
+        return td;
+    }
+    for (let[key,val] of Object.entries(custom_data)){
+        if(toReturn == "data"){
+            let value = val.data 
+            if(value == undefined || value == 0 || value == "" || value == "00:00"){
+                value = "No Workout"
+                td.push(<td className="progress_table">{value}</td>);
+            }
+            else{
+                td.push(<td className="progress_table">{value}</td>);
+            }
+            
         }
         else if(toReturn == "key"){
             let str = key;
@@ -806,7 +867,6 @@ createExcelPrintURL(){
         custom_ranges.push(this.state.cr3_end_date);
     }
     custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
-    console.log(custom_ranges);
     let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
     return excelURL;
 }
@@ -1398,39 +1458,39 @@ createExcelPrintURL(){
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Workout Duration (hours:minutes)</td>
-                {this.renderCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range)}
+                {this.renderExerciseCustomRangeTD(this.renderCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range))}
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.yesterday)}</td>
-                <td className="progress_table">{this.state.summary.exercise.workout_duration_hours_min.week}</td>
-                <td className="progress_table">{this.state.summary.exercise.workout_duration_hours_min.month}</td>
-                <td className="progress_table">{this.state.summary.exercise.workout_duration_hours_min.year}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.week)}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.month)}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.year)}</td>
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Workout Effort Level</td>
-                {this.renderCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
+                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.yesterday)}</td>
-                <td className="progress_table">{this.state.summary.exercise.workout_effort_level.week}</td>
-                <td className="progress_table">{this.state.summary.exercise.workout_effort_level.month}</td>
-                <td className="progress_table">{this.state.summary.exercise.workout_effort_level.year}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.week)}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.month)}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.year)}</td>
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">Average Exercise Heart Rate</td>
-               {this.renderCustomRangeTD(this.state.summary.exercise.avg_exercise_heart_rate.custom_range)}
+               {this.renderExerciseCustomRangeTD(this.state.summary.exercise.avg_exercise_heart_rate.custom_range)}
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.yesterday)}</td>
-                <td className="progress_table">{this.state.summary.exercise.avg_exercise_heart_rate.week}</td>
-                <td className="progress_table">{this.state.summary.exercise.avg_exercise_heart_rate.month}</td>
-                <td className="progress_table">{this.state.summary.exercise.avg_exercise_heart_rate.year}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.week)}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.month)}</td>
+                <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.year)}</td>
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">VO2 Max</td>
-                {this.renderCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
+                {this.renderVo2maxCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.today)}</td>
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.yesterday)}</td>
-                <td className="progress_table">{this.state.summary.exercise.vo2_max.week}</td>
-                <td className="progress_table">{this.state.summary.exercise.vo2_max.month}</td>
-                <td className="progress_table">{this.state.summary.exercise.vo2_max.year}</td>
+                <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.week)}</td>
+                <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.month)}</td>
+                <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.year)}</td>
             </tr>
 
             

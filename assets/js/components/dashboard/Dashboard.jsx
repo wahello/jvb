@@ -19,7 +19,7 @@ class Dashboard extends Component {
 						  <div className="social-login-buttons">
 	  
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
-							 <Link to='/activity_type'>activities</Link><br/>
+							 <Link to='/activity_type'>Activities</Link><br/>
 							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 							  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
 							  {/*<Link to='/overallgrade'>Over All Grade</Link><br/>*/}

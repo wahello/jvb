@@ -276,18 +276,18 @@ export default class Activity_Type extends Component{
 							let time = hour + ":" + mins;
 							activityData.push(<td id = "add_button">{time}</td>);						
 						}else{
-							activityData.push(<td id = "add_button" name = {summaryId}>{value1}
-								 <span name={summaryId}
+							activityData.push(<td id = "add_button">{value1}
+								 
+								</td>);
+						}
+				 }
+				activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
+					             <span name={summaryId}
 					              data-name = {summaryId}
 					              className="fa fa-pencil fa-1x progressActivity"
 					              onClick={this.handleChangeModal}
 					              id = "add_button">
 					              </span>
-								</td>);
-						}
-				 }
-				activityRows.push(<tr  id = "add_button">{activityData}
-					             
 								</tr>); 
 			}
 			return activityRows;
@@ -306,7 +306,7 @@ export default class Activity_Type extends Component{
 	                            <ModalBody>
 	                       <FormGroup>                            
 	         
-	                      <Label className="padding">1.Exercise Type.</Label>
+	                      <Label className="padding1">1.Exercise Type.</Label>
 	                      <div className="input ">
 	                         <Input 
 	                          type="select" 
@@ -321,7 +321,7 @@ export default class Activity_Type extends Component{
 
 	                     {this.state.activity_display_name == "OTHER" &&
 	                     <FormGroup>	                     
-	                    <Label className="padding">1.1 Other Exercise Type.</Label>
+	                    <Label className="padding1">1.1 Other Exercise Type.</Label>
 	                     <div className="input1 ">
 	                      <Input
 	                      	type = "text" 
@@ -335,7 +335,7 @@ export default class Activity_Type extends Component{
 	                          </FormGroup>
 	                      }
 	                      <FormGroup>
-	                    <Label className="padding">2. Activity Heart Rate.</Label>
+	                    <Label className="padding1">2. Activity Heart Rate.</Label>
 	                     <div className="input1 ">
 	                      <Input 
 	                        type="select" 
@@ -351,7 +351,7 @@ export default class Activity_Type extends Component{
 	                          </FormGroup>                               
 	           		
 	                     <FormGroup>
-	                   <Label className="padding">3. Exercise Duration (hh:mm).</Label>
+	                   <Label className="padding1">3. Exercise Duration (hh:mm).</Label>
 	                   <div className=" display_flex" >
                          <div className="align_width align_width1">
 	                      <div className="input " style = {{marginLeft:"15px"}}> 
@@ -380,7 +380,7 @@ export default class Activity_Type extends Component{
 	                    </div>
 	                    </div>
 	                     <FormGroup>
-	                    <Label className="padding">4. Exercise Comments.</Label>
+	                    <Label className="padding1">4. Exercise Comments.</Label>
 	                     <div className="input1 ">
 	                      <Textarea 
 	                        className="form-control"
