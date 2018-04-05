@@ -48,6 +48,9 @@ class LeaderBoard extends Component{
 	        lb2_end_date:'',
 	        lb3_start_date:'',
 	        lb3_end_date:'',
+	        dateRange1:false,
+	        dateRange2:false,
+	        dateRange3:false,
 			calendarOpen:false,
 			isOpen:false,
 			ranking_data:rankInitialState,
@@ -60,8 +63,16 @@ class LeaderBoard extends Component{
 		this.processDate = this.processDate.bind(this);
 		this.renderTablesTd = this.renderTablesTd.bind(this);
 		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
+		this.onSubmitDate2 = this.onSubmitDate2.bind(this);
+		this.onSubmitDate3 = this.onSubmitDate3.bind(this);
+		this.toggleDate1 = this.toggleDate1.bind(this);
+		this.toggleDate2 = this.toggleDate2.bind(this);
+		this.toggleDate3 = this.toggleDate3.bind(this);
+		this.handleChange = this.handleChange.bind(this);
+		this.renderCustomRangeRankTD = this.renderCustomRangeRankTD.bind(this);
 	}
 	successLeaderBoard(data){
+		console.log("+++++++++",data);
 		this.setState({
 			ranking_data:data.data
 		});
@@ -80,7 +91,6 @@ class LeaderBoard extends Component{
     event.preventDefault();
     this.setState({
       dateRange1:!this.state.dateRange1,
-      fetching_ql1:true
     },()=>{
         let custom_ranges = [];
         if(this.state.lb2_start_date && this.state.lb2_end_date){
@@ -93,14 +103,14 @@ class LeaderBoard extends Component{
         }
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
-      fetchLeaderBoard(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+        // console.log("=======",custom_ranges);
+      fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,custom_ranges);
     });
   }
    onSubmitDate2(event){
     event.preventDefault();
     this.setState({
       dateRange2:!this.state.dateRange2,
-      fetching_ql2:true
     },()=>{
          let custom_ranges = [];
         if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -114,27 +124,28 @@ class LeaderBoard extends Component{
 
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
-      fetchLeaderBoard(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+        // console.log("=======",custom_ranges);
+      fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,custom_ranges);
     });
   }
  onSubmitDate3(event){
     event.preventDefault();
     this.setState({
       dateRange3:!this.state.dateRange3,
-      fetching_ql3:true
     },()=>{
          let custom_ranges = [];
          if(this.state.lb1_start_date && this.state.lb1_end_date){
-            custom_ranges.push(this.state.cr1_start_date);
-            custom_ranges.push(this.state.cr1_end_date);
+            custom_ranges.push(this.state.lb1_start_date);
+            custom_ranges.push(this.state.lb1_end_date);
         }
-        if(this.state.cr2_start_date && this.state.cr2_end_date){
-            custom_ranges.push(this.state.cr2_start_date);
-            custom_ranges.push(this.state.cr2_end_date);
+        if(this.state.lb2_start_date && this.state.lb2_end_date){
+            custom_ranges.push(this.state.lb2_start_date);
+            custom_ranges.push(this.state.lb2_end_date);
         }
-        custom_ranges.push(this.state.cr3_start_date);
-        custom_ranges.push(this.state.cr3_end_date);
-      fetchLeaderBoard(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
+        custom_ranges.push(this.state.lb3_start_date);
+        custom_ranges.push(this.state.lb3_end_date);
+        // console.log("=======",custom_ranges);
+      fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,custom_ranges);
     });
   }
 	componentDidMount(){
@@ -143,7 +154,6 @@ class LeaderBoard extends Component{
 	toggle() {
 	    this.setState({
 	      isOpen: !this.state.isOpen,
-	     
 	    });
   	}
 	toggleCalendar(){
@@ -151,26 +161,65 @@ class LeaderBoard extends Component{
 	      calendarOpen:!this.state.calendarOpen
 	    });
     }
+    toggleDate1(){
+    this.setState({
+      dateRange1:!this.state.dateRange1
+    });
+   }
+ toggleDate2(){
+    this.setState({
+      dateRange2:!this.state.dateRange2
+    });
+   }
+    toggleDate3(){
+    this.setState({
+      dateRange3:!this.state.dateRange3
+    });
+   }
     handleLogout(){
     	this.props.logoutUser(this.onLogoutSuccess);
   	}
+  	handleChange(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      this.setState({
+        [name]: value
+      });
+    }
   	renderTablesTd(value){
   		let category = "";
 	  	let durations = [];
 	  	let scores = [];
 	  	let ranks = [];
 	  	let tableRows = [];
-
+	  	let time = ["custom_range","today","yesterday","week","month","year"];
 	  	for(let [duration,val] of Object.entries(value)){
-	  		durations.push(duration);
-	  		 for (let [key,rankData] of Object.entries(val)){
-	  		 	if(key == "user_rank"){
-	  		 		if(!category)
-	  		 			category = rankData.category;
-	  		 		scores.push(rankData.score);
-	  		 		ranks.push(rankData.rank);
-	  		 	}
-	  		 }
+	  		if(duration == "custom_range"){
+	  			for(let [range,value1] of Object.entries(val)){
+	  				// console.log("**********",range,value1);
+	  				durations.push(range);
+	  				for(let [c_key,c_rankData] of Object.entries(value1)){
+		  				if(c_key == "user_rank"){
+			  		 		if(!category)
+			  		 			category = c_rankData.category;
+			  		 		scores.push(c_rankData.score);
+			  		 		ranks.push(c_rankData.rank);
+		  		 		}
+	  				}
+	  			}
+	  		}
+	  		else{ 
+		  		durations.push(duration);
+		  		for (let [key,rankData] of Object.entries(val)){
+		  		 	if(key == "user_rank"){
+		  		 		if(!category)
+		  		 			category = rankData.category;
+		  		 		scores.push(rankData.score);
+		  		 		ranks.push(rankData.rank);
+		  		 	}
+		  		}
+		  	}
 	  	}
 
 	  	// creating headers for table
@@ -199,6 +248,31 @@ class LeaderBoard extends Component{
 
 	  	return  <table className = "table table-striped table-hover table-responsive lb_table_style_rows">{tableRows}</table>;
   	}
+  	renderCustomRangeRankTD(custom_data, toReturn="data"){
+    let td=[];
+    if(!custom_data){
+        return td;
+    }
+   
+    for (let[key,val] of Object.entries(custom_data)){
+        for(let [key1,val1] of Object.entries(val)){
+          if(key1 == "user_rank"){
+                 td.push(<td className="progress_table">{val1.rank}</td>);
+               }
+      }
+        if(toReturn == "key"){
+            let str = key;
+            let d = str.split(" ");
+            let d1 = d[0];
+            let date1 =moment(d1).format('MMM DD, YYYY');
+            let d2 = d[2];
+            let date2 =moment(d2).format('MMM DD, YYYY');
+            let date = date1 + ' to ' + date2;
+            td.push(<th className="progress_table">{date}</th>);
+        }
+    }
+    return td;
+}
 	render(){
 		 const {fix} = this.props;
 		return(
@@ -207,11 +281,10 @@ class LeaderBoard extends Component{
 		         <Navbar toggleable
 		         fixed={fix ? 'top' : ''}
 		          className="navbar navbar-expand-sm navbar-inverse nav6">
-		          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
+		          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
 		           <FontAwesome
 		                 name = "bars"
 		                 size = "1x"
-
 		             />
 		          </NavbarToggler>
 		          <Link to='/' >
@@ -243,12 +316,43 @@ class LeaderBoard extends Component{
 		          </Collapse>
 		        </Navbar>
       		</div>
- 			<span id="navlink" onClick={this.toggleCalendar} id="progress">
-                <FontAwesome
-                    name = "calendar"
-                    size = "2x"
-            	/>
-            </span>
+
+
+      		<div className = "row justify-content-center"> 
+                <span id="navlink" onClick={this.toggleCalendar} id="progress">
+                    <FontAwesome
+                        name = "calendar"
+                        size = "2x"
+                    />
+                </span>               
+                <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
+                    <span className="date_range_btn">
+                        <Button
+                            className="daterange-btn btn"                            
+                            id="daterange"
+                            onClick={this.toggleDate1} >Custom Date Range1
+                        </Button>
+                    </span>
+                </span>
+                <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+                    <span className="date_range_btn">
+                        <Button
+                            className="daterange-btn btn"                            
+                            id="daterange"
+                            onClick={this.toggleDate2} >Custom Date Range2
+                        </Button>
+                    </span>
+                </span>
+                <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+                    <span className="date_range_btn">
+                        <Button
+                            className="daterange-btn btn"                            
+                            id="daterange"
+                            onClick={this.toggleDate3} >Custom Date Range3
+                        </Button>
+                    </span>
+                </span>
+            </div>
             <Popover
             placement="bottom"
             isOpen={this.state.calendarOpen}
@@ -258,6 +362,110 @@ class LeaderBoard extends Component{
 	                <CalendarWidget  onDaySelect={this.processDate}/>
 	              </PopoverBody>
 	        </Popover>
+
+	        <Popover
+            placement="bottom"
+            isOpen={this.state.dateRange1}
+            target="daterange1"
+            toggle={this.toggleDate1}>
+                    <PopoverBody>
+                        <div >
+                            <Form>
+	                            <div style={{paddingBottom:"12px"}} className="justify-content-center">
+	                                <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+	                                <Input type="date"
+	                                name="lb1_start_date"
+	                                value={this.state.lb1_start_date}
+	                                onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+	                            </div>
+	                            <div id="date" className="justify-content-center">
+	                                <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+	                                <Input type="date"
+	                                name="lb1_end_date"
+	                                value={this.state.lb1_end_date}
+	                                onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+	                            </div>
+	                            <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+		                            <button
+		                            id="nav-btn"
+		                            style={{backgroundColor:"#ed9507"}}
+		                            type="submit"
+		                            className="btn btn-block-lg"
+		                            onClick={this.onSubmitDate1} style={{width:"175px"}}>SUBMIT</button>
+	                            </div>
+                            </Form>
+                        </div>
+                    </PopoverBody>
+                </Popover>
+                 <Popover
+            placement="bottom"
+            isOpen={this.state.dateRange2}
+            target="daterange2"
+            toggle={this.toggleDate2}>
+                    <PopoverBody>
+                        <div >
+                            <Form>
+	                            <div style={{paddingBottom:"12px"}} className="justify-content-center">
+	                                <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+	                                <Input type="date"
+	                                name="lb2_start_date"
+	                                value={this.state.lb2_start_date}
+	                                onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+	                            </div>
+	                            <div id="date" className="justify-content-center">
+	                                <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+	                                <Input type="date"
+	                                name="lb2_end_date"
+	                                value={this.state.lb2_end_date}
+	                                onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+	                            </div>
+	                            <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+		                            <button
+		                            id="nav-btn"
+		                            style={{backgroundColor:"#ed9507"}}
+		                            type="submit"
+		                            className="btn btn-block-lg"
+		                            onClick={this.onSubmitDate2} style={{width:"175px"}}>SUBMIT</button>
+	                            </div>
+                            </Form>
+                        </div>
+                    </PopoverBody>
+                </Popover>
+                 <Popover
+            placement="bottom"
+            isOpen={this.state.dateRange3}
+            target="daterange3"
+            toggle={this.toggleDate3}>
+                    <PopoverBody>
+                        <div >
+                            <Form>
+	                            <div style={{paddingBottom:"12px"}} className="justify-content-center">
+	                                <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+	                                <Input type="date"
+	                                name="lb3_start_date"
+	                                value={this.state.lb3_start_date}
+	                                onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+	                            </div>
+	                            <div id="date" className="justify-content-center">
+	                                <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+	                                <Input type="date"
+	                                name="lb3_end_date"
+	                                value={this.state.lb3_end_date}
+	                                onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+	                            </div>
+	                            <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+		                            <button
+		                            id="nav-btn"
+		                            style={{backgroundColor:"#ed9507"}}
+		                            type="submit"
+		                            className="btn btn-block-lg"
+		                            onClick={this.onSubmitDate3} style={{width:"175px"}}>SUBMIT</button>
+	                            </div>
+                            </Form>
+                        </div>
+                    </PopoverBody>
+                </Popover>
+
 	        <div className = "row justify-content-center lb_table_style">
 		        {this.renderTablesTd(this.state.ranking_data.oh_gpa)}
 	        </div>

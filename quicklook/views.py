@@ -1937,7 +1937,7 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,data[key])
 				elif i == 25:
 					if json2_data:
-						if data[key] == '':
+						if data[key] == '' or data[key] == ':':
 							sheet6.write(i + 2, row_num,'Not Recorded')
 						else:
 							sheet6.write(i + 2, row_num,data[key],format)
