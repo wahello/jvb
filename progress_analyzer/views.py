@@ -147,11 +147,11 @@ def progress_excel_export(request):
 	week1='{} to {}'.format(ys1,ys2)
 
 	month = DATA['duration_date']['month']
-	m1=[x.strip() for x in week.split('to')]
+	m1=[x.strip() for x in month.split('to')]
 	mon1=datetime.strptime(m1[0],"%Y-%m-%d")
 	mon2=datetime.strptime(m1[1],"%Y-%m-%d")
-	ms1=yest1.strftime("%b %d,%Y")
-	ms2=yest2.strftime("%b %d,%Y")
+	ms1=mon1.strftime("%b %d,%Y")
+	ms2=mon2.strftime("%b %d,%Y")
 	month1='{} to {}'.format(ms1,ms2)
 
 
@@ -346,7 +346,7 @@ def progress_excel_export(request):
 		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
-		print(pprint.pprint(DATA))
+		#print(pprint.pprint(DATA))
 		c=1
 		for i in range(1):
 			c = c + 1
