@@ -1925,8 +1925,8 @@ def progress_excel_export(request):
 	# 				ls2.append(keys)
 
 	# 	#print(pprint.pprint(dic))
-	# 	# x=max(ls)-min(ls)
-	# 	# dic1['aerobic']=x
+	# 	x=max(ls)-min(ls)
+	# 	dic1['aerobic']=x
 	# 	# y=max(ls1)-min(ls1)
 	# 	# dic1['anaerobic']=y
 	# 	z=max(ls2)-min(ls2)
