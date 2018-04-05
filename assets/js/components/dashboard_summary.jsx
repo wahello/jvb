@@ -859,54 +859,47 @@ createExcelPrintURL(){
         </Navbar>
 
       </div> 
-      <div> 
-      <span id="navlink" onClick={this.toggleCalendar} id="progress">
-                <FontAwesome
-                    name = "calendar"
-                    size = "2x"
+            <div> 
+                <span id="navlink" onClick={this.toggleCalendar} id="progress">
+                    <FontAwesome
+                        name = "calendar"
+                        size = "2x"
+                    />
+                </span>               
+                <span className="pdf_button" id="pdf_button">
+                    <a href={this.createExcelPrintURL()}>
+                    <Button className="btn createbutton mb5" onClick={this.printDocument}>Export Excel</Button>
+                    </a>
+                </span>
 
-                />
-      </span>               
-            <span className="pdf_button" id="pdf_button">
-            <a href={this.createExcelPrintURL()}>
-            <Button className="btn createbutton mb5" onClick={this.printDocument}>Export Excel</Button>
-            </a>
-            </span>
-
-            <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
-                         
-                          <span className="date_range_btn">
-                           <Button
-                              className="daterange-btn btn"                            
-                              id="daterange"
-                              
-                              onClick={this.toggleDate1} >Custom Date Range1
-                          </Button>
-                          </span>
-                           </span>
-                            <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
-                         
-                          <span className="date_range_btn">
-                           <Button
-                              className="daterange-btn btn"                            
-                              id="daterange"
-                              
-                              onClick={this.toggleDate2} >Custom Date Range2
-                          </Button>
-                          </span>
-                           </span>
-                            <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
-                         
-                          <span className="date_range_btn">
-                           <Button
-                             className="daterange-btn btn"                            
-                              id="daterange"
-                              
-                              onClick={this.toggleDate3} >Custom Date Range3
-                          </Button>
-                          </span>
-                           </span>
-                        </div>
+                <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
+                    <span className="date_range_btn">
+                        <Button
+                            className="daterange-btn btn"                            
+                            id="daterange"
+                            onClick={this.toggleDate1} >Custom Date Range1
+                        </Button>
+                    </span>
+                </span>
+                <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+                    <span className="date_range_btn">
+                        <Button
+                            className="daterange-btn btn"                            
+                            id="daterange"
+                            onClick={this.toggleDate2} >Custom Date Range2
+                        </Button>
+                    </span>
+                </span>
+                <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+                    <span className="date_range_btn">
+                        <Button
+                            className="daterange-btn btn"                            
+                            id="daterange"
+                            onClick={this.toggleDate3} >Custom Date Range3
+                        </Button>
+                    </span>
+                </span>
+            </div>
                                         
                         <Popover
                             placement="bottom"
