@@ -8,45 +8,78 @@ from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.models import Score as s
 
 class RankedScore(object):
-	def __init__(self,user,score,category,rank=None):
+	DEFAULT_MAXIMUM_SCORE = 999999
+	DEFAULT_MINIMUM_SCORE = -999999
+
+	CATEGORY_DEFAULT_SCORE = {
+		'oh_gpa':DEFAULT_MINIMUM_SCORE,
+		'mne_gpa':DEFAULT_MINIMUM_SCORE,
+		'mc':DEFAULT_MAXIMUM_SCORE,
+		'avg_sleep':DEFAULT_MINIMUM_SCORE,
+		'ec':DEFAULT_MINIMUM_SCORE,
+		'prcnt_uf':DEFAULT_MINIMUM_SCORE,
+		'alcohol_drink':DEFAULT_MAXIMUM_SCORE,
+		'total_steps':DEFAULT_MINIMUM_SCORE,
+		'floor_climbed':DEFAULT_MINIMUM_SCORE,
+		'resting_hr':DEFAULT_MAXIMUM_SCORE,
+		'deep_sleep':DEFAULT_MINIMUM_SCORE,
+		'awake_time':DEFAULT_MAXIMUM_SCORE
+	}
+
+	def __init__(self,current_user,user,category,score,rank=None):
+		self.current_user = current_user
 		self.user = user
-		self._score = score
-		self._category = category
-		self._rank = rank
+		self.category = category
+		self.score = score
+		self.rank = rank
 
 	@property		
 	def category(self):
-		return self._category
+		return self.__category
 
 	@category.setter
 	def category(self,category):
 		category_choices = [c[0] for c in s.CATEGORY_CHOICES]
 		if category.lower() in category_choices:
-			self._category = category
+			self.__category = category
 		else:
 			raise ValueError("'{}' is not a valid category".format(category))
 
 	@property
+	def score(self):
+		return self.__score
+
+	@score.setter
+	def score(self,score):
+		if score == None or score == 'Not Reported':
+			self.__score = self.CATEGORY_DEFAULT_SCORE[self.category]
+		else:
+			self.__score = score
+
+
+	@property
 	def rank(self):
-		return self._rank
+		return self.__rank
 
 	@rank.setter
 	def rank(self,rank):
-		if ((not rank < 1 and type(rank) is int) or rank is None):
-			self._rank = rank
+		if (rank is None or (not rank < 1 and type(rank) is int)):
+			self.__rank = rank
 		else:
-			raise ValueError("'{}' is not a valid rank. Rank should be integer and non zero".format(rank))
+			raise ValueError("'{}' is not a valid rank. Rank should be positive integer and non zero".format(rank))
 
 	def as_dict(self):
 		verbose_category = {c[0]:c[1] for c in s.CATEGORY_CHOICES}
-		score = self._score
-		if self._category in ["awake_time","deep_sleep"]:
+		score = self.score
+		if score == self.DEFAULT_MAXIMUM_SCORE or score == self.DEFAULT_MINIMUM_SCORE:
+			score = "N/A"
+		elif self.category in ["awake_time","deep_sleep"]:
 			score = self._hours_to_hours_min(score)
 		d = {
-			'username':self.user.username,
+			'username':self.user.username if self.user == self.current_user else "Anonymous",
 			'score':score,
-			'category':verbose_category[self._category],
-			'rank':self._rank
+			'category':verbose_category[self.category],
+			'rank':self.rank
 		}
 		return d
 
@@ -89,13 +122,13 @@ class Leaderboard(object):
 		ranked_scores = []
 		rank_to_award = 1
 		previous_score = None
-		sorted_scores = sorted(self.scores,key=attrgetter('_score'),reverse=to_reverse)
+		sorted_scores = sorted(self.scores,key=attrgetter('score'),reverse=to_reverse)
 		for i,score in enumerate(sorted_scores):
-			if previous_score is not None and (previous_score != score._score):
+			if previous_score is not None and (previous_score != score.score):
 				rank_to_award = i+1
 			score.rank = rank_to_award
 			ranked_scores.append(score)
-			previous_score = score._score
+			previous_score = score.score
 		return ranked_scores
 
 	def get_leaderboard(self,format = 'dict'):
@@ -256,52 +289,42 @@ class LeaderboardOverview(object):
 				for dtype in self.duration_type:
 					if catg == 'oh_gpa':
 						score = data['overall_health']['overall_health_gpa'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'mne_gpa':
 						score = data['non_exercise']['non_exericse_steps_gpa'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'mc':
 						score = data['mc']['movement_consistency_score'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'avg_sleep':
 						score = data['sleep']['overall_sleep_gpa'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'ec':
 						score = data['ec']['avg_no_of_days_exercises_per_week'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'prcnt_uf':
 						score = data['nutrition']['prcnt_unprocessed_food_gpa'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'alcohol_drink':
 						score = data['alcohol']['alcoholic_drinks_per_week_gpa'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'total_steps':
 						score = data['non_exercise']['total_steps'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'floor_climbed':
 						score = data['other']['floors_climbed'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'resting_hr':
 						score = data['other']['resting_hr'][dtype]
-						score = score if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					if catg == 'deep_sleep':
 						score = data['sleep']['deep_sleep_in_hours_min'][dtype]
-						score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					if catg == 'awake_time':
 						score = data['sleep']['awake_duration_in_hours_min'][dtype]
-						score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
-						category_wise_data[catg][dtype].append(RankedScore(user,score,catg))
+						score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 
 				if self.custom_ranges:
 					if not category_wise_data[catg].get('custom_range',None):
@@ -314,52 +337,42 @@ class LeaderboardOverview(object):
 						str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
 						if catg == 'oh_gpa':
 							score = data['overall_health']['overall_health_gpa']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'mne_gpa':
 							score = data['non_exercise']['non_exericse_steps_gpa']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'mc':
 							score = data['mc']['movement_consistency_score']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'avg_sleep':
 							score = data['sleep']['overall_sleep_gpa']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'ec':
 							score = data['ec']['avg_no_of_days_exercises_per_week']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'prcnt_uf':
 							score = data['nutrition']['prcnt_unprocessed_food_gpa']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'alcohol_drink':
 							score = data['alcohol']['alcoholic_drinks_per_week_gpa']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'total_steps':
 							score = data['non_exercise']['total_steps']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'floor_climbed':
 							score = data['other']['floors_climbed']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'resting_hr':
 							score = data['other']['resting_hr']['custom_range'][str_range]['data']
-							score = score if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						if catg == 'deep_sleep':
 							score = data['sleep']['deep_sleep_in_hours_min']['custom_range'][str_range]['data']
-							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						if catg == 'awake_time':
 							score = data['sleep']['awake_duration_in_hours_min']['custom_range'][str_range]['data']
-							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else 0
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(user,score,catg))
+							score = self._str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):

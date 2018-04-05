@@ -1610,7 +1610,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['resting_hr_last_night'] = safe_get_dict(dailies_json,
 			'restingHeartRateInBeatsPerMinute',0)
 		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
-			daily_encouraged,"lowest_hr_during_hrr",0)
+			daily_encouraged,"lowest_hr_first_minute",0)
 		
 		# exercise_calculated_data['highest_hr_first_minute'] = f
 		

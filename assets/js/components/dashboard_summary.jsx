@@ -455,7 +455,7 @@ constructor(props){
   }
     
   successProgress(data){
-  let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
+ 
     this.setState({
         fetching_ql1:false,
         fetching_ql2:false,
@@ -467,7 +467,7 @@ constructor(props){
     });
   }
   successRank(data){
-    let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
+   
 
     this.setState({
         fetching_ql1:false,
@@ -480,9 +480,9 @@ constructor(props){
   }
 
 gpascoreDecimal(gpa){
-  let value;
+let value;
 let x = gpa;
-if(x && x != "Not Reported"){
+if( x !=  null && x != undefined && x != "Not Reported"){
     value =parseFloat(x).toFixed(2);
  }
  else if(x == "Not Reported"){
@@ -582,7 +582,7 @@ gpascoreCustomRangeTD(custom_data, toReturn="data"){
         if(toReturn == "data"){
             let x = val.data;
             let value;
-            if(x && x != "Not Reported"){
+            if(x !=  null && x != undefined && x != "Not Reported"){
               value =parseFloat(x).toFixed(2);
             td.push(<td className="progress_table">{value}</td>);
           }
@@ -812,7 +812,6 @@ createExcelPrintURL(){
 }
     render(){
         const {fix} = this.props;
-   let haveCustomData = ((this.state.cr1_start_date && this.state.cr1_end_date) || (this.state.cr2_start_date && this.state.cr2_end_date) ||(this.state.cr3_start_date && this.state.cr3_end_date))?true:false;
         return(
             <div className="dashboard">
         <div className="container-fluid">

@@ -494,7 +494,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_hrr_beats_lowered_in_first_min",0)
 
 		other_stats_cum_data['cum_highest_hr_in_first_min'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"highest_hr_first_minute",0) \
+			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_highest_hr_in_first_min",0)
 
 		other_stats_cum_data['cum_hrr_lowest_hr_point'] = _safe_get_mobj(
@@ -517,7 +517,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
 
 		other_stats_cum_data['cum_highest_hr_in_first_min'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"highest_hr_first_minute",0)
+			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0)
 
 		other_stats_cum_data['cum_hrr_lowest_hr_point'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
@@ -580,7 +580,7 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_beats_lowered_in_first_min_days_count",0)
 
 		highest_hr_in_first_min = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"highest_hr_first_minute",0)
+			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0)
 		highest_hr_in_first_min = 1 if highest_hr_in_first_min else 0
 		meta_cum_data['cum_highest_hr_in_first_min_days_count'] = highest_hr_in_first_min \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_highest_hr_in_first_min_days_count",0)
@@ -633,7 +633,7 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		meta_cum_data['cum_hrr_beats_lowered_in_first_min_days_count'] = 1 if hrr_beats_lowered_in_first_min else 0
 
 		highest_hr_in_first_min = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"highest_hr_first_minute",0)
+			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0)
 		meta_cum_data['cum_highest_hr_in_first_min_days_count'] = 1 if highest_hr_in_first_min else 0
 
 		hrr_lowest_hr_point = _safe_get_mobj(
