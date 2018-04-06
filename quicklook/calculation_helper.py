@@ -404,9 +404,6 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	If bed_time_today is True, that's mean we are tying to find out today's bedtime
 	"""
-	# print("\nDate:",sleep_calendar_date)
-	# print("Yesterday sleep Data:",yesterday_sleep_data)
-	# print("Today Sleep Data:", today_sleep_data)
 
 	def _get_actual_sleep_start_time(data):
 		min_duration = None
@@ -489,9 +486,10 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 				obj_start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds')+
 					obj.get('startTimeOffsetInSeconds'))
-				obj_end_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(obj)+
-				   obj.get('startTimeOffsetInSeconds',0)+
-				   obj.get('durationInSeconds'))
+				obj_end_time = obj_start_time + timedelta(seconds=obj.get('durationInSeconds',0))
+				# obj_end_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(obj)+
+				#    obj.get('startTimeOffsetInSeconds',0)+
+				#    obj.get('durationInSeconds'))
 
 				if not target_sleep_data:
 					# most earliest(or recent if trying to find bedtime today) record of the day

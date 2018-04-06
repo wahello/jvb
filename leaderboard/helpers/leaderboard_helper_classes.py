@@ -18,7 +18,7 @@ class RankedScore(object):
 		'avg_sleep':DEFAULT_MINIMUM_SCORE,
 		'ec':DEFAULT_MINIMUM_SCORE,
 		'prcnt_uf':DEFAULT_MINIMUM_SCORE,
-		'alcohol_drink':DEFAULT_MAXIMUM_SCORE,
+		'alcohol_drink':DEFAULT_MINIMUM_SCORE,
 		'total_steps':DEFAULT_MINIMUM_SCORE,
 		'floor_climbed':DEFAULT_MINIMUM_SCORE,
 		'resting_hr':DEFAULT_MAXIMUM_SCORE,
@@ -256,7 +256,7 @@ class LeaderboardOverview(object):
 	def _get_catg_score_priority(self):
 		categories = [x[0] for x in s.CATEGORY_CHOICES]
 		catg_score_priority = {}
-		lowest_first_categories = ['mc','alcohol_drink','resting_hr','awake_time']
+		lowest_first_categories = ['mc','resting_hr','awake_time']
 		for category in categories:
 			if category in lowest_first_categories:
 				catg_score_priority[category] = 'lowest_first'
