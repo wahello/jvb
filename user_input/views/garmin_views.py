@@ -126,7 +126,6 @@ class GarminData(APIView):
 			act_obj = manually_edited(act)
 			finall = self._create_activity_stat(act_obj)
 			final_act_data.update(finall)
-		print(final_act_data)
 		return final_act_data
 			
 
