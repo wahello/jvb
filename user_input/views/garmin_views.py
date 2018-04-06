@@ -84,18 +84,32 @@ class GarminData(APIView):
 		return (activity_data,manually_updated_activity_data)    
 
 	def _create_activity_stat(self,activity_obj):
-
 		if activity_obj:
 			tmp = {
 					"summaryId":"",
 					"activityType":"",
 					"durationInSeconds":"",
 					"averageHeartRateInBeatsPerMinute":"",
-					"comments":""
+					"comments":"",
+					"startTimeInSeconds":"",
+					"endTimeInSeconds":"",
+					"durationInSeconds":"",
+					"startTimeOffsetInSeconds":""
+
 				}
 			for k, v in activity_obj.items():
 				if k in tmp.keys():
 					tmp[k] = v
+					if tmp["startTimeInSeconds"]:
+						a = int(tmp["startTimeInSeconds"])
+					else:
+						a = 0
+					if tmp["durationInSeconds"]:
+						b = int(tmp["durationInSeconds"])
+					else:
+						b = 0
+					tmp["endTimeInSeconds"] = a + b
+			tmp.pop("durationInSeconds")
 			return {activity_obj['summaryId']:tmp}
 		
 
@@ -110,9 +124,9 @@ class GarminData(APIView):
 		act_obj = {}
 		for act in activity_data:
 			act_obj = manually_edited(act)
-			# print(act_obj)
 			finall = self._create_activity_stat(act_obj)
 			final_act_data.update(finall)
+		print(final_act_data)
 		return final_act_data
 			
 
