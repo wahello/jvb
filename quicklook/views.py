@@ -16,8 +16,8 @@ from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from garmin.models import GarminFitFiles
 from user_input.models import DailyUserInputOptional ,\
-                              DailyUserInputEncouraged,\
-                              DailyUserInputStrong
+							  DailyUserInputEncouraged,\
+							  DailyUserInputStrong
 
 from .serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
@@ -36,14 +36,14 @@ from .models import UserQuickLook,\
 					ExerciseAndReporting
 
 from progress_analyzer.models import OverallHealthGradeCumulative, \
-                                     NonExerciseStepsCumulative,\
-                                     SleepPerNightCumulative,\
-                                     MovementConsistencyCumulative,\
-                                     ExerciseConsistencyCumulative,\
-                                     NutritionCumulative,\
-                                     ExerciseStatsCumulative,\
-                                     AlcoholCumulative,\
-                                     OtherStatsCumulative
+									 NonExerciseStepsCumulative,\
+									 SleepPerNightCumulative,\
+									 MovementConsistencyCumulative,\
+									 ExerciseConsistencyCumulative,\
+									 NutritionCumulative,\
+									 ExerciseStatsCumulative,\
+									 AlcoholCumulative,\
+									 OtherStatsCumulative
 
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
@@ -1025,19 +1025,19 @@ def export_users_xls(request):
 				
 				if i == 12:
 					if 'RUNNING' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['RUNNING'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['RUNNING'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 13:
 					if 'ELLIPTICAL' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['ELLIPTICAL'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['ELLIPTICAL'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 14:
 					if 'WALKING' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['WALKING'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['WALKING'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 15:
 					if 'OTHER' in json2_data:
 						sheet9.write(i1+i+1,row_num - num_11,json2_data['OTHER'],format)
@@ -1847,21 +1847,167 @@ def export_users_xls(request):
 
 	# Exercise Reporting
 
+	# sheet6.set_landscape()
+	# sheet6.repeat_rows(0)
+	# sheet6.repeat_columns(0)
+	# sheet6.set_row(0,30)
+	# columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
+	# "distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate","avg_exercise_heartrate","avg_exercise_heartrate",
+	# "elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+	# "temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
+	# "nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
+	# "drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
+	# "heartrate_variability_stress","fitness_age","workout_comment"]
+	# columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
+	# 'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate WALKING','Average Heartrate OTHER','Overall Average Exercise Heart Rate',
+	# 'Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
+	# 'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+	
+	# current_date = to_date
+	# r = 0
+	# if to_date and from_date:
+	# 	while (current_date >= from_date):
+	# 		r = r + 1
+	# 		weekday1 = calendar.day_name[current_date.weekday()]
+	# 		x= current_date.strftime('%m-%d-%y')
+	# 		current_date_split= x.split("-")
+	# 		current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+	# 		current_date_string = str(current_date_string)
+	# 		sheet6.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+	# 		# sheet6.write(0, r, current_date,date_format)
+	# 		current_date -= timedelta(days=1)
+	# sheet6.write(0, 0, "Exercise Reporting",bold)
+	# col_num1 = 1
+	# row_num = 0
+	# for col_num in range(len(columns8w)):
+	# 	col_num1 = col_num1 + 1
+	# 	sheet6.write(col_num1, row_num, columns8w[col_num])
+
+	# current_date = to_date
+	# # for row in exercise_qs.values():
+	# 	# print (row)
+	# while (current_date >= from_date):
+	# 	# logic
+	# 	data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+	# 	if data:
+	# 		data = data.__dict__
+	# 		# print(data)
+	# 		row_num += 1
+	# 		for i,key in enumerate(columns):
+	# 			avg_heart_rate_string = data['avg_heartrate']
+	# 			json2_data = json.loads(avg_heart_rate_string)
+
+	# 			#print(json2_data)
+
+	# 			if i == 12:
+	# 				if 'RUNNING' in json2_data:
+	# 				 	sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
+	# 				else:
+	# 				 	sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 13:
+	# 				if 'ELLIPTICAL' in json2_data:
+	# 				 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
+	# 				else:
+	# 				 	sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 14:
+	# 				if 'WALKING' in json2_data:
+	# 				 	sheet6.write(i+2,row_num,json2_data['WALKING'],format)
+	# 				else:
+	# 				 	sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 15:
+	# 				if 'OTHER' in json2_data:
+
+	# 					sheet6.write(i+2,row_num,json2_data['OTHER'],format)
+	# 				else:
+	# 					sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 4:
+	# 				if data[key] == "0:00:00":
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,data[key])
+	# 			elif i == 19:
+	# 				if data[key] == 0:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,data[key])
+	# 			elif i == 29:
+	# 				if data[key] == 0:
+	# 					sheet6.write(i + 2, row_num,'Not provided')
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,data[key])
+	# 			elif i == 25:
+	# 				if json2_data:
+	# 					if data[key] == '' or data[key] == ':':
+	# 						sheet6.write(i + 2, row_num,'Not Recorded')
+	# 					else:
+	# 						sheet6.write(i + 2, row_num,data[key],format)
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 			elif i == 26:
+	# 				if json2_data:
+	# 					if data[key] == 0:
+	# 						sheet6.write(i + 2, row_num,'Not Recorded')
+	# 					else:
+	# 						sheet6.write(i + 2, row_num,data[key],format)
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 			elif i == 27:
+	# 				if json2_data:
+	# 					if data[key] == 0:
+	# 						sheet6.write(i + 2, row_num,'Not Recorded')
+	# 					else:
+	# 						sheet6.write(i + 2, row_num,data[key],format)
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+
+	# 			elif data[key] == None:
+	# 				sheet6.write(i + 2, row_num,'Not provided')
+	# 			elif key != 'avg_heartrate':
+	# 				sheet6.write(i + 2, row_num,data[key],format)
+
+
+	# 	else:
+	# 		row_num += 1
+	# 		sheet6.write(i + 2, row_num, '')
+	# 	current_date -= timedelta(days=1)
+
+
+
+
+
+
+
+
+
+
+
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
 	sheet6.repeat_columns(0)
 	sheet6.set_row(0,30)
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate","avg_exercise_heartrate","avg_exercise_heartrate",
-	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+	"distance_run","distance_bike","distance_swim","distance_other","pace"]
+
+	columns_1 = ["avg_exercise_heartrate","elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
 	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
-	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
-	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate WALKING','Average Heartrate OTHER','Overall Average Exercise Heart Rate',
-	'Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
-	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+	
+	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)',
+	'Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 'Distance (in Miles) - Bike', 
+	'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)']
+
+
+	rem_columns = ['Overall Average Exercise Heart Rate','Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)',
+	'Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',
+	'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout',
+	'Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ',
+	'Drug Consumed','Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout',
+	'Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+
+
+	Avg_Heart = ['avg_heartrate']
 	
 	current_date = to_date
 	r = 0
@@ -1882,93 +2028,133 @@ def export_users_xls(request):
 	for col_num in range(len(columns8w)):
 		col_num1 = col_num1 + 1
 		sheet6.write(col_num1, row_num, columns8w[col_num])
+	current_date = to_date
+	Activities_list = []
+	while (current_date >= from_date):
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			for i,key in enumerate(Avg_Heart):
+				avg_heart_rate_string = data[key]
+				json2_data = json.loads(avg_heart_rate_string)
+				Activities_key = list(json2_data.keys())
+				Activities_list.extend(Activities_key)
+		current_date -= timedelta(days=1)
+	
+	Activities_list_unique = list(set(Activities_list))
+	print(Activities_list_unique)
+	for col_num in range(len(Activities_list_unique)):
+		col_num1 = col_num1 + 1
+		sheet6.write(col_num1, row_num,"Average Heartrate"+' '+Activities_list_unique[col_num])
+
+	
+	current_date = to_date
+	while (current_date >= from_date):
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			row_num += 1
+			for i,key in enumerate(columns):
+				if i == 4:
+					if data[key] == "0:00:00":
+						sheet6.write(i + 2, row_num,'No Workout')
+					else:
+						sheet6.write(i + 2, row_num,data[key])
+				else:
+					sheet6.write(i + 2, row_num,data[key],format)
+		else:
+			row_num += 1
+			sheet6.write(i + 2, row_num, '')
+		current_date -= timedelta(days=1)
+	
+
+	row_avg_heart = i+1
+	column_no = row_num
+	current_date = to_date
+	while (current_date >= from_date):
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			avg_heart_rate_string = data['avg_heartrate']
+			json2_data = json.loads(avg_heart_rate_string)
+			row_num += 1
+			for k,key in enumerate(Activities_list_unique):
+
+				if json2_data:
+					try:
+						sheet6.write(row_avg_heart+2+k,row_num - column_no,json2_data[key],format)
+					except KeyError:
+						sheet6.write(row_avg_heart+2+k,row_num - column_no,' ')
+				else:
+					sheet6.write(row_avg_heart+2+k,row_num - column_no,' ')
+		else:
+			row_num += 1
+			sheet6.write(i + 2, row_num, '')
+		current_date -= timedelta(days=1)
+
+	no_days = (to_date-from_date).days
+
+	for col_num in range(len(rem_columns)):
+		col_num1 = col_num1 + 1
+		sheet6.write(col_num1, row_num - column_no - no_days -1, rem_columns[col_num])
+
 
 	current_date = to_date
-	# for row in exercise_qs.values():
-		# print (row)
+	rem_row = i+k
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		if data:
 			data = data.__dict__
-			# print(data)
+			avg_heart_rate_string = data['avg_heartrate']
+			json2_data = json.loads(avg_heart_rate_string)
 			row_num += 1
-			for i,key in enumerate(columns):
-				avg_heart_rate_string = data['avg_heartrate']
-				json2_data = json.loads(avg_heart_rate_string)
-
-				#print(json2_data)
-
-				if i == 12:
-					if 'RUNNING' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
-					else:
-					 	sheet6.write(i+2,row_num,"",format)
-				elif i == 13:
-					if 'ELLIPTICAL' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
-					else:
-					 	sheet6.write(i+2,row_num,"",format)
-				elif i == 14:
-					if 'WALKING' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['WALKING'],format)
-					else:
-					 	sheet6.write(i+2,row_num,"",format)
-				elif i == 15:
-					if 'OTHER' in json2_data:
-
-						sheet6.write(i+2,row_num,json2_data['OTHER'],format)
-					else:
-						sheet6.write(i+2,row_num,"",format)
-				elif i == 4:
-					if data[key] == "0:00:00":
-						sheet6.write(i + 2, row_num,'No Workout')
-					else:
-						sheet6.write(i + 2, row_num,data[key])
-				elif i == 19:
+			for j,key in enumerate(columns_1):
+				
+				if j == 3:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'No Workout')
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
 					else:
-						sheet6.write(i + 2, row_num,data[key])
-				elif i == 29:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
+				elif j == 13:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'Not provided')
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not provided')
 					else:
-						sheet6.write(i + 2, row_num,data[key])
-				elif i == 25:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key])
+				elif j == 9:
 					if json2_data:
 						if data[key] == '' or data[key] == ':':
-							sheet6.write(i + 2, row_num,'Not Recorded')
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
 						else:
-							sheet6.write(i + 2, row_num,data[key],format)
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 					else:
-						sheet6.write(i + 2, row_num,'No Workout')
-				elif i == 26:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
+				elif j == 10:
 					if json2_data:
 						if data[key] == 0:
-							sheet6.write(i + 2, row_num,'Not Recorded')
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
 						else:
-							sheet6.write(i + 2, row_num,data[key],format)
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 					else:
-						sheet6.write(i + 2, row_num,'No Workout')
-				elif i == 27:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
+				elif j == 11:
 					if json2_data:
 						if data[key] == 0:
-							sheet6.write(i + 2, row_num,'Not Recorded')
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
 						else:
-							sheet6.write(i + 2, row_num,data[key],format)
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 					else:
-						sheet6.write(i + 2, row_num,'No Workout')
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
 
 				elif data[key] == None:
-					sheet6.write(i + 2, row_num,'Not provided')
-				elif key != 'avg_heartrate':
-					sheet6.write(i + 2, row_num,data[key],format)
+					sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not provided')
+				else:
+					sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 
 
 		else:
 			row_num += 1
-			sheet6.write(i + 2, row_num, '')
+			sheet6.write(rem_row+4+i, row_num - column_no - no_days - 1,'')
 		current_date -= timedelta(days=1)
 	
 	#movement consistenct
@@ -2528,31 +2714,31 @@ def export_users_xls(request):
 
 	#table borders
 	border_format=book.add_format({
-                            'border':1,
-                            'align':'left',
-                            'font_size':10
-                           })
+							'border':1,
+							'align':'left',
+							'font_size':10
+						   })
 	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
 	
 	
 	sheet10.conditional_format('B4:G7', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('B11:G15', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('B19:G22', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('B25:G27', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('B32:G37', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('I4:N8', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('I11:N14', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('I19:N22', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
-                                          'format': border_format})
+										  'format': border_format})
 	format_align = book.add_format({'align':'left'})
 	custom_range='{} to {}'.format(from_date,to_date)
 	to_date1 = '{}'.format(to_date)
