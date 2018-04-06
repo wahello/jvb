@@ -1911,24 +1911,24 @@ def progress_excel_export(request):
 	# 			pass
 	# 			age=40
 	# 			if (180-age-30)<dic[keys]<(180-age+5):
-	# 				print('aerobic')
-	# 				print(keys)
+	# 				#print('aerobic')
+	# 				#print(keys)
 	# 				ls.append(keys)
 
 	# 			elif (dic[keys]>(180-age+5)):
-	# 				print('anaerobic')
-	# 				print(keys)
+	# 				#print('anaerobic')
+	# 				#print(keys)
 	# 				ls1.append(keys)
 	# 			elif(dic[keys]<(180-age-30)):
-	# 				print('below aerobic')
-	# 				print(keys)
+	# 				#print('below aerobic')
+	# 				#print(keys)
 	# 				ls2.append(keys)
 
-	# 	print(pprint.pprint(dic))
+	# 	#print(pprint.pprint(dic))
 	# 	x=max(ls)-min(ls)
 	# 	dic1['aerobic']=x
-	# 	y=max(ls1)-min(ls1)
-	# 	dic1['anaerobic']=y
+	# 	# y=max(ls1)-min(ls1)
+	# 	# dic1['anaerobic']=y
 	# 	z=max(ls2)-min(ls2)
 	# 	dic1['below aerobic']=z
 	# 	print(pprint.pprint(dic1))

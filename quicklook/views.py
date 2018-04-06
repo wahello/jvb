@@ -2738,7 +2738,10 @@ def export_users_xls(request):
 	sheet10.conditional_format('I19:N22', {'type': 'no_errors',
 										  'format': border_format})
 	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
-										  'format': border_format})
+                                          'format': border_format})
+
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
 	format_align = book.add_format({'align':'left'})
 	custom_range='{} to {}'.format(from_date,to_date)
 	to_date1 = '{}'.format(to_date)
@@ -2762,6 +2765,7 @@ def export_users_xls(request):
 
 	
 	week = DATA['duration_date']['week']
+	#print(DATA)
 	
 	yest=[x.strip() for x in week.split('to')]
 	yest1=datetime.strptime(yest[0],"%Y-%m-%d")
@@ -2771,11 +2775,11 @@ def export_users_xls(request):
 	week1='{} to {}'.format(ys1,ys2)
 
 	month = DATA['duration_date']['month']
-	m1=[x.strip() for x in week.split('to')]
+	m1=[x.strip() for x in month.split('to')]
 	mon1=datetime.strptime(m1[0],"%Y-%m-%d")
 	mon2=datetime.strptime(m1[1],"%Y-%m-%d")
-	ms1=yest1.strftime("%b %d,%Y")
-	ms2=yest2.strftime("%b %d,%Y")
+	ms1=mon1.strftime("%b %d,%Y")
+	ms2=mon2.strftime("%b %d,%Y")
 	month1='{} to {}'.format(ms1,ms2)
 
 
