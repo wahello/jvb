@@ -1047,23 +1047,23 @@ def export_users_xls(request):
 					if data[key] == "0:00:00":
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 				elif i == 19:
 					if data[key] == 0:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 				elif i == 29:
 					if data[key] == 0:
-						sheet9.write(i1+i+1,row_num - num_11,'Not Provided')
+						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
 					else:
-						sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+						sheet9.write(i1+i+1,row_num - num_11,data[key])
 				elif i == 25:
 					if json2_data:
-						if data[key] == '' or data[key] == ':':
+						if data[key] == '':
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 26:
@@ -1071,7 +1071,7 @@ def export_users_xls(request):
 						if data[key] == 0:
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 27:
@@ -1079,7 +1079,7 @@ def export_users_xls(request):
 						if data[key] == 0:
 							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
 						else:
-							sheet9.write(i1+i+1,row_num - num_11,data[key],format)
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 
@@ -1929,12 +1929,12 @@ def export_users_xls(request):
 					if data[key] == 0:
 						sheet6.write(i + 2, row_num,'No Workout')
 					else:
-						sheet6.write(i + 2, row_num,data[key],format)
+						sheet6.write(i + 2, row_num,data[key])
 				elif i == 29:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'Not Provided')
+						sheet6.write(i + 2, row_num,'Not provided')
 					else:
-						sheet6.write(i + 2, row_num,data[key],format)
+						sheet6.write(i + 2, row_num,data[key])
 				elif i == 25:
 					if json2_data:
 						if data[key] == '' or data[key] == ':':
@@ -1961,7 +1961,7 @@ def export_users_xls(request):
 						sheet6.write(i + 2, row_num,'No Workout')
 
 				elif data[key] == None:
-					sheet6.write(i + 2, row_num,'Not Provided')
+					sheet6.write(i + 2, row_num,'Not provided')
 				elif key != 'avg_heartrate':
 					sheet6.write(i + 2, row_num,data[key],format)
 
@@ -2553,39 +2553,74 @@ def export_users_xls(request):
                                           'format': border_format})
 	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
                                           'format': border_format})
-  
-	#column headings
-	date_format1 = book.add_format({'num_format': 'mm-dd-yyyy','bold':True})
-	today= date.today()
-	yesterday=date.today()-timedelta(days=1)
-	week = date.today()-timedelta(days = 7)
 
 	format = book.add_format({'bold': True})
 	format.set_text_wrap()
 	format_align = book.add_format({'align':'left'})
-	today = date.today()
-	year = to_date.year
+	custom_range='{} to {}'.format(from_date,to_date)
 	to_date1 = '{}'.format(to_date)
-	to_datef = to_date.strftime("%b %d,%Y")
+	query_params = {
+	"date":to_date1,
+	"duration":"today,yesterday,week,month,year",
+	"custom_ranges":custom_range,
+	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+	}
+	DATA = ProgressReport(request.user,query_params).get_progress_report()
+  
+	#column headings
+	date_format1 = book.add_format({'num_format': 'mm-dd-yyyy','bold':True})
+	today = DATA['duration_date']['today']
+	t1=datetime.strptime(today,"%Y-%m-%d")
+	today1=t1.strftime("%b %d,%Y")
 
-	year1 = '{}-{}'.format('Jan 01',year)
-	yesterday=to_date-timedelta(days=1)
-	week = to_date-timedelta(days = 7)
-	month = to_date-timedelta(days=30)
-	today1 = today.strftime("%b %d,%Y")
-	yestf = yesterday.strftime("%b %d,%Y")
-	weekf = week.strftime("%b %d,%Y")
-	monthf = month.strftime("%b %d,%Y")
-	avg_week = '{} to {}'.format(weekf,to_datef)
-	avg_month ='{} to {}'.format(monthf,to_datef)
-	avg_year = '{} to {}'.format(year1,to_datef)
-	date1='{}'.format(today)
+	yesterday=DATA['duration_date']['yesterday']
+	to1=datetime.strptime(yesterday,"%Y-%m-%d")
+	yesterday1=to1.strftime("%b %d,%Y")
+
 	
-	today1 ='{}\n{}'.format('Today',to_datef)
-	yesterday1 = '{}\n{}'.format('Yesterday',yestf)
-	week1 = '{}\n{}'.format('Avg Last 7 days',avg_week)
-	month1 = '{}\n{}'.format('Avg Last 30 days',avg_month)
-	year1 = '{}\n{}'.format('Avg Year to Date',avg_year)
+	week = DATA['duration_date']['week']
+	#print(DATA)
+	
+	yest=[x.strip() for x in week.split('to')]
+	yest1=datetime.strptime(yest[0],"%Y-%m-%d")
+	yest2=datetime.strptime(yest[1],"%Y-%m-%d")
+	ys1=yest1.strftime("%b %d,%Y")
+	ys2=yest2.strftime("%b %d,%Y")
+	week1='{} to {}'.format(ys1,ys2)
+
+	month = DATA['duration_date']['month']
+	m1=[x.strip() for x in month.split('to')]
+	mon1=datetime.strptime(m1[0],"%Y-%m-%d")
+	mon2=datetime.strptime(m1[1],"%Y-%m-%d")
+	ms1=mon1.strftime("%b %d,%Y")
+	ms2=mon2.strftime("%b %d,%Y")
+	month1='{} to {}'.format(ms1,ms2)
+
+
+	# y1= DATA['duration_date']['year']
+	# yestf = y1.strftime("%b %d,%Y")
+	# weekf = w1.strftime("%b %d,%Y")
+	# monthf = m1.strftime("%b %d,%Y")
+	# avg_week = '{} to {}'.format(weekf,yestf)
+	# avg_month ='{} to {}'.format(monthf,yestf)
+	#avg_year = '{} to {}'.format(year1,yestf)
+	# date1='{}'.format(today)
+
+	today1 ='{}\n{}'.format('Today',today1)
+	yesterday1 = '{}\n{}'.format('Yesterday',yesterday1)
+	week1 = '{}\n{}'.format('Avg Last 7 days',week1)
+	month1 = '{}\n{}'.format('Avg Last 30 days',month1)
+	
+
+	y1= DATA['duration_date']['year']
+	y2=[x.strip() for x in y1.split('to')]
+	#print(y2) 
+	y=datetime.strptime(y2[1],"%Y-%m-%d")
+	x=datetime.strptime(y2[0],"%Y-%m-%d")
+	x1=x.strftime("%b %d,%Y")
+	y1=y.strftime("%b %d,%Y")
+	yearformat='{} to {}'.format(x1,y1)
+	year1 = '{}\n{}'.format('Avg Year to Date',yearformat)
 
 	
 	duration = [today1,yesterday1,week1,month1,year1]

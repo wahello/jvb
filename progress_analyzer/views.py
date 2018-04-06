@@ -33,6 +33,14 @@ def progress_excel_export(request):
 	a = crs.split(",")
 	
 	date = datetime.strptime(date2,'%Y-%m-%d').date()
+
+	query_params = {
+		"date":date2,
+		"duration":"today,yesterday,week,month,year",
+		#"custom_ranges":cr1,
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+	DATA = ProgressReport(request.user,query_params).get_progress_report()
 	#custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
 	#custom_ranges1_end = datetime.strptime(a[1], "%Y-%m-%d").date()
 	#custom_ranges2_start = datetime.strptime(a[2], "%Y-%m-%d").date()
@@ -118,26 +126,59 @@ def progress_excel_export(request):
 	
 	dt = date.strftime("%b %d,%Y")
 	year = date.year
-	year1 = '{}-{}'.format('Jan 01',year)
-	yesterday=date-timedelta(days=1)
-	week = date-timedelta(days = 7)
-	month = date-timedelta(days=30)
-	today = date.today()
-	yestf = yesterday.strftime("%b %d,%Y")
-	weekf = week.strftime("%b %d,%Y")
-	monthf = month.strftime("%b %d,%Y")
-	avg_week = '{} to {}'.format(weekf,dt)
-	avg_month ='{} to {}'.format(monthf,dt)
-	avg_year = '{} to {}'.format(year1,dt)
-	date1='{}'.format(today)
+	#year1 = '{},{}'.format('Mar 02',year)
+	
+	today = DATA['duration_date']['today']
+	t1=datetime.strptime(today,"%Y-%m-%d")
+	today1=t1.strftime("%b %d,%Y")
 
-	today1 ='{}\n{}'.format('Today',dt)
-	yesterday1 = '{}\n{}'.format('Yesterday',yestf)
-	week1 = '{}\n{}'.format('Avg Last 7 days',avg_week)
-	month1 = '{}\n{}'.format('Avg Last 30 days',avg_month)
-	year1 = '{}\n{}'.format('Avg Year to Date',avg_year)
+	yesterday=DATA['duration_date']['yesterday']
+	to1=datetime.strptime(yesterday,"%Y-%m-%d")
+	yesterday1=to1.strftime("%b %d,%Y")
 
 	
+	week = DATA['duration_date']['week']
+	
+	yest=[x.strip() for x in week.split('to')]
+	yest1=datetime.strptime(yest[0],"%Y-%m-%d")
+	yest2=datetime.strptime(yest[1],"%Y-%m-%d")
+	ys1=yest1.strftime("%b %d,%Y")
+	ys2=yest2.strftime("%b %d,%Y")
+	week1='{} to {}'.format(ys1,ys2)
+
+	month = DATA['duration_date']['month']
+	m1=[x.strip() for x in month.split('to')]
+	mon1=datetime.strptime(m1[0],"%Y-%m-%d")
+	mon2=datetime.strptime(m1[1],"%Y-%m-%d")
+	ms1=mon1.strftime("%b %d,%Y")
+	ms2=mon2.strftime("%b %d,%Y")
+	month1='{} to {}'.format(ms1,ms2)
+
+
+	# y1= DATA['duration_date']['year']
+	# yestf = y1.strftime("%b %d,%Y")
+	# weekf = w1.strftime("%b %d,%Y")
+	# monthf = m1.strftime("%b %d,%Y")
+	# avg_week = '{} to {}'.format(weekf,yestf)
+	# avg_month ='{} to {}'.format(monthf,yestf)
+	#avg_year = '{} to {}'.format(year1,yestf)
+	# date1='{}'.format(today)
+
+	today1 ='{}\n{}'.format('Today',today1)
+	yesterday1 = '{}\n{}'.format('Yesterday',yesterday1)
+	week1 = '{}\n{}'.format('Avg Last 7 days',week1)
+	month1 = '{}\n{}'.format('Avg Last 30 days',month1)
+	
+
+	y1= DATA['duration_date']['year']
+	y2=[x.strip() for x in y1.split('to')]
+	#print(y2) 
+	y=datetime.strptime(y2[1],"%Y-%m-%d")
+	x=datetime.strptime(y2[0],"%Y-%m-%d")
+	x1=x.strftime("%b %d,%Y")
+	y1=y.strftime("%b %d,%Y")
+	yearformat='{} to {}'.format(x1,y1)
+	year1 = '{}\n{}'.format('Avg Year to Date',yearformat)
 	duration = [today1,yesterday1,week1,month1,year1]
 
 	# Row headers
@@ -1843,11 +1884,11 @@ def progress_excel_export(request):
 
 	# from garmin.models import GarminFitFiles
 
-	# start = "2018-04-04"
-	# end = "2018-04-05"
+	# start = "2018-03-27"
+	# end = "2018-04-28"
 	# a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	# for x in a1:
-	# 	print(x)
+	# 	#print(x)
 	# 	from fitparse import FitFile        
 	# 	fitfile = FitFile(x.fit_file)
 	# 	import pprint
@@ -1857,11 +1898,11 @@ def progress_excel_export(request):
 	# 		for record_data in record:
 	# 			if(record_data.name=='timestamp'):
 	# 				a=record_data.value
-	# 				print(record_data.name,record_data.value)
+	# 				#print(record_data.name,record_data.value)
 	# 			if(record_data.name=='heart_rate'):
-	# 	  			print(record_data.name,record_data.value)
+	# 	  			#print(record_data.name,record_data.value)
 	# 	  			b= record_data.value
-	# 		print()
+			
 	# 		dic[a]=b
 	# 		ls=[]
 	# 		ls1=[]
@@ -1870,28 +1911,28 @@ def progress_excel_export(request):
 	# 			pass
 	# 			age=40
 	# 			if (180-age-30)<dic[keys]<(180-age+5):
-	# 				print('aerobic')
-	# 				print(keys)
+	# 				#print('aerobic')
+	# 				#print(keys)
 	# 				ls.append(keys)
 
 	# 			elif (dic[keys]>(180-age+5)):
-	# 				print('anaerobic')
-	# 				print(keys)
+	# 				#print('anaerobic')
+	# 				#print(keys)
 	# 				ls1.append(keys)
 	# 			elif(dic[keys]<(180-age-30)):
-	# 				print('below aerobic')
-	# 				print(keys)
+	# 				#print('below aerobic')
+	# 				#print(keys)
 	# 				ls2.append(keys)
-	# 	print(pprint.pprint(dic))
+
+	# 	#print(pprint.pprint(dic))
 	# 	x=max(ls)-min(ls)
 	# 	dic1['aerobic']=x
-	# 	y=max(ls1)-min(ls1)
-	# 	dic1['anaerobic']=y
+	# 	# y=max(ls1)-min(ls1)
+	# 	# dic1['anaerobic']=y
 	# 	z=max(ls2)-min(ls2)
-		
-		
 	# 	dic1['below aerobic']=z
 	# 	print(pprint.pprint(dic1))
+	
 
 	book.close()
 	return response
