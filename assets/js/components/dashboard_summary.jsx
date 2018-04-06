@@ -1094,9 +1094,10 @@ createExcelPrintURL(){
                        </PopoverBody>
                     </Popover>
       
-            <div className="col-sm-12 col-md-12 col-lg-12">
+           <div className="col-sm-12 col-md-12 col-lg-12">
             <div className="row justify-content-center padding">
-        <table className = "table table-striped table-responsive">
+          <span className = "table table-responsive">
+        <table className = "table table-striped table-bordered">
          <thead className=" progress_table">
             <tr className=" progress_table">
                 <th className=" progress_table">Overall Health Grade</th>
@@ -1147,11 +1148,12 @@ createExcelPrintURL(){
             </tr>
         </tbody>
     </table>
+</span>
 </div>
 
 <div className="row justify-content-center padding">
-   
-     <table className = "table table-striped table-responsive">
+  <div className = "table table-responsive">
+     <table className = "table table-striped table-bordered">
          <thead>
            
                 <tr className="progress_table">
@@ -1204,12 +1206,14 @@ createExcelPrintURL(){
             </tr>
         </tbody>
     </table>
-</div>      
+</div> 
+</div>     
 
 
 
 <div className="row justify-content-center padding">
-     <table className = "table table-striped table-responsive">
+  <div className = "table table-responsive">
+     <table className = "table table-striped table-bordered">
         <thead>
             <tr className="progress_table">
                 
@@ -1272,9 +1276,11 @@ createExcelPrintURL(){
         </tbody>
     </table>
 </div>
+</div>
 
 <div className="row justify-content-center padding">
- <table className = "table table-striped table-responsive">
+ <div className = "table table-responsive">
+ <table className = "table table-striped table-bordered">
         <thead>
             <tr className="progress_table">
                 
@@ -1328,10 +1334,11 @@ createExcelPrintURL(){
         </tbody>
     </table>
 </div>
-
+</div>
 
 <div className="row justify-content-center padding">
- <table className = "table table-striped table-responsive">
+ <div className = "table table-responsive">
+ <table className = "table table-striped table-bordered">
         <thead>
             <tr className="progress_table">
                 
@@ -1384,10 +1391,12 @@ createExcelPrintURL(){
         </tbody>
     </table>
 </div>
+</div>
 
 
 <div className="row justify-content-center padding">
- <table className = "table table-striped table-responsive">
+ <div className = "table table-responsive">
+ <table className = "table  table-striped table-bordered">
         <thead>
             <tr className="progress_table">
                 
@@ -1440,9 +1449,11 @@ createExcelPrintURL(){
         </tbody>
     </table>
 </div>
+</div>
 
 <div className="row justify-content-center padding">
- <table className = "table table-striped table-responsive">
+<div className = "table table-responsive">
+ <table className = "table table-striped table-bordered">
         <thead>
             <tr className="progress_table">
                 
@@ -1497,10 +1508,12 @@ createExcelPrintURL(){
         </tbody>
     </table>
 </div>
+</div>
 
 
 <div className="row justify-content-center padding">
-    <table className = "table table-striped table-responsive">
+  <div className = "table table-responsive">
+    <table className = "table table-striped table-bordered ">
          <thead>
             <tr className="progress_table">
                 
@@ -1571,9 +1584,11 @@ createExcelPrintURL(){
             </tr>
         </tbody>
     </table>
-</div>      
+</div> 
+</div>     
 <div className=" row justify-content-center padding">
-    <table className = "table table-striped table-responsive">
+<div className = "table table-responsive">
+    <table className = "table table-striped table-bordered">
          <thead>
              
                 <tr className="progress_table">
@@ -1644,7 +1659,8 @@ createExcelPrintURL(){
             </tr>*/}
         </tbody>
     </table>
-    </div>        
+    </div> 
+    </div>       
 </div>
 {this.renderProgressFetchOverlay()}
 {this.renderProgress2FetchOverlay()}
