@@ -18,7 +18,7 @@ class RankedScore(object):
 		'avg_sleep':DEFAULT_MINIMUM_SCORE,
 		'ec':DEFAULT_MINIMUM_SCORE,
 		'prcnt_uf':DEFAULT_MINIMUM_SCORE,
-		'alcohol_drink':DEFAULT_MAXIMUM_SCORE,
+		'alcohol_drink':DEFAULT_MINIMUM_SCORE,
 		'total_steps':DEFAULT_MINIMUM_SCORE,
 		'floor_climbed':DEFAULT_MINIMUM_SCORE,
 		'resting_hr':DEFAULT_MAXIMUM_SCORE,
