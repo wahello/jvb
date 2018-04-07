@@ -227,6 +227,7 @@ class Quicklook extends Component{
 		        wind:data.exercise_reporting_ql.wind,
 		        hrr_time_to_99: data.exercise_reporting_ql.hrr_time_to_99,
 		        hrr_starting_point: data.exercise_reporting_ql.hrr_starting_point,
+		        lowest_hr_during_hrr:data.exercise_reporting_ql.lowest_hr_during_hrr,
 		        hrr_beats_lowered_first_minute:data.exercise_reporting_ql.hrr_beats_lowered_first_minute,
 		        resting_hr_last_night:data.exercise_reporting_ql.resting_hr_last_night,
 		        vo2_max:data.exercise_reporting_ql.vo2_max,
@@ -743,7 +744,7 @@ onLogoutSuccess(response){
                                           <abbr  id="abbri">
                                            <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
                                             <div className="btn3">
-                                            <Button id="nav-btn" className="btn">Print</Button>
+                                            <Button id="nav-btn" className="btn">Export Reports</Button>
                                             </div>
                                            </a>
                                           </abbr>
@@ -938,7 +939,7 @@ onLogoutSuccess(response){
 						         	   type="submit"
 						               className="btn btn-block-lg"
 						               onClick = {this.handleCreateQuicklook}>
-							               Create Raw Data Report
+							               Refresh Data
 								      </Button>
                                    </span>
                            </Navbar>

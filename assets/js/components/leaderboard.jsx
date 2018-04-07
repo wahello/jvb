@@ -1,4 +1,4 @@
- import React,{ Component } from 'react';
+import React,{ Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import FontAwesome from "react-fontawesome";
@@ -10,12 +10,62 @@ import moment from 'moment';
 
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
+import AllRank_Data from "./leaderboard_allrank";
 
 
 
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
-
+const categoryMeta = {
+	"Overall Health GPA":{
+		short_name:"oh_gpa",
+		url_name:"overall-health-gpa"
+	},
+	"Alcohol Drink":{
+		short_name:"alcohol_drink",
+		url_name:"alcohol-drink"
+	},
+	"Average Sleep":{
+		short_name:"avg_sleep",
+		url_name:"avg-sleep"
+	},
+	"Percent Unprocessed Food":{
+		short_name:"prcnt_uf",
+		url_name:"percent-unprocessed-food"
+	},
+	"Total Steps":{
+		short_name:"total_steps",
+		url_name:"total-steps"
+	},
+	"Movement Consistency":{
+		short_name:"mc",
+		url_name:"movement-consistency"
+	},
+	"Exercise Consistency":{
+		short_name:"ec",
+		url_name:"exercise-consistency"
+	},
+	"Awake Time":{
+		short_name:"awake_time",
+		url_name:"awake-time"
+	},
+	"Resting Heart Rate":{
+		short_name:"resting_hr",
+		url_name:"resting-heart-rate"
+	},
+	"Deep Sleep":{
+		short_name:"deep_sleep",
+		url_name:"deep-sleep"
+	},
+	"Movement Non Exercise GPA":{
+		short_name:"mne_gpa",
+		url_name:"movement-non-exercise-gpa"
+	},
+	"Floor Climbed":{
+		short_name:"floor_climbed",
+		url_name:"floor-climbed"
+	},
+};
 const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","mne_gpa","floor_climbed",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 
@@ -72,7 +122,6 @@ class LeaderBoard extends Component{
 		this.renderCustomRangeRankTD = this.renderCustomRangeRankTD.bind(this);
 	}
 	successLeaderBoard(data){
-		console.log("+++++++++",data);
 		this.setState({
 			ranking_data:data.data
 		});
@@ -103,7 +152,6 @@ class LeaderBoard extends Component{
         }
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
-        // console.log("=======",custom_ranges);
       fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,custom_ranges);
     });
   }
@@ -124,7 +172,6 @@ class LeaderBoard extends Component{
 
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
-        // console.log("=======",custom_ranges);
       fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,custom_ranges);
     });
   }
@@ -144,7 +191,6 @@ class LeaderBoard extends Component{
         }
         custom_ranges.push(this.state.lb3_start_date);
         custom_ranges.push(this.state.lb3_end_date);
-        // console.log("=======",custom_ranges);
       fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,custom_ranges);
     });
   }
@@ -197,14 +243,13 @@ class LeaderBoard extends Component{
 	  	for(let [duration,val] of Object.entries(value)){
 	  		if(duration == "custom_range"){
 	  			for(let [range,value1] of Object.entries(val)){
-	  				// console.log("**********",range,value1);
 	  				durations.push(range);
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "user_rank"){
 			  		 		if(!category)
 			  		 			category = c_rankData.category;
 			  		 		scores.push(c_rankData.score);
-			  		 		ranks.push(c_rankData.rank);
+			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
 	  				}
 	  			}
@@ -216,7 +261,7 @@ class LeaderBoard extends Component{
 		  		 		if(!category)
 		  		 			category = rankData.category;
 		  		 		scores.push(rankData.score);
-		  		 		ranks.push(rankData.rank);
+		  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 		  		 	}
 		  		}
 		  	}
@@ -233,9 +278,40 @@ class LeaderBoard extends Component{
 	  	let rankTableData = [<td style={{fontWeight:"bold"}}
 	  							 className = "lb_table_style_rows">
 	  							 {"Ranks"}</td>]
-	  	for(let rank of ranks){
-	  		rankTableData.push(<td className = "lb_table_style_rows">{rank}</td>);
-	  	}
+	  	if (category){
+		  	for(let rank of ranks){
+		  		if(rank.isCustomRange){
+		  			var state = {
+			  					lbCatgData:this.state.ranking_data[
+			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank}
+			  	}
+			  	else{
+			  		var state = {
+			  					lbCatgData:this.state.ranking_data[
+			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank}
+			  	}
+		  		rankTableData.push(
+			  		<td className = "lb_table_style_rows">
+			  			<Link to={{
+			  				pathname:`/leaderboard/${categoryMeta[category]["url_name"]}`,
+			  				state:state
+			  				}}>{rank.rank}
+			  			</Link>
+			  		</td>
+		  		);
+		  	}
+		 }else{
+		 	for(let rank of ranks){
+		  		rankTableData.push(
+			  		<td className = "lb_table_style_rows">
+			  			<Link to={{
+			  				pathname:`/leaderboard}`
+			  				}}>{rank?rank.rank:rank}
+			  			</Link>
+			  		</td>
+		  		);
+		  	}
+		 }
 	  	tableRows.push(<tr className = "lb_table_style_rows">{rankTableData}</tr>)
 
 	  	let scoreTableData = [<td style={{fontWeight:"bold"}}
