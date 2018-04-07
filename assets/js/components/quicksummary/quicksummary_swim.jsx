@@ -79,7 +79,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 		          width={167}
 		          fixed={true}
 		        />
-			    {this.renderTableColumns(this.props.data,"swim_stats_ql")}
+			    {this.renderTableColumns(this.props.data,"swim_stats_ql")}  
       		</Table>
 		
 		
