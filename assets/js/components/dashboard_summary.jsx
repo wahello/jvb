@@ -617,7 +617,7 @@ renderExerciseCustomRangeTD(custom_data, toReturn="data"){
                 td.push(<td className="progress_table">{value}</td>);
             }
             else{
-                td.push(<td className="progress_table">{value}</td>);
+                td.push(<td className="progress_table">{val.data}</td>);
             }
             
         }
@@ -928,7 +928,7 @@ createExcelPrintURL(){
                 </span>               
                 <span className="pdf_button" id="pdf_button">
                     <a href={this.createExcelPrintURL()}>
-                    <Button className="btn createbutton mb5" onClick={this.printDocument}>Export Excel</Button>
+                    <Button className="btn createbutton mb5" onClick={this.printDocument}>Export Report</Button>
                     </a>
                 </span>
 
@@ -1469,7 +1469,7 @@ createExcelPrintURL(){
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Workout Duration (hours:minutes)</td>
-                {this.renderExerciseCustomRangeTD(this.renderCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range))}
+                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range)}
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.yesterday)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.week)}</td>
