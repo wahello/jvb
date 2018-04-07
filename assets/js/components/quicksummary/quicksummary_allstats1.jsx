@@ -115,6 +115,7 @@ const attrVerboseName = {
     non_exercise_steps: 'Non Exercise Steps',
     exercise_steps: 'Exercise Steps',
     total_steps: 'Total Steps',
+    weight:'Weight',
     floor_climed: 'Floor Climed',
     movement_consistency: 'Movement Consistency',
 
