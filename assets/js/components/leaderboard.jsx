@@ -319,9 +319,9 @@ class LeaderBoard extends Component{
 	  	for(let score of scores){
 	  		scoreTableData.push(<td className = "lb_table_style_rows">{score}</td>);
 	  	}
-	  	tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>)
+	  	tableRows.push(<tbody><tr className = "lb_table_style_rows">{scoreTableData}</tr></tbody>)
 
-	  	return  <table className = "table table-dark table-striped table-responsive lb_table_style_rows">{tableRows}</table>;
+	  	return  <table className = "table table-striped table-responsive lb_table_style_rows">{tableRows}</table>;
   	}
   	
 	render(){
