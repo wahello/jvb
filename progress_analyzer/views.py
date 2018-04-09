@@ -11,14 +11,24 @@ from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
 
 # from quicklook.views import export_users_xls
-	
+
+
+		
+
+	# query_params = {
+	# 			"date":"2018-04-09",
+	# 		 	#"custom_ranges":"2018-02-12,2018-02-16,2018-02-13,2018-02-18",
+	# 		 	"duration":"today,yesterday,year"
+	# 		 }
+	# r = LeaderboardOverview(request.user,request.query_params).get_leaderboard()
+	# print(r)
 class ProgressReportView(APIView):
 	'''Generate Progress Analyzer Reports on the fly'''
 
 	permission_classes = (IsAuthenticated,)
 	def get(self, request, format="json"):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
-		#print(pprint.pprint(DATA))
+		print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
 
 
@@ -211,15 +221,15 @@ def progress_excel_export(request):
 		row=row+1
 		sheet10.write(row,1,sleep_per_night[i])
 
-	Ohg=['total_gpa_point','overall_health_gpa','rank','overall_health_gpa_grade']
-	mc=['movement_consistency_score','rank','movement_consistency_grade','movement_consistency_gpa']
-	non_exe=['non_exercise_steps','rank','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
-	nutri=['prcnt_unprocessed_volume_of_food','rank','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
-	Alc=['avg_drink_per_week','rank','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
-	Ec=['avg_no_of_days_exercises_per_week','rank','exercise_consistency_grade','exercise_consistency_gpa']
+	Ohg=['total_gpa_point','overall_health_gpa','overall_health_gpa_grade']
+	mc=['movement_consistency_score','movement_consistency_grade','movement_consistency_gpa']
+	non_exe=['non_exercise_steps','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
+	nutri=['prcnt_unprocessed_volume_of_food','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
+	Alc=['avg_drink_per_week','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
+	Ec=['avg_no_of_days_exercises_per_week','exercise_consistency_grade','exercise_consistency_gpa']
 	Es=['workout_duration_hours_min','workout_effort_level','avg_exercise_heart_rate','vo2_max']
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
-	slept=['total_sleep_in_hours_min','rank','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
+	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
 
 	query_params = {
 	"date":rdate,
@@ -227,7 +237,7 @@ def progress_excel_export(request):
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
-
+	#print(DATA)
 	time1=['today','yesterday','week','month','year']
 	c = 1
 	r=1
@@ -236,33 +246,33 @@ def progress_excel_export(request):
 		r=r+1
 		sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
 		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
-		sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
+		#sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
 		# sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
 		
 		sheet10.write(9,c,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
-		sheet10.write(10,c,DATA['summary']['mc']['rank'][time1[i]],format_align)
+		#sheet10.write(10,c,DATA['summary']['mc']['rank'][time1[i]],format_align)
 		# sheet10.write(11,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
 		sheet10.write(12,c,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		
 		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
-		sheet10.write(16,c,DATA['summary']['non_exercise']['rank'][time1[i]])
+		#sheet10.write(16,c,DATA['summary']['non_exercise']['rank'][time1[i]])
 		# sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
 		sheet10.write(18,c,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
 		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
 		
 		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
-		sheet10.write(23,c,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
+		#sheet10.write(23,c,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
 		# sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		
 
 		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
-		sheet10.write(29,c,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
+		#sheet10.write(29,c,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
 		# sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
 		
 		sheet10.write(34,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
-		sheet10.write(35,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
+		#sheet10.write(35,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
 		# sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 		sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
 		
@@ -472,7 +482,7 @@ def progress_excel_export(request):
 			for n in range(len(non_exe)):
 				r= r+1	
 				sheet10.write(r,c,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],format_align1)
 
 			r=21
 			for n in range(len(nutri)):
@@ -520,71 +530,71 @@ def progress_excel_export(request):
 			elif (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data']=='F'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data'],red)
 			
-			if (DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data'],green)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data'],lawn_green)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data'],yellow)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data'],orange)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data'],red)
+			if (DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data']=='A'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data'],green)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data']=='B'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data'],lawn_green)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data']=='C'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data'],yellow)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data']=='D'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data'],orange)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data']=='F'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data'],red)
 			
-			if (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],green)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],lawn_green)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],yellow)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],orange)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],red)
+			if (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data']=='A'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],green)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data']=='B'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],lawn_green)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data']=='C'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],yellow)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data']=='D'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],orange)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data']=='F'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],red)
 				
-			if (DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data'],green)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data'],lawn_green)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data'],yellow)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data'],orange)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][custom_range1]['data'],red)
+			if (DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data']=='A'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data'],green)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data']=='B'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data'],lawn_green)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data']=='C'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data'],yellow)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data']=='D'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data'],orange)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data']=='F'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data'],red)
 
-			if (DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data']=='A'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data'],green)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data']=='B'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data'],lawn_green)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data']=='C'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data'],yellow)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data']=='D'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data'],orange)
-			if (DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data']=='F'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][custom_range1]['data'],red)
+			if (DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data']=='A'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],green)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data']=='B'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],lawn_green)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data']=='C'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],yellow)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data']=='D'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],orange)
+			if (DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data']=='F'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],red)
 
-			if (DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data'],green)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data'],lawn_green)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data'],yellow)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data'],orange)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][custom_range1]['data'],red)
+			if (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='A'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],green)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='B'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],lawn_green)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='C'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],yellow)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='D'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],orange)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='F'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],red)
 
-			if (DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],green)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],lawn_green)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],yellow)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],orange)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],red)
+			if (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='A'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],green)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='B'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],lawn_green)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='C'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],yellow)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='D'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],orange)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='F'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],red)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']=='00:00'):
 				sheet10.write(40,c,'No Workout',format_align)
@@ -944,7 +954,7 @@ def progress_excel_export(request):
 			for n in range(len(non_exe)):
 				r= r+1	
 				sheet10.write(r,c,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],format_align1)
 
 			r=21
 			for n in range(len(nutri)):
@@ -992,71 +1002,71 @@ def progress_excel_export(request):
 			elif (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data']=='F'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data'],red)
 			
-			if (DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],green)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],lawn_green)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],yellow)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],orange)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],red)
+			if (DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data']=='A'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],green)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data']=='B'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],lawn_green)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data']=='C'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],yellow)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data']=='D'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],orange)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data']=='F'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],red)
 			
-			if (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],green)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],lawn_green)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],yellow)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],orange)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],red)
+			if (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data']=='A'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],green)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data']=='B'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],lawn_green)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data']=='C'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],yellow)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data']=='D'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],orange)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data']=='F'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],red)
 				
-			if (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data'],green)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data'],lawn_green)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data'],yellow)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data'],orange)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list1[i]]['data'],red)
+			if (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data']=='A'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data'],green)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data']=='B'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data'],lawn_green)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data']=='C'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data'],yellow)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data']=='D'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data'],orange)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data']=='F'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data'],red)
 
-			if (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data']=='A'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data'],green)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data']=='B'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data'],lawn_green)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data']=='C'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data'],yellow)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data']=='D'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data'],orange)
-			if (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data']=='F'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list1[i]]['data'],red)
+			if (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data']=='A'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],green)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data']=='B'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],lawn_green)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data']=='C'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],yellow)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data']=='D'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],orange)
+			if (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data']=='F'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],red)
 
-			if (DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data'],green)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data'],lawn_green)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data'],yellow)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data'],orange)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list1[i]]['data'],red)
+			if (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='A'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],green)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='B'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],lawn_green)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='C'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],yellow)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='D'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],orange)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='F'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],red)
 
-			if (DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],green)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],lawn_green)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],yellow)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],orange)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],red)
+			if (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='A'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],green)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='B'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],lawn_green)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='C'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],yellow)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='D'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],orange)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='F'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],red)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data']=='00:00'):
 				sheet10.write(40,c,'No Workout',format_align)
@@ -1412,7 +1422,7 @@ def progress_excel_export(request):
 			for n in range(len(non_exe)):
 				r= r+1	
 				sheet10.write(r,c,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],format_align1)
 
 			r=21
 			for n in range(len(nutri)):
@@ -1460,71 +1470,71 @@ def progress_excel_export(request):
 			elif (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data']=='F'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data'],red)
 			
-			if (DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],green)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],lawn_green)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],yellow)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],orange)
-			elif (DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(11,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],red)
+			if (DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data']=='A'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],green)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data']=='B'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],lawn_green)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data']=='C'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],yellow)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data']=='D'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],orange)
+			elif (DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data']=='F'):
+				sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],red)
 			
-			if (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],green)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],lawn_green)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],yellow)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],orange)
-			elif (DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],red)
+			if (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data']=='A'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],green)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data']=='B'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],lawn_green)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data']=='C'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],yellow)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data']=='D'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],orange)
+			elif (DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data']=='F'):
+				sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],red)
 				
-			if (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data'],green)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data'],lawn_green)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data'],yellow)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data'],orange)
-			elif (DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[2]]['custom_range'][list2[i]]['data'],red)
+			if (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data']=='A'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data'],green)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data']=='B'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data'],lawn_green)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data']=='C'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data'],yellow)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data']=='D'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data'],orange)
+			elif (DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data']=='F'):
+				sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data'],red)
 
-			if (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data']=='A'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data'],green)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data']=='B'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data'],lawn_green)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data']=='C'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data'],yellow)
-			elif (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data']=='D'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data'],orange)
-			if (DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data']=='F'):	
-				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[2]]['custom_range'][list2[i]]['data'],red)
+			if (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data']=='A'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],green)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data']=='B'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],lawn_green)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data']=='C'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],yellow)
+			elif (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data']=='D'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],orange)
+			if (DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data']=='F'):	
+				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],red)
 
-			if (DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data'],green)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data'],lawn_green)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data'],yellow)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data'],orange)
-			elif (DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[2]]['custom_range'][list2[i]]['data'],red)
+			if (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='A'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],green)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='B'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],lawn_green)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='C'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],yellow)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='D'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],orange)
+			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='F'):
+				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],red)
 
-			if (DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],green)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],lawn_green)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],yellow)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],orange)
-			elif (DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],red)
+			if (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='A'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],green)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='B'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],lawn_green)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='C'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],yellow)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='D'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],orange)
+			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='F'):
+				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],red)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data']=='00:00'):
 				sheet10.write(40,c,'No Workout',format_align)
@@ -2056,8 +2066,26 @@ def progress_excel_export(request):
 	# 	z=max(ls2)-min(ls2)
 	# 	dic1['below aerobic']=z
 	# 	print(pprint.pprint(dic1))
-	
+	class LeaderBoardAPIView(APIView):
+		permission_classes = (IsAuthenticated, )
 
+		def get(self, request, format="Json"):
+			# query_params = {
+			# 	"date":"2018-02-19",
+			# 	"custom_ranges":"2018-02-12,2018-02-16,2018-02-13,2018-02-18",
+			# 	"duration":"today,yesterday,year"
+			# }
+			r = LeaderboardOverview(request.user,request.query_params).get_leaderboard()
+			print(r)
+			return Response(r, status=status.HTTP_200_OK)
+			# query_params = {
+			#  	"date":"2018-02-19",
+			#  	"custom_ranges":"2018-02-12,2018-02-16,2018-02-13,2018-02-18",
+			#  	"duration":"today,yesterday,year",
+			#  	"oh_gpa":"week"
+			# }
+			# r = LeaderboardOverview(request.user,request.query_params).get_leaderboard()
+			# print(r)
 
 
 	book.close()
