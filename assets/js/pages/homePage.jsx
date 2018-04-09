@@ -29,6 +29,7 @@ import ServiceConnect_fitBit from '../components/serviceConnect_fitbit';
 import Activity_Type from '../components/activity_types';
 import LeaderBoard from '../components/leaderboard';
 import FitBit from '../components/fitbitData';
+import AllRank_Data from '../components/leaderboard_allrank';
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -38,7 +39,6 @@ const createStoreWithMiddleware = applyMiddleware(promise,thunk)(createStore);
 
 // reconcile the user state, ie. Authenticated or not with server
 // and maintain this in local state "persisted_state"
-
 function initializeLocalState(){
 	let state = {authenticated:false,
 				 terms_accepted:false};
@@ -70,7 +70,8 @@ function initializeLocalState(){
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
 					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />
-					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />					
+					<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />				
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 			    </Switch>
