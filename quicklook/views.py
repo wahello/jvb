@@ -6,6 +6,7 @@ import json
 import xlsxwriter
 import pprint
 
+from django.http import JsonResponse  
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -218,6 +219,46 @@ class SleepListView(generics.ListCreateAPIView):
 	permission_classes = (IsAuthenticated,)
 	queryset = Sleep.objects.all()
 	serializer_class = SleepSerializer
+
+def hrr_calculations(request):
+	
+	from registration.models import Profile
+	from fitparse import FitFile
+	from garmin.models import GarminFitFiles
+	start = "2018-04-07"
+	end = "2018-04-08"
+	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	kd = Profile.objects.filter(user=request.user)
+	for ss in kd:
+		cc = ss.date_of_birth
+	today = date.today()
+	age_user = today.year - cc.year
+	lis = []
+	for x in a1:
+		# print(x)
+		fitfile = FitFile(x.fit_file)
+		for record in fitfile.get_messages('record'):
+			for record_data in record:
+				if(record_data.name=='heart_rate'):
+					b = record_data.value
+					lis.extend([b])
+	
+	total_time = len(lis)
+	avg = int(sum(lis)/total_time)
+
+	below_aerobic_value = 180-age_user-30
+	anaerobic_value = 180-age_user+5
+
+	time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
+	time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
+	time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
+
+	data = {"total_time":total_time,
+			"aerobic_zone":time_in_aerobic,
+			"anaerobic _range":time_in_anaerobic,
+			"below_aerobic_zone":time_in_below_aerobic}
+
+	return JsonResponse(data)
 
 def export_users_xls(request):
 	to_date1 = request.GET.get('to_date',None)
@@ -1845,6 +1886,7 @@ def export_users_xls(request):
 			sheet5.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 
+	
 	# from registration.models import Profile
 	# from fitparse import FitFile
 	# from garmin.models import GarminFitFiles
@@ -1856,22 +1898,30 @@ def export_users_xls(request):
 	# 	cc = ss.date_of_birth
 	# today = date.today()
 	# dd = today.year - cc.year
-
+	# lis = []
 	# for x in a1:
 	# 	# print(x)
 	# 	fitfile = FitFile(x.fit_file)
 	# 	dic={}
 	# 	for record in fitfile.get_messages('record'):
 	# 		for record_data in record:
-	# 			if(record_data.name=='timestamp'):
-	# 				a=record_data.value
-	# 				print(a)
 	# 			if(record_data.name=='heart_rate'):
-	# 				b= record_data.value
-	# 				print(b)
-	# 	dic[a]=b
-		# print(dic)
+	# 				b = record_data.value
+	# 				lis.extend([b])
+	
+	# avg = int(sum(lis)/len(lis))
+	# print(avg)
 
+	# below_aerobic_value = 180-dd-30
+	# anaerobic_value = 180-dd+5
+
+	# time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
+	# time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
+	# time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
+	# print(len(lis))
+	# print(time_in_anaerobic)
+	# print(time_in_below_aerobic)
+	# print(time_in_aerobic)
 
 
 	# Exercise Reporting
@@ -2129,7 +2179,10 @@ def export_users_xls(request):
 
 
 	current_date = to_date
-	rem_row = i+k
+	if data:
+		rem_row = i+k
+	else:
+		rem_row = i
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
