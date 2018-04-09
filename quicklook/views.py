@@ -15,7 +15,9 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
+from fitparse import FitFile
 from garmin.models import GarminFitFiles
+from registration.models import Profile
 from user_input.models import DailyUserInputOptional ,\
 							  DailyUserInputEncouraged,\
 							  DailyUserInputStrong
@@ -221,12 +223,11 @@ class SleepListView(generics.ListCreateAPIView):
 	serializer_class = SleepSerializer
 
 def hrr_calculations(request):
-	
-	from registration.models import Profile
-	from fitparse import FitFile
-	from garmin.models import GarminFitFiles
-	start = "2018-04-07"
-	end = "2018-04-08"
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	start = start_date
+	end = start + timedelta(days=1)
+	print(start,end)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	kd = Profile.objects.filter(user=request.user)
 	for ss in kd:
@@ -252,11 +253,18 @@ def hrr_calculations(request):
 	time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
 	time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
 	time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
-
+	
+	percent_anaerobic = int((time_in_anaerobic/total_time)*100)
+	percent_below_aerobic = int((time_in_below_aerobic/total_time)*100)
+	percent_aerobic = int((time_in_aerobic/total_time)*100)
+	
 	data = {"total_time":total_time,
 			"aerobic_zone":time_in_aerobic,
-			"anaerobic _range":time_in_anaerobic,
-			"below_aerobic_zone":time_in_below_aerobic}
+			"anaerobic_range":time_in_anaerobic,
+			"below_aerobic_zone":time_in_below_aerobic,
+			"percent_aerobic":percent_aerobic,
+			"percent_below_aerobic":percent_below_aerobic,
+			"percent_anaerobic":percent_anaerobic}
 
 	return JsonResponse(data)
 

@@ -6,11 +6,11 @@ axiosRetry(axios, { retries: 4});
 
 export default function fetchHeartRateData(successHeartRate,errorHeartRate,selectedDate){   
   selectedDate = moment(selectedDate);
-  const URL=`/leaderboard/`;
+  const URL=`/quicklook/hrr_calculations`;
   const config={
    method:"get",
    params:{
-   date: selectedDate.format('YYYY-MM-DD')
+   start_date: selectedDate.format('YYYY-MM-DD')
  },
    url:URL,
    withCredentials: true
