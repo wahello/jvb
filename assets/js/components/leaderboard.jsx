@@ -55,7 +55,7 @@ const categoryMeta = {
 	},
 	"Deep Sleep":{
 		short_name:"deep_sleep",
-		url_name:"deep-sleep"
+		url_name:"deep-sleep" 
 	},
 	"Movement Non Exercise GPA":{
 		short_name:"mne_gpa",
@@ -119,7 +119,6 @@ class LeaderBoard extends Component{
 		this.toggleDate2 = this.toggleDate2.bind(this);
 		this.toggleDate3 = this.toggleDate3.bind(this);
 		this.handleChange = this.handleChange.bind(this);
-		this.renderCustomRangeRankTD = this.renderCustomRangeRankTD.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
@@ -322,38 +321,13 @@ class LeaderBoard extends Component{
 	  	}
 	  	tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>)
 
-	  	return  <table className = "table table-striped table-hover table-responsive lb_table_style_rows">{tableRows}</table>;
+	  	return  <table className = "table table-dark table-striped table-responsive lb_table_style_rows">{tableRows}</table>;
   	}
-  	renderCustomRangeRankTD(custom_data, toReturn="data"){
-    let td=[];
-    if(!custom_data){
-        return td;
-    }
-   
-    for (let[key,val] of Object.entries(custom_data)){
-        for(let [key1,val1] of Object.entries(val)){
-          if(key1 == "user_rank"){
-                 td.push(<td className="progress_table">{val1.rank}</td>);
-               }
-      }
-        if(toReturn == "key"){
-            let str = key;
-            let d = str.split(" ");
-            let d1 = d[0];
-            let date1 =moment(d1).format('MMM DD, YYYY');
-            let d2 = d[2];
-            let date2 =moment(d2).format('MMM DD, YYYY');
-            let date = date1 + ' to ' + date2;
-            td.push(<th className="progress_table">{date}</th>);
-        }
-    }
-    return td;
-}
+  	
 	render(){
 		 const {fix} = this.props;
 		return(
-			<div>
-			 <div className="container-fluid">
+			<div className="container-fluid">
 		         <Navbar toggleable
 		         fixed={fix ? 'top' : ''}
 		          className="navbar navbar-expand-sm navbar-inverse nav6">
@@ -391,8 +365,6 @@ class LeaderBoard extends Component{
 		            </Nav>
 		          </Collapse>
 		        </Navbar>
-      		</div>
-
 
       		<div className = "row justify-content-center"> 
                 <span id="navlink" onClick={this.toggleCalendar} id="progress">
@@ -541,7 +513,7 @@ class LeaderBoard extends Component{
                         </div>
                     </PopoverBody>
                 </Popover>
-
+            <div className="col-sm-12 col-md-12 col-lg-12">
 	        <div className = "row justify-content-center lb_table_style">
 		        {this.renderTablesTd(this.state.ranking_data.oh_gpa)}
 	        </div>
@@ -577,6 +549,7 @@ class LeaderBoard extends Component{
 	        </div>
 	        <div className = "row justify-content-center lb_table_style">
 	        	{this.renderTablesTd(this.state.ranking_data.floor_climbed)}
+	        </div>
 	        </div>
 	        </div>
 		)

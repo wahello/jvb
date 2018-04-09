@@ -28,12 +28,13 @@ class Dashboard extends Component {
 							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
+							  <Link to='/leaderboard'>Leader Board</Link><br/>
+							   <Link to='/heartrate'>Heart Rate Recovery</Link><br/>
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
 							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
 							  <Link to='/rawdata#grades'>Grades</Link><br/>
 							  <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
-							  {/*<Link to='/leaderboard'>Leader Board</Link><br/>*/}
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
 							  <h3 id="link_style">Set up Links to Garmin</h3>
 							  <a href='/users/request_token'>Garmin Health Connect</a><br/>

@@ -204,11 +204,11 @@ getDayWithDate(date){
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
-            A: { background: 'green', color: 'white' },
-            B: { background: 'green', color: 'white' },
-            C: { background: 'yellow', color: 'black'},
-            D: { background: 'yellow', color: 'black'},
-            F: { background: 'red', color: 'black' }
+            A: { background: 'green', color: 'white'},
+            B: { background: '#32CD32', color: 'white' },
+            C: { background: 'yellow', color:'black' },
+            D: { background: '#FF8C00', color:'black' },
+            F: { background: 'red', color: 'black' },
         };
         let avgHrKeys =  [];
         let keys = [];
