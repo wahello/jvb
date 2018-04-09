@@ -20,38 +20,41 @@ export default class AllRank_Data extends Component{
 		let rowData = [];
 		let category = ["username","score","category","rank"];
 		let keys = [];
-		let values =[];
-		for (let cat of category){
-			keys.push(cat);
-			for (let [key,value] of Object.entries(data)){
+		
+		for (let [key,value] of Object.entries(data)){
 				for (let [key1,value1] of Object.entries(value)){
-					values.push(value1[cat]);
-				}
+					let values =[];
+					for (let cat of category){
+						values.push(<td className = "progress_table">{value1[cat]}</td>);
+					}
+				rowData.push(<tr className = "progress_table">{values}</tr>);
 			}
 		}
-		let tableHeaders = [];
-		for (let head of keys){
-			tableHeaders.push(<th>{head}</th>);
-		}
-		rowData.push(<tr>{tableHeaders}</tr>);
-
-		let tableData = [];
-		for (let info of values){
-			tableData.push(<td>{info}</td>);
-		}
-		rowData.push(<tr>{tableData}</tr>);
+		
 		return rowData;
 	}
 	render(){
 		return(
 			<div>
-			<NavbarMenu fix={true}/>
-			<div style = {{paddingTop:"150px"}}>
-			<table>
-			{this.renderTable(this.props.location.state)}
-			</table>
+				<NavbarMenu fix={true}/>
+					<div className="col-sm-12 col-md-12 col-lg-12">
+					<div style = {{paddingTop:"80px"}} className = "row justify-content-center ar_table_padd">
+					<div className = "table table-responsive ">
+    				<table className = "table table-striped table-bordered"> 
+						<thead className = "progress_table">
+							<th className = "progress_table">Username</th>
+							<th className = "progress_table">Score</th>
+							<th className = "progress_table">Category</th>
+							<th className = "progress_table">Rank</th>
+						</thead>
+						<tbody className = "progress_table">
+							{this.renderTable(this.props.location.state)}
+						</tbody>
+					</table>
+					</div>
+					</div>
+					</div>
 			</div>
-			</div>
-			)
+		)
 	}
 }

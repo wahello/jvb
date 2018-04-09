@@ -30,6 +30,7 @@ import Activity_Type from '../components/activity_types';
 import LeaderBoard from '../components/leaderboard';
 import FitBit from '../components/fitbitData';
 import AllRank_Data from '../components/leaderboard_allrank';
+import HeartRate from '../components/Heart_rate_recovery';
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -71,7 +72,8 @@ function initializeLocalState(){
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
 					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />
 					<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
-					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />				
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />
+					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 			    </Switch>
