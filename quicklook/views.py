@@ -254,9 +254,11 @@ def hrr_calculations(request):
 	time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
 	time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
 	
-	percent_anaerobic = int((time_in_anaerobic/total_time)*100)
-	percent_below_aerobic = int((time_in_below_aerobic/total_time)*100)
-	percent_aerobic = int((time_in_aerobic/total_time)*100)
+	percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
+	percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
+	percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+	
+	total_percent = 100
 	
 	data = {"total_time":total_time,
 			"aerobic_zone":time_in_aerobic,
@@ -264,7 +266,8 @@ def hrr_calculations(request):
 			"below_aerobic_zone":time_in_below_aerobic,
 			"percent_aerobic":percent_aerobic,
 			"percent_below_aerobic":percent_below_aerobic,
-			"percent_anaerobic":percent_anaerobic}
+			"percent_anaerobic":percent_anaerobic,
+			"total_percent":total_percent}
 
 	return JsonResponse(data)
 
