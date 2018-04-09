@@ -9,3 +9,11 @@
 	border-collapse: collapse;
 	border-color:lightgray !important;
 }
+.ar_table_padd{
+	padding:0px 50px;
+}
+@media (max-width: 1023px){
+	.ar_table_padd{
+		padding:0px 25px;
+	}
+}
