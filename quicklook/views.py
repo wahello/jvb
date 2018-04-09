@@ -756,7 +756,7 @@ def export_users_xls(request):
 
 	#Sleep
 
-	columns5 = ['sleep_per_wearable','sleep_comments',  'sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
+	columns5 = ['sleep_per_wearable','sleep_comments','sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
 	'sleep_awake_time','deep_sleep','light_sleep','awake_time']
 	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 
 	'Resting Heart Rate (RHR)','Sleep per Wearable (excluding awake time)',
@@ -2508,9 +2508,7 @@ def export_users_xls(request):
 	sheet10.set_column('H:H',1)
 	sheet10.set_column('C:G',16)
 	sheet10.set_column('J:N',16)
-	
 	sheet10.set_row(0,45)
-	
 	sheet10.set_landscape()
 
 	#Headings
@@ -2533,7 +2531,9 @@ def export_users_xls(request):
                             'font_size':10
                            })
 	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
-	
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
+	format_align = book.add_format({'align':'left'})
 	
 	sheet10.conditional_format('B4:G7', {'type': 'no_errors',
                                           'format': border_format})
@@ -2554,9 +2554,7 @@ def export_users_xls(request):
 	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
                                           'format': border_format})
 
-	format = book.add_format({'bold': True})
-	format.set_text_wrap()
-	format_align = book.add_format({'align':'left'})
+	
 	custom_range='{} to {}'.format(from_date,to_date)
 	to_date1 = '{}'.format(to_date)
 	query_params = {
@@ -2605,6 +2603,10 @@ def export_users_xls(request):
 	# avg_month ='{} to {}'.format(monthf,yestf)
 	#avg_year = '{} to {}'.format(year1,yestf)
 	# date1='{}'.format(today)
+
+	report_date= DATA['report_date']
+	rdate1=datetime.strptime(report_date,"%Y-%m-%d").date()
+	rdate='{}'.format(rdate1)
 
 	today1 ='{}\n{}'.format('Today',today1)
 	yesterday1 = '{}\n{}'.format('Yesterday',yesterday1)
@@ -2706,7 +2708,7 @@ def export_users_xls(request):
 	date1='{}'.format(today)
 	
 	query_params = {
-	"date":to_date1,
+	"date":rdate,
 	"duration":"today,yesterday,week,month,year",
 	"custom_ranges":custom_range,
 	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
@@ -2824,6 +2826,7 @@ def export_users_xls(request):
 		
 		# color formatting based on grades
 		green = book.add_format({'align':'left', 'bg_color': 'green'})
+		lawn_green=book.add_format({'align':'left','bg_color':'#32d358'})
 		yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
 		red = book.add_format({'align':'left', 'bg_color': 'red'})
 		orange = book.add_format({'align':'left', 'bg_color': 'orange'})
@@ -2831,7 +2834,7 @@ def export_users_xls(request):
 		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
 			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
 		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='B'):
-			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='C'):
 			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],yellow)
 		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='D'):
@@ -2842,7 +2845,7 @@ def export_users_xls(request):
 		if (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='A'):
 			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='B'):
-			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
+			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='C'):
 			sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],yellow)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
@@ -2853,7 +2856,7 @@ def export_users_xls(request):
 		if (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='A'):
 			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='B'):
-			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
+			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='C'):
 			sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],yellow)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='D'):
@@ -2864,7 +2867,7 @@ def export_users_xls(request):
 		if (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='A'):
 				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],green)
 		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='B'):
-				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],green)
+				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='C'):
 				sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],yellow)
 		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='D'):
@@ -2875,7 +2878,7 @@ def export_users_xls(request):
 		if (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='A'):
 			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],green)
 		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='B'):
-			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],green)
+			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='C'):
 			sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],yellow)
 		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='D'):
@@ -2886,7 +2889,7 @@ def export_users_xls(request):
 		if (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='A'):
 			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],green)
 		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='B'):
-			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],green)
+			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='C'):
 			sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],yellow)
 		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='D'):
@@ -2897,19 +2900,19 @@ def export_users_xls(request):
 		if (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='A'):	
 			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
 		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='B'):	
-			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='C'):	
-			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],yellow)
 		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='D'):	
-			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],orange)
 		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='F'):	
-			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+			sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],red)
 
 		if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
 			sheet10.write(10,c,'No Workout',format_align)
 		else:
 			sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
-		if(DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
 			sheet10.write(24,c,'No Workout',format_align)
 		else:
 			sheet10.write(24,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
@@ -2928,21 +2931,30 @@ def export_users_xls(request):
 			sheet10.write(27,c,'Not provided')
 		else:
 			sheet10.write(27,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
-				
-		if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00'):
-				sheet10.write(32,c,'No Workout')
+		
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
+			if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00'):
+					sheet10.write(32,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(32,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 		else:
-			sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
-
-		if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
+			sheet10.write(32,c,'No Workout',format_align)
+		
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
+			if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
+				sheet10.write(33,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(33,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+		else:
 			sheet10.write(33,c,'No Workout',format_align)
+		
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):	
+			if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
+				sheet10.write(34,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(34,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 		else:
-			sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
-			
-		if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
 			sheet10.write(34,c,'No Workout',format_align)
-		else:
-			sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
 
 
 		# sheet10.conditional_format('A1:T50', {'type':'cell', 

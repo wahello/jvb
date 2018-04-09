@@ -97,3 +97,4 @@ class LeaderBoardAPIView(APIView):
 		# }
 		r = LeaderboardOverview(request.user,request.query_params).get_leaderboard()
 		return Response(r, status=status.HTTP_200_OK)
+		print(r)
