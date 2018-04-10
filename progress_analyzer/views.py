@@ -262,7 +262,7 @@ def progress_excel_export(request):
 		
 		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
 		#sheet10.write(23,c,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
-		# sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+		#sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		
 
@@ -463,61 +463,79 @@ def progress_excel_export(request):
 		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
-		print(pprint.pprint(DATA))
+		#print(pprint.pprint(DATA))
 		c=6
 		for i in range(1):
 			c = c + 1
-			r=2
-			for n in range(len(Ohg)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][custom_range1]['data'],format_align1)
-			r=8
-			for n in range(len(mc)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['mc'][mc[n]]['custom_range'][custom_range1]['data'],format_align)	
-			sheet10.write(12,c,DATA['summary']['mc'][mc[-1]]['custom_range'][custom_range1]['data'],format_align1)	
-			
-			r=14
-			for n in range(len(non_exe)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],format_align1)
+			# r=2
+			# for n in range(len(Ohg)):
+			# 	r= r+1
+			sheet10.write(3,c,DATA['summary']['overall_health'][Ohg[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(5,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[2]]['custom_range'][custom_range1]['data'],format_align)
 
-			r=21
-			for n in range(len(nutri)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['nutrition'][nutri[n]]['custom_range'][custom_range1]['data'],format_align)
+			# r=8
+			# for n in range(len(mc)):
+			# 	r= r+1	
+			sheet10.write(9,c,DATA['summary']['mc'][mc[0]]['custom_range'][custom_range1]['data'],format_align)	
+			sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][custom_range1]['data'],format_align)	
+			sheet10.write(12,c,DATA['summary']['mc'][mc[2]]['custom_range'][custom_range1]['data'],format_align1)	
+			
+			# r=14
+			# for n in range(len(non_exe)):
+			# 	r= r+1	
+			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][custom_range1]['data'],format_align1)
+
+			# r=21
+			# for n in range(len(nutri)):
+			# 	r= r+1
+			sheet10.write(22,c,DATA['summary']['nutrition'][nutri[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(25,c,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][custom_range1]['data'],format_align1)
 
-			r=27
-			for n in range(len(Alc)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['alcohol'][Alc[n]]['custom_range'][custom_range1]['data'],format_align)
+			# r=27
+			# for n in range(len(Alc)):
+			# 	r= r+1	
+			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align1)
 
-			r=33
-			for n in range(len(Ec)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][custom_range1]['data'],format_align)
+			# r=33
+			# for n in range(len(Ec)):
+			# 	r= r+1
+			sheet10.write(34,c,DATA['summary']['ec'][Ec[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(37,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][custom_range1]['data'],format_align1)
 
-			r=40
-			for n in range(len(Es)):
-				r= r+1
-				#sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][custom_range1]['data'],format_align)
-			
-			r=45
-			for n in range(len(other1)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][custom_range1]['data'],format_align)
-				
-			r=53
-			for n in range(len(slept)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][custom_range1]['data'],format_align)
-			
-			
+			# r=40
+			# for n in range(len(Es)):
+			# 	r= r+1
+			sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
+
+			# r=45
+			# for n in range(len(other1)):
+			# 	r= r+1
+			sheet10.write(46,c,DATA['summary']['other'][other1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(50,c,DATA['summary']['other'][other1[4]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(51,c,DATA['summary']['other'][other1[5]]['custom_range'][custom_range1]['data'],format_align)
+
+			# r=53
+			# for n in range(len(slept)):
+			# 	r= r+1
+			sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(57,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(58,c,DATA['summary']['sleep'][slept[3]]['custom_range'][custom_range1]['data'],format_align)
+
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data'],green)
@@ -939,57 +957,72 @@ def progress_excel_export(request):
 		c=6
 		for i in range(len(list1)):
 			c = c + 1
-			r=2
-			for n in range(len(Ohg)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list1[i]]['data'],format_align1)
-			r=8
-			for n in range(len(mc)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['mc'][mc[n]]['custom_range'][list1[i]]['data'],format_align)	
-			sheet10.write(12,c,DATA['summary']['mc'][mc[-1]]['custom_range'][list1[i]]['data'],format_align1)	
-			
-			r=14
-			for n in range(len(non_exe)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(3,c,DATA['summary']['overall_health'][Ohg[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(5,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[2]]['custom_range'][list1[i]]['data'],format_align)
 
-			r=21
-			for n in range(len(nutri)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['nutrition'][nutri[n]]['custom_range'][list1[i]]['data'],format_align)
+			# r=8
+			# for n in range(len(mc)):
+			# 	r= r+1	
+			sheet10.write(9,c,DATA['summary']['mc'][mc[0]]['custom_range'][list1[i]]['data'],format_align)	
+			sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],format_align)	
+			sheet10.write(12,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],format_align1)	
+			
+			# r=14
+			# for n in range(len(non_exe)):
+			# 	r= r+1	
+			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list1[i]]['data'],format_align1)
+
+			# r=21
+			# for n in range(len(nutri)):
+			# 	r= r+1
+			sheet10.write(22,c,DATA['summary']['nutrition'][nutri[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(25,c,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list1[i]]['data'],format_align1)
 
-			r=27
-			for n in range(len(Alc)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['alcohol'][Alc[n]]['custom_range'][list1[i]]['data'],format_align)
+			# r=27
+			# for n in range(len(Alc)):
+			# 	r= r+1	
+			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align1)
 
-			r=33
-			for n in range(len(Ec)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][list1[i]]['data'],format_align)
+			# r=33
+			# for n in range(len(Ec)):
+			# 	r= r+1
+			sheet10.write(34,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(37,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list1[i]]['data'],format_align1)
 
-			r=40
-			for n in range(len(Es)):
-				r= r+1
-				#sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][custom_range1]['data'],format_align)
-			
-			r=45
-			for n in range(len(other1)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][list1[i]]['data'],format_align)
-				
-			r=53
-			for n in range(len(slept)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][list1[i]]['data'],format_align)
-			
-			
+			# r=40
+			# for n in range(len(Es)):
+			# 	r= r+1
+			sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list1[i]]['data'],format_align)
+
+			# r=45
+			# for n in range(len(other1)):
+			# 	r= r+1
+			sheet10.write(46,c,DATA['summary']['other'][other1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(50,c,DATA['summary']['other'][other1[4]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(51,c,DATA['summary']['other'][other1[5]]['custom_range'][list1[i]]['data'],format_align)
+
+			# r=53
+			# for n in range(len(slept)):
+			# 	r= r+1
+			sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(57,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(58,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list1[i]]['data'],format_align)
+
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data'],green)
@@ -1407,57 +1440,72 @@ def progress_excel_export(request):
 		c=6
 		for i in range(len(list2)):
 			c = c + 1
-			r=2
-			for n in range(len(Ohg)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(4,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list2[i]]['data'],format_align1)
-			r=8
-			for n in range(len(mc)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['mc'][mc[n]]['custom_range'][list2[i]]['data'],format_align)	
-			sheet10.write(12,c,DATA['summary']['mc'][mc[-1]]['custom_range'][list2[i]]['data'],format_align1)	
-			
-			r=14
-			for n in range(len(non_exe)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(3,c,DATA['summary']['overall_health'][Ohg[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(5,c,DATA['summary']['overall_health'][Ohg[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[2]]['custom_range'][list2[i]]['data'],format_align)
 
-			r=21
-			for n in range(len(nutri)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['nutrition'][nutri[n]]['custom_range'][list2[i]]['data'],format_align)
+			# r=8
+			# for n in range(len(mc)):
+			# 	r= r+1	
+			sheet10.write(9,c,DATA['summary']['mc'][mc[0]]['custom_range'][list2[i]]['data'],format_align)	
+			sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],format_align)	
+			sheet10.write(12,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],format_align1)	
+			
+			# r=14
+			# for n in range(len(non_exe)):
+			# 	r= r+1	
+			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list2[i]]['data'],format_align1)
+
+			# r=21
+			# for n in range(len(nutri)):
+			# 	r= r+1
+			sheet10.write(22,c,DATA['summary']['nutrition'][nutri[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(24,c,DATA['summary']['nutrition'][nutri[1]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(25,c,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list2[i]]['data'],format_align1)
 
-			r=27
-			for n in range(len(Alc)):
-				r= r+1	
-				sheet10.write(r,c,DATA['summary']['alcohol'][Alc[n]]['custom_range'][list2[i]]['data'],format_align)
+			# r=27
+			# for n in range(len(Alc)):
+			# 	r= r+1	
+			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align1)
 
-			r=33
-			for n in range(len(Ec)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][list2[i]]['data'],format_align)
+			# r=33
+			# for n in range(len(Ec)):
+			# 	r= r+1
+			sheet10.write(34,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(37,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list2[i]]['data'],format_align1)
 
-			r=40
-			for n in range(len(Es)):
-				r= r+1
-				#sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][custom_range1]['data'],format_align)
-			
-			r=45
-			for n in range(len(other1)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][list2[i]]['data'],format_align)
-				
-			r=53
-			for n in range(len(slept)):
-				r= r+1
-				sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][list2[i]]['data'],format_align)
-			
-			
+			# r=40
+			# for n in range(len(Es)):
+			# 	r= r+1
+			sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list2[i]]['data'],format_align)
+
+			# r=45
+			# for n in range(len(other1)):
+			# 	r= r+1
+			sheet10.write(46,c,DATA['summary']['other'][other1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(50,c,DATA['summary']['other'][other1[4]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(51,c,DATA['summary']['other'][other1[5]]['custom_range'][list2[i]]['data'],format_align)
+
+			# r=53
+			# for n in range(len(slept)):
+			# 	r= r+1
+			sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(57,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(58,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list2[i]]['data'],format_align)
+
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data'],green)
