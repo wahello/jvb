@@ -6,6 +6,7 @@ import json
 import xlsxwriter
 import pprint
 
+from django.http import JsonResponse  
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -14,7 +15,9 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
+from fitparse import FitFile
 from garmin.models import GarminFitFiles
+from registration.models import Profile
 from user_input.models import DailyUserInputOptional ,\
 							  DailyUserInputEncouraged,\
 							  DailyUserInputStrong
@@ -218,6 +221,55 @@ class SleepListView(generics.ListCreateAPIView):
 	permission_classes = (IsAuthenticated,)
 	queryset = Sleep.objects.all()
 	serializer_class = SleepSerializer
+
+def hrr_calculations(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	start = start_date
+	end = start + timedelta(days=1)
+	print(start,end)
+	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	kd = Profile.objects.filter(user=request.user)
+	for ss in kd:
+		cc = ss.date_of_birth
+	today = date.today()
+	age_user = today.year - cc.year
+	lis = []
+	for x in a1:
+		# print(x)
+		fitfile = FitFile(x.fit_file)
+		for record in fitfile.get_messages('record'):
+			for record_data in record:
+				if(record_data.name=='heart_rate'):
+					b = record_data.value
+					lis.extend([b])
+	
+	total_time = len(lis)
+	avg = int(sum(lis)/total_time)
+
+	below_aerobic_value = 180-age_user-30
+	anaerobic_value = 180-age_user+5
+
+	time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
+	time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
+	time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
+	
+	percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
+	percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
+	percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+	
+	total_percent = 100
+	
+	data = {"total_time":total_time,
+			"aerobic_zone":time_in_aerobic,
+			"anaerobic_range":time_in_anaerobic,
+			"below_aerobic_zone":time_in_below_aerobic,
+			"percent_aerobic":percent_aerobic,
+			"percent_below_aerobic":percent_below_aerobic,
+			"percent_anaerobic":percent_anaerobic,
+			"total_percent":total_percent}
+
+	return JsonResponse(data)
 
 def export_users_xls(request):
 	to_date1 = request.GET.get('to_date',None)
@@ -1845,6 +1897,7 @@ def export_users_xls(request):
 			sheet5.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 
+	
 	# from registration.models import Profile
 	# from fitparse import FitFile
 	# from garmin.models import GarminFitFiles
@@ -1856,22 +1909,30 @@ def export_users_xls(request):
 	# 	cc = ss.date_of_birth
 	# today = date.today()
 	# dd = today.year - cc.year
-
+	# lis = []
 	# for x in a1:
 	# 	# print(x)
 	# 	fitfile = FitFile(x.fit_file)
 	# 	dic={}
 	# 	for record in fitfile.get_messages('record'):
 	# 		for record_data in record:
-	# 			if(record_data.name=='timestamp'):
-	# 				a=record_data.value
-	# 				print(a)
 	# 			if(record_data.name=='heart_rate'):
-	# 				b= record_data.value
-	# 				print(b)
-	# 	dic[a]=b
-		# print(dic)
+	# 				b = record_data.value
+	# 				lis.extend([b])
+	
+	# avg = int(sum(lis)/len(lis))
+	# print(avg)
 
+	# below_aerobic_value = 180-dd-30
+	# anaerobic_value = 180-dd+5
+
+	# time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
+	# time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
+	# time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
+	# print(len(lis))
+	# print(time_in_anaerobic)
+	# print(time_in_below_aerobic)
+	# print(time_in_aerobic)
 
 
 	# Exercise Reporting
@@ -2029,7 +2090,7 @@ def export_users_xls(request):
 
 
 	rem_columns = ['Overall Average Exercise Heart Rate','Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)',
-	'Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',"HRR (lowest heart rate point) in 1st min"
+	'Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',"HRR (lowest heart rate point) in 1st min",
 	'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout',
 	'Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ',
 	'Drug Consumed','Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout',
@@ -2129,7 +2190,10 @@ def export_users_xls(request):
 
 
 	current_date = to_date
-	rem_row = i+k
+	if data:
+		rem_row = i+k
+	else:
+		rem_row = i
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
