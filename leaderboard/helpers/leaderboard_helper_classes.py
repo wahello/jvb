@@ -18,7 +18,7 @@ class RankedScore(object):
 		'avg_sleep':DEFAULT_MINIMUM_SCORE,
 		'ec':DEFAULT_MINIMUM_SCORE,
 		'prcnt_uf':DEFAULT_MINIMUM_SCORE,
-		'alcohol_drink':DEFAULT_MINIMUM_SCORE,
+		'alcohol_drink':DEFAULT_MAXIMUM_SCORE,
 		'total_steps':DEFAULT_MINIMUM_SCORE,
 		'floor_climbed':DEFAULT_MINIMUM_SCORE,
 		'resting_hr':DEFAULT_MAXIMUM_SCORE,
@@ -256,7 +256,7 @@ class LeaderboardOverview(object):
 	def _get_catg_score_priority(self):
 		categories = [x[0] for x in s.CATEGORY_CHOICES]
 		catg_score_priority = {}
-		lowest_first_categories = ['mc','resting_hr','awake_time']
+		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol_drink']
 		for category in categories:
 			if category in lowest_first_categories:
 				catg_score_priority[category] = 'lowest_first'
@@ -291,7 +291,7 @@ class LeaderboardOverview(object):
 						score = data['overall_health']['overall_health_gpa'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'mne_gpa':
-						score = data['non_exercise']['non_exericse_steps_gpa'][dtype]
+						score = data['non_exercise']['non_exercise_steps'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'mc':
 						score = data['mc']['movement_consistency_score'][dtype]
@@ -306,7 +306,7 @@ class LeaderboardOverview(object):
 						score = data['nutrition']['prcnt_unprocessed_food_gpa'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'alcohol_drink':
-						score = data['alcohol']['alcoholic_drinks_per_week_gpa'][dtype]
+						score = data['alcohol']['avg_drink_per_week'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'total_steps':
 						score = data['non_exercise']['total_steps'][dtype]

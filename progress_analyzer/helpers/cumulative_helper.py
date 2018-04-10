@@ -4,6 +4,8 @@ import json
 from django.db import transaction,DatabaseError
 
 from quicklook.models import UserQuickLook
+from user_input.models import UserDailyInput
+
 from progress_analyzer.models import CumulativeSum,\
 	OverallHealthGradeCumulative, \
 	NonExerciseStepsCumulative, \
@@ -13,6 +15,10 @@ from progress_analyzer.models import CumulativeSum,\
 	NutritionCumulative, \
 	ExerciseStatsCumulative, \
 	AlcoholCumulative,\
+	SickCumulative,\
+	StandingCumulative,\
+	TravelCumulative,\
+	StressCumulative,\
 	OtherStatsCumulative,\
 	MetaCumulative
 
@@ -71,6 +77,29 @@ def _get_blank_pa_model_fields(model):
 			"cum_alcohol_drink_per_week_gpa":None,
 		}
 		return fields
+
+	elif model == 'sick':
+		fields = {
+			"cum_days_sick":None
+		}
+		return fields
+	elif model == 'standing':
+		fields = {
+			"cum_days_stand_three_hour":None
+		}
+		return fields
+	elif model == 'travel':
+		fields = {
+			"cum_days_travel_away_from_home":None
+		}
+		return fields
+	elif model == 'stress':
+		fields = {
+			"cum_days_low_stress":None,
+			"cum_days_medium_stress":None,
+			"cum_days_high_stress":None
+		}
+		return fields
 	elif model == "other_stats":
 		fields = {
 			"cum_resting_hr":None,
@@ -93,7 +122,11 @@ def _get_blank_pa_model_fields(model):
 			"cum_hrr_beats_lowered_in_first_min_days_count":None,
 			"cum_highest_hr_in_first_min_days_count":None,
 			"cum_hrr_lowest_hr_point_days_count":None,
-			"cum_mc_recorded_days_count":None
+			"cum_mc_recorded_days_count":None,
+			"cum_reported_sick_days_count":None,
+			"cum_reported_stand_three_hours_days_count":None,
+			"cum_reported_stress_days_count":None,
+			"cum_reported_alcohol_days_count":None
 		}
 		return fields
 
@@ -211,6 +244,10 @@ def _update_cumulative_instance(instance, data):
 	_update_helper(instance.exercise_stats_cum, data['exercise_stats_cum'])
 	_update_helper(instance.alcohol_cum, data['alcohol_cum'])
 	_update_helper(instance.other_stats_cum, data['other_stats_cum'])
+	_update_helper(instance.sick_cum, data['sick_cum'])
+	_update_helper(instance.standing_cum, data['standing_cum'])
+	_update_helper(instance.travel_cum, data['travel_cum'])
+	_update_helper(instance.stress_cum, data['stress_cum'])
 	_update_helper(instance.meta_cum, data['meta_cum'])
 
 @transaction.atomic
@@ -226,7 +263,12 @@ def _create_cumulative_instance(user, data):
 	ExerciseStatsCumulative.objects.create(user_cum = user_cum,**data['exercise_stats_cum'])
 	AlcoholCumulative.objects.create(user_cum = user_cum,**data['alcohol_cum'])
 	OtherStatsCumulative.objects.create(user_cum = user_cum, **data['other_stats_cum'])
+	SickCumulative.objects.create(user_cum = user_cum, **data['sick_cum'])
+	StandingCumulative.objects.create(user_cum = user_cum, **data['standing_cum'])
+	TravelCumulative.objects.create(user_cum = user_cum, **data['travel_cum'])
+	StressCumulative.objects.create(user_cum = user_cum, **data['stress_cum'])
 	MetaCumulative.objects.create(user_cum = user_cum, **data['meta_cum'])
+
 
 def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 	overall_health_grade_cal_data = _get_blank_pa_model_fields("overall_health_grade")
@@ -270,6 +312,7 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return overall_health_grade_cal_data
 
+
 def _get_non_exercise_steps_cum_sum(today_ql_data, yday_cum_data=None):
 	non_exercise_steps_cum_data = _get_blank_pa_model_fields("non_exercise_steps")
 	GRADE_POINT = _get_grading_sheme()
@@ -298,6 +341,7 @@ def _get_non_exercise_steps_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.steps_ql, "total_steps",0)
 
 	return non_exercise_steps_cum_data
+
 
 def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 	sleep_per_night_cum_data = _get_blank_pa_model_fields("sleep_per_night")
@@ -354,6 +398,7 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return sleep_per_night_cum_data
 
+
 def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 	mc_cum_data = _get_blank_pa_model_fields("mc")
 	GRADE_POINT = _get_grading_sheme()
@@ -380,6 +425,7 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 			
 	return mc_cum_data
 
+
 def _get_ec_cum_sum(today_ql_data, yday_cum_data=None):
 	ec_cum_data = _get_blank_pa_model_fields("ec")
 	GRADE_POINT = _get_grading_sheme()
@@ -402,6 +448,7 @@ def _get_ec_cum_sum(today_ql_data, yday_cum_data=None):
 	
 	return ec_cum_data
 
+
 def _get_nutrition_cum_sum(today_ql_data, yday_cum_data=None):
 	nutrition_cum_data = _get_blank_pa_model_fields("nutrition")
 
@@ -422,6 +469,7 @@ def _get_nutrition_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.food_ql,"prcnt_non_processed_food",0)
 
 	return nutrition_cum_data
+
 
 def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None):
 	exercise_stats_cum_data = _get_blank_pa_model_fields("exercise_stats")
@@ -456,6 +504,7 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None):
 		
 	return exercise_stats_cum_data
 
+
 def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 	alcohol_cum_data = _get_blank_pa_model_fields("alcohol")
 	
@@ -475,6 +524,7 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0) 
 	return alcohol_cum_data
+
 
 def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 	other_stats_cum_data = _get_blank_pa_model_fields("other_stats")
@@ -504,7 +554,7 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
 			today_ql_data.steps_ql,"floor_climed",0) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_floors_climbed",0)
-	
+
 	elif today_ql_data:
 		other_stats_cum_data['cum_resting_hr'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0)
@@ -527,7 +577,109 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return other_stats_cum_data
 
-def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
+def _get_sick_cum_sum(today_ql_data, yday_cum_data=None):
+	sick_cum_data = _get_blank_pa_model_fields("sick")
+
+	if today_ql_data and yday_cum_data:
+		is_sick = _safe_get_mobj(today_ql_data.exercise_reporting_ql,"sick",None)
+		is_sick = 1 if (is_sick and is_sick == 'yes') else 0 
+		sick_cum_data['cum_days_sick'] = is_sick \
+			+ _safe_get_mobj(yday_cum_data.sick_cum,"cum_days_sick",0)
+
+	elif today_ql_data:
+		is_sick = _safe_get_mobj(today_ql_data.exercise_reporting_ql,"sick",None) 
+		sick_cum_data['cum_days_sick'] = 1 if (is_sick and is_sick == 'yes') else 0
+
+	return sick_cum_data
+
+def _get_standing_cum_sum(today_ui_data,yday_cum_data=None):
+	standing_cum_data = _get_blank_pa_model_fields("standing")
+
+	if today_ui_data and yday_cum_data:
+		stand_three_hours = _safe_get_mobj(
+			today_ui_data.optional_input,"stand_for_three_hours",None)
+		stand_three_hours = 1 if (stand_three_hours and stand_three_hours == 'yes') else 0
+		standing_cum_data['cum_days_stand_three_hour'] = stand_three_hours \
+			+ _safe_get_mobj(yday_cum_data.standing_cum,"cum_days_stand_three_hour",0)
+
+	elif not today_ui_data and yday_cum_data:
+		# if no user input then copy last cumulative sum
+		standing_cum_data['cum_days_stand_three_hour'] = _safe_get_mobj(
+			yday_cum_data.standing_cum,"cum_days_stand_three_hour",0)
+
+	elif today_ui_data:
+		stand_three_hours = _safe_get_mobj(
+			today_ui_data.optional_input,"stand_for_three_hours",None)
+		stand_three_hours = 1 if (stand_three_hours and stand_three_hours == 'yes') else 0 
+		standing_cum_data['cum_days_stand_three_hour'] = stand_three_hours
+	else:
+		standing_cum_data['cum_days_stand_three_hour'] = 0
+
+
+	return standing_cum_data
+
+
+def _get_travel_cum_sum(today_ui_data,yday_cum_data=None):
+	travel_cum_data = _get_blank_pa_model_fields("travel")
+
+	if today_ui_data and yday_cum_data:
+		travel_away_from_home = _safe_get_mobj(today_ui_data.optional_input,"travel",None)
+		travel_away_from_home = (1 if (
+			travel_away_from_home and travel_away_from_home == 'yes')else 0)
+		travel_cum_data['cum_days_travel_away_from_home'] = travel_away_from_home \
+			+ _safe_get_mobj(yday_cum_data.travel_cum,"cum_days_travel_away_from_home",0)
+
+	elif not today_ui_data and yday_cum_data:
+		# if no user input then copy last cumulative sum
+		travel_cum_data['cum_days_travel_away_from_home'] = _safe_get_mobj(
+			yday_cum_data.standing_cum,"cum_days_travel_away_from_home",0)
+
+	elif today_ui_data:
+		travel_away_from_home = _safe_get_mobj(today_ui_data.optional_input,"travel",None)
+		travel_away_from_home = (1 if (
+			travel_away_from_home and travel_away_from_home == 'yes')else 0)
+		travel_cum_data['cum_days_travel_away_from_home'] = travel_away_from_home
+
+	else:
+		travel_cum_data['cum_days_travel_away_from_home'] = 0
+
+	return travel_cum_data
+
+def _get_stress_cum_sum(today_ql_data, yday_cum_data=None):
+	stress_cum_data = _get_blank_pa_model_fields("stress")
+
+	if today_ql_data and yday_cum_data:
+		stress_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"stress_level",None
+		)
+		stress_low = 1 if stress_level and stress_level == 'low' else 0
+		stress_cum_data["cum_days_low_stress"] = stress_low + \
+			_safe_get_mobj(yday_cum_data.stress_cum,"cum_days_low_stress",0)
+
+		stress_medium = 1 if stress_level and stress_level == 'medium' else 0
+		stress_cum_data["cum_days_medium_stress"] = stress_medium + \
+			_safe_get_mobj(yday_cum_data.stress_cum,"cum_days_medium_stress",0)
+
+		stress_high = 1 if stress_level and stress_level == 'high' else 0
+		stress_cum_data["cum_days_high_stress"] = stress_high + \
+			_safe_get_mobj(yday_cum_data.stress_cum,"cum_days_high_stress",0)
+
+	elif today_ql_data:
+		stress_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"stress_level",None
+		)
+		stress_low = 1 if stress_level and stress_level == 'low' else 0
+		stress_cum_data["cum_days_low_stress"] = stress_low 
+
+		stress_medium = 1 if stress_level and stress_level == 'medium' else 0
+		stress_cum_data["cum_days_medium_stress"] = stress_medium 
+
+		stress_high = 1 if stress_level and stress_level == 'high' else 0
+		stress_cum_data["cum_days_high_stress"] = stress_high
+
+	return stress_cum_data
+
+def _get_meta_cum_sum(today_ql_data, today_ui_data, yday_cum_data=None):
 	meta_cum_data = _get_blank_pa_model_fields("meta")
 	
 	if today_ql_data and yday_cum_data:
@@ -597,6 +749,29 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		meta_cum_data['cum_mc_recorded_days_count'] = have_mc \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_mc_recorded_days_count",0)
 
+		sick_reported = _safe_get_mobj(today_ql_data.exercise_reporting_ql,"sick",0)
+		sick_reported = 1 if sick_reported else 0
+		meta_cum_data['cum_reported_sick_days_count'] = (sick_reported +
+			_safe_get_mobj(yday_cum_data.meta_cum,"cum_reported_sick_days_count",0))
+
+		stress_reported = _safe_get_mobj(today_ql_data.exercise_reporting_ql,"stress_level",0)
+		stress_reported = 1 if stress_reported else 0
+		meta_cum_data['cum_reported_stress_days_count'] = (stress_reported + 
+			_safe_get_mobj(yday_cum_data.meta_cum,"cum_reported_stress_days_count",0)) 
+
+		if today_ui_data:
+			stand_three_hour = _safe_get_mobj(today_ui_data.optional_input,"stand_for_three_hours",0)
+		else:
+			stand_three_hour = 0
+		stand_three_hour = 1 if stand_three_hour else 0
+		meta_cum_data['cum_reported_stand_three_hours_days_count'] = (stand_three_hour + 
+			_safe_get_mobj(yday_cum_data.meta_cum,"cum_reported_stand_three_hours_days_count",0))
+
+		alcohol_yesterday = _safe_get_mobj(today_ql_data.alcohol_ql,"alcohol_day",0)
+		alcohol_yesterday = 1 if alcohol_yesterday else 0 
+		meta_cum_data['cum_reported_alcohol_days_count'] = alcohol_yesterday \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_reported_alcohol_days_count",0)
+
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"workout_duration",None
@@ -643,14 +818,34 @@ def _get_meta_cum_sum(today_ql_data, yday_cum_data=None):
 		have_mc = _safe_get_mobj(
 			today_ql_data.steps_ql,"movement_consistency",None)
 		meta_cum_data['cum_mc_recorded_days_count'] = 1 if have_mc else 0
+
+		sick_reported = _safe_get_mobj(today_ql_data.exercise_reporting_ql,"sick",0)
+		meta_cum_data['cum_reported_sick_days_count'] = 1 if sick_reported else 0
+
+		stress_reported = _safe_get_mobj(today_ql_data.exercise_reporting_ql,"stress_level",0)
+		meta_cum_data['cum_reported_stress_days_count'] = 1 if stress_reported else 0
+
+		if today_ui_data:
+			stand_three_hour = _safe_get_mobj(today_ui_data.optional_input,"stand_for_three_hours",0)
+		else:
+			stand_three_hour = 0
+		meta_cum_data['cum_reported_stand_three_hours_days_count'] = 1 if stand_three_hour else 0
+
+		alcohol_yesterday = _safe_get_mobj(today_ql_data.alcohol_ql,"alcohol_day",0)
+		meta_cum_data['cum_reported_alcohol_days_count'] = 1 if alcohol_yesterday else 0 
 		
 	return meta_cum_data
+
 
 def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	from_dt = _str_to_datetime(from_dt)
 	to_dt = _str_to_datetime(to_dt)
 	quicklook_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q 
 		for q in _get_queryset(UserQuickLook,user,from_dt,to_dt)}
+
+	userinput_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q 
+		for q in _get_queryset(UserDailyInput,user,from_dt,to_dt)}
+
 	cum_sum_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
 		for q in _get_queryset(CumulativeSum,user,from_dt,to_dt)}
 	current_date = from_dt
@@ -658,6 +853,7 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 		data = {"created_at":current_date.strftime("%Y-%m-%d")}
 		yday_dt = current_date - timedelta(days=1)
 		today_ql_data = quicklook_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
+		today_ui_data = userinput_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
 		yday_cum_data = cum_sum_datewise_data.get(yday_dt.strftime('%Y-%m-%d'),None)
 
 		if not yday_cum_data:
@@ -675,7 +871,11 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
 			data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
-			data["meta_cum"] = _get_meta_cum_sum(today_ql_data, yday_cum_data)
+			data["sick_cum"] = _get_sick_cum_sum(today_ql_data, yday_cum_data)
+			data["standing_cum"] = _get_standing_cum_sum(today_ui_data, yday_cum_data)
+			data["travel_cum"] = _get_travel_cum_sum(today_ui_data, yday_cum_data)
+			data["stress_cum"] = _get_stress_cum_sum(today_ql_data, yday_cum_data)
+			data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data,yday_cum_data)
 
 		elif today_ql_data:
 			# Very begining when there is no quick look data yesterday
@@ -689,7 +889,11 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
 			data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data)
-			data["meta_cum"] = _get_meta_cum_sum(today_ql_data)
+			data["sick_cum"] = _get_sick_cum_sum(today_ql_data)
+			data["standing_cum"] = _get_standing_cum_sum(today_ui_data)
+			data["travel_cum"] = _get_travel_cum_sum(today_ui_data)
+			data["stress_cum"] = _get_stress_cum_sum(today_ql_data)
+			data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data)
 		else:
 			# Insufficient data, do not create cumulative sum for current date
 			current_date += timedelta(days = 1)
@@ -702,7 +906,8 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 
 		current_date += timedelta(days = 1)
 
-def create_cum_raw_data(today_ql_data, yday_cum_data=None):
+
+def create_cum_raw_data(today_ql_data,today_ui_data,yday_cum_data=None):
 	data = {"created_at":today_ql_data.created_at.strftime("%Y-%m-%d")}
 
 	if today_ql_data and yday_cum_data:
@@ -715,7 +920,11 @@ def create_cum_raw_data(today_ql_data, yday_cum_data=None):
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
 		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
-		data["meta_cum"] = _get_meta_cum_sum(today_ql_data, yday_cum_data)
+		data["sick_cum"] = _get_sick_cum_sum(today_ql_data, yday_cum_data)
+		data["standing_cum"] = _get_standing_cum_sum(today_ui_data, yday_cum_data)
+		data["travel_cum"] = _get_travel_cum_sum(today_ui_data, yday_cum_data)
+		data["stress_cum"] = _get_stress_cum_sum(today_ql_data, yday_cum_data)
+		data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data,yday_cum_data)
 
 	elif today_ql_data:
 		# get current quicklook data and create cumulative sum
@@ -728,6 +937,10 @@ def create_cum_raw_data(today_ql_data, yday_cum_data=None):
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
 		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data)
-		data["meta_cum"] = _get_meta_cum_sum(today_ql_data)
+		data["sick_cum"] = _get_sick_cum_sum(today_ql_data)
+		data["standing_cum"] = _get_standing_cum_sum(today_ui_data)
+		data["travel_cum"] = _get_travel_cum_sum(today_ui_data)
+		data["stress_cum"] = _get_stress_cum_sum(today_ql_data)
+		data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data)
 
 	return data
