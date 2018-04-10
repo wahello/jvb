@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from quicklook import calculation_helper
 from quicklook.models import UserQuickLook
+from user_input.models import UserDailyInput
 from progress_analyzer.models import CumulativeSum
 from progress_analyzer.helpers.cumulative_helper import create_cum_raw_data
 
@@ -55,6 +56,24 @@ class ToAlcoholCumulative(object):
 		self.cum_average_drink_per_week = raw_data["cum_average_drink_per_week"]
 		self.cum_alcohol_drink_per_week_gpa = raw_data["cum_alcohol_drink_per_week_gpa"]
 
+class ToSickCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_days_sick = raw_data["cum_days_sick"]
+
+class ToStressCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_days_low_stress = raw_data["cum_days_low_stress"]
+		self.cum_days_medium_stress = raw_data["cum_days_medium_stress"]
+		self.cum_days_high_stress = raw_data["cum_days_high_stress"]
+
+class ToTravelCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_days_travel_away_from_home = raw_data["cum_days_travel_away_from_home"]
+
+class ToStandingCumulative(object):
+	def __init__(self,raw_data):
+		self.cum_days_stand_three_hour = raw_data["cum_days_stand_three_hour"]
+
 class ToOtherStatsCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_resting_hr = raw_data["cum_resting_hr"]
@@ -84,14 +103,26 @@ class ToMetaCumulative(object):
 		self.cum_mc_recorded_days_count = raw_data[
 			"cum_mc_recorded_days_count"
 		]
+		self.cum_reported_alcohol_days_count = raw_data[
+			"cum_reported_alcohol_days_count"
+		]
+		self.cum_reported_sick_days_count = raw_data[
+			"cum_reported_sick_days_count"
+		]
+		self.cum_reported_stand_three_hours_days_count = raw_data[
+			"cum_reported_stand_three_hours_days_count"
+		]
+		self.cum_reported_stress_days_count = raw_data[
+			"cum_reported_stress_days_count"
+		]
 
 class ToCumulativeSum(object):
 	'''
 	Convert a quicklook object to cumulative sum object
 	'''
-	def __init__(self,ql_obj,cum_obj=None):
+	def __init__(self,ql_obj,ui_obj,cum_obj=None):
 
-		cum_raw_data = create_cum_raw_data(ql_obj,cum_obj)
+		cum_raw_data = create_cum_raw_data(ql_obj,ui_obj,cum_obj)
 		
 		self.overall_health_grade_cum = ToOverallHealthGradeCumulative(
 			cum_raw_data["overall_health_grade_cum"]
@@ -119,6 +150,18 @@ class ToCumulativeSum(object):
 		)
 		self.other_stats_cum = ToOtherStatsCumulative(
 			cum_raw_data["other_stats_cum"]
+		)
+		self.sick_cum = ToSickCumulative(
+			cum_raw_data["sick_cum"]
+		)
+		self.stress_cum = ToStressCumulative(
+			cum_raw_data["stress_cum"]
+		)
+		self.travel_cum = ToTravelCumulative(
+			cum_raw_data["travel_cum"]
+		)
+		self.standing_cum = ToStandingCumulative(
+			cum_raw_data["standing_cum"]
 		)
 		self.meta_cum = ToMetaCumulative(
 			cum_raw_data["meta_cum"]
@@ -148,7 +191,7 @@ class ProgressReport():
 	def __init__(self,user, query_params):
 		self.user = user
 		self.summary_type = ['overall_health','non_exercise','sleep','mc','ec',
-		'nutrition','exercise','alcohol','other']
+		'nutrition','exercise','alcohol','sick','stress','travel','standing','other']
 		self.duration_type = ['today','yesterday','week','month','year']
 		self.current_date = self._str_to_dt(query_params.get('date',None))
 		# Custom date range(s) for which report is to be created
@@ -173,6 +216,8 @@ class ProgressReport():
 				for q in self._get_cum_queryset()}
 			self.ql_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
 				for q in self._get_ql_queryset()}
+			self.ui_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
+				for q in self._get_ui_queryset()}
 
 		self.custom_daterange = False
 		if self.custom_ranges:
@@ -195,7 +240,7 @@ class ProgressReport():
 				if not r[1] == r[0]:
 					self.duration_denominator[str_range] = (r[1] - r[0]).days + 1
 				else:
-					self.duration_denominator[str_range] = 0
+					self.duration_denominator[str_range] = 1
 			self.custom_daterange = True
 
 
@@ -243,12 +288,16 @@ class ProgressReport():
 			return "{}:{}".format(mins,seconds)
 		return "00:00"
 
-	def _get_average(self, stat1, stat2, duration_type):
+	def _get_average(self,stat1, stat2, demominator):
+		if demominator:
+			avg = (stat1 - stat2)/demominator
+			return avg
+		return 0
+
+	def _get_average_for_duration(self, stat1, stat2, duration_type):
 		if not stat1 == None and not stat2 == None:
-			demominator = self.duration_denominator.get(duration_type)
-			if demominator:
-				avg = (stat1 - stat2)/demominator
-				return avg
+			denominator = self.duration_denominator.get(duration_type)
+			return self._get_average(stat1,stat2,denominator)
 		return 0
 	
 	def _get_model_related_fields_names(self,model):
@@ -310,6 +359,19 @@ class ProgressReport():
 		)
 		return ql_data_qs
 
+	def _get_ui_queryset(self):
+		"""
+			Returns queryset of User Inputs for "today"
+			according to current_date	  
+		"""
+		user = self.user
+		filters = Q(created_at=self.current_date.date())
+		related_fields = self._get_model_related_fields_names(UserDailyInput)
+		ui_data_qs = UserDailyInput.objects.select_related(*related_fields).filter(
+			filters, user = user
+		)
+		return ui_data_qs
+
 	def _get_cum_queryset_custom_range(self,custom_ranges):
 		user = self.user
 		filters = Q()
@@ -343,6 +405,9 @@ class ProgressReport():
 			to_select_related = lambda x : "_{}_cache".format(x)
 
 			day_before_from_date = r[0] - timedelta(days=1)
+			todays_ui_data = self.ui_datewise_data.get(
+			self.current_date.strftime("%Y-%m-%d"),None)
+		
 			range_start_data = self.cumulative_datewise_data_custom_range.get(
 				day_before_from_date.strftime("%Y-%m-%d"),None
 			)
@@ -359,7 +424,7 @@ class ProgressReport():
 					r[1].strftime("%Y-%m-%d"),None
 				)
 				if range_end_data and yesterday_cum_data:
-					range_end_data = ToCumulativeSum(range_end_data,yesterday_cum_data)
+					range_end_data = ToCumulativeSum(range_end_data,todays_ui_data,yesterday_cum_data)
 					format_summary_name = False
 
 			str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
@@ -395,6 +460,8 @@ class ProgressReport():
 	def _generic_summary_calculator(self,calculated_data_dict,avg_calculator,summary_type):
 		todays_data = self.ql_datewise_data.get(
 				self.current_date.strftime("%Y-%m-%d"),None)
+		todays_ui_data = self.ui_datewise_data.get(
+			self.current_date.strftime("%Y-%m-%d"),None)
 		todays_meta_data = None
 		yesterday_data = self.cumulative_datewise_data.get(
 			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
@@ -405,11 +472,11 @@ class ProgressReport():
 
 		if todays_data:
 			if yesterday_data:
-				todays_meta_data = ToCumulativeSum(todays_data,yesterday_data).__dict__.get("meta_cum")
-				todays_data = ToCumulativeSum(todays_data,yesterday_data).__dict__.get(summary_type)
+				todays_meta_data = ToCumulativeSum(todays_data,todays_ui_data,yesterday_data).__dict__.get("meta_cum")
+				todays_data = ToCumulativeSum(todays_data,todays_ui_data,yesterday_data).__dict__.get(summary_type)
 			else:
-				todays_meta_data = ToCumulativeSum(todays_data).__dict__.get(summary_type)
-				todays_data = ToCumulativeSum(todays_data).__dict__.get(summary_type)
+				todays_meta_data = ToCumulativeSum(todays_data,todays_ui_data).__dict__.get(summary_type)
+				todays_data = ToCumulativeSum(todays_data,todays_ui_data).__dict__.get(summary_type)
 		if yesterday_data:
 			# Because of select related, attribute names become "_attrname_cache"
 			cached_summary_type = "_{}_cache".format(summary_type)
@@ -454,6 +521,10 @@ class ProgressReport():
 			"nutrition":self._cal_nutrition_summary,
 			"exercise":self._cal_exercise_summary,
 			"alcohol":self._cal_alcohol_summary,
+			"sick":self._cal_sick_summary,
+			"stress":self._cal_stress_summary,
+			"travel":self._cal_travel_summary,
+			"standing":self._cal_standing_summary,
 			"other":self._cal_other_summary
 		}
 		return SUMMARY_CALCULATOR_BINDING
@@ -465,14 +536,14 @@ class ProgressReport():
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='total_gpa_point':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_total_gpa_point,
 						current_data.cum_total_gpa_point,alias
 					)
 					return round(val,2)
 
 				elif key == 'overall_health_gpa':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_overall_health_gpa_point,
 						current_data.cum_overall_health_gpa_point,alias
 					)
@@ -480,7 +551,7 @@ class ProgressReport():
 
 				elif key == 'overall_health_gpa_grade':
 					return calculation_helper.cal_overall_grade(
-						self._get_average(
+						self._get_average_for_duration(
 							todays_data.cum_overall_health_gpa_point,
 							current_data.cum_overall_health_gpa_point,alias
 						)
@@ -490,7 +561,6 @@ class ProgressReport():
 		calculated_data = {
 			'total_gpa_point':{d:None for d in self.duration_type},
 			'overall_health_gpa':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'overall_health_gpa_grade':{d:None for d in self.duration_type}
 		}
 		summary_type = "overall_health_grade_cum"
@@ -512,26 +582,26 @@ class ProgressReport():
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='non_exercise_steps':
-					val =  self._get_average(
+					val =  self._get_average_for_duration(
 						todays_data.cum_non_exercise_steps,
 						current_data.cum_non_exercise_steps,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'non_exericse_steps_gpa':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_non_exercise_steps_gpa,
 						current_data.cum_non_exercise_steps_gpa,alias)
 					return round(val,2)
 
 				elif key == 'total_steps':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_total_steps,
 						current_data.cum_total_steps,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'movement_non_exercise_step_grade':
 					return calculation_helper.cal_non_exercise_step_grade(
-						self._get_average(
+						self._get_average_for_duration(
 							todays_data.cum_non_exercise_steps,
 							current_data.cum_non_exercise_steps,alias
 						)
@@ -540,7 +610,6 @@ class ProgressReport():
 
 		calculated_data = {
 			'non_exercise_steps':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'movement_non_exercise_step_grade':{d:None for d in self.duration_type},
 			'non_exericse_steps_gpa':{d:None for d in self.duration_type},
 			'total_steps':{d:None for d in self.duration_type}
@@ -576,31 +645,31 @@ class ProgressReport():
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key == 'total_sleep_in_hours_min':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_total_sleep_in_hours,
 						current_data.cum_total_sleep_in_hours,alias)
 					return self._hours_to_hours_min(val)
 
 				if key == 'deep_sleep_in_hours_min':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_deep_sleep_in_hours,
 						current_data.cum_deep_sleep_in_hours,alias)
 					return self._hours_to_hours_min(val)
 
 				if key == 'awake_duration_in_hours_min':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_awake_duration_in_hours,
 						current_data.cum_awake_duration_in_hours,alias)
 					return self._hours_to_hours_min(val)
 
 				elif key == 'overall_sleep_gpa':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_overall_sleep_gpa,
 						current_data.cum_overall_sleep_gpa,alias)
 					return round(val,2)
 
 				elif key == 'average_sleep_grade':
-					avg_sleep_gpa = round(self._get_average(
+					avg_sleep_gpa = round(self._get_average_for_duration(
 						todays_data.cum_overall_sleep_gpa,
 						current_data.cum_overall_sleep_gpa,alias),2)
 					if alias == 'today' or alias == 'yesterday':
@@ -632,7 +701,6 @@ class ProgressReport():
 			'total_sleep_in_hours_min':{d:None for d in self.duration_type},
 			'deep_sleep_in_hours_min':{d:None for d in self.duration_type},
 			'awake_duration_in_hours_min':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'average_sleep_grade':{d:None for d in self.duration_type},
 			'num_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
 			'prcnt_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
@@ -721,7 +789,6 @@ class ProgressReport():
 
 		calculated_data = {
 			'movement_consistency_score':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'movement_consistency_grade':{d:None for d in self.duration_type},
 			'movement_consistency_gpa':{d:None for d in self.duration_type},
 		}
@@ -744,19 +811,19 @@ class ProgressReport():
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='avg_no_of_days_exercises_per_week':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_avg_exercise_day,
 						current_data.cum_avg_exercise_day,alias)
 					return round(val,2)
 				elif key == 'exercise_consistency_gpa':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_exercise_consistency_gpa,
 						current_data.cum_exercise_consistency_gpa,alias)
 					return round(val,2)
 
 				elif key == 'exercise_consistency_grade':
 					return calculation_helper.cal_exercise_consistency_grade(
-						self._get_average(
+						self._get_average_for_duration(
 							todays_data.cum_avg_exercise_day,
 							current_data.cum_avg_exercise_day,alias
 						)
@@ -765,7 +832,6 @@ class ProgressReport():
 
 		calculated_data = {
 			'avg_no_of_days_exercises_per_week':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'exercise_consistency_grade':{d:None for d in self.duration_type},
 			'exercise_consistency_gpa':{d:None for d in self.duration_type},
 		}
@@ -788,18 +854,18 @@ class ProgressReport():
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='prcnt_unprocessed_volume_of_food':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_prcnt_unprocessed_food_consumed,
 						current_data.cum_prcnt_unprocessed_food_consumed,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 				elif key == 'prcnt_unprocessed_food_gpa':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_prcnt_unprocessed_food_consumed_gpa,
 						current_data.cum_prcnt_unprocessed_food_consumed_gpa,alias)
 					return round(val,2)
 				elif key == 'prcnt_unprocessed_food_grade':
 					return calculation_helper.cal_unprocessed_food_grade(
-						self._get_average(
+						self._get_average_for_duration(
 							todays_data.cum_prcnt_unprocessed_food_consumed,
 							current_data.cum_prcnt_unprocessed_food_consumed,alias
 						)
@@ -808,7 +874,6 @@ class ProgressReport():
 
 		calculated_data = {
 			'prcnt_unprocessed_volume_of_food':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'prcnt_unprocessed_food_grade':{d:None for d in self.duration_type},
 			'prcnt_unprocessed_food_gpa':{d:None for d in self.duration_type},
 		}
@@ -926,30 +991,44 @@ class ProgressReport():
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key =='avg_drink_per_week':
-					val = self._get_average(
-						todays_data.cum_average_drink_per_week,
-						current_data.cum_average_drink_per_week,alias)
-					return round(val,2)
+					if todays_meta_data and current_meta_data:
+						alcohol_reported_days = (todays_meta_data.cum_reported_alcohol_days_count -
+							current_meta_data.cum_reported_alcohol_days_count)
+
+						if alcohol_reported_days: 
+							val = self._get_average_for_duration(
+								todays_data.cum_average_drink_per_week,
+								current_data.cum_average_drink_per_week,alias)
+							return round(val,2)
+						else:
+							return 'Not Reported'
 
 				elif key == 'alcoholic_drinks_per_week_gpa':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_alcohol_drink_per_week_gpa,
 						current_data.cum_alcohol_drink_per_week_gpa,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 				elif key == 'alcoholic_drinks_per_week_grade':
 					return calculation_helper.cal_alcohol_drink_grade(
-						self._get_average(
+						self._get_average_for_duration(
 							todays_data.cum_average_drink_per_week,
 							current_data.cum_average_drink_per_week,alias
 						),self.user.profile.gender
 					)[0]
+				elif key == "prcnt_alcohol_consumption_reported":
+					if todays_meta_data and current_meta_data:
+						val = self._get_average_for_duration(
+							todays_meta_data.cum_reported_alcohol_days_count,
+							current_meta_data.cum_reported_alcohol_days_count,alias
+						) * 100
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 			return None
 
 		calculated_data = {
 			'avg_drink_per_week':{d:None for d in self.duration_type},
-			'rank':{d:None for d in self.duration_type},
 			'alcoholic_drinks_per_week_grade':{d:None for d in self.duration_type},
 			'alcoholic_drinks_per_week_gpa':{d:None for d in self.duration_type},
+			'prcnt_alcohol_consumption_reported':{d:None for d in self.duration_type}
 		}
 		summary_type = "alcohol_cum"
 
@@ -1035,7 +1114,7 @@ class ProgressReport():
 						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 				elif key == 'floors_climbed':
-					val = self._get_average(
+					val = self._get_average_for_duration(
 						todays_data.cum_floors_climbed,
 						current_data.cum_floors_climbed,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
@@ -1050,6 +1129,251 @@ class ProgressReport():
 			'floors_climbed':{d:None for d in self.duration_type}
 		}
 		summary_type = "other_stats_cum"
+
+		if custom_daterange:
+			alias = "custom_range"
+			for key in calculated_data.keys():
+				calculated_data[key][alias] = self._generic_custom_range_calculator(
+					key, alias,summary_type, _calculate
+				)
+
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
+
+		return calculated_data
+
+	def _cal_sick_summary(self,custom_daterange = False):
+
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
+			if todays_data and current_data:
+				if key =='number_of_days_not_sick':
+					if todays_meta_data and current_meta_data:
+						days_sick_reported = (todays_meta_data.cum_reported_sick_days_count - 
+							current_meta_data.cum_reported_sick_days_count)
+						days_sick = todays_data.cum_days_sick - current_data.cum_days_sick
+						val = days_sick_reported - days_sick
+						return val
+
+				elif key == 'prcnt_of_days_not_sick':
+					if todays_meta_data and current_meta_data:
+						days_sick_not_sick_reported = (todays_meta_data.cum_reported_sick_days_count - 
+							current_meta_data.cum_reported_sick_days_count)
+						days_sick = todays_data.cum_days_sick - current_data.cum_days_sick
+						days_not_sick = days_sick_not_sick_reported - days_sick
+						if days_sick_not_sick_reported:
+							val = (days_not_sick/days_sick_not_sick_reported) * 100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key == 'number_of_days_sick':
+					val = todays_data.cum_days_sick - current_data.cum_days_sick
+					return val
+
+				elif key == 'prcnt_of_days_sick':
+					if todays_meta_data and current_meta_data:
+						days_sick_not_sick_reported = (todays_meta_data.cum_reported_sick_days_count - 
+							current_meta_data.cum_reported_sick_days_count)
+						days_sick = todays_data.cum_days_sick - current_data.cum_days_sick
+						if days_sick_not_sick_reported:
+							val = (days_sick/days_sick_not_sick_reported) * 100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key == 'days_sick_not_sick_reported':
+					if todays_meta_data and current_meta_data:
+						days_sick_not_sick_reported = (todays_meta_data.cum_reported_sick_days_count - 
+							current_meta_data.cum_reported_sick_days_count)
+						return days_sick_not_sick_reported
+
+			return None
+
+		calculated_data = {
+			'number_of_days_not_sick':{d:None for d in self.duration_type},
+			'prcnt_of_days_not_sick':{d:None for d in self.duration_type},
+			'number_of_days_sick':{d:None for d in self.duration_type},
+			'prcnt_of_days_sick':{d:None for d in self.duration_type},
+			'days_sick_not_sick_reported':{d:None for d in self.duration_type}
+		}
+		summary_type = "sick_cum"
+
+		if custom_daterange:
+			alias = "custom_range"
+			for key in calculated_data.keys():
+				calculated_data[key][alias] = self._generic_custom_range_calculator(
+					key, alias, summary_type, _calculate
+				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
+
+		return calculated_data
+
+	def _cal_stress_summary(self,custom_daterange = False):
+
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
+			if todays_data and current_data:
+				if key =='number_of_days_low_stress_reported':
+					days_low_stress = (
+						todays_data.cum_days_low_stress - 
+						current_data.cum_days_low_stress
+					)
+					return days_low_stress 
+
+				elif key == "prcnt_of_days_low_stress":
+					if todays_meta_data and current_meta_data:
+						days_stress_reported = (
+							todays_meta_data.cum_reported_stress_days_count - 
+							current_meta_data.cum_reported_stress_days_count
+						)
+						days_low_stress = (
+							todays_data.cum_days_low_stress - 
+							current_data.cum_days_low_stress
+						)
+						if days_stress_reported:
+							val = (days_low_stress/days_stress_reported)*100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key == "number_of_days_medium_stress_reported":
+					days_medium_stress = (
+						todays_data.cum_days_medium_stress - 
+						current_data.cum_days_medium_stress
+					)
+					return days_medium_stress 
+
+				elif key == "prcnt_of_days_medium_stress":
+					if todays_meta_data and current_meta_data:
+						days_stress_reported = (
+							todays_meta_data.cum_reported_stress_days_count - 
+							current_meta_data.cum_reported_stress_days_count
+						)
+						days_medium_stress = (
+							todays_data.cum_days_medium_stress - 
+							current_data.cum_days_medium_stress
+						)
+						if days_stress_reported:
+							val = (days_medium_stress/days_stress_reported)*100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+				elif key == "number_of_days_high_stress_reported":
+					days_high_stress = (
+						todays_data.cum_days_high_stress - 
+						current_data.cum_days_high_stress
+					)
+					return days_high_stress
+				elif key == "prcnt_of_days_high_stress":
+					if todays_meta_data and current_meta_data:
+						days_stress_reported = (
+							todays_meta_data.cum_reported_stress_days_count - 
+							current_meta_data.cum_reported_stress_days_count
+						)
+						days_high_stress = (
+							todays_data.cum_days_high_stress - 
+							current_data.cum_days_high_stress
+						)
+						if days_stress_reported:
+							val = (days_high_stress/days_stress_reported)*100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+				elif key == "days_stress_level_reported":
+					days_stress_reported = (
+							todays_meta_data.cum_reported_stress_days_count - 
+							current_meta_data.cum_reported_stress_days_count
+						)
+					return days_stress_reported
+
+			return None
+
+		calculated_data = {
+			'number_of_days_low_stress_reported':{d:None for d in self.duration_type},
+			'prcnt_of_days_low_stress':{d:None for d in self.duration_type},
+			'number_of_days_medium_stress_reported':{d:None for d in self.duration_type},
+			'prcnt_of_days_medium_stress':{d:None for d in self.duration_type},
+			'number_of_days_high_stress_reported':{d:None for d in self.duration_type},
+			'prcnt_of_days_high_stress':{d:None for d in self.duration_type},
+			'days_stress_level_reported':{d:None for d in self.duration_type},
+		}
+		summary_type = "stress_cum"
+
+		if custom_daterange:
+			alias = "custom_range"
+			for key in calculated_data.keys():
+				calculated_data[key][alias] = self._generic_custom_range_calculator(
+					key, alias, summary_type, _calculate
+				)
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
+
+		return calculated_data
+
+	def _cal_travel_summary(self, custom_daterange = False):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
+			if todays_data and current_data:
+				if key =='number_days_travel_away_from_home':
+					val = (todays_data.cum_days_travel_away_from_home -
+						current_data.cum_days_travel_away_from_home)
+					return val 
+				elif key == "prcnt_days_travel_away_from_home":
+					val = self._get_average_for_duration(
+						todays_data.cum_days_travel_away_from_home,
+						current_data.cum_days_travel_away_from_home,alias
+					) * 100
+					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+			return None
+
+		calculated_data = {
+			'number_days_travel_away_from_home':{d:None for d in self.duration_type},
+			'prcnt_days_travel_away_from_home':{d:None for d in self.duration_type}
+		}
+		summary_type = "travel_cum"
+
+		if custom_daterange:
+			alias = "custom_range"
+			for key in calculated_data.keys():
+				calculated_data[key][alias] = self._generic_custom_range_calculator(
+					key, alias,summary_type, _calculate
+				)
+
+		if self.current_date:
+			self._generic_summary_calculator(calculated_data,_calculate,summary_type)
+
+		return calculated_data
+
+
+	def _cal_standing_summary(self, custom_daterange = False):
+		def _calculate(key,alias,todays_data,current_data,
+			todays_meta_data,current_meta_data):
+			if todays_data and current_data:
+				if key =='number_days_stood_three_hours':
+					val = (todays_data.cum_days_stand_three_hour -
+						current_data.cum_days_stand_three_hour)
+					return val 
+
+				elif key == "prcnt_days_stood_three_hours":
+					if todays_meta_data and current_meta_data:
+						days_reported_stood_not_stood_three_hours = (
+							todays_meta_data.cum_reported_stand_three_hours_days_count - 
+							current_meta_data.cum_reported_stand_three_hours_days_count
+						)
+						val = (todays_data.cum_days_stand_three_hour -
+						current_data.cum_days_stand_three_hour)
+						if days_reported_stood_not_stood_three_hours:
+							val = (val/days_reported_stood_not_stood_three_hours) * 100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return 0
+
+				elif key == "number_days_reported_stood_not_stood_three_hours":
+					days_reported_stood_not_stood_three_hours = (
+							todays_meta_data.cum_reported_stand_three_hours_days_count - 
+							current_meta_data.cum_reported_stand_three_hours_days_count
+						)
+					return days_reported_stood_not_stood_three_hours
+			return None
+
+		calculated_data = {
+			'number_days_stood_three_hours':{d:None for d in self.duration_type},
+			'prcnt_days_stood_three_hours':{d:None for d in self.duration_type},
+			'number_days_reported_stood_not_stood_three_hours':{d:None for d in self.duration_type}
+		}
+		summary_type = "standing_cum"
 
 		if custom_daterange:
 			alias = "custom_range"
