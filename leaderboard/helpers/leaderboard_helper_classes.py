@@ -75,8 +75,14 @@ class RankedScore(object):
 			score = "N/A"
 		elif self.category in ["awake_time","deep_sleep"]:
 			score = self._hours_to_hours_min(score)
+
+		if self.user == self.current_user or self.current_user.is_staff:
+			#if user is staff user, show username
+			username = self.user.username
+		else:
+			username = "Anonymous",
 		d = {
-			'username':self.user.username if self.user == self.current_user else "Anonymous",
+			'username':username,
 			'score':score,
 			'category':verbose_category[self.category],
 			'rank':self.rank
@@ -157,6 +163,7 @@ class LeaderboardOverview(object):
 		self.duration_type = ['today','yesterday','week','month','year']
 		self.custom_ranges = self._get_custom_range_info(query_params)
 		self.catg_score_priority = self._get_catg_score_priority()
+		self.duration_date = None
 
 		if not self.current_date:
 			self.duration_type = []
@@ -284,7 +291,10 @@ class LeaderboardOverview(object):
 			for catg in self.categories.keys()}
 
 		for user in user_model.objects.all():
-			data = ProgressReport(user,query_params).get_progress_report()['summary']
+			data = ProgressReport(user,query_params).get_progress_report()
+			if not self.duration_date:
+				self.duration_date = data.get("duration_date")
+			data = data['summary']
 			for catg in category_wise_data.keys():
 				for dtype in self.duration_type:
 					if catg == 'oh_gpa':
@@ -405,5 +415,6 @@ class LeaderboardOverview(object):
 				lb[catg] = self._get_category_leaderboard(catg,format)
 		else:
 			lb[category] = self._get_category_leaderboard(category,format)
+		lb["duration_date"] = self.duration_date
 
 		return lb					
