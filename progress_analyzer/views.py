@@ -28,7 +28,7 @@ class ProgressReportView(APIView):
 	permission_classes = (IsAuthenticated,)
 	def get(self, request, format="json"):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
-		#print(pprint.pprint(DATA))
+		print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
 
 
@@ -43,10 +43,10 @@ def progress_excel_export(request):
 		"date":date2,
 		"duration":"today,yesterday,week,month,year",
 		#"custom_ranges":cr1,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,travel"
 		}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
-	print(pprint.pprint(DATA))
+	#print(pprint.pprint(DATA))
 
 	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
 	#print(pprint.pprint(rank_data))	
@@ -104,9 +104,9 @@ def progress_excel_export(request):
 	sheet10.write(46,1,'Other Stats',bold)
 	sheet10.write(54,1,'Sleep Per Night (excluding awake time)',bold)
 	sheet10.write(61,1,'Sick',bold)
-	sheet10.write(66,1,'stress Level',bold)
-	sheet10.write(72,1,'Standing',bold)
-	sheet10.write(77,1,'Travel',bold)
+	sheet10.write(69,1,'stress Level',bold)
+	sheet10.write(78,1,'Standing',bold)
+	sheet10.write(84,1,'Travel',bold)
 	
 	#columns headings
 	report_date= DATA['report_date']
@@ -217,26 +217,26 @@ def progress_excel_export(request):
 		row=row+1
 		sheet10.write(row,1,sleep_per_night[i])
 
-	sick = ['% of Days Not Sick','% of Days Sick','Rank']
+	sick = ['# of Days Not Sick','% of Days Not Sick','# of Days Sick','% of Days Sick',' # Days Sick/Not Sick Reported',]
 	row=61
 	for i in range(len(sick)):
 		row=row+1
 		sheet10.write(row,1,sick[i])
 
-	stresslevel = ['% of Days Low Stress','% of Days Medium Stress','% of Days High Stress']
-	row=66
+	stresslevel = ['# of Days Low Stress Reported','% of Days Low Stress','# of Days Medium Stress Reported','% of Days Medium Stress','# of Days High Stress Reported','% of Days High Stress','# Days Stress Level Reported']
+	row=69
 	for i in range(len(stresslevel)):
 		row=row+1
 		sheet10.write(row,1,stresslevel[i])
 
-	standing = ['% of Days Stood More Than 3 Hours','Rank']
-	row=72
+	standing = ['# of Days Stood more than 3 hours','% of Days Stood More Than 3 Hours', '# of Days Reported Standing/Not Standing more than 3 hours'] 
+	row=78
 	for i in range(len(standing)):
 		row=row+1
 		sheet10.write(row,1,standing[i])
 
-	travel=['% of Days you Traveled/Stayed Away From Home?']
-	row=77
+	travel=['# of Days you Traveled/Stayed Away From Home?','% of Days you Traveled/Stayed Away From Home?']
+	row=84
 	for i in range(len(travel)):
 		row=row+1
 		sheet10.write(row,1,travel[i])
@@ -250,51 +250,56 @@ def progress_excel_export(request):
 	Es=['workout_duration_hours_min','workout_effort_level','avg_exercise_heart_rate','vo2_max']
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
+	sick1=['number_of_days_not_sick','prcnt_of_days_not_sick','number_of_days_sick','prcnt_of_days_sick','days_sick_not_sick_reported']
+	stress1=['prcnt_of_days_low_stress','prcnt_of_days_medium_stress','prcnt_of_days_high_stress']
+	standing1=['number_days_stood_three_hours','prcnt_days_stood_three_hours','number_days_reported_stood_not_stood_three_hours']
+	travel1=['number_days_travel_away_from_home','prcnt_days_travel_away_from_home']
 
 	query_params = {
 	"date":rdate,
 	"duration":"today,yesterday,week,month,year",
-	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
-	print(pprint.pprint(DATA))
+	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
+	#print(pprint.pprint(DATA))
+	print(pprint.pprint(rank_data))
 	time1=['today','yesterday','week','month','year']
 	c = 1
-	r=1
 	for i in range(len(time1)):
 		c = c+1
-		r=r+1
+		
 		sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
 		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
 		sheet10.write(5,c,rank_data['oh_gpa'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+		sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
 		
 		sheet10.write(9,c,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
 		sheet10.write(10,c,rank_data['mc'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(11,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+		sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
 		sheet10.write(12,c,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		
 		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
 		sheet10.write(16,c,rank_data['total_steps'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+		sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
 		sheet10.write(18,c,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
 		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
 		
 		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
 		sheet10.write(23,c,rank_data['prcnt_uf'][time1[i]]['user_rank']['rank'],format_align)
-		#sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+		sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		
 
 		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
 		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
 		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align1)
 
 		sheet10.write(35,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
 		sheet10.write(36,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+		sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
 		sheet10.write(38,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
 		
 		# sheet10.write(42,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
@@ -309,11 +314,13 @@ def progress_excel_export(request):
 		sheet10.write(51,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
 		sheet10.write(52,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
 
+		
 		sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
 		sheet10.write(56,c,rank_data['avg_sleep'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+		sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
 		sheet10.write(58,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		sheet10.write(59,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+		
 		
 		
 		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
@@ -393,10 +400,10 @@ def progress_excel_export(request):
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='F'):
 			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],red)
 
-		# if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
-		# 	sheet10.write(55,c,'No Workout',format_align)
-		# else:
-		# 	sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+		if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
+			sheet10.write(55,c,'No Workout',format_align)
+		else:
+			sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
 			
 		if (DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]]==0):
 			sheet10.write(43,c,'No Workout',format_align)
@@ -417,7 +424,7 @@ def progress_excel_export(request):
 			if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00'):
 				sheet10.write(48,c,'Not Recorded',format_align)
 			else:
-				sheet10.write(48,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+				sheet10.write(48,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
 		else:
 			sheet10.write(48,c,'No Workout',format_align)
 		
@@ -425,7 +432,7 @@ def progress_excel_export(request):
 			if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
 				sheet10.write(49,c,'Not Recorded',format_align)
 			else:
-				sheet10.write(49,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+				sheet10.write(49,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
 		else:
 			sheet10.write(49,c,'No Workout',format_align)
 		
@@ -433,7 +440,7 @@ def progress_excel_export(request):
 			if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
 				sheet10.write(50,c,'Not Recorded',format_align)
 			else:
-				sheet10.write(50,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+				sheet10.write(50,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
 		else:
 			sheet10.write(50,c,'No Workout',format_align)
 
@@ -444,6 +451,28 @@ def progress_excel_export(request):
 			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
 
+		row=61
+		for i in range(len(sick1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
+		
+		row=69
+		for i in range(len(stress1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
+		
+		row=78
+		for i in range(len(standing1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
+		
+		row=84
+		for i in range(len(travel1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
+
+
+		sheet10.write
 	#conditions for custom_ranges
 	if (len(a) == 2):
 		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
@@ -481,9 +510,10 @@ def progress_excel_export(request):
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
 		"custom_ranges":cr1,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
 		
 		query_params = {
 		"date":rdate,
@@ -492,7 +522,7 @@ def progress_excel_export(request):
 		}
 		rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
 		#print(pprint.pprint(rank_data))
-		print(pprint.pprint(DATA))
+		
 		c=6
 		for i in range(1):
 			c = c + 1
@@ -573,6 +603,25 @@ def progress_excel_export(request):
 			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][custom_range1]['data'],format_align)
 
+			row=61
+			for i in range(len(sick1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['sick'][sick1[i]]['custom_range'][custom_range1]['data'],format_align)
+		
+			row=69
+			for i in range(len(stress1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['stress'][stress1[i]]['custom_range'][custom_range1]['data'],format_align)
+		
+			row=78
+			for i in range(len(standing1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['standing'][standing1[i]]['custom_range'][custom_range1]['data'],format_align)
+		
+			row=84
+			for i in range(len(travel1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['travel'][travel1[i]]['custom_range'][custom_range1]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data'],green)
@@ -735,7 +784,7 @@ def progress_excel_export(request):
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
 		"custom_ranges":crs1,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
 		rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
@@ -794,6 +843,25 @@ def progress_excel_export(request):
 			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list1[i]]['data'],format_align)
 
+			row=61
+			for n in range(len(sick1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['sick'][sick1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+			row=69
+			for n in range(len(stress1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['stress'][stress1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+			row=78
+			for n in range(len(standing1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['standing'][standing1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+			row=84
+			for n in range(len(travel1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['travel'][travel1[n]]['custom_range'][list1[i]]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data'],green)
@@ -962,7 +1030,7 @@ def progress_excel_export(request):
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
 		"custom_ranges":crs2,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
 		rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
@@ -1021,6 +1089,25 @@ def progress_excel_export(request):
 			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list2[i]]['data'],format_align)
 
+			row=61
+			for n in range(len(sick1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['sick'][sick1[n]]['custom_range'][list2[i]]['data'],format_align)
+		
+			row=69
+			for n in range(len(stress1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['stress'][stress1[n]]['custom_range'][list2[i]]['data'],format_align)
+		
+			row=78
+			for n in range(len(standing1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['standing'][standing1[n]]['custom_range'][list2[i]]['data'],format_align)
+		
+			row=84
+			for n in range(len(travel1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['travel'][travel1[n]]['custom_range'][list2[i]]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data'],green)
