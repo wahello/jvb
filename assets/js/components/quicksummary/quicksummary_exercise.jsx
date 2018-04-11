@@ -57,7 +57,7 @@ const attrVerboseName = {
     exercise_consistency: 'Exercise Consistency',
     heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
     fitness_age: 'Fitness Age',
-    workout_comment: 'Workout Comment'                    
+    workout_comment: 'Workout Comments'                    
 }
 
 class Exercise extends Component {

@@ -80,7 +80,7 @@ class LeaderBoard extends Component{
 	            'user_rank':{
 	              category:'',
 	              rank:'',
-	              username:'',
+	              username:'', 
 	              score:''
 	            },
 	            "all_rank":[
@@ -257,8 +257,9 @@ class LeaderBoard extends Component{
 		  		durations.push(duration);
 		  		for (let [key,rankData] of Object.entries(val)){
 		  		 	if(key == "user_rank"){
-		  		 		if(!category)
+		  		 		if(!category){
 		  		 			category = rankData.category;
+		  		 		}
 		  		 		scores.push(rankData.score);
 		  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 		  		 	}
@@ -317,12 +318,28 @@ class LeaderBoard extends Component{
 	  							  className = "lb_table_style_rows">
 	  							  {"Scores"}</td>]
 	  	for(let score of scores){
+	  		if(category == "Total Steps"){
+	  			var value = score;
+	  		    if(value != undefined){
+	                value += '';
+	                var x = value.split('.');
+	                var x1 = x[0];
+	                var x2 = x.length > 1 ? '.' + x[1] : '';
+	                var rgx = /(\d+)(\d{3})/;
+	                while (rgx.test(x1)) {
+	            			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	          		}
+	                scoreTableData.push(<td className="lb_table_style_rows">{x1 + x2}</td>);
+    	        }
+	  		}
+	  		else{
 	  		scoreTableData.push(<td className = "lb_table_style_rows">{score}</td>);
+	  	    }
 	  	}
 	  	tableRows.push(<tbody><tr className = "lb_table_style_rows">{scoreTableData}</tr></tbody>)
 
-	  	return  <table className = "table table-striped table-responsive lb_table_style_rows">{tableRows}</table>;
-  	}
+	  	return  <table className = "table table-striped table-bordered">{tableRows}</table>;
+  	};
   	
 	render(){
 		 const {fix} = this.props;
@@ -514,42 +531,66 @@ class LeaderBoard extends Component{
                     </PopoverBody>
                 </Popover>
             <div className="col-sm-12 col-md-12 col-lg-12">
-	        <div className = "row justify-content-center lb_table_style">
-		        {this.renderTablesTd(this.state.ranking_data.oh_gpa)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.alcohol_drink)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.avg_sleep)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.prcnt_uf)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.total_steps)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.mc)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.ec)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.awake_time)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.resting_hr)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.deep_sleep)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.mne_gpa)}
-	        </div>
-	        <div className = "row justify-content-center lb_table_style">
-	        	{this.renderTablesTd(this.state.ranking_data.floor_climbed)}
-	        </div>
+		        <div className = "row justify-content-center lb_table_style" style = {{paddingTop:"25px"}}>
+		        	<div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.oh_gpa)}
+			        </div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.alcohol_drink)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.avg_sleep)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.prcnt_uf)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.total_steps)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.mc)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.ec)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.awake_time)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.resting_hr)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.deep_sleep)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+		        	<div className = "table table-responsive">
+		        		{this.renderTablesTd(this.state.ranking_data.mne_gpa)}
+		        	</div>
+		        </div>
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.floor_climbed)}
+			        </div>
+		        </div>
 	        </div>
 	        </div>
 		)

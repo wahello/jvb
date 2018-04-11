@@ -75,6 +75,24 @@ class OtherStatsCumulative(models.Model):
 	cum_hrr_lowest_hr_point = models.IntegerField(blank=True, null=True)
 	cum_floors_climbed = models.IntegerField(blank=True,null=True)
 
+class SickCumulative(models.Model):
+	user_cum = models.OneToOneField(CumulativeSum, related_name="sick_cum")
+	cum_days_sick = models.IntegerField(blank=True,null=True)
+
+class StandingCumulative(models.Model):
+	user_cum = models.OneToOneField(CumulativeSum, related_name="standing_cum")
+	cum_days_stand_three_hour = models.IntegerField(blank=True,null=True)
+
+class TravelCumulative(models.Model):
+	user_cum = models.OneToOneField(CumulativeSum, related_name="travel_cum")
+	cum_days_travel_away_from_home = models.IntegerField(blank=True,null=True)
+
+class StressCumulative(models.Model):
+	user_cum = models.OneToOneField(CumulativeSum, related_name="stress_cum")
+	cum_days_low_stress = models.IntegerField(blank=True,null=True)
+	cum_days_medium_stress = models.IntegerField(blank=True,null=True)
+	cum_days_high_stress = models.IntegerField(blank=True,null=True)
+
 class MetaCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name='meta_cum')
 	cum_workout_days_count = models.IntegerField(blank=True,null=True)
@@ -93,3 +111,7 @@ class MetaCumulative(models.Model):
 		blank=True, null=True
 	)
 	cum_mc_recorded_days_count = models.IntegerField(blank=True,null=True)
+	cum_reported_sick_days_count = models.IntegerField(blank=True,null=True)
+	cum_reported_stand_three_hours_days_count = models.IntegerField(blank=True,null=True)
+	cum_reported_stress_days_count = models.IntegerField(blank=True,null=True)
+	cum_reported_alcohol_days_count = models.IntegerField(blank=True,null=True)
