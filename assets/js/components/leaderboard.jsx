@@ -90,6 +90,7 @@ class LeaderBoard extends Component{
         }
         rankInitialState[catg] = catInitialState;
     };
+    console.log("rankInitialState",rankInitialState);
 		this.state = {
 			selectedDate:new Date(),
 			lb1_start_date:'',
@@ -233,14 +234,16 @@ class LeaderBoard extends Component{
       });
     }
   	renderTablesTd(value){
+  		console.log(value);
   		let category = "";
 	  	let durations = [];
 	  	let scores = [];
 	  	let ranks = [];
 	  	let tableRows = [];
-	  	let time = ["custom_range","today","yesterday","week","month","year"];
-	  	for(let [duration,val] of Object.entries(value)){
-	  		if(duration == "custom_range"){
+	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
+	  	for(let duration of durations_type){
+	  		let val = value[duration];
+	  		if(duration == "custom_range" && val){
 	  			for(let [range,value1] of Object.entries(val)){
 	  				durations.push(range);
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
@@ -253,17 +256,19 @@ class LeaderBoard extends Component{
 	  				}
 	  			}
 	  		}
-	  		else{ 
-		  		durations.push(duration);
-		  		for (let [key,rankData] of Object.entries(val)){
-		  		 	if(key == "user_rank"){
-		  		 		if(!category){
-		  		 			category = rankData.category;
-		  		 		}
-		  		 		scores.push(rankData.score);
-		  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
-		  		 	}
-		  		}
+	  		else{
+	  			if (val){ 
+			  		durations.push(duration);
+			  		for (let [key,rankData] of Object.entries(val)){
+			  		 	if(key == "user_rank"){
+			  		 		if(!category){
+			  		 			category = rankData.category;
+			  		 		}
+			  		 		scores.push(rankData.score);
+			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
+			  		 	}
+			  		}
+			  	}
 		  	}
 	  	}
 
@@ -272,6 +277,7 @@ class LeaderBoard extends Component{
 	  	for(let dur of durations){
 	  		tableHeaders.push(<th className = "lb_table_style_rows">{dur}</th>);
 	  	}
+	 
 	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
 
 	  	// creating table rows for ranks
