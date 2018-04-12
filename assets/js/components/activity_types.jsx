@@ -279,7 +279,36 @@ if(selectedActivityId){
   }
 }
 
-
+editToggleHandler_start_time(event){
+            const target = event.target;
+const selectedActivityId = target.getAttribute('data-name');
+  let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+            
+      categoryMode['startTimeInSeconds'] = !categoryMode['startTimeInSeconds'] 
+      console.log("cat"+categoryMode['startTimeInSeconds']);
+if(selectedActivityId){
+    this.setState({
+    ...this.state.activities_edit_mode,
+        [selectedActivityId]:categoryMode
+      });
+   
+  }
+}
+editToggleHandler_end_time(event){
+            const target = event.target;
+const selectedActivityId = target.getAttribute('data-name');
+  let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+            
+      categoryMode['endTimeInSeconds'] = !categoryMode['endTimeInSeconds'] 
+      console.log("cat"+categoryMode['endTimeInSeconds']);
+if(selectedActivityId){
+    this.setState({
+    ...this.state.activities_edit_mode,
+        [selectedActivityId]:categoryMode
+      });
+   
+  }
+}
 
 
   editToggleHandler_comments(event){
@@ -634,16 +663,20 @@ const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinu
 let activityRows = [];
 for (let [key,value] of Object.entries(this.state.activites)){
 let activityData = [];
+console.log("complete_data",activityData);
+
 let summaryId; 
 let hour;
 let min; 
 for (let key of activityKeys){
 let value1 = value[key];
+console.log("value[key]:", value[key]);
 if(key == 'summaryId'){
 summaryId = value1;
 }
 else if(key == "activityType"){
-let  activityType=value1;
+var  activityType=value1;
+console.log("activityType:",activityType);
 activityData.push(<td  name = {summaryId}  id = "add_button">
 
 { this.state.activities_edit_mode[summaryId][key] ? <Input 
@@ -669,7 +702,9 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
 else if(key == "averageHeartRateInBeatsPerMinute"){
 let  averageHeartRateInBeatsPerMinute=value1;
 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            { this.state.activities_edit_mode[summaryId][key]  ? <Input 
+                            { this.state.activities_edit_mode[summaryId][key]  ? 
+                           
+                              <Input 
                            data-name = {summaryId}
                         type="select" 
                         className="form-control"
@@ -690,7 +725,10 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
 
 }
 else if(key == "startTimeInSeconds"){
-let  averageHeartRateInBeatsPerMinute=value1;
+var  start_time=value1;
+var start_time_sec=moment.unix(start_time);
+console.log("start-time-sec",start_time_sec);
+var total_time1=moment(start_time_sec, "x").format("DD MMM YYYY hh:mm a");
 activityData.push(<td  name = {summaryId}  id = "add_button">
                             { this.state.activities_edit_mode[summaryId][key]  ? <Input 
                            data-name = {summaryId}
@@ -700,20 +738,24 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
                         name = "modal_activity_heart_rate" 
                         value={this.state.activites[summaryId][key]}                               
                         onChange={this.handleChange_heartrate}
-                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                        onBlur={this.editToggleHandler_start_time.bind(this)}>
                         
                         <option key="hours" value=" ">Select</option>
                     {this.createSleepDropdown_heartrate(90,220)}
                     <option value="Not Measured">Not Measured</option>     
-                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:averageHeartRateInBeatsPerMinute}
-                        <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:total_time1}
+                        <span data-name = {summaryId} onClick={this.editToggleHandler_start_time.bind(this)}
             className="fa fa-pencil fa-1x progressActivity1"
             id = "add_button">
         </span></td>);
 
 }
 else if(key == "endTimeInSeconds"){
-let  averageHeartRateInBeatsPerMinute=value1;
+var  end_time=start_time+duration;
+
+var end_time_sec=moment.unix(end_time);
+console.log("start-time-sec",end_time_sec);
+var total_time=moment(end_time_sec, "x").format("DD MMM YYYY hh:mm a");
 activityData.push(<td  name = {summaryId}  id = "add_button">
                             { this.state.activities_edit_mode[summaryId][key]  ? <Input 
                            data-name = {summaryId}
@@ -723,45 +765,20 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
                         name = "modal_activity_heart_rate" 
                         value={this.state.activites[summaryId][key]}                               
                         onChange={this.handleChange_heartrate}
-                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                        onBlur={this.editToggleHandler_end_time.bind(this)}>
                         
                         <option key="hours" value=" ">Select</option>
                     {this.createSleepDropdown_heartrate(90,220)}
                     <option value="Not Measured">Not Measured</option>     
-                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:averageHeartRateInBeatsPerMinute}
-                        <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:total_time}
+                        <span data-name = {summaryId} onClick={this.editToggleHandler_end_time.bind(this)}
             className="fa fa-pencil fa-1x progressActivity1"
             id = "add_button">
         </span></td>);
 
 }
-else if(key == "comments"){
-let  comments=value1;
-activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
-                              { this.state.activities_edit_mode[summaryId][key] ? <div><Textarea 
-                              data-name={summaryId}
-                            onBlur={ this.editToggleHandler_comments.bind(this)}
-                            id="text_area"
-                            className="form-control"
-                            style={{height:"37px"}}
-                            name = "modal_activity_comment" 
-                            value={this.state.activites[summaryId][key]} 
-                           onChange={this.valueChange.bind(this)}
-                        onBlur={this.handleChange_comments.bind(this), this.editToggleHandler_comments.bind(this)}>                       
-                          </Textarea><Button data-name={summaryId} size = "sm" id={summaryId} 
-                          className="btn btn-info save_btn" onClick={ this.editToggleHandler_comments.bind(this)}>Save
-                          </Button></div>
-                       :this.state.modal_activity_comment? this.state.modal_activity_comment:comments}
-                         
-            <span data-name={summaryId} onClick={this.editToggleHandler_comments.bind(this)}
-                  className="fa fa-pencil fa-1x progressActivity1 "
-                  id = "add_button">
-            </span>
-        </td>);
-}
-
 else if(key == "durationInSeconds"){
-let duration = value1;
+var duration = value1;
 let min = parseInt(duration/60);
 let hour = parseInt(min/60);
 let mins = parseInt(min%60);
@@ -812,17 +829,38 @@ activityData.push(<td  name={summaryId} id = "add_button">
             </span>
             </td>); 
 }
+else if(key == "comments"){
+let  comments=value1;
+activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
+                              { this.state.activities_edit_mode[summaryId][key] ? <div><Textarea 
+                              data-name={summaryId}
+                            onBlur={ this.editToggleHandler_comments.bind(this)}
+                            id="text_area"
+                            className="form-control"
+                            style={{height:"37px"}}
+                            name = "modal_activity_comment" 
+                            value={this.state.activites[summaryId][key]} 
+                           onChange={this.valueChange.bind(this)}
+                        onBlur={this.handleChange_comments.bind(this), this.editToggleHandler_comments.bind(this)}>                       
+                          </Textarea><Button data-name={summaryId} size = "sm" id={summaryId} 
+                          className="btn btn-info save_btn" onClick={ this.editToggleHandler_comments.bind(this)}>Save
+                          </Button></div>
+                       :this.state.modal_activity_comment? this.state.modal_activity_comment:comments}
+                         
+            <span data-name={summaryId} onClick={this.editToggleHandler_comments.bind(this)}
+                  className="fa fa-pencil fa-1x progressActivity1 "
+                  id = "add_button">
+            </span>
+        </td>);
+}
+
+
 else{
 activityData.push(<td id = "add_button">{value1}</td>);
 }
 }
 activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-                       <span name={summaryId}
-                        data-name = {summaryId}
-                        className="fa fa-pencil fa-1x progressActivity"
-                        onClick={this.handleChangeModal}
-                        id = "add_button">
-                        </span>
+                      
                 </tr>); 
       }
 
