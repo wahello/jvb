@@ -620,36 +620,36 @@ def progress_excel_export(request):
 			# row=61
 			# for i in range(len(sick1)):
 			# 	row=row+1
-			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]][time1[i]],format_align)
-			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]][time1[i]],format_align)
-			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]][time1[i]],format_align)
-			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]][time1[i]],format_align)
-			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]][time1[i]],format_align)
+			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]]['custom_range'][custom_range1]['data'],format_align)
 
 
 			# row=69
 			# for i in range(len(stress1)):
 			# 	row=row+1
-			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]][time1[i]],format_align)
-			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]][time1[i]],format_align)
-			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]][time1[i]],format_align)
-			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]][time1[i]],format_align)
-			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]][time1[i]],format_align)
-			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]][time1[i]],format_align)
-			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]][time1[i]],format_align)
+			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]]['custom_range'][custom_range1]['data'],format_align)
 
 			# row=78
 			# for i in range(len(standing1)):
 			# 	row=row+1
-			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]][time1[i]],format_align)
-			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]][time1[i]],format_align)
-			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]][time1[i]],format_align)
+			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]]['custom_range'][custom_range1]['data'],format_align)
 
 			# row=84
 			# for i in range(len(travel1)):
 			# 	row=row+1
-			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]][time1[i]],format_align)
-			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]][time1[i]],format_align)
+			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]]['custom_range'][custom_range1]['data'],format_align)
 
 		
 			
@@ -848,7 +848,7 @@ def progress_excel_export(request):
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list1[i]]['data'],format_align1)
-			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align)
 
 			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(36,c,rank_data['ec']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
@@ -876,36 +876,36 @@ def progress_excel_export(request):
 			# row=61
 			# for i in range(len(sick1)):
 			# 	row=row+1
-			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]][time1[i]],format_align)
-			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]][time1[i]],format_align)
-			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]][time1[i]],format_align)
-			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]][time1[i]],format_align)
-			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]][time1[i]],format_align)
+			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]]['custom_range'][list1[i]]['data'],format_align)
 
 
 			# row=69
 			# for i in range(len(stress1)):
 			# 	row=row+1
-			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]][time1[i]],format_align)
-			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]][time1[i]],format_align)
-			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]][time1[i]],format_align)
-			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]][time1[i]],format_align)
-			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]][time1[i]],format_align)
-			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]][time1[i]],format_align)
-			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]][time1[i]],format_align)
+			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]]['custom_range'][list1[i]]['data'],format_align)
 
 			# row=78
 			# for i in range(len(standing1)):
 			# 	row=row+1
-			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]][time1[i]],format_align)
-			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]][time1[i]],format_align)
-			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]][time1[i]],format_align)
+			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]]['custom_range'][list1[i]]['data'],format_align)
 
 			# row=84
 			# for i in range(len(travel1)):
 			# 	row=row+1
-			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]][time1[i]],format_align)
-			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]][time1[i]],format_align)
+			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]]['custom_range'][list1[i]]['data'],format_align)
 
 		
 			
@@ -1110,7 +1110,7 @@ def progress_excel_export(request):
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list2[i]]['data'],format_align1)
-			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align)
 
 			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(36,c,rank_data['ec']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
@@ -1138,36 +1138,36 @@ def progress_excel_export(request):
 			# row=61
 			# for i in range(len(sick1)):
 			# 	row=row+1
-			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]][time1[i]],format_align)
-			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]][time1[i]],format_align)
-			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]][time1[i]],format_align)
-			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]][time1[i]],format_align)
-			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]][time1[i]],format_align)
+			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]]['custom_range'][list2[i]]['data'],format_align)
 
 
 			# row=69
 			# for i in range(len(stress1)):
 			# 	row=row+1
-			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]][time1[i]],format_align)
-			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]][time1[i]],format_align)
-			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]][time1[i]],format_align)
-			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]][time1[i]],format_align)
-			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]][time1[i]],format_align)
-			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]][time1[i]],format_align)
-			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]][time1[i]],format_align)
+			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]]['custom_range'][list2[i]]['data'],format_align)
 
 			# row=78
 			# for i in range(len(standing1)):
 			# 	row=row+1
-			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]][time1[i]],format_align)
-			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]][time1[i]],format_align)
-			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]][time1[i]],format_align)
+			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]]['custom_range'][list2[i]]['data'],format_align)
 
 			# row=84
 			# for i in range(len(travel1)):
 			# 	row=row+1
-			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]][time1[i]],format_align)
-			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]][time1[i]],format_align)
+			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]]['custom_range'][list2[i]]['data'],format_align)
 
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data']=='A'):
