@@ -612,9 +612,9 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 		sleep_stats['sleep_awake_time'] = None
 
 	return sleep_stats
-	
+
 def get_activity_stats(activities_json,manually_updated_json):
-		activity_stats = {
+	activity_stats = {
 		"have_activity":False,
 		"distance_run_miles": 0,
 		"distance_bike_miles": 0,

@@ -14,8 +14,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
-from xlsxwriter.workbook import Workbook
-from fitparse import FitFile
+#from fitparse import FitFile
 from garmin.models import GarminFitFiles
 from registration.models import Profile
 from user_input.models import DailyUserInputOptional ,\

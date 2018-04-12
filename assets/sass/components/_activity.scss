@@ -36,7 +36,7 @@ float: right;
 }
 }
 #activity_table{
-	padding-top: 80px;	
+	padding-top: 10px;	
 }
 .edit_sel{
 	width:80%;
@@ -53,4 +53,11 @@ td{
 }
 .save_btn{
 	margin-top:10px;
+}
+.add_activity{
+	float:left;
+}
+.tableresponsive{
+	margin :0 auto;
+	width:98%;
 }
