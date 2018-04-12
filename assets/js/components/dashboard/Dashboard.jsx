@@ -29,7 +29,7 @@ class Dashboard extends Component {
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							  <Link to='/leaderboard'>Leader Board</Link><br/>
-							   <Link to='/heartrate'>Heart Rate Recovery</Link><br/>
+							   <Link to='/heartrate'>Aerobic vs. Anaerobic Ranges</Link><br/>
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
 							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
