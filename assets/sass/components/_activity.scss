@@ -9,6 +9,9 @@
 	padding-left: 20px;
 
 }
+.progressActivity1{
+float: right;
+}
 #save_cancel_btn{
 	float: right;
 	padding-top: 30px;
@@ -36,4 +39,19 @@
 #activity_table{
 	padding-top: 80px;	
 }
+.edit_sel{
+	width:80%;
+}
 
+
+td{
+	width:230px;
+	height:40px;
+}
+.displayflex {
+    display: inline-flex;
+   
+}
+.save_btn{
+	margin-top:10px;
+}
