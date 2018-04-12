@@ -228,7 +228,7 @@ def hrr_calculations(request):
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	start = start_date
 	end = start + timedelta(days=1)
-	print(start,end)
+
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	kd = Profile.objects.filter(user=request.user)
 	for ss in kd:
@@ -236,39 +236,73 @@ def hrr_calculations(request):
 	today = date.today()
 	age_user = today.year - cc.year
 	lis = []
-	for x in a1:
-		# print(x)
-		fitfile = FitFile(x.fit_file)
-		for record in fitfile.get_messages('record'):
-			for record_data in record:
-				if(record_data.name=='heart_rate'):
-					b = record_data.value
-					lis.extend([b])
-	
-	total_time = len(lis)
-	avg = int(sum(lis)/total_time)
+	tim = []
+	data = {"total_time":"",
+				"aerobic_zone":"",
+				"anaerobic_range":"",
+				"below_aerobic_zone":"",
+				"percent_aerobic":"",
+				"percent_below_aerobic":"",
+				"percent_anaerobic":"",
+				"total_percent":""}
+	if a1:
+		for x in a1:
+			# print(x)
+			fitfile = FitFile(x.fit_file)
+			for record in fitfile.get_messages('record'):
+				for record_data in record:
+					if(record_data.name=='heart_rate'):
+						b = record_data.value
+						lis.extend([b])
 
-	below_aerobic_value = 180-age_user-30
-	anaerobic_value = 180-age_user+5
+					if(record_data.name=='timestamp'):
+						c = record_data.value
+						tim.extend([c]) 
+		tim_ts = []
+		for i,k in enumerate(tim):
+			dtt = k.timetuple()
+			ts = time.mktime(dtt)
+			tim_ts.extend([ts])
+		tim_ts_diff = []
+		for i,k in enumerate(tim_ts):
+			try:
+				dif_tim = tim_ts[i+1] - tim_ts[i]
+				tim_ts_diff.extend([dif_tim])
+			except IndexError:
+				tim_ts_diff.extend([1])
 
-	time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
-	time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
-	time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
-	
-	percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
-	percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
-	percent_aerobic = round((time_in_aerobic/total_time)*100,2)
-	
-	total_percent = 100
-	
-	data = {"total_time":total_time,
-			"aerobic_zone":time_in_aerobic,
-			"anaerobic_range":time_in_anaerobic,
-			"below_aerobic_zone":time_in_below_aerobic,
-			"percent_aerobic":percent_aerobic,
-			"percent_below_aerobic":percent_below_aerobic,
-			"percent_anaerobic":percent_anaerobic,
-			"total_percent":total_percent}
+		below_aerobic_value = 180-age_user-30
+		anaerobic_value = 180-age_user+5
+
+		anaerobic_range_list = []
+		below_aerobic_list = []
+		aerobic_list = []
+		for a, b in zip(lis,tim_ts_diff):
+			if a > anaerobic_value:
+				anaerobic_range_list.extend([b])
+			elif a < below_aerobic_value:
+				below_aerobic_list.extend([b])
+			else:
+				aerobic_list.extend([b])
+
+		time_in_aerobic = sum(aerobic_list)
+		time_in_below_aerobic = sum(below_aerobic_list)
+		time_in_anaerobic = sum(anaerobic_range_list)
+		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
+		percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
+		percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
+		percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+
+		total_percent = 100
+
+		data = {"total_time":total_time,
+				"aerobic_zone":time_in_aerobic,
+				"anaerobic_range":time_in_anaerobic,
+				"below_aerobic_zone":time_in_below_aerobic,
+				"percent_aerobic":percent_aerobic,
+				"percent_below_aerobic":percent_below_aerobic,
+				"percent_anaerobic":percent_anaerobic,
+				"total_percent":total_percent}
 
 	return JsonResponse(data)
 
@@ -380,8 +414,10 @@ def export_users_xls(request):
 	format_red = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0'})
 	format_red_con = book.add_format({'align':'left', 'bg_color': 'red','num_format': '#,##0','font_color': 'white'})
 	format_green = book.add_format({'align':'left', 'bg_color': 'green','num_format': '#,##0','font_color': 'white'})
+	format_limegreen = book.add_format({'align':'left', 'bg_color': '#32CD32','num_format': '#,##0','font_color': 'black'})
 	format_yellow = book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '#,##0'})
 	format_orange = book.add_format({'align':'left', 'bg_color': '#00B0EC','num_format': '#,##0'})
+	format_orange_grades = book.add_format({'align':'left', 'bg_color': '#FF8C00','num_format': '#,##0'})
 	format_purple = book.add_format({'align':'left', 'bg_color': 'pink','num_format': '#,##0','font_color': 'white'})
 	format = book.add_format({'align':'left','num_format': '#,##0'})
 	format1 = book.add_format({'align':'left','num_format': '0.00'})
@@ -389,10 +425,14 @@ def export_users_xls(request):
 	format_exe = book.add_format({'align':'left','num_format': '0.0'})
 	format_red_a = book.add_format({'align':'left', 'bg_color': 'red','num_format': '0.0'})
 	format_green_a = book.add_format({'align':'left', 'bg_color': 'green','num_format': '0.0','font_color': 'white'})
+	format_limegreen_a = book.add_format({'align':'left', 'bg_color': '#32CD32','num_format': '0.0','font_color': 'black'})
 	format_yellow_a= book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '0.0'})
+	format_orange_a= book.add_format({'align':'left', 'bg_color': '#FF8C00','num_format': '0.0'})
 	format_red_overall = book.add_format({'align':'left', 'bg_color': 'red','num_format': '0.00'})
 	format_green_overall = book.add_format({'align':'left', 'bg_color': 'green','num_format': '0.00','font_color': 'white'})
+	format_limegreen_overall = book.add_format({'align':'left', 'bg_color': '#32CD32','num_format': '0.00','font_color': 'black'})
 	format_yellow_overall= book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '0.00'})
+	format_orange_overall= book.add_format({'align':'left', 'bg_color': '#FF8C00','num_format': '0.00'})
 
 	format_points= book.add_format({'align':'left','num_format': '0.00'})
 
@@ -520,11 +560,11 @@ def export_users_xls(request):
 					if grades_data[key] == 'A':
 						sheet9.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
-						sheet9.write(i+3,row_num, grades_data[key],format_green)
+						sheet9.write(i+3,row_num, grades_data[key],format_limegreen)
 					elif grades_data[key] == 'C':
 						sheet9.write(i+3,row_num, grades_data[key],format_yellow)
 					elif grades_data[key] == 'D':
-						sheet9.write(i+3,row_num, grades_data[key],format_yellow)
+						sheet9.write(i+3,row_num, grades_data[key],format_orange_grades)
 					elif grades_data[key] == 'F':
 						sheet9.write(i+3,row_num, grades_data[key],format_red)
 					elif grades_data[key] == 'N/A':
@@ -776,21 +816,21 @@ def export_users_xls(request):
 				if i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'A':
 					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_green)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'B':
-					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_green)
+					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_limegreen)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'C':
 					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_yellow)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'D':
-					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_yellow)
+					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_orange_grades)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'F':
 					sheet9.write(i1+i+1,row_num - num_3, steps_data[key], format_red)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and steps_data[key]:
 					sheet9.write(i1+i+1,row_num - num_3, ast.literal_eval(steps_data[key])['inactive_hours'], format_green)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and steps_data[key]:
-					sheet9.write(i1+i+1,row_num - num_3, ast.literal_eval(steps_data[key])['inactive_hours'], format_green)
+					sheet9.write(i1+i+1,row_num - num_3, ast.literal_eval(steps_data[key])['inactive_hours'], format_limegreen)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and steps_data[key]:
 					sheet9.write(i1+i+1,row_num - num_3, ast.literal_eval(steps_data[key])['inactive_hours'], format_yellow)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and steps_data[key]:
-					sheet9.write(i1+i+1,row_num - num_3, ast.literal_eval(steps_data[key])['inactive_hours'], format_yellow)
+					sheet9.write(i1+i+1,row_num - num_3, ast.literal_eval(steps_data[key])['inactive_hours'], format_orange_grades)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and steps_data[key]:
 					sheet9.write(i1+i+1,row_num - num_3,ast.literal_eval(steps_data[key])['inactive_hours'], format_red)
 				else:
@@ -892,11 +932,11 @@ def export_users_xls(request):
 					if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
 						sheet3.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'B':
-						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_limegreen)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'C':
 						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'D':
-						sheet9.write(i1 + i + 1, row_num - num_4,user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
+						sheet9.write(i1 + i + 1, row_num - num_4,user_input_strong_data['sleep_time_excluding_awake_time'], format_orange_grades)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'F':
 						sheet9.write(i1 + i + 1, row_num - num_4,user_input_strong_data['sleep_time_excluding_awake_time'], format_red)
 					elif i == 3:
@@ -960,11 +1000,11 @@ def export_users_xls(request):
 				if grades_data['prcnt_unprocessed_food_consumed_grade'] == 'A' and i == 0:
 					sheet9.write(i1 + i + 1, row_num - num_5,str(int(food_data[key])) + '%' ,format_green)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'B' and i == 0:
-					sheet9.write(i1 + i + 1, row_num - num_5, str(int(food_data[key])) + '%' ,format_green)
+					sheet9.write(i1 + i + 1, row_num - num_5, str(int(food_data[key])) + '%' ,format_limegreen)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'C' and i == 0:
 					sheet9.write(i1 + i + 1, row_num - num_5,str(int(food_data[key])) + '%' ,format_yellow)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'D' and i == 0:
-					sheet9.write(i1 + i + 1, row_num - num_5, str(int(food_data[key])) + '%' ,format_yellow)
+					sheet9.write(i1 + i + 1, row_num - num_5, str(int(food_data[key])) + '%' ,format_orange_grades)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'F' and i == 0:
 					sheet9.write(i1 + i + 1, row_num - num_5,str(int(food_data[key])) + '%' ,format_red)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == '':
@@ -1016,11 +1056,11 @@ def export_users_xls(request):
 				if i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'A':
 					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_green)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'B':
-					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_green)
+					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_limegreen)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'C':
 					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_yellow)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'D':
-					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_yellow)
+					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_orange_grades)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'F':
 					sheet9.write(i1 + i + 1, row_num - num_6, alcohol_data[key], format_red)
 				else:
@@ -1298,11 +1338,11 @@ def export_users_xls(request):
 					if grades_data[key] == 'A':
 						sheet1.write(i+3,row_num, grades_data[key],format_green)
 					elif grades_data[key] == 'B':
-						sheet1.write(i+3,row_num, grades_data[key],format_green)
+						sheet1.write(i+3,row_num, grades_data[key],format_limegreen)
 					elif grades_data[key] == 'C':
 						sheet1.write(i+3,row_num, grades_data[key],format_yellow)
 					elif grades_data[key] == 'D':
-						sheet1.write(i+3,row_num, grades_data[key],format_yellow)
+						sheet1.write(i+3,row_num, grades_data[key],format_orange_grades)
 					elif grades_data[key] == 'F':
 						sheet1.write(i+3,row_num, grades_data[key],format_red)
 					elif grades_data[key] == 'N/A':
@@ -1654,21 +1694,21 @@ def export_users_xls(request):
 				if i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'A':
 					sheet2.write(i + 2, row_num, steps_data[key], format_green)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'B':
-					sheet2.write(i + 2, row_num,steps_data[key], format_green)
+					sheet2.write(i + 2, row_num,steps_data[key], format_limegreen)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'C':
 					sheet2.write(i + 2, row_num, steps_data[key], format_yellow)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'D':
-					sheet2.write(i + 2, row_num, steps_data[key], format_yellow)
+					sheet2.write(i + 2, row_num, steps_data[key], format_orange_grades)
 				elif i == 1 and grades_data['movement_non_exercise_steps_grade'] == 'F':
 					sheet2.write(i + 2, row_num, steps_data[key], format_red)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'A' and key == 'movement_consistency' and steps_data[key]:
 					sheet2.write(i + 2, row_num, ast.literal_eval(steps_data[key])['inactive_hours'], format_green)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'B' and key == 'movement_consistency' and steps_data[key]:
-					sheet2.write(i + 2, row_num, ast.literal_eval(steps_data[key])['inactive_hours'], format_green)
+					sheet2.write(i + 2, row_num, ast.literal_eval(steps_data[key])['inactive_hours'],format_limegreen)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'C' and key == 'movement_consistency' and steps_data[key]:
 					sheet2.write(i + 2, row_num, ast.literal_eval(steps_data[key])['inactive_hours'], format_yellow)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'D' and key == 'movement_consistency' and steps_data[key]:
-					sheet2.write(i + 2, row_num, ast.literal_eval(steps_data[key])['inactive_hours'], format_yellow)
+					sheet2.write(i + 2, row_num, ast.literal_eval(steps_data[key])['inactive_hours'], format_orange_grades)
 				elif i == 0 and grades_data['movement_consistency_grade'] == 'F' and key == 'movement_consistency' and steps_data[key]:
 					sheet2.write(i + 2, row_num,ast.literal_eval(steps_data[key])['inactive_hours'], format_red)
 				else:
@@ -1740,11 +1780,11 @@ def export_users_xls(request):
 					if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
 						sheet3.write(i + 2, row_num, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'B':
-						sheet3.write(i + 2, row_num, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+						sheet3.write(i + 2, row_num, user_input_strong_data['sleep_time_excluding_awake_time'], format_limegreen)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'C':
 						sheet3.write(i + 2, row_num, user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'D':
-						sheet3.write(i + 2, row_num,user_input_strong_data['sleep_time_excluding_awake_time'], format_yellow)
+						sheet3.write(i + 2, row_num,user_input_strong_data['sleep_time_excluding_awake_time'], format_orange_grades)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'F':
 						sheet3.write(i + 2, row_num,user_input_strong_data['sleep_time_excluding_awake_time'], format_red)
 					elif i == 3:
@@ -1819,11 +1859,11 @@ def export_users_xls(request):
 				if grades_data['prcnt_unprocessed_food_consumed_grade'] == 'A' and i == 0:
 					sheet4.write(i + 2, row_num,str(int(food_data[key])) + '%' ,format_green)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'B' and i == 0:
-					sheet4.write(i + 2, row_num, str(int(food_data[key])) + '%' ,format_green)
+					sheet4.write(i + 2, row_num, str(int(food_data[key])) + '%' ,format_limegreen)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'C' and i == 0:
 					sheet4.write(i + 2, row_num,str(int(food_data[key])) + '%' ,format_yellow)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'D' and i == 0:
-					sheet4.write(i + 2, row_num,str(int(food_data[key])) + '%' ,format_yellow)
+					sheet4.write(i + 2, row_num,str(int(food_data[key])) + '%' ,format_orange_grades)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == 'F' and i == 0:
 					sheet4.write(i + 2, row_num,str(int(food_data[key])) + '%' ,format_red)
 				elif grades_data['prcnt_unprocessed_food_consumed_grade'] == '':
@@ -1878,11 +1918,11 @@ def export_users_xls(request):
 				if i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'A':
 					sheet5.write(i + 2, row_num, alcohol_data[key], format_green_a)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'B':
-					sheet5.write(i + 2, row_num, alcohol_data[key], format_green_a)
+					sheet5.write(i + 2, row_num, alcohol_data[key], format_limegreen_a)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'C':
 					sheet5.write(i + 2, row_num, alcohol_data[key], format_yellow_a)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'D':
-					sheet5.write(i + 2, row_num, alcohol_data[key], format_yellow_a)
+					sheet5.write(i + 2, row_num, alcohol_data[key], format_orange_a)
 				elif i == 1 and grades_data['alcoholic_drink_per_week_grade'] == 'F':
 					sheet5.write(i + 2, row_num, alcohol_data[key], format_red_a)
 				else:
@@ -2990,7 +3030,8 @@ def export_users_xls(request):
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
 	sick1=['number_of_days_not_sick','prcnt_of_days_not_sick','number_of_days_sick','prcnt_of_days_sick','days_sick_not_sick_reported']
-	stress1=['prcnt_of_days_low_stress','prcnt_of_days_medium_stress','prcnt_of_days_high_stress']
+	stress1=['number_of_days_low_stress_reported','prcnt_of_days_low_stress','number_of_days_medium_stress_reported','prcnt_of_days_medium_stress',
+			'number_of_days_high_stress_reported','prcnt_of_days_high_stress','days_stress_level_reported']	
 	standing1=['number_days_stood_three_hours','prcnt_days_stood_three_hours','number_days_reported_stood_not_stood_three_hours']
 	travel1=['number_days_travel_away_from_home','prcnt_days_travel_away_from_home']
 
@@ -3058,7 +3099,39 @@ def export_users_xls(request):
 		sheet10.write(58,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		sheet10.write(59,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		
-		
+		# row=61
+		# for i in range(len(sick1)):
+		# 	row=row+1
+		sheet10.write(62,c,DATA['summary']['sick'][sick1[0]][time1[i]],format_align)
+		sheet10.write(63,c,DATA['summary']['sick'][sick1[1]][time1[i]],format_align)
+		sheet10.write(64,c,DATA['summary']['sick'][sick1[2]][time1[i]],format_align)
+		sheet10.write(65,c,DATA['summary']['sick'][sick1[3]][time1[i]],format_align)
+		sheet10.write(66,c,DATA['summary']['sick'][sick1[4]][time1[i]],format_align)
+
+
+		# row=69
+		# for i in range(len(stress1)):
+		# 	row=row+1
+		sheet10.write(70,c,DATA['summary']['stress'][stress1[0]][time1[i]],format_align)
+		sheet10.write(71,c,DATA['summary']['stress'][stress1[1]][time1[i]],format_align)
+		sheet10.write(72,c,DATA['summary']['stress'][stress1[2]][time1[i]],format_align)
+		sheet10.write(73,c,DATA['summary']['stress'][stress1[3]][time1[i]],format_align)
+		sheet10.write(74,c,DATA['summary']['stress'][stress1[4]][time1[i]],format_align)
+		sheet10.write(75,c,DATA['summary']['stress'][stress1[5]][time1[i]],format_align)
+		sheet10.write(76,c,DATA['summary']['stress'][stress1[6]][time1[i]],format_align)
+
+		# row=78
+		# for i in range(len(standing1)):
+		# 	row=row+1
+		sheet10.write(79,c,DATA['summary']['standing'][standing1[0]][time1[i]],format_align)
+		sheet10.write(80,c,DATA['summary']['standing'][standing1[1]][time1[i]],format_align)
+		sheet10.write(81,c,DATA['summary']['standing'][standing1[2]][time1[i]],format_align)
+
+		# row=84
+		# for i in range(len(travel1)):
+		# 	row=row+1
+		sheet10.write(85,c,DATA['summary']['travel'][travel1[0]][time1[i]],format_align)
+		sheet10.write(86,c,DATA['summary']['travel'][travel1[1]][time1[i]],format_align)
 		
 		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
 			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
@@ -3188,25 +3261,25 @@ def export_users_xls(request):
 			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
 
-		row=61
-		for i in range(len(sick1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
+		# row=61
+		# for i in range(len(sick1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
 		
-		row=69
-		for i in range(len(stress1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
+		# row=69
+		# for i in range(len(stress1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
 		
-		row=78
-		for i in range(len(standing1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
+		# row=78
+		# for i in range(len(standing1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
 		
-		row=84
-		for i in range(len(travel1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
+		# row=84
+		# for i in range(len(travel1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
 		
 		num_fmt = book.add_format({'num_format': '#,###'})
 
@@ -3216,8 +3289,6 @@ def export_users_xls(request):
 												'format': num_fmt})
 												
 	
-	book.close()
-	return response
 
 # draef export_movement_consistency_xls(request):
 # 	to_date = request.GET.get('to_date',None)
@@ -3339,6 +3410,5 @@ def export_users_xls(request):
 # 			sheet11.write(row,col,'')
 # 		current_date -= timedelta(days=1)
 
-	
-# 	book.close()
-# 	return response
+	book.close()
+	return response
