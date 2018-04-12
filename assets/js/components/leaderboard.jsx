@@ -8,6 +8,7 @@ import { Collapse, Navbar, NavbarToggler,
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import {renderLeaderBoardFetchOverlay,renderLeaderBoard2FetchOverlay,renderLeaderBoard3FetchOverlay,renderLeaderBoardSelectedDateFetchOverlay} from './leaderboard_healpers';
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
 import AllRank_Data from "./leaderboard_allrank";
@@ -25,7 +26,7 @@ const categoryMeta = {
 		short_name:"alcohol_drink",
 		url_name:"alcohol-drink"
 	},
-	"Average Sleep":{
+	"Average Sleep":{ 
 		short_name:"avg_sleep",
 		url_name:"avg-sleep"
 	},
@@ -68,7 +69,7 @@ const categoryMeta = {
 };
 const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","mne_gpa","floor_climbed",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
-
+let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
 class LeaderBoard extends Component{
 	constructor(props){
 		super(props);
@@ -98,6 +99,10 @@ class LeaderBoard extends Component{
 	        lb2_end_date:'',
 	        lb3_start_date:'',
 	        lb3_end_date:'',
+	        fetching_lb1:false,
+	        fetching_lb2:false,
+	        fetching_lb3:false,
+	        fetching_lb4:false,
 	        dateRange1:false,
 	        dateRange2:false,
 	        dateRange3:false,
@@ -127,20 +132,36 @@ class LeaderBoard extends Component{
 		this.toggleDate2 = this.toggleDate2.bind(this);
 		this.toggleDate3 = this.toggleDate3.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+		this.headerDates = this.headerDates.bind(this);
+		this.renderLeaderBoardFetchOverlay = renderLeaderBoardFetchOverlay.bind(this);
+		this.renderLeaderBoard2FetchOverlay = renderLeaderBoard2FetchOverlay.bind(this);
+		this.renderLeaderBoard3FetchOverlay = renderLeaderBoard3FetchOverlay.bind(this);
+		this.renderLeaderBoardSelectedDateFetchOverlay = renderLeaderBoardSelectedDateFetchOverlay.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
 			ranking_data:data.data,
 			duration_date:data.data.duration_date,
+			fetching_lb1:false,
+	        fetching_lb2:false,
+	        fetching_lb3:false,
+	        fetching_lb4:false,
 		});
 	}
 
 	errorLeaderBoard(error){
 		console.log(error.message);
+		this.setState({
+			fetching_lb1:false,
+	        fetching_lb2:false,
+	        fetching_lb3:false,
+	        fetching_lb4:false,
+    	});
 	}
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
+			fetching_lb4:true,
 			calendarOpen:!this.state.calendarOpen,
 		},()=>{fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate);
 		});
@@ -149,6 +170,7 @@ class LeaderBoard extends Component{
     event.preventDefault();
     this.setState({
       dateRange1:!this.state.dateRange1,
+      fetching_lb1:true
     },()=>{
         let custom_ranges = [];
         if(this.state.lb2_start_date && this.state.lb2_end_date){
@@ -168,6 +190,7 @@ class LeaderBoard extends Component{
     event.preventDefault();
     this.setState({
       dateRange2:!this.state.dateRange2,
+      fetching_lb2:true,
     },()=>{
          let custom_ranges = [];
         if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -188,6 +211,7 @@ class LeaderBoard extends Component{
     event.preventDefault();
     this.setState({
       dateRange3:!this.state.dateRange3,
+      fetching_lb3:true,
     },()=>{
          let custom_ranges = [];
          if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -242,7 +266,17 @@ class LeaderBoard extends Component{
         [name]: value
       });
     }
-  	renderTablesTd(value){
+    headerDates(value){
+    let str = value;
+            let d = str.split(" ");
+            let d1 = d[0];
+            let date1 =moment(d1).format('MMM DD, YYYY');
+            let d2 = d[2];
+            let date2 =moment(d2).format('MMM DD, YYYY');
+            let date = date1 + ' to ' + date2;
+            return date;
+	}
+  	renderTablesTd(value,value5){
   		let category = "";
 	  	let durations = [];
 	  	let scores = [];
@@ -253,7 +287,7 @@ class LeaderBoard extends Component{
 	  		let val = value[duration];
 	  		if(duration == "custom_range" && val){
 	  			for(let [range,value1] of Object.entries(val)){
-	  				durations.push(range);
+	  				durations.push(this.headerDates(range));
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "user_rank"){
 			  		 		if(!category)
@@ -283,7 +317,27 @@ class LeaderBoard extends Component{
 	  	// creating headers for table
 	  	let tableHeaders = [<th className = "lb_table_style_rows">{category}</th>]
 	  	for(let dur of durations){
-	  		tableHeaders.push(<th className = "lb_table_style_rows">{dur}</th>);
+	  		let capt = dur[0].toUpperCase() + dur.slice(1)
+	  		let date;
+	  		if(dur == "today"){
+	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
+	  		}
+	  		else if(dur == "yesterday"){
+	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
+	  		}
+	  		else if(dur == "week"){
+		  		date = this.headerDates(value5[dur]);
+	  		}
+	  		else if(dur == "month"){
+		  		date = this.headerDates(value5[dur]);
+	  		}
+	  		else if(dur == "year"){
+		  		date = this.headerDates(value5[dur]);
+	  		}
+	  		else{
+	  			date = value5[dur];
+	  		}	
+	  		tableHeaders.push(<th className = "lb_table_style_rows">{capt}<br/>{date}</th>);
 	  	}
 	 
 	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
@@ -547,65 +601,69 @@ class LeaderBoard extends Component{
             <div className="col-sm-12 col-md-12 col-lg-12">
 		        <div className = "row justify-content-center lb_table_style" style = {{paddingTop:"25px"}}>
 		        	<div className = "table table-responsive">
-			        	{this.renderTablesTd(this.state.ranking_data.oh_gpa)}
+			        	{this.renderTablesTd(this.state.ranking_data.oh_gpa,this.state.duration_date)}
 			        </div>
 		        </div>
-		        <div className = "row justify-content-center lb_table_style">
+		       <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.alcohol_drink)}
+		        		{this.renderTablesTd(this.state.ranking_data.alcohol_drink,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.avg_sleep)}
+		        		{this.renderTablesTd(this.state.ranking_data.avg_sleep,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.prcnt_uf)}
+		        		{this.renderTablesTd(this.state.ranking_data.prcnt_uf,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.total_steps)}
+		        		{this.renderTablesTd(this.state.ranking_data.total_steps,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.mc)}
+		        		{this.renderTablesTd(this.state.ranking_data.mc,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.ec)}
+		        		{this.renderTablesTd(this.state.ranking_data.ec,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.awake_time)}
+		        		{this.renderTablesTd(this.state.ranking_data.awake_time,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.resting_hr)}
+		        		{this.renderTablesTd(this.state.ranking_data.resting_hr,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.deep_sleep)}
+		        		{this.renderTablesTd(this.state.ranking_data.deep_sleep,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.mne_gpa)}
+		        		{this.renderTablesTd(this.state.ranking_data.mne_gpa,this.state.duration_date)}
 		        	</div>
 		        </div>
 		        <div className = "row justify-content-center lb_table_style">
 			        <div className = "table table-responsive">
-			        	{this.renderTablesTd(this.state.ranking_data.floor_climbed)}
+			        	{this.renderTablesTd(this.state.ranking_data.floor_climbed,this.state.duration_date)}
 			        </div>
 		        </div>
 	        </div>
+	        {this.renderLeaderBoardFetchOverlay()}
+			{this.renderLeaderBoard2FetchOverlay()}
+			{this.renderLeaderBoard3FetchOverlay()}
+			{this.renderLeaderBoardSelectedDateFetchOverlay()}
 	        </div>
 		)
 	}
