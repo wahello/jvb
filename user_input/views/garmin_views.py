@@ -126,7 +126,7 @@ class GarminData(APIView):
 			final_act_data.update(finall)
 		print(final_act_data)
 		return final_act_data
-			
+		
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)

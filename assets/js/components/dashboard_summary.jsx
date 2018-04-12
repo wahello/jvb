@@ -1786,15 +1786,6 @@ createExcelPrintURL(){
         </thead>
         <tbody>
             <tr className="progress_table">
-                <td className="progress_table">Days Sick/Not Sick Reported</td>
-                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.today}</td>
-                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.yesterday}</td>
-                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.week}</td>
-                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.month}</td>
-                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.sick.days_sick_not_sick_reported.custom_range)}
-            </tr>
-            <tr className="progress_table">
                <td className="progress_table">Number of Days Not Sick</td>
                 <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.today}</td>
                 <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.yesterday}</td>
@@ -1802,6 +1793,15 @@ createExcelPrintURL(){
                 <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.month}</td>
                 <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.sick.number_of_days_not_sick.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">% of Days Not Sick</td>                
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.today}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.week}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.month}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.prcnt_of_days_not_sick.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Number of Days Sick</td>
@@ -1813,15 +1813,6 @@ createExcelPrintURL(){
                 {this.renderCustomRangeTD(this.state.summary.sick.number_of_days_sick.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">% of Days Not Sick</td>                
-                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.today}</td>
-                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.yesterday}</td>
-                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.week}</td>
-                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.month}</td>
-                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.sick.prcnt_of_days_not_sick.custom_range)}
-            </tr>
-            <tr className="progress_table">
                 <td className="progress_table">% of Days Sick</td>
                 <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.today}</td>
                 <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.yesterday}</td>
@@ -1829,6 +1820,15 @@ createExcelPrintURL(){
                 <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.month}</td>
                 <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.sick.prcnt_of_days_sick.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Days Sick/Not Sick Reported</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.today}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.week}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.month}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.days_sick_not_sick_reported.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1851,14 +1851,41 @@ createExcelPrintURL(){
             
         </thead>
         <tbody>
-            <tr className="progress_table">
-                <td className="progress_table">Number of Days Stress Level Reported</td>              
-                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.today}</td>
-                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.yesterday}</td>
-                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.week}</td>
-                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.month}</td>
-                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.stress.days_stress_level_reported.custom_range)}
+             <tr className="progress_table">
+                <td className="progress_table">Number of Days Low Stress Reported</td>                
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_low_stress_reported.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">% of Days Low Stress</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.today}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.week}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.month}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_low_stress.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Number of Days Medium Stress Reported</td>                
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_medium_stress_reported.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">% of Days Medium Stress</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.today}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.week}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.month}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_medium_stress.custom_range)}
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Number of Days High Stress Reported</td>                 
@@ -1870,24 +1897,6 @@ createExcelPrintURL(){
                 {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_high_stress_reported.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Number of Days Low Stress Reported</td>                
-                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.today}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.yesterday}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.week}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.month}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_low_stress_reported.custom_range)}
-            </tr>
-            <tr className="progress_table">
-                <td className="progress_table">Number of Days Medium Stress Reported</td>                
-                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.today}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.yesterday}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.week}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.month}</td>
-                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_medium_stress_reported.custom_range)}
-            </tr>
-            <tr className="progress_table">
                 <td className="progress_table">% of Days High Stress</td>
                 <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.today}</td>
                 <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.yesterday}</td>
@@ -1896,23 +1905,14 @@ createExcelPrintURL(){
                 <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_high_stress.custom_range)}
             </tr>
-            <tr className="progress_table">
-                <td className="progress_table">% of Days Low Stress</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.today}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.yesterday}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.week}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.month}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_low_stress.custom_range)}
-            </tr>
              <tr className="progress_table">
-                <td className="progress_table">% of Days Medium Stress</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.today}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.yesterday}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.week}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.month}</td>
-                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.year}</td>
-                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_medium_stress.custom_range)}
+                <td className="progress_table">Number of Days Stress Level Reported</td>              
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.days_stress_level_reported.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1935,15 +1935,6 @@ createExcelPrintURL(){
         </thead>
         <tbody>
             <tr className="progress_table">
-                <td className="progress_table">Number of Days Reported Standing/Not Standing more than 3 hours</td>       
-                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.today}</td>
-                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.yesterday}</td>
-                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.week}</td>
-                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.month}</td>
-                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.year}</td>
-                 {this.renderCustomRangeTD(this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.custom_range)}
-            </tr>
-            <tr className="progress_table">
                 <td className="progress_table">Number of Days Stood more than 3 hours</td>               
                 <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.today}</td>
                 <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.yesterday}</td>
@@ -1960,6 +1951,15 @@ createExcelPrintURL(){
                 <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.month}</td>
                 <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.year}</td>
                  {this.renderCustomRangeTD(this.state.summary.standing.prcnt_days_stood_three_hours.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Number of Days Reported Standing/Not Standing more than 3 hours</td>       
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.today}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.yesterday}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.week}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.month}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.year}</td>
+                 {this.renderCustomRangeTD(this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.custom_range)}
             </tr>
         </tbody>
     </table>

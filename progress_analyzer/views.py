@@ -28,7 +28,7 @@ class ProgressReportView(APIView):
 	permission_classes = (IsAuthenticated,)
 	def get(self, request, format="json"):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
-		print(pprint.pprint(DATA))
+		#print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
 
 
@@ -251,7 +251,8 @@ def progress_excel_export(request):
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
 	sick1=['number_of_days_not_sick','prcnt_of_days_not_sick','number_of_days_sick','prcnt_of_days_sick','days_sick_not_sick_reported']
-	stress1=['prcnt_of_days_low_stress','prcnt_of_days_medium_stress','prcnt_of_days_high_stress']
+	stress1=['number_of_days_low_stress_reported','prcnt_of_days_low_stress','number_of_days_medium_stress_reported','prcnt_of_days_medium_stress',
+			'number_of_days_high_stress_reported','prcnt_of_days_high_stress','days_stress_level_reported']
 	standing1=['number_days_stood_three_hours','prcnt_days_stood_three_hours','number_days_reported_stood_not_stood_three_hours']
 	travel1=['number_days_travel_away_from_home','prcnt_days_travel_away_from_home']
 
@@ -262,8 +263,8 @@ def progress_excel_export(request):
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
 	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
-	#print(pprint.pprint(DATA))
-	print(pprint.pprint(rank_data))
+	print(pprint.pprint(DATA))
+	#print(pprint.pprint(rank_data))
 	time1=['today','yesterday','week','month','year']
 	c = 1
 	for i in range(len(time1)):
@@ -321,7 +322,40 @@ def progress_excel_export(request):
 		sheet10.write(58,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		sheet10.write(59,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		
-		
+		# row=61
+		# for i in range(len(sick1)):
+		# 	row=row+1
+		sheet10.write(62,c,DATA['summary']['sick'][sick1[0]][time1[i]],format_align)
+		sheet10.write(63,c,DATA['summary']['sick'][sick1[1]][time1[i]],format_align)
+		sheet10.write(64,c,DATA['summary']['sick'][sick1[2]][time1[i]],format_align)
+		sheet10.write(65,c,DATA['summary']['sick'][sick1[3]][time1[i]],format_align)
+		sheet10.write(66,c,DATA['summary']['sick'][sick1[4]][time1[i]],format_align)
+
+
+		# row=69
+		# for i in range(len(stress1)):
+		# 	row=row+1
+		sheet10.write(70,c,DATA['summary']['stress'][stress1[0]][time1[i]],format_align)
+		sheet10.write(71,c,DATA['summary']['stress'][stress1[1]][time1[i]],format_align)
+		sheet10.write(72,c,DATA['summary']['stress'][stress1[2]][time1[i]],format_align)
+		sheet10.write(73,c,DATA['summary']['stress'][stress1[3]][time1[i]],format_align)
+		sheet10.write(74,c,DATA['summary']['stress'][stress1[4]][time1[i]],format_align)
+		sheet10.write(75,c,DATA['summary']['stress'][stress1[5]][time1[i]],format_align)
+		sheet10.write(76,c,DATA['summary']['stress'][stress1[6]][time1[i]],format_align)
+
+		# row=78
+		# for i in range(len(standing1)):
+		# 	row=row+1
+		sheet10.write(79,c,DATA['summary']['standing'][standing1[0]][time1[i]],format_align)
+		sheet10.write(80,c,DATA['summary']['standing'][standing1[1]][time1[i]],format_align)
+		sheet10.write(81,c,DATA['summary']['standing'][standing1[2]][time1[i]],format_align)
+
+		# row=84
+		# for i in range(len(travel1)):
+		# 	row=row+1
+		sheet10.write(85,c,DATA['summary']['travel'][travel1[0]][time1[i]],format_align)
+		sheet10.write(86,c,DATA['summary']['travel'][travel1[1]][time1[i]],format_align)
+
 		
 		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
 			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
@@ -451,28 +485,8 @@ def progress_excel_export(request):
 			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
 
-		row=61
-		for i in range(len(sick1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
 		
-		row=69
-		for i in range(len(stress1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
-		
-		row=78
-		for i in range(len(standing1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
-		
-		row=84
-		for i in range(len(travel1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
 
-
-		sheet10.write
 	#conditions for custom_ranges
 	if (len(a) == 2):
 		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
@@ -603,25 +617,41 @@ def progress_excel_export(request):
 			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][custom_range1]['data'],format_align)
 
-			row=61
-			for i in range(len(sick1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['sick'][sick1[i]]['custom_range'][custom_range1]['data'],format_align)
+			# row=61
+			# for i in range(len(sick1)):
+			# 	row=row+1
+			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]]['custom_range'][custom_range1]['data'],format_align)
+
+
+			# row=69
+			# for i in range(len(stress1)):
+			# 	row=row+1
+			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]]['custom_range'][custom_range1]['data'],format_align)
+
+			# row=78
+			# for i in range(len(standing1)):
+			# 	row=row+1
+			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]]['custom_range'][custom_range1]['data'],format_align)
+
+			# row=84
+			# for i in range(len(travel1)):
+			# 	row=row+1
+			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]]['custom_range'][custom_range1]['data'],format_align)
+
 		
-			row=69
-			for i in range(len(stress1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['stress'][stress1[i]]['custom_range'][custom_range1]['data'],format_align)
-		
-			row=78
-			for i in range(len(standing1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['standing'][standing1[i]]['custom_range'][custom_range1]['data'],format_align)
-		
-			row=84
-			for i in range(len(travel1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['travel'][travel1[i]]['custom_range'][custom_range1]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data'],green)
@@ -818,7 +848,7 @@ def progress_excel_export(request):
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list1[i]]['data'],format_align1)
-			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align)
 
 			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(36,c,rank_data['ec']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
@@ -843,25 +873,41 @@ def progress_excel_export(request):
 			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list1[i]]['data'],format_align)
 
-			row=61
-			for n in range(len(sick1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['sick'][sick1[n]]['custom_range'][list1[i]]['data'],format_align)
+			# row=61
+			# for i in range(len(sick1)):
+			# 	row=row+1
+			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]]['custom_range'][list1[i]]['data'],format_align)
+
+
+			# row=69
+			# for i in range(len(stress1)):
+			# 	row=row+1
+			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]]['custom_range'][list1[i]]['data'],format_align)
+
+			# row=78
+			# for i in range(len(standing1)):
+			# 	row=row+1
+			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]]['custom_range'][list1[i]]['data'],format_align)
+
+			# row=84
+			# for i in range(len(travel1)):
+			# 	row=row+1
+			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]]['custom_range'][list1[i]]['data'],format_align)
+
 		
-			row=69
-			for n in range(len(stress1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['stress'][stress1[n]]['custom_range'][list1[i]]['data'],format_align)
-		
-			row=78
-			for n in range(len(standing1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['standing'][standing1[n]]['custom_range'][list1[i]]['data'],format_align)
-		
-			row=84
-			for n in range(len(travel1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['travel'][travel1[n]]['custom_range'][list1[i]]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data'],green)
@@ -1064,7 +1110,7 @@ def progress_excel_export(request):
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list2[i]]['data'],format_align1)
-			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align)
 
 			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(36,c,rank_data['ec']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
@@ -1089,25 +1135,40 @@ def progress_excel_export(request):
 			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list2[i]]['data'],format_align)
 
-			row=61
-			for n in range(len(sick1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['sick'][sick1[n]]['custom_range'][list2[i]]['data'],format_align)
-		
-			row=69
-			for n in range(len(stress1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['stress'][stress1[n]]['custom_range'][list2[i]]['data'],format_align)
-		
-			row=78
-			for n in range(len(standing1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['standing'][standing1[n]]['custom_range'][list2[i]]['data'],format_align)
-		
-			row=84
-			for n in range(len(travel1)):
-				row=row+1
-				sheet10.write(row,c,DATA['summary']['travel'][travel1[n]]['custom_range'][list2[i]]['data'],format_align)
+			# row=61
+			# for i in range(len(sick1)):
+			# 	row=row+1
+			sheet10.write(62,c,DATA['summary']['sick'][sick1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(63,c,DATA['summary']['sick'][sick1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(64,c,DATA['summary']['sick'][sick1[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(65,c,DATA['summary']['sick'][sick1[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(66,c,DATA['summary']['sick'][sick1[4]]['custom_range'][list2[i]]['data'],format_align)
+
+
+			# row=69
+			# for i in range(len(stress1)):
+			# 	row=row+1
+			sheet10.write(70,c,DATA['summary']['stress'][stress1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(71,c,DATA['summary']['stress'][stress1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(72,c,DATA['summary']['stress'][stress1[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(73,c,DATA['summary']['stress'][stress1[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(74,c,DATA['summary']['stress'][stress1[4]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(75,c,DATA['summary']['stress'][stress1[5]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(76,c,DATA['summary']['stress'][stress1[6]]['custom_range'][list2[i]]['data'],format_align)
+
+			# row=78
+			# for i in range(len(standing1)):
+			# 	row=row+1
+			sheet10.write(79,c,DATA['summary']['standing'][standing1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(80,c,DATA['summary']['standing'][standing1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(81,c,DATA['summary']['standing'][standing1[2]]['custom_range'][list2[i]]['data'],format_align)
+
+			# row=84
+			# for i in range(len(travel1)):
+			# 	row=row+1
+			sheet10.write(85,c,DATA['summary']['travel'][travel1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(86,c,DATA['summary']['travel'][travel1[1]]['custom_range'][list2[i]]['data'],format_align)
+
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data'],green)

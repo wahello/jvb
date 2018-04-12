@@ -3030,7 +3030,8 @@ def export_users_xls(request):
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
 	sick1=['number_of_days_not_sick','prcnt_of_days_not_sick','number_of_days_sick','prcnt_of_days_sick','days_sick_not_sick_reported']
-	stress1=['prcnt_of_days_low_stress','prcnt_of_days_medium_stress','prcnt_of_days_high_stress']
+	stress1=['number_of_days_low_stress_reported','prcnt_of_days_low_stress','number_of_days_medium_stress_reported','prcnt_of_days_medium_stress',
+			'number_of_days_high_stress_reported','prcnt_of_days_high_stress','days_stress_level_reported']	
 	standing1=['number_days_stood_three_hours','prcnt_days_stood_three_hours','number_days_reported_stood_not_stood_three_hours']
 	travel1=['number_days_travel_away_from_home','prcnt_days_travel_away_from_home']
 
@@ -3098,7 +3099,39 @@ def export_users_xls(request):
 		sheet10.write(58,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		sheet10.write(59,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
 		
-		
+		# row=61
+		# for i in range(len(sick1)):
+		# 	row=row+1
+		sheet10.write(62,c,DATA['summary']['sick'][sick1[0]][time1[i]],format_align)
+		sheet10.write(63,c,DATA['summary']['sick'][sick1[1]][time1[i]],format_align)
+		sheet10.write(64,c,DATA['summary']['sick'][sick1[2]][time1[i]],format_align)
+		sheet10.write(65,c,DATA['summary']['sick'][sick1[3]][time1[i]],format_align)
+		sheet10.write(66,c,DATA['summary']['sick'][sick1[4]][time1[i]],format_align)
+
+
+		# row=69
+		# for i in range(len(stress1)):
+		# 	row=row+1
+		sheet10.write(70,c,DATA['summary']['stress'][stress1[0]][time1[i]],format_align)
+		sheet10.write(71,c,DATA['summary']['stress'][stress1[1]][time1[i]],format_align)
+		sheet10.write(72,c,DATA['summary']['stress'][stress1[2]][time1[i]],format_align)
+		sheet10.write(73,c,DATA['summary']['stress'][stress1[3]][time1[i]],format_align)
+		sheet10.write(74,c,DATA['summary']['stress'][stress1[4]][time1[i]],format_align)
+		sheet10.write(75,c,DATA['summary']['stress'][stress1[5]][time1[i]],format_align)
+		sheet10.write(76,c,DATA['summary']['stress'][stress1[6]][time1[i]],format_align)
+
+		# row=78
+		# for i in range(len(standing1)):
+		# 	row=row+1
+		sheet10.write(79,c,DATA['summary']['standing'][standing1[0]][time1[i]],format_align)
+		sheet10.write(80,c,DATA['summary']['standing'][standing1[1]][time1[i]],format_align)
+		sheet10.write(81,c,DATA['summary']['standing'][standing1[2]][time1[i]],format_align)
+
+		# row=84
+		# for i in range(len(travel1)):
+		# 	row=row+1
+		sheet10.write(85,c,DATA['summary']['travel'][travel1[0]][time1[i]],format_align)
+		sheet10.write(86,c,DATA['summary']['travel'][travel1[1]][time1[i]],format_align)
 		
 		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
 			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
@@ -3228,25 +3261,25 @@ def export_users_xls(request):
 			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
 
-		row=61
-		for i in range(len(sick1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
+		# row=61
+		# for i in range(len(sick1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
 		
-		row=69
-		for i in range(len(stress1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
+		# row=69
+		# for i in range(len(stress1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
 		
-		row=78
-		for i in range(len(standing1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
+		# row=78
+		# for i in range(len(standing1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
 		
-		row=84
-		for i in range(len(travel1)):
-			row=row+1
-			sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
+		# row=84
+		# for i in range(len(travel1)):
+		# 	row=row+1
+		# 	sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
 		
 		num_fmt = book.add_format({'num_format': '#,###'})
 
@@ -3256,8 +3289,6 @@ def export_users_xls(request):
 												'format': num_fmt})
 												
 	
-	book.close()
-	return response
 
 # draef export_movement_consistency_xls(request):
 # 	to_date = request.GET.get('to_date',None)
@@ -3379,6 +3410,5 @@ def export_users_xls(request):
 # 			sheet11.write(row,col,'')
 # 		current_date -= timedelta(days=1)
 
-	
-# 	book.close()
-# 	return response
+	book.close()
+	return response
