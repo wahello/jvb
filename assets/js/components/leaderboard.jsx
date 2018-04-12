@@ -104,6 +104,14 @@ class LeaderBoard extends Component{
 			calendarOpen:false,
 			isOpen:false,
 			ranking_data:rankInitialState,
+			duration_date:{
+				"week":"",
+				"today":"",
+				"yesterday":"",
+				"year":"",
+				"month":"",
+			
+			},
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.handleLogout = this.handleLogout.bind(this);
@@ -122,9 +130,11 @@ class LeaderBoard extends Component{
 	}
 	successLeaderBoard(data){
 		this.setState({
-			ranking_data:data.data
+			ranking_data:data.data,
+			duration_date:data.data.duration_date,
 		});
 	}
+
 	errorLeaderBoard(error){
 		console.log(error.message);
 	}
@@ -238,9 +248,10 @@ class LeaderBoard extends Component{
 	  	let scores = [];
 	  	let ranks = [];
 	  	let tableRows = [];
-	  	let time = ["custom_range","today","yesterday","week","month","year"];
-	  	for(let [duration,val] of Object.entries(value)){
-	  		if(duration == "custom_range"){
+	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
+	  	for(let duration of durations_type){
+	  		let val = value[duration];
+	  		if(duration == "custom_range" && val){
 	  			for(let [range,value1] of Object.entries(val)){
 	  				durations.push(range);
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
@@ -253,17 +264,19 @@ class LeaderBoard extends Component{
 	  				}
 	  			}
 	  		}
-	  		else{ 
-		  		durations.push(duration);
-		  		for (let [key,rankData] of Object.entries(val)){
-		  		 	if(key == "user_rank"){
-		  		 		if(!category){
-		  		 			category = rankData.category;
-		  		 		}
-		  		 		scores.push(rankData.score);
-		  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
-		  		 	}
-		  		}
+	  		else{
+	  			if (val){ 
+			  		durations.push(duration);
+			  		for (let [key,rankData] of Object.entries(val)){
+			  		 	if(key == "user_rank"){
+			  		 		if(!category){
+			  		 			category = rankData.category;
+			  		 		}
+			  		 		scores.push(rankData.score);
+			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
+			  		 	}
+			  		}
+			  	}
 		  	}
 	  	}
 
@@ -272,6 +285,7 @@ class LeaderBoard extends Component{
 	  	for(let dur of durations){
 	  		tableHeaders.push(<th className = "lb_table_style_rows">{dur}</th>);
 	  	}
+	 
 	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
 
 	  	// creating table rows for ranks

@@ -690,50 +690,6 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
 
 }
 else if(key == "startTimeInSeconds"){
- let duration = value1;
-  console.log("duration",duration)
-let min = parseInt(duration/(60*1000000));
-console.log("min",min);
-let hour = parseInt(min/60);
-console.log("hour",hour);
-let mins = parseInt(min%60);
-console.log("mins", mins);
-mins = (mins && mins < 10) ? "0" + mins : mins;
-let time = hour + ":" + mins;
-console.log("time",time);
-let  averageHeartRateInBeatsPerMinute=value1;activityData.push(<td  name = {summaryId}  id = "add_button">
-                            { this.state.activities_edit_mode[summaryId][key]  ? <Input 
-                           data-name = {summaryId}
-                        type="select" 
-                        className="form-control"
-                        style={{height:"37px",width:"80%"}}
-                        name = "modal_activity_heart_rate" 
-                        value={this.state.activites[summaryId][key]}                               
-                        onChange={this.handleChange_heartrate}
-                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
-                        
-                        <option key="hours" value=" ">Select</option>
-                    {this.createSleepDropdown_heartrate(90,220)}
-                    <option value="Not Measured">Not Measured</option>     
-                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:time}
-                        <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
-            className="fa fa-pencil fa-1x progressActivity1"
-            id = "add_button">
-        </span></td>);
-
-}
-else if(key == "endTimeInSeconds"){
-  let duration = value1;
-  console.log("duration",duration)
-let min = parseInt(duration/(60*1000000));
-console.log("min",min);
-let hour = parseInt(min/60);
-console.log("hour",hour);
-let mins = parseInt(min%60);
-console.log("mins", mins);
-mins = (mins && mins < 10) ? "0" + mins : mins;
-let time = hour + ":" + mins;
-console.log("time",time);
 let  averageHeartRateInBeatsPerMinute=value1;
 activityData.push(<td  name = {summaryId}  id = "add_button">
                             { this.state.activities_edit_mode[summaryId][key]  ? <Input 
@@ -749,7 +705,30 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
                         <option key="hours" value=" ">Select</option>
                     {this.createSleepDropdown_heartrate(90,220)}
                     <option value="Not Measured">Not Measured</option>     
-                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:time}
+                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:averageHeartRateInBeatsPerMinute}
+                        <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+            className="fa fa-pencil fa-1x progressActivity1"
+            id = "add_button">
+        </span></td>);
+
+}
+else if(key == "endTimeInSeconds"){
+let  averageHeartRateInBeatsPerMinute=value1;
+activityData.push(<td  name = {summaryId}  id = "add_button">
+                            { this.state.activities_edit_mode[summaryId][key]  ? <Input 
+                           data-name = {summaryId}
+                        type="select" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        name = "modal_activity_heart_rate" 
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={this.handleChange_heartrate}
+                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                        
+                        <option key="hours" value=" ">Select</option>
+                    {this.createSleepDropdown_heartrate(90,220)}
+                    <option value="Not Measured">Not Measured</option>     
+                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:averageHeartRateInBeatsPerMinute}
                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
             className="fa fa-pencil fa-1x progressActivity1"
             id = "add_button">
@@ -838,7 +817,12 @@ activityData.push(<td id = "add_button">{value1}</td>);
 }
 }
 activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-                      
+                       <span name={summaryId}
+                        data-name = {summaryId}
+                        className="fa fa-pencil fa-1x progressActivity"
+                        onClick={this.handleChangeModal}
+                        id = "add_button">
+                        </span>
                 </tr>); 
       }
 
