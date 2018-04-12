@@ -28,7 +28,7 @@ class ProgressReportView(APIView):
 	permission_classes = (IsAuthenticated,)
 	def get(self, request, format="json"):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
-		#print(pprint.pprint(DATA))
+		print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
 
 
@@ -43,9 +43,10 @@ def progress_excel_export(request):
 		"date":date2,
 		"duration":"today,yesterday,week,month,year",
 		#"custom_ranges":cr1,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,travel"
 		}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
+	#print(pprint.pprint(DATA))
 
 	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
 	#print(pprint.pprint(rank_data))	
@@ -98,11 +99,14 @@ def progress_excel_export(request):
 	sheet10.write(14,1,'Non Exercise Steps',bold)
 	sheet10.write(21,1,'Nutrition',bold)
 	sheet10.write(27,1,'Alcohol',bold)
-	sheet10.write(33,1,'Exercise Consistency',bold)
-	sheet10.write(39,1,'Exercise Stats',bold)
-	sheet10.write(45,1,'Other Stats',bold)
-	sheet10.write(53,1,'Sleep Per Night (excluding awake time)',bold)
-	
+	sheet10.write(34,1,'Exercise Consistency',bold)
+	sheet10.write(40,1,'Exercise Stats',bold)
+	sheet10.write(46,1,'Other Stats',bold)
+	sheet10.write(54,1,'Sleep Per Night (excluding awake time)',bold)
+	sheet10.write(61,1,'Sick',bold)
+	sheet10.write(69,1,'stress Level',bold)
+	sheet10.write(78,1,'Standing',bold)
+	sheet10.write(84,1,'Travel',bold)
 	
 	#columns headings
 	report_date= DATA['report_date']
@@ -182,109 +186,141 @@ def progress_excel_export(request):
 		row=row+1
 		sheet10.write(row,1,Nutrition[i])
 	
-	alcohol=['Average Drinks Per Week(7Days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
+	alcohol=['Average Drinks Per Week(7Days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA','% of days alcohol consumption reported']
 	row=27
 	for i in range(len(alcohol)):
 		row = row+1
 		sheet10.write(row,1,alcohol[i])
 	
 	exercise_consistency=['Avg # of Days Exercised/Week','Rank against other users','Exercise Consistency Grade','Exercise Consistency GPA']
-	row=33
+	row=34
 	for i in range(len(exercise_consistency)):
 		row=row+1
 		sheet10.write(row,1,exercise_consistency[i])
 	
 	exercise_stats=['Workout Duration (hours:minutes)','Workout Effort Level','Average Exercise Heart Rate','VO2 Max']
-	row=39
+	row=40
 	for i in range(len(exercise_stats)):
 		row=row+1
 		sheet10.write(row,1,exercise_stats[i])
 
 	other_stats=['Resting Heart Rate(RHR)','HRR (time to 99)','HRR (heart beats lowered in 1st minute)','HRR (highest heart rate in 1st minute)','HRR (lowest heart rate point)','Floors Climbed']
-	row=45
+	row=46
 	for i in range(len(other_stats)):
 		row=row+1
 		sheet10.write(row,1,other_stats[i])
 
 	
 	sleep_per_night=['Total Sleep in hours:minutes','Rank against other users','Average Sleep Grade','# of Days Sleep Aid Taken in Period','%  of Days Sleep Aid Taken in Period']
-	row=53
+	row=54
 	for i in range(len(sleep_per_night)):
 		row=row+1
 		sheet10.write(row,1,sleep_per_night[i])
+
+	sick = ['# of Days Not Sick','% of Days Not Sick','# of Days Sick','% of Days Sick',' # Days Sick/Not Sick Reported',]
+	row=61
+	for i in range(len(sick)):
+		row=row+1
+		sheet10.write(row,1,sick[i])
+
+	stresslevel = ['# of Days Low Stress Reported','% of Days Low Stress','# of Days Medium Stress Reported','% of Days Medium Stress','# of Days High Stress Reported','% of Days High Stress','# Days Stress Level Reported']
+	row=69
+	for i in range(len(stresslevel)):
+		row=row+1
+		sheet10.write(row,1,stresslevel[i])
+
+	standing = ['# of Days Stood more than 3 hours','% of Days Stood More Than 3 Hours', '# of Days Reported Standing/Not Standing more than 3 hours'] 
+	row=78
+	for i in range(len(standing)):
+		row=row+1
+		sheet10.write(row,1,standing[i])
+
+	travel=['# of Days you Traveled/Stayed Away From Home?','% of Days you Traveled/Stayed Away From Home?']
+	row=84
+	for i in range(len(travel)):
+		row=row+1
+		sheet10.write(row,1,travel[i])
 
 	Ohg=['total_gpa_point','overall_health_gpa','overall_health_gpa_grade']
 	mc=['movement_consistency_score','movement_consistency_grade','movement_consistency_gpa']
 	non_exe=['non_exercise_steps','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
 	nutri=['prcnt_unprocessed_volume_of_food','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
-	Alc=['avg_drink_per_week','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
+	Alc=['avg_drink_per_week','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa','prcnt_alcohol_consumption_reported']
 	Ec=['avg_no_of_days_exercises_per_week','exercise_consistency_grade','exercise_consistency_gpa']
 	Es=['workout_duration_hours_min','workout_effort_level','avg_exercise_heart_rate','vo2_max']
 	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
 	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
+	sick1=['number_of_days_not_sick','prcnt_of_days_not_sick','number_of_days_sick','prcnt_of_days_sick','days_sick_not_sick_reported']
+	stress1=['prcnt_of_days_low_stress','prcnt_of_days_medium_stress','prcnt_of_days_high_stress']
+	standing1=['number_days_stood_three_hours','prcnt_days_stood_three_hours','number_days_reported_stood_not_stood_three_hours']
+	travel1=['number_days_travel_away_from_home','prcnt_days_travel_away_from_home']
 
 	query_params = {
 	"date":rdate,
 	"duration":"today,yesterday,week,month,year",
-	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
-	#print(DATA)
+	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
+	#print(pprint.pprint(DATA))
+	print(pprint.pprint(rank_data))
 	time1=['today','yesterday','week','month','year']
 	c = 1
-	r=1
 	for i in range(len(time1)):
 		c = c+1
-		r=r+1
+		
 		sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
 		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
 		sheet10.write(5,c,rank_data['oh_gpa'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
+		sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
 		
 		sheet10.write(9,c,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
 		sheet10.write(10,c,rank_data['mc'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(11,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+		sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
 		sheet10.write(12,c,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		
 		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
 		sheet10.write(16,c,rank_data['total_steps'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+		sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
 		sheet10.write(18,c,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
 		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
 		
 		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
 		sheet10.write(23,c,rank_data['prcnt_uf'][time1[i]]['user_rank']['rank'],format_align)
-		#sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+		sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		
 
 		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
 		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
-		
-		sheet10.write(34,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
-		sheet10.write(35,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
-		sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
+		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align1)
+
+		sheet10.write(35,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
+		sheet10.write(36,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+		sheet10.write(38,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
 		
 		# sheet10.write(42,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 		# sheet10.write(43,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 		# sheet10.write(44,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 		# sheet10.write(45,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
 		
-		sheet10.write(46,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
-		# sheet10.write(47,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
-		# sheet10.write(48,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
-		# sheet10.write(49,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
-		sheet10.write(50,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
-		sheet10.write(51,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
+		sheet10.write(47,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
+		# sheet10.write(48,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+		# sheet10.write(49,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+		# sheet10.write(50,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+		sheet10.write(51,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
+		sheet10.write(52,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
 
-		sheet10.write(54,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
-		sheet10.write(55,c,rank_data['avg_sleep'][time1[i]]['user_rank']['rank'],format_align)
-		# sheet10.write(56,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
-		sheet10.write(57,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
-		sheet10.write(58,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+		
+		sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+		sheet10.write(56,c,rank_data['avg_sleep'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+		sheet10.write(58,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+		sheet10.write(59,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+		
 		
 		
 		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
@@ -343,78 +379,100 @@ def progress_excel_export(request):
 			sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],red)
 		
 		if (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='A'):
-			sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='B'):
-			sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],lawn_green)
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='C'):
-			sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],yellow)
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],yellow)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='D'):
-			sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],orange)
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],orange)
 		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='F'):
-			sheet10.write(36,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],red)
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],red)
 
 		if (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='A'):
-			sheet10.write(56,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='B'):
-			sheet10.write(56,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],lawn_green)
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],lawn_green)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='C'):
-			sheet10.write(56,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],yellow)
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],yellow)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
-			sheet10.write(56,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],orange)
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],orange)
 		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='F'):
-			sheet10.write(56,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],red)
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],red)
 
-		# if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
-		# 	sheet10.write(55,c,'No Workout',format_align)
-		# else:
-		# 	sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+		if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
+			sheet10.write(55,c,'No Workout',format_align)
+		else:
+			sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
 			
 		if (DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]]==0):
-			sheet10.write(42,c,'No Workout',format_align)
+			sheet10.write(43,c,'No Workout',format_align)
 		else:
-			sheet10.write(42,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
 		
 		if (DATA['summary']['exercise']['workout_effort_level'][time1[i]]==0):
-			sheet10.write(41,c,'No Workout',format_align)
+			sheet10.write(42,c,'No Workout',format_align)
 		else:
-			sheet10.write(41,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
 
 		if (DATA['summary']['exercise']['vo2_max'][time1[i]]==0):
-			sheet10.write(43,c,'Not provided',format_align)
+			sheet10.write(44,c,'Not provided',format_align)
 		else:
-			sheet10.write(43,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+			sheet10.write(44,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
 			
 		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
 			if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00'):
-				sheet10.write(47,c,'Not Recorded',format_align)
-			else:
-				sheet10.write(47,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
-		else:
-			sheet10.write(47,c,'No Workout',format_align)
-		
-		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
-			if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
 				sheet10.write(48,c,'Not Recorded',format_align)
 			else:
-				sheet10.write(48,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+				sheet10.write(48,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
 		else:
 			sheet10.write(48,c,'No Workout',format_align)
 		
-		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):	
-			if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
+			if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
 				sheet10.write(49,c,'Not Recorded',format_align)
 			else:
-				sheet10.write(49,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+				sheet10.write(49,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
 		else:
 			sheet10.write(49,c,'No Workout',format_align)
+		
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):	
+			if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
+				sheet10.write(50,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(50,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+		else:
+			sheet10.write(50,c,'No Workout',format_align)
 
 
 		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
-			sheet10.write(40,c,"No Workout",format_align)
+			sheet10.write(41,c,"No Workout",format_align)
 		else:
-			sheet10.write(40,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
 
+		row=61
+		for i in range(len(sick1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
+		
+		row=69
+		for i in range(len(stress1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
+		
+		row=78
+		for i in range(len(standing1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
+		
+		row=84
+		for i in range(len(travel1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
+
+
+		sheet10.write
 	#conditions for custom_ranges
 	if (len(a) == 2):
 		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
@@ -452,9 +510,10 @@ def progress_excel_export(request):
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
 		"custom_ranges":cr1,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
+		#print(pprint.pprint(DATA))
 		
 		query_params = {
 		"date":rdate,
@@ -462,8 +521,8 @@ def progress_excel_export(request):
 		"custom_ranges":cr1
 		}
 		rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
-		print(pprint.pprint(rank_data))
-		#print(pprint.pprint(DATA))
+		#print(pprint.pprint(rank_data))
+		
 		c=6
 		for i in range(1):
 			c = c + 1
@@ -506,43 +565,63 @@ def progress_excel_export(request):
 			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
 
 			# r=33
 			# for n in range(len(Ec)):
 			# 	r= r+1
-			sheet10.write(34,c,DATA['summary']['ec'][Ec[0]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(35,c,rank_data['ec']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
-			sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(37,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(36,c,rank_data['ec']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
+			sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(38,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][custom_range1]['data'],format_align1)
 
 			# r=40
 			# for n in range(len(Es)):
 			# 	r= r+1
-			sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(44,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
 
 			# r=45
 			# for n in range(len(other1)):
 			# 	r= r+1
-			sheet10.write(46,c,DATA['summary']['other'][other1[0]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(50,c,DATA['summary']['other'][other1[4]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(51,c,DATA['summary']['other'][other1[5]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(47,c,DATA['summary']['other'][other1[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(48,c,DATA['summary']['other'][other1[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(49,c,DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(50,c,DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(51,c,DATA['summary']['other'][other1[4]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(52,c,DATA['summary']['other'][other1[5]]['custom_range'][custom_range1]['data'],format_align)
 
 			# r=53
 			# for n in range(len(slept)):
 			# 	r= r+1
-			sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(55,c,rank_data['avg_sleep']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
-			sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(57,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(58,c,DATA['summary']['sleep'][slept[3]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(55,c,DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(56,c,rank_data['avg_sleep']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
+			sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][custom_range1]['data'],format_align)
 
+			row=61
+			for i in range(len(sick1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['sick'][sick1[i]]['custom_range'][custom_range1]['data'],format_align)
+		
+			row=69
+			for i in range(len(stress1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['stress'][stress1[i]]['custom_range'][custom_range1]['data'],format_align)
+		
+			row=78
+			for i in range(len(standing1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['standing'][standing1[i]]['custom_range'][custom_range1]['data'],format_align)
+		
+			row=84
+			for i in range(len(travel1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['travel'][travel1[i]]['custom_range'][custom_range1]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][custom_range1]['data'],green)
@@ -600,75 +679,75 @@ def progress_excel_export(request):
 				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],red)
 
 			if (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],green)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],green)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],lawn_green)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],lawn_green)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],yellow)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],yellow)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],orange)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],orange)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],red)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][custom_range1]['data'],red)
 
 			if (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='A'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],green)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],green)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='B'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],lawn_green)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],lawn_green)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='C'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],yellow)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],yellow)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='D'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],orange)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],orange)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data']=='F'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],red)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][custom_range1]['data'],red)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']=='00:00'):
-				sheet10.write(40,c,'No Workout',format_align)
-			else:
-				sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
-
-			if (DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data']==0):
 				sheet10.write(41,c,'No Workout',format_align)
 			else:
-				sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
-			
-			if (DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data']==0):
+				sheet10.write(41,c,DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data'],format_align)
+
+			if (DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data']==0):
 				sheet10.write(42,c,'No Workout',format_align)
 			else:
-				sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(42,c,DATA['summary']['exercise'][Es[1]]['custom_range'][custom_range1]['data'],format_align)
+			
+			if (DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data']==0):
+				sheet10.write(43,c,'No Workout',format_align)
+			else:
+				sheet10.write(43,c,DATA['summary']['exercise'][Es[2]]['custom_range'][custom_range1]['data'],format_align)
 
 			if (DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data']==0):
-				sheet10.write(43,c,'Not provided',format_align)
+				sheet10.write(44,c,'Not provided',format_align)
 			else:
-				sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(44,c,DATA['summary']['exercise'][Es[3]]['custom_range'][custom_range1]['data'],format_align)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']!='00:00'):
 				if (DATA['summary']['other'][other1[1]]['custom_range'][custom_range1]['data']=='00:00'):
-					sheet10.write(47,c,'Not Recorded',format_align)
-				else:
-					sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][custom_range1]['data'],format_align)
-			else:
-				sheet10.write(47,c,'No Workout',format_align)
-
-			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']!='00:00'):
-				if (DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data']==0):
 					sheet10.write(48,c,'Not Recorded',format_align)
 				else:
-					sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data'],format_align)
+					sheet10.write(48,c,DATA['summary']['other'][other1[1]]['custom_range'][custom_range1]['data'],format_align)
 			else:
 				sheet10.write(48,c,'No Workout',format_align)
 
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']!='00:00'):
-				if (DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data']==0):
+				if (DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data']==0):
 					sheet10.write(49,c,'Not Recorded',format_align)
 				else:
-					sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data'],format_align)
+					sheet10.write(49,c,DATA['summary']['other'][other1[2]]['custom_range'][custom_range1]['data'],format_align)
 			else:
 				sheet10.write(49,c,'No Workout',format_align)
 
-			if (DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data']=='00:00'):
-				sheet10.write(54,c,'Not provided')
+			if (DATA['summary']['exercise'][Es[0]]['custom_range'][custom_range1]['data']!='00:00'):
+				if (DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data']==0):
+					sheet10.write(50,c,'Not Recorded',format_align)
+				else:
+					sheet10.write(50,c,DATA['summary']['other'][other1[3]]['custom_range'][custom_range1]['data'],format_align)
 			else:
-				sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data'],format_align)
+				sheet10.write(50,c,'No Workout',format_align)
+
+			if (DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data']=='00:00'):
+				sheet10.write(55,c,'Not provided')
+			else:
+				sheet10.write(55,c,DATA['summary']['sleep'][slept[0]]['custom_range'][custom_range1]['data'],format_align)
 	
 
 	elif (len(a) == 4):
@@ -705,7 +784,7 @@ def progress_excel_export(request):
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
 		"custom_ranges":crs1,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
 		rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
@@ -738,31 +817,51 @@ def progress_excel_export(request):
 			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align1)
-			
-			sheet10.write(34,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(35,c,rank_data['ec']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
-			sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(37,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
 
-			sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(36,c,rank_data['ec']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
+			sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(38,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list1[i]]['data'],format_align1)
 
-			sheet10.write(46,c,DATA['summary']['other'][other1[0]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(50,c,DATA['summary']['other'][other1[4]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(51,c,DATA['summary']['other'][other1[5]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(44,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list1[i]]['data'],format_align)
 
-			sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(55,c,rank_data['avg_sleep']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
-			sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(57,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(58,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(47,c,DATA['summary']['other'][other1[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(48,c,DATA['summary']['other'][other1[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(49,c,DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(50,c,DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(51,c,DATA['summary']['other'][other1[4]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(52,c,DATA['summary']['other'][other1[5]]['custom_range'][list1[i]]['data'],format_align)
 
+			sheet10.write(55,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(56,c,rank_data['avg_sleep']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
+			sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list1[i]]['data'],format_align)
+
+			row=61
+			for n in range(len(sick1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['sick'][sick1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+			row=69
+			for n in range(len(stress1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['stress'][stress1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+			row=78
+			for n in range(len(standing1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['standing'][standing1[n]]['custom_range'][list1[i]]['data'],format_align)
+		
+			row=84
+			for n in range(len(travel1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['travel'][travel1[n]]['custom_range'][list1[i]]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list1[i]]['data'],green)
@@ -820,75 +919,75 @@ def progress_excel_export(request):
 				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],red)
 
 			if (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],green)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],green)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],lawn_green)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],lawn_green)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],yellow)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],yellow)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],orange)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],orange)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],red)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list1[i]]['data'],red)
 
 			if (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='A'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],green)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],green)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='B'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],lawn_green)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],lawn_green)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='C'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],yellow)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],yellow)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='D'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],orange)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],orange)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data']=='F'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],red)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list1[i]]['data'],red)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data']=='00:00'):
-				sheet10.write(40,c,'No Workout',format_align)
-			else:
-				sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data'],format_align)
-
-			if (DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data']==0):
 				sheet10.write(41,c,'No Workout',format_align)
 			else:
-				sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data'],format_align)
-			
-			if (DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data']==0):
+				sheet10.write(41,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data'],format_align)
+
+			if (DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data']==0):
 				sheet10.write(42,c,'No Workout',format_align)
 			else:
-				sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(42,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list1[i]]['data'],format_align)
+			
+			if (DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data']==0):
+				sheet10.write(43,c,'No Workout',format_align)
+			else:
+				sheet10.write(43,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list1[i]]['data'],format_align)
 
 			if (DATA['summary']['exercise'][Es[3]]['custom_range'][list1[i]]['data']==0):
-				sheet10.write(43,c,'Not provided',format_align)
+				sheet10.write(44,c,'Not provided',format_align)
 			else:
-				sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(44,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list1[i]]['data'],format_align)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data']!='00:00'):
 				if (DATA['summary']['other'][other1[1]]['custom_range'][list1[i]]['data']=='00:00'):
-					sheet10.write(47,c,'Not Recorded',format_align)
-				else:
-					sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][list1[i]]['data'],format_align)
-			else:
-				sheet10.write(47,c,'No Workout',format_align)
-
-			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data']!='00:00'):
-				if (DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data']==0):
 					sheet10.write(48,c,'Not Recorded',format_align)
 				else:
-					sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data'],format_align)
+					sheet10.write(48,c,DATA['summary']['other'][other1[1]]['custom_range'][list1[i]]['data'],format_align)
 			else:
 				sheet10.write(48,c,'No Workout',format_align)
 
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data']!='00:00'):
-				if (DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data']==0):
+				if (DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data']==0):
 					sheet10.write(49,c,'Not Recorded',format_align)
 				else:
-					sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data'],format_align)
+					sheet10.write(49,c,DATA['summary']['other'][other1[2]]['custom_range'][list1[i]]['data'],format_align)
 			else:
 				sheet10.write(49,c,'No Workout',format_align)
 
-			if (DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data']=='00:00'):
-				sheet10.write(54,c,'Not provided')
+			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list1[i]]['data']!='00:00'):
+				if (DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data']==0):
+					sheet10.write(50,c,'Not Recorded',format_align)
+				else:
+					sheet10.write(50,c,DATA['summary']['other'][other1[3]]['custom_range'][list1[i]]['data'],format_align)
 			else:
-				sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data'],format_align)
+				sheet10.write(50,c,'No Workout',format_align)
+
+			if (DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data']=='00:00'):
+				sheet10.write(55,c,'Not provided')
+			else:
+				sheet10.write(55,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list1[i]]['data'],format_align)
 			
 	elif (len(a) == 6):
 		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
@@ -931,7 +1030,7 @@ def progress_excel_export(request):
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
 		"custom_ranges":crs2,
-		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 		}
 		DATA = ProgressReport(request.user,query_params).get_progress_report()
 		rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
@@ -964,31 +1063,51 @@ def progress_excel_export(request):
 			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
 
-			sheet10.write(34,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(35,c,rank_data['ec']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
-			sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(37,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(35,c,DATA['summary']['ec'][Ec[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(36,c,rank_data['ec']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
+			sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(38,c,DATA['summary']['ec'][Ec[-1]]['custom_range'][list2[i]]['data'],format_align1)
 
-			sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(41,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(42,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(43,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(44,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list2[i]]['data'],format_align)
 
-			sheet10.write(46,c,DATA['summary']['other'][other1[0]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(50,c,DATA['summary']['other'][other1[4]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(51,c,DATA['summary']['other'][other1[5]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(47,c,DATA['summary']['other'][other1[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(48,c,DATA['summary']['other'][other1[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(49,c,DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(50,c,DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(51,c,DATA['summary']['other'][other1[4]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(52,c,DATA['summary']['other'][other1[5]]['custom_range'][list2[i]]['data'],format_align)
 
-			sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(55,c,rank_data['avg_sleep']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
-			sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(57,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(58,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(55,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(56,c,rank_data['avg_sleep']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
+			sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(58,c,DATA['summary']['sleep'][slept[2]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(59,c,DATA['summary']['sleep'][slept[3]]['custom_range'][list2[i]]['data'],format_align)
 
+			row=61
+			for n in range(len(sick1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['sick'][sick1[n]]['custom_range'][list2[i]]['data'],format_align)
+		
+			row=69
+			for n in range(len(stress1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['stress'][stress1[n]]['custom_range'][list2[i]]['data'],format_align)
+		
+			row=78
+			for n in range(len(standing1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['standing'][standing1[n]]['custom_range'][list2[i]]['data'],format_align)
+		
+			row=84
+			for n in range(len(travel1)):
+				row=row+1
+				sheet10.write(row,c,DATA['summary']['travel'][travel1[n]]['custom_range'][list2[i]]['data'],format_align)
 			
 			if (DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data']=='A'):
 				sheet10.write(6,c,DATA['summary']['overall_health'][Ohg[-1]]['custom_range'][list2[i]]['data'],green)
@@ -1046,75 +1165,75 @@ def progress_excel_export(request):
 				sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],red)
 
 			if (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],green)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],green)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],lawn_green)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],lawn_green)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],yellow)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],yellow)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],orange)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],orange)
 			elif (DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(36,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],red)
+				sheet10.write(37,c,DATA['summary']['ec'][Ec[1]]['custom_range'][list2[i]]['data'],red)
 
 			if (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='A'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],green)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],green)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='B'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],lawn_green)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],lawn_green)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='C'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],yellow)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],yellow)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='D'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],orange)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],orange)
 			elif (DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data']=='F'):
-				sheet10.write(56,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],red)
+				sheet10.write(57,c,DATA['summary']['sleep'][slept[1]]['custom_range'][list2[i]]['data'],red)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data']=='00:00'):
-				sheet10.write(40,c,'No Workout',format_align)
-			else:
-				sheet10.write(40,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data'],format_align)
-
-			if (DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data']==0):
 				sheet10.write(41,c,'No Workout',format_align)
 			else:
-				sheet10.write(41,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data'],format_align)
-			
-			if (DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data']==0):
+				sheet10.write(41,c,DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data'],format_align)
+
+			if (DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data']==0):
 				sheet10.write(42,c,'No Workout',format_align)
 			else:
-				sheet10.write(42,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(42,c,DATA['summary']['exercise'][Es[1]]['custom_range'][list2[i]]['data'],format_align)
+			
+			if (DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data']==0):
+				sheet10.write(43,c,'No Workout',format_align)
+			else:
+				sheet10.write(43,c,DATA['summary']['exercise'][Es[2]]['custom_range'][list2[i]]['data'],format_align)
 
 			if (DATA['summary']['exercise'][Es[3]]['custom_range'][list2[i]]['data']==0):
-				sheet10.write(43,c,'Not provided',format_align)
+				sheet10.write(44,c,'Not provided',format_align)
 			else:
-				sheet10.write(43,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(44,c,DATA['summary']['exercise'][Es[3]]['custom_range'][list2[i]]['data'],format_align)
 			
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data']!='00:00'):
 				if (DATA['summary']['other'][other1[1]]['custom_range'][list2[i]]['data']=='00:00'):
-					sheet10.write(47,c,'Not Recorded',format_align)
-				else:
-					sheet10.write(47,c,DATA['summary']['other'][other1[1]]['custom_range'][list2[i]]['data'],format_align)
-			else:
-				sheet10.write(47,c,'No Workout',format_align)
-
-			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data']!='00:00'):
-				if (DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data']==0):
 					sheet10.write(48,c,'Not Recorded',format_align)
 				else:
-					sheet10.write(48,c,DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data'],format_align)
+					sheet10.write(48,c,DATA['summary']['other'][other1[1]]['custom_range'][list2[i]]['data'],format_align)
 			else:
 				sheet10.write(48,c,'No Workout',format_align)
 
 			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data']!='00:00'):
-				if (DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data']==0):
+				if (DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data']==0):
 					sheet10.write(49,c,'Not Recorded',format_align)
 				else:
-					sheet10.write(49,c,DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data'],format_align)
+					sheet10.write(49,c,DATA['summary']['other'][other1[2]]['custom_range'][list2[i]]['data'],format_align)
 			else:
 				sheet10.write(49,c,'No Workout',format_align)
 
-			if (DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data']=='00:00'):
-				sheet10.write(54,c,'Not provided')
+			if (DATA['summary']['exercise'][Es[0]]['custom_range'][list2[i]]['data']!='00:00'):
+				if (DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data']==0):
+					sheet10.write(50,c,'Not Recorded',format_align)
+				else:
+					sheet10.write(50,c,DATA['summary']['other'][other1[3]]['custom_range'][list2[i]]['data'],format_align)
 			else:
-				sheet10.write(54,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data'],format_align)
+				sheet10.write(50,c,'No Workout',format_align)
+
+			if (DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data']=='00:00'):
+				sheet10.write(55,c,'Not provided')
+			else:
+				sheet10.write(55,c,DATA['summary']['sleep'][slept[0]]['custom_range'][list2[i]]['data'],format_align)
 			
 	
 	num_fmt = book.add_format({'num_format': '#,###'})
