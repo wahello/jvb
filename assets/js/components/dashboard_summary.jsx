@@ -79,15 +79,6 @@ constructor(props){
                         "year":"-"
 
                      },
-                 "rank":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-
-                     },
                  "total_gpa_point":{
                         "week":"-",
                         "yesterday":"-",
@@ -115,14 +106,6 @@ constructor(props){
                         "today":"-",
                         "year":"-"
                      },
-                   "rank":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
                    "exercise_consistency_gpa":{
                         "week":"-",
                         "yesterday":"-",
@@ -142,14 +125,6 @@ constructor(props){
                         "year":"-"
                      },
                  "prcnt_unprocessed_food_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "rank":{
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
@@ -184,14 +159,6 @@ constructor(props){
                         "today":"-",
                         "year":"-"
                      },
-                     "rank":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
                      "movement_consistency_score":{
                         "week":"-",
                         "yesterday":"-",
@@ -203,14 +170,6 @@ constructor(props){
                   },
             "non_exercise":{
                  "non_exericse_steps_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "rank":{
                         "week":"-",
                         "yesterday":"-",
                         "month":"-",
@@ -294,14 +253,6 @@ constructor(props){
                 "today": "-",
                 "year": "-"
             },
-            "rank": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
             "total_sleep_in_hours_min": {
                 "week": "-",
                 "yesterday": "-",
@@ -344,16 +295,16 @@ constructor(props){
                 "today": "-",
                 "year": "-"
             },
-            "rank": {
+            "alcoholic_drinks_per_week_gpa": {
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
-                "custom_range": "-",
+               "custom_range":"-",
                 "today": "-",
                 "year": "-"
             },
-            "alcoholic_drinks_per_week_gpa": {
-               "week": "-",
+            "prcnt_alcohol_consumption_reported":{
+                "week": "-",
                 "yesterday": "-",
                 "month": "-",
                "custom_range":"-",
@@ -410,19 +361,162 @@ constructor(props){
                 "today": "-",
                 "year": "-"
             }
-        }
-              
         },
+        "sick":{
+          "days_sick_not_sick_reported":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "number_of_days_not_sick":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "number_of_days_sick":{
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_of_days_not_sick":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_of_days_sick":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-",
+        }
+      },
+        "stress":{
+          "days_stress_level_reported":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "number_of_days_high_stress_reported":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "number_of_days_low_stress_reported":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "number_of_days_medium_stress_reported":{
+              "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_of_days_high_stress":{
+              "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_of_days_low_stress":{
+              "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_of_days_medium_stress":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                 "custom_range":"-",
+                  "today": "-",
+                  "year": "-"
+          }
+        },
+        "standing":{
+          "number_days_reported_stood_not_stood_three_hours":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "number_days_stood_three_hours":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_days_stood_three_hours":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range":"-",
+                "today": "-",
+                "year": "-",
+          }
 
+        },
+        "travel":{
+          "number_days_travel_away_from_home":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range":"-",
+                "today": "-",
+                "year": "-"
+          },
+          "prcnt_days_travel_away_from_home":{
+                "week": "-",
+                "yesterday": "-",
+                "month": "-",
+                "custom_range":"-",
+                "today": "-",
+                "year": "-",
+          }
+        },
+      },
         "duration_date": {
            "month": "-",
            "year": "-",
            "week": "-",
            "today": "-",
            "yesterday": "-"
-       },
-    };
+       }
 
+    };
     this.successProgress = this.successProgress.bind(this);
     this.errorProgress = this.errorProgress.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -1101,50 +1195,50 @@ createExcelPrintURL(){
          <thead className=" progress_table">
             <tr className=" progress_table">
                 <th className=" progress_table">Overall Health Grade</th>
-                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th className=" progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className=" progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                 <th className=" progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className=" progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className=" progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             </tr>
         </thead>
         <tbody className="progress_table">
             <tr>
                 <td className="progress_table">Total GPA Points</td>
-                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range)}
                 <td className="progress_table">{this.state.summary.overall_health.total_gpa_point.today}</td>
                 <td className="progress_table">{this.state.summary.overall_health.total_gpa_point.yesterday}</td>
                 <td className="progress_table">{this.state.summary.overall_health.total_gpa_point.week}</td>
                 <td className="progress_table">{this.state.summary.overall_health.total_gpa_point.month}</td>
                 <td className="progress_table">{this.state.summary.overall_health.total_gpa_point.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Overall Health GPA</td>
-                { this.gpascoreCustomRangeTD(this.state.summary.overall_health.overall_health_gpa.custom_range)}
                 <td className=" progress_table">{this.gpascoreDecimal(this.state.summary.overall_health.overall_health_gpa.today)}</td>
                 <td className=" progress_table">{this.gpascoreDecimal(this.state.summary.overall_health.overall_health_gpa.yesterday)}</td>
                 <td className=" progress_table">{this.gpascoreDecimal(this.state.summary.overall_health.overall_health_gpa.week)}</td>
                 <td className=" progress_table">{this.gpascoreDecimal(this.state.summary.overall_health.overall_health_gpa.month)}</td>
                 <td className=" progress_table">{this.gpascoreDecimal(this.state.summary.overall_health.overall_health_gpa.year)}</td>
+                { this.gpascoreCustomRangeTD(this.state.summary.overall_health.overall_health_gpa.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Rank against other users</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.oh_gpa.custom_range)}
                 <td className="progress_table">{this.state.rankData.oh_gpa.today.user_rank.rank}</td>
                 <td className=" progress_table">{this.state.rankData.oh_gpa.yesterday.user_rank.rank}</td>
                 <td className=" progress_table">{this.state.rankData.oh_gpa.week.user_rank.rank}</td>
                 <td className=" progress_table">{this.state.rankData.oh_gpa.month.user_rank.rank}</td>
                 <td className=" progress_table">{this.state.rankData.oh_gpa.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.oh_gpa.custom_range)}
             </tr>
              <tr className=" progress_table">
-                <td className=" progress_table">Overall Health GPA Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.overall_health.overall_health_gpa_grade.custom_range)}
+                <td className=" progress_table">Overall Health GPA Grade</td>                
                 <td className=" progress_table">{this.state.summary.overall_health.overall_health_gpa_grade.today}</td>
                 <td className=" progress_table">{this.state.summary.overall_health.overall_health_gpa_grade.yesterday}</td>
                 <td className=" progress_table">{this.state.summary.overall_health.overall_health_gpa_grade.week}</td>
                 <td className=" progress_table">{this.state.summary.overall_health.overall_health_gpa_grade.month}</td>
                 <td className=" progress_table">{this.state.summary.overall_health.overall_health_gpa_grade.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.overall_health_gpa_grade.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1157,52 +1251,52 @@ createExcelPrintURL(){
          <thead>
            
                 <tr className="progress_table">
-                <th className="progress_table">Movement Consistency</th>
-                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+                <th className="progress_table">Movement Consistency</th>                 
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             </tr>
            
         </thead>
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Movement Consistency Score</td>
-                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_score.custom_range)}
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_score.today}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_score.yesterday}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_score.week}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_score.month}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_score .year}</td>
+                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_score.custom_range)}
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.mc.custom_range)}
                <td className="progress_table">{this.state.rankData.mc.today.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.mc.yesterday.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.mc.week.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.mc.month.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.mc.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.mc.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Movement Consistency Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_grade.custom_range)}
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_grade.today}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_grade.yesterday}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_grade.week}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_grade.month}</td>
                 <td className="progress_table">{this.state.summary.mc.movement_consistency_grade .year}</td>
+                {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_grade.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Movement Consistency GPA</td>
-                {this.gpascoreCustomRangeTD(this.state.summary.mc.movement_consistency_gpa.custom_range)}
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.mc.movement_consistency_gpa.today)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.mc.movement_consistency_gpa.yesterday)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.mc.movement_consistency_gpa.week)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.mc.movement_consistency_gpa.month)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.mc.movement_consistency_gpa .year)}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.movement_consistency_gpa.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1218,60 +1312,60 @@ createExcelPrintURL(){
             <tr className="progress_table">
                 
                 <th className="progress_table">Non Exercise Steps</th>    
-                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             
             </tr>
         </thead>
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Non Exercise Steps</td>
-              {this.renderCustomRangeTDSteps(this.state.summary.non_exercise.non_exercise_steps.custom_range)}
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.today)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.yesterday)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.week)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.month)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.non_exercise_steps.year)}</td>
+                 {this.renderCustomRangeTDSteps(this.state.summary.non_exercise.non_exercise_steps.custom_range)}
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-               {this.renderCustomRangeRankTD(this.state.rankData.total_steps.custom_range)}
                 <td className="progress_table">{this.state.rankData.total_steps.today.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.total_steps.yesterday.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.total_steps.week.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.total_steps.month.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.total_steps.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.total_steps.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Movement-Non Exercise Steps Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.non_exercise.movement_non_exercise_step_grade.custom_range)}
+                <td className="progress_table">Movement-Non Exercise Steps Grade</td>            
                 <td className="progress_table">{this.state.summary.non_exercise.movement_non_exercise_step_grade.today}</td>
                 <td className="progress_table">{this.state.summary.non_exercise.movement_non_exercise_step_grade.yesterday}</td>
                 <td className="progress_table">{this.state.summary.non_exercise.movement_non_exercise_step_grade.week}</td>
                 <td className="progress_table">{this.state.summary.non_exercise.movement_non_exercise_step_grade.month}</td>
                 <td className="progress_table">{this.state.summary.non_exercise.movement_non_exercise_step_grade.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.non_exercise.movement_non_exercise_step_grade.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Non Exercise Steps GPA</td>
-                {this.gpascoreCustomRangeTD(this.state.summary.non_exercise.non_exericse_steps_gpa.custom_range)}
+                <td className="progress_table">Non Exercise Steps GPA</td>                
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.non_exercise.non_exericse_steps_gpa.today)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.non_exercise.non_exericse_steps_gpa.yesterday)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.non_exercise.non_exericse_steps_gpa.week)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.non_exercise.non_exericse_steps_gpa.month)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.non_exercise.non_exericse_steps_gpa.year)}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.non_exercise.non_exericse_steps_gpa.custom_range)}
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">Total Steps</td>
-               {this.renderCustomRangeTDSteps(this.state.summary.non_exercise.total_steps.custom_range)}
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.today)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.yesterday)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.week)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.month)}</td>
                 <td className="progress_table">{this.nonExerciseSteps(this.state.summary.non_exercise.total_steps.year)}</td>
+                {this.renderCustomRangeTDSteps(this.state.summary.non_exercise.total_steps.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1285,51 +1379,51 @@ createExcelPrintURL(){
             <tr className="progress_table">
                 
                 <th className="progress_table">Nutrition</th>
-                  {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             
             </tr>
         </thead>
         <tbody>
             <tr className="progress_table">
-                <td className="progress_table">% of Unprocessed Food Consumed</td>
-               {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range)}
+                <td className="progress_table">% of Unprocessed Food Consumed</td>               
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.today}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.yesterday}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.week}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.month}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range)}
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-               {this.renderCustomRangeRankTD(this.state.rankData.prcnt_uf.custom_range)}
                 <td className="progress_table">{this.state.rankData.prcnt_uf.today.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.prcnt_uf.yesterday.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.prcnt_uf.week.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.prcnt_uf.month.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.prcnt_uf.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.prcnt_uf.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">% Non Processed Food Consumed Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_food_grade.custom_range)}
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_food_grade.today}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_food_grade.yesterday}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_food_grade.week}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_food_grade.month}</td>
                 <td className="progress_table">{this.state.summary.nutrition.prcnt_unprocessed_food_grade.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_food_grade.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">% Non Processed Food Consumed GPA</td>
-                {this.gpascoreCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range)}
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.today)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.yesterday)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.week)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.month)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.year)}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_food_gpa.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1341,52 +1435,61 @@ createExcelPrintURL(){
  <table className = "table table-striped table-bordered">
         <thead>
             <tr className="progress_table">
-                
                 <th className="progress_table">Alcohol</th>
-                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             </tr>
         </thead>
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Average Drinks Per Week (7 Days)</td>
-                {this.renderCustomRangeTD(this.state.summary.alcohol.avg_drink_per_week.custom_range)}
                 <td className="progress_table">{this.state.summary.alcohol.avg_drink_per_week.today}</td>
                 <td className="progress_table">{this.state.summary.alcohol.avg_drink_per_week.yesterday}</td>
                 <td className="progress_table">{this.state.summary.alcohol.avg_drink_per_week.week}</td>
                 <td className="progress_table">{this.state.summary.alcohol.avg_drink_per_week.month}</td>
                 <td className="progress_table">{this.state.summary.alcohol.avg_drink_per_week.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.alcohol.avg_drink_per_week.custom_range)}
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.alcohol_drink.custom_range)}
                 <td className="progress_table">{this.state.rankData.alcohol_drink.today.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.alcohol_drink.yesterday.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.alcohol_drink.week.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.alcohol_drink.month.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.alcohol_drink.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.alcohol_drink.custom_range)}
+
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Alcoholic drinks per week Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range)}
+                <td className="progress_table">Alcoholic drinks per week Grade</td>               
                 <td className="progress_table">{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.today}</td>
                 <td className="progress_table">{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.yesterday}</td>
                 <td className="progress_table">{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.week}</td>
                 <td className="progress_table">{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.month}</td>
                 <td className="progress_table">{this.state.summary.alcohol.alcoholic_drinks_per_week_grade.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.alcohol.alcoholic_drinks_per_week_grade.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Alcoholic drinks per week GPA</td>
-                {this.gpascoreCustomRangeTD(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range)}
+                <td className="progress_table">Alcoholic drinks per week GPA</td>                
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.today)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.yesterday)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.week)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.month)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.year)}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.alcohol.alcoholic_drinks_per_week_gpa.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">% of Days Alcohol Consumption Reported</td>               
+                <td className="progress_table">{this.state.summary.alcohol.prcnt_alcohol_consumption_reported.today}</td>
+                <td className="progress_table">{this.state.summary.alcohol.prcnt_alcohol_consumption_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.alcohol.prcnt_alcohol_consumption_reported.week}</td>
+                <td className="progress_table">{this.state.summary.alcohol.prcnt_alcohol_consumption_reported.month}</td>
+                <td className="progress_table">{this.state.summary.alcohol.prcnt_alcohol_consumption_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.alcohol.prcnt_alcohol_consumption_reported.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1401,50 +1504,52 @@ createExcelPrintURL(){
             <tr className="progress_table">
                 
                 <th className="progress_table">Exercise Consistency</th>
-                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
-               <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+
             </tr>
         </thead>
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Avg # of Days Exercised/Week</td>
-               {this.renderCustomRangeTD(this.state.summary.ec.avg_no_of_days_exercises_per_week.custom_range)}
                 <td className="progress_table">{this.state.summary.ec.avg_no_of_days_exercises_per_week.today}</td>
                 <td className="progress_table">{this.state.summary.ec.avg_no_of_days_exercises_per_week.yesterday}</td>
                 <td className="progress_table">{this.state.summary.ec.avg_no_of_days_exercises_per_week.week}</td>
                 <td className="progress_table">{this.state.summary.ec.avg_no_of_days_exercises_per_week.month}</td>
                 <td className="progress_table">{this.state.summary.ec.avg_no_of_days_exercises_per_week.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.ec.avg_no_of_days_exercises_per_week.custom_range)}
+
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.ec.custom_range)}
                 <td className="progress_table">{this.state.rankData.ec.today.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.ec.yesterday.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.ec.week.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.ec.month.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.ec.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.ec.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Exercise Consistency Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.ec.exercise_consistency_grade.custom_range)}
                 <td className="progress_table">{this.state.summary.ec.exercise_consistency_grade.today}</td>
                 <td className="progress_table">{this.state.summary.ec.exercise_consistency_grade.yesterday}</td>
                 <td className="progress_table">{this.state.summary.ec.exercise_consistency_grade.week}</td>
                 <td className="progress_table">{this.state.summary.ec.exercise_consistency_grade.month}</td>
                 <td className="progress_table">{this.state.summary.ec.exercise_consistency_grade.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.ec.exercise_consistency_grade.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Exercise Consistency GPA</td>
-                {this.gpascoreCustomRangeTD(this.state.summary.ec.exercise_consistency_gpa.custom_range)}
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.ec.exercise_consistency_gpa.today)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.ec.exercise_consistency_gpa.yesterday)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.ec.exercise_consistency_gpa.week)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.ec.exercise_consistency_gpa.month)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.ec.exercise_consistency_gpa .year)}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.ec.exercise_consistency_gpa.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1457,51 +1562,51 @@ createExcelPrintURL(){
         <thead>
             <tr className="progress_table">
                 
-                <th className="progress_table">Exercise Stats</th>
-                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+                <th className="progress_table">Exercise Stats</th>               
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             </tr>
         </thead>
         <tbody>
             <tr className="progress_table">
-                <td className="progress_table">Workout Duration (hours:minutes)</td>
-                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range)}
+                <td className="progress_table">Workout Duration (hours:minutes)</td>        
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.yesterday)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.week)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.month)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_duration_hours_min.year)}</td>
+                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.workout_duration_hours_min.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Workout Effort Level</td>
-                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
+                <td className="progress_table">Workout Effort Level</td>              
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.yesterday)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.week)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.month)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.workout_effort_level.year)}</td>
+                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.workout_effort_level.custom_range)}
             </tr>
              <tr className="progress_table">
-                <td className="progress_table">Average Exercise Heart Rate</td>
-               {this.renderExerciseCustomRangeTD(this.state.summary.exercise.avg_exercise_heart_rate.custom_range)}
+                <td className="progress_table">Average Exercise Heart Rate</td>               
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.today)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.yesterday)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.week)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.month)}</td>
                 <td className="progress_table">{this.exerciseStatsNoWorkOut(this.state.summary.exercise.avg_exercise_heart_rate.year)}</td>
+                {this.renderExerciseCustomRangeTD(this.state.summary.exercise.avg_exercise_heart_rate.custom_range)}
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">VO2 Max</td>
-                {this.renderVo2maxCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.today)}</td>
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.yesterday)}</td>
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.week)}</td>
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.month)}</td>
                 <td className="progress_table">{this.vo2MaxNotReported(this.state.summary.exercise.vo2_max.year)}</td>
+                {this.renderVo2maxCustomRangeTD(this.state.summary.exercise.vo2_max.custom_range)}
             </tr>
 
             
@@ -1517,70 +1622,70 @@ createExcelPrintURL(){
          <thead>
             <tr className="progress_table">
                 
-                <th className="progress_table">Other Stats</th>
-                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+                <th className="progress_table">Other Stats</th>               
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                 {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             
             </tr>
         </thead>
         <tbody>
             <tr className="progress_table">
-                <td className="progress_table">Resting Heart Rate (RHR)</td>
-                {this.renderCustomRangeTD(this.state.summary.other.resting_hr.custom_range)}
+                <td className="progress_table">Resting Heart Rate (RHR)</td>            
                 <td className="progress_table">{this.state.summary.other.resting_hr.today}</td>
                 <td className="progress_table">{this.state.summary.other.resting_hr.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.resting_hr.week}</td>
                 <td className="progress_table">{this.state.summary.other.resting_hr.month}</td>
                 <td className="progress_table">{this.state.summary.other.resting_hr.year}</td>
+                 {this.renderCustomRangeTD(this.state.summary.other.resting_hr.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">HRR (time to 99)</td>
-                {this.renderCustomRangeTD(this.state.summary.other.hrr_time_to_99.custom_range)}
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.today}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.week}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_time_to_99.custom_range)}
             </tr>
             <tr className="progress_table">
-               <td className="progress_table">HRR (heart beats lowered in 1st minute)</td>
-                {this.renderCustomRangeTD(this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range)}
+               <td className="progress_table">HRR (heart beats lowered in 1st minute)</td>               
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.today}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.week}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">HRR (higest heart rate in 1st minute)</td>
-                {this.renderCustomRangeTD(this.state.summary.other.hrr_highest_hr_in_first_min.custom_range)}
+                <td className="progress_table">HRR (higest heart rate in 1st minute)</td>               
                 <td className="progress_table">{this.state.summary.other.hrr_highest_hr_in_first_min.today}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_highest_hr_in_first_min.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_highest_hr_in_first_min.week}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_highest_hr_in_first_min.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_highest_hr_in_first_min.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_highest_hr_in_first_min.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">HRR (lowest heart rate point)</td>
-                {this.renderCustomRangeTD(this.state.summary.other.hrr_lowest_hr_point.custom_range)}
+                <td className="progress_table">HRR (lowest heart rate point)</td>     
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.today}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.week}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_lowest_hr_point.custom_range)}
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">Floors Climbed</td>
-                {this.renderCustomRangeTD(this.state.summary.other.floors_climbed.custom_range)}
                 <td className="progress_table">{this.state.summary.other.floors_climbed.today}</td>
                 <td className="progress_table">{this.state.summary.other.floors_climbed.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.floors_climbed.week}</td>
                 <td className="progress_table">{this.state.summary.other.floors_climbed.month}</td>
                 <td className="progress_table">{this.state.summary.other.floors_climbed.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.floors_climbed.custom_range)}
             </tr>
         </tbody>
     </table>
@@ -1592,61 +1697,61 @@ createExcelPrintURL(){
          <thead>
              
                 <tr className="progress_table">
-                  <th className="progress_table">Sleep Per Night (excluding awake time)</th>
-                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+                  <th className="progress_table">Sleep Per Night (excluding awake time)</th>               
                 <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
                 <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
                <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
                 <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
                 <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
             </tr>
             
         </thead>
         <tbody>
             <tr className="progress_table">
                 <td className="progress_table">Total Sleep in hours:minutes</td>
-                {this.renderCustomRangeTD(this.state.summary.sleep.total_sleep_in_hours_min.custom_range)}
                 <td className="progress_table">{this.state.summary.sleep.total_sleep_in_hours_min.today}</td>
                 <td className="progress_table">{this.state.summary.sleep.total_sleep_in_hours_min.yesterday}</td>
                 <td className="progress_table">{this.state.summary.sleep.total_sleep_in_hours_min.week}</td>
                 <td className="progress_table">{this.state.summary.sleep.total_sleep_in_hours_min.month}</td>
                 <td className="progress_table">{this.state.summary.sleep.total_sleep_in_hours_min.year}</td>
+                 {this.renderCustomRangeTD(this.state.summary.sleep.total_sleep_in_hours_min.custom_range)}
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.avg_sleep.custom_range)}
                 <td className="progress_table">{this.state.rankData.avg_sleep.today.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.avg_sleep.yesterday.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.avg_sleep.week.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.avg_sleep.month.user_rank.rank}</td>
                 <td className="progress_table">{this.state.rankData.avg_sleep.year.user_rank.rank}</td>
+                {this.renderCustomRangeRankTD(this.state.rankData.avg_sleep.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Average Sleep Grade</td>
-                {this.renderCustomRangeTD(this.state.summary.sleep.average_sleep_grade.custom_range)}
                 <td className="progress_table">{this.state.summary.sleep.average_sleep_grade.today}</td>
                 <td className="progress_table">{this.state.summary.sleep.average_sleep_grade.yesterday}</td>
                 <td className="progress_table">{this.state.summary.sleep.average_sleep_grade.week}</td>
                 <td className="progress_table">{this.state.summary.sleep.average_sleep_grade.month}</td>
                 <td className="progress_table">{this.state.summary.sleep.average_sleep_grade.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sleep.average_sleep_grade.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table"># of Days Sleep Aid Taken in Period</td>
-                {this.renderCustomRangeTD(this.state.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range)}
                 <td className="progress_table">{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.today}</td>
                 <td className="progress_table">{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.yesterday}</td>
                 <td className="progress_table">{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.week}</td>
                 <td className="progress_table">{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.month}</td>
                 <td className="progress_table">{this.state.summary.sleep.num_days_sleep_aid_taken_in_period.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sleep.num_days_sleep_aid_taken_in_period.custom_range)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">% of Days Sleep Aid Taken in Period</td>
-                {this.renderCustomRangeTD(this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range)}
                 <td className="progress_table">{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.today}</td>
                 <td className="progress_table">{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.yesterday}</td>
                 <td className="progress_table">{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.week}</td>
                 <td className="progress_table">{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.month}</td>
                 <td className="progress_table">{this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sleep.prcnt_days_sleep_aid_taken_in_period.custom_range)}
             </tr>
             {/*<tr className="progress_table">
                 <td className="progress_table">Overall Sleep GPA</td>
@@ -1657,6 +1762,243 @@ createExcelPrintURL(){
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.sleep.overall_sleep_gpa.month)}</td>
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.sleep.overall_sleep_gpa.year)}</td>
             </tr>*/}
+        </tbody>
+    </table>
+
+    </div> 
+    </div>
+
+<div className=" row justify-content-center padding">
+<div className = "table table-responsive">
+    <table className = "table table-striped table-bordered">
+         <thead>
+             
+                <tr className="progress_table">
+                  <th className="progress_table">Sick</th>
+                <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
+                <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
+               <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr className="progress_table">
+                <td className="progress_table">Days Sick/Not Sick Reported</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.today}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.week}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.month}</td>
+                <td className="progress_table">{this.state.summary.sick.days_sick_not_sick_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.days_sick_not_sick_reported.custom_range)}
+            </tr>
+            <tr className="progress_table">
+               <td className="progress_table">Number of Days Not Sick</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.today}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.week}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.month}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_not_sick.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.number_of_days_not_sick.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days Sick</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_sick.today}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_sick.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_sick.week}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_sick.month}</td>
+                <td className="progress_table">{this.state.summary.sick.number_of_days_sick.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.number_of_days_sick.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Days Not Sick</td>                
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.today}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.week}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.month}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_not_sick.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.prcnt_of_days_not_sick.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Days Sick</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.today}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.yesterday}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.week}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.month}</td>
+                <td className="progress_table">{this.state.summary.sick.prcnt_of_days_sick.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.sick.prcnt_of_days_sick.custom_range)}
+            </tr>
+        </tbody>
+    </table>
+    </div> 
+    </div>
+
+<div className=" row justify-content-center padding">
+<div className = "table table-responsive">
+    <table className = "table table-striped table-bordered">
+         <thead>
+                <tr className="progress_table">
+                  <th className="progress_table">Stress</th>
+                <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
+                <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
+               <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days Stress Level Reported</td>              
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.days_stress_level_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.days_stress_level_reported.custom_range)}
+            </tr>
+            <tr className="progress_table">
+               <td className="progress_table">Number of Days High Stress Reported</td>                 
+                <td className="progress_table">{this.state.summary.stress.number_of_days_high_stress_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_high_stress_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_high_stress_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_high_stress_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_high_stress_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_high_stress_reported.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days Low Stress Reported</td>                
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_low_stress_reported.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days Medium Stress Reported</td>                
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.today}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.week}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.month}</td>
+                <td className="progress_table">{this.state.summary.stress.number_of_days_medium_stress_reported.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.number_of_days_medium_stress_reported.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Days High Stress</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.today}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.week}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.month}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_high_stress.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_high_stress.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Days Low Stress</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.today}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.week}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.month}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_low_stress.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_low_stress.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">% of Days Medium Stress</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.today}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.week}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.month}</td>
+                <td className="progress_table">{this.state.summary.stress.prcnt_of_days_medium_stress.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.prcnt_of_days_medium_stress.custom_range)}
+            </tr>
+        </tbody>
+    </table>
+    </div> 
+    </div>
+      <div className=" row justify-content-center padding">
+      <div className = "table table-responsive">
+      <table className = "table table-striped table-bordered">
+         <thead>
+                <tr className="progress_table">
+                  <th className="progress_table">Standing</th>               
+                <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
+                <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
+               <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days Reported Standing/Not Standing more than 3 hours</td>       
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.today}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.yesterday}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.week}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.month}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.year}</td>
+                 {this.renderCustomRangeTD(this.state.summary.standing.number_days_reported_stood_not_stood_three_hours.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days Stood more than 3 hours</td>               
+                <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.today}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.yesterday}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.week}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.month}</td>
+                <td className="progress_table">{this.state.summary.standing.number_days_stood_three_hours.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.standing.number_days_stood_three_hours.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Days Stood More Than 3 Hours</td>
+                <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.today}</td>
+                <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.yesterday}</td>
+                <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.week}</td>
+                <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.month}</td>
+                <td className="progress_table">{this.state.summary.standing.prcnt_days_stood_three_hours.year}</td>
+                 {this.renderCustomRangeTD(this.state.summary.standing.prcnt_days_stood_three_hours.custom_range)}
+            </tr>
+        </tbody>
+    </table>
+    </div> 
+    </div>
+     <div className=" row justify-content-center padding">
+      <div className = "table table-responsive">
+      <table className = "table table-striped table-bordered">
+         <thead>
+                <tr className="progress_table">
+                  <th className="progress_table">Travel</th>               
+                <th className="progress_table">Today<br/>{moment(this.state.duration_date.today).format('MMM DD, YYYY')}</th>
+                <th className="progress_table">Yesterday<br/>{moment(this.state.duration_date.yesterday).format('MMM DD, YYYY')}</th>
+               <th className="progress_table">Avg Last 7 Days<br/>{this.headerDates(this.state.duration_date.week)}</th>
+                <th className="progress_table">Avg Last 30 Days<br/>{this.headerDates(this.state.duration_date.month)}</th>
+                <th className="progress_table">Avg Year to Date<br/>{this.headerDates(this.state.duration_date.year)}</th>
+                {this.renderCustomRangeTD(this.state.summary.overall_health.total_gpa_point.custom_range,"key")}
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr className="progress_table">
+                <td className="progress_table">Number of Days you Traveled/Stayed Away From Home?</td>
+                <td className="progress_table">{this.state.summary.travel.number_days_travel_away_from_home.today}</td>
+                <td className="progress_table">{this.state.summary.travel.number_days_travel_away_from_home.yesterday}</td>
+                <td className="progress_table">{this.state.summary.travel.number_days_travel_away_from_home.week}</td>
+                <td className="progress_table">{this.state.summary.travel.number_days_travel_away_from_home.month}</td>
+                <td className="progress_table">{this.state.summary.travel.number_days_travel_away_from_home.year}</td>
+                 {this.renderCustomRangeTD(this.state.summary.travel.number_days_travel_away_from_home.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Days you Traveled/Stayed Away From Home?</td>
+                <td className="progress_table">{this.state.summary.travel.prcnt_days_travel_away_from_home.today}</td>
+                <td className="progress_table">{this.state.summary.travel.prcnt_days_travel_away_from_home.yesterday}</td>
+                <td className="progress_table">{this.state.summary.travel.prcnt_days_travel_away_from_home.week}</td>
+                <td className="progress_table">{this.state.summary.travel.prcnt_days_travel_away_from_home.month}</td>
+                <td className="progress_table">{this.state.summary.travel.prcnt_days_travel_away_from_home.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.travel.prcnt_days_travel_away_from_home.custom_range)}
+            </tr>
         </tbody>
     </table>
     </div> 
