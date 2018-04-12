@@ -1,0 +1,21 @@
+.hr_table_style{
+    margin-top:50px;
+	padding-top: 30px;
+	padding-left: 46px;
+	padding-right: 46px;
+}
+.hr_table_style_rows{
+	align-items: center;
+	font-size: 16px;
+	border-collapse: collapse;
+	border-color:lightgray !important;
+}
+.hr_table_padd{
+	padding:0px 50px;
+	margin-top:20px;
+}
+@media (max-width: 1023px){
+	.hr_table_padd{
+		padding:0px 25px;
+	}
+}

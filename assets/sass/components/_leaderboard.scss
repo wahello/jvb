@@ -1,0 +1,26 @@
+.lb_table_style{
+	padding-top: 0px;
+	padding-left: 46px;
+	padding-right: 46px;
+}
+.lb_table_style_rows{
+	align-items: center;
+	font-size: 16px;
+	border-collapse: collapse;
+	border-color:lightgray !important;
+	width: 190px;
+	height:50px;
+}
+.ar_table_padd{
+	padding:0px 50px;
+}
+@media (max-width: 1023px){
+	.ar_table_padd{
+		padding:0px 25px;
+	}
+	.lb_table_style{
+	padding-top: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+} 

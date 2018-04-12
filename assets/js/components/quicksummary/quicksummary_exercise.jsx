@@ -23,6 +23,7 @@ const attrVerboseName = {
     distance_other: 'Distance (in Miles) - Other',  
     pace: 'Pace (minutes:seconds) (Running)',
     avg_heartrate: 'Average Heartrate',
+    avg_exercise_heartrate:'Overall Average Exercise Heart Rate',
     elevation_gain: 'Elevation Gain(feet)',
     elevation_loss: 'Elevation Loss(feet)',  
     effort_level: 'Effort Level',
@@ -32,7 +33,8 @@ const attrVerboseName = {
     temperature_feels_like: 'Temperature Feels Like (in °F)',
     wind: 'Wind (in miles per hour)',
     hrr_time_to_99: 'HRR - Time to 99 (mm:ss)',
-    hrr_starting_point: 'HRR Starting Point',  
+    hrr_starting_point: 'HRR Starting Point',
+    lowest_hr_during_hrr:'HRR (lowest heart rate point) in 1st min', 
     hrr_beats_lowered_first_minute: 'HRR - Beats Lowered in First Minute',
     resting_hr_last_night: 'Resting HR Last Night',
     vo2_max: 'Vo2 Max',
@@ -55,7 +57,7 @@ const attrVerboseName = {
     exercise_consistency: 'Exercise Consistency',
     heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
     fitness_age: 'Fitness Age',
-    workout_comment: 'Workout Comment'                    
+    workout_comment: 'Workout Comments'                    
 }
 
 class Exercise extends Component {
@@ -158,7 +160,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             }
             else if(key == "hrr_time_to_99"){
                 if(value == "" || value == undefined || value == "0:0"){
-                    all_data.push("No Workout")
+                    all_data.push("Not Recorded")
                 }
                 else{
                     all_data.push(value);
@@ -166,7 +168,7 @@ renderTableColumns(dateWiseData,category,classes=""){
             }
             else if(key == "hrr_starting_point"){
                 if(value == "" || value == undefined || value == 0){
-                    all_data.push("No Workout")
+                    all_data.push("Not Recorded")
                 }
                 else{
                     all_data.push(value);
@@ -174,7 +176,23 @@ renderTableColumns(dateWiseData,category,classes=""){
             }
              else if(key == "hrr_beats_lowered_first_minute"){
                 if(value == "" || value == undefined || value == 0){
-                    all_data.push("No Workout")
+                    all_data.push("Not Recorded")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
+            else if(key == "lowest_hr_during_hrr"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push("Not Recorded")
+                }
+                else{
+                    all_data.push(value);
+                }
+            }
+            else if(key == "avg_exercise_heartrate"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push("")
                 }
                 else{
                     all_data.push(value);

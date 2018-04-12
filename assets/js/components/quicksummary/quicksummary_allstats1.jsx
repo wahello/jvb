@@ -22,6 +22,7 @@ const attrVerboseName = {
     distance_other: 'Distance (in Miles) - Other',  
     pace: 'Pace (minutes:seconds) (Running)',
     avg_heartrate: 'Average Heartrate',
+    avg_exercise_heartrate:'Overall Average Exercise Heart Rate',
     elevation_gain: 'Elevation Gain(feet)',
     elevation_loss: 'Elevation Loss(feet)',  
     effort_level: 'Effort Level',
@@ -31,7 +32,8 @@ const attrVerboseName = {
     temperature_feels_like: 'Temperature Feels Like (in °F)',
     wind: 'Wind (in miles per hour)',
     hrr_time_to_99: 'HRR - Time to 99 (mm:ss)',
-    hrr_starting_point: 'HRR Starting Point',  
+    hrr_starting_point: 'HRR Starting Point',
+    lowest_hr_during_hrr:'HRR (lowest heart rate point) in 1st min',  
     hrr_beats_lowered_first_minute: 'HRR - Beats Lowered in First Minute',
     resting_hr_last_night: 'Resting HR Last Night',
     vo2_max: 'Vo2 Max',
@@ -113,6 +115,7 @@ const attrVerboseName = {
     non_exercise_steps: 'Non Exercise Steps',
     exercise_steps: 'Exercise Steps',
     total_steps: 'Total Steps',
+    weight:'Weight',
     floor_climed: 'Floor Climed',
     movement_consistency: 'Movement Consistency',
 
@@ -201,11 +204,11 @@ getDayWithDate(date){
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
-            A: { background: 'green', color: 'white' },
-            B: { background: 'green', color: 'white' },
-            C: { background: 'yellow', color: 'black'},
-            D: { background: 'yellow', color: 'black'},
-            F: { background: 'red', color: 'black' }
+            A: { background: 'green', color: 'white'},
+            B: { background: '#32CD32', color: 'white' },
+            C: { background: 'yellow', color:'black' },
+            D: { background: '#FF8C00', color:'black' },
+            F: { background: 'red', color: 'black' },
         };
         let avgHrKeys =  [];
         let keys = [];
@@ -360,6 +363,56 @@ getDayWithDate(date){
                     (key == 'temperature_feels_like' && (value && value != '-'))){   
                 all_data.push({value:value,   
                                style:{}});    
+            }
+            else if(key == "hrr_time_to_99"){
+                if(value == "" || value == undefined || value == "0:0"){
+                    all_data.push({value:"Not Recorded",
+                                    style:{}});
+                }
+                else{
+                    all_data.push({value:value,
+                                    style:{}});
+                }
+            }
+            else if(key == "hrr_starting_point"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push({value:"Not Recorded",
+                                    style:{}});
+                }
+                else{
+                    all_data.push({value:value,
+                                    style:{}});
+                }
+            }
+             else if(key == "hrr_beats_lowered_first_minute"){
+                if(value == "" || value == undefined || value == 0){
+                   all_data.push({value:"Not Recorded",
+                                    style:{}});
+                }
+                else{
+                   all_data.push({value:value,
+                                    style:{}});
+                }
+            }
+            else if(key == "lowest_hr_during_hrr"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push({value:"Not Recorded",
+                                    style:{}});
+                }
+                else{
+                    all_data.push({value:value,
+                                    style:{}});
+                }
+            }
+            else if(key == "avg_exercise_heartrate"){
+                if(value == "" || value == undefined || value == 0){
+                    all_data.push({value:"",
+                                    style:{}});
+                }
+                else{
+                   all_data.push({value:value,
+                                    style:{}});
+                }
             }
            
             else{

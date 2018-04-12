@@ -128,8 +128,11 @@ class Quicklook extends Component{
 
 			let avg_sleep_per_night = data.sleep_ql.sleep_per_wearable;
 			let avg_sleep_per_night_gpa = data.grades_ql.avg_sleep_per_night_gpa;
+			let total_penalty = data.grades_ql.ctrl_subs_penalty + data.grades_ql.smoke_penalty;
 			if (avg_sleep_per_night_gpa){
-				avg_sleep_per_night_gpa = avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty)
+				avg_sleep_per_night_gpa = avg_sleep_per_night_gpa + Math.abs(data.grades_ql.sleep_aid_penalty);
+			}else{
+				total_penalty +=data.grades_ql.sleep_aid_penalty
 			}
 
 			let exercise_consistency_points = (
@@ -138,7 +141,7 @@ class Quicklook extends Component{
 					data.grades_ql.movement_non_exercise_steps_gpa + movement_consistency_points + 
 					data.grades_ql.avg_sleep_per_night_gpa + exercise_consistency_points +
 					 data.grades_ql.prcnt_unprocessed_food_consumed_gpa + data.grades_ql.alcoholic_drink_per_week_gpa +
-					 data.grades_ql.ctrl_subs_penalty + data.grades_ql.smoke_penalty
+					 total_penalty
 				)
 			if(user_input_data){
 				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
@@ -213,6 +216,7 @@ class Quicklook extends Component{
 		        distance_other:data.exercise_reporting_ql.distance_other,
 		        pace: data.exercise_reporting_ql.pace,
 		        avg_heartrate: data.exercise_reporting_ql.avg_heartrate,
+		        avg_exercise_heartrate:data.exercise_reporting_ql.avg_exercise_heartrate,
 		        elevation_gain: data.exercise_reporting_ql.elevation_gain,
 		        elevation_loss: data.exercise_reporting_ql.elevation_loss,
 		        effort_level: data.exercise_reporting_ql.effort_level,
@@ -223,6 +227,7 @@ class Quicklook extends Component{
 		        wind:data.exercise_reporting_ql.wind,
 		        hrr_time_to_99: data.exercise_reporting_ql.hrr_time_to_99,
 		        hrr_starting_point: data.exercise_reporting_ql.hrr_starting_point,
+		        lowest_hr_during_hrr:data.exercise_reporting_ql.lowest_hr_during_hrr,
 		        hrr_beats_lowered_first_minute:data.exercise_reporting_ql.hrr_beats_lowered_first_minute,
 		        resting_hr_last_night:data.exercise_reporting_ql.resting_hr_last_night,
 		        vo2_max:data.exercise_reporting_ql.vo2_max,
@@ -739,7 +744,7 @@ onLogoutSuccess(response){
                                           <abbr  id="abbri">
                                            <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
                                             <div className="btn3">
-                                            <Button id="nav-btn" className="btn">Print</Button>
+                                            <Button id="nav-btn" className="btn">Export Reports</Button>
                                             </div>
                                            </a>
                                           </abbr>
@@ -934,7 +939,7 @@ onLogoutSuccess(response){
 						         	   type="submit"
 						               className="btn btn-block-lg"
 						               onClick = {this.handleCreateQuicklook}>
-							               Create Raw Data Report
+							               Refresh Data
 								      </Button>
                                    </span>
                            </Navbar>

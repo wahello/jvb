@@ -9,6 +9,10 @@ from progress_analyzer.models import CumulativeSum,\
 	ExerciseStatsCumulative,\
 	AlcoholCumulative,\
 	OtherStatsCumulative,\
+	SickCumulative,\
+	StandingCumulative,\
+	TravelCumulative,\
+	StressCumulative,\
 	MetaCumulative
 
 class OverallHealthGradeCumulativeInline(admin.StackedInline):
@@ -38,6 +42,18 @@ class AlcoholCumulativeInline(admin.StackedInline):
 class OtherStatsCumulativeInline(admin.StackedInline):
 	model = OtherStatsCumulative
 
+class SickCumulativeInline(admin.StackedInline):
+	model = SickCumulative
+
+class StandingCumulativeInline(admin.StackedInline):
+	model = StandingCumulative
+
+class TravelCumulativeInline(admin.StackedInline):
+	model = TravelCumulative
+
+class StressCumulativeInline(admin.StackedInline):
+	model = StressCumulative
+
 class MetaCumulativeInline(admin.StackedInline):
 	model = MetaCumulative
 
@@ -59,6 +75,10 @@ class CumulativeSumManager(admin.ModelAdmin):
 		NutritionCumulativeInline,
 		ExerciseStatsCumulativeInline,
 		AlcoholCumulativeInline,
+		SickCumulativeInline,
+		StandingCumulativeInline,
+		TravelCumulativeInline,
+		StressCumulativeInline,
 		OtherStatsCumulativeInline,
 		MetaCumulativeInline
 	]

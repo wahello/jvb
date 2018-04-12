@@ -2,7 +2,7 @@ body{
 	overflow-x: hidden !important;
 }
 .padding{
-	padding-top: 7px;
+	padding: 0px 41px 0px 41px; 
 }
 .table_style{
 	border-collapse: collapse;
@@ -10,23 +10,23 @@ body{
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
 	
 }
-.dashboard th,tr,td{
-width: 190px;
-height:40px;
-}
+
 .createbutton{
 		font-family:futura-pt;
 		background-color: rgb(237, 149, 7);
 		border-radius: 0px;
 		border-color: rgb(237, 149, 7);
-		height: 49px;
+		height: 39px;
 		padding: 0px 20px;
 		font-size: 14px;
 
 }
 @media (max-width: 1023px){
-	.tablecenter{
+.tablecenter{
 	overflow-x: scroll;
+}
+.padding{
+	padding: 15px 10px 0px 10px;
 }
 #pdf_button{
 	padding-left:110px;
@@ -42,4 +42,12 @@ height:40px;
 }
 #progress{
 	padding-left: 50px;
+}
+.progress_table{
+	align-items: center;
+	font-size: 16px;
+	border-collapse: collapse;
+	border-color:lightgray;
+	width: 190px;
+	height:50px;
 }

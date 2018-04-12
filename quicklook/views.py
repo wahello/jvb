@@ -6,6 +6,7 @@ import json
 import xlsxwriter
 import pprint
 
+from django.http import JsonResponse  
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse
@@ -14,9 +15,12 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
+from fitparse import FitFile
+from garmin.models import GarminFitFiles
+from registration.models import Profile
 from user_input.models import DailyUserInputOptional ,\
-                              DailyUserInputEncouraged,\
-                              DailyUserInputStrong
+							  DailyUserInputEncouraged,\
+							  DailyUserInputStrong
 
 from .serializers import UserQuickLookSerializer,\
 						 GradesSerializer,\
@@ -35,17 +39,18 @@ from .models import UserQuickLook,\
 					ExerciseAndReporting
 
 from progress_analyzer.models import OverallHealthGradeCumulative, \
-                                     NonExerciseStepsCumulative,\
-                                     SleepPerNightCumulative,\
-                                     MovementConsistencyCumulative,\
-                                     ExerciseConsistencyCumulative,\
-                                     NutritionCumulative,\
-                                     ExerciseStatsCumulative,\
-                                     AlcoholCumulative,\
-                                     OtherStatsCumulative
+									 NonExerciseStepsCumulative,\
+									 SleepPerNightCumulative,\
+									 MovementConsistencyCumulative,\
+									 ExerciseConsistencyCumulative,\
+									 NutritionCumulative,\
+									 ExerciseStatsCumulative,\
+									 AlcoholCumulative,\
+									 OtherStatsCumulative
 
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
+from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
 
 class UserQuickLookView(generics.ListCreateAPIView):
 	'''
@@ -218,6 +223,55 @@ class SleepListView(generics.ListCreateAPIView):
 	queryset = Sleep.objects.all()
 	serializer_class = SleepSerializer
 
+def hrr_calculations(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	start = start_date
+	end = start + timedelta(days=1)
+	print(start,end)
+	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	kd = Profile.objects.filter(user=request.user)
+	for ss in kd:
+		cc = ss.date_of_birth
+	today = date.today()
+	age_user = today.year - cc.year
+	lis = []
+	for x in a1:
+		# print(x)
+		fitfile = FitFile(x.fit_file)
+		for record in fitfile.get_messages('record'):
+			for record_data in record:
+				if(record_data.name=='heart_rate'):
+					b = record_data.value
+					lis.extend([b])
+	
+	total_time = len(lis)
+	avg = int(sum(lis)/total_time)
+
+	below_aerobic_value = 180-age_user-30
+	anaerobic_value = 180-age_user+5
+
+	time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
+	time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
+	time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
+	
+	percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
+	percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
+	percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+	
+	total_percent = 100
+	
+	data = {"total_time":total_time,
+			"aerobic_zone":time_in_aerobic,
+			"anaerobic_range":time_in_anaerobic,
+			"below_aerobic_zone":time_in_below_aerobic,
+			"percent_aerobic":percent_aerobic,
+			"percent_below_aerobic":percent_below_aerobic,
+			"percent_anaerobic":percent_anaerobic,
+			"total_percent":total_percent}
+
+	return JsonResponse(data)
+
 def export_users_xls(request):
 	to_date1 = request.GET.get('to_date',None)
 	from_date1 = request.GET.get('from_date', None)
@@ -230,8 +284,11 @@ def export_users_xls(request):
 
 	#date = datetime.strptime(date2,'%m-%d-%Y').date()
 	#custom_ranges = datetime.strptime(crs, "%m-%d-%Y").date()
-
-	
+	# print(request.user)
+	# start = "2018-03-28"
+	# end = "2018-03-29"
+	# a = GarminFitFiles.objects.filter(user=request.user,created_at__range=[start, end])
+	# print(a)
 	x= to_date.strftime('%m-%d-%y')
 	# print(type(x))
 	y= x.split("-")
@@ -244,8 +301,8 @@ def export_users_xls(request):
 	response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 	response['Content-Disposition'] = "attachment; filename={}".format(filename) 
 	book = Workbook(response,{'in_memory': True})
-	sheet10 = book.add_worksheet('Progress Analyzer')
 	sheet1 = book.add_worksheet('Grades')
+	sheet10 = book.add_worksheet('Progress Analyzer')
 	sheet2 = book.add_worksheet('Steps')
 	sheet3 = book.add_worksheet('Sleep')
 	sheet4 = book.add_worksheet('Food')
@@ -752,7 +809,7 @@ def export_users_xls(request):
 
 	#Sleep
 
-	columns5 = ['sleep_per_wearable','sleep_comments',  'sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
+	columns5 = ['sleep_per_wearable','sleep_comments','sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
 	'sleep_awake_time','deep_sleep','light_sleep','awake_time']
 	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 
 	'Resting Heart Rate (RHR)','Sleep per Wearable (excluding awake time)',
@@ -977,14 +1034,14 @@ def export_users_xls(request):
 	# Exercise Reporting
 
 	columns_of_exercise = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate",
+	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate","avg_heartrate",'avg_exercise_heartrate',
 	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
 	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
 	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
-	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate OTHER','Elevation Gain(feet)','Elevation Loss(feet)', 
+	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate WALKING','Average Heartrate OTHER','Overall Average Exercise Heart Rate','Elevation Gain(feet)','Elevation Loss(feet)', 
 	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
 	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
 	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
@@ -1021,15 +1078,20 @@ def export_users_xls(request):
 				
 				if i == 12:
 					if 'RUNNING' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['RUNNING'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['RUNNING'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 13:
 					if 'ELLIPTICAL' in json2_data:
-					 	sheet9.write(i1+i+1,row_num - num_11,json2_data['ELLIPTICAL'],format)
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['ELLIPTICAL'],format)
 					else:
-					 	sheet9.write(i1+i+1,row_num - num_11,"",format)
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
 				elif i == 14:
+					if 'WALKING' in json2_data:
+						sheet9.write(i1+i+1,row_num - num_11,json2_data['WALKING'],format)
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,"",format)
+				elif i == 15:
 					if 'OTHER' in json2_data:
 						sheet9.write(i1+i+1,row_num - num_11,json2_data['OTHER'],format)
 					else:
@@ -1039,31 +1101,38 @@ def export_users_xls(request):
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,data[key])
-				elif i == 17:
+				elif i == 19:
 					if data[key] == 0:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,data[key])
-				elif i == 27:
+				elif i == 29:
 					if data[key] == 0:
 						sheet9.write(i1+i+1,row_num - num_11,'Not provided')
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,data[key])
-				elif i == 23:
-					if json2_data:
-						sheet9.write(i1+i+1,row_num - num_11,data[key])
-					else:
-						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
-				elif i == 24:
-					if json2_data:
-						# print(data['avg_heartrate'])
-						sheet9.write(i1+i+1,row_num - num_11,data[key])
-					else:
-						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 				elif i == 25:
 					if json2_data:
-						# print(data['avg_heartrate'])
-						sheet9.write(i1+i+1,row_num - num_11,data[key])
+						if data[key] == '':
+							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
+						else:
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+				elif i == 26:
+					if json2_data:
+						if data[key] == 0:
+							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
+						else:
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
+					else:
+						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
+				elif i == 27:
+					if json2_data:
+						if data[key] == 0:
+							sheet9.write(i1+i+1,row_num - num_11,'Not Recorded')
+						else:
+							sheet9.write(i1+i+1,row_num - num_11,data[key])
 					else:
 						sheet9.write(i1+i+1,row_num - num_11,'No Workout')
 
@@ -1829,24 +1898,207 @@ def export_users_xls(request):
 			sheet5.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 
+	
+	# from registration.models import Profile
+	# from fitparse import FitFile
+	# from garmin.models import GarminFitFiles
+	# start = "2018-04-07"
+	# end = "2018-04-08"
+	# a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	# kd = Profile.objects.filter(user=request.user)
+	# for ss in kd:
+	# 	cc = ss.date_of_birth
+	# today = date.today()
+	# dd = today.year - cc.year
+	# lis = []
+	# for x in a1:
+	# 	# print(x)
+	# 	fitfile = FitFile(x.fit_file)
+	# 	dic={}
+	# 	for record in fitfile.get_messages('record'):
+	# 		for record_data in record:
+	# 			if(record_data.name=='heart_rate'):
+	# 				b = record_data.value
+	# 				lis.extend([b])
+	
+	# avg = int(sum(lis)/len(lis))
+	# print(avg)
+
+	# below_aerobic_value = 180-dd-30
+	# anaerobic_value = 180-dd+5
+
+	# time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
+	# time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
+	# time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
+	# print(len(lis))
+	# print(time_in_anaerobic)
+	# print(time_in_below_aerobic)
+	# print(time_in_aerobic)
+
+
 	# Exercise Reporting
+
+	# sheet6.set_landscape()
+	# sheet6.repeat_rows(0)
+	# sheet6.repeat_columns(0)
+	# sheet6.set_row(0,30)
+	# columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
+	# "distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate","avg_exercise_heartrate","avg_exercise_heartrate",
+	# "elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+	# "temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
+	# "nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
+	# "drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
+	# "heartrate_variability_stress","fitness_age","workout_comment"]
+	# columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
+	# 'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate WALKING','Average Heartrate OTHER','Overall Average Exercise Heart Rate',
+	# 'Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
+	# 'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+	
+	# current_date = to_date
+	# r = 0
+	# if to_date and from_date:
+	# 	while (current_date >= from_date):
+	# 		r = r + 1
+	# 		weekday1 = calendar.day_name[current_date.weekday()]
+	# 		x= current_date.strftime('%m-%d-%y')
+	# 		current_date_split= x.split("-")
+	# 		current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+	# 		current_date_string = str(current_date_string)
+	# 		sheet6.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+	# 		# sheet6.write(0, r, current_date,date_format)
+	# 		current_date -= timedelta(days=1)
+	# sheet6.write(0, 0, "Exercise Reporting",bold)
+	# col_num1 = 1
+	# row_num = 0
+	# for col_num in range(len(columns8w)):
+	# 	col_num1 = col_num1 + 1
+	# 	sheet6.write(col_num1, row_num, columns8w[col_num])
+
+	# current_date = to_date
+	# # for row in exercise_qs.values():
+	# 	# print (row)
+	# while (current_date >= from_date):
+	# 	# logic
+	# 	data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+	# 	if data:
+	# 		data = data.__dict__
+	# 		# print(data)
+	# 		row_num += 1
+	# 		for i,key in enumerate(columns):
+	# 			avg_heart_rate_string = data['avg_heartrate']
+	# 			json2_data = json.loads(avg_heart_rate_string)
+
+	# 			#print(json2_data)
+
+	# 			if i == 12:
+	# 				if 'RUNNING' in json2_data:
+	# 				 	sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
+	# 				else:
+	# 				 	sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 13:
+	# 				if 'ELLIPTICAL' in json2_data:
+	# 				 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
+	# 				else:
+	# 				 	sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 14:
+	# 				if 'WALKING' in json2_data:
+	# 				 	sheet6.write(i+2,row_num,json2_data['WALKING'],format)
+	# 				else:
+	# 				 	sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 15:
+	# 				if 'OTHER' in json2_data:
+
+	# 					sheet6.write(i+2,row_num,json2_data['OTHER'],format)
+	# 				else:
+	# 					sheet6.write(i+2,row_num,"",format)
+	# 			elif i == 4:
+	# 				if data[key] == "0:00:00":
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,data[key])
+	# 			elif i == 19:
+	# 				if data[key] == 0:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,data[key])
+	# 			elif i == 29:
+	# 				if data[key] == 0:
+	# 					sheet6.write(i + 2, row_num,'Not provided')
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,data[key])
+	# 			elif i == 25:
+	# 				if json2_data:
+	# 					if data[key] == '' or data[key] == ':':
+	# 						sheet6.write(i + 2, row_num,'Not Recorded')
+	# 					else:
+	# 						sheet6.write(i + 2, row_num,data[key],format)
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 			elif i == 26:
+	# 				if json2_data:
+	# 					if data[key] == 0:
+	# 						sheet6.write(i + 2, row_num,'Not Recorded')
+	# 					else:
+	# 						sheet6.write(i + 2, row_num,data[key],format)
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+	# 			elif i == 27:
+	# 				if json2_data:
+	# 					if data[key] == 0:
+	# 						sheet6.write(i + 2, row_num,'Not Recorded')
+	# 					else:
+	# 						sheet6.write(i + 2, row_num,data[key],format)
+	# 				else:
+	# 					sheet6.write(i + 2, row_num,'No Workout')
+
+	# 			elif data[key] == None:
+	# 				sheet6.write(i + 2, row_num,'Not provided')
+	# 			elif key != 'avg_heartrate':
+	# 				sheet6.write(i + 2, row_num,data[key],format)
+
+
+	# 	else:
+	# 		row_num += 1
+	# 		sheet6.write(i + 2, row_num, '')
+	# 	current_date -= timedelta(days=1)
+
+
+
+
+
+
+
+
+
+
 
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
 	sheet6.repeat_columns(0)
 	sheet6.set_row(0,30)
 	columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-	"distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate",
-	"elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
-	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
+	"distance_run","distance_bike","distance_swim","distance_other","pace"]
+
+	columns_1 = ["avg_exercise_heartrate","elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
+	"temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","lowest_hr_during_hrr","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
 	"nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
 	"drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
 	"heartrate_variability_stress","fitness_age","workout_comment"]
-	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
-	'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate OTHER','Elevation Gain(feet)','Elevation Loss(feet)', 
-	'Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night',
-	'Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
-	'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+	
+	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)',
+	'Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 'Distance (in Miles) - Bike', 
+	'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)']
+
+
+	rem_columns = ['Overall Average Exercise Heart Rate','Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)',
+	'Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',"HRR (lowest heart rate point) in 1st min",
+	'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout',
+	'Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ',
+	'Drug Consumed','Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout',
+	'Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
+
+
+	Avg_Heart = ['avg_heartrate']
 	
 	current_date = to_date
 	r = 0
@@ -1867,81 +2119,149 @@ def export_users_xls(request):
 	for col_num in range(len(columns8w)):
 		col_num1 = col_num1 + 1
 		sheet6.write(col_num1, row_num, columns8w[col_num])
+	current_date = to_date
+	Activities_list = []
+	while (current_date >= from_date):
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			for i,key in enumerate(Avg_Heart):
+				avg_heart_rate_string = data[key]
+				json2_data = json.loads(avg_heart_rate_string)
+				Activities_key = list(json2_data.keys())
+				Activities_list.extend(Activities_key)
+		current_date -= timedelta(days=1)
+	
+	Activities_list_unique = list(set(Activities_list))
+
+	for col_num in range(len(Activities_list_unique)):
+		col_num1 = col_num1 + 1
+		sheet6.write(col_num1, row_num,"Average Heartrate"+' '+Activities_list_unique[col_num])
+
+	
+	current_date = to_date
+	while (current_date >= from_date):
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			row_num += 1
+			for i,key in enumerate(columns):
+				if i == 4:
+					if data[key] == "0:00:00":
+						sheet6.write(i + 2, row_num,'No Workout')
+					else:
+						sheet6.write(i + 2, row_num,data[key])
+				else:
+					sheet6.write(i + 2, row_num,data[key],format)
+		else:
+			row_num += 1
+			sheet6.write(i + 2, row_num, '')
+		current_date -= timedelta(days=1)
+	
+
+	row_avg_heart = i+1
+	column_no = row_num
+	current_date = to_date
+	while (current_date >= from_date):
+		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			avg_heart_rate_string = data['avg_heartrate']
+			json2_data = json.loads(avg_heart_rate_string)
+			row_num += 1
+			for k,key in enumerate(Activities_list_unique):
+
+				if json2_data:
+					try:
+						sheet6.write(row_avg_heart+2+k,row_num - column_no,json2_data[key],format)
+					except KeyError:
+						sheet6.write(row_avg_heart+2+k,row_num - column_no,' ')
+				else:
+					sheet6.write(row_avg_heart+2+k,row_num - column_no,' ')
+		else:
+			row_num += 1
+			sheet6.write(i + 2, row_num, '')
+		current_date -= timedelta(days=1)
+
+	no_days = (to_date-from_date).days
+
+	for col_num in range(len(rem_columns)):
+		col_num1 = col_num1 + 1
+		sheet6.write(col_num1, row_num - column_no - no_days -1, rem_columns[col_num])
+
 
 	current_date = to_date
-	# for row in exercise_qs.values():
-		# print (row)
+	if data:
+		rem_row = i+k
+	else:
+		rem_row = i
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
 		if data:
 			data = data.__dict__
-			# print(data)
+			avg_heart_rate_string = data['avg_heartrate']
+			json2_data = json.loads(avg_heart_rate_string)
 			row_num += 1
-			for i,key in enumerate(columns):
-				avg_heart_rate_string = data['avg_heartrate']
-				json2_data = json.loads(avg_heart_rate_string)
-
-				#print(json2_data)
-
-				if i == 12:
-					if 'RUNNING' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
-					else:
-					 	sheet6.write(i+2,row_num,"",format)
-				elif i == 13:
-					if 'ELLIPTICAL' in json2_data:
-					 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
-					else:
-					 	sheet6.write(i+2,row_num,"",format)
-				elif i == 14:
-					if 'OTHER' in json2_data:
-
-						sheet6.write(i+2,row_num,json2_data['OTHER'],format)
-					else:
-						sheet6.write(i+2,row_num,"",format)
-				elif i == 4:
-					if data[key] == "0:00:00":
-						sheet6.write(i + 2, row_num,'No Workout')
-					else:
-						sheet6.write(i + 2, row_num,data[key])
-				elif i == 17:
+			for j,key in enumerate(columns_1):
+				
+				if j == 0:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'No Workout')
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,' ')
 					else:
-						sheet6.write(i + 2, row_num,data[key])
-				elif i == 27:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
+				elif j == 3:
 					if data[key] == 0:
-						sheet6.write(i + 2, row_num,'Not provided')
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
 					else:
-						sheet6.write(i + 2, row_num,data[key])
-				elif i == 23:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
+				elif j == 13:
+					if data[key] == 0:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not provided')
+					else:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key])
+				elif j == 9:
 					if json2_data:
-						sheet6.write(i + 2, row_num,data[key])
+						if data[key] == '' or data[key] == ':':
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
+						else:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 					else:
-						sheet6.write(i + 2, row_num,'No Workout')
-				elif i == 24:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
+				elif j == 10:
 					if json2_data:
-						# print(data['avg_heartrate'])
-						sheet6.write(i + 2, row_num,data[key])
+						if data[key] == 0:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
+						else:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 					else:
-						sheet6.write(i + 2, row_num,'No Workout')
-				elif i == 25:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
+				elif j == 11:
 					if json2_data:
-						# print(data['avg_heartrate'])
-						sheet6.write(i + 2, row_num,data[key])
+						if data[key] == 0:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
+						else:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 					else:
-						sheet6.write(i + 2, row_num,'No Workout')
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
+				elif j == 12:
+					if json2_data:
+						if data[key] == 0:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not Recorded')
+						else:
+							sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
+					else:
+						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
 
 				elif data[key] == None:
-					sheet6.write(i + 2, row_num,'Not Reported')
-				elif key != 'avg_heartrate':
-					sheet6.write(i + 2, row_num,data[key],format)
+					sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not provided')
+				else:
+					sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
 
 
 		else:
 			row_num += 1
-			sheet6.write(i + 2, row_num, '')
+			sheet6.write(rem_row+4+i, row_num - column_no - no_days - 1,'')
 		current_date -= timedelta(days=1)
 	
 	#movement consistenct
@@ -1987,7 +2307,6 @@ def export_users_xls(request):
 	columns = ['movement_consistency']
 	current_date = to_date
 	r = 6
-	# ?from_date=01-31-2018&to_date=01-05-2018
 	total_days = (to_date-from_date).days+1
 
 	if to_date and from_date:
@@ -2478,319 +2797,417 @@ def export_users_xls(request):
 	sheet10.freeze_panes(1,1)
 	sheet10.set_column('A:A',1)
 	sheet10.set_column('B:B',35)
-	sheet10.set_column('I:I',45)
-	sheet10.set_column('H:H',1)
-	sheet10.set_column('C:G',16)
-	sheet10.set_column('J:N',16)
-	
+	sheet10.set_column('C:D',13)
+	sheet10.set_column('D:G',16)
 	sheet10.set_row(0,45)
-	
 	sheet10.set_landscape()
 
-	#Headings
-	sheet10.write(0,1,'Summary Dashboard',bold)
-	sheet10.write(0,8,'Summary Dashboard',bold)
-	sheet10.write(2,1,'Overall Health Grade',bold)
-	sheet10.write(9,1,'Sleep Per Night (excluding awake time)',bold)
-	sheet10.write(17,1,'Exercise Consistency',bold)
-	sheet10.write(23,1,'Exercise Stats',bold)
-	sheet10.write(30,1,'other stats',bold)
-	sheet10.write(2,8,'Non Exercise Steps',bold)
-	sheet10.write(9,8,'Movement Consistency',bold)
-	sheet10.write(17,8,'Nutrition',bold)
-	sheet10.write(23,8,'Alcohol',bold)
+	format = book.add_format({'bold': True})
+	format.set_text_wrap()
+	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
+	format_align = book.add_format({'align':'left'})
 
-	#table borders
+	green = book.add_format({'align':'left', 'bg_color': 'green'})
+	lawn_green=book.add_format({'align':'left','bg_color':'#32d358'})
+	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
+	red = book.add_format({'align':'left', 'bg_color': 'red'})
+	orange = book.add_format({'align':'left', 'bg_color': 'orange'})
+
 	border_format=book.add_format({
                             'border':1,
                             'align':'left',
                             'font_size':10
                            })
-	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
-	
-	
-	sheet10.conditional_format('B4:G7', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('B11:G15', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('B19:G22', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('B25:G27', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('B32:G37', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('I4:N8', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('I11:N14', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('I19:N22', {'type': 'no_errors',
-                                          'format': border_format})
-	sheet10.conditional_format('I25:N28', {'type': 'no_errors',
-                                          'format': border_format})
-  
-	#column headings
-	date_format1 = book.add_format({'num_format': 'mm-dd-yyyy','bold':True})
-	today= date.today()
-	yesterday=date.today()-timedelta(days=1)
-	week = date.today()-timedelta(days = 7)
 
-	format = book.add_format({'bold': True})
-	format.set_text_wrap()
-	format_align = book.add_format({'align':'left'})
-	today = date.today()
-	year = to_date.year
-	to_date1 = '{}'.format(to_date)
-	to_datef = to_date.strftime("%b %d,%Y")
-
-	year1 = '{}-{}'.format('Jan 01',year)
-	yesterday=to_date-timedelta(days=1)
-	week = to_date-timedelta(days = 7)
-	month = to_date-timedelta(days=30)
-	today1 = today.strftime("%b %d,%Y")
-	yestf = yesterday.strftime("%b %d,%Y")
-	weekf = week.strftime("%b %d,%Y")
-	monthf = month.strftime("%b %d,%Y")
-	avg_week = '{} to {}'.format(weekf,to_datef)
-	avg_month ='{} to {}'.format(monthf,to_datef)
-	avg_year = '{} to {}'.format(year1,to_datef)
-	date1='{}'.format(today)
+	#Headings
+	bold = book.add_format({'bold': True})
+	sheet10.write(0,1,'Summary Dashboard',bold)
+	sheet10.write(2,1,'Overall Health Grade',bold)
+	sheet10.write(8,1,'Movement Consistency',bold)
+	sheet10.write(14,1,'Non Exercise Steps',bold)
+	sheet10.write(21,1,'Nutrition',bold)
+	sheet10.write(27,1,'Alcohol',bold)
+	sheet10.write(34,1,'Exercise Consistency',bold)
+	sheet10.write(40,1,'Exercise Stats',bold)
+	sheet10.write(46,1,'Other Stats',bold)
+	sheet10.write(54,1,'Sleep Per Night (excluding awake time)',bold)
+	sheet10.write(61,1,'Sick',bold)
+	sheet10.write(69,1,'stress Level',bold)
+	sheet10.write(78,1,'Standing',bold)
+	sheet10.write(84,1,'Travel',bold)
 	
-	today1 ='{}\n{}'.format('Today',to_datef)
-	yesterday1 = '{}\n{}'.format('Yesterday',yestf)
-	week1 = '{}\n{}'.format('Avg Last 7 days',avg_week)
-	month1 = '{}\n{}'.format('Avg Last 30 days',avg_month)
-	year1 = '{}\n{}'.format('Avg Year to Date',avg_year)
-
+	to_date1 ='{}'.format(to_date)
 	
+	query_params = {
+		"date":to_date1,
+		"duration":"today,yesterday,week,month,year",
+		#"custom_ranges":cr1,
+		"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+		}
+	DATA = ProgressReport(request.user,query_params).get_progress_report()
+	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
+	#print(pprint.pprint(rank_data))
+	#columns headings
+	report_date= DATA['report_date']
+	rdate1=datetime.strptime(report_date,"%Y-%m-%d").date()
+	rdate='{}'.format(rdate1)
+	#print(rdate)
+	
+	today = DATA['duration_date']['today']
+	t1=datetime.strptime(today,"%Y-%m-%d")
+	today1=t1.strftime("%b %d,%Y")
+
+	yesterday=DATA['duration_date']['yesterday']
+	to1=datetime.strptime(yesterday,"%Y-%m-%d")
+	yesterday1=to1.strftime("%b %d,%Y")
+
+	week = DATA['duration_date']['week']
+	yest=[x.strip() for x in week.split('to')]
+	yest1=datetime.strptime(yest[0],"%Y-%m-%d")
+	yest2=datetime.strptime(yest[1],"%Y-%m-%d")
+	ys1=yest1.strftime("%b %d,%Y")
+	ys2=yest2.strftime("%b %d,%Y")
+	week1='{} to {}'.format(ys1,ys2)
+
+	month = DATA['duration_date']['month']
+	m1=[x.strip() for x in month.split('to')]
+	mon1=datetime.strptime(m1[0],"%Y-%m-%d")
+	mon2=datetime.strptime(m1[1],"%Y-%m-%d")
+	ms1=mon1.strftime("%b %d,%Y")
+	ms2=mon2.strftime("%b %d,%Y")
+	month1='{} to {}'.format(ms1,ms2)
+
+
+	today1 ='{}\n{}'.format('Today',today1)
+	yesterday1 = '{}\n{}'.format('Yesterday',yesterday1)
+	week1 = '{}\n{}'.format('Avg Last 7 days',week1)
+	month1 = '{}\n{}'.format('Avg Last 30 days',month1)
+	
+
+	y1= DATA['duration_date']['year']
+	y2=[x.strip() for x in y1.split('to')]
+	#print(y2) 
+	y=datetime.strptime(y2[1],"%Y-%m-%d")
+	x=datetime.strptime(y2[0],"%Y-%m-%d")
+	x1=x.strftime("%b %d,%Y")
+	y1=y.strftime("%b %d,%Y")
+	yearformat='{} to {}'.format(x1,y1)
+	year1 = '{}\n{}'.format('Avg Year to Date',yearformat)
 	duration = [today1,yesterday1,week1,month1,year1]
+
 	c = 1
 	for i in range(len(duration)):
 		c = c+1
 		sheet10.write(0,c,duration[i],format)
-		sheet10.write(0,c+7,duration[i],format)
-	
-	
+		
 	# Row headers
-	columns1=['Total GPA Points','overall_health_gpa','Rank against other users','Overall Health GPA grade',]
+	columns1=['Total GPA Points','Overall Health GPA','Rank against other users','Overall Health GPA Grade']
 	row=2
 	for i in range(len(columns1)):
 		row=row+1
 		sheet10.write(row,1,columns1[i])
 
-	sleep_per_night=['Total Sleep in hours:minutes','Rank against other users','Average Sleep Grade','# of Days Sleep Aid Taken in Period','% of Days Sleep Aid Taken in Period']
-	row=9
-	for i in range(len(sleep_per_night)):
+	Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
+	row=8
+	for i in range(len(Movement_consistency)):
 		row=row+1
-		sheet10.write(row,1,sleep_per_night[i])
-
+		sheet10.write(row,1,Movement_consistency[i])
+	
+	Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise Steps Grade','Non Exercise Steps GPA','Total Steps']
+	row=14
+	for i in range(len(Non_Exercise_Steps)):
+		row=row+1
+		sheet10.write(row,1,Non_Exercise_Steps[i])
+	
+	Nutrition=['% Unprocessed Food Consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
+	row=21
+	for i in range(len(Nutrition)):
+		row=row+1
+		sheet10.write(row,1,Nutrition[i])
+	
+	alcohol=['Average Drinks Per Week(7Days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA','% of days alcohol consumption reported']
+	row=27
+	for i in range(len(alcohol)):
+		row = row+1
+		sheet10.write(row,1,alcohol[i])
+	
 	exercise_consistency=['Avg # of Days Exercised/Week','Rank against other users','Exercise Consistency Grade','Exercise Consistency GPA']
-	row=17
+	row=34
 	for i in range(len(exercise_consistency)):
 		row=row+1
 		sheet10.write(row,1,exercise_consistency[i])
-
-	exercise_stats=['Workout Effort Level','Average Exercise Heart Rate','VO2 Max']
-	row=23
+	
+	exercise_stats=['Workout Duration (hours:minutes)','Workout Effort Level','Average Exercise Heart Rate','VO2 Max']
+	row=40
 	for i in range(len(exercise_stats)):
 		row=row+1
 		sheet10.write(row,1,exercise_stats[i])
 
-	other_stats=['Resting heart Rate(RHR)','HRR (time to 99)','HRR (heart beats lowered in 1st minute)','HRR (highest heart rate in 1st minute)','HRR (lowest heart rate point)','Floors Climbed']
-	row=30
+	other_stats=['Resting Heart Rate(RHR)','HRR (time to 99)','HRR (heart beats lowered in 1st minute)','HRR (highest heart rate in 1st minute)','HRR (lowest heart rate point)','Floors Climbed']
+	row=46
 	for i in range(len(other_stats)):
 		row=row+1
 		sheet10.write(row,1,other_stats[i])
 
-	Non_Exercise_Steps=['Non Eercise Steps','Rank against other users','Movement-Non Exercise steps Grade','Non Exercise Steps GPA','Total Steps']
-	row=2
-	for i in range(len(Non_Exercise_Steps)):
-		row=row+1
-		sheet10.write(row,8,Non_Exercise_Steps[i])
-
-	Movement_consistency=['Movement Consistency Score','Rank against other users','Movement Consistency Grade','Movement Consistency GPA']
-	row=9
-	for i in range(len(Movement_consistency)):
-		row=row+1
-		sheet10.write(row,8,Movement_consistency[i])
-
-	Nutrition=['% Unprocessed Food of the volume of food consumed','Rank against other users','% Non Processed Food Consumed Grade','% Non Processedd Food Consumed GPA']
-	row=17
-	for i in range(len(Nutrition)):
-		row=row+1
-		sheet10.write(row,8,Nutrition[i])
-
-	alcohol=['# of Drinks Consumed per week(7days)','Rank against other users','Alcoholic drinks per week Grade','Alcoholic drinks per week GPA']
-	row=23
-	for i in range(len(alcohol)):
-		row = row+1
-		sheet10.write(row,8,alcohol[i])
-
-	Total = ['Total Exercise time(hours:minutes) in','Total time(hours:minutes) in anaerobic Zone last 7 days','Total time (hours:minutes) below Aerobic Zone last 7 days',
-	'Total Exercise time (hours:minutes) the last 7 days',
-	'Exercise % Time in Aerobic Zone','Exercise % Time in Anaerobic zone','Exercise % Time below aerobic zone']
-	row=30
-	for i in range(len(Total)):
-		row = row+1
-		sheet10.write(row,8,Total[i])
-
-	#Transferring Json data
-	#json_cum = open('/home/normsoftware/Downloads/pa_dummy.json')
-	#json_cum_str = json_cum.read()
-	#json_cum1 = json.loads(json_cum_str)
 	
-	#print(custom_range)
-	#print(from_date,to_date)
-	#print(date1)
-	custom_range = '{},{}'.format(from_date,to_date)
-	date1='{}'.format(today)
-	
+	sleep_per_night=['Total Sleep in hours:minutes','Rank against other users','Average Sleep Grade','# of Days Sleep Aid Taken in Period','%  of Days Sleep Aid Taken in Period']
+	row=54
+	for i in range(len(sleep_per_night)):
+		row=row+1
+		sheet10.write(row,1,sleep_per_night[i])
+
+	sick = ['# of Days Not Sick','% of Days Not Sick','# of Days Sick','% of Days Sick',' # Days Sick/Not Sick Reported']
+	row=61
+	for i in range(len(sick)):
+		row=row+1
+		sheet10.write(row,1,sick[i])
+
+	stresslevel = ['# of Days Low Stress Reported','% of Days Low Stress','# of Days Medium Stress Reported','% of Days Medium Stress','# of Days High Stress Reported','% of Days High Stress','# Days Stress Level Reported']
+	row=69
+	for i in range(len(stresslevel)):
+		row=row+1
+		sheet10.write(row,1,stresslevel[i])
+
+	standing = ['# of Days Stood more than 3 hours','% of Days Stood More Than 3 Hours', '# of Days Reported Standing/Not Standing more than 3 hours'] 
+	row=78
+	for i in range(len(standing)):
+		row=row+1
+		sheet10.write(row,1,standing[i])
+
+	travel=['# of Days you Traveled/Stayed Away From Home?','% of Days you Traveled/Stayed Away From Home?']
+	row=84
+	for i in range(len(travel)):
+		row=row+1
+		sheet10.write(row,1,travel[i])
+
+	Ohg=['total_gpa_point','overall_health_gpa','overall_health_gpa_grade']
+	mc=['movement_consistency_score','movement_consistency_grade','movement_consistency_gpa']
+	non_exe=['non_exercise_steps','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
+	nutri=['prcnt_unprocessed_volume_of_food','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
+	Alc=['avg_drink_per_week','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa','prcnt_alcohol_consumption_reported']
+	Ec=['avg_no_of_days_exercises_per_week','exercise_consistency_grade','exercise_consistency_gpa']
+	Es=['workout_duration_hours_min','workout_effort_level','avg_exercise_heart_rate','vo2_max']
+	other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
+	slept=['total_sleep_in_hours_min','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period']
+	sick1=['number_of_days_not_sick','prcnt_of_days_not_sick','number_of_days_sick','prcnt_of_days_sick','days_sick_not_sick_reported']
+	stress1=['prcnt_of_days_low_stress','prcnt_of_days_medium_stress','prcnt_of_days_high_stress']
+	standing1=['number_days_stood_three_hours','prcnt_days_stood_three_hours','number_days_reported_stood_not_stood_three_hours']
+	travel1=['number_days_travel_away_from_home','prcnt_days_travel_away_from_home']
+
 	query_params = {
-	"date":to_date1,
+	"date":rdate,
 	"duration":"today,yesterday,week,month,year",
-	"custom_ranges":custom_range,
-	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other"
+	"summary":"overall_health,non_exercise,sleep,mc,ec,nutrition,exercise,alcohol,other,sick,stress,standing,travel"
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
 	#print(pprint.pprint(DATA))
-	#print(query_params['custom_ranges'])
-	#sheet10.write(6,2,json_cum1['summary']['nutrition']['prcnt_unprocessed_food_gpa']['custom_range']['2018-02-12 to 2018-02-18']['to_dt'])
-	
 	time1=['today','yesterday','week','month','year']
-	
 	c = 1
 	for i in range(len(time1)):
 		c = c+1
+		
 		sheet10.write(3,c,DATA['summary']['overall_health']['total_gpa_point'][time1[i]],format_align)																
 		sheet10.write(4,c,DATA['summary']['overall_health']['overall_health_gpa'][time1[i]],format_align1)																
-		sheet10.write(5,c,DATA['summary']['overall_health']['rank'][time1[i]],format_align)
+		sheet10.write(5,c,rank_data['oh_gpa'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],format_align)
-		sheet10.write(10,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
-		sheet10.write(11,c,DATA['summary']['sleep']['rank'][time1[i]],format_align)
-		sheet10.write(12,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
-		sheet10.write(13,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
-		sheet10.write(14,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
-		sheet10.write(15,c,DATA['summary']['sleep']['overall_sleep_gpa'][time1[i]],format_align1)
-		sheet10.write(18,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
-		sheet10.write(19,c,DATA['summary']['ec']['rank'][time1[i]],format_align)
-		sheet10.write(20,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
-		sheet10.write(21,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
-		sheet10.write(24,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
-		sheet10.write(25,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
-		sheet10.write(26,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
-		sheet10.write(31,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
-		sheet10.write(32,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
-		sheet10.write(33,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
-		sheet10.write(35,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
-		sheet10.write(34,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
-		sheet10.write(36,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
-
-		sheet10.write(3,c+7,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
-		sheet10.write(5,c+7,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
-		sheet10.write(6,c+7,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
-		sheet10.write(7,c+7,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
-		sheet10.write(10,c+7,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
-		sheet10.write(11,c+7,DATA['summary']['mc']['rank'][time1[i]],format_align)
-		sheet10.write(12,c+7,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
-		sheet10.write(13,c+7,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
-		sheet10.write(18,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
-		sheet10.write(19,c+7,DATA['summary']['nutrition']['rank'][time1[i]],format_align)
-		sheet10.write(20,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
-		sheet10.write(21,c+7,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
-		sheet10.write(24,c+7,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
-		sheet10.write(25,c+7,DATA['summary']['alcohol']['rank'][time1[i]],format_align)
-		sheet10.write(26,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
-		sheet10.write(27,c+7,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
-	
-	# #custom_range=[from_date,to_date,'data']
-	# nutri=['prcnt_unprocessed_volume_of_food','rank','prcnt_unprocessed_food_grade','prcnt_unprocessed_food_gpa']
-	# non_exe=['non_exercise_steps','rank','movement_non_exercise_step_grade','non_exericse_steps_gpa','total_steps']
-	# mc=['movement_consistency_score','rank','movement_consistency_grade','movement_consistency_gpa',]
-	# Alc=['avg_drink_per_week','rank','alcoholic_drinks_per_week_grade','alcoholic_drinks_per_week_gpa']
-	# Ohg=['total_gpa_point','rank','overall_health_gpa_grade','overall_health_gpa']
-	# slept=['total_sleep_in_hours_min','rank','average_sleep_grade','num_days_sleep_aid_taken_in_period','prcnt_days_sleep_aid_taken_in_period','overall_sleep_gpa']
-	# Ec=['avg_no_of_days_exercises_per_week','rank','exercise_consistency_grade','exercise_consistency_gpa']
-	# Es=['workout_effort_level','avg_exercise_heart_rate','vo2_max']
-	# other1=['resting_hr','hrr_time_to_99','hrr_beats_lowered_in_first_min','hrr_highest_hr_in_first_min','hrr_lowest_hr_point','floors_climbed']
-
-	# range1='{} to {}'.format(from_date,to_date)
-	# #keys = ['from_dt','to_dt','data']
-	# keys=['data']
-
-	# c=1
-	# for i in range(len(keys)):
-	# 	c = c + 1
-	# 	r=2
-	# 	for n in range(len(nutri)):
-	# 		r= r+1
-	# 		sheet10.write(r+15,c+10,DATA['summary']['nutrition'][nutri[n]]['custom_range'][range1][keys[i]],format_align)
-	# 	r=2
-	# 	for n in range(len(non_exe)):
-	# 		r= r+1	
-	# 		sheet10.write(r,c+10,DATA['summary']['non_exercise'][non_exe[n]]['custom_range'][range1][keys[i]],format_align)
-
-	# 	r=9
-	# 	for n in range(len(mc)):
-	# 		r= r+1	
-	# 		sheet10.write(r,c+10,DATA['summary']['mc'][mc[n]]['custom_range'][range1][keys[i]],format_align)	
-	# 	r=23
-	# 	for n in range(len(Alc)):
-	# 		r= r+1	
-	# 		sheet10.write(r,c+10,DATA['summary']['alcohol'][Alc[n]]['custom_range'][range1][keys[i]],format_align)
-
-	# 	r=2
-	# 	for n in range(len(Ohg)):
-	# 		r= r+1
-	# 		sheet10.write(r,c,DATA['summary']['overall_health'][Ohg[n]]['custom_range'][range1][keys[i]],format_align)
-	# 	r=9
-	# 	for n in range(len(slept)):
-	# 		r= r+1
-	# 		sheet10.write(r,c,DATA['summary']['sleep'][slept[n]]['custom_range'][range1][keys[i]],format_align)
-	# 	r=17
-	# 	for n in range(len(Ec)):
-	# 		r= r+1
-	# 		sheet10.write(r,c,DATA['summary']['ec'][Ec[n]]['custom_range'][range1][keys[i]],format_align)
 		
-	# 	r=23
-	# 	for n in range(len(Es)):
-	# 		r= r+1
-	# 		sheet10.write(r,c,DATA['summary']['exercise'][Es[n]]['custom_range'][range1][keys[i]],format_align)
-
-		# r=30
-		# for n in range(len(other1)):
-		# 	r= r+1
-		# 	sheet10.write(r,c,DATA['summary']['other'][other1[n]]['custom_range'][range1][keys[i]],format_align)
+		sheet10.write(9,c,DATA['summary']['mc']['movement_consistency_score'][time1[i]],format_align)
+		sheet10.write(10,c,rank_data['mc'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
+		sheet10.write(12,c,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		
-		# color formatting based on grades
-		green = book.add_format({'align':'left', 'bg_color': 'green'})
-		yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
-		red = book.add_format({'align':'left', 'bg_color': 'red'})
-		orange = book.add_format({'align':'left', 'bg_color': 'orange'})
+		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+		sheet10.write(16,c,rank_data['total_steps'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
+		sheet10.write(18,c,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
+		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+		
+		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
+		sheet10.write(23,c,rank_data['prcnt_uf'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
+		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
+		
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"A"', 
-												'format': green})
+		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
+		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
+		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
+		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align1)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"B"', 
-												'format': green})
+		sheet10.write(35,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
+		sheet10.write(36,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],format_align)
+		sheet10.write(38,c,DATA['summary']['ec']['exercise_consistency_gpa'][time1[i]],format_align1)
+		
+		# sheet10.write(42,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+		# sheet10.write(43,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+		# sheet10.write(44,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+		# sheet10.write(45,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+		
+		sheet10.write(47,c,DATA['summary']['other']['resting_hr'][time1[i]],format_align)
+		# sheet10.write(48,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+		# sheet10.write(49,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+		# sheet10.write(50,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+		sheet10.write(51,c,DATA['summary']['other']['hrr_lowest_hr_point'][time1[i]],format_align)
+		sheet10.write(52,c,DATA['summary']['other']['floors_climbed'][time1[i]],format_align)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"C"', 
-												'format': yellow})
+		
+		sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+		sheet10.write(56,c,rank_data['avg_sleep'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],format_align)
+		sheet10.write(58,c,DATA['summary']['sleep']['num_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+		sheet10.write(59,c,DATA['summary']['sleep']['prcnt_days_sleep_aid_taken_in_period'][time1[i]],format_align)
+		
+		
+		
+		if (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='A'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],green)
+		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='B'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='C'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],yellow)
+		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='D'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],orange)
+		elif(DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]]=='F'):
+			sheet10.write(6,c,DATA['summary']['overall_health']['overall_health_gpa_grade'][time1[i]],red)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"D"', 
-												'format': orange})
+		if (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='A'):
+			sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],green)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='B'):
+			sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='C'):
+			sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],yellow)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='D'):
+			sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],orange)
+		elif (DATA['summary']['mc']['movement_consistency_grade'][time1[i]]=='F'):
+			sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],red)
+		
+		if (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='A'):
+			sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],green)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='B'):
+			sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='C'):
+			sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],yellow)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='D'):
+			sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],orange)
+		elif (DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]]=='F'):
+			sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],red)
+		
+		if (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='A'):
+			sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],green)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='B'):
+			sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='C'):
+			sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],yellow)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='D'):
+			sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],orange)
+		elif (DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]]=='F'):
+			sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],red)
+		
+		if (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='A'):	
+			sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],green)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='B'):	
+			sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='C'):	
+			sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],yellow)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='D'):	
+			sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],orange)
+		elif (DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]]=='F'):	
+			sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],red)
+		
+		if (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='A'):
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],green)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='B'):
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='C'):
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],yellow)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='D'):
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],orange)
+		elif (DATA['summary']['ec']['exercise_consistency_grade'][time1[i]]=='F'):
+			sheet10.write(37,c,DATA['summary']['ec']['exercise_consistency_grade'][time1[i]],red)
 
-		sheet10.conditional_format('A1:T50', {'type':'cell', 
-												'criteria':'==', 
-												'value': '"F"', 
-												'format': red},
-												)
+		if (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='A'):
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],green)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='B'):
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],lawn_green)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='C'):
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],yellow)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='D'):
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],orange)
+		elif (DATA['summary']['sleep']['average_sleep_grade'][time1[i]]=='F'):
+			sheet10.write(57,c,DATA['summary']['sleep']['average_sleep_grade'][time1[i]],red)
+
+		if (DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]]=='00:00'):
+			sheet10.write(55,c,'No Workout',format_align)
+		else:
+			sheet10.write(55,c,DATA['summary']['sleep']['total_sleep_in_hours_min'][time1[i]],format_align)
+			
+		if (DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]]==0):
+			sheet10.write(43,c,'No Workout',format_align)
+		else:
+			sheet10.write(43,c,DATA['summary']['exercise']['avg_exercise_heart_rate'][time1[i]],format_align)
+		
+		if (DATA['summary']['exercise']['workout_effort_level'][time1[i]]==0):
+			sheet10.write(42,c,'No Workout',format_align)
+		else:
+			sheet10.write(42,c,DATA['summary']['exercise']['workout_effort_level'][time1[i]],format_align)
+
+		if (DATA['summary']['exercise']['vo2_max'][time1[i]]==0):
+			sheet10.write(44,c,'Not provided',format_align)
+		else:
+			sheet10.write(44,c,DATA['summary']['exercise']['vo2_max'][time1[i]],format_align)
+			
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
+			if (DATA['summary']['other']['hrr_time_to_99'][time1[i]]=='00:00'):
+				sheet10.write(48,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(48,c,DATA['summary']['other']['hrr_time_to_99'][time1[i]],format_align)
+		else:
+			sheet10.write(48,c,'No Workout',format_align)
+		
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):
+			if (DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]]==0):
+				sheet10.write(49,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(49,c,DATA['summary']['other']['hrr_beats_lowered_in_first_min'][time1[i]],format_align)
+		else:
+			sheet10.write(49,c,'No Workout',format_align)
+		
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]!='00:00'):	
+			if (DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]]==0):
+				sheet10.write(50,c,'Not Recorded',format_align)
+			else:
+				sheet10.write(50,c,DATA['summary']['other']['hrr_highest_hr_in_first_min'][time1[i]],format_align)
+		else:
+			sheet10.write(50,c,'No Workout',format_align)
+
+
+		if (DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]]=='00:00'):
+			sheet10.write(41,c,"No Workout",format_align)
+		else:
+			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
+
+
+		row=61
+		for i in range(len(sick1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['sick'][sick1[i]][time1[i]],format_align)
+		
+		row=69
+		for i in range(len(stress1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['stress'][stress1[i]][time1[i]],format_align)
+		
+		row=78
+		for i in range(len(standing1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['standing'][standing1[i]][time1[i]],format_align)
+		
+		row=84
+		for i in range(len(travel1)):
+			row=row+1
+			sheet10.write(row,c,DATA['summary']['travel'][travel1[i]][time1[i]],format_align)
+		
 		num_fmt = book.add_format({'num_format': '#,###'})
 
 		sheet10.conditional_format('A1:T50', {'type':'cell', 
