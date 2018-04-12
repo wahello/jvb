@@ -81,8 +81,9 @@ export default class HeartRate extends Component{
 		    return time;
 	}
 	renderpercentage(value){
+		let percentage
 		if(value){
-			let percentage = value +"%";
+			percentage = value +"%";
 		}
 		return percentage;
 	}
