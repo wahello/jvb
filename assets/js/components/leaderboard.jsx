@@ -90,7 +90,6 @@ class LeaderBoard extends Component{
         }
         rankInitialState[catg] = catInitialState;
     };
-    console.log("rankInitialState",rankInitialState);
 		this.state = {
 			selectedDate:new Date(),
 			lb1_start_date:'',
@@ -105,6 +104,14 @@ class LeaderBoard extends Component{
 			calendarOpen:false,
 			isOpen:false,
 			ranking_data:rankInitialState,
+			duration_date:{
+				"week":"",
+				"today":"",
+				"yesterday":"",
+				"year":"",
+				"month":"",
+			
+			},
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.handleLogout = this.handleLogout.bind(this);
@@ -123,9 +130,11 @@ class LeaderBoard extends Component{
 	}
 	successLeaderBoard(data){
 		this.setState({
-			ranking_data:data.data
+			ranking_data:data.data,
+			duration_date:data.data.duration_date,
 		});
 	}
+
 	errorLeaderBoard(error){
 		console.log(error.message);
 	}
@@ -234,7 +243,6 @@ class LeaderBoard extends Component{
       });
     }
   	renderTablesTd(value){
-  		console.log(value);
   		let category = "";
 	  	let durations = [];
 	  	let scores = [];
