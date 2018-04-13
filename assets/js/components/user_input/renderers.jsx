@@ -18,7 +18,8 @@ import Hrr from './HRR';
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" &&  
 	 this.state.workout_effort !== "" &&
-  	 this.state.workout_easy === "easy"){
+  	 (this.state.workout_easy === "easy" ||
+     this.state.workout_easy === "medium")){
   	console.log("rendering");
 	const updateState = function(val){
 						  this.setState({
