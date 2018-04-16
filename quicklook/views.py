@@ -289,9 +289,9 @@ def hrr_calculations(request):
 		time_in_below_aerobic = sum(below_aerobic_list)
 		time_in_anaerobic = sum(anaerobic_range_list)
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-		percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
-		percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
-		percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+		percent_anaerobic = (time_in_anaerobic/total_time)*100
+		percent_below_aerobic = (time_in_below_aerobic/total_time)*100
+		percent_aerobic = (time_in_aerobic/total_time)*100
 
 		total_percent = 100
 
