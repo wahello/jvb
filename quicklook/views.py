@@ -2847,7 +2847,7 @@ def export_users_xls(request):
 	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
 	format_align = book.add_format({'align':'left'})
 
-	green = book.add_format({'align':'left', 'bg_color': 'green'})
+	green = book.add_format({'align':'left', 'bg_color': 'green','font_color': 'white'})
 	lawn_green=book.add_format({'align':'left','bg_color':'#32d358'})
 	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
 	red = book.add_format({'align':'left', 'bg_color': 'red'})

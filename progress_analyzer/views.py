@@ -79,7 +79,7 @@ def progress_excel_export(request):
 	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
 	format_align = book.add_format({'align':'left'})
 
-	green = book.add_format({'align':'left', 'bg_color': 'green'})
+	green = book.add_format({'align':'left', 'bg_color': 'green','font_color': 'white'})
 	lawn_green=book.add_format({'align':'left','bg_color':'#32d358'})
 	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
 	red = book.add_format({'align':'left', 'bg_color': 'red'})
@@ -263,7 +263,7 @@ def progress_excel_export(request):
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
 	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
-	print(pprint.pprint(DATA))
+	#print(pprint.pprint(DATA))
 	#print(pprint.pprint(rank_data))
 	time1=['today','yesterday','week','month','year']
 	c = 1
