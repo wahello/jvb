@@ -2179,7 +2179,7 @@ def export_users_xls(request):
 		current_date -= timedelta(days=1)
 	
 	Activities_list_unique = list(set(Activities_list))
-
+	len_activity = len(Activities_list_unique)
 	for col_num in range(len(Activities_list_unique)):
 		col_num1 = col_num1 + 1
 		sheet6.write(col_num1, row_num,"Average Heartrate"+' '+Activities_list_unique[col_num])
@@ -2204,7 +2204,7 @@ def export_users_xls(request):
 			sheet6.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 	
-
+	
 	row_avg_heart = i+1
 	column_no = row_num
 	current_date = to_date
@@ -2238,7 +2238,7 @@ def export_users_xls(request):
 
 	current_date = to_date
 	if data:
-		rem_row = i+k
+		rem_row = i+len_activity
 	else:
 		rem_row = i
 	while (current_date >= from_date):
