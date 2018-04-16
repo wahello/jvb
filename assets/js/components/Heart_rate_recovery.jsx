@@ -126,7 +126,7 @@ export default class HeartRate extends Component{
           	    <table className = "table table-striped table-bordered ">
 	          	    <thead className = "hr_table_style_rows">
 		          	    <th className = "hr_table_style_rows">Ranges</th>
-		          	    <th className = "hr_table_style_rows">Time in Zone (hours:minutes:seconds)</th>
+		          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
 		          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
 	          	    </thead>
 	          	    <tbody>
@@ -146,7 +146,7 @@ export default class HeartRate extends Component{
 	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
 	          	    </tr>
 	          	    <tr className = "hr_table_style_rows">
-	          	    <td className = "hr_table_style_rows">Total Workout Duration (hours:minutes:seconds)</td>
+	          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
 	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
 	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.total_percent)}</td>
 	          	    </tr>
