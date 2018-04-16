@@ -85,6 +85,9 @@ export default class HeartRate extends Component{
 		if(value){
 			percentage = value +"%";
 		}
+		else if(value == 0 || value == null || value == undefined){
+			percentage = "0%";
+		}
 		return percentage;
 	}
 	processDate(selectedDate){
