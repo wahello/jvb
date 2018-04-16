@@ -228,7 +228,10 @@ class LeaderBoard extends Component{
     });
   }
 	componentDidMount(){
-		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate);
+		this.setState({
+			fetching_lb4:true,
+		});
+		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,true);
 	}
 	toggle() {
 	    this.setState({
