@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta , date
+from decimal import Decimal, ROUND_HALF_UP
 import calendar
 import ast
 import time
@@ -290,8 +291,13 @@ def hrr_calculations(request):
 		time_in_anaerobic = sum(anaerobic_range_list)
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 		percent_anaerobic = (time_in_anaerobic/total_time)*100
+		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+
 		percent_below_aerobic = (time_in_below_aerobic/total_time)*100
+		percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+
 		percent_aerobic = (time_in_aerobic/total_time)*100
+		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
 		total_percent = 100
 
