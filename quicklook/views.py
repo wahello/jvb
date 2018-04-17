@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta , date
+from decimal import Decimal, ROUND_HALF_UP
 import calendar
 import ast
 import time
@@ -298,10 +299,16 @@ def hrr_calculations(request):
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-		
-		percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
-		percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
-		percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+
+		percent_anaerobic = (time_in_anaerobic/total_time)*100
+		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+
+		percent_below_aerobic = (time_in_below_aerobic/total_time)*100
+		percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+
+		percent_aerobic = (time_in_aerobic/total_time)*100
+		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+
 
 		total_percent = 100
 
@@ -2186,7 +2193,7 @@ def export_users_xls(request):
 		current_date -= timedelta(days=1)
 	
 	Activities_list_unique = list(set(Activities_list))
-
+	len_activity = len(Activities_list_unique)
 	for col_num in range(len(Activities_list_unique)):
 		col_num1 = col_num1 + 1
 		sheet6.write(col_num1, row_num,"Average Heartrate"+' '+Activities_list_unique[col_num])
@@ -2211,7 +2218,7 @@ def export_users_xls(request):
 			sheet6.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 	
-
+	
 	row_avg_heart = i+1
 	column_no = row_num
 	current_date = to_date
@@ -2245,7 +2252,7 @@ def export_users_xls(request):
 
 	current_date = to_date
 	if data:
-		rem_row = i+k
+		rem_row = i+len_activity
 	else:
 		rem_row = i
 	while (current_date >= from_date):

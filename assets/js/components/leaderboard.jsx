@@ -228,7 +228,10 @@ class LeaderBoard extends Component{
     });
   }
 	componentDidMount(){
-		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate);
+		this.setState({
+			fetching_lb4:true,
+		});
+		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,true);
 	}
 	toggle() {
 	    this.setState({
@@ -351,19 +354,31 @@ class LeaderBoard extends Component{
 		  		if(rank.isCustomRange){
 		  			var state = {
 			  					lbCatgData:this.state.ranking_data[
-			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank}
+			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank,
+			  					lbCatgName:category
+			  				}
 			  	}
 			  	else{
 			  		var state = {
 			  					lbCatgData:this.state.ranking_data[
-			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank}
+			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank,
+			  					lbCatgName:category
+			  				}
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
 			  			<Link to={{
 			  				pathname:`/leaderboard/${categoryMeta[category]["url_name"]}`,
 			  				state:state
-			  				}}>{rank.rank}
+			  				}}>
+			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
+			  				 <span id="lbfontawesome">
+			                    <FontAwesome
+			                    	className = "fantawesome_style"
+			                        name = "external-link"
+			                        size = "1x"
+			                    />
+			                 </span>   
 			  			</Link>
 			  		</td>
 		  		);
@@ -374,7 +389,15 @@ class LeaderBoard extends Component{
 			  		<td className = "lb_table_style_rows">
 			  			<Link to={{
 			  				pathname:`/leaderboard}`
-			  				}}>{rank?rank.rank:rank}
+			  				}}>
+			  				<span style={{textDecoration:"underline"}}>{rank?rank.rank:rank}</span>
+			  				 <span id="lbfontawesome">
+			                    <FontAwesome
+			                    	className = "fantawesome_style"
+			                        name = "external-link"
+			                        size = "1x"
+			                    />
+			                 </span>    
 			  			</Link>
 			  		</td>
 		  		);
@@ -432,7 +455,7 @@ class LeaderBoard extends Component{
 		            </NavbarBrand>
 		          </Link>
 		            <span id="header">
-		            <h2 className="head" id="head">Leader Board
+		            <h2 className="head" id="head">My Ranking
 		            </h2>
 		            </span>
 		          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>

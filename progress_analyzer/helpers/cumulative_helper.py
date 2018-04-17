@@ -632,7 +632,7 @@ def _get_travel_cum_sum(today_ui_data,yday_cum_data=None):
 	elif not today_ui_data and yday_cum_data:
 		# if no user input then copy last cumulative sum
 		travel_cum_data['cum_days_travel_away_from_home'] = _safe_get_mobj(
-			yday_cum_data.standing_cum,"cum_days_travel_away_from_home",0)
+			yday_cum_data.travel_cum,"cum_days_travel_away_from_home",0)
 
 	elif today_ui_data:
 		travel_away_from_home = _safe_get_mobj(today_ui_data.optional_input,"travel",None)

@@ -898,8 +898,11 @@ headerDates(value){
 }
 
     componentDidMount(){
+      this.setState({
+         fetching_ql4 :true,     
+       });
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
-      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate);
+      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,true);
 
     }
   toggle() {

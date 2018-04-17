@@ -28,8 +28,8 @@ class Dashboard extends Component {
 							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
-							  <Link to='/leaderboard'>Leader Board</Link><br/>
-							   <Link to='/heartrate'>Heart Rate Recovery</Link><br/>
+							  <Link to='/leaderboard'>My Ranking</Link><br/>
+							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
 							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
