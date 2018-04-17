@@ -241,6 +241,9 @@ def hrr_calculations(request):
 				"aerobic_zone":"",
 				"anaerobic_range":"",
 				"below_aerobic_zone":"",
+				"aerobic_range":"",
+				"anaerobic_range":"",
+				"below_aerobic_range":"",
 				"percent_aerobic":"",
 				"percent_below_aerobic":"",
 				"percent_anaerobic":"",
@@ -274,6 +277,11 @@ def hrr_calculations(request):
 		below_aerobic_value = 180-age_user-30
 		anaerobic_value = 180-age_user+5
 
+		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
+		anaerobic_range = '{} or above'.format(anaerobic_value+1)
+		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
+		print(anaerobic_range,below_aerobic_range)
+		
 		anaerobic_range_list = []
 		below_aerobic_list = []
 		aerobic_list = []
@@ -288,7 +296,9 @@ def hrr_calculations(request):
 		time_in_aerobic = sum(aerobic_list)
 		time_in_below_aerobic = sum(below_aerobic_list)
 		time_in_anaerobic = sum(anaerobic_range_list)
+		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
+		
 		percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
 		percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
 		percent_aerobic = round((time_in_aerobic/total_time)*100,2)
@@ -297,8 +307,11 @@ def hrr_calculations(request):
 
 		data = {"total_time":total_time,
 				"aerobic_zone":time_in_aerobic,
-				"anaerobic_range":time_in_anaerobic,
+				"anaerobic_zone":time_in_anaerobic,
 				"below_aerobic_zone":time_in_below_aerobic,
+				"aerobic_range":aerobic_range,
+				"anaerobic_range":anaerobic_range,
+				"below_aerobic_range":below_aerobic_range,
 				"percent_aerobic":percent_aerobic,
 				"percent_below_aerobic":percent_below_aerobic,
 				"percent_anaerobic":percent_anaerobic,
