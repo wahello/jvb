@@ -115,3 +115,12 @@ class MetaCumulative(models.Model):
 	cum_reported_stand_three_hours_days_count = models.IntegerField(blank=True,null=True)
 	cum_reported_stress_days_count = models.IntegerField(blank=True,null=True)
 	cum_reported_alcohol_days_count = models.IntegerField(blank=True,null=True)
+
+
+class ProgressReportUpdateMeta(models.Model):
+	user = models.OneToOneField(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE,
+		related_name="pa_update_meta"
+	)
+	requires_update_from = models.DateField(blank=True,null=True)

@@ -63,7 +63,7 @@ class Score(models.Model):
 		(PRCNT_UNPROCESSED_FOOD, "Percent Unprocessed Food"),
 		(ALCOHOL_DRINK, "Alcohol Drink"),
 		(TOTAL_STEPS, "Total Steps"),
-		(FLOOR_CLIMBED, "Floor Climbed"),
+		(FLOOR_CLIMBED, "Floors Climbed"),
 		(RESTING_HEART_RATE, "Resting Heart Rate"),
 		(DEEP_SLEEP, "Deep Sleep"),
 		(AWAKE_TIME, "Awake Time"),

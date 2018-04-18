@@ -4,19 +4,24 @@ from datetime import datetime,timedelta
 from django.contrib.auth.models import User
 from rauth import OAuth1Service
 
-from .models import UserGarminDataEpoch,\
-                    UserGarminDataSleep,\
-                    UserGarminDataBodyComposition,\
-                    UserGarminDataDaily,\
-                    UserGarminDataActivity,\
-                    UserGarminDataManuallyUpdated,\
-                    UserGarminDataStressDetails,\
-                    UserGarminDataMetrics,\
-                    UserGarminDataMoveIQ
-                    # GarminConnectToken
+from .models import (
+	UserGarminDataEpoch,
+    UserGarminDataSleep,
+    UserGarminDataBodyComposition,
+    UserGarminDataDaily,
+    UserGarminDataActivity,
+    UserGarminDataManuallyUpdated,
+    UserGarminDataStressDetails,
+    UserGarminDataMetrics,
+    UserGarminDataMoveIQ,
+    # GarminConnectToken
+)
 
 from quicklook.tasks import generate_quicklook
-from progress_analyzer.tasks import generate_cumulative_instances_custom_range
+from progress_analyzer.tasks import (
+	generate_cumulative_instances_custom_range,
+	set_pa_report_update_date
+)
 
 def _get_model_types():
 	MODEL_TYPES = {
@@ -175,5 +180,14 @@ def store_garmin_health_push(data):
 				 	generate_cumulative_instances_custom_range.si(user.id,date,date)
 				)
 				chain.delay()
+			elif datetime.strptime(date,"%Y-%m-%d").date() != datetime.now().date():
+				# if received data is not for today (some historical data) then
+				# we have to update all the PA report from that date. So we need to record
+				# this date in database and update PA later as a celery task
+				generate_quicklook.delay(user.id,date,date)
+				set_pa_report_update_date.delay(
+					user.id, 
+					date
+				)
 			else:
 				generate_quicklook.delay(user.id,date,date)

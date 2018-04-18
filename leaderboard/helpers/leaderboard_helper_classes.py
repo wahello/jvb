@@ -51,7 +51,7 @@ class RankedScore(object):
 
 	@score.setter
 	def score(self,score):
-		if score == None or score == 'Not Reported':
+		if score == None or score in ['Not Reported','Not Provided']:
 			self.__score = self.CATEGORY_DEFAULT_SCORE[self.category]
 		else:
 			self.__score = score
@@ -90,7 +90,7 @@ class RankedScore(object):
 		return d
 
 	def _hours_to_hours_min(self,hours):
-		if hours:
+		if hours or hours is not None:
 			mins = hours * 60
 			hours,mins = divmod(mins,60)
 			hours = round(hours)
