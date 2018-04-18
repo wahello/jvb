@@ -21,7 +21,56 @@ import { getGarminToken,logoutUser} from '../network/auth';
 
 const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec"];
 const duration = ["week","today","yesterday","year","month","custom_range"];
-
+const categoryMeta = {
+  "Overall Health GPA":{
+    short_name:"oh_gpa",
+    url_name:"overall-health-gpa"
+  },
+  "Alcohol Drink":{
+    short_name:"alcohol_drink",
+    url_name:"alcohol-drink"
+  },
+  "Average Sleep":{ 
+    short_name:"avg_sleep",
+    url_name:"avg-sleep"
+  },
+  "Percent Unprocessed Food":{
+    short_name:"prcnt_uf",
+    url_name:"percent-unprocessed-food"
+  },
+  "Total Steps":{
+    short_name:"total_steps",
+    url_name:"total-steps"
+  },
+  "Movement Consistency":{
+    short_name:"mc",
+    url_name:"movement-consistency"
+  },
+  "Exercise Consistency":{
+    short_name:"ec",
+    url_name:"exercise-consistency"
+  },
+  "Awake Time":{
+    short_name:"awake_time",
+    url_name:"awake-time"
+  },
+  "Resting Heart Rate":{
+    short_name:"resting_hr",
+    url_name:"resting-heart-rate"
+  },
+  "Deep Sleep":{
+    short_name:"deep_sleep",
+    url_name:"deep-sleep" 
+  },
+  "Movement Non Exercise GPA":{
+    short_name:"mne_gpa",
+    url_name:"movement-non-exercise-gpa"
+  },
+  "Floor Climbed":{
+    short_name:"floor_climbed",
+    url_name:"floor-climbed"
+  },
+};
  class DashboardSummary extends Component{
 constructor(props){
     super(props);
@@ -35,7 +84,9 @@ constructor(props){
               rank:'Getting Ranks...',
               username:'',
               score:''
-            }
+            },
+            "all_rank":[
+              ]
         };
          catInitialState[dur] = userRank;
         }
@@ -544,10 +595,10 @@ constructor(props){
    this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
    this.exerciseStatsNoWorkOut = this.exerciseStatsNoWorkOut.bind(this);
    this.successRank = this.successRank.bind(this);
-   this.renderCustomRangeRankTD = this.renderCustomRangeRankTD.bind(this);
    this.vo2MaxNotReported = this.vo2MaxNotReported.bind(this);
    this.renderVo2maxCustomRangeTD = this.renderVo2maxCustomRangeTD.bind(this);
    this.renderExerciseCustomRangeTD = this.renderExerciseCustomRangeTD.bind(this);
+   this.renderTablesTd = this.renderTablesTd.bind(this);
   }
     
   successProgress(data){
@@ -620,31 +671,6 @@ if(value != undefined){
           }
           return x1 + x2;
      }
-}
-renderCustomRangeRankTD(custom_data, toReturn="data"){
-    let td=[];
-    if(!custom_data){
-        return td;
-    }
-   
-    for (let[key,val] of Object.entries(custom_data)){
-        for(let [key1,val1] of Object.entries(val)){
-          if(key1 == "user_rank"){
-                 td.push(<td className="progress_table">{val1.rank}</td>);
-               }
-      }
-        if(toReturn == "key"){
-            let str = key;
-            let d = str.split(" ");
-            let d1 = d[0];
-            let date1 =moment(d1).format('MMM DD, YYYY');
-            let d2 = d[2];
-            let date2 =moment(d2).format('MMM DD, YYYY');
-            let date = date1 + ' to ' + date2;
-            td.push(<th className="progress_table">{date}</th>);
-        }
-    }
-    return td;
 }
 renderCustomRangeTD(custom_data, toReturn="data"){
     let td=[];
@@ -967,6 +993,104 @@ createExcelPrintURL(){
     let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
     return excelURL;
 }
+
+  renderTablesTd(value,value5){
+      let category = "";
+      let durations = [];
+      let scores = [];
+      let ranks = [];
+      let tableRows = [];
+      let durations_type = ["today","yesterday","week","month","year","custom_range"];
+      for(let duration of durations_type){
+        let val = value[duration];
+        if(duration == "custom_range" && val){
+          for(let [range,value1] of Object.entries(val)){
+            durations.push(this.headerDates(range));
+            for(let [c_key,c_rankData] of Object.entries(value1)){
+              if(c_key == "user_rank"){
+                if(!category)
+                  category = c_rankData.category;
+                scores.push(c_rankData.score);
+                ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
+              }
+            }
+          }
+        }
+        else{
+          if (val){ 
+            durations.push(duration);
+            for (let [key,a_rankData] of Object.entries(val)){
+              if(key == "user_rank"){
+                if(!category){
+                  category = a_rankData.category;
+                }
+                scores.push(a_rankData.score);
+                ranks.push({'rank':a_rankData.rank,'duration':duration,'isCustomRange':false});
+              }
+            }
+          }
+        }
+      }
+
+      // creating table rows for ranks
+      let rankTableData = [];
+      if (category){
+        for(let rank of ranks){
+          if(rank.isCustomRange){
+            var state = {
+                  lbCatgData:this.state.rankData[
+                  categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank,
+                  lbCatgName:category
+                }
+          }
+          else{
+            var state = {
+                  lbCatgData:this.state.rankData[
+                  categoryMeta[category]["short_name"]][rank['duration']].all_rank,
+                  lbCatgName:category
+                }
+          }
+          rankTableData.push(
+            <td className = "lb_table_style_rows">
+              <Link to={{
+                pathname:`/leaderboard/${categoryMeta[category]["url_name"]}`,
+                state:state
+                }}>
+                <span style={{textDecoration:"underline"}}>{rank.rank}</span>
+                 <span id="lbfontawesome">
+                          <FontAwesome
+                            className = "fantawesome_style"
+                              name = "external-link"
+                              size = "1x"
+                          />
+                       </span>   
+              </Link>
+            </td>
+          );
+        }
+     }else{
+      for(let rank of ranks){
+          rankTableData.push(
+            <td className = "lb_table_style_rows">
+              <Link to={{
+                pathname:`/leaderboard}`
+                }}>
+                <span style={{textDecoration:"underline"}}>{rank?rank.rank:rank}</span>
+                 <span id="lbfontawesome">
+                          <FontAwesome
+                            className = "fantawesome_style"
+                              name = "external-link"
+                              size = "1x"
+                          />
+                       </span>    
+              </Link>
+            </td>
+          );
+        }
+     }
+      return rankTableData;
+    };
+
     render(){
         const {fix} = this.props;
         return(
@@ -1226,13 +1350,8 @@ createExcelPrintURL(){
                 { this.gpascoreCustomRangeTD(this.state.summary.overall_health.overall_health_gpa.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">Rank against other users</td>
-                <td className="progress_table">{this.state.rankData.oh_gpa.today.user_rank.rank}</td>
-                <td className=" progress_table">{this.state.rankData.oh_gpa.yesterday.user_rank.rank}</td>
-                <td className=" progress_table">{this.state.rankData.oh_gpa.week.user_rank.rank}</td>
-                <td className=" progress_table">{this.state.rankData.oh_gpa.month.user_rank.rank}</td>
-                <td className=" progress_table">{this.state.rankData.oh_gpa.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.oh_gpa.custom_range)}
+            <td className="progress_table">Rank against other users</td>
+                {this.renderTablesTd(this.state.rankData.oh_gpa)}
             </tr>
              <tr className=" progress_table">
                 <td className=" progress_table">Overall Health GPA Grade</td>                
@@ -1275,13 +1394,8 @@ createExcelPrintURL(){
                 {this.renderCustomRangeTD(this.state.summary.mc.movement_consistency_score.custom_range)}
             </tr>
             <tr className="progress_table">
-               <td className="progress_table">Rank against other users</td>
-               <td className="progress_table">{this.state.rankData.mc.today.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.mc.yesterday.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.mc.week.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.mc.month.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.mc.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.mc.custom_range)}
+            <td className="progress_table">Rank against other users</td>
+               {this.renderTablesTd(this.state.rankData.mc)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Movement Consistency Grade</td>
@@ -1335,13 +1449,8 @@ createExcelPrintURL(){
                  {this.renderCustomRangeTDSteps(this.state.summary.non_exercise.non_exercise_steps.custom_range)}
             </tr>
             <tr className="progress_table">
-               <td className="progress_table">Rank against other users</td>
-                <td className="progress_table">{this.state.rankData.total_steps.today.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.total_steps.yesterday.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.total_steps.week.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.total_steps.month.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.total_steps.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.total_steps.custom_range)}
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.total_steps)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Movement-Non Exercise Steps Grade</td>            
@@ -1402,13 +1511,8 @@ createExcelPrintURL(){
                 {this.renderCustomRangeTD(this.state.summary.nutrition.prcnt_unprocessed_volume_of_food.custom_range)}
             </tr>
             <tr className="progress_table">
-               <td className="progress_table">Rank against other users</td>
-                <td className="progress_table">{this.state.rankData.prcnt_uf.today.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.prcnt_uf.yesterday.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.prcnt_uf.week.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.prcnt_uf.month.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.prcnt_uf.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.prcnt_uf.custom_range)}
+              <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.prcnt_uf)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">% Non Processed Food Consumed Grade</td>
@@ -1458,14 +1562,8 @@ createExcelPrintURL(){
                 {this.renderCustomRangeTD(this.state.summary.alcohol.avg_drink_per_week.custom_range)}
             </tr>
             <tr className="progress_table">
-               <td className="progress_table">Rank against other users</td>
-                <td className="progress_table">{this.state.rankData.alcohol_drink.today.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.alcohol_drink.yesterday.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.alcohol_drink.week.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.alcohol_drink.month.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.alcohol_drink.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.alcohol_drink.custom_range)}
-
+              <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.alcohol_drink)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Alcoholic drinks per week Grade</td>               
@@ -1528,13 +1626,8 @@ createExcelPrintURL(){
 
             </tr>
             <tr className="progress_table">
-               <td className="progress_table">Rank against other users</td>
-                <td className="progress_table">{this.state.rankData.ec.today.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.ec.yesterday.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.ec.week.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.ec.month.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.ec.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.ec.custom_range)}
+              <td className="progress_table">Rank against other users</td>
+                {this.renderTablesTd(this.state.rankData.ec)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Exercise Consistency Grade</td>
@@ -1722,12 +1815,7 @@ createExcelPrintURL(){
             </tr>
             <tr className="progress_table">
                <td className="progress_table">Rank against other users</td>
-                <td className="progress_table">{this.state.rankData.avg_sleep.today.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.avg_sleep.yesterday.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.avg_sleep.week.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.avg_sleep.month.user_rank.rank}</td>
-                <td className="progress_table">{this.state.rankData.avg_sleep.year.user_rank.rank}</td>
-                {this.renderCustomRangeRankTD(this.state.rankData.avg_sleep.custom_range)}
+                {this.renderTablesTd(this.state.rankData.avg_sleep)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Average Sleep Grade</td>

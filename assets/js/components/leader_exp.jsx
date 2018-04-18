@@ -11,7 +11,7 @@ import moment from 'moment';
 import {renderLeaderBoardFetchOverlay,renderLeaderBoard2FetchOverlay,renderLeaderBoard3FetchOverlay,renderLeaderBoardSelectedDateFetchOverlay} from './leaderboard_healpers';
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
-import AllRank_Data from "./leaderboard_allrank";
+import AllRank_Data1 from "./leader_all_exp";
 
 
 
@@ -62,7 +62,7 @@ const categoryMeta = {
 		short_name:"mne_gpa",
 		url_name:"movement-non-exercise-gpa"
 	},
-	"Floors Climbed":{
+	"Floor Climbed":{
 		short_name:"floor_climbed",
 		url_name:"floor-climbed"
 	},
@@ -70,7 +70,7 @@ const categoryMeta = {
 const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","mne_gpa","floor_climbed",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
-class LeaderBoard extends Component{
+class LeaderBoard1 extends Component{
 	constructor(props){
 		super(props);
 		let rankInitialState = {}
@@ -109,6 +109,9 @@ class LeaderBoard extends Component{
 			calendarOpen:false,
 			isOpen:false,
 			ranking_data:rankInitialState,
+			active_view:true,
+			btnView:false,
+			active_category:"",
 			duration_date:{
 				"week":"",
 				"today":"",
@@ -137,6 +140,8 @@ class LeaderBoard extends Component{
 		this.renderLeaderBoard2FetchOverlay = renderLeaderBoard2FetchOverlay.bind(this);
 		this.renderLeaderBoard3FetchOverlay = renderLeaderBoard3FetchOverlay.bind(this);
 		this.renderLeaderBoardSelectedDateFetchOverlay = renderLeaderBoardSelectedDateFetchOverlay.bind(this);
+		this.handleBackButton = this.handleBackButton.bind(this);
+		this.renderTableHeader = this.renderTableHeader.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
@@ -352,25 +357,20 @@ class LeaderBoard extends Component{
 	  	if (category){
 		  	for(let rank of ranks){
 		  		if(rank.isCustomRange){
-		  			var state = {
-			  					lbCatgData:this.state.ranking_data[
-			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank,
-			  					lbCatgName:category
-			  				}
+		  			var all_cat_rank = this.state.ranking_data[
+			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank;
+		
 			  	}
 			  	else{
-			  		var state = {
-			  					lbCatgData:this.state.ranking_data[
-			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank,
-			  					lbCatgName:category
-			  				}
+			  		var all_cat_rank = this.state.ranking_data[
+			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank;
+
+			  				
+
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  			<Link to={{
-			  				pathname:`/leaderboard/${categoryMeta[category]["url_name"]}`,
-			  				state:state
-			  				}}>
+			  		<a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -378,8 +378,8 @@ class LeaderBoard extends Component{
 			                        name = "external-link"
 			                        size = "1x"
 			                    />
-			                 </span>   
-			  			</Link>
+			                 </span>  
+			                 </a> 
 			  		</td>
 		  		);
 		  	}
@@ -387,9 +387,6 @@ class LeaderBoard extends Component{
 		 	for(let rank of ranks){
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  			<Link to={{
-			  				pathname:`/leaderboard}`
-			  				}}>
 			  				<span style={{textDecoration:"underline"}}>{rank?rank.rank:rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -398,7 +395,6 @@ class LeaderBoard extends Component{
 			                        size = "1x"
 			                    />
 			                 </span>    
-			  			</Link>
 			  		</td>
 		  		);
 		  	}
@@ -431,7 +427,37 @@ class LeaderBoard extends Component{
 
 	  	return  <table className = "table table-striped table-bordered">{tableRows}</table>;
   	};
-  	
+  	reanderAll(value,event){
+ 		if(value){
+  		this.setState({
+  			active_view:!this.state.active_view,
+  			btnView:!this.state.btnView,
+  			active_category:value
+  		});
+  		}
+  	};
+  	handleBackButton(){
+  		this.setState({
+  			active_view:!this.state.active_view,
+  			btnView:false
+  		})
+  	}
+  	renderTableHeader(data){
+		let category = ["rank","username","score","category"];
+		let keys = [];
+		let values;
+		
+				for (let [key1,value1] of Object.entries(data)){
+					values =[];
+					for (let cat of category){
+						if(cat == "category"){
+							values.push(<span style = {{fontWeight:"bold"}}>{value1[cat]}</span>);
+						}
+					}
+				}
+		
+		return values;
+	}
 	render(){
 		 const {fix} = this.props;
 		return(
@@ -473,7 +499,7 @@ class LeaderBoard extends Component{
 		            </Nav>
 		          </Collapse>
 		        </Navbar>
-
+		    {this.state.active_view &&
       		<div className = "row justify-content-center"> 
                 <span id="navlink" onClick={this.toggleCalendar} id="progress">
                     <FontAwesome
@@ -509,6 +535,7 @@ class LeaderBoard extends Component{
                     </span>
                 </span>
             </div>
+        }
             <Popover
             placement="bottom"
             isOpen={this.state.calendarOpen}
@@ -622,66 +649,103 @@ class LeaderBoard extends Component{
                     </PopoverBody>
                 </Popover>
             <div className="col-sm-12 col-md-12 col-lg-12">
+            {this.state.btnView &&
+	           	<div>
+	            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
+	            </div>
+            }
+            {this.state.btnView &&
+	        	<div className = "row justify-content-center">
+  					<span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
+  				</div>
+  			}
+            {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style" style = {{paddingTop:"25px"}}>
 		        	<div className = "table table-responsive">
 			        	{this.renderTablesTd(this.state.ranking_data.oh_gpa,this.state.duration_date)}
 			        </div>
 		        </div>
-		       <div className = "row justify-content-center lb_table_style">
+		    }
+		    {this.state.active_view &&
+		    	<div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.alcohol_drink,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.avg_sleep,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.prcnt_uf,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.total_steps,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.mc,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.ec,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.awake_time,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.resting_hr,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.deep_sleep,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
 		        		{this.renderTablesTd(this.state.ranking_data.mne_gpa,this.state.duration_date)}
 		        	</div>
 		        </div>
+		    }
+		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 			        <div className = "table table-responsive">
 			        	{this.renderTablesTd(this.state.ranking_data.floor_climbed,this.state.duration_date)}
 			        </div>
 		        </div>
+		    }
+		      {this.state.btnView && 
+		        <AllRank_Data1 data={this.state.active_category}/>
+			  }
 	        </div>
 	        {this.renderLeaderBoardFetchOverlay()}
 			{this.renderLeaderBoard2FetchOverlay()}
@@ -698,7 +762,7 @@ function mapStateToProps(state){
     message : state.garmin_auth.message
   };
 }
-export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(LeaderBoard));
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(LeaderBoard1));
 Navbar.propTypes={
     fixed: PropTypes.string,
     color: PropTypes.string,
