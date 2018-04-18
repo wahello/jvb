@@ -300,7 +300,7 @@ def hrr_calculations(request):
 
 		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
 		anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
+		below_aerobic_range = 'below {}'.format(below_aerobic_value)
 		
 		anaerobic_range_list = []
 		below_aerobic_list = []
