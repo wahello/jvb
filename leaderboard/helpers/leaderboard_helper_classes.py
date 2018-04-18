@@ -51,7 +51,7 @@ class RankedScore(object):
 
 	@score.setter
 	def score(self,score):
-		if score == None or score == 'Not Reported':
+		if score == None or score in ['Not Reported','Not Provided']:
 			self.__score = self.CATEGORY_DEFAULT_SCORE[self.category]
 		else:
 			self.__score = score
@@ -90,7 +90,7 @@ class RankedScore(object):
 		return d
 
 	def _hours_to_hours_min(self,hours):
-		if hours:
+		if hours or hours is not None:
 			mins = hours * 60
 			hours,mins = divmod(mins,60)
 			hours = round(hours)
@@ -349,7 +349,7 @@ class LeaderboardOverview(object):
 							score = data['overall_health']['overall_health_gpa']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'mne_gpa':
-							score = data['non_exercise']['non_exericse_steps_gpa']['custom_range'][str_range]['data']
+							score = data['non_exercise']['non_exercise_steps']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'mc':
 							score = data['mc']['movement_consistency_score']['custom_range'][str_range]['data']
@@ -364,7 +364,7 @@ class LeaderboardOverview(object):
 							score = data['nutrition']['prcnt_unprocessed_food_gpa']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'alcohol_drink':
-							score = data['alcohol']['alcoholic_drinks_per_week_gpa']['custom_range'][str_range]['data']
+							score = data['alcohol']['avg_drink_per_week']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'total_steps':
 							score = data['non_exercise']['total_steps']['custom_range'][str_range]['data']

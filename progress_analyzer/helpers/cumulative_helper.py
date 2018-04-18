@@ -2,6 +2,7 @@ from datetime import datetime,timedelta
 import json
 
 from django.db import transaction,DatabaseError
+from django.core.exceptions import ObjectDoesNotExist
 
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
@@ -20,7 +21,8 @@ from progress_analyzer.models import CumulativeSum,\
 	TravelCumulative,\
 	StressCumulative,\
 	OtherStatsCumulative,\
-	MetaCumulative
+	MetaCumulative,\
+	ProgressReportUpdateMeta
 
 def _get_blank_pa_model_fields(model):
 	if model == "overall_health_grade":
@@ -249,6 +251,7 @@ def _update_cumulative_instance(instance, data):
 	_update_helper(instance.travel_cum, data['travel_cum'])
 	_update_helper(instance.stress_cum, data['stress_cum'])
 	_update_helper(instance.meta_cum, data['meta_cum'])
+	instance.save()
 
 @transaction.atomic
 def _create_cumulative_instance(user, data):
@@ -944,3 +947,19 @@ def create_cum_raw_data(today_ql_data,today_ui_data,yday_cum_data=None):
 		data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data)
 
 	return data
+
+def set_pa_bulk_update_start_date(user,from_dt):
+	try:
+		update_require_from = user.pa_update_meta.requires_update_from
+	except ObjectDoesNotExist:
+		ProgressReportUpdateMeta.objects.create(
+			user = user,
+			requires_update_from = None
+		)
+		update_require_from = None
+
+	from_dt = datetime.strptime(from_dt,"%Y-%m-%d").date()
+
+	if not update_require_from or from_dt <= update_require_from:
+		user.pa_update_meta.requires_update_from = from_dt
+		user.pa_update_meta.save()

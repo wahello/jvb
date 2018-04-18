@@ -49,7 +49,7 @@ class Movementquick extends Component{
         {name: '08:00 PM - 08:59 PM'},        
         {name: '09:00 PM - 09:59 PM'},
         {name: '10:00 PM - 10:59 PM'},
-        {name: '11:00 PM - 11:59 AM'},
+        {name: '11:00 PM - 11:59 PM'},
         {name: 'Active Hours'},
         {name: 'Inactive Hours'},
         {name: 'Strength Hours'},

@@ -62,7 +62,7 @@ const categoryMeta = {
 		short_name:"mne_gpa",
 		url_name:"movement-non-exercise-gpa"
 	},
-	"Floor Climbed":{
+	"Floors Climbed":{
 		short_name:"floor_climbed",
 		url_name:"floor-climbed"
 	},
