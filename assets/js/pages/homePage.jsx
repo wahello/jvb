@@ -31,6 +31,8 @@ import LeaderBoard from '../components/leaderboard';
 import FitBit from '../components/fitbitData';
 import AllRank_Data from '../components/leaderboard_allrank';
 import HeartRate from '../components/Heart_rate_recovery';
+import LeaderBoard1 from '../components/leader_exp';
+import AllRank_Data1 from '../components/leader_all_exp';
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -73,6 +75,8 @@ function initializeLocalState(){
 					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />
 					<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
 					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />
+					{/*<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data1)} />
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard1)} />*/}
 					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />

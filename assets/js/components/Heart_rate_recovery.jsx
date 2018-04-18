@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { withRouter, Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import fetchHeartRateData  from '../network/heratrateOperations';
@@ -10,6 +12,8 @@ import { Collapse, Navbar, NavbarToggler,
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
+import { getGarminToken,logoutUser} from '../network/auth';
+
 
 
 
@@ -19,7 +23,7 @@ axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
-export default class HeartRate extends Component{
+class HeartRate extends Component{
 	constructor(props){
 		super(props);
 	    this.processDate = this.processDate.bind(this);
@@ -28,9 +32,12 @@ export default class HeartRate extends Component{
 	    this.renderTime = this.renderTime.bind(this);
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
 	    this.renderpercentage = this.renderpercentage.bind(this);
+	    this.handleLogout = this.handleLogout.bind(this);
+		this.toggle = this.toggle.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
 	    	calendarOpen:false,
+	    	isOpen:false,
 	    	aerobic_zone:"",
             anaerobic_range:"",
             below_aerobic_zone:"",
@@ -62,6 +69,14 @@ export default class HeartRate extends Component{
 	errorHeartRate(error){
 		console.log(error.message)
 	}
+	handleLogout(){
+    	this.props.logoutUser(this.onLogoutSuccess);
+  	}
+  	toggle() {
+	    this.setState({
+	      isOpen: !this.state.isOpen,
+	    });
+  	}
 	renderTime(value){
 		if(value>0){
 			var sec_num = parseInt(value); 
@@ -103,9 +118,46 @@ export default class HeartRate extends Component{
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 	}
 	render(){
+		const {fix} = this.props;
 		return(
 			<div className = "container-fluid">
-			 <NavbarMenu/>
+			<Navbar toggleable
+		         fixed={fix ? 'top' : ''}
+		          className="navbar navbar-expand-sm navbar-inverse nav6">
+		          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
+		           <FontAwesome
+		                 name = "bars"
+		                 size = "1x"
+		             />
+		          </NavbarToggler>
+		          <Link to='/' >
+		            <NavbarBrand
+		              className="navbar-brand float-sm-left"
+		              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
+		              <img className="img-fluid"
+		               style={{maxWidth:"200px"}}
+		               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+		            </NavbarBrand>
+		          </Link>
+		            <span id="header">
+		            <h4 className="head" id="head" style = {{fontSize:"22px"}}>Heartrate Aerobic/Anaerobic Ranges
+		            </h4>
+		            </span>
+		          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
+		            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+		              <NavItem className="float-sm-right">
+		                <Link id="logout"className="nav-link" to='/'>Home</Link>
+		              </NavItem>
+		               <NavItem className="float-sm-right">
+		                   <NavLink
+		                   className="nav-link"
+		                   id="logout"
+		                   onClick={this.handleLogout}>Log Out
+		                    </NavLink>
+		              </NavItem>
+		            </Nav>
+		          </Collapse>
+		        </Navbar>
 			 <div className="col-md-12,col-sm-12,col-lg-12">
 	            <div className="row" style = {{marginTop:"10px"}}>
 	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
@@ -113,7 +165,7 @@ export default class HeartRate extends Component{
 	                        name = "calendar"
 	                        size = "2x"
 	                    />
-                	</span>   
+                	</span> 
 	            	<Popover
 			            placement="bottom"
 			            isOpen={this.state.calendarOpen}
@@ -123,6 +175,7 @@ export default class HeartRate extends Component{
 		                <CalendarWidget  onDaySelect={this.processDate}/>
 		                </PopoverBody>
 	                </Popover>
+	                <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 	            </div>
           	    <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
@@ -163,3 +216,14 @@ export default class HeartRate extends Component{
 		)
 	}
 }
+function mapStateToProps(state){
+  return {
+    errorMessage: state.garmin_auth.error,
+    message : state.garmin_auth.message
+  };
+}
+export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(HeartRate));
+Navbar.propTypes={
+    fixed: PropTypes.string,
+    color: PropTypes.string,
+} 
