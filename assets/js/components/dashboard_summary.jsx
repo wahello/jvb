@@ -101,6 +101,7 @@ constructor(props){
         cr3_start_date:'',
         cr3_end_date:'',
         isOpen: false,
+        isOpen1:false,
         calendarOpen:false,
         dateRange1:false,
         dateRange2:false,
@@ -109,6 +110,7 @@ constructor(props){
         fetching_ql2:false,
         fetching_ql3:false,
         fetching_ql4:false,
+        scrollingLock:false,
         "report_date":"-",
         "rankData":rankInitialState,
         "summary":{
@@ -599,6 +601,8 @@ constructor(props){
    this.renderVo2maxCustomRangeTD = this.renderVo2maxCustomRangeTD.bind(this);
    this.renderExerciseCustomRangeTD = this.renderExerciseCustomRangeTD.bind(this);
    this.renderTablesTd = this.renderTablesTd.bind(this);
+   this.handleScroll = this.handleScroll.bind(this);
+   this.toggle1 = this.toggle1.bind(this);
   }
     
   successProgress(data){
@@ -848,7 +852,9 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
     event.preventDefault();
     this.setState({
       dateRange1:!this.state.dateRange1,
-      fetching_ql1:true
+      fetching_ql1:true,
+      isOpen1: !this.state.isOpen1,
+
     },()=>{
         let custom_ranges = [];
         if(this.state.cr2_start_date && this.state.cr2_end_date){
@@ -870,7 +876,9 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
     event.preventDefault();
     this.setState({
       dateRange2:!this.state.dateRange2,
-      fetching_ql2:true
+      fetching_ql2:true,
+      isOpen1: !this.state.isOpen1,
+
     },()=>{
          let custom_ranges = [];
         if(this.state.cr1_start_date && this.state.cr1_end_date){
@@ -893,7 +901,9 @@ renderCustomRangeTDSteps(custom_data, toReturn="data"){
     event.preventDefault();
     this.setState({
       dateRange3:!this.state.dateRange3,
-      fetching_ql3:true
+      fetching_ql3:true,
+      isOpen1: !this.state.isOpen1,
+
     },()=>{
          let custom_ranges = [];
          if(this.state.cr1_start_date && this.state.cr1_end_date){
@@ -929,14 +939,35 @@ headerDates(value){
        });
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
       fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,true);
+      window.addEventListener('scroll', this.handleScroll);
 
     }
+    componentWillUnmount() {
+      window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  handleScroll() {
+      if (window.scrollY >= 150 && !this.state.scrollingLock) {
+        this.setState({
+          scrollingLock: true
+        });
+      } else if(window.scrollY < 100 && this.state.scrollingLock) {                                               
+        this.setState({
+          scrollingLock: false
+        });
+      }
+  }
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen,
      
     });
   }
+  toggle1() {
+      this.setState({
+        isOpen1: !this.state.isOpen1,
+      });
+    }
   toggleDate1(){
     this.setState({
       dateRange1:!this.state.dateRange1
@@ -1138,50 +1169,68 @@ createExcelPrintURL(){
             </Nav>
           </Collapse>
         </Navbar>
-
       </div> 
-            <div> 
-                <span id="navlink" onClick={this.toggleCalendar} id="progress">
-                    <FontAwesome
-                        name = "calendar"
-                        size = "2x"
-                    />
-                </span>               
-                <span className="pdf_button" id="pdf_button">
-                    <a href={this.createExcelPrintURL()}>
-                    <Button className="btn createbutton mb5" onClick={this.printDocument}>Export Report</Button>
-                    </a>
-                </span>
-
-                <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
-                    <span className="date_range_btn">
-                        <Button
-                            className="daterange-btn btn"                            
-                            id="daterange"
-                            onClick={this.toggleDate1} >Custom Date Range1
-                        </Button>
-                    </span>
-                </span>
-                <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
-                    <span className="date_range_btn">
-                        <Button
-                            className="daterange-btn btn"                            
-                            id="daterange"
-                            onClick={this.toggleDate2} >Custom Date Range2
-                        </Button>
-                    </span>
-                </span>
-                <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
-                    <span className="date_range_btn">
-                        <Button
-                            className="daterange-btn btn"                            
-                            id="daterange"
-                            onClick={this.toggleDate3} >Custom Date Range3
-                        </Button>
-                    </span>
-                </span>
-            </div>
-                                        
+      <div className="nav3" id='bottom-nav'>
+                           <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
+                           <Navbar light toggleable className="navbar nav1 user_nav">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle1}>
+                                    <div className="toggler">
+                                    <FontAwesome 
+                                          name = "bars"
+                                          size = "1x"
+                                    />
+                                    </div>
+                               </NavbarToggler>
+                                <span id="navlink" onClick={this.toggleCalendar} id="progress">
+                                    <FontAwesome
+                                        style = {{color:"white"}}
+                                        name = "calendar"
+                                        size = "1x"
+                                    />
+                                    <span id="navlink">
+                                            {moment(this.state.selectedDate).format('MMM D, YYYY')}
+                                    </span>  
+                                </span>  
+                               <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen1} navbar>
+                                  <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+                                     <span className="pdf_button" id="pdf_button">
+                                    <a href={this.createExcelPrintURL()}>
+                                    <Button className="btn createbutton mb5">Export Report</Button>
+                                    </a>
+                                </span>
+                                <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
+                                        <span className="date_range_btn">
+                                            <Button
+                                                className="daterange-btn btn"                            
+                                                id="daterange"
+                                                onClick={this.toggleDate1} >Custom Date Range1
+                                            </Button>
+                                        </span>
+                                </span>
+                           <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+                                  <span className="date_range_btn">
+                                      <Button
+                                          className="daterange-btn btn"                            
+                                          id="daterange"
+                                          onClick={this.toggleDate2} >Custom Date Range2
+                                      </Button>
+                                  </span>
+                              </span>
+                           <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+                                  <span className="date_range_btn">
+                                      <Button
+                                          className="daterange-btn btn"                            
+                                          id="daterange"
+                                          onClick={this.toggleDate3} >Custom Date Range3
+                                      </Button>
+                                  </span>
+                              </span>                                                                                                                 
+                                  </Nav>
+                                </Collapse>    
+                           </Navbar> 
+                           </div>
+                           </div>                                
+            
                         <Popover
                             placement="bottom"
                             isOpen={this.state.calendarOpen}

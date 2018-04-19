@@ -13,6 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
+import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers';
 
 
 
@@ -34,10 +35,12 @@ class HeartRate extends Component{
 	    this.renderpercentage = this.renderpercentage.bind(this);
 	    this.handleLogout = this.handleLogout.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
 	    	calendarOpen:false,
 	    	isOpen:false,
+	    	fetching_aerobic:false,
 	    	aerobic_zone:"",
             anaerobic_range:"",
             below_aerobic_zone:"",
@@ -59,6 +62,7 @@ class HeartRate extends Component{
 			percent_below_aerobic:data.data.percent_below_aerobic,
 			percent_anaerobic:data.data.percent_anaerobic,
 			total_percent:data.data.total_percent,
+			fetching_aerobic:false,
 		});
 	}
 	toggleCalendar(){
@@ -67,7 +71,10 @@ class HeartRate extends Component{
 	    });
     }
 	errorHeartRate(error){
-		console.log(error.message)
+		console.log(error.message);
+		this.setState({
+			fetching_aerobic:false,
+		})
 	}
 	handleLogout(){
     	this.props.logoutUser(this.onLogoutSuccess);
@@ -108,13 +115,17 @@ class HeartRate extends Component{
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
-			calendarOpen:!this.state.calendarOpen
+			calendarOpen:!this.state.calendarOpen,
+			fetching_aerobic:true,
 		},()=>{
 			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 		});
 		
 	}
 	componentDidMount(){
+		this.setState({
+			fetching_aerobic:false,
+		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 	}
 	render(){
@@ -210,6 +221,7 @@ class HeartRate extends Component{
           	    </table>   
           	   </div>
           	  </div>
+          	  {this.renderAerobicSelectedDateFetchOverlay()}
           	  </div>
 			</div>
 
