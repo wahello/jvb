@@ -263,7 +263,7 @@ def progress_excel_export(request):
 	}
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
 	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
-	print(pprint.pprint(DATA))
+	# print(pprint.pprint(DATA))
 	#print(pprint.pprint(rank_data))
 	time1=['today','yesterday','week','month','year']
 	c = 1
