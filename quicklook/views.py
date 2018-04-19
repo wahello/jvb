@@ -230,7 +230,7 @@ def hrr_calculations(request):
 	start = start_date
 	end = start_date + timedelta(days=7)
 	start_date_str = start_date.strftime('%Y-%m-%d')
-	
+
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	profile = Profile.objects.filter(user=request.user)
 	for tmp_profile in profile:
@@ -360,7 +360,18 @@ def export_users_xls(request):
 
 	#date2 = request.GET.get('date',None)
 	#crs = request.GET.get('custom_ranges',None)
-
+	import requests
+	s = 406723465
+	d = s * (180 / 2**31)
+	lat = d
+	b = -1411000367
+	a = b * (180 / 2**31)
+	lon = b
+	url = "http://api.geonames.org/timezoneJSON?formatted=true&lat={}&lng={}&username=demo".format(lat,lon)
+	r = requests.get(url)
+	r = json.loads(r)
+	print(r)
+	print(r.json()['timezoneId'])
 	#date = datetime.strptime(date2,'%m-%d-%Y').date()
 	#custom_ranges = datetime.strptime(crs, "%m-%d-%Y").date()
 	# print(request.user)
