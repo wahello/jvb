@@ -2219,6 +2219,7 @@ def export_users_xls(request):
 	
 	Activities_list_unique = list(set(Activities_list))
 	len_activity = len(Activities_list_unique)
+	
 	for col_num in range(len(Activities_list_unique)):
 		col_num1 = col_num1 + 1
 		sheet6.write(col_num1, row_num,"Average Heartrate"+' '+Activities_list_unique[col_num])
@@ -2277,9 +2278,9 @@ def export_users_xls(request):
 
 	current_date = to_date
 	if data:
-		rem_row = i+len_activity
+		rem_row = i+len_activity-1
 	else:
-		rem_row = i
+		rem_row = i-1
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2300,7 +2301,7 @@ def export_users_xls(request):
 						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
 					else:
 						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
-				elif j == 13:
+				elif j == 14:
 					if data[key] == 0:
 						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not provided')
 					else:

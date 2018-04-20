@@ -19,7 +19,7 @@ var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
 
-const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec"];
+const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","mne_gpa","mc","ec"];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 const categoryMeta = {
   "Overall Health GPA":{
@@ -1499,7 +1499,7 @@ createExcelPrintURL(){
             </tr>
             <tr className="progress_table">
                  <td className="progress_table">Rank against other users</td>
-                 {this.renderTablesTd(this.state.rankData.total_steps)}
+                 {this.renderTablesTd(this.state.rankData.mne_gpa)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Movement-Non Exercise Steps Grade</td>            
