@@ -21,7 +21,7 @@ class AllRank_Data1 extends Component{
 		this.renderTable = this.renderTable.bind(this);
 		this.handleLogout = this.handleLogout.bind(this);
 		this.toggle = this.toggle.bind(this);
-		// this.renderHeader =this.renderHeader.bind(this);
+		this.handleScroll = this.handleScroll.bind(this)
 	}
 	 handleLogout(){
     	this.props.logoutUser(this.onLogoutSuccess);
@@ -31,18 +31,14 @@ class AllRank_Data1 extends Component{
 	      isOpen: !this.state.isOpen,
 	    });
   	}
-  // 	renderHeader(value){
-
-  // 		let head = [];
- 	// let category_head = ["category"];
- 	// for (let [key,value6] of Object.entries(value)){
- 	// 		for(let cat of category_head){
- 	// 			head.push(value6[cat]);
- 	// 		}
- 	// }
- 	// return head;
-  // 	}
-	renderTable(data){
+  handleScroll(){
+  		  var b = document.getElementById('hambergar').clientHeight;
+	  	  console.log("**********",b);
+	      var scrollHeight = b + document.getElementById("lbscroll").offsetTop;
+	      console.log("**********",scrollHeight);
+	      window.scrollTo(0, scrollHeight+270);	
+  }
+	renderTable(data,a_username){
 		let rowData = [];
 		let category = ["rank","username","score"];
 		let keys = [];
@@ -63,6 +59,16 @@ class AllRank_Data1 extends Component{
 				          		}
 		                		values.push(<td className = "progress_table">{x1 + x2}</td>);
 	    	       			}
+						}
+						else if(cat == "username"){
+							let user = value1[cat];
+							if(user == a_username){
+							     values.push(<td className = "progress_table">{user}</td>);
+							}
+							else{
+								values.push(<td className = "progress_table"><div>{user}</div></td>);
+							}
+
 						}
 						else{
 							values.push(<td className = "progress_table">{value1[cat]}</td>);
@@ -123,6 +129,7 @@ class AllRank_Data1 extends Component{
 					<div className="col-sm-12 col-md-12 col-lg-12">
 					<div style = {{paddingTop:"5px"}} className = "row justify-content-center ar_table_padd">
 					<div className = "table table-responsive ">
+					<div id="lbscroll">
     				<table className = "table table-striped table-bordered"> 
 						<thead className = "progress_table">
 							<th className = "progress_table">Rank</th>
@@ -130,9 +137,11 @@ class AllRank_Data1 extends Component{
 							<th className = "progress_table">Score</th>				
 						</thead>
 						<tbody className = "progress_table">
-							{this.renderTable(this.props.data)}
+							{this.renderTable(this.props.data,this.props.active_username)}
 						</tbody>
 					</table>
+					</div>
+					{this.handleScroll()}
 					</div>
 					</div>
 					</div> 
