@@ -45,6 +45,7 @@ function formatJSON(data){
 		    "user": 1,
 		    "created_at": "2017-10-04",
 		    "updated_at": "2017-10-04T18:25:23.129221Z",
+		    "report_type": 'quick',
 		    "timezone": "America/New_York",
 		    "strong_input": {
 		        "id": 1,
@@ -151,6 +152,7 @@ function formatJSON(data){
 
 	let json_data = {
 		"created_at":created_at,
+		"report_type":data.report_type,
 		"timezone":moment.tz.guess(),
 		"strong_input":{},   
 		"encouraged_input":{},
@@ -295,6 +297,7 @@ export function userDailyInputUpdate(data,successCallback=undefined, errorCallba
 	let date = data.fetched_user_input_created_at;
 	data = formatJSON(data);
 	data['created_at'] = date;
+	console.log(data);
 	const config = {
 		url : URL,
 		data:data,
