@@ -251,19 +251,30 @@ def hrr_calculations(request):
 				"percent_anaerobic":"",
 				"total_percent":""}
 	if a1:
-		for x in a1:
-			fitfile = FitFile(x.fit_file)
-			for record in fitfile.get_messages('record'):
-				for record_data in record:
-					if(record_data.name=='heart_rate'):
-						b = record_data.value
-						heartrate_complete.extend([b])
+		xz = [record_data for record in (FitFile(x.fit_file)).get_messages('record') for x in a1]
+		# some = {x.get_messages('record') for record in x}
+		#print(x)
+		# for record in x:
+		# 	for record_data in record:
+		# 		for ss in record_data:
+		# 			print(ss)
+		# ss = [qx for qw in for aa in x]
+		print(xz)
+		# for x in a1:
+		# 	fitfile = FitFile(x.fit_file)
+		# 	for record in fitfile.get_messages('record'):
+		# 		print(record)
+		# 		for record_data in record:
+		# 			if(record_data.name=='heart_rate'):
+		# 				b = record_data.value
+		# 				heartrate_complete.extend([b])
 
-					if(record_data.name=='timestamp'):
-						c = record_data.value
-						cc = c.strftime('%Y-%m-%d')
-						timestamp_complete.extend([c])
+		# 			if(record_data.name=='timestamp'):
+		# 				c = record_data.value
+		# 				cc = c.strftime('%Y-%m-%d')
+		# 				timestamp_complete.extend([c])
 		
+		print(heartrate_complete)
 		heartrate_selected_date = []
 		timestamp_selected_date = []
 		for heart,timeheart in zip(heartrate_complete,timestamp_complete):
@@ -2910,10 +2921,10 @@ def export_users_xls(request):
 	orange = book.add_format({'align':'left', 'bg_color': 'orange'})
 
 	border_format=book.add_format({
-                            'border':1,
-                            'align':'left',
-                            'font_size':10
-                           })
+							'border':1,
+							'align':'left',
+							'font_size':10
+						   })
 
 	#Headings
 	bold = book.add_format({'bold': True})
