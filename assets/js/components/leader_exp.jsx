@@ -62,7 +62,7 @@ const categoryMeta = {
 		short_name:"mne_gpa",
 		url_name:"movement-non-exercise-gpa"
 	},
-	"Floor Climbed":{
+	"Floors Climbed":{
 		short_name:"floor_climbed",
 		url_name:"floor-climbed"
 	},
@@ -112,6 +112,7 @@ class LeaderBoard1 extends Component{
 			active_view:true,
 			btnView:false,
 			active_category:"",
+			active_username:"",
 			duration_date:{
 				"week":"",
 				"today":"",
@@ -142,6 +143,7 @@ class LeaderBoard1 extends Component{
 		this.renderLeaderBoardSelectedDateFetchOverlay = renderLeaderBoardSelectedDateFetchOverlay.bind(this);
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.renderTableHeader = this.renderTableHeader.bind(this);
+		this.handButton = this.handButton.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
@@ -289,6 +291,7 @@ class LeaderBoard1 extends Component{
 	  	let durations = [];
 	  	let scores = [];
 	  	let ranks = [];
+	  	let usernames;
 	  	let tableRows = [];
 	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
 	  	for(let duration of durations_type){
@@ -300,6 +303,7 @@ class LeaderBoard1 extends Component{
 		  				if(c_key == "user_rank"){
 			  		 		if(!category)
 			  		 			category = c_rankData.category;
+			  		 		usernames = c_rankData.username;
 			  		 		scores.push(c_rankData.score);
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
@@ -314,6 +318,7 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category){
 			  		 			category = rankData.category;
 			  		 		}
+			  		 		usernames = rankData.username;
 			  		 		scores.push(rankData.score);
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
@@ -359,6 +364,7 @@ class LeaderBoard1 extends Component{
 		  		if(rank.isCustomRange){
 		  			var all_cat_rank = this.state.ranking_data[
 			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank;
+
 		
 			  	}
 			  	else{
@@ -370,7 +376,7 @@ class LeaderBoard1 extends Component{
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  		<a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank)}>
+			  		<a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank,usernames)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -427,15 +433,23 @@ class LeaderBoard1 extends Component{
 
 	  	return  <table className = "table table-striped table-bordered">{tableRows}</table>;
   	};
-  	reanderAll(value,event){
+  	reanderAll(value,value1,event){
  		if(value){
   		this.setState({
   			active_view:!this.state.active_view,
   			btnView:!this.state.btnView,
-  			active_category:value
+  			active_category:value,
+  			active_username:value1,
   		});
-  		}
+  		};
   	};
+  	handButton(){
+  	  var b = document.getElementById('hambergar').clientHeight;
+  	  console.log("**********",b);
+      var scrollHeight = b + document.getElementById('workout').offsetTop;
+      console.log("**********",scrollHeight);
+      window.scrollTo(0, scrollHeight+270);
+  	}
   	handleBackButton(){
   		this.setState({
   			active_view:!this.state.active_view,
@@ -455,13 +469,21 @@ class LeaderBoard1 extends Component{
 						}
 					}
 				}
-		
+		  
 		return values;
 	}
+	// handleScroll(){
+ //  		  var b = document.getElementById('hambergar').clientHeight;
+	//   	  console.log("**********",b);
+	//       var scrollHeight = b + document.getElementById("lbscroll").offsetTop;
+	//       console.log("**********",scrollHeight);
+	//       window.scrollTo(0, scrollHeight+270);	
+ //  }
 	render(){
 		 const {fix} = this.props;
 		return(
-			<div className="container-fluid">
+			<div className="container-fluid" >
+			<div id = "hambergar">
 		         <Navbar toggleable
 		         fixed={fix ? 'top' : ''}
 		          className="navbar navbar-expand-sm navbar-inverse nav6">
@@ -499,6 +521,7 @@ class LeaderBoard1 extends Component{
 		            </Nav>
 		          </Collapse>
 		        </Navbar>
+		    </div>
 		    {this.state.active_view &&
       		<div className = "row justify-content-center"> 
                 <span id="navlink" onClick={this.toggleCalendar} id="progress">
@@ -649,6 +672,9 @@ class LeaderBoard1 extends Component{
                     </PopoverBody>
                 </Popover>
             <div className="col-sm-12 col-md-12 col-lg-12">
+           		 {/*<div>
+	            	<Button className = "btn btn-info" onClick = {this.handButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
+	            </div>*/}
             {this.state.btnView &&
 	           	<div>
 	            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
@@ -659,6 +685,7 @@ class LeaderBoard1 extends Component{
   					<span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
   				</div>
   			}
+  			
             {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style" style = {{paddingTop:"25px"}}>
 		        	<div className = "table table-responsive">
@@ -708,6 +735,7 @@ class LeaderBoard1 extends Component{
 		        	</div>
 		        </div>
 		    }
+		     
 		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
@@ -736,6 +764,7 @@ class LeaderBoard1 extends Component{
 		        	</div>
 		        </div>
 		    }
+		   
 		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 			        <div className = "table table-responsive">
@@ -744,7 +773,7 @@ class LeaderBoard1 extends Component{
 		        </div>
 		    }
 		      {this.state.btnView && 
-		        <AllRank_Data1 data={this.state.active_category}/>
+		        <AllRank_Data1 data={this.state.active_category} active_username = {this.state.active_username}/>
 			  }
 	        </div>
 	        {this.renderLeaderBoardFetchOverlay()}
