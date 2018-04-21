@@ -144,6 +144,7 @@ export default class Activity_Type extends Component{
  		 handleChangeModal(event){
 		      const target = event.target;
 		      const selectedActivityId = target.getAttribute('data-name');
+		      console.log("selectedActivityId",selectedActivityId);
 		      let activityDisplayName = "";
 		      let current_activity = "";
 		      let hour = "";

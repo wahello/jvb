@@ -52,6 +52,8 @@ from progress_analyzer.models import OverallHealthGradeCumulative, \
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
+from .calculation_helper import *
+
 
 class UserQuickLookView(generics.ListCreateAPIView):
 	'''
@@ -2289,6 +2291,7 @@ def export_users_xls(request):
 
 	current_date = to_date
 	if data:
+
 		rem_row = i+len_activity-1
 	else:
 		rem_row = i-1
@@ -2904,7 +2907,7 @@ def export_users_xls(request):
 	format_align1 = book.add_format({'align':'left','num_format': '0.00'})
 	format_align = book.add_format({'align':'left'})
 
-	green = book.add_format({'align':'left', 'bg_color': 'green'})
+	green = book.add_format({'align':'left', 'bg_color': 'green','font_color': 'white'})
 	lawn_green=book.add_format({'align':'left','bg_color':'#32d358'})
 	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
 	red = book.add_format({'align':'left', 'bg_color': 'red'})
@@ -3125,12 +3128,11 @@ def export_users_xls(request):
 		sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		
-
 		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
-		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(29,c,rank_data['alcohol'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
-		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align1)
+		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align)
 
 		sheet10.write(35,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
 		sheet10.write(36,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
@@ -3466,6 +3468,6 @@ def export_users_xls(request):
 # 			row += 1
 # 			sheet11.write(row,col,'')
 # 		current_date -= timedelta(days=1)
-
+	
 	book.close()
 	return response
