@@ -51,6 +51,8 @@ from progress_analyzer.models import OverallHealthGradeCumulative, \
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
+from .calculation_helper import *
+
 
 class UserQuickLookView(generics.ListCreateAPIView):
 	'''
@@ -2232,7 +2234,7 @@ def export_users_xls(request):
 
 	current_date = to_date
 	if data:
-		rem_row = i+k
+		rem_row = i+1
 	else:
 		rem_row = i
 	while (current_date >= from_date):
@@ -3068,12 +3070,11 @@ def export_users_xls(request):
 		sheet10.write(24,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_grade'][time1[i]],format_align)
 		sheet10.write(25,c,DATA['summary']['nutrition']['prcnt_unprocessed_food_gpa'][time1[i]],format_align1)
 		
-
 		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
 		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
-		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align1)
+		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align)
 
 		sheet10.write(35,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
 		sheet10.write(36,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
@@ -3409,6 +3410,6 @@ def export_users_xls(request):
 # 			row += 1
 # 			sheet11.write(row,col,'')
 # 		current_date -= timedelta(days=1)
-
+	
 	book.close()
 	return response

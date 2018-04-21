@@ -30,7 +30,7 @@ class ProgressReportView(APIView):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
 		#print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
-
+	
 
 def progress_excel_export(request):
 	date2 = request.GET.get('date',None)
@@ -264,7 +264,7 @@ def progress_excel_export(request):
 	DATA = ProgressReport(request.user,query_params).get_progress_report()
 	rank_data = LeaderboardOverview(request.user,query_params).get_leaderboard()
 	#print(pprint.pprint(DATA))
-	#print(pprint.pprint(rank_data))
+	print(pprint.pprint(rank_data))
 	time1=['today','yesterday','week','month','year']
 	c = 1
 	for i in range(len(time1)):
@@ -296,7 +296,7 @@ def progress_excel_export(request):
 		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
-		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align1)
+		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align)
 
 		sheet10.write(35,c,DATA['summary']['ec']['avg_no_of_days_exercises_per_week'][time1[i]],format_align)
 		sheet10.write(36,c,rank_data['ec'][time1[i]]['user_rank']['rank'],format_align)
@@ -1303,59 +1303,7 @@ def progress_excel_export(request):
 												'criteria':'>=', 
 												'value': '100', 
 												'format': num_fmt})
-	
 
-	# from garmin.models import GarminFitFiles
-
-	# start = "2018-03-27"
-	# end = "2018-04-28"
-	# a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
-	# for x in a1:
-	# 	#print(x)
-	# 	from fitparse import FitFile        
-	# 	fitfile = FitFile(x.fit_file)
-	# 	import pprint
-	# 	dic={}
-	# 	dic1={}
-	# 	for record in fitfile.get_messages('record'):
-	# 		for record_data in record:
-	# 			if(record_data.name=='timestamp'):
-	# 				a=record_data.value
-	# 				#print(record_data.name,record_data.value)
-	# 			if(record_data.name=='heart_rate'):
-	# 	  			#print(record_data.name,record_data.value)
-	# 	  			b= record_data.value
-			
-	# 		dic[a]=b
-	# 		ls=[]
-	# 		ls1=[]
-	# 		ls2=[]
-	# 		for keys in dic.keys():
-	# 			pass
-	# 			age=40
-	# 			if (180-age-30)<dic[keys]<(180-age+5):
-	# 				#print('aerobic')
-	# 				#print(keys)
-	# 				ls.append(keys)
-
-	# 			elif (dic[keys]>(180-age+5)):
-	# 				#print('anaerobic')
-	# 				#print(keys)
-	# 				ls1.append(keys)
-	# 			elif(dic[keys]<(180-age-30)):
-	# 				#print('below aerobic')
-	# 				#print(keys)
-	# 				ls2.append(keys)
-
-	# 	#print(pprint.pprint(dic))
-	# 	x=max(ls)-min(ls)
-	# 	dic1['aerobic']=x
-	# 	# y=max(ls1)-min(ls1)
-	# 	# dic1['anaerobic']=y
-	# 	z=max(ls2)-min(ls2)
-	# 	dic1['below aerobic']=z
-	# 	print(pprint.pprint(dic1))
-	
 	book.close()
 	return response
 

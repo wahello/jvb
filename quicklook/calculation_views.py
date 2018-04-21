@@ -24,7 +24,7 @@ class QuicklookCalculationView(APIView):
 		SERIALIZED_DATA = hlpr.create_quick_look(user,from_dt,to_dt)
 
 		return Response(SERIALIZED_DATA,status = status.HTTP_201_CREATED)
-
+		print(todays_activities)
 
 class movementConsistencySummary(generics.ListAPIView):
 	permission_classes = (IsAuthenticated,)

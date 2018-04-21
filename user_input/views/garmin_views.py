@@ -81,6 +81,8 @@ class GarminData(APIView):
 		activity_data = [ast.literal_eval(dic) for dic in activity_data]
 		manually_updated_activity_data = [ast.literal_eval(dic) for dic
 			in manually_updated_activity_data]
+		# print(activity_data)
+		# print(manually_updated_activity_data)
 		return (activity_data,manually_updated_activity_data)    
 
 	def _create_activity_stat(self,activity_obj):
@@ -123,8 +125,7 @@ class GarminData(APIView):
 		for act in activity_data:
 			act_obj = manually_edited(act)
 			finall = self._create_activity_stat(act_obj)
-			final_act_data.update(finall)
-		print(final_act_data)
+			final_act_data.update(finall)	
 		return final_act_data
 		
 
@@ -143,3 +144,4 @@ class GarminData(APIView):
 			}
 			return Response(data)
 		return Response({})
+
