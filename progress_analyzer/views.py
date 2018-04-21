@@ -294,7 +294,7 @@ def progress_excel_export(request):
 		
 
 		sheet10.write(28,c,DATA['summary']['alcohol']['avg_drink_per_week'][time1[i]],format_align)
-		sheet10.write(29,c,rank_data['alcohol_drink'][time1[i]]['user_rank']['rank'],format_align)
+		sheet10.write(29,c,rank_data['alcohol'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(30,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_grade'][time1[i]],format_align)
 		sheet10.write(31,c,DATA['summary']['alcohol']['alcoholic_drinks_per_week_gpa'][time1[i]],format_align1)
 		sheet10.write(32,c,DATA['summary']['alcohol']['prcnt_alcohol_consumption_reported'][time1[i]],format_align)
@@ -578,7 +578,7 @@ def progress_excel_export(request):
 			# for n in range(len(Alc)):
 			# 	r= r+1	
 			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][custom_range1]['data'],format_align)
-			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
+			sheet10.write(29,c,rank_data['alcohol']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][custom_range1]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][custom_range1]['data'],format_align1)
 			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][custom_range1]['data'],format_align)
@@ -846,7 +846,7 @@ def progress_excel_export(request):
 			sheet10.write(25,c,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list1[i]]['data'],format_align1)
 
 			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][list1[i]]['data'],format_align)
-			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
+			sheet10.write(29,c,rank_data['alcohol']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list1[i]]['data'],format_align1)
 			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list1[i]]['data'],format_align)
@@ -1108,7 +1108,7 @@ def progress_excel_export(request):
 			sheet10.write(25,c,DATA['summary']['nutrition'][nutri[-1]]['custom_range'][list2[i]]['data'],format_align1)
 
 			sheet10.write(28,c,DATA['summary']['alcohol'][Alc[0]]['custom_range'][list2[i]]['data'],format_align)
-			sheet10.write(29,c,rank_data['alcohol_drink']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
+			sheet10.write(29,c,rank_data['alcohol']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
 			sheet10.write(30,c,DATA['summary']['alcohol'][Alc[1]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(31,c,DATA['summary']['alcohol'][Alc[-2]]['custom_range'][list2[i]]['data'],format_align1)
 			sheet10.write(32,c,DATA['summary']['alcohol'][Alc[-1]]['custom_range'][list2[i]]['data'],format_align)
