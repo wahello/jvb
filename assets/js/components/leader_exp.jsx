@@ -22,8 +22,8 @@ const categoryMeta = {
 		short_name:"oh_gpa",
 		url_name:"overall-health-gpa"
 	},
-	"Alcohol Drink":{
-		short_name:"alcohol_drink",
+	"Alcohol":{
+		short_name:"alcohol",
 		url_name:"alcohol-drink"
 	},
 	"Average Sleep":{ 
@@ -58,8 +58,8 @@ const categoryMeta = {
 		short_name:"deep_sleep",
 		url_name:"deep-sleep" 
 	},
-	"Movement Non Exercise GPA":{
-		short_name:"mne_gpa",
+	"Non Exercise Steps":{
+		short_name:"nes",
 		url_name:"movement-non-exercise-gpa"
 	},
 	"Floors Climbed":{
@@ -67,7 +67,7 @@ const categoryMeta = {
 		url_name:"floor-climbed"
 	},
 };
-const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","mne_gpa","floor_climbed",];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","nes","floor_climbed",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
 class LeaderBoard1 extends Component{
@@ -317,7 +317,7 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category)
 			  		 			category = c_rankData.category;
 			  		 		usernames = c_rankData.username;
-			  		 		scores.push(c_rankData.score);
+			  		 		scores.push(c_rankData.score.value);
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
 	  				}
@@ -332,7 +332,7 @@ class LeaderBoard1 extends Component{
 			  		 			category = rankData.category;
 			  		 		}
 			  		 		usernames = rankData.username;
-			  		 		scores.push(rankData.score);
+			  		 		scores.push(rankData.score.value);
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
 			  		}
@@ -389,7 +389,7 @@ class LeaderBoard1 extends Component{
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  		<a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,date)}>
+			  		<a  onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,date)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -714,7 +714,7 @@ class LeaderBoard1 extends Component{
             {this.state.btnView &&
 	        	<div className = "row justify-content-center">
   					<span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
-  					<span style={{float:"center",fontSize:"17px",fontWeight:"bold",marginLeft:"20px"}}>{this.state.active_day}</span>
+  					{/*<span style={{float:"center",fontSize:"17px",fontWeight:"bold",marginLeft:"20px"}}>{this.state.active_day}</span>*/}
   				</div>
   			}
   			
@@ -728,7 +728,7 @@ class LeaderBoard1 extends Component{
 		    {this.state.active_view &&
 		    	<div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.alcohol_drink,this.state.duration_date)}
+		        		{this.renderTablesTd(this.state.ranking_data.alcohol,this.state.duration_date)}
 		        	</div>
 		        </div>
 		    }
@@ -792,7 +792,7 @@ class LeaderBoard1 extends Component{
 		    {this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 		        	<div className = "table table-responsive">
-		        		{this.renderTablesTd(this.state.ranking_data.mne_gpa,this.state.duration_date)}
+		        		{this.renderTablesTd(this.state.ranking_data.nes,this.state.duration_date)}
 		        	</div>
 		        </div>
 		    }

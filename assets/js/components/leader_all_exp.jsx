@@ -45,7 +45,7 @@ class AllRank_Data1 extends Component{
   scrollCallback(operationCount) {
       if (objectLength === operationCount) {
           setTimeout(function () {
-              document.getElementById('my-row').style.background = 'yellow';
+              document.getElementById('my-row').style.background = 'lightyellow';
               var index = -1;
             var rows = document.getElementById("my-table").rows;
             for (var i=0;i<rows.length; i++){
@@ -71,7 +71,7 @@ class AllRank_Data1 extends Component{
                     let currentUser = '';
                     for (let cat of category){
                         if(cat == "score"){
-                            let value = value1[cat];
+                            let value = value1[cat].value;
                             if(value != undefined){
                                 value += '';
                                 var x = value.split('.');

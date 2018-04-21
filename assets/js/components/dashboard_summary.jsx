@@ -20,15 +20,15 @@ var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
 
-const catagory = ["oh_gpa","alcohol_drink","avg_sleep","prcnt_uf","mne_gpa","mc","ec"];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec"];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 const categoryMeta = {
   "Overall Health GPA":{
     short_name:"oh_gpa",
     url_name:"overall-health-gpa"
   },
-  "Alcohol Drink":{
-    short_name:"alcohol_drink",
+  "Alcohol":{
+    short_name:"alcohol",
     url_name:"alcohol-drink"
   },
   "Average Sleep":{ 
@@ -63,11 +63,11 @@ const categoryMeta = {
     short_name:"deep_sleep",
     url_name:"deep-sleep" 
   },
-  "Movement Non Exercise GPA":{
-    short_name:"mne_gpa",
+  "Non Exercise Steps":{
+    short_name:"nes",
     url_name:"movement-non-exercise-gpa"
   },
-  "Floor Climbed":{
+  "Floors Climbed":{
     short_name:"floor_climbed",
     url_name:"floor-climbed"
   },
@@ -1052,7 +1052,7 @@ createExcelPrintURL(){
                 if(!category)
                   category = c_rankData.category;
                 usernames = c_rankData.username;
-                scores.push(c_rankData.score);
+                scores.push(c_rankData.score.value);
                 ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
               }
             }
@@ -1067,7 +1067,7 @@ createExcelPrintURL(){
                   category = a_rankData.category;
                 }
                 usernames = a_rankData.username;
-                scores.push(a_rankData.score);
+                scores.push(a_rankData.score.value);
                 ranks.push({'rank':a_rankData.rank,'duration':duration,'isCustomRange':false});
               }
             }
@@ -1542,7 +1542,7 @@ handleBackButton(){
             </tr>
             <tr className="progress_table">
                  <td className="progress_table">Rank against other users</td>
-                 {this.renderTablesTd(this.state.rankData.mne_gpa)}
+                 {this.renderTablesTd(this.state.rankData.nes)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Movement-Non Exercise Steps Grade</td>            
@@ -1657,7 +1657,7 @@ handleBackButton(){
             </tr>
             <tr className="progress_table">
               <td className="progress_table">Rank against other users</td>
-                 {this.renderTablesTd(this.state.rankData.alcohol_drink)}
+                 {this.renderTablesTd(this.state.rankData.alcohol)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">Alcoholic drinks per week Grade</td>               
