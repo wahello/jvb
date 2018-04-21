@@ -13,12 +13,12 @@ class RankedScore(object):
 
 	CATEGORY_DEFAULT_SCORE = {
 		'oh_gpa':DEFAULT_MINIMUM_SCORE,
-		'mne_gpa':DEFAULT_MINIMUM_SCORE,
+		'nes':DEFAULT_MINIMUM_SCORE,
 		'mc':DEFAULT_MAXIMUM_SCORE,
 		'avg_sleep':DEFAULT_MINIMUM_SCORE,
 		'ec':DEFAULT_MINIMUM_SCORE,
 		'prcnt_uf':DEFAULT_MINIMUM_SCORE,
-		'alcohol_drink':DEFAULT_MAXIMUM_SCORE,
+		'alcohol':DEFAULT_MAXIMUM_SCORE,
 		'total_steps':DEFAULT_MINIMUM_SCORE,
 		'floor_climbed':DEFAULT_MINIMUM_SCORE,
 		'resting_hr':DEFAULT_MAXIMUM_SCORE,
@@ -26,12 +26,29 @@ class RankedScore(object):
 		'awake_time':DEFAULT_MAXIMUM_SCORE
 	}
 
-	def __init__(self,current_user,user,category,score,rank=None):
+	CATEGORY_SCORE_VNAME = {
+		'oh_gpa':'Overall Health GPA',
+		'nes':'Non Exercise Steps',
+		'mc':'Movement Consistency Score',
+		'avg_sleep':'Sleep GPA',
+		'ec':'Avg # of Days Exercised/Week',
+		'prcnt_uf':'% Unprocessed Food',
+		'alcohol':'Average Drinks Per Week (7 Days)',
+		'total_steps':'Total Steps',
+		'floor_climbed':'Floors Climbed',
+		'resting_hr':'Resting Heart Rate (RHR)',
+		'deep_sleep':'Deep Sleep Duration (hh:mm)',
+		'awake_time':'Awake Time Duration (hh:mm)'
+	}
+
+	def __init__(self,current_user,user,category,score,
+			rank=None,other_scores=None):
 		self.current_user = current_user
 		self.user = user
 		self.category = category
 		self.score = score
 		self.rank = rank
+		self.other_scores = other_scores
 
 	@property		
 	def category(self):
@@ -56,6 +73,17 @@ class RankedScore(object):
 		else:
 			self.__score = score
 
+	@property
+	def other_scores(self):
+		return self.__other_scores
+
+	@other_scores.setter
+	def other_scores(self,other_scores):
+		if other_scores:
+			for score,data in other_scores.items():
+				if data['value'] == None:
+					other_scores[score]['value'] = 'N/A'
+		self.__other_scores = other_scores
 
 	@property
 	def rank(self):
@@ -83,7 +111,11 @@ class RankedScore(object):
 			username = "Anonymous",
 		d = {
 			'username':username,
-			'score':score,
+			'score':{
+				'value':score,
+				'verbose_name':self.CATEGORY_SCORE_VNAME[self.category]
+			},
+			'other_scores':self.other_scores,
 			'category':verbose_category[self.category],
 			'rank':self.rank
 		}
@@ -263,7 +295,7 @@ class LeaderboardOverview(object):
 	def _get_catg_score_priority(self):
 		categories = [x[0] for x in s.CATEGORY_CHOICES]
 		catg_score_priority = {}
-		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol_drink']
+		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol']
 		for category in categories:
 			if category in lowest_first_categories:
 				catg_score_priority[category] = 'lowest_first'
@@ -300,7 +332,7 @@ class LeaderboardOverview(object):
 					if catg == 'oh_gpa':
 						score = data['overall_health']['overall_health_gpa'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
-					elif catg == 'mne_gpa':
+					elif catg == 'nes':
 						score = data['non_exercise']['non_exercise_steps'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'mc':
@@ -308,14 +340,30 @@ class LeaderboardOverview(object):
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'avg_sleep':
 						score = data['sleep']['overall_sleep_gpa'][dtype]
-						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+						other_scores = {
+							'sleep_duration':{
+								"value":data['sleep']['total_sleep_in_hours_min'][dtype],
+								"verbose_name":"Sleep Duration (hh:mm)"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores)
+						)
 					elif catg == 'ec':
 						score = data['ec']['avg_no_of_days_exercises_per_week'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'prcnt_uf':
 						score = data['nutrition']['prcnt_unprocessed_food_gpa'][dtype]
-						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
-					elif catg == 'alcohol_drink':
+						other_scores = {
+							"percent_unprocessed_food":{
+								"value":data['nutrition']['prcnt_unprocessed_volume_of_food'][dtype],
+								"verbose_name":"% Unprocessed Food"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores)
+						)
+					elif catg == 'alcohol':
 						score = data['alcohol']['avg_drink_per_week'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'total_steps':
@@ -348,7 +396,7 @@ class LeaderboardOverview(object):
 						if catg == 'oh_gpa':
 							score = data['overall_health']['overall_health_gpa']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
-						elif catg == 'mne_gpa':
+						elif catg == 'nes':
 							score = data['non_exercise']['non_exercise_steps']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'mc':
@@ -356,14 +404,30 @@ class LeaderboardOverview(object):
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'avg_sleep':
 							score = data['sleep']['overall_sleep_gpa']['custom_range'][str_range]['data']
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
+							other_scores = {
+								'sleep_duration':{
+									"value":data['sleep']['total_sleep_in_hours_min']['custom_range'][str_range]['data'],
+									"verbose_name":"Sleep Duration (hh:mm)"
+								}
+							}
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score,other_scores=other_scores)
+							)
 						elif catg == 'ec':
 							score = data['ec']['avg_no_of_days_exercises_per_week']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'prcnt_uf':
 							score = data['nutrition']['prcnt_unprocessed_food_gpa']['custom_range'][str_range]['data']
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
-						elif catg == 'alcohol_drink':
+							other_scores = {
+								"percent_unprocessed_food":{
+									"value":data['nutrition']['prcnt_unprocessed_volume_of_food']['custom_range'][str_range]['data'],
+									"verbose_name":"% Unprocessed Food"
+								}
+							}
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score,other_scores=other_scores)
+							)
+						elif catg == 'alcohol':
 							score = data['alcohol']['avg_drink_per_week']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'total_steps':
