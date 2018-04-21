@@ -73,10 +73,9 @@ function initializeLocalState(){
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
 					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />
-					<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
-					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />
-					{/*<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data1)} />
-					<Route path='/leaderboard' component={RequireAuth(LeaderBoard1)} />*/}
+					{/*<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />*/}
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard1)} />
 					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />

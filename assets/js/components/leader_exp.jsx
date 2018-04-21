@@ -108,11 +108,14 @@ class LeaderBoard1 extends Component{
 	        dateRange3:false,
 			calendarOpen:false,
 			isOpen:false,
+			isOpen1:false,
 			ranking_data:rankInitialState,
 			active_view:true,
 			btnView:false,
+			scrollingLock:false,
 			active_category:"",
 			active_username:"",
+			active_day:"",
 			duration_date:{
 				"week":"",
 				"today":"",
@@ -125,6 +128,7 @@ class LeaderBoard1 extends Component{
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.handleLogout = this.handleLogout.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.toggle1 = this.toggle1.bind(this);
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
 		this.processDate = this.processDate.bind(this);
@@ -143,7 +147,7 @@ class LeaderBoard1 extends Component{
 		this.renderLeaderBoardSelectedDateFetchOverlay = renderLeaderBoardSelectedDateFetchOverlay.bind(this);
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.renderTableHeader = this.renderTableHeader.bind(this);
-		this.handButton = this.handButton.bind(this);
+		this.handleScroll = this.handleScroll.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
@@ -239,10 +243,19 @@ class LeaderBoard1 extends Component{
 			fetching_lb4:true,
 		});
 		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,true);
+		window.addEventListener('scroll', this.handleScroll);
+	}
+	componentWillUnmount() {
+    	window.removeEventListener('scroll', this.handleScroll);
 	}
 	toggle() {
 	    this.setState({
 	      isOpen: !this.state.isOpen,
+	    });
+  	}
+  	toggle1() {
+	    this.setState({
+	      isOpen1: !this.state.isOpen,
 	    });
   	}
 	toggleCalendar(){
@@ -328,10 +341,10 @@ class LeaderBoard1 extends Component{
 	  	}
 
 	  	// creating headers for table
+	  	let date;
 	  	let tableHeaders = [<th className = "lb_table_style_rows">{category}</th>]
 	  	for(let dur of durations){
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
-	  		let date;
 	  		if(dur == "today"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
 	  		}
@@ -376,7 +389,7 @@ class LeaderBoard1 extends Component{
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  		<a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank,usernames)}>
+			  		<a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,date)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -433,23 +446,17 @@ class LeaderBoard1 extends Component{
 
 	  	return  <table className = "table table-striped table-bordered">{tableRows}</table>;
   	};
-  	reanderAll(value,value1,event){
+  	reanderAll(value,value1,value2,event){
  		if(value){
   		this.setState({
   			active_view:!this.state.active_view,
   			btnView:!this.state.btnView,
   			active_category:value,
   			active_username:value1,
+  			active_day:value2,
   		});
   		};
   	};
-  	handButton(){
-  	  var b = document.getElementById('hambergar').clientHeight;
-  	  console.log("**********",b);
-      var scrollHeight = b + document.getElementById('workout').offsetTop;
-      console.log("**********",scrollHeight);
-      window.scrollTo(0, scrollHeight+270);
-  	}
   	handleBackButton(){
   		this.setState({
   			active_view:!this.state.active_view,
@@ -472,13 +479,17 @@ class LeaderBoard1 extends Component{
 		  
 		return values;
 	}
-	// handleScroll(){
- //  		  var b = document.getElementById('hambergar').clientHeight;
-	//   	  console.log("**********",b);
-	//       var scrollHeight = b + document.getElementById("lbscroll").offsetTop;
-	//       console.log("**********",scrollHeight);
-	//       window.scrollTo(0, scrollHeight+270);	
- //  }
+	handleScroll() {
+		  if (window.scrollY >= 150 && !this.state.scrollingLock) {
+		    this.setState({
+		      scrollingLock: true
+		    });
+		  } else if(window.scrollY < 100 && this.state.scrollingLock) {                                               
+		    this.setState({
+		      scrollingLock: false
+		    });
+		  }
+	}
 	render(){
 		 const {fix} = this.props;
 		return(
@@ -522,43 +533,66 @@ class LeaderBoard1 extends Component{
 		          </Collapse>
 		        </Navbar>
 		    </div>
+
 		    {this.state.active_view &&
-      		<div className = "row justify-content-center"> 
-                <span id="navlink" onClick={this.toggleCalendar} id="progress">
-                    <FontAwesome
-                        name = "calendar"
-                        size = "2x"
-                    />
-                </span>               
-                <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
-                    <span className="date_range_btn">
-                        <Button
-                            className="daterange-btn btn"                            
-                            id="daterange"
-                            onClick={this.toggleDate1} >Custom Date Range1
-                        </Button>
-                    </span>
-                </span>
-                <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
-                    <span className="date_range_btn">
-                        <Button
-                            className="daterange-btn btn"                            
-                            id="daterange"
-                            onClick={this.toggleDate2} >Custom Date Range2
-                        </Button>
-                    </span>
-                </span>
-                <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
-                    <span className="date_range_btn">
-                        <Button
-                            className="daterange-btn btn"                            
-                            id="daterange"
-                            onClick={this.toggleDate3} >Custom Date Range3
-                        </Button>
-                    </span>
-                </span>
-            </div>
-        }
+		      <div className="nav3" id='bottom-nav'>
+                           <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
+                           <Navbar light toggleable className="navbar nav1 user_nav">
+                                <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle1}>
+                                    <div className="toggler">
+                                    <FontAwesome 
+                                          name = "bars"
+                                          size = "1x"
+                                        />
+                                    </div>
+                               </NavbarToggler>
+                               <span id="navlink" onClick={this.toggleCalendar} id="progress">
+					                    <FontAwesome
+					                    	style = {{color:"white"}}
+					                        name = "calendar"
+					                        size = "1x"
+					                    />
+	                                     <span id="navlink">
+	                                      	{moment(this.state.selectedDate).format('MMM D, YYYY')}
+	                                     </span>  
+					            </span>
+
+                               <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen1} navbar>
+                                  <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+                                    <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
+					                    <span className="date_range_btn">
+					                        <Button
+					                            className="daterange-btn btn"                            
+					                            id="daterange"
+					                            onClick={this.toggleDate1} >Custom Date Range1
+					                        </Button>
+					                    </span>
+					                </span>
+					                 <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+							                    <span className="date_range_btn">
+							                        <Button
+							                            className="daterange-btn btn"                            
+							                            id="daterange"
+							                            onClick={this.toggleDate2} >Custom Date Range2
+							                        </Button>
+							                    </span>
+						                	</span>
+						               <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+							                    <span className="date_range_btn">
+							                        <Button
+							                            className="daterange-btn btn"                            
+							                            id="daterange"
+							                            onClick={this.toggleDate3} >Custom Date Range3
+							                        </Button>
+							                    </span>
+							                </span>                                                                                                                 
+                                  </Nav>
+                                </Collapse>    
+                           </Navbar> 
+                           </div>
+                           </div>                                
+		    }
+
             <Popover
             placement="bottom"
             isOpen={this.state.calendarOpen}
@@ -672,9 +706,6 @@ class LeaderBoard1 extends Component{
                     </PopoverBody>
                 </Popover>
             <div className="col-sm-12 col-md-12 col-lg-12">
-           		 {/*<div>
-	            	<Button className = "btn btn-info" onClick = {this.handButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
-	            </div>*/}
             {this.state.btnView &&
 	           	<div>
 	            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
@@ -683,6 +714,7 @@ class LeaderBoard1 extends Component{
             {this.state.btnView &&
 	        	<div className = "row justify-content-center">
   					<span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
+  					<span style={{float:"center",fontSize:"17px",fontWeight:"bold",marginLeft:"20px"}}>{this.state.active_day}</span>
   				</div>
   			}
   			
