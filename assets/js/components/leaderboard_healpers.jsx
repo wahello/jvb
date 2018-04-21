@@ -18,7 +18,7 @@ export function renderLeaderBoardFetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching LeaderBoard Data from {lb1_start_date.format('MMMM D, YYYY')} to {lb1_end_date.format('MMMM D, YYYY')}  </p>
+					<p>Fetching Rank Data from {lb1_start_date.format('MMMM D, YYYY')} to {lb1_end_date.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
@@ -41,7 +41,7 @@ export function renderLeaderBoard2FetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching LeaderBoard Data from {lb2_start_date.format('MMMM D, YYYY')} to {lb2_end_date.format('MMMM D, YYYY')}  </p>
+					<p>Fetching Rank Data from {lb2_start_date.format('MMMM D, YYYY')} to {lb2_end_date.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
@@ -64,7 +64,7 @@ export function renderLeaderBoard3FetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching LeaderBoard Data from {lb3_start_date.format('MMMM D, YYYY')} to {lb3_end_date.format('MMMM D, YYYY')}  </p>
+					<p>Fetching Rank Data from {lb3_start_date.format('MMMM D, YYYY')} to {lb3_end_date.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
@@ -85,7 +85,7 @@ export function renderLeaderBoardSelectedDateFetchOverlay(){
 						/>
 					</div>
 					<br/>
-					<p>Fetching LeaderBoard Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+					<p>Fetching Rank Data For {selectedDate.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);

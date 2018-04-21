@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta , date
+from decimal import Decimal, ROUND_HALF_UP
 import calendar
 import ast
 import time
@@ -229,57 +230,86 @@ def hrr_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	start = start_date
-	end = start + timedelta(days=1)
+	end = start_date + timedelta(days=7)
+	start_date_str = start_date.strftime('%Y-%m-%d')
 
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
-	kd = Profile.objects.filter(user=request.user)
-	for ss in kd:
-		cc = ss.date_of_birth
+	profile = Profile.objects.filter(user=request.user)
+	for tmp_profile in profile:
+		user_dob = tmp_profile.date_of_birth
 	today = date.today()
-	age_user = today.year - cc.year
-	lis = []
-	tim = []
+	user_age = today.year - user_dob.year
+	heartrate_complete = []
+	timestamp_complete = []
 	data = {"total_time":"",
 				"aerobic_zone":"",
 				"anaerobic_range":"",
 				"below_aerobic_zone":"",
+				"aerobic_range":"",
+				"anaerobic_range":"",
+				"below_aerobic_range":"",
 				"percent_aerobic":"",
 				"percent_below_aerobic":"",
 				"percent_anaerobic":"",
 				"total_percent":""}
 	if a1:
 		for x in a1:
-			# print(x)
 			fitfile = FitFile(x.fit_file)
 			for record in fitfile.get_messages('record'):
 				for record_data in record:
 					if(record_data.name=='heart_rate'):
 						b = record_data.value
-						lis.extend([b])
+						heartrate_complete.extend([b])
 
 					if(record_data.name=='timestamp'):
 						c = record_data.value
-						tim.extend([c]) 
-		tim_ts = []
-		for i,k in enumerate(tim):
+						cc = c.strftime('%Y-%m-%d')
+						timestamp_complete.extend([c])
+		
+		heartrate_selected_date = []
+		timestamp_selected_date = []
+		for heart,timeheart in zip(heartrate_complete,timestamp_complete):
+			timeheart_str = timeheart.strftime('%Y-%m-%d')
+			if timeheart_str == start_date_str:
+				heartrate_selected_date.extend([heart])
+				timestamp_selected_date.extend([timeheart])
+
+ 
+		to_timestamp = []
+		for i,k in enumerate(timestamp_selected_date):
 			dtt = k.timetuple()
 			ts = time.mktime(dtt)
-			tim_ts.extend([ts])
-		tim_ts_diff = []
-		for i,k in enumerate(tim_ts):
+			to_timestamp.extend([ts])
+		
+		timestamp_difference = []
+		for i,k in enumerate(to_timestamp):
 			try:
-				dif_tim = tim_ts[i+1] - tim_ts[i]
-				tim_ts_diff.extend([dif_tim])
+				dif_tim = to_timestamp[i+1] - to_timestamp[i]
+				timestamp_difference.extend([dif_tim])
 			except IndexError:
-				tim_ts_diff.extend([1])
+				timestamp_difference.extend([1])
 
-		below_aerobic_value = 180-age_user-30
-		anaerobic_value = 180-age_user+5
+		final_heartrate = []
+		final_timestamp = []
 
+		for i,k in zip(heartrate_selected_date,timestamp_difference):
+			if (k < 60) and (k >= 0):
+				final_heartrate.extend([i])
+				final_timestamp.extend([k])
+
+
+		below_aerobic_value = 180-user_age-30
+		anaerobic_value = 180-user_age+5
+
+		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
+		anaerobic_range = '{} or above'.format(anaerobic_value+1)
+		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
+		
 		anaerobic_range_list = []
 		below_aerobic_list = []
 		aerobic_list = []
-		for a, b in zip(lis,tim_ts_diff):
+
+		for a, b in zip(final_heartrate,final_timestamp):
 			if a > anaerobic_value:
 				anaerobic_range_list.extend([b])
 			elif a < below_aerobic_value:
@@ -290,17 +320,32 @@ def hrr_calculations(request):
 		time_in_aerobic = sum(aerobic_list)
 		time_in_below_aerobic = sum(below_aerobic_list)
 		time_in_anaerobic = sum(anaerobic_range_list)
+		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-		percent_anaerobic = round((time_in_anaerobic/total_time)*100,2)
-		percent_below_aerobic = round((time_in_below_aerobic/total_time)*100,2)
-		percent_aerobic = round((time_in_aerobic/total_time)*100,2)
+		try:
+			percent_anaerobic = (time_in_anaerobic/total_time)*100
+			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 
-		total_percent = 100
+			percent_below_aerobic = (time_in_below_aerobic/total_time)*100
+			percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
+			percent_aerobic = (time_in_aerobic/total_time)*100
+			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+
+			total_percent = 100
+		except ZeroDivisionError:
+			percent_anaerobic=''
+			percent_below_aerobic=''
+			percent_aerobic=''
+			total_percent=''
+			
 		data = {"total_time":total_time,
 				"aerobic_zone":time_in_aerobic,
-				"anaerobic_range":time_in_anaerobic,
+				"anaerobic_zone":time_in_anaerobic,
 				"below_aerobic_zone":time_in_below_aerobic,
+				"aerobic_range":aerobic_range,
+				"anaerobic_range":anaerobic_range,
+				"below_aerobic_range":below_aerobic_range,
 				"percent_aerobic":percent_aerobic,
 				"percent_below_aerobic":percent_below_aerobic,
 				"percent_anaerobic":percent_anaerobic,
@@ -317,7 +362,18 @@ def export_users_xls(request):
 
 	#date2 = request.GET.get('date',None)
 	#crs = request.GET.get('custom_ranges',None)
-
+	# import requests
+	# s = 406723465
+	# d = s * (180 / 2**31)
+	# lat = d
+	# b = -1411000367
+	# a = b * (180 / 2**31)
+	# lon = b
+	# url = "http://api.geonames.org/timezoneJSON?formatted=true&lat={}&lng={}&username=demo".format(lat,lon)
+	# r = requests.get(url)
+	# r = json.loads(r)
+	# print(r)
+	# print(r.json()['timezoneId'])
 	#date = datetime.strptime(date2,'%m-%d-%Y').date()
 	#custom_ranges = datetime.strptime(crs, "%m-%d-%Y").date()
 	# print(request.user)
@@ -2175,7 +2231,8 @@ def export_users_xls(request):
 		current_date -= timedelta(days=1)
 	
 	Activities_list_unique = list(set(Activities_list))
-
+	len_activity = len(Activities_list_unique)
+	
 	for col_num in range(len(Activities_list_unique)):
 		col_num1 = col_num1 + 1
 		sheet6.write(col_num1, row_num,"Average Heartrate"+' '+Activities_list_unique[col_num])
@@ -2200,7 +2257,7 @@ def export_users_xls(request):
 			sheet6.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 	
-
+	
 	row_avg_heart = i+1
 	column_no = row_num
 	current_date = to_date
@@ -2234,9 +2291,10 @@ def export_users_xls(request):
 
 	current_date = to_date
 	if data:
-		rem_row = i+1
+
+		rem_row = i+len_activity-1
 	else:
-		rem_row = i
+		rem_row = i-1
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2257,7 +2315,7 @@ def export_users_xls(request):
 						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'No Workout')
 					else:
 						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,data[key],format)
-				elif j == 13:
+				elif j == 14:
 					if data[key] == 0:
 						sheet6.write(rem_row+4+j, row_num - column_no - no_days - 1,'Not provided')
 					else:

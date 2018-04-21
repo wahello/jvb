@@ -1064,7 +1064,10 @@ class ProgressReport():
 							todays_data.cum_resting_hr,
 							current_data.cum_resting_hr,
 							resting_hr_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if val:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 
 				elif key == 'hrr_time_to_99':

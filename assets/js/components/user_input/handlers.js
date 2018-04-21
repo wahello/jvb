@@ -4,7 +4,7 @@ export function handleChange(event){
   const name = target.name;
   this.setState({
 	[name]: value
-  });
+  }); 
 }
 
 
@@ -102,7 +102,7 @@ export function handleChangeSleepAwakeTime(date){
 
       console.log(mins);
       this.setState({
-        sleep_hours_last_night:hours,
+        sleep_hours_last_night:hours, 
         sleep_mins_last_night:mins
       })
     }

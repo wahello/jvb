@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.core.urlresolvers import reverse
@@ -6,13 +8,23 @@ from .serializers import UserDailyInputSerializer
 from quicklook.tasks import generate_quicklook
 from .custom_signals import user_input_post_save,user_input_notify
 from .tasks import notify_admins_task
+from progress_analyzer.tasks import set_pa_report_update_date
 
 @receiver(user_input_post_save, sender=UserDailyInputSerializer)
 def create_or_update_quicklook(sender, **kwargs):
 	request = kwargs.get('request')
-	from_date = kwargs.get('from_date').strftime("%Y-%m-%d")
-	to_date = kwargs.get('to_date').strftime("%Y-%m-%d")
-	generate_quicklook.delay(request.user.id,from_date,to_date)
+	from_date = kwargs.get('from_date')
+	from_date_str = kwargs.get('from_date').strftime("%Y-%m-%d")
+	to_date_str = kwargs.get('to_date').strftime("%Y-%m-%d")
+	generate_quicklook.delay(request.user.id,from_date_str,to_date_str)
+	if from_date != datetime.now().date():
+		# if updated user input is not for today (some historical date) then
+		# we have to update all the PA report from that date. So we need to record
+		# this date in database and update PA later as a celery task
+		set_pa_report_update_date.delay(
+			request.user.id, 
+			from_date_str
+		)
 
 
 @receiver(user_input_notify, sender=UserDailyInputSerializer)

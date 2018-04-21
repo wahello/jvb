@@ -55,9 +55,19 @@ class CharMaxValueValidator(BaseValidator):
         return int(x);
 
 class UserDailyInput(models.Model):
+    REPORT_TYPE_CHOICES = (
+        ("quick","Quick Report"),
+        ("full","Full Report"),
+    )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateField()
     updated_at = models.DateTimeField(auto_now=True)
+    report_type = models.CharField(
+        choices = REPORT_TYPE_CHOICES,
+        default = "full",
+        max_length = 10
+    )
     timezone = models.CharField(max_length=100, blank=True)
 
     def __str__(self):

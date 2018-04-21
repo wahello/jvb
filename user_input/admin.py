@@ -22,7 +22,7 @@ class GoalsInline(admin.StackedInline):
 	model = Goals
 
 class UserInputAdmin(admin.ModelAdmin):
-	list_display=('user','created_at', 'updated_at')
+	list_display=('user','report_type','created_at', 'updated_at')
 	list_filter = ('created_at','updated_at',)
 	save_on_top = True
 	search_fields = ('user__username','user__email','user__first_name',

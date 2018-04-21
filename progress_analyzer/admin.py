@@ -13,7 +13,8 @@ from progress_analyzer.models import CumulativeSum,\
 	StandingCumulative,\
 	TravelCumulative,\
 	StressCumulative,\
-	MetaCumulative
+	MetaCumulative,\
+	ProgressReportUpdateMeta
 
 class OverallHealthGradeCumulativeInline(admin.StackedInline):
 	model = OverallHealthGradeCumulative
@@ -82,3 +83,10 @@ class CumulativeSumManager(admin.ModelAdmin):
 		OtherStatsCumulativeInline,
 		MetaCumulativeInline
 	]
+
+@admin.register(ProgressReportUpdateMeta)
+class ProgressReportUpdateMetaAdmin(admin.ModelAdmin):
+	list_display = ['user','requires_update_from']
+	ordering = ('-requires_update_from',)
+	search_fields = ('user__username','user__email','user__first_name',
+		'user__last_name')
