@@ -190,6 +190,7 @@ class UserInputs extends React.Component{
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
       this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
       this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
+      this.handleQuickReportPreSubmit = handlers.handleQuickReportPreSubmit.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -732,6 +733,7 @@ getTotalSleep(){
       this.setState({
         updating_form:true
       },function(){
+        this.handleQuickReportPreSubmit();
         userDailyInputUpdate(this.state,this.onUpdateSuccess);
       }.bind(this));
     }
@@ -741,6 +743,7 @@ getTotalSleep(){
       this.setState({
         submitting_form:true
       },function(){
+        this.handleQuickReportPreSubmit();
         userDailyInputSend(this.state,this.resetForm);
       }.bind(this));    
     }
