@@ -1314,14 +1314,18 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.report_type == "quick" &&
-                                <div className="input">
-                                  <p>The Reporting mode Quickreport</p>
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Quick Report</span>
                                 </div>
                               }
                               {
                                 !this.state.editable && this.state.report_type == "full" &&
-                                <div className="input">
-                                  <p>The Reporting mode Fullreport</p>
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Full Report</span>
                                 </div>
                               }
                           </FormGroup>
@@ -3667,7 +3671,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                           <FormGroup>      
                             <Label className="padding">15.1 Where did you travel to or stay?</Label>
                               {this.state.editable &&
@@ -3687,7 +3691,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                            <FormGroup>   
                             <Label className="padding">15.2 Was your Travel for work, vacation, or other?</Label>
                             {this.state.editable &&
@@ -3724,7 +3728,7 @@ handleScroll() {
                           </FormGroup>
                         }
                         {
-                         (this.state.travel_purpose_checked == "other") &&
+                         (this.state.travel_purpose_checked == "other") && (this.state.report_type == 'full') &&
                           <FormGroup>              
                               {this.state.editable &&
                                 <div className="input1">
