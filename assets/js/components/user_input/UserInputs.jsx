@@ -3398,6 +3398,8 @@ handleScroll() {
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
                                </div>
+
+
                           
          
                           <div id="stress">
@@ -3533,7 +3535,7 @@ handleScroll() {
                             </FormGroup>
                           }
 
-                         {(this.state.report_type === 'full') &&
+                         {(this.state.report_type === 'full') && (this.state.gender === 'F') &&
                              <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
                               {this.state.editable &&

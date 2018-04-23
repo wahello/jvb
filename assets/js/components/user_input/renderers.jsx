@@ -121,6 +121,7 @@ export function renderPrescriptionMedication(){
 		  updateStateMedication={updateStateMedication}
 		  updateStateCtrlSubs={updateStateCtrlSubs}
 		  editable = {this.state.editable}
+		  report_type = {this.state.report_type}
 		  />
 		);
 	  }
