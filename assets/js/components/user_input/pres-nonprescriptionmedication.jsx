@@ -64,9 +64,9 @@ export default class PrescriptionMedication extends Component{
 					<Collapse isOpen={this.state.collapse}>
 	
 					<FormGroup>
-								{((this.props.editable)  && (this.props.report_type == 'full')) &&
+								{(this.props.report_type == 'full') &&
 								<Label className="LAbel">8.1 What Did You Take?</Label>}
-									{this.props.editable &&  this.props.report_type == 'full' &&
+									{((this.props.editable) &&  (this.props.report_type == 'full')) &&
 										<div className="input1">
 											<Textarea
 											id="placeholder" 				                           
@@ -79,7 +79,7 @@ export default class PrescriptionMedication extends Component{
 				                        </div>
 				                    }
 				                    {
-	                                  !this.props.editable && this.props.report_type == 'full' && 
+	                                  !this.props.editable && 
 	                                  <div className="input">
 	                                    <p >{this.state.medications_taken_list}</p>
 	                                  </div>

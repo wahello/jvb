@@ -1692,7 +1692,7 @@ handleScroll() {
 
                             {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                               <FormGroup>   
-                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard”?
+                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard?
                                 <span id="easyorhard"
                              onClick={this.toggleEasyorHard} 
                              style={{paddingLeft:"15px",color:"gray"}}>
