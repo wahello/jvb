@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta , date
+from datetime import datetime, timedelta, date
+import time
 from decimal import Decimal, ROUND_HALF_UP
 import calendar
 import ast
-import time
 import json
 import xlsxwriter
 import pprint
@@ -53,7 +53,7 @@ from progress_analyzer.models import OverallHealthGradeCumulative, \
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
-from .calculation_helper import *
+# from .calculation_helper import *
 
 
 class UserQuickLookView(generics.ListCreateAPIView):
