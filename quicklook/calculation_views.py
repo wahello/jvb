@@ -25,7 +25,6 @@ class QuicklookCalculationView(APIView):
 
 		return Response(SERIALIZED_DATA,status = status.HTTP_201_CREATED)
 
-
 class movementConsistencySummary(generics.ListAPIView):
 	permission_classes = (IsAuthenticated,)
 

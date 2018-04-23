@@ -42,12 +42,12 @@ GROUP BY s1.id ORDER BY s1.category,category_rank""".format(where_condition)
 		
 class Score(models.Model):
 	OVERALL_HEALTH_GPA = 'oh_gpa'
-	MOVEMENT_NON_EXERCISE_GPA = 'mne_gpa'
+	NON_EXERCISE_STEPS = 'nes'
 	MOVEMENT_CONSISTENCY = 'mc'
 	AVG_SLEEP = 'avg_sleep'
 	EXERCISE_CONSISTENCY = 'ec'
 	PRCNT_UNPROCESSED_FOOD = 'prcnt_uf'
-	ALCOHOL_DRINK = 'alcohol_drink'
+	ALCOHOL = 'alcohol'
 	TOTAL_STEPS = 'total_steps'
 	FLOOR_CLIMBED = 'floor_climbed'
 	RESTING_HEART_RATE = 'resting_hr'
@@ -56,12 +56,12 @@ class Score(models.Model):
 
 	CATEGORY_CHOICES = (
 		(OVERALL_HEALTH_GPA,"Overall Health GPA"),
-		(MOVEMENT_NON_EXERCISE_GPA,"Movement Non Exercise GPA"),
+		(NON_EXERCISE_STEPS,"Non Exercise Steps"),
 		(MOVEMENT_CONSISTENCY, "Movement Consistency"),
 		(AVG_SLEEP, "Average Sleep"),
 		(EXERCISE_CONSISTENCY, "Exercise Consistency"),
 		(PRCNT_UNPROCESSED_FOOD, "Percent Unprocessed Food"),
-		(ALCOHOL_DRINK, "Alcohol Drink"),
+		(ALCOHOL, "Alcohol"),
 		(TOTAL_STEPS, "Total Steps"),
 		(FLOOR_CLIMBED, "Floors Climbed"),
 		(RESTING_HEART_RATE, "Resting Heart Rate"),
