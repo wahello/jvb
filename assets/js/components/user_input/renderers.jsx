@@ -104,7 +104,7 @@ export function renderFasted(){
 
 
 export function renderPrescriptionMedication(){
-	if(this.state. medications === 'yes'){
+	if((this.state.medications === 'yes') || (this.state.report_type == 'quick')){
 	 const updateStateMedication = function(val){
 							  this.setState({
 						   medications_taken_list: val
