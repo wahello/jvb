@@ -1310,9 +1310,15 @@ handleScroll() {
                                 </div>  
                               }
                               {
-                                !this.state.editable &&
+                                !this.state.editable && this.state.report_type == "quick" &&
                                 <div className="input">
-                                  <p>{this.state.report_type}</p>
+                                  <p>The Reporting mode Quickreport</p>
+                                </div>
+                              }
+                              {
+                                !this.state.editable && this.state.report_type == "full" &&
+                                <div className="input">
+                                  <p>The Reporting mode Fullreport</p>
                                 </div>
                               }
                           </FormGroup>
@@ -3398,6 +3404,8 @@ handleScroll() {
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
                                </div>
+
+
                           
          
                           <div id="stress">
@@ -3533,7 +3541,7 @@ handleScroll() {
                             </FormGroup>
                           }
 
-                         {(this.state.report_type === 'full') &&
+                         {(this.state.report_type === 'full') && (this.state.gender === 'F') &&
                              <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
                               {this.state.editable &&
