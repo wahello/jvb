@@ -730,20 +730,20 @@ getTotalSleep(){
     }
 
     onUpdate(){
+      this.handleQuickReportPreSubmit();
       this.setState({
         updating_form:true
       },function(){
-        this.handleQuickReportPreSubmit();
         userDailyInputUpdate(this.state,this.onUpdateSuccess);
       }.bind(this));
     }
 
     onSubmit(event){
       event.preventDefault();
+      this.handleQuickReportPreSubmit();
       this.setState({
         submitting_form:true
       },function(){
-        this.handleQuickReportPreSubmit();
         userDailyInputSend(this.state,this.resetForm);
       }.bind(this));    
     }

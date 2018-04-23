@@ -428,7 +428,6 @@ else{
 
 export function handleQuickReportPreSubmit(){
   if(this.state.report_type == 'quick'){
-
     this.setState({
       workout:'',
       no_exercise_reason:'',
