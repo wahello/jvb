@@ -21,9 +21,11 @@ export default class PrescriptionMedication extends Component{
 	}
 
 	componentWillReceiveProps(nextProps) {
-  	  if(nextProps.medications_taken_list !== this.props.medications_taken_list) {
+  	  if(nextProps.medications_taken_list !== this.props.medications_taken_list || 
+  	  	nextProps.controlled_uncontrolled_substance !== this.props.controlled_uncontrolled_substance) {
     	  	this.setState({
-    	  		medications_taken_list:nextProps.medications_taken_list
+    	  		medications_taken_list:nextProps.medications_taken_list,
+    	  		controlled_uncontrolled_substance:nextProps.controlled_uncontrolled_substance
     	  	});
     	}
   	}
@@ -79,7 +81,7 @@ export default class PrescriptionMedication extends Component{
 				                        </div>
 				                    }
 				                    {
-	                                  !this.props.editable && 
+	                                  (!this.props.editable && this.props.report_type == 'full') && 
 	                                  <div className="input">
 	                                    <p >{this.state.medications_taken_list}</p>
 	                                  </div>

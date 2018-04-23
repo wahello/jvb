@@ -20,7 +20,6 @@ export function renderWorkoutEffortModal(){
 	 this.state.workout_effort !== "" &&
   	 (this.state.workout_easy === "easy" ||
      this.state.workout_easy === "medium")){
-  	console.log("rendering");
 	const updateState = function(val){
 						  this.setState({
 							workout_effort_hard_portion:val
@@ -113,7 +112,7 @@ export function renderPrescriptionMedication(){
 	 const updateStateCtrlSubs = function(val){
 							  this.setState({
 						   controlled_uncontrolled_substance: val
-							  })}.bind(this);          
+							  })}.bind(this);        
 	  return(
 		  <PrescriptionMedication
 		  medications_taken_list={this.state.medications_taken_list}
