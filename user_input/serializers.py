@@ -108,8 +108,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = UserDailyInput
-		fields = ('user','created_at','updated_at','timezone','strong_input',
-					'encouraged_input','optional_input')
+		fields = ('user','created_at','updated_at','timezone','report_type',
+			'strong_input','encouraged_input','optional_input')
 		
 		# fields = ('user','created_at','updated_at','strong_input','encouraged_input',
 		# 		  'optional_input','third_source_input','goals')
@@ -131,7 +131,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		instance.save()
 			
 	def create(self, validated_data):
-		# pprint.pprint(validated_data)
 		user = self.context['request'].user
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
@@ -179,6 +178,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		optional_data = validated_data.pop('optional_input')
 		# third_source_data = validated_data.pop('third_source_input')
 		# goals_data = validated_data.pop('goals')
+		user_input_data = validated_data
+
+		instance.timezone = user_input_data.get('timezone')
+		instance.report_type = user_input_data.get('report_type')
+		instance.save()
 
 		strong_obj = instance.strong_input
 		self._update_helper(strong_obj, strong_data)

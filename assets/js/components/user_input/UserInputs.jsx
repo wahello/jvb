@@ -157,7 +157,8 @@ class UserInputs extends React.Component{
 
         no_exercise_reason:'',
         no_exercise_comment:'',
-        activities:{}
+        activities:{},
+        report_type:'quick',
 
       };
       return initialState;
@@ -189,6 +190,7 @@ class UserInputs extends React.Component{
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
       this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
       this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
+      this.handleQuickReportPreSubmit = handlers.handleQuickReportPreSubmit.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -370,13 +372,13 @@ class UserInputs extends React.Component{
           update_form:canUpdateForm,
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           travel_purpose_checked:travel_purpose_other ? 'other':data.data.optional_input.travel_purpose,
-
           cloning_data:false,
           fetching_data:false,
           weather_check: has_weather_data,
           calories_item_check:has_calories_data,
           editable: was_cloning ? true : false,
 
+          report_type:data.data.report_type,
           workout:have_strong_input?data.data.strong_input.workout:'',
           no_exercise_reason:have_strong_input?data.data.strong_input.no_exercise_reason:'',
           no_exercise_comment:have_strong_input?data.data.strong_input.no_exercise_comment:'',
@@ -728,6 +730,7 @@ getTotalSleep(){
     }
 
     onUpdate(){
+      this.handleQuickReportPreSubmit();
       this.setState({
         updating_form:true
       },function(){
@@ -737,6 +740,7 @@ getTotalSleep(){
 
     onSubmit(event){
       event.preventDefault();
+      this.handleQuickReportPreSubmit();
       this.setState({
         submitting_form:true
       },function(){
@@ -1205,7 +1209,8 @@ handleScroll() {
                                         </NavItem>
 
                                         <NavItem onClick={this.toggle}>
-                                        <span id="spa">
+                                        <span id="spa"> 
+                                        {(this.state.report_type == 'full') &&
                                           <abbr  id="abbri"  title="Stress/Illness Inputs">
                                             <NavLink id="navlink" href="#" onClick={this.stressTab}>
                                               <FontAwesome
@@ -1214,11 +1219,13 @@ handleScroll() {
                                               />&nbsp; Stress/Illness
                                             </NavLink>
                                           </abbr>
+                                        }
                                           </span>
                                         </NavItem>
 
                                         <NavItem onClick={this.toggle}>
                                         <span id="spa">
+                                        {(this.state.report_type == 'full') &&
                                           <abbr  id="abbri"  title="Extra Inputs">
                                             <NavLink id="navlink" href="#" onClick={this.extraTab}>
                                               <FontAwesome
@@ -1227,6 +1234,7 @@ handleScroll() {
                                               />&nbsp; Extra <b style={{fontWeight:"bold"}}>. . .</b>
                                             </NavLink>
                                           </abbr>
+                                        }
                                           </span>
                                        </NavItem>                                                                                                       
                                   </Nav>
@@ -1279,11 +1287,50 @@ handleScroll() {
                     <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-10 col-sm-12">
                         <Form 
+
                           onSubmit = {this.onSubmit}
                           className="user-inputs-form bootstrap_validator" 
                           role="form" 
                           data-toggle="validator">
-                          {this.state.editable &&
+
+                          <FormGroup>   
+                              {this.state.editable &&
+                                <div className="input">
+                                     <Label check className="btn btn-secondary quickreport_class">
+                                        <Input type="radio" name="report_type" 
+                                        value="quick"
+                                        checked={this.state.report_type === 'quick'}
+                                        onChange={this.handleChange}/>{' '}
+                                        Quick Report
+                                     </Label>
+                                     <Label check className="btn btn-secondary fullreport_class">
+                                       <Input type="radio" name="report_type" 
+                                            value="full"
+                                            checked={this.state.report_type === 'full'}
+                                            onChange={this.handleChange}/>{' '}
+                                          Full Report
+                                    </Label>
+                                </div>  
+                              }
+                              {
+                                !this.state.editable && this.state.report_type == "quick" &&
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Quick Report</span>
+                                </div>
+                              }
+                              {
+                                !this.state.editable && this.state.report_type == "full" &&
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Full Report</span>
+                                </div>
+                              }
+                          </FormGroup>
+
+                          {(this.state.editable && this.state.report_type === "full") &&
                                  <div className="row justify-content-center"> 
                                    <span className="button1">
                                        <Button
@@ -1297,9 +1344,12 @@ handleScroll() {
                                 </div>
                           }
 
-                          <div id="workout">
-                          <h3><strong>Workout Inputs</strong></h3>
+                           
 
+                          <div id="workout">
+                          {(this.state.report_type === 'full') &&<h3><strong>Workout Inputs</strong></h3>}
+
+                          {(this.state.report_type === "full") &&
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
                              <span id="workoutinfo"
@@ -1342,7 +1392,7 @@ handleScroll() {
                                   <p>{this.state.workout}</p>
                                 </div>
                               }
-                          </FormGroup>
+                          </FormGroup>}
                             <Modal 
                             className="pop"
                             id="popover" 
@@ -1375,7 +1425,7 @@ handleScroll() {
                                </div>
                               </ModalBody>
                            </Modal>       
-                           {(this.state.workout === "no") &&
+                           {(this.state.workout === "no") && this.state.report_type == 'full' &&
                           <FormGroup>
                               <Label className="padding">1.0.1 What Was The Reason You Did Not Exercise Today?</Label>
 
@@ -1397,7 +1447,7 @@ handleScroll() {
                                                 <option value="travel day">Travel Day</option>
                                                 <option value="weather">Weather</option>
                                                 <option value="other">Other</option>                                                                                                                                                                            
-                                      </Input>
+                                      </Input>  
                                     </div>
                                   }
                                   {
@@ -1408,7 +1458,7 @@ handleScroll() {
                                 }
                           </FormGroup>
                         }
-                         {(this.state.workout === "no") &&
+                         {(this.state.workout === "no") && this.state.report_type == 'full' &&
                            <FormGroup>      
                             <Label className="padding">1.0.2 No Exercise Reason Comments</Label>
                               {this.state.editable &&
@@ -1429,7 +1479,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.workout === "yes" || this.state.workout === "") &&
+                          {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             <FormGroup>   
                             <Label className="padding">1.1 What Type of Workout Did You Do Today?
                              <span id="workouttypeinfo"
@@ -1510,8 +1560,8 @@ handleScroll() {
                               </ModalBody>
                            </Modal> 
 
-                           {(this.state.workout_type =="strength" || 
-                           this.state.workout_type =="both") &&
+                           {(this.state.workout_type =="strength" ||
+                           this.state.workout_type =="both") && this.state.report_type == 'full' &&
                            <FormGroup>
                             <Label className="padding">1.1.1 Enter the time your strength workout started.</Label>
                             {this.state.editable &&
@@ -1576,6 +1626,7 @@ handleScroll() {
                             </FormGroup> 
                         
                          {(this.state.workout_type =="strength" ||  this.state.workout_type == "both") &&
+                         this.state.report_type == 'full' &&
                          <FormGroup>
                             <Label className="padding">1.1.2 Enter the Time your Strength Workout Ended.</Label>
                             {this.state.editable &&
@@ -1639,9 +1690,9 @@ handleScroll() {
 
                         
 
-                            {(this.state.workout == "yes" || this.state.workout == "") &&
+                            {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                               <FormGroup>   
-                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard”?
+                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard?
                                 <span id="easyorhard"
                              onClick={this.toggleEasyorHard} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -1739,7 +1790,7 @@ handleScroll() {
                            </Modal> 
 
 
-                        { (this.state.workout == "yes" || this.state.workout == "") &&
+                        {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                           <FormGroup>   
                               <Label className="padding">1.3 Was Your Workout Today Enjoyable?
                               <span id="enjoyble"
@@ -1802,7 +1853,7 @@ handleScroll() {
                                       </ModalBody>
                                    </Modal> 
 
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             <FormGroup>   
                               <Label className="padding">1.4 Your Workout Effort Level? (with 1 being the easiest and 10 the hardest)
                                <span id="workoutlevel"
@@ -1876,7 +1927,7 @@ handleScroll() {
                                       </ModalBody>
                                    </Modal> 
 
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                           <FormGroup>
                             <Label className="padding">1.5 Did You Have Any Pain or Twinges During or After Your Workout?
                              <span id="pain"
@@ -1952,7 +2003,7 @@ handleScroll() {
                            </Modal> 
 
 
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                           <FormGroup>    
@@ -2022,7 +2073,7 @@ handleScroll() {
                            </Modal> 
 
                           
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&    
                           <FormGroup>      
@@ -2096,7 +2147,7 @@ handleScroll() {
                            </Modal> 
 
                         
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&  
                             <FormGroup>
@@ -2173,7 +2224,7 @@ handleScroll() {
                               </ModalBody>
                            </Modal>       
                            
-                          { (this.state.workout == "yes" || this.state.workout == "") &&
+                          { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
@@ -2259,7 +2310,7 @@ handleScroll() {
 
 
 
-                        { (this.state.workout === "yes" || this.state.workout === "") &&     
+                        {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&     
                           <FormGroup>      
                             <Label className="padding">
                               {(this.state.workout_type === 'strength' ||
@@ -2321,7 +2372,7 @@ handleScroll() {
                               </ModalBody>
                            </Modal> 
 
-                        { (this.state.workout === "yes" || this.state.workout === "") &&
+                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             <FormGroup>  
                               {this.state.editable &&
                                 <div className="input1">
@@ -2400,7 +2451,7 @@ handleScroll() {
                            </Modal> 
                          
                         <Collapse isOpen={this.state.weather_check}>
-                         { (this.state.workout === "yes" || this.state.workout === "") &&                                                      
+                         { (this.state.workout === "yes" || this.state.workout === "") &&  this.state.report_type == 'full' &&                                                    
                          <FormGroup>                          
                             <Label className="padding">1.11.1 What was the temperature (in degree celsius)
                              when I did my workout (get from weather apps)?</Label>
@@ -2444,7 +2495,7 @@ handleScroll() {
                           </FormGroup>
                         }
 
-                         { (this.state.workout === "yes" || this.state.workout === "") &&  
+                         { (this.state.workout === "yes" || this.state.workout === "") &&  this.state.report_type == 'full' &&
                           <FormGroup>
                             <Label className="padding">1.11.2 What was the dew point when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
@@ -2468,7 +2519,7 @@ handleScroll() {
                           </FormGroup> 
                        }
 
-                        { (this.state.workout === "yes" || this.state.workout === "") && 
+                        { (this.state.workout === "yes" || this.state.workout === "") && this.state.report_type == 'full' &&
                         <FormGroup>
                             <Label className="padding">1.11.3  What was the humidity when I did my workout (get from weather apps)? </Label>
                             {this.state.editable &&
@@ -2492,7 +2543,7 @@ handleScroll() {
                           </FormGroup>  
                         }
 
-                         { (this.state.workout === "yes" || this.state.workout === "") &&  
+                         { (this.state.workout === "yes" || this.state.workout === "") &&  this.state.report_type == 'full' &&
                           <FormGroup>
                             <Label className="padding">1.11.4 What was the wind when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
@@ -2516,7 +2567,7 @@ handleScroll() {
                           </FormGroup> 
                        }
 
-                        { (this.state.workout === "yes" || this.state.workout === "") &&  
+                        { (this.state.workout === "yes" || this.state.workout === "") &&  this.state.report_type == 'full' &&
                           <FormGroup>
                             <Label className="padding">1.11.5 What was the Temperature Feels Like when I did my workout (get from weather apps)?</Label>
                             {this.state.editable &&
@@ -2541,7 +2592,7 @@ handleScroll() {
                        }
 
 
-                         { (this.state.workout === "yes" || this.state.workout === "") &&
+                         { (this.state.workout === "yes" || this.state.workout === "") && this.state.report_type == 'full' &&
                           <FormGroup>      
                             <Label className="padding">1.11.6  Weather Comments (allow the user to enter text with comments)</Label>
                             {this.state.editable &&
@@ -2565,7 +2616,7 @@ handleScroll() {
                            
                             
                       
-                        { (this.state.workout == "yes" || this.state.workout == "") &&
+                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                           <FormGroup>   
                               <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
                               information button for instructions about how to record this)?
@@ -2654,7 +2705,7 @@ handleScroll() {
                               </ModalBody>
                            </Modal> 
                          
-                         { (this.state.workout == "yes" || this.state.workout == "") &&
+                         { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" &&
                         <FormGroup>
@@ -2686,8 +2737,8 @@ handleScroll() {
                         <Collapse isOpen={this.state.calories_item_check}>
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
-                            this.state.workout_input_type !== "strength" &&
-                            
+                            this.state.workout_input_type !== "strength" && this.state.report_type == 'full' &&
+                             
                           <FormGroup>      
                             <Label className="padding">1.13 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
@@ -2709,7 +2760,7 @@ handleScroll() {
                                                 
                           { (this.state.workout == "yes" || this.state.workout == "") &&
                             this.state.workout_type !== "strength" &&
-                            this.state.workout_input_type !== "strength" &&
+                            this.state.workout_input_type !== "strength" && this.state.report_type == 'full' &&
                           <FormGroup>      
                             <Label className="padding">1.14 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
@@ -2967,7 +3018,7 @@ handleScroll() {
                             }                          
                           </FormGroup>
                          
-
+                          {(this.state.report_type === "full") && 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>
                               {this.state.editable &&
@@ -2987,7 +3038,7 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-                           
+                           }
                            
                            <FormGroup>
                              <Label className="padding">4. Did you take any prescription or non prescription Sleep Aids Last Night (if you took Melatonin, select “No”)</Label>
@@ -3019,10 +3070,11 @@ handleScroll() {
                                 </div>
                               }
                               </FormGroup>
-                             
+                             {this.state.report_type == 'full' &&
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionSleepAids()}
                               </FormGroup>
+                            }
                           </div>
                         
                          
@@ -3067,9 +3119,11 @@ handleScroll() {
                                   <p>{this.state.prcnt_processed_food}</p>
                                 </div>
                               }
+                              {this.state.report_type == 'full' &&
                             <FormGroup id="padd"> 
                             {this.renderProcessedFoodModal()}
                             </FormGroup>
+                          }
                           </FormGroup>
                            <Modal
                            id="popover" 
@@ -3236,9 +3290,11 @@ handleScroll() {
                                           this.state.alchol_consumed }</p>
                                     </div>
                                   }
+                                  { this.state.report_type == 'full' &&
                                   <FormGroup id="padd"> 
                                     {this.renderAlcoholModal()}
                                   </FormGroup>
+                                }
                           </FormGroup>
                           <Modal
                            id="popover" 
@@ -3313,12 +3369,13 @@ handleScroll() {
                                 <p>{this.state.smoke_substances}</p>
                               </div>
                             }
-
+                            {this.state.report_type == 'full' &&
                             <FormGroup id="padd"> 
                             {this.renderSmokeSubstance()}   
-                            </FormGroup>    
+                            </FormGroup> 
+                            }   
                           </FormGroup>
-
+                          {this.state.report_type === 'full' &&
                            <FormGroup>
                               <Label className="padding">8. Did You Take Any Prescription or Non Prescription Medications or Supplements Yesterday?</Label>
                                 {this.state.editable &&
@@ -3349,13 +3406,19 @@ handleScroll() {
                                   </div>
                                 }
                                  </FormGroup> 
+                               }
                               <FormGroup id="padd"> 
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
                                </div>
+
+
+                          
          
                           <div id="stress">
-                           <h3><strong>Stress/Illness Inputs</strong></h3>
+                          {(this.state.report_type === 'full') &&
+                           <h3><strong>Stress/Illness Inputs</strong></h3>}
+                          {(this.state.report_type === 'full') &&
                           <FormGroup>
                             <Label className="padding">9. Yesterday's Stress Level</Label>
                               {this.state.editable &&
@@ -3393,7 +3456,8 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-
+                        }
+                        {(this.state.report_type === 'full') && 
                           <FormGroup>
                             <Label className="padding">10. Are You Sick Today?</Label>
                             {this.state.editable &&
@@ -3424,13 +3488,18 @@ handleScroll() {
                               </div>
                             }
                             </FormGroup>
+                          }
+                          {(this.state.report_type === 'full') &&
                             <FormGroup id="padd"> 
                             {this.renderPainSick()}
                             </FormGroup>
+                          }
                             </div>
 
                            <div id="daily">
-                          <h3><strong>Extra Inputs</strong></h3>
+
+                          {(this.state.report_type === 'full') &&<h3><strong>Extra Inputs</strong></h3>}
+                          {(this.state.report_type === 'full') &&
                           <FormGroup>
                             <Label className="padding">11. Weight (Pounds)</Label>
                             {this.state.editable &&
@@ -3454,8 +3523,8 @@ handleScroll() {
                               </div>
                             }
                           </FormGroup>
-
-                          { this.state.gender === 'M' &&
+                        }
+                          {(this.state.gender === 'M' && (this.state.report_type === 'full')) &&
                             <FormGroup>       
                               <Label className="padding">12. Waist Size (Male)</Label>
                               {this.state.editable &&
@@ -3479,8 +3548,8 @@ handleScroll() {
                             </FormGroup>
                           }
 
-                          { this.state.gender === 'F' &&
-                            <FormGroup>
+                         {(this.state.report_type === 'full') && (this.state.gender === 'F') &&
+                             <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
                               {this.state.editable &&
                                 <div className="input1">
@@ -3502,7 +3571,7 @@ handleScroll() {
                               }
                             </FormGroup>
                           }
-
+                          {(this.state.report_type === 'full') &&
                           <FormGroup>
                               <Label className="padding">13. What Type Of Diet Do You Eat?</Label>
 
@@ -3537,8 +3606,8 @@ handleScroll() {
                                {this.renderDietType()}
                                </FormGroup>
                           </FormGroup>
-                        
-
+                        }
+                          {(this.state.report_type === 'full') &&
                            <FormGroup>     
                             <Label className="padding">14. Did You Stand For 3 Hours or More Yesterday? </Label>
 
@@ -3570,7 +3639,8 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-
+                        }
+                        {(this.state.report_type === 'full') &&
                           <FormGroup>     
                             <Label className="padding">15. Did you travel somewhere today and/or spend the day today away from the city you live in? </Label>
 
@@ -3600,8 +3670,8 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
-
-                          {(this.state.travel == "yes") &&
+                        }
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                           <FormGroup>      
                             <Label className="padding">15.1 Where did you travel to or stay?</Label>
                               {this.state.editable &&
@@ -3621,7 +3691,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                            <FormGroup>   
                             <Label className="padding">15.2 Was your Travel for work, vacation, or other?</Label>
                             {this.state.editable &&
@@ -3658,7 +3728,7 @@ handleScroll() {
                           </FormGroup>
                         }
                         {
-                         (this.state.travel_purpose_checked == "other") &&
+                         (this.state.travel_purpose_checked == "other") && (this.state.report_type == 'full') &&
                           <FormGroup>              
                               {this.state.editable &&
                                 <div className="input1">
@@ -3678,6 +3748,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
+                        {(this.state.report_type === 'full') &&
                            <FormGroup>      
                             <Label className="padding">16. General Comments</Label>
                               {this.state.editable &&
@@ -3697,6 +3768,7 @@ handleScroll() {
                                 </div>
                               }
                           </FormGroup>
+                        }
                           </div>
 
                           { (!this.state.update_form && this.state.editable) &&

@@ -645,7 +645,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 			obj_act = obj.get('activityType')
 
 			activities_duration[obj['activityType']] = obj.get('durationInSeconds',0)
-			
+			print(activities_hr)
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = {}
 				activities_hr[obj_act]['hr'] = 0
@@ -731,7 +731,8 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleeps_today_json,
 					user_input_todays_bedtime,user_input_bedtime = None,
 					user_input_awake_time = None,user_input_timezone = None,
-					user_input_strength_start_time=None,user_input_strength_end_time=None):
+					user_input_strength_start_time=None,user_input_strength_end_time=None,
+					):
 	
 	'''
 		Calculate the movement consistency summary
@@ -1451,7 +1452,26 @@ def did_workout_today(have_activities,user_did_workout):
 		return "yes"
 	else:
 		return ""
-
+# def movement_consistency_cal(todays_activities,todays_manually_updated_json,todays_manually_updated):
+# 	if len(todays_activities):
+# 		for obj in todays_activities:
+# 			if (obj['summaryId']== x for x in todays_manually_updated_json['summaryId']):
+# 				start_time=todays_manually_updated['startTimeInSeconds']
+# 				end_time=todays_manually_updated['startTimeInSeconds']+todays_manually_updated_json['durationInSeconds']
+# 				time_interval = start_time.strftime("%I:00 %p")+" to "+start_time.strftime("%I:59 %p")
+# 				todays_manually_updated['activityType']
+# 				if todays_manually_updated('durationInSeconds')<=900:
+# 					print('inactive')
+# 					print(todays_manually_updated)	
+# 				else:
+# 					start_time=todays_activities['startTimeInSeconds']
+# 					end_time=todays_activities['startTimeInSeconds']+todays_activities['durationInSeconds']
+# 					time_interval = start_time.strftime("%I:00 %p")+" to "+start_time.strftime("%I:59 %p")
+# 					activity=todays_activities['activityType']
+# 					if todays_activities('durationInSeconds')<=900:
+# 						print('inactive')
+# 					print(todays_activities)
+# 		return (start_time,end_time)
 
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -1495,7 +1515,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Already parsed from json to python objects
 		weekly_manual_activities = get_weekly_data(manually_updated,current_date,last_seven_days_date)
-		
 		todays_manually_updated = weekly_manual_activities.get(current_date.strftime('%Y-%m-%d'))
 
 		# pull data for past 7 days (incuding today)
@@ -1760,6 +1779,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 									  	user_input_timezone = user_input_timezone,
 									  	user_input_strength_start_time = user_input_strength_start_time,
 									  	user_input_strength_end_time = user_input_strength_end_time)
+		# movement_constency1 = movement_consistency_cal(todays_activities=todays_activities,
+		# 											todays_manually_updated_json=todays_manually_updated_json,
+		# 											todays_manually_updated=todays_manually_updated)
 		if movement_consistency_summary:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
 			inactive_hours = movement_consistency_summary.get("inactive_hours")
@@ -1829,5 +1851,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		SERIALIZED_DATA.append(UserQuickLookSerializer(user_ql).data)
 		#Add one day to current date
 		current_date += timedelta(days=1)
-
+		
 	return SERIALIZED_DATA
+
+	
+	

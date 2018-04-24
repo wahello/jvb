@@ -21,6 +21,7 @@ class AllRank_Data extends Component{
 		this.renderTable = this.renderTable.bind(this);
 		this.handleLogout = this.handleLogout.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.renderHeader =this.renderHeader.bind(this);
 	}
 	 handleLogout(){
     	this.props.logoutUser(this.onLogoutSuccess);
@@ -30,18 +31,28 @@ class AllRank_Data extends Component{
 	      isOpen: !this.state.isOpen,
 	    });
   	}
+  	renderHeader(value){
+
+  		let head = [];
+ 	let category_head = ["category"];
+ 	for (let [key,value6] of Object.entries(value)){
+ 			for(let cat of category_head){
+ 				head.push(value6[cat]);
+ 				console.log("********",head);
+ 			}
+ 	}
+ 	return head;
+  	}
 	renderTable(data){
 		let rowData = [];
-		let category = ["username","score","category","rank"];
+		let category = ["rank","username","score"];
 		let keys = [];
 		
-		for (let [key,value] of Object.entries(data)){
-				for (let [key1,value1] of Object.entries(value)){
+				for (let [key1,value1] of Object.entries(data)){
 					let values =[];
 					for (let cat of category){
 						if(cat == "score"){
 							let value = value1[cat];
-							console.log("************",value);
 							if(value != undefined){
 				                value += '';
 				                var x = value.split('.');
@@ -59,7 +70,6 @@ class AllRank_Data extends Component{
 						}
 					}
 				rowData.push(<tr className = "progress_table">{values}</tr>);
-			}
 		}
 		
 		return rowData;
@@ -86,14 +96,17 @@ class AllRank_Data extends Component{
 		               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
 		            </NavbarBrand>
 		          </Link>
-		            <span id="header">
-		            <h2 className="head" id="head">
-		            </h2>
+		            <span id="lbheader">
+		            <h4 className="lbhead" id="head">{this.props.location.state.lbCatgName}
+		            </h4>
 		            </span>
 		          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
 		            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
 		              <NavItem className="float-sm-right">
-		                <Link id="logout"className="nav-link" to='/leaderboard'>Leader Board</Link>
+		                <Link id="logout"className="nav-link" to='/leaderboard'>My Ranking</Link>
+		              </NavItem>
+		              <NavItem className="float-sm-right">
+		                <Link id="logout"className="nav-link" to='/'>Home</Link>
 		              </NavItem>
 		               <NavItem className="float-sm-right">
 		                   <NavLink
@@ -111,13 +124,12 @@ class AllRank_Data extends Component{
 					<div className = "table table-responsive ">
     				<table className = "table table-striped table-bordered"> 
 						<thead className = "progress_table">
-							<th className = "progress_table">Username</th>
-							<th className = "progress_table">Score</th>
-							<th className = "progress_table">Category</th>
 							<th className = "progress_table">Rank</th>
+							<th className = "progress_table">Username</th>
+							<th className = "progress_table">Score</th>				
 						</thead>
 						<tbody className = "progress_table">
-							{this.renderTable(this.props.location.state)}
+							{this.renderTable(this.props.location.state.lbCatgData)}
 						</tbody>
 					</table>
 					</div>

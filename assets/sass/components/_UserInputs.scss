@@ -71,7 +71,7 @@ padding-top: 10px;
 	height: 28px;
 }
 #user-inputs .user-inputs-form .button1{
-margin-top: 46px;
+margin-top: 0px;
 }
 #user-inputs .user-inputs-form .padding{
 	padding: 10px;
@@ -370,6 +370,28 @@ margin-left:2%;
 	}
 	#abbri{
 		text-decoration: none;
+	}
+	.quickreport_class{
+		background-color: #f4f5f5;
+		margin:15px 0px 20px 100px;
+		padding-left: 29px;
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 16px;
+		color:#5e5e5e;
+		border-collapse: collapse;
+	    border-color: #f4f5f5;
+	}
+	.fullreport_class{
+		background-color: #f4f5f5;
+		margin:15px 0px 20px 130px;
+		padding-left: 29px;
+		font-family: Proxima-Nova;
+		font-style: normal;
+		font-size: 16px;
+		color:#5e5e5e;
+		border-collapse: collapse;
+	    border-color: #f4f5f5;
 	}
 	.radio1{
 		background-color: #f4f5f5;

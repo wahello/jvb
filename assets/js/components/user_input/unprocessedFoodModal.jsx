@@ -55,8 +55,9 @@ export default class UnprocesedFoodModal extends Component{
 			<div>
 				<Collapse isOpen={this.state.collapse}>				
 						<FormGroup>   
-                            	{this.props.editable &&
+                            	{this.props.editable && 
                             		<div>
+                            		
                             		 <Label className="LAbel">5.1 What Processed Food were Consumed?</Label>
 											<div className="input1">	
 					                            <Textarea 

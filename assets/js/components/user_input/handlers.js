@@ -4,7 +4,7 @@ export function handleChange(event){
   const name = target.name;
   this.setState({
 	[name]: value
-  });
+  }); 
 }
 
 
@@ -59,7 +59,6 @@ export function handleChangeSleepBedTime(date){
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
 
-      console.log(mins);
       this.setState({
         sleep_hours_last_night:hours,
         sleep_mins_last_night:mins
@@ -98,11 +97,8 @@ export function handleChangeSleepAwakeTime(date){
     {  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
-      console.log(hours);
-
-      console.log(mins);
       this.setState({
-        sleep_hours_last_night:hours,
+        sleep_hours_last_night:hours, 
         sleep_mins_last_night:mins
       })
     }
@@ -428,5 +424,77 @@ else{
    no_exercise_reason:value,
   });
 }
+}
+
+export function handleQuickReportPreSubmit(){
+  if(this.state.report_type == 'quick'){
+    this.setState({
+      workout:'',
+      no_exercise_reason:'',
+      no_exercise_comment:'',
+      workout_type:'',
+      strength_workout_start_hour:'',
+      strength_workout_start_min:'',
+      strength_workout_start_am_pm:'',
+      strength_workout_end_hour:'',
+      strength_workout_end_min:'',
+      strength_workout_end_am_pm:'',
+      workout_input_type:'',
+      workout_easy:'',
+      workout_effort:'',
+      workout_effort_hard_portion:'',
+      unprocessed_food_list:'',
+      processed_food_list:'',
+      alcohol_drink_consumed_list:'',
+      sleep_comment:'',
+      sleep_aid_taken:'',
+      smoked_substance_list:'',
+      medications:'',
+      medications_taken_list:'',
+      indoor_temperature:'',
+      outdoor_temperature:'',
+      temperature_feels_like:'',
+      wind:'',
+      dewpoint:'',
+      humidity:'',
+      weather_comment:'',
+      stress:'',
+      pain:'',
+      water_consumed:'',
+      breath_nose:'',
+      pain_area:'',
+      measured_hr:'',
+      hr_down_99:'',
+      time_to_99_min:'',
+      time_to_99_sec:'',
+      hr_level:'',
+      lowest_hr_first_minute:'',
+      lowest_hr_during_hrr:'',
+      time_to_lowest_point_sec:'',
+      time_to_lowest_point_min:'',
+      food_consumed:'',
+      chia_seeds:'',
+      fasted:'',
+      food_ate_before_workout:'',
+      calories:'',
+      calories_item:'',
+      workout_enjoyable:'',
+      workout_comment:'',
+      weight:'',
+      waist:'',
+      clothes_size:'',
+      heart_variability:'',
+      sick:'',
+      sickness:'',
+      stand:'',
+      breath_sleep:'',
+      breath_day:'',
+      diet_type:'',
+      travel:'',
+      travel_destination:'',
+      travel_purpose:'',
+      general_comment:''
+    });
+  }
 }
 

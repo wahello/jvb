@@ -1,4 +1,5 @@
 from .base import *  # noqa
+# from celery.schedules import crontab
 
 
 DEBUG = True
@@ -28,6 +29,19 @@ AUTH_PASSWORD_VALIDATORS = []  # allow easy passwords only on local
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+# CELERY_TIMEZONE = 'Asia/Calcutta'
+# CELERY_BEAT_SCHEDULE = {
+#     #execute every day at 1:00 AM EST (America/New_york)
+#     'create-cumulative-sum':{
+#         'task':'progress_analyzer.generate_cumulative_instances',
+#         'schedule':crontab(minute=0, hour=1)
+#     },
+#     #execute every day at 2:00 AM EST (America/New_york)
+#     'update-obsolete-progress-analyzer-report':{
+#         'task':'progress_analyzer.update_obsolete_pa_reports',
+#         'schedule':crontab(minute=2, hour=19)
+#     }
+# }
 
 # Email
 INSTALLED_APPS += ('naomi',)

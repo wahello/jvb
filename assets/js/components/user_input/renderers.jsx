@@ -18,8 +18,8 @@ import Hrr from './HRR';
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" &&  
 	 this.state.workout_effort !== "" &&
-  	 this.state.workout_easy === "easy"){
-  	console.log("rendering");
+  	 (this.state.workout_easy === "easy" ||
+     this.state.workout_easy === "medium")){
 	const updateState = function(val){
 						  this.setState({
 							workout_effort_hard_portion:val
@@ -103,7 +103,7 @@ export function renderFasted(){
 
 
 export function renderPrescriptionMedication(){
-	if(this.state. medications === 'yes'){
+	if((this.state.medications === 'yes') || (this.state.report_type == 'quick')){
 	 const updateStateMedication = function(val){
 							  this.setState({
 						   medications_taken_list: val
@@ -112,7 +112,7 @@ export function renderPrescriptionMedication(){
 	 const updateStateCtrlSubs = function(val){
 							  this.setState({
 						   controlled_uncontrolled_substance: val
-							  })}.bind(this);          
+							  })}.bind(this);        
 	  return(
 		  <PrescriptionMedication
 		  medications_taken_list={this.state.medications_taken_list}
@@ -120,6 +120,7 @@ export function renderPrescriptionMedication(){
 		  updateStateMedication={updateStateMedication}
 		  updateStateCtrlSubs={updateStateCtrlSubs}
 		  editable = {this.state.editable}
+		  report_type = {this.state.report_type}
 		  />
 		);
 	  }

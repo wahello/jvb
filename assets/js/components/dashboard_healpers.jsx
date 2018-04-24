@@ -92,3 +92,26 @@ export function renderProgressSelectedDateFetchOverlay(){
 		);
 	}
 }
+
+export function renderAerobicSelectedDateFetchOverlay(){
+	if(this.state.fetching_aerobic){
+		let selectedDate = moment(this.state.selectedDate);
+		
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Heartrate Aerobic/Anaerobic Ranges Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
