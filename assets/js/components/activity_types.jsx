@@ -7,9 +7,11 @@ import CalendarWidget from 'react-calendar-widget';
 import fetchActivity from '../network/activity';
 import FontAwesome from "react-fontawesome";
 import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'; 
 
 
-const activites = { "":"SELECT",
+const activites = { "":"Select",
   //"ALL":"ALL",
 "OTHER":"OTHER",
 "HEART_RATE_RECOVERY":"HEART RATE RECOVERY(HRR)",
@@ -81,7 +83,10 @@ calendarOpen:false,
 selected_date:new Date(),
 activites:{},
 activities_edit_mode:{},
+activityEditModeState_modal:{},
 activites_hour_min:{},
+start_end_time:{},
+activities_to_delete:{},
 modal_activity_type:"",
 modal_activity_id:"",
 modal_activity_heart_rate:"",
@@ -93,6 +98,33 @@ editToggle_heartrate:false,
 editToggle_comments:false,
 editToggle_time:false,
 changevalue: '',
+workout_start_time:null,
+ modal: false,
+ modal_start_time:false,
+ activity_calender:moment(),
+ end_time_hours:null,
+ end_time_min: null,
+ end_time_am_pm:null,
+ end_time_total_time:null,
+ activitystarttime_calender:moment(),
+start_time_hours:null,
+start_time_min:null,
+start_time_am_pm:null,
+start_time_total_time:null,
+activitystarttime_calender:moment(),
+modalstarttime_activity_hour:"",
+modalstarttime_activity_min:"",
+modalstarttime_activity_ampm:"",
+activityendtime_calender:moment(),
+modalendtime_activity_hour:"",
+modalendtime_activity_min:"",
+modalendtime_activity_ampm:"",
+button_state: "",
+ checkboxState: true,
+ modal_delete:false,
+ getselectedid:'',
+ selectedId_starttime:'',
+ selectedId_delete:'',
 }
 this.errorActivity = this.errorActivity.bind(this);
 this.sucessActivity = this.sucessActivity.bind(this);
@@ -103,8 +135,8 @@ this.handleChange_activity = this.handleChange_activity.bind(this);
 this.handleChange_heartrate = this.handleChange_heartrate.bind(this);
 this.handleChange_time = this.handleChange_time.bind(this);
 this.handleChange_comments = this.handleChange_comments.bind(this);
-            //this.handleChange_mins=this.handleChange_mins.bind(this);
-            //this.handleChange_hours=this.handleChange_hours.bind(this);
+this.handleChange_start_time=this.handleChange_start_time.bind(this);
+this.handleChange_end_time=this.handleChange_end_time.bind(this);          
 this.createSleepDropdown = this.createSleepDropdown.bind(this);
 this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
 this.renderTable = this.renderTable.bind(this);
@@ -113,7 +145,80 @@ this.handleChangeModal = this.handleChangeModal.bind(this);
 this.onClickEditActivityModalSave = this.onClickEditActivityModalSave.bind(this);
 this.toggleCalendar = this.toggleCalendar.bind(this);
 this.activitySelectOptions = this.activitySelectOptions.bind(this);
+this.toggle = this.toggle.bind(this);
+this.handleChangeActivityCalendar = this.handleChangeActivityCalendar.bind(this);
+this.EndTimeInSecondsSaveHour = this.EndTimeInSecondsSaveHour.bind(this);
+this.EndTimeInSecondsSavemin = this.EndTimeInSecondsSavemin.bind(this);
+this.EndTimeInSecondsSaveAMPM = this.EndTimeInSecondsSaveAMPM.bind(this);
+this.editTimeSecondsSaveModel = this.editTimeSecondsSaveModel.bind(this);
+this.toggle_starttime=this.toggle_starttime.bind(this);
+this.handleChangeActivityStartTimeCalendar=this.handleChangeActivityStartTimeCalendar.bind(this);
+this.StartTimeInSecondsSaveHour=this.StartTimeInSecondsSaveHour.bind(this);
+this.StartTimeInSecondsSavemin=this.StartTimeInSecondsSavemin.bind(this);
+this.StartTimeInSecondsSaveAMPM=this.StartTimeInSecondsSaveAMPM.bind(this);
+this.editStartTimeSecondsSaveModel=this.editStartTimeSecondsSaveModel.bind(this);
+this.Delete_Activity=this.Delete_Activity.bind(this);
+this.checkBox=this.checkBox.bind(this);
+this.toggle_delete=this.toggle_delete.bind(this);
 }
+
+ checkBox(event) {
+   const target = event.target;
+          const selectedActivityId = target.getAttribute('data-name');
+    if(!this.state.checkboxState){
+    
+    }
+    else{
+
+      
+     const SelectedRow = delete this.state.activites[selectedActivityId]
+     
+    }
+    this.setState({
+      checkboxState: !this.state.checkboxState
+    });
+    this.toggle_delete(event);
+   
+  }
+
+ 
+
+ Delete_Activity(event) {
+    
+                          
+    }
+
+
+toggle_delete(event){
+  const target = event.target;
+  const selectedActivityId = target.getAttribute('data-name');
+  this.setState({
+    modal_delete:!this.state.modal_delete,
+        selectedId_delete:selectedActivityId
+
+  });
+}
+
+ toggle(event) {
+  const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    this.setState({
+      modal: !this.state.modal,
+      getselectedid: selectedActivityId
+
+    });
+    
+
+     
+  }
+  toggle_starttime(event){
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    this.setState({
+     modal_start_time:! this.state.modal_start_time ,
+     selectedId_starttime: selectedActivityId  
+    });
+  }
 
 secondsToHourMinStr(durationInSeconds){
 let time = "0:00";
@@ -127,6 +232,14 @@ time = hour + ":" + mins;
 return time;
 }
 
+convertingStartEndTime(start_end_time){
+  if(start_end_time){
+    let starttime=moment.unix(start_end_time);
+    var totalTime=moment(starttime, "x").format("DD MMM YYYY hh:mm a");
+  }
+  return totalTime;    
+}
+
 createActivityEditModeState(activityData){
 let activityEditModeState = {}
 for(let [id,data] of Object.entries(activityData)){
@@ -137,6 +250,9 @@ activityEditModeState[id] = tmp;
 }
 return activityEditModeState;
 }
+ 
+
+
 
 
 createActivityTime(activityData){
@@ -150,22 +266,56 @@ let tmp = {
 "duration_hour":duration_hour,
 "duration_min":duration_min
 };
+
 activites_hour_min[id] = tmp;
 }
-console.log("Activities hour min state:",activites_hour_min);
+return activites_hour_min;
+
+}
+
+createActivityTime_modal(activityData){
+let activites_hour_min_modal = {}
+for(let [id,data] of Object.entries(activityData)){
+let durationInHourMin_modal = this.secondsToHourMinStr(data["durationInSeconds"]);
+let duration_hour_modal = durationInHourMin.split(":")[0];
+let duration_min_modal = durationInHourMin.split(":")[1];
+let tmp = {
+"durationInSeconds":data["durationInSeconds"],
+"duration_hour":duration_hour,
+"duration_min":duration_min
+};
+activites_hour_min[id] = tmp;
+}
 return activites_hour_min;
 }
 
+
+createStartAndEndTime(activityData){
+let start_end_time= {}
+for(let [id,data] of Object.entries(activityData)){
+let start_time_seconds = this.convertingStartEndTime(data["startTimeInSeconds"]);
+let end_time_seconds= this.convertingStartEndTime(data["endTimeInSeconds"]);
+let tmp = {
+"start_time_seconds":start_time_seconds,
+"end_time_seconds":end_time_seconds
+};
+
+start_end_time[id] = tmp;
+}
+return start_end_time;
+}
 
 sucessActivity(data){
     this.setState({
       selected_date:this.state.selected_date,
       activities_edit_mode:this.createActivityEditModeState(data.data.activites),
       activites_hour_min:this.createActivityTime(data.data.activites),
+      start_end_time:this.createStartAndEndTime(data.data.activites),
       activites:data.data.activites,
-      activity_hours_mins:data.data.activites,
+      //activity_hours_mins:data.data.activites,
+      //start_end_time:data.data.activites,
     });
-    console.log("data", this.state.activites);
+
   }
 
   errorActivity(error){
@@ -183,19 +333,28 @@ fetchActivity(date,this.sucessActivity,this.errorActivity);
 componentDidMount(){
     fetchActivity(this.state.selected_date,this.sucessActivity, this.errorActivity)
 }
-toggleCalendar(){
+toggleCalendar(event){
+ 
 this.setState({
 calendarOpen:!this.state.calendarOpen
 })
 }
 toggleModal(){
     this.setState({
-   modal_activity_type:"",
-modal_activity_heart_rate:"",
-modal_activity_hour:"",
-modal_activity_min:"",
-modal_activity_comment:"",
+      modal_activity_type:"",
+      modal_activity_heart_rate:"",
+      modal_activity_hour:"",
+      modal_activity_min:"",
+      modal_activity_comment:"",
       selectedActivityId:"",
+      activitystarttime_calender:"",
+      modalstarttime_activity_hour:"",
+      modalstarttime_activity_min:"",
+      modalstarttime_activity_ampm:"",
+      activityendtime_calender:"",
+      modalendtime_activity_hour:"",
+      modalendtime_activity_min:"",
+      modalendtime_activity_ampm:"",
       activityEditModal:!this.state.activityEditModal
     });
   }
@@ -237,6 +396,7 @@ mins = (mins && mins < 10) ? "0" + mins : mins;
       modal_activity_hour:hour,
       modal_activity_min:mins,
       modal_activity_comment:current_activity?current_activity.comments:"",
+
       selectedActivityId:selectedActivityId,
       activityEditModal:true,
       });
@@ -246,19 +406,16 @@ mins = (mins && mins < 10) ? "0" + mins : mins;
     const target = event.target;
       const selectedActivityId = target.getAttribute('data-name');
       let activity_time=this.state.activites_hour_min[selectedActivityId];
-      console.log("activity_time",activity_time);
       let categoryMode = this.state.activities_edit_mode[selectedActivityId];
 
       categoryMode['activityType'] = !categoryMode['activityType'] 
-      console.log("cat"+categoryMode['activityType']);
       if(selectedActivityId){
     this.setState({
     ...this.state.activities_edit_mode,
         [selectedActivityId]:categoryMode
       });
-           
-            }
-     }
+    }
+  }
 
 
 
@@ -269,7 +426,6 @@ const selectedActivityId = target.getAttribute('data-name');
   let categoryMode = this.state.activities_edit_mode[selectedActivityId];
             
       categoryMode['averageHeartRateInBeatsPerMinute'] = !categoryMode['averageHeartRateInBeatsPerMinute'] 
-      console.log("cat"+categoryMode['averageHeartRateInBeatsPerMinute']);
 if(selectedActivityId){
     this.setState({
     ...this.state.activities_edit_mode,
@@ -279,28 +435,13 @@ if(selectedActivityId){
   }
 }
 
-editToggleHandler_start_time(event){
-            const target = event.target;
-const selectedActivityId = target.getAttribute('data-name');
-  let categoryMode = this.state.activities_edit_mode[selectedActivityId];
-            
-      categoryMode['startTimeInSeconds'] = !categoryMode['startTimeInSeconds'] 
-      console.log("cat"+categoryMode['startTimeInSeconds']);
-if(selectedActivityId){
-    this.setState({
-    ...this.state.activities_edit_mode,
-        [selectedActivityId]:categoryMode
-      });
-   
-  }
-}
+
 editToggleHandler_end_time(event){
             const target = event.target;
 const selectedActivityId = target.getAttribute('data-name');
   let categoryMode = this.state.activities_edit_mode[selectedActivityId];
             
       categoryMode['endTimeInSeconds'] = !categoryMode['endTimeInSeconds'] 
-      console.log("cat"+categoryMode['endTimeInSeconds']);
 if(selectedActivityId){
     this.setState({
     ...this.state.activities_edit_mode,
@@ -315,11 +456,9 @@ if(selectedActivityId){
   $('#'+selectedActivityId,).css('display','block');
   const target = event.target;
    const selectedActivityId = target.getAttribute('data-name');
-   console.log("comment_id"+ selectedActivityId);
      let categoryMode = this.state.activities_edit_mode[selectedActivityId];
             
       categoryMode['comments'] = !categoryMode['comments'] 
-      console.log("cat"+categoryMode['comments']);
 if(selectedActivityId){
     this.setState({
     ...this.state.activities_edit_mode,
@@ -331,23 +470,37 @@ if(selectedActivityId){
    }
     }
   }
-componentDidMount(){
-$('.comment_td .save_btn').css('display','none');
-}
+
    
-  
-  editToggleHandler_time(event){
- 
+  editToggleHandler_start_time(event){
   const target = event.target;
+  var selectedActivityId1 = target.getAttribute('data-name');
+  let categoryMode = this.state.activities_edit_mode[selectedActivityId1];
+  //let starttime_mode = this.state.start_end_time[selectedActivityId1];
+  //starttime_mode['startTimeInSeconds'] = !starttime_mode['startTimeInSeconds'] ;
+  categoryMode['startTimeInSeconds'] = !categoryMode['startTimeInSeconds'] ;
+  if(selectedActivityId1){
+    this.setState({
+    //   start_end_time:{
+    // ...this.state.start_end_time,
+    //     [selectedActivityId1]:starttime_mode
+    //   },
+      //activities_edit_mode: {
+    ...this.state.activities_edit_mode,
+        [selectedActivityId1]:categoryMode
+        //}
+      });
+      
+   
+  }
+}
+  editToggleHandler_time(event){
+      const target = event.target;
       const selectedActivityId = target.getAttribute('data-name');
-     let categoryMode = this.state.activities_edit_mode[selectedActivityId];
-      //console.log("categoryMode", categoryMode);  
-     let activity_mode=this.state.activites_hour_min[selectedActivityId]; 
-     console.log("activitymode", activity_mode);  
+      let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+      let activity_mode=this.state.activites_hour_min[selectedActivityId]; 
          activity_mode['durationInSeconds']=!activity_mode['durationInSeconds'];
-         console.log("activity_mode",activity_mode['durationInSeconds']);
       categoryMode['durationInSeconds'] = !categoryMode['durationInSeconds'] ;
-      console.log("cat"+categoryMode['durationInSeconds']);
      if(selectedActivityId){
     this.setState({
     activites_hour_min:{
@@ -364,13 +517,25 @@ $('.comment_td .save_btn').css('display','none');
          
   }   
 
+handleChangeActivityCalendar(date){
+ 
+  this.setState({
+    activity_calender: date
+  })
+}
+handleChangeActivityStartTimeCalendar(date){
+ 
+  this.setState({
+    activitystarttime_calender: date
+  })
+}
     handleChange_activity(event){
   const target = event.target;
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
   let activity_data = this.state.activites[selectedActivityId];
-  console.log("Selected activity id:",selectedActivityId);
   activity_data['activityType'] = value;
+
   this.setState({
   activites:{...this.state.activites,
   [selectedActivityId]:activity_data
@@ -397,21 +562,47 @@ $('.comment_td .save_btn').css('display','none');
   });
   }
 }
+handleChange_time(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
+  const selectedActivityId = target.getAttribute('data-name');
+  let activity_data = this.state.activites_hour_min[selectedActivityId];
+  activity_data[name] = value;
+  this.setState({
+  activites_hour_min:{
+  ...this.state.activites_hour_min,
+  [selectedActivityId]:activity_data
+  }
+  });
+
+}
+  handleChange_start_time(date){
+    //let start_time_data= date._d;
+     this.setState({
+      workout_start_time:date
+     });
+
+
+  }
+  handleChange_end_time(date){
+       
+    this.setState({
+      workout_end_time:date
+    });
+  }
  
     handleChange_heartrate(event){
   const target = event.target;
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
   let activity_data = this.state.activites[selectedActivityId];
-  console.log("Selected activity id:",selectedActivityId);
   activity_data['averageHeartRateInBeatsPerMinute'] = value;
-  console.log("Selected:",activity_data['averageHeartRateInBeatsPerMinute'] );
   this.setState({
   activites:{...this.state.activites,
   [selectedActivityId]:activity_data
   }
      });
-
   $('#comments_id').css('display','none');
    if(value== "OTHER"){
   this.setState({
@@ -431,7 +622,6 @@ $('.comment_td .save_btn').css('display','none');
   this.setState({
 [selectedActivityId]: value
   });
-  console.log("name"+name);
 
   }
 }
@@ -439,12 +629,8 @@ valueChange(event){
 const target = event.target;
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
-  console.log("comid:", selectedActivityId);
   let activity_data = this.state.activites[selectedActivityId];
-   console.log("com_data:", activity_data);
-  console.log("Selected activity id:",selectedActivityId);
   activity_data['comments'] = value;
-  console.log("selection:", activity_data['comments'] );
   this.setState({
  
   changevalue: activity_data
@@ -456,12 +642,8 @@ const target = event.target;
   const target = event.target;
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
-  console.log("comid:", selectedActivityId);
   let activity_data = this.state.activites[selectedActivityId];
-   console.log("com_data:", activity_data);
-  console.log("Selected activity id:",selectedActivityId);
   activity_data['comments'] = value;
-  console.log("selection:", activity_data['comments'] );
   this.setState({
   activites:{...this.state.activites,
   [selectedActivityId]:activity_data,
@@ -474,7 +656,6 @@ const target = event.target;
 [selectedActivityId]: value,
 "modal_activity_comment":""
   });
-  console.log("testing");
   }
 
   else if(name == "modal_activity_comment"){
@@ -482,78 +663,142 @@ const target = event.target;
 [selectedActivityId]: value,
 "modal_activity_comment":value
   });
-  console.log("state_id"+this.state.selectedActivityId);
 
   }
   this.setState({
 [selectedActivityId]: value,
 
   });
-
-  console.log("****", selectedActivityId)
-
-
 }
-//  handleChange_hours(event){
-//   const target = event.target;
-//   const value = target.value;
-//   const selectedActivityId = target.getAttribute('data-name');
-//   let activity_data = this.state.activites[selectedActivityId];
-//   console.log("Selected activity id:",selectedActivityId);
-//   console.log("data_value",activity_data);
-//   var randomNumber = Math.floor(1000000000 + Math.random() * 900000000);
-// let custom_activity_id = this.state.selectedActivityId;
-// custom_activity_id = custom_activity_id?custom_activity_id:randomNumber;
-  // let durationmins = this.state.modal_activity_min;
-  // let durationhours = this.state.modal_activity_hour;
-  // console.log("min"+durationmins);
-  // let durationSeconds;
-  // durationSeconds = durationhours*3600 + durationmins*60; 
-  // console.log("tm"+durationSeconds); 
-//   activity_data['durationInSeconds'] = value;
-  // this.setState({
-  // activites:{...this.state.activites,
-  // [selectedActivityId]:activity_data
-  // }
-//      });
- 
-//   $('#comments_id').css('display','none');
-//    if(value== "OTHER"){
-//    this.setState({
-// [selectedActivityId]: value,
-// "durationSeconds":""
-//   });
-//   }
-//   else if(name == "modal_activity_hour" && name== "modal_activity_min"){
-//    this.setState({
-// [selectedActivityId]: value,
-// "durationSeconds":value
-//   });
 
-//   }
-
-  
-//   else{
-//   this.setState({
-// [selectedActivityId]: value
-//   });
-//   }
-// }
-handleChange_time(event){
+editTimeSecondsSaveModel(event){
   const target = event.target;
   const value = target.value;
   const name = target.name;
-  const selectedActivityId = target.getAttribute('data-name');
-  let activity_data = this.state.activites_hour_min[selectedActivityId];
-  activity_data[name] = value;
+  var end_date=this.state.activity_calender;
+  var time_store=moment(end_date).format('DD MMM YYYY')
+  var selectedActivityId = target.getAttribute('data-name');
+  var hours = this.state.end_time_hours;
+  var min = this.state.end_time_min;
+  var ampm = this.state.end_time_am_pm;
+  var result = time_store+' '+hours+' :'+min+' '+ampm;
+  let activity_data = this.state.activites[selectedActivityId];
+  activity_data['endTimeInSeconds'] = result;
   this.setState({
-  activites_hour_min:{
-  ...this.state.activites_hour_min,
-  [selectedActivityId]:activity_data
-  }
-  });
-
+  activites:{...this.state.activites,
+            [selectedActivityId]:activity_data
+        }
+     });
+  this.toggle(event);
+  this.setState({
+    [selectedActivityId]: result
+  })
 }
+
+  
+
+
+
+editStartTimeSecondsSaveModel(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
+  var start_date=this.state.activitystarttime_calender;
+  var time_store1=moment(start_date).format('DD MMM YYYY')
+  var selectedActivityId = target.getAttribute('data-name');
+  var hours = this.state.start_time_hours;
+  var min = this.state.start_time_min;
+  var ampm = this.state.start_time_am_pm;
+  var result1 = time_store1+' '+hours+': '+min+' '+ampm;
+  let activity_data = this.state.activites[selectedActivityId];
+  activity_data['startTimeInSeconds'] = result1;
+  this.setState({
+  activites:{...this.state.activites,
+            [selectedActivityId]:activity_data
+        }
+     });
+  this.toggle_starttime(event);
+  this.setState({
+     [selectedActivityId]: result1
+  })
+}
+EndTimeInSecondsSaveCalender(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  let new_value = {
+      "calender_date":this.state.activity_calender,
+      
+  }
+  this.setState({
+    end_time_hours:value,
+  })
+}
+EndTimeInSecondsSaveHour(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  let new_value = {
+      "calender_date":this.state.activity_calender,
+      
+  }
+  this.setState({
+    end_time_hours:value,
+  })
+}
+StartTimeInSecondsSaveHour(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  let new_value = {
+      "calender_date":this.state.activitystarttime_calender,
+      
+  }
+  this.setState({
+    start_time_hours:value,
+  });
+  
+}
+EndTimeInSecondsSavemin(event){
+  const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  this.setState({
+    end_time_min:value,
+  })
+}
+StartTimeInSecondsSavemin(event){
+  const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  this.setState({
+    start_time_min:value,
+  })
+}
+EndTimeInSecondsSaveAMPM(event){
+  const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  this.setState({
+    end_time_am_pm:value,
+  })
+}
+StartTimeInSecondsSaveAMPM(event){
+  const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      const selectedActivityId = target.getAttribute('data-name');
+  this.setState({
+    start_time_am_pm:value,
+  })
+}
+
  handleChange(event){
       const target = event.target;
       const value = target.value;
@@ -601,45 +846,88 @@ handleChange_time(event){
     }
     return elements;
   }
+ 
 
-
-  onClickEditActivityModalSave(){
-
-var randomNumber = Math.floor(1000000000 + Math.random() * 900000000);
-let custom_activity_id = this.state.selectedActivityId;
-custom_activity_id = custom_activity_id?custom_activity_id:randomNumber;
+  onClickEditActivityModalSave(data){
+  var randomNumber = Math.floor(1000000000 + Math.random() * 900000000);
+  let custom_activity_id = this.state.selectedActivityId;
+  custom_activity_id = custom_activity_id?custom_activity_id:randomNumber;
   let durationmins = this.state.modal_activity_min;
   let durationhours = this.state.modal_activity_hour;
-  let durationSeconds;
-  durationSeconds = durationhours*3600 + durationmins*60; 
+  let durationSeconds=durationhours +":"+ durationmins;
+  let start_calender = moment(this.state.activitystarttime_calender, "x").format("DD MMM YYYY");
+  let start_time_hours = this.state.modalstarttime_activity_hour
+  let start_time_min = this.state.modalstarttime_activity_min
+  let start_time_ampm = this.state.modalstarttime_activity_ampm
+  let end_calender = moment(this.state.activityendtime_calender, "x").format("DD MMM YYYY");
+  let end_time_hours = this.state.modalendtime_activity_hour
+  let end_time_min = this.state.modalendtime_activity_min
+  let end_time_ampm = this.state.modalendtime_activity_ampm
+  let startTimeInSeconds = start_calender+" "+start_time_hours +":"+ start_time_min+" "+start_time_ampm;
+  let endTimeInSeconds = end_calender+" "+end_time_hours+ ":"+ end_time_min+" "+end_time_ampm;
+
   let new_value = {
-    "summaryId": custom_activity_id,
-                   "activityType": this.state.modal_activity_type,
-                   "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
-                   "durationInSeconds":durationSeconds,
-                   "comments":this.state.modal_activity_comment,
+   "summaryId": custom_activity_id,
+   "activityType": this.state.modal_activity_type,
+   "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
+   "durationInSeconds":durationSeconds,
+   "comments":this.state.modal_activity_comment,
+   "startTimeInSeconds":startTimeInSeconds,
+   "endTimeInSeconds":endTimeInSeconds,
   }; 
-  //console.log("manikanta", new_value["activityType"]);
- 
-  this.setState({
-  activites:{
-  ...this.state.activites,
-  [custom_activity_id]:new_value,
-  },
-      activity_display_name:"",
-      modal_activity_type:"",
-      modal_activity_heart_rate:"",
-      modal_activity_hour:"",
-      modal_activity_min:"",
-      modal_activity_comment:"",
-      selectedActivityId:"",
-      activityEditModal:!this.state.activityEditModal,
-      editToggle: false,
-      editToggle_heartrate:false,
-      editToggle_comments:false,
-      editToggle_time:false,
+  
+  let edit_mode_state = {}
+  for(let [key,val] of Object.entries(new_value)){
+    edit_mode_state[key] = false
+  }
+
+  let activity_time_state = {}
+  for(let [id,data] of Object.entries(new_value)){
+    let durationInHourMin = new_value["durationInSeconds"];
+    let duration_hour = durationInHourMin.split(":")[0];
+    let duration_min = durationInHourMin.split(":")[1];
+    let activity_time_state = {
+    "durationInSeconds":new_value["durationInSeconds"],
+    "duration_hour":duration_hour,
+    "duration_min":duration_min
+    };
+    this.setState({
+    activites:{
+      ...this.state.activites,
+      [custom_activity_id]:new_value,
+    },
+    activity_display_name:"",
+    modal_activity_type:"",
+    modal_activity_heart_rate:"",
+    modal_activity_hour:"",
+    modal_activity_min:"",
+    modal_activity_comment:"",
+    activitystarttime_calender:"",
+    modalstarttime_activity_hour:"",
+    modalstarttime_activity_min:"",
+    modalstarttime_activity_ampm:"",
+    activityendtime_calender:"",
+    modalendtime_activity_hour:"",
+    modalendtime_activity_min:"",
+    modalendtime_activity_ampm:"",
+    selectedActivityId:"",
+    activityEditModal:!this.state.activityEditModal,
+    editToggle: false,
+    editToggle_heartrate:false,
+    editToggle_comments:false,
+    editToggle_time:false,
+    activityEditModal: !this.state.activityEditModal,
+    activities_edit_mode:{
+      ...this.state.activities_edit_mode,
+      [custom_activity_id]:edit_mode_state
+    },
+    activites_hour_min:{
+      ...this.state.activites_hour_min,
+      [custom_activity_id]:activity_time_state
+    },
   });
- 
+}
+  
   }
   activitySelectOptions(){
   let option = [];
@@ -663,22 +951,18 @@ const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinu
 let activityRows = [];
 for (let [key,value] of Object.entries(this.state.activites)){
 let activityData = [];
-console.log("complete_data",activityData);
-
 let summaryId; 
 let hour;
-let min; 
+let min;
+
 for (let key of activityKeys){
 let value1 = value[key];
-console.log("value[key]:", value[key]);
-if(key == 'summaryId'){
+if(key === 'summaryId'){
 summaryId = value1;
 }
-else if(key == "activityType"){
+else if(key === "activityType"){
 var  activityType=value1;
-console.log("activityType:",activityType);
 activityData.push(<td  name = {summaryId}  id = "add_button">
-
 { this.state.activities_edit_mode[summaryId][key] ? <Input 
                           type="select"
                           data-name = {summaryId}
@@ -688,9 +972,8 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
                           onChange={this.handleChange_activity}
                           onBlur={ this.editToggleHandlerActivityType.bind(this)}>
                                   {this.activitySelectOptions()}                                                                                                                                                                
-                          </Input> : !this.state.activites[summaryId][key]? activityType:this.state.activites[summaryId][key] }
- 
-                              
+                          </Input> : !this.state.activites[summaryId][key]? activityType :this.state.activites[summaryId][key] }
+                           
 <span  data-name = {summaryId} onClick={this.editToggleHandlerActivityType.bind(this)}
             className="fa fa-pencil fa-1x progressActivity1"
             id = "add_button">
@@ -699,13 +982,12 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
         </td>);
 
 }
-else if(key == "averageHeartRateInBeatsPerMinute"){
+else if(key === "averageHeartRateInBeatsPerMinute"){
 let  averageHeartRateInBeatsPerMinute=value1;
 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            { this.state.activities_edit_mode[summaryId][key]  ? 
-                           
-                              <Input 
-                           data-name = {summaryId}
+                            { this.state.activities_edit_mode[summaryId][key]  ?                            
+                        <Input 
+                        data-name = {summaryId}
                         type="select" 
                         className="form-control"
                         style={{height:"37px",width:"80%"}}
@@ -721,63 +1003,189 @@ activityData.push(<td  name = {summaryId}  id = "add_button">
                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
             className="fa fa-pencil fa-1x progressActivity1"
             id = "add_button">
-        </span></td>);
-
+        </span>
+        </td>
+        );
 }
-else if(key == "startTimeInSeconds"){
+else if(key === "startTimeInSeconds"){
 var  start_time=value1;
 var start_time_sec=moment.unix(start_time);
-console.log("start-time-sec",start_time_sec);
 var total_time1=moment(start_time_sec, "x").format("DD MMM YYYY hh:mm a");
+
+
 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            { this.state.activities_edit_mode[summaryId][key]  ? <Input 
-                           data-name = {summaryId}
-                        type="select" 
-                        className="form-control"
-                        style={{height:"37px",width:"80%"}}
-                        name = "modal_activity_heart_rate" 
-                        value={this.state.activites[summaryId][key]}                               
-                        onChange={this.handleChange_heartrate}
-                        onBlur={this.editToggleHandler_start_time.bind(this)}>
-                        
-                        <option key="hours" value=" ">Select</option>
-                    {this.createSleepDropdown_heartrate(90,220)}
-                    <option value="Not Measured">Not Measured</option>     
-                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:total_time1}
-                        <span data-name = {summaryId} onClick={this.editToggleHandler_start_time.bind(this)}
+
+                            { this.state.activities_edit_mode[summaryId][key]  ? 
+                         <div>
+                        </div> :this.state.activites[summaryId][key]?this.state.activites[summaryId][key]:total_time1  }  
+                 
+                  
+                        <span data-name = {summaryId}  onClick={this.toggle_starttime}
             className="fa fa-pencil fa-1x progressActivity1"
             id = "add_button">
-        </span></td>);
+        </span>{console.log("id",this.state.activites[summaryId][key])}
+        <Modal isOpen={this.state.modal_start_time} toggle={this.toggle_starttime} >
+          <ModalHeader toggle={this.toggle_starttime}>Enter the Time Your Workout Started</ModalHeader>
+          <ModalBody>
+      <div className=" display_flex" >
+                              <div className="align_width align_width1">
+                              <div className="input  ">
+                                <DatePicker
+                                    id="datepicker"
+                                    // name = "activitystarttime_calender"
+                                    selected={this.state.activitystarttime_calender}
+                                    onChange={this.handleChangeActivityStartTimeCalendar}
+                                    data-name={summaryId}
+                                    dateFormat="LL"
+                                    isClearable={true}
+                                    shouldCloseOnSelect={false}
+                                />
+                              </div>
+                              </div>
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" 
+                                // name="start_time_hours"
+                                id="bed_hr"
+                                data-name={summaryId}
+                                className="form-control custom-select"
+                                value={this.state.start_time_hours}
+                                onChange={this.StartTimeInSecondsSaveHour}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" 
+                                //name="start_time_min"
+                                 id="bed_min"
+                                 data-name={summaryId}
+                                className="form-control custom-select "
+                                value={this.state.start_time_min}
+                                onChange={this.StartTimeInSecondsSavemin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                  data-name={summaryId}
+                                     className="custom-select form-control "
+                                    // name="start_time_am_pm"                                  
+                                     value={this.state.start_time_am_pm}
+                                     onChange={this.StartTimeInSecondsSaveAMPM} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                                        </ModalBody>
+          <ModalFooter>
+            <Button color="primary" data-name={this.state.selectedId_starttime} onClick={this.editStartTimeSecondsSaveModel}>Save</Button>{' '}
+            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+      </td>);
 
 }
-else if(key == "endTimeInSeconds"){
+else if(key === "endTimeInSeconds"){
 var  end_time=start_time+duration;
-
 var end_time_sec=moment.unix(end_time);
-console.log("start-time-sec",end_time_sec);
 var total_time=moment(end_time_sec, "x").format("DD MMM YYYY hh:mm a");
 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            { this.state.activities_edit_mode[summaryId][key]  ? <Input 
-                           data-name = {summaryId}
-                        type="select" 
-                        className="form-control"
-                        style={{height:"37px",width:"80%"}}
-                        name = "modal_activity_heart_rate" 
-                        value={this.state.activites[summaryId][key]}                               
-                        onChange={this.handleChange_heartrate}
-                        onBlur={this.editToggleHandler_end_time.bind(this)}>
+                            { this.state.activities_edit_mode[summaryId][key] ? <div>
+                     </div> :  !this.state.activites[summaryId][key]? total_time :this.state.activites[summaryId][key]    }
                         
-                        <option key="hours" value=" ">Select</option>
-                    {this.createSleepDropdown_heartrate(90,220)}
-                    <option value="Not Measured">Not Measured</option>     
-                      </Input>: this.state.modal_activity_heart_rate? this.state.modal_activity_heart_rate:total_time}
-                        <span data-name = {summaryId} onClick={this.editToggleHandler_end_time.bind(this)}
+                        <span data-name = {summaryId} 
             className="fa fa-pencil fa-1x progressActivity1"
-            id = "add_button">
-        </span></td>);
+            id = "add_button"
+            onClick={this.toggle}
+            >
+        </span>
+        <Modal isOpen={this.state.modal} toggle={this.toggle} >
+          <ModalHeader toggle={this.toggle}>Enter the Time Your Workout Ended</ModalHeader>
+          <ModalBody>
+      <div className=" display_flex" >
+                              <div className="align_width align_width1">
+                              <div className="input ">
+                                <DatePicker
+                                    id="datepicker"
+                                    name = "sleep_bedtime_date"
+                                    selected={this.state.activity_calender}
+                                    onChange={this.handleChangeActivityCalendar}
+                                    data-name={summaryId}
+                                    dateFormat="LL"
+                                    isClearable={true}
+                                    shouldCloseOnSelect={false}
+                                />
+                              </div>
+                              </div>
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="sleep_hours_bed_time"
+                                id="bed_hr"
+                                data-name={summaryId}
+                                className="form-control custom-select"
+                                value={this.state.end_time_hours}
+                                onChange={this.EndTimeInSecondsSaveHour}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="sleep_mins_bed_time"
+                                 id="bed_min"
+                                 data-name={summaryId}
+                                className="form-control custom-select "
+                                value={this.state.end_time_min}
+                                onChange={this.EndTimeInSecondsSavemin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                  data-name={summaryId}
+                                     className="custom-select form-control "
+                                     name="sleep_bedtime_am_pm"                                  
+                                     value={this.state.end_time_am_pm}
+                                     onChange={this.EndTimeInSecondsSaveAMPM} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+
+                              </div>
+                              </div>
+                                        </ModalBody>
+          <ModalFooter>
+            <Button color="primary" data-name={this.state.getselectedid} onClick={this.editTimeSecondsSaveModel}>Save</Button>{' '}
+            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+              
+        </td>);
 
 }
-else if(key == "durationInSeconds"){
+else if(key === "durationInSeconds"){
 var duration = value1;
 let min = parseInt(duration/60);
 let hour = parseInt(min/60);
@@ -829,7 +1237,7 @@ activityData.push(<td  name={summaryId} id = "add_button">
             </span>
             </td>); 
 }
-else if(key == "comments"){
+else if(key === "comments"){
 let  comments=value1;
 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
                               { this.state.activities_edit_mode[summaryId][key] ? <div><Textarea 
@@ -844,8 +1252,7 @@ activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
                         onBlur={this.handleChange_comments.bind(this), this.editToggleHandler_comments.bind(this)}>                       
                           </Textarea><Button data-name={summaryId} size = "sm" id={summaryId} 
                           className="btn btn-info save_btn" onClick={ this.editToggleHandler_comments.bind(this)}>Save
-                          </Button></div>
-                       :this.state.modal_activity_comment? this.state.modal_activity_comment:comments}
+                          </Button></div>:this.state.modal_activity_comment? this.state.modal_activity_comment:comments}
                          
             <span data-name={summaryId} onClick={this.editToggleHandler_comments.bind(this)}
                   className="fa fa-pencil fa-1x progressActivity1 "
@@ -860,23 +1267,46 @@ activityData.push(<td id = "add_button">{value1}</td>);
 }
 }
 activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-                      
-                </tr>); 
-      }
 
-return activityRows;
+                       <span className="checkbox_delete fa fa-close martp_20" data-name={summaryId} style={{color:"red", marginTop:"15px"}} onClick={this.toggle_delete}>  
+                     {/* <input  type="checkbox"
+                          
+                     
+                    className="martp_20" type="checkbox" id="myCheck"
+                    />*/}
+                    </span>
+                     <Modal isOpen={this.state.modal_delete} toggle={this.toggle_delete} >
+         
+          <ModalBody toggle={this.toggle_delete}>
+      <div className=" display_flex" >
+                              <div className=" align_width1">
+                              
+                               Do You want to Delete
+                              </div>
+                           </div>
+                </ModalBody>
+          <ModalFooter>
+            <Button color="primary" data-name={this.state.selectedId_delete} onClick={this.checkBox}>Yes</Button>{' '}
+            <Button color="secondary" onClick={this.toggle_delete}>No</Button>
+          </ModalFooter>
+        </Modal>
+    </tr>
+    ); 
+      }
+      
+return activityRows.reverse();
 }
 
 
 renderEditActivityModal(){
       if (this.state.activityEditModal){
-          let modal = <Modal
+                 let modal = <Modal
                           placement="bottom"
                           target="progressActivity"                              
                           isOpen={this.state.activityEditModal}
                           toggle={this.handleChangeModal}>
                           <ModalHeader toggle={this.toggleModal}>
-                            {this.state.selectedActivityId?'Edit Activity':'Add Activity'}
+                            {this.state.selectedActivityId?'Edit Activity':'Create Manual Activity'}
                           </ModalHeader>
                               <ModalBody>
                          <FormGroup>                            
@@ -925,10 +1355,124 @@ renderEditActivityModal(){
                         </Input>
                             </div> 
                             </FormGroup>                               
-                
+                         <FormGroup>
+                            <Label className="padding1">3. Enter the Time Your Workout Started</Label>
+                     <div className=" display_flex margin_lft0" >
+                      <div className="align_width align_width1">
+                        <div className="input " style = {{marginLeft:"15px"}}> 
+                      <DatePicker  className="calender_styles"
+                                   id="datepicker"
+                                   name = "activitystarttime_calender"
+                                   selected={this.state.activitystarttime_calender}
+                                   onChange={(date)=>{this.setState({activitystarttime_calender: date})}}
+                                   //data-name={summaryId}
+                                   dateFormat="LL"
+                                   isClearable={true}
+                                   shouldCloseOnSelect={false}
+                               />
+                      </div>
+                      </div>
+
+                         <div className="align_width align_width1">
+                        <div className="input " style = {{marginLeft:"15px"}}> 
+                      <Input type="select" name="modalstarttime_activity_hour"
+                      id="bed_hr"
+                      className="form-control custom-select"
+                      value={this.state.modalstarttime_activity_hour}
+                      onChange={this.handleChange}>
+                       <option key="hours" value="">Hours</option>
+                      {this.createSleepDropdown(0,12)}                        
+                      </Input>
+                      </div>
+                      </div>
+
+                  <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modalstarttime_activity_min"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modalstarttime_activity_min}
+                      onChange={this.handleChange}>
+                       <option key="mins" value="">Minutes</option>
+                      {this.createSleepDropdown(0,59,true)}                        
+                      </Input>                        
+                      </div>
+                      </div>
+                       <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modalstarttime_activity_ampm"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modalstarttime_activity_ampm}
+                      onChange={this.handleChange}>
+                      <option value="">AM/PM</option>
+                                      <option value="am">AM</option>
+                                      <option value="pm">PM</option>                      
+                      </Input>                        
+                      </div>
+                      </div>
+                      </div>
+                         </FormGroup>
+                              <FormGroup>
+                            <Label className="padding1">4. Enter the Time Your Workout Ended</Label>
+                     <div className=" display_flex margin_lft0" >
+                     <div className="align_width align_width1">
+                        <div className="input " style = {{marginLeft:"15px"}}> 
+                      <DatePicker  className="calender_styles"
+                                   id="datepicker"
+                                   name = "activityendtime_calender"
+                                   selected={this.state.activityendtime_calender}
+                                   onChange={(date)=>{this.setState({activityendtime_calender: date})}}
+                                   //data-name={summaryId}
+                                   dateFormat="LL"
+                                   isClearable={true}
+                                   shouldCloseOnSelect={false}
+                               />
+                      </div>
+                      </div>
+                         <div className="align_width align_width1">
+                        <div className="input " style = {{marginLeft:"15px"}}> 
+                      <Input type="select" name="modalendtime_activity_hour"
+                      id="bed_hr"
+                      className="form-control custom-select"
+                      value={this.state.modalendtime_activity_hour}
+                      onChange={this.handleChange}>
+                       <option key="hours" value="">Hours</option>
+                      {this.createSleepDropdown(0,12)}                        
+                      </Input>
+                      </div>
+                      </div>
+
+                  <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modalendtime_activity_min"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modalendtime_activity_min}
+                      onChange={this.handleChange}>
+                       <option key="mins" value="">Minutes</option>
+                      {this.createSleepDropdown(0,59,true)}                        
+                      </Input>                        
+                      </div>
+                      </div>
+                       <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modalendtime_activity_ampm"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modalendtime_activity_ampm}
+                      onChange={this.handleChange}>
+                      <option value="">AM/PM</option>
+                                      <option value="am">AM</option>
+                                      <option value="pm">PM</option>                      
+                      </Input>                        
+                      </div>
+                      </div>
+                      </div>
+                         </FormGroup>
                        <FormGroup>
-                     <Label className="padding1">3. Exercise Duration (hh:mm)</Label>
-                     <div className=" display_flex" >
+                     <Label className="padding1">5. Exercise Duration (hh:mm)</Label>
+                     <div className=" display_flex margin_lft0" >
                          <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
                       <Input type="select" name="modal_activity_hour"
@@ -955,6 +1499,7 @@ renderEditActivityModal(){
                       </div>
                       </div>
                       </div>
+                      </FormGroup>
                        <FormGroup>
                       <Label className="padding1">4. Exercise Comments</Label>
                        <div className="input1 ">
@@ -971,11 +1516,13 @@ renderEditActivityModal(){
                       <Button size = "sm" className="btn btn-info" onClick={this.onClickEditActivityModalSave}>Save</Button>&nbsp;&nbsp;&nbsp;&nbsp;
                       <Button size = "sm" className="btn btn-info" onClick={this.toggleModal}>Cancel</Button>
                       </div>
-                      </FormGroup>
+                      
                     
                           </ModalBody>
                           </Modal>  
+            
                   return modal;
+          
           }
     }
 render(){
@@ -985,7 +1532,7 @@ return(
 <div className = "container_fluid">
 <NavbarMenu fix={true}/>
 <div className="row justify-content-center">
-<div id = "activity_calender">
+<div id = "activity_calender " className="cal_width">
 <span id="navlink" onClick={this.toggleCalendar} id="progress">
                 <FontAwesome
                     name = "calendar"
@@ -1002,9 +1549,13 @@ return(
                               </PopoverBody>
                      </Popover> 
                      </div>
+                       
+
+          
+
                      <div id = "activity_table">
                       <div className="table-responsive tableresponsive" >  
-<table className = "table table-striped table-hover table-responsive">
+<table className = "table table-striped table-hover table-responsive" id="dataTable">
 <thead id = "add_button">
 <td id = "add_button" className="add_button_back">Exercise Type</td>
 <td id = "add_button" className="add_button_back">Activity Average Heart Rate</td>
@@ -1012,28 +1563,43 @@ return(
 <td id = "add_button" className="add_button_back">Enter the Time Your Workout Ended</td>
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm)</td>
 <td id = "add_button" className="add_button_back">Comment</td>
+<td id = "add_button" className="add_button_back">Delete</td>
 </thead>
 <tbody className = "tbody_styles">
 {this.renderTable()}
-<tr>
-<td id="add_button" className="add_button_back"></td>
-<td id="add_button" className="add_button_back"></td>
-<td id="add_button" className="add_button_back"></td>
-<td id="add_button"  className="add_button_back "> 
-<span
-  id="add_button"
-  data-name=""
-              className="fa fa-plus-circle fa-1x add_button add_activity"
-              onClick={this.handleChangeModal}
-              >
-              </span>
-            </td>
-            <td id="add_button" className="add_button_back"></td> 
-</tr>
+
+
+
+            
+            
+
 </tbody>
 </table>
-{this.renderEditActivityModal()}
 </div>
+ <div className="btn2 btn4 mar_20  row">
+ <div>
+                                    <Button
+                                     id="nav-btn"
+                                    style={{backgroundColor:"#ed9507"}}
+                         type="submit"
+                           className="btn btn-block-lg"
+                            onClick={this.handleChangeModal}>
+                            Create Manual Activity
+                      </Button>
+</div>
+<div className="delete_position">
+                       <Button
+                            id="nav-btn"
+                            style={{backgroundColor:"#ed9507"}}
+                            className="btn btn-block-lg"
+                            onClick={this.Delete_Activity('dataTable')}>
+                            Delete
+                      </Button>
+                                   </div>
+                                   </div>
+
+{this.renderEditActivityModal()}
+
 </div>
 </div>
 </div>

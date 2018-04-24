@@ -21,7 +21,7 @@ float: right;
 	align-items: center;
 	font-size: 16px; 
 	border-collapse: collapse;
-	border-color: white;
+	border-color: #d3d3d3;
 }
 .add_button_back{
 	background-color: #F9F8F8;
@@ -56,8 +56,85 @@ td{
 }
 .add_activity{
 	float:left;
+	cursor: pointer;
 }
 .tableresponsive{
 	margin :0 auto;
 	width:98%;
+}
+.margin_lft0{
+	 margin-left:0px;
+}
+#datepicker{
+	padding-left:0px;
+}
+.align_content_center  {
+	transform:translateX(350%);
+}
+.mar_20{
+	margin:20px;
+}
+.cal_width{
+	width:100%;
+	margin-top: 80px;
+}
+.delete_position{
+  position: absolute;
+  right: 10px;	
+}
+.checkbox_delete .martp_20{
+	margin-top:15px;
+	color:red;
+}
+
+@media screen and (min-width: 2561px) {
+
+.delete_position{
+position:absolute;
+right:500px	
+}
+}
+
+@media screen and (max-width: 1200px) and (min-width: 769px) {
+
+.tableresponsive {
+    max-width: 670px;
+}
+
+.delete_position {
+    position: absolute;
+    right: 90px;
+}
+}
+
+@media screen and (max-width: 768px) and (min-width: 481px) {
+.delete_position {
+    position: absolute;
+    right: 85px;
+}
+}
+
+@media screen and (max-width: 480px) and (min-width: 320px) {
+.delete_position {
+    position: absolute;
+    right: 45px;
+}
+
+}
+@media screen and (max-width: 667px) and (min-width: 375px) and (orientation: portrait){
+.btn2 {
+   position:relative;
+    top: 42px;
+    right: 8px;
+}
+.calender_styles{
+    width: 162px !important;
+}
+}
+
+@media screen and (max-width: 768px) and (min-width: 481px) and (orientation : landscape){
+.delete_position {
+    position: relative;
+    left: 141px;
+}
 }
