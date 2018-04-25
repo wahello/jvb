@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import FontAwesome from "react-fontawesome";
 import moment from 'moment';
+import _ from 'lodash'
+
 
 import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
@@ -14,6 +16,7 @@ import DietType from './diettype';
 import SmokedSubstance from './smokedSubstance';
 import AlcoholModal from './alcoholModal';
 import Hrr from './HRR';
+import ActivityGrid from './activity_grid';
 
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" &&  
@@ -302,6 +305,22 @@ export function renderSubmitOverlay(){
 					<p>Submitting data for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
+		);
+	}
+}
+
+export function renderActivityGrid(){
+	if(!_.isEmpty(this.state.activities)){
+		const updateParentActivities = function(activities){
+				this.setState({
+					activities:activities
+				});
+		}.bind(this);
+		return(
+			<ActivityGrid
+				updateParentActivities = {updateParentActivities}
+				activities = {this.state.activities}
+			/>
 		);
 	}
 }

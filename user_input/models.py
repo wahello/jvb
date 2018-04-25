@@ -253,6 +253,7 @@ class DailyUserInputStrong(models.Model):
         max_length=10, blank=True)
 
     weather_comment = models.TextField(blank=True)
+    activities = models.TextField(blank=True)
     
 class DailyUserInputEncouraged(models.Model):
 
