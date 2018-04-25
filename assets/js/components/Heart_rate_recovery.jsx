@@ -183,6 +183,8 @@ class HeartRate extends Component{
 	                        name = "calendar"
 	                        size = "2x"
 	                    />
+	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+
                 	</span> 
 	            	<Popover
 			            placement="bottom"
@@ -193,7 +195,6 @@ class HeartRate extends Component{
 		                <CalendarWidget  onDaySelect={this.processDate}/>
 		                </PopoverBody>
 	                </Popover>
-	                <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 	            </div>
           	    <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
@@ -203,10 +204,10 @@ class HeartRate extends Component{
 		          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
 		          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
 		          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
-	          	    </thead>
-	          	    <tbody>
-	          	    <tr className = "hr_table_style_rows">
-	          	    <td className = "hr_table_style_rows">Aerobic Range</td>
+	          	    </thead>  
+	          	    <tbody>   
+	          	    <tr className = "hr_table_style_rows">   
+	          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
 	          	    <td className = "hr_table_style_rows">{(this.state.aerobic_range)}</td>
 	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.aerobic_zone)}</td>
 	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_aerobic)}</td>
@@ -237,7 +238,6 @@ class HeartRate extends Component{
           	  {this.renderAerobicSelectedDateFetchOverlay()}
           	  </div>
 			</div>
-
 		)
 	}
 }
