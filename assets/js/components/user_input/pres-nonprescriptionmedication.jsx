@@ -21,9 +21,11 @@ export default class PrescriptionMedication extends Component{
 	}
 
 	componentWillReceiveProps(nextProps) {
-  	  if(nextProps.medications_taken_list !== this.props.medications_taken_list) {
+  	  if(nextProps.medications_taken_list !== this.props.medications_taken_list || 
+  	  	nextProps.controlled_uncontrolled_substance !== this.props.controlled_uncontrolled_substance) {
     	  	this.setState({
-    	  		medications_taken_list:nextProps.medications_taken_list
+    	  		medications_taken_list:nextProps.medications_taken_list,
+    	  		controlled_uncontrolled_substance:nextProps.controlled_uncontrolled_substance
     	  	});
     	}
   	}
@@ -64,9 +66,9 @@ export default class PrescriptionMedication extends Component{
 					<Collapse isOpen={this.state.collapse}>
 	
 					<FormGroup>
-								{this.props.editable || this.props.report_type === 'full' && 
+								{(this.props.report_type == 'full') &&
 								<Label className="LAbel">8.1 What Did You Take?</Label>}
-									{this.props.editable || this.props.report_type === 'full' && 
+									{((this.props.editable) &&  (this.props.report_type == 'full')) &&
 										<div className="input1">
 											<Textarea
 											id="placeholder" 				                           
@@ -79,7 +81,7 @@ export default class PrescriptionMedication extends Component{
 				                        </div>
 				                    }
 				                    {
-	                                  !this.props.editable &&
+	                                  (!this.props.editable && this.props.report_type == 'full') && 
 	                                  <div className="input">
 	                                    <p >{this.state.medications_taken_list}</p>
 	                                  </div>
@@ -87,6 +89,7 @@ export default class PrescriptionMedication extends Component{
 							</FormGroup>
 					
 					<FormGroup check>
+
 					<Label className="LAbel">8.2 Did you take a controlled or uncontrolled 
 					substance today (marijuana is not considered either)</Label>				
 					{this.props.editable &&

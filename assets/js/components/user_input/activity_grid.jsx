@@ -2,11 +2,9 @@ import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 ModalHeader, ModalBody, ModalFooter, Collapse,Popover,PopoverBody} from 'reactstrap';
 import Textarea from 'react-textarea-autosize';
-import NavbarMenu from './navbar';
-import CalendarWidget from 'react-calendar-widget';
-import fetchActivity from '../network/activity';
 import FontAwesome from "react-fontawesome";
 import moment from 'moment';
+import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 
@@ -71,17 +69,50 @@ const activites = { "":"Select",
 "BASKETBALL":"BASKETBALL"
 };
 
-export default class Activity_Type extends Component{
+export default class ActivityGrid extends Component{
 constructor(props){
-super(props)
+super(props);
+this.errorActivity = this.errorActivity.bind(this);
+this.initializeActivity = this.initializeActivity.bind(this);
+this.toggleModal = this.toggleModal.bind(this);
+this.handleChange=this.handleChange.bind(this);
+this.handleChange_activity = this.handleChange_activity.bind(this);
+this.handleChange_heartrate = this.handleChange_heartrate.bind(this);
+this.handleChange_time = this.handleChange_time.bind(this);
+this.handleChange_comments = this.handleChange_comments.bind(this);
+this.handleChange_start_time=this.handleChange_start_time.bind(this);
+this.handleChange_end_time=this.handleChange_end_time.bind(this);          
+this.createSleepDropdown = this.createSleepDropdown.bind(this);
+this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
+this.renderTable = this.renderTable.bind(this);
+this.renderEditActivityModal = this.renderEditActivityModal.bind(this);
+this.handleChangeModal = this.handleChangeModal.bind(this);
+this.CreateNewActivity = this.CreateNewActivity.bind(this);
+this.activitySelectOptions = this.activitySelectOptions.bind(this);
+this.toggle = this.toggle.bind(this);
+this.saveEndTimeModel = this.saveEndTimeModel.bind(this);
+this.toggle_starttime=this.toggle_starttime.bind(this);
+this.saveStartTimeModel=this.saveStartTimeModel.bind(this);
+this.deleteActivity=this.deleteActivity.bind(this);
+this.toggle_delete=this.toggle_delete.bind(this);
+this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);
+this.handleChangeActivityStartEndTime = this.handleChangeActivityStartEndTime.bind(this);
+this.handleChangeActivityDate = this.handleChangeActivityDate.bind(this);
+this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);
+this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);
+this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);
+this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);
+this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
+this.createActivityTime = this.createActivityTime.bind(this);
+this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
+let activities = this.props.activities;
 this.state ={
     activityEditModal:false,
     calendarOpen:false,
-    selected_date:new Date(),
-    activites:{},
-    activities_edit_mode:{},
-    activites_hour_min:{},
-    activity_start_end_time:{},
+    activites:activities,
+    activities_edit_mode:this.createActivityEditModeState(activities),
+    activites_hour_min:this.createActivityTime(activities),
+    activity_start_end_time:this.createStartAndEndTime(activities),
     modal_activity_type:"",
     modal_activity_id:"",
     modal_activity_heart_rate:"",
@@ -114,39 +145,21 @@ this.state ={
     selectedId_starttime:'',
     selectedId_delete:'',
 }
-this.errorActivity = this.errorActivity.bind(this);
-this.sucessActivity = this.sucessActivity.bind(this);
-this.processDate = this.processDate.bind(this);
-this.toggleModal = this.toggleModal.bind(this);
-this.handleChange=this.handleChange.bind(this);
-this.handleChange_activity = this.handleChange_activity.bind(this);
-this.handleChange_heartrate = this.handleChange_heartrate.bind(this);
-this.handleChange_time = this.handleChange_time.bind(this);
-this.handleChange_comments = this.handleChange_comments.bind(this);
-this.handleChange_start_time=this.handleChange_start_time.bind(this);
-this.handleChange_end_time=this.handleChange_end_time.bind(this);          
-this.createSleepDropdown = this.createSleepDropdown.bind(this);
-this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
-this.renderTable = this.renderTable.bind(this);
-this.renderEditActivityModal = this.renderEditActivityModal.bind(this);
-this.handleChangeModal = this.handleChangeModal.bind(this);
-this.CreateNewActivity = this.CreateNewActivity.bind(this);
-this.toggleCalendar = this.toggleCalendar.bind(this);
-this.activitySelectOptions = this.activitySelectOptions.bind(this);
-this.toggle = this.toggle.bind(this);
-this.saveEndTimeModel = this.saveEndTimeModel.bind(this);
-this.toggle_starttime=this.toggle_starttime.bind(this);
-this.saveStartTimeModel=this.saveStartTimeModel.bind(this);
-this.deleteActivity=this.deleteActivity.bind(this);
-this.toggle_delete=this.toggle_delete.bind(this);
-this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);
-this.handleChangeActivityStartEndTime = this.handleChangeActivityStartEndTime.bind(this);
-this.handleChangeActivityDate = this.handleChangeActivityDate.bind(this);
-this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);
-this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);
-this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);
-this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);
-this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
+}
+
+initializeActivity(activities){
+    this.setState({
+      activities_edit_mode:this.createActivityEditModeState(activities),
+      activites_hour_min:this.createActivityTime(activities),
+      activity_start_end_time:this.createStartAndEndTime(activities),
+      activites:activities,
+    });
+  }
+
+componentWillReceiveProps(nextProps) {
+    if(nextProps.activities !== this.props.activities) {
+        this.initializeActivity(nextProps.activities);
+    }
 }
 
 deleteActivity(event) {
@@ -165,6 +178,8 @@ deleteActivity(event) {
         activities_edit_mode:updated_activities_edit_mode,
         activites_hour_min:updated_activites_hour_min,
         activity_start_end_time:updated_activity_start_end_time,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 
     this.toggle_delete(event);
@@ -206,7 +221,7 @@ secondsToHourMinStr(durationInSeconds){
         let min = parseInt(durationInSeconds/60);
         let hour = parseInt(min/60);
         let mins = parseInt(min%60);
-        mins = (mins && mins < 10) ? "0" + mins : mins;
+        mins = (mins < 10) ? "0" + mins : mins;
         time = hour + ":" + mins;
     }
     return time;
@@ -265,37 +280,8 @@ createStartAndEndTime(activityData){
     return activity_start_end_time;
 }
 
-sucessActivity(data){
-    this.setState({
-      selected_date:this.state.selected_date,
-      activities_edit_mode:this.createActivityEditModeState(data.data.activites),
-      activites_hour_min:this.createActivityTime(data.data.activites),
-      activity_start_end_time:this.createStartAndEndTime(data.data.activites),
-      activites:data.data.activites,
-    });
-
-  }
-
-  errorActivity(error){
+errorActivity(error){
     console.log(error);
-}
-
-processDate(date){
-this.setState({
-selected_date:date,
-calendarOpen:!this.state.calendarOpen
-});
-fetchActivity(date,this.sucessActivity,this.errorActivity);
-}
-
-componentDidMount(){
-    fetchActivity(this.state.selected_date,this.sucessActivity, this.errorActivity)
-}
-toggleCalendar(event){
- 
-this.setState({
-calendarOpen:!this.state.calendarOpen
-})
 }
 toggleModal(){
     this.setState({
@@ -371,7 +357,7 @@ editToggleHandlerActivityType(event){
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
         },()=>{
-            console.log(this.state);
+            this.props.updateParentActivities(this.state.activites);
         });
     }
 }
@@ -388,6 +374,8 @@ editToggleHandler_heartrate(event){
         this.setState({
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
         });
     }
 }
@@ -418,6 +406,8 @@ editToggleHandlerStartTime(selectedActivityId,event){
         activity_start_end_hour:activity_start_end_hour,
         activity_start_end_min:activity_start_end_min,
         activity_start_end_am_pm:activity_start_end_am_pm,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -447,6 +437,8 @@ editToggleHandlerEndTime(selectedActivityId,event){
         activity_start_end_hour:activity_start_end_hour,
         activity_start_end_min:activity_start_end_min,
         activity_start_end_am_pm:activity_start_end_am_pm,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -462,6 +454,8 @@ if(selectedActivityId){
     this.setState({
     ...this.state.activities_edit_mode,
         [selectedActivityId]:categoryMode
+      },()=>{
+        this.props.updateParentActivities(this.state.activites);
       });
    if(!categoryMode['comments']){
       $('#'+selectedActivityId).css('display','none');
@@ -501,22 +495,12 @@ editToggleHandlerDuration(event){
                 ...this.state.activites,
                 [selectedActivityId]:timeOriginData
             }
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
         });
     }
 }   
 
-// handleChangeActivityCalendar(date){
- 
-//   this.setState({
-//     activity_calender: date
-//   })
-// }
-// handleChangeActivityStartTimeCalendar(date){
- 
-//   this.setState({
-//     activitystarttime_calender: date
-//   })
-// }
 handleChange_activity(event){
   const target = event.target;
   const value = target.value;
@@ -567,7 +551,6 @@ handleChange_time(event){
 
 }
   handleChange_start_time(date){
-    //let start_time_data= date._d;
      this.setState({
       workout_start_time:date
      });
@@ -575,7 +558,6 @@ handleChange_time(event){
 
   }
   handleChange_end_time(date){
-       
     this.setState({
       workout_end_time:date
     });
@@ -839,15 +821,17 @@ CreateNewActivity(data){
     if(activityStartTimeMObject && activityEndTimeMObject){
         durationSeconds = activityEndTimeMObject.diff(activityStartTimeMObject,'seconds');
     }
+    let timezone = moment.tz.guess();
+    let tzOffsetFromUTCInSeconds = (moment.tz(moment.utc(),timezone).utcOffset())*60;
 
     let new_value = {
-        "summaryId": newActivityID,
+        "summaryId": newActivityID.toString(),
         "activityType": this.state.modal_activity_type,
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
-        "startTimeOffsetInSeconds":234
+        "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds
     }; 
 
     let durationInHourMin = this.secondsToHourMinStr(new_value["durationInSeconds"]);
@@ -862,8 +846,6 @@ CreateNewActivity(data){
     };
 
     let activity_start_end_time_state = this.createStartAndEndTime({[newActivityID]:new_value});
-    console.log("state:",activity_start_end_time_state);
-
     this.setState({
         activites:{
             ...this.state.activites,
@@ -902,6 +884,8 @@ CreateNewActivity(data){
             ...this.state.activity_start_end_time,
             [newActivityID]:activity_start_end_time_state[newActivityID]
         }
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -1056,7 +1040,6 @@ renderTable(){
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","comments"];
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
-        console.log(key, value);
         let activityData = [];
         let summaryId; 
         let hour;
@@ -1624,7 +1607,7 @@ renderEditActivityModal(){
                       </div>
                       </FormGroup>
                        <FormGroup>
-                      <Label className="padding1">4. Exercise Comments</Label>
+                      <Label className="padding1">6. Exercise Comments</Label>
                        <div className="input1 ">
                         <Textarea 
                           className="form-control"
@@ -1653,31 +1636,9 @@ render(){
 return(
 
 <div className = "container_fluid">
-<NavbarMenu fix={true}/>
 <div className="row justify-content-center">
-<div id = "activity_calender " className="cal_width">
-<span id="navlink" onClick={this.toggleCalendar} id="progress">
-                <FontAwesome
-                    name = "calendar"
-                    size = "2x"
-                />
-      </span> 
-      <Popover
-                        placement="bottom"
-                        isOpen={this.state.calendarOpen}
-                        target="progress"
-                        toggle={this.toggleCalendar}>
-                              <PopoverBody className="calendar2">
-                                <CalendarWidget  onDaySelect={this.processDate}/>
-                              </PopoverBody>
-                     </Popover> 
-                     </div>
-                       
-
-          
-
-                     <div id = "activity_table">
-                      <div className="table-responsive tableresponsive" >  
+<div id = "activity_table">
+<div className="table-responsive tableresponsive" >  
 <table className = "table table-striped table-hover table-responsive" id="dataTable">
 <thead id = "add_button">
 <td id = "add_button" className="add_button_back">Exercise Type</td>
@@ -1690,12 +1651,6 @@ return(
 </thead>
 <tbody className = "tbody_styles">
 {this.renderTable()}
-
-
-
-            
-            
-
 </tbody>
 </table>
 </div>
@@ -1704,7 +1659,6 @@ return(
   <Button
     id="nav-btn"
     style={{backgroundColor:"#ed9507"}}
-    type="submit"
     className="btn btn-block-lg"
     onClick={this.handleChangeModal}>
      <span

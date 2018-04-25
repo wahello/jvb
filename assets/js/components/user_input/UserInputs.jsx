@@ -190,6 +190,7 @@ class UserInputs extends React.Component{
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
       this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
       this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
+      this.handleQuickReportPreSubmit = handlers.handleQuickReportPreSubmit.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -206,6 +207,7 @@ class UserInputs extends React.Component{
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
       this.renderHrr = renderers.renderHrr.bind(this);
+      this.renderActivityGrid = renderers.renderActivityGrid.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -245,6 +247,7 @@ class UserInputs extends React.Component{
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
       this.createWindDropdown = this.createWindDropdown.bind(this)
+      this.onFetchGarminSuccessActivities = this.onFetchGarminSuccessActivities.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -419,6 +422,7 @@ class UserInputs extends React.Component{
           dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
           humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
           weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
+          activities:(have_strong_input&&canUpdateForm)?JSON.parse(data.data.strong_input.activities):{},
 
 
           measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
@@ -471,15 +475,21 @@ class UserInputs extends React.Component{
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
-              !this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet' ||
-              (!this.state.weight || this.state.weight == "i do not weigh myself today")){
-            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
+              (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
+              (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
+              (!_.isEmpty(this.state.activities))){
+            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
-            else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet')
+            }
+            else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
-            else if(!this.state.weight || this.state.weight == "i do not weigh myself today")
+            }
+            else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
-            
+            }
+            else if(_.isEmpty(this.state.activities)){
+             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
+            }
           } 
           window.scrollTo(0,0);
         });
@@ -532,6 +542,12 @@ class UserInputs extends React.Component{
       let workout_status = this.state.workout;
       let sleep_stats = data.data.sleep_stats;
       let have_activities = data.data.have_activities;
+      let activities = this.state.activities;
+
+      if(_.isEmpty(activities) && !_.isEmpty(data.data.activites)){
+        activities = data.data.activites;
+      }
+
       let weight = this.state.weight;
       if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value){
@@ -573,7 +589,8 @@ class UserInputs extends React.Component{
           sleep_hours_last_night:hours,
           sleep_mins_last_night:mins,
           workout:have_activities?'yes':workout_status,
-          weight: weight?weight:"i do not weigh myself today"
+          weight: weight?weight:"i do not weigh myself today",
+          activities:activities
       });
      }
     }
@@ -583,24 +600,44 @@ class UserInputs extends React.Component{
     if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value)
         weight = Math.round((data.data.weight.value)*0.00220462);
+
+    let activities = this.state.activities;
+    if(_.isEmpty(activities)){
+      activities = data.data.activities;
+    }
       
     let workout_status = this.state.workout;
     let have_activities = data.data.have_activities;
     this.setState({
       workout: have_activities?'yes':workout_status,
-      weight: weight?weight:"i do not weigh myself today"
+      weight: weight?weight:"i do not weigh myself today",
+      activities:activities
     });
   }
 
   onFetchGarminSuccessWeight(data){
     let weight = this.state.weight;
+    let activities = this.state.activities;
+    if(_.isEmpty(activities)){
+      activities = data.data.activities;
+    }
     if(data.data.weight.value)
       // convert to pound
       weight = Math.round(data.data.weight.value*0.00220462);
 
     this.setState({
-       weight: weight?weight:"i do not weigh myself today"
+       weight: weight?weight:"i do not weigh myself today",
+       activities:activities
     });
+  }
+
+  onFetchGarminSuccessActivities(data){
+    let activities = this.state.activities;
+    if(_.isEmpty(activities)){
+      this.setState({
+        activities:activities
+      });
+    }
   }
   
 
@@ -729,6 +766,7 @@ getTotalSleep(){
     }
 
     onUpdate(){
+      this.handleQuickReportPreSubmit();
       this.setState({
         updating_form:true
       },function(){
@@ -738,6 +776,7 @@ getTotalSleep(){
 
     onSubmit(event){
       event.preventDefault();
+      this.handleQuickReportPreSubmit();
       this.setState({
         submitting_form:true
       },function(){
@@ -1310,9 +1349,19 @@ handleScroll() {
                                 </div>  
                               }
                               {
-                                !this.state.editable &&
-                                <div className="input">
-                                  <p>{this.state.report_type}</p>
+                                !this.state.editable && this.state.report_type == "quick" &&
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Quick Report</span>
+                                </div>
+                              }
+                              {
+                                !this.state.editable && this.state.report_type == "full" &&
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Full Report</span>
                                 </div>
                               }
                           </FormGroup>
@@ -1411,7 +1460,10 @@ handleScroll() {
                                page and selecting any date you would like to enter information for.
                                </div>
                               </ModalBody>
-                           </Modal>       
+                           </Modal>
+
+                           {this.renderActivityGrid()}
+
                            {(this.state.workout === "no") && this.state.report_type == 'full' &&
                           <FormGroup>
                               <Label className="padding">1.0.1 What Was The Reason You Did Not Exercise Today?</Label>
@@ -1679,7 +1731,7 @@ handleScroll() {
 
                             {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                               <FormGroup>   
-                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard”?
+                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard?
                                 <span id="easyorhard"
                              onClick={this.toggleEasyorHard} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -3398,6 +3450,8 @@ handleScroll() {
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
                                </div>
+
+
                           
          
                           <div id="stress">
@@ -3533,7 +3587,7 @@ handleScroll() {
                             </FormGroup>
                           }
 
-                         {(this.state.report_type === 'full') &&
+                         {(this.state.report_type === 'full') && (this.state.gender === 'F') &&
                              <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
                               {this.state.editable &&
@@ -3656,7 +3710,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                           <FormGroup>      
                             <Label className="padding">15.1 Where did you travel to or stay?</Label>
                               {this.state.editable &&
@@ -3676,7 +3730,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                            <FormGroup>   
                             <Label className="padding">15.2 Was your Travel for work, vacation, or other?</Label>
                             {this.state.editable &&
@@ -3713,7 +3767,7 @@ handleScroll() {
                           </FormGroup>
                         }
                         {
-                         (this.state.travel_purpose_checked == "other") &&
+                         (this.state.travel_purpose_checked == "other") && (this.state.report_type == 'full') &&
                           <FormGroup>              
                               {this.state.editable &&
                                 <div className="input1">

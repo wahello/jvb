@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import FontAwesome from "react-fontawesome";
 import moment from 'moment';
+import _ from 'lodash'
+
 
 import WorkoutEffortModal from './workoutEffortModal';
 import PainModal from './painModal';
@@ -14,13 +16,13 @@ import DietType from './diettype';
 import SmokedSubstance from './smokedSubstance';
 import AlcoholModal from './alcoholModal';
 import Hrr from './HRR';
+import ActivityGrid from './activity_grid';
 
 export function renderWorkoutEffortModal(){
   if(this.state.workout_effort !== "no workout today" &&  
 	 this.state.workout_effort !== "" &&
   	 (this.state.workout_easy === "easy" ||
      this.state.workout_easy === "medium")){
-  	console.log("rendering");
 	const updateState = function(val){
 						  this.setState({
 							workout_effort_hard_portion:val
@@ -104,7 +106,7 @@ export function renderFasted(){
 
 
 export function renderPrescriptionMedication(){
-	if(this.state. medications === 'yes'){
+	if((this.state.medications === 'yes') || (this.state.report_type == 'quick')){
 	 const updateStateMedication = function(val){
 							  this.setState({
 						   medications_taken_list: val
@@ -113,7 +115,7 @@ export function renderPrescriptionMedication(){
 	 const updateStateCtrlSubs = function(val){
 							  this.setState({
 						   controlled_uncontrolled_substance: val
-							  })}.bind(this);          
+							  })}.bind(this);        
 	  return(
 		  <PrescriptionMedication
 		  medications_taken_list={this.state.medications_taken_list}
@@ -121,6 +123,7 @@ export function renderPrescriptionMedication(){
 		  updateStateMedication={updateStateMedication}
 		  updateStateCtrlSubs={updateStateCtrlSubs}
 		  editable = {this.state.editable}
+		  report_type = {this.state.report_type}
 		  />
 		);
 	  }
@@ -302,6 +305,22 @@ export function renderSubmitOverlay(){
 					<p>Submitting data for {selected_date.format('MMM D, YYYY')}</p>
 				</div>
 			</div>
+		);
+	}
+}
+
+export function renderActivityGrid(){
+	if(!_.isEmpty(this.state.activities)){
+		const updateParentActivities = function(activities){
+				this.setState({
+					activities:activities
+				});
+		}.bind(this);
+		return(
+			<ActivityGrid
+				updateParentActivities = {updateParentActivities}
+				activities = {this.state.activities}
+			/>
 		);
 	}
 }
