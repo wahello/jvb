@@ -472,16 +472,23 @@ editToggleHandlerDuration(event){
     let timeOriginData = this.state.activites[selectedActivityId];
     let currentHour = timeHourMin['duration_hour'];
     let currentMin = timeHourMin['duration_min'];
-    let durationInSeconds = 0;
+    let durationInSeconds = timeOriginData['durationInSeconds'];
+    let isDurationChanged = false;
+
     if(currentHour && currentMin){
         currentHour = parseInt(currentHour);
         currentMin = parseInt(currentMin);
         durationInSeconds = ((currentHour * 3600) + (currentMin * 60));
-    } 
-    timeOriginData['durationInSeconds'] = durationInSeconds;
+    }
+
+    if (this.secondsToHourMinStr(timeOriginData['durationInSeconds'])
+        != this.secondsToHourMinStr(durationInSeconds)){ 
+        isDurationChanged = true;
+    }
     timeHourMin['durationInSeconds'] = durationInSeconds;
     timeEditMode['durationInSeconds'] = !timeEditMode['durationInSeconds'] ;
-    if(selectedActivityId){
+
+    if(selectedActivityId && isDurationChanged){
         this.setState({
             activites_hour_min:{
                 ...this.state.activites_hour_min,
@@ -494,6 +501,20 @@ editToggleHandlerDuration(event){
             activites:{
                 ...this.state.activites,
                 [selectedActivityId]:timeOriginData
+            }
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+    }
+    else{
+        this.setState({
+            activites_hour_min:{
+                ...this.state.activites_hour_min,
+                [selectedActivityId]:timeHourMin
+            },
+            activities_edit_mode: {
+                ...this.state.activities_edit_mode,
+                [selectedActivityId]:timeEditMode
             }
         },()=>{
             this.props.updateParentActivities(this.state.activites);
@@ -568,7 +589,6 @@ handleChange_heartrate(event){
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
-    console.log(typeof(value));
     activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
     this.setState({
         activites:{
@@ -1347,12 +1367,12 @@ renderTable(){
                                     </div>
                                     </div>
                                     </div>: this.state.activites_hour_min[summaryId]? this.state.activites_hour_min[summaryId]["duration_hour"]+":"+this.state.activites_hour_min[summaryId]["duration_min"]:time}
-                            {this.props.editable &&  
+                            {/*this.props.editable &&  
                                 <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
                                 className="fa fa-pencil fa-1x progressActivity1 "
                                 id = "add_button">
                                 </span>
-                        }
+                             */}
                             </td>); 
             }
             else if(key === "comments"){
