@@ -1665,7 +1665,7 @@ return(
 </table>
 </div>
 {this.props.editable && 
- <div className="btn2 btn4 mar_20  row"> 
+ <div className="activity_add_btn btn4 mar_20 row"> 
  <div>
   <Button
     id="nav-btn"
