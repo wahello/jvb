@@ -614,6 +614,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	return sleep_stats
 
 def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+	# print("/n usr input activites",userinput_activities)
 	activity_stats = {
 		"have_activity":False,
 		"distance_run_miles": 0,
@@ -1940,11 +1941,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 			if q.user_input.created_at == current_date.date():
 				todays_daily_strong.append(daily_strong[i])
 				break
-		userinput_activities = ''
-		# jo7userinput_activities = safe_get(todays_daily_strong,'workout_actiity',None)
-		userinput_activities = {"1000000000":{"activityType":"FOOTBALL","averageHeartRateInBeatsPerMinute":103,"comments":"","durationInSeconds":61,
-"startTimeInSeconds":1523481843,"startTimeOffsetInSeconds":-14400,"summaryId":"10000000"},"9999999":{"activityType":"CRICKET","averageHeartRateInBeatsPerMinute":103,"comments":"","durationInSeconds":61,
-"startTimeInSeconds":1523481843,"startTimeOffsetInSeconds":-14400,"summaryId":"99999999"},"2633178982":{'summaryId': '2633178982', 'distanceInMeters': 0.0, 'manual': True, 'maxPaceInMinutesPerKilometer': 0.0, 'activityType': 'BASEBALL', 'activeKilocalories': 5, 'maxHeartRateInBeatsPerMinute': 160, 'averageHeartRateInBeatsPerMinute': 200, 'averageSpeedInMetersPerSecond': 0.0, 'durationInSeconds': 60, 'startTimeOffsetInSeconds': -14400, 'averagePaceInMinutesPerKilometer': 0.0, 'startTimeInSeconds': 1524059292, 'deviceName': 'unknown'}}
+		# userinput_activities = ''
+		userinput_activities = safe_get(todays_daily_strong,'activities',None)
+		if userinput_activities:
+			userinput_activities = json.loads(userinput_activities)
+		# print("Dileeeppppppppppppppp")
+		# print(userinput_activities)	
+# 		userinput_activities = {"1000000000":{"activityType":"FOOTBALL","averageHeartRateInBeatsPerMinute":103,"comments":"","durationInSeconds":61,
+# "startTimeInSeconds":1523481843,"startTimeOffsetInSeconds":-14400,"summaryId":"10000000"},"9999999":{"activityType":"CRICKET","averageHeartRateInBeatsPerMinute":103,"comments":"","durationInSeconds":61,
+# "startTimeInSeconds":1523481843,"startTimeOffsetInSeconds":-14400,"summaryId":"99999999"},"2633178982":{'summaryId': '2633178982', 'distanceInMeters': 0.0, 'manual': True, 'maxPaceInMinutesPerKilometer': 0.0, 'activityType': 'BASEBALL', 'activeKilocalories': 5, 'maxHeartRateInBeatsPerMinute': 160, 'averageHeartRateInBeatsPerMinute': 200, 'averageSpeedInMetersPerSecond': 0.0, 'durationInSeconds': 60, 'startTimeOffsetInSeconds': -14400, 'averagePaceInMinutesPerKilometer': 0.0, 'startTimeInSeconds': 1524059292, 'deviceName': 'unknown'}}
 		# userinput_activities = ast.literal_eval(userinput_activities)
 		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
 		# 	user_input__user = user,
@@ -1960,14 +1965,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		todays_activities_json = todays_activities
-		if userinput_activities:
-			[todays_activities_json.append(tmp) for tmp in userinput_activities.values()]
 
 		todays_manually_updated_json = {}
 		for dic in todays_manually_updated:
 			todays_manually_updated_json[dic.get('summaryId')] = dic
-
-		# todays_manually_updated_json.update(userinput_activities)
 		
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
