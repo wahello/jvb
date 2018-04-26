@@ -320,6 +320,7 @@ export function renderActivityGrid(){
 			<ActivityGrid
 				updateParentActivities = {updateParentActivities}
 				activities = {this.state.activities}
+				editable = {this.state.editable}
 			/>
 		);
 	}

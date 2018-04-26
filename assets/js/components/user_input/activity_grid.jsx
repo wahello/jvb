@@ -1063,11 +1063,12 @@ renderTable(){
                                           onBlur={ this.editToggleHandlerActivityType.bind(this)}>
                                                   {this.activitySelectOptions()}                                                                                                                                                                
                                           </Input> : !this.state.activites[summaryId][key]? activityType :this.state.activites[summaryId][key] }
-                                           
-                <span  data-name = {summaryId} onClick={this.editToggleHandlerActivityType.bind(this)}
+                             {this.props.editable &&               
+                            <span  data-name = {summaryId} onClick={this.editToggleHandlerActivityType.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
                         </span>
+                    }
                                                    
                         </td>);
             }
@@ -1089,10 +1090,12 @@ renderTable(){
                                     {this.createSleepDropdown_heartrate(90,220)}
                                     <option value="Not Measured">Not Measured</option>     
                                       </Input>: this.state.activites[summaryId][key]}
+                                       {this.props.editable &&  
                                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
                         </span>
+                    }
                         </td>
                         );
             }
@@ -1100,14 +1103,15 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm a'):''}                              
+                {start_time?start_time.format('MMM D, YYYY h:mm a'):''} 
+                 {this.props.editable &&                               
                         <span 
                             data-name = {summaryId}  
                             onClick={this.editToggleHandlerStartTime.bind(this,summaryId)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
                         </span>
-
+                    }
                         <Modal 
                         isOpen={this.state.activities_edit_mode[summaryId]["startTimeInSeconds"]}
                         toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} 
@@ -1202,7 +1206,7 @@ renderTable(){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                             {end_time?end_time.format('MMM D, YYYY h:mm a'):''}  
-                                        
+                          {this.props.editable &&                 
                         <span 
                             data-name = {summaryId} 
                             className="fa fa-pencil fa-1x progressActivity1"
@@ -1210,6 +1214,7 @@ renderTable(){
                             onClick={this.editToggleHandlerEndTime.bind(this,summaryId)}
                         >
                         </span>
+                    }
                         <Modal 
                             isOpen={this.state.activities_edit_mode[summaryId]["endTimeInSeconds"]}
                             toggle={this.editToggleHandlerEndTime.bind(this,summaryId)} 
@@ -1341,10 +1346,12 @@ renderTable(){
                                     </div>
                                     </div>
                                     </div>: this.state.activites_hour_min[summaryId]? this.state.activites_hour_min[summaryId]["duration_hour"]+":"+this.state.activites_hour_min[summaryId]["duration_min"]:time}
-                            <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
-                            className="fa fa-pencil fa-1x progressActivity1 "
-                            id = "add_button">
-                            </span>
+                            {this.props.editable &&  
+                                <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
+                                className="fa fa-pencil fa-1x progressActivity1 "
+                                id = "add_button">
+                                </span>
+                        }
                             </td>); 
             }
             else if(key === "comments"){
@@ -1362,11 +1369,12 @@ renderTable(){
                                           </Textarea><Button data-name={summaryId} size = "sm" id={summaryId} 
                                           className="btn btn-info save_btn" onClick={ this.editToggleHandler_comments.bind(this)}>Save
                                           </Button></div>:this.state.activites[summaryId][key]}
-                                         
+                                {this.props.editable &&            
                             <span data-name={summaryId} onClick={this.editToggleHandler_comments.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
                                   id = "add_button">
                             </span>
+                        }
                         </td>);
             }
 
@@ -1376,12 +1384,13 @@ renderTable(){
 
         }
     activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-
+                         {this.props.editable &&  
                         <span className="checkbox_delete fa fa-close martp_20"
                          data-name={summaryId}
                          style={{color:"red", marginTop:"15px"}}
                          onClick={this.toggle_delete}>  
                         </span>
+                    }
 
           <Modal 
            isOpen={this.state.modal_delete && summaryId == this.state.selectedId_delete}
@@ -1638,8 +1647,9 @@ return(
 <div className = "container_fluid">
 <div className="row justify-content-center">
 <div id = "activity_table">
-<div className="table-responsive tableresponsive" >  
-<table className = "table table-striped table-hover table-responsive" id="dataTable">
+<div  className="table-responsive input1 tablecenter1">
+                                             
+<table className="table table-bordered">  
 <thead id = "add_button">
 <td id = "add_button" className="add_button_back">Exercise Type</td>
 <td id = "add_button" className="add_button_back">Activity Average Heart Rate</td>
@@ -1647,31 +1657,33 @@ return(
 <td id = "add_button" className="add_button_back">Enter the Time Your Workout Ended</td>
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm)</td>
 <td id = "add_button" className="add_button_back">Comment</td>
-<td id = "add_button" className="add_button_back">Delete</td>
+ {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
 <tbody className = "tbody_styles">
 {this.renderTable()}
 </tbody>
 </table>
 </div>
- <div className="btn2 btn4 mar_20  row">
+{this.props.editable && 
+ <div className="btn2 btn4 mar_20  row"> 
  <div>
   <Button
     id="nav-btn"
     style={{backgroundColor:"#ed9507"}}
     className="btn btn-block-lg"
     onClick={this.handleChangeModal}>
-     <span
+    <span
         id="add_button"
         data-name=""
-                              className="fa fa-plus-circle fa-1x "
-                            >
-                              </span> &nbsp; 
-                            Create Manual Activity
-                      </Button>
+        className="fa fa-plus-circle fa-1x "
+    >
+        </span> &nbsp; 
+            Create Manual Activity
+  </Button>
 </div>
 
-                                   </div>
+</div>
+}
 
 {this.renderEditActivityModal()}
 
