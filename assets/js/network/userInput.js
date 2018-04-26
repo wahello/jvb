@@ -81,7 +81,12 @@ function formatJSON(data){
 		        "wind":"6",
 		        "dewpoint":"18",
 		        "humidity":"61",
-		        "weather_comment":"Awesome weather"
+		        "weather_comment":"Awesome weather",
+		        "activities":{
+		        	"2551701200":{"activityType":"RUNNING","averageHeartRateInBeatsPerMinute":"129",
+					"comments":"some comment","durationInSeconds":"3786","startTimeInSeconds":"1520885895"
+					"startTimeOffsetInSeconds":"-14400", "summaryId":"2551701200"},
+				}
 		    },	
 		    "encouraged_input": {
 		        "id": 1,
@@ -194,13 +199,14 @@ function formatJSON(data){
 	json_data.strong_input['prescription_or_non_prescription_medication_yesterday'] = data.medications; 
 	json_data.strong_input['prescription_or_non_prescription_medication_taken'] = data.medications_taken_list; 
 	json_data.strong_input['controlled_uncontrolled_substance'] = data.controlled_uncontrolled_substance;
-	json_data.strong_input['indoor_temperature'] = data.indoor_temperature,
-	json_data.strong_input['outdoor_temperature'] = data.outdoor_temperature,
-	json_data.strong_input['temperature_feels_like'] = data.temperature_feels_like,
-	json_data.strong_input['wind'] = data.wind,
-	json_data.strong_input['dewpoint'] = data.dewpoint,
-	json_data.strong_input['humidity'] = data.humidity,
-	json_data.strong_input['weather_comment'] = data.weather_comment
+	json_data.strong_input['indoor_temperature'] = data.indoor_temperature;
+	json_data.strong_input['outdoor_temperature'] = data.outdoor_temperature;
+	json_data.strong_input['temperature_feels_like'] = data.temperature_feels_like;
+	json_data.strong_input['wind'] = data.wind;
+	json_data.strong_input['dewpoint'] = data.dewpoint;
+	json_data.strong_input['humidity'] = data.humidity;
+	json_data.strong_input['weather_comment'] = data.weather_comment;
+	json_data.strong_input['activities'] = JSON.stringify(data.activities);
 
 	json_data.encouraged_input['stress_level_yesterday'] = data.stress; 
 	json_data.encouraged_input['pains_twings_during_or_after_your_workout'] = data.pain; 

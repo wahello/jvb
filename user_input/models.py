@@ -226,7 +226,7 @@ class DailyUserInputStrong(models.Model):
 
     prescription_or_non_prescription_medication_taken = models.TextField(blank=True)
     controlled_uncontrolled_substance = models.CharField(
-        max_length=4, choices=CTRL_SUBS_CHOICE, blank = True)
+        max_length=10, choices=CTRL_SUBS_CHOICE, blank = True)
 
     indoor_temperature = models.CharField(
             validators = [CharMinValueValidator(-20),CharMaxValueValidator(120)],
@@ -253,6 +253,7 @@ class DailyUserInputStrong(models.Model):
         max_length=10, blank=True)
 
     weather_comment = models.TextField(blank=True)
+    activities = models.TextField(blank=True)
     
 class DailyUserInputEncouraged(models.Model):
 
