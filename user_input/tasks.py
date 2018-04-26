@@ -12,7 +12,7 @@ def notify_admins_task(admin_users_email,instance_meta):
 		submits/updates user inputs
 	'''
 	try:
-		send_userinput_update_email(admin_users_email,instance_meta)
+		# send_userinput_update_email(admin_users_email,instance_meta)
 		logger.info("Sent email successfully")
 	except Exception as e:
 		logger.error(str(e),exc_info=True)

@@ -568,7 +568,8 @@ handleChange_heartrate(event){
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
-    activity_data['averageHeartRateInBeatsPerMinute'] = value;
+    console.log(typeof(value));
+    activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
     this.setState({
         activites:{
             ...this.state.activites,
@@ -766,6 +767,11 @@ handleChange(event){
             "modal_activity_type":value
         });
     }
+    else if (name == "modal_activity_heart_rate"){
+        this.setState({
+            [name]: parseInt(value)
+        });
+    }
     else{
         this.setState({
             [name]: value
@@ -783,17 +789,11 @@ handleChange(event){
     return elements;
   }
   createSleepDropdown_heartrate(start_num , end_num, mins=false, step=1){
-    let elements = [];
+    let elements = [<option key={0} value={0}>Not Measured</option>];
     let i = start_num;
     while(i<=end_num){
-      if(i < 1)
-        elements.push(
-          <option key={0} value={0}>Not Measured</option>
-          );
-      else
-        elements.push(
-          <option key={i} value={i}>{i}</option>);
-      i=i+step;
+        elements.push(<option key={i} value={i}>{i}</option>);
+        i=i+step;
     }
     return elements;
   }
@@ -1074,9 +1074,11 @@ renderTable(){
             }
 
             else if(key === "averageHeartRateInBeatsPerMinute"){
-                let  averageHeartRateInBeatsPerMinute=keyValue;
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                                            { this.state.activities_edit_mode[summaryId][key]  ?                            
+                                        {this.state.activities_edit_mode[summaryId][key] ?                            
                                         <Input 
                                         data-name = {summaryId}
                                         type="select" 
@@ -1087,9 +1089,8 @@ renderTable(){
                                         onBlur={this.editToggleHandler_heartrate.bind(this)}>
                                         
                                         <option key="hours" value=" ">Select</option>
-                                    {this.createSleepDropdown_heartrate(90,220)}
-                                    <option value="Not Measured">Not Measured</option>     
-                                      </Input>: this.state.activites[summaryId][key]}
+                                    {this.createSleepDropdown_heartrate(90,220)}  
+                                      </Input>: hr}
                                        {this.props.editable &&  
                                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
@@ -1467,8 +1468,7 @@ renderEditActivityModal(){
                           value={this.state.modal_activity_heart_rate}                               
                           onChange={this.handleChange}>
                           <option key="hours" value="">Select</option>
-                          <option value="Not Measured">Not Measured</option>  
-                        {this.createSleepDropdown(90,220)}     
+                        {this.createSleepDropdown_heartrate(90,220)}     
                         </Input>
                             </div> 
                             </FormGroup>                               
