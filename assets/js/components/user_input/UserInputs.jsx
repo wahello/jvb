@@ -369,6 +369,10 @@ class UserInputs extends React.Component{
         if(have_strong_input && data.data.strong_input.strength_workout_end)
           strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
 
+        let activities = {};
+        if(have_strong_input && canUpdateForm && data.data.strong_input.activities){
+          activities = JSON.parse(data.data.strong_input.activities);
+        }
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -422,7 +426,7 @@ class UserInputs extends React.Component{
           dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
           humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
           weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
-          activities:(have_strong_input&&canUpdateForm)?JSON.parse(data.data.strong_input.activities):{},
+          activities:activities,
 
 
           measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
