@@ -12,17 +12,21 @@ import { getGarminToken,logoutUser} from '../network/auth';
 
 
 let objectLength = 0;
+ let names;
+ let names1;  
 class AllRank_Data1 extends Component{
     constructor(props){
         super(props);
         this.state = {
             isOpen:false,
+            td_view:false,
         }
         this.renderTable = this.renderTable.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
         this.toggle = this.toggle.bind(this);
         this.scrollCallback = this.scrollCallback.bind(this);
-        
+        this.renderScoreHeader = this.renderScoreHeader.bind(this);
+        this.renderScoreHeader1 = this.renderScoreHeader1.bind(this);
     }
      handleLogout(){
         this.props.logoutUser(this.onLogoutSuccess);
@@ -35,13 +39,6 @@ class AllRank_Data1 extends Component{
       componentDidUpdate() {
           console.log("Hello componentDidUpdate");
       }
-  /*handleScroll(){
-            var b = document.getElementById('hambergar').clientHeight;
-            console.log("**********",b);
-          var scrollHeight = b + document.getElementById("lbscroll").offsetTop;
-          console.log("**********",scrollHeight);
-          window.scrollTo(0, scrollHeight+270);    
-  }*/
   scrollCallback(operationCount) {
       if (objectLength === operationCount) {
           setTimeout(function () {
@@ -58,9 +55,35 @@ class AllRank_Data1 extends Component{
           }, 100);
       }
   }
-    renderTable(data,a_username){
+  renderScoreHeader(data,c_name){
+     let category = ["rank","username","score","other_scores"];
+                for (let [key1,value1] of Object.entries(data)){
+                    let values =[];
+                    let currentUser = '';
+                    for (let cat of category){
+                        if(cat == "score"){
+                          if(c_name == "Percent Unprocessed Food"){
+                            names = null;
+                          }
+                          else{
+                            names = <th className = "progress_table">{value1[cat].verbose_name}</th>;
+                          }
+                        }
+                    }
+                }
+                return names;
+  }
+renderScoreHeader1(data){
+  let name;
+    if(data){
+      name = <th className = "progress_table">{data}</th>
+    };
+    return name;
+  }
+
+    renderTable(data,a_username,c_name){
         let rowData = [];
-        let category = ["rank","username","score"];
+        let category = ["rank","username","score","other_scores"];
         let keys = [];
         let operationCount = 0;
         let trCount = 0;
@@ -71,6 +94,10 @@ class AllRank_Data1 extends Component{
                     let currentUser = '';
                     for (let cat of category){
                         if(cat == "score"){
+                          if(c_name == "Percent Unprocessed Food"){
+                            values.push(null);
+                          }
+                          else{
                             let value = value1[cat].value;
                             if(value != undefined){
                                 value += '';
@@ -83,6 +110,7 @@ class AllRank_Data1 extends Component{
                                   }
                                 values.push(<td className = "progress_table">{x1 + x2}</td>);
                                }
+                          }
                         }
                         else if(cat == "username"){
                             let user = value1[cat];
@@ -95,6 +123,13 @@ class AllRank_Data1 extends Component{
                                 currentUser = '';
                             }
 
+                        }
+                        else if(cat == "other_scores"){
+                         if(c_name == "Percent Unprocessed Food" || c_name == "Average Sleep"){
+                          for (let [key3,o_score] of Object.entries(value1[cat])){
+                                values.push(<td className = "progress_table">{o_score.value}</td>)
+                              }
+                            }
                         }
                         else{
                             values.push(<td className = "progress_table">{value1[cat]}</td>);
@@ -110,50 +145,8 @@ class AllRank_Data1 extends Component{
     render(){
         const {fix} = this.props;
         const rankdata = this.props.data;
-
         return(
             <div>
-                {/*<Navbar toggleable
-                 fixed={fix ? 'top' : ''}
-                  className="navbar navbar-expand-sm navbar-inverse nav6">
-                  <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-                   <FontAwesome
-                         name = "bars"
-                         size = "1x"
-                     />
-                  </NavbarToggler>
-                  <Link to='/' >
-                    <NavbarBrand
-                      className="navbar-brand float-sm-left"
-                      id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-                      <img className="img-fluid"
-                       style={{maxWidth:"200px"}}
-                       src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-                    </NavbarBrand>
-                  </Link>
-                    <span id="lbheader">
-                    <h4 className="lbhead" id="head">
-                    </h4>
-                    </span>
-                  <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
-                    <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-                      <NavItem className="float-sm-right">
-                        <Link id="logout"className="nav-link" to='/leaderboard'>My Ranking</Link>
-                      </NavItem>
-                      <NavItem className="float-sm-right">
-                        <Link id="logout"className="nav-link" to='/'>Home</Link>
-                      </NavItem>
-                       <NavItem className="float-sm-right">
-                           <NavLink
-                           className="nav-link"
-                           id="logout"
-                           onClick={this.handleLogout}>Log Out
-                            </NavLink>
-                      </NavItem>
-                    </Nav>
-                  </Collapse>
-                </Navbar>*/}
-               
                     <div className="col-sm-12 col-md-12 col-lg-12">
                     <div style = {{paddingTop:"5px"}} className = "row justify-content-center ar_table_padd">
                     <div className = "table table-responsive ">
@@ -162,10 +155,11 @@ class AllRank_Data1 extends Component{
                         <thead className = "progress_table">
                             <th className = "progress_table">Rank</th>
                             <th className = "progress_table">Username</th>
-                            <th className = "progress_table">Score</th>                
+                            {this.renderScoreHeader(this.props.data,this.props.active_category_name)}
+                            {this.renderScoreHeader1(this.props.all_verbose_name)}         
                         </thead>
                         <tbody className = "progress_table">
-                            {this.renderTable(this.props.data,this.props.active_username)}
+                            {this.renderTable(this.props.data,this.props.active_username,this.props.active_category_name)}
                         </tbody>
                     </table>
                     <div style={{height: "1000px"}}></div>
