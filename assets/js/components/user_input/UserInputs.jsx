@@ -481,17 +481,21 @@ class UserInputs extends React.Component{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
-              (!_.isEmpty(this.state.activities))){
+              (_.isEmpty(this.state.activities))){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
+              console.log("first Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
             else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
+              console.log("Second Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
             }
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
+             console.log("third Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
             else if(_.isEmpty(this.state.activities)){
+             console.log("fourth Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
             }
           } 
@@ -607,7 +611,7 @@ class UserInputs extends React.Component{
 
     let activities = this.state.activities;
     if(_.isEmpty(activities)){
-      activities = data.data.activities;
+      activities = data.data.activites;
     }
       
     let workout_status = this.state.workout;
@@ -623,7 +627,7 @@ class UserInputs extends React.Component{
     let weight = this.state.weight;
     let activities = this.state.activities;
     if(_.isEmpty(activities)){
-      activities = data.data.activities;
+      activities = data.data.activites;
     }
     if(data.data.weight.value)
       // convert to pound
@@ -637,9 +641,10 @@ class UserInputs extends React.Component{
 
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
+    console.log(data.data.activites);
     if(_.isEmpty(activities)){
       this.setState({
-        activities:activities
+        activities:data.data.activites
       });
     }
   }
