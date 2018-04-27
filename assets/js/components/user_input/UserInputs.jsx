@@ -369,10 +369,6 @@ class UserInputs extends React.Component{
         if(have_strong_input && data.data.strong_input.strength_workout_end)
           strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
 
-        let activities = {};
-        if(have_strong_input && canUpdateForm && data.data.strong_input.activities){
-          activities = JSON.parse(data.data.strong_input.activities);
-        }
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -426,7 +422,7 @@ class UserInputs extends React.Component{
           dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
           humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
           weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
-          activities:activities,
+          activities:(have_strong_input&&canUpdateForm)?JSON.parse(data.data.strong_input.activities):{},
 
 
           measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
@@ -481,21 +477,17 @@ class UserInputs extends React.Component{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
-              (_.isEmpty(this.state.activities))){
+              (!_.isEmpty(this.state.activities))){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
-              console.log("first Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
             else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
-              console.log("Second Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
             }
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
-             console.log("third Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
             else if(_.isEmpty(this.state.activities)){
-             console.log("fourth Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
             }
           } 
@@ -611,7 +603,7 @@ class UserInputs extends React.Component{
 
     let activities = this.state.activities;
     if(_.isEmpty(activities)){
-      activities = data.data.activites;
+      activities = data.data.activities;
     }
       
     let workout_status = this.state.workout;
@@ -627,7 +619,7 @@ class UserInputs extends React.Component{
     let weight = this.state.weight;
     let activities = this.state.activities;
     if(_.isEmpty(activities)){
-      activities = data.data.activites;
+      activities = data.data.activities;
     }
     if(data.data.weight.value)
       // convert to pound
@@ -641,10 +633,9 @@ class UserInputs extends React.Component{
 
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
-    console.log(data.data.activites);
     if(_.isEmpty(activities)){
       this.setState({
-        activities:data.data.activites
+        activities:activities
       });
     }
   }
@@ -1340,15 +1331,15 @@ handleScroll() {
 
                           <FormGroup>   
                               {this.state.editable &&
-                                <div className="input">
-                                     <Label check className="btn btn-secondary quickreport_class">
-                                        <Input type="radio" name="report_type" 
+                                <div className="input ">
+                                     <Label check className="btn btn-secondary quickreport_class " id = "quick_btn">
+                                        <Input type="radio" name="report_type"
                                         value="quick"
                                         checked={this.state.report_type === 'quick'}
                                         onChange={this.handleChange}/>{' '}
                                         Quick Report
                                      </Label>
-                                     <Label check className="btn btn-secondary fullreport_class">
+                                     <Label check className="btn btn-secondary fullreport_class " id = "full_btn">
                                        <Input type="radio" name="report_type" 
                                             value="full"
                                             checked={this.state.report_type === 'full'}
@@ -1394,7 +1385,7 @@ handleScroll() {
                           <div id="workout">
                           {(this.state.report_type === 'full') &&<h3><strong>Workout Inputs</strong></h3>}
 
-                          {(this.state.report_type === "full") &&
+                          {(this.state.report_type === "full" ) &&
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
                              <span id="workoutinfo"

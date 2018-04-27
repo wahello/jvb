@@ -263,8 +263,8 @@ toggle() {
 				  (this.state.lowest_hr_first_minute >= "70") &&
 
 				 <div  className="table-responsive input1 tablecenter1">			       			       			    
-			         <table className="table table-bordered">
-			         <thead>
+			         <table className="table table-bordered">  
+			         <thead> 
 			         <th>HRR time to 99</th>
 			         <th>Heart rate starting point</th>
 			         <th>Number of heart beats recovered in the first minute</th>
