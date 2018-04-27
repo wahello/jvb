@@ -1386,13 +1386,7 @@ handleScroll() {
                            
 
                           <div id="workout">
-<<<<<<< HEAD
-                          {(this.state.report_type === 'full') &&<h3><strong>Workout Inputs</strong></h3>}
-
-                          {(this.state.report_type === "full" ) &&
-=======
                           <h3><strong>Workout Inputs</strong></h3>
->>>>>>> 1d7b9e988e22de96ca5156adf3a7454f67c45622
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
                              <span id="workoutinfo"
