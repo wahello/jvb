@@ -650,7 +650,6 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 			obj_act = obj.get('activityType')
 
 			activities_duration[obj['activityType']] = obj.get('durationInSeconds',0)
-			print(activities_hr)
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = {}
 				activities_hr[obj_act]['hr'] = 0
