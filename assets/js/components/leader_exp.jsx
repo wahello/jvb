@@ -182,7 +182,8 @@ class LeaderBoard1 extends Component{
     event.preventDefault();
     this.setState({
       dateRange1:!this.state.dateRange1,
-      fetching_lb1:true
+      fetching_lb1:true,
+       isOpen1: !this.state.isOpen1,
     },()=>{
         let custom_ranges = [];
         if(this.state.lb2_start_date && this.state.lb2_end_date){
@@ -203,6 +204,7 @@ class LeaderBoard1 extends Component{
     this.setState({
       dateRange2:!this.state.dateRange2,
       fetching_lb2:true,
+       isOpen1: !this.state.isOpen1,
     },()=>{
          let custom_ranges = [];
         if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -224,6 +226,7 @@ class LeaderBoard1 extends Component{
     this.setState({
       dateRange3:!this.state.dateRange3,
       fetching_lb3:true,
+       isOpen1: !this.state.isOpen1,
     },()=>{
          let custom_ranges = [];
          if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -256,7 +259,7 @@ class LeaderBoard1 extends Component{
   	}
   	toggle1() {
 	    this.setState({
-	      isOpen1: !this.state.isOpen,
+	      isOpen1: !this.state.isOpen1,
 	    });
   	}
 	toggleCalendar(){
@@ -654,7 +657,7 @@ class LeaderBoard1 extends Component{
                                           name = "bars"
                                           size = "1x"
                                         />
-                                    </div>
+                                    </div> 
                                </NavbarToggler>
                                <span id="navlink" onClick={this.toggleCalendar} id="progress">
 					                    <FontAwesome
