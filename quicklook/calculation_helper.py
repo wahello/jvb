@@ -613,7 +613,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	return sleep_stats
 
-def get_activity_stats(activities_json,manually_updated_json):
+def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
 	activity_stats = {
 		"have_activity":False,
 		"distance_run_miles": 0,
@@ -633,6 +633,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 	activities_duration = {}
 
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
+	userinput_edited = lambda x: userinput_activities.get(x.get('summaryId'),x)
 	max_duration = 0
 
 	if len(activities_json):
@@ -640,6 +641,10 @@ def get_activity_stats(activities_json,manually_updated_json):
 		avg_run_speed_mps = 0
 		for obj in activities_json:
 			obj = manually_edited(obj)
+	
+			if userinput_activities:
+				obj = userinput_edited(obj)
+	
 			if not activity_stats['have_activity']:
 				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
@@ -654,7 +659,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 			activities_hr[obj_act]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj_act]['count'] += 1
-			activity_stats['total_duration'] += obj.get('durationInSeconds',0)
+			activity_stats['total_duration'] += obj.get('durationInSeconds',0)/2
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -706,7 +711,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 		activity_stats['activities_duration'] = json.dumps(activities_duration)
 		#print(activity_stats)
-			
+
 	return activity_stats
 
 def _get_avg_hr_points_range(age,workout_easy_hard):
@@ -1473,6 +1478,7 @@ def did_workout_today(have_activities,user_did_workout):
 # 					print(todays_activities)
 # 		return (start_time,end_time)
 
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -1525,7 +1531,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Already parsed from json to python objects
 		weekly_activities = get_weekly_data(activities,current_date,last_seven_days_date)
 		todays_activities = weekly_activities.get(current_date.strftime('%Y-%m-%d'))
-			
 
 		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
 				user = user,calendar_date = current_date.date()).order_by('-id')]
@@ -1553,7 +1558,16 @@ def create_quick_look(user,from_date=None,to_date=None):
 			if q.user_input.created_at == current_date.date():
 				todays_daily_strong.append(daily_strong[i])
 				break
-
+		
+		userinput_activities = safe_get(todays_daily_strong,'activities',None)
+		if userinput_activities:
+			userinput_activities = json.loads(userinput_activities)
+		print("\n activites")
+		print(userinput_activities)
+# 		userinput_activities = {"1000000000":{"activityType":"FOOTBALL","averageHeartRateInBeatsPerMinute":103,"comments":"","durationInSeconds":61,
+# "startTimeInSeconds":1523481843,"startTimeOffsetInSeconds":-14400,"summaryId":"10000000"},"9999999":{"activityType":"CRICKET","averageHeartRateInBeatsPerMinute":103,"comments":"","durationInSeconds":61,
+# "startTimeInSeconds":1523481843,"startTimeOffsetInSeconds":-14400,"summaryId":"99999999"},"2633178982":{'summaryId': '2633178982', 'distanceInMeters': 0.0, 'manual': True, 'maxPaceInMinutesPerKilometer': 0.0, 'activityType': 'BASEBALL', 'activeKilocalories': 5, 'maxHeartRateInBeatsPerMinute': 160, 'averageHeartRateInBeatsPerMinute': 200, 'averageSpeedInMetersPerSecond': 0.0, 'durationInSeconds': 60, 'startTimeOffsetInSeconds': -14400, 'averagePaceInMinutesPerKilometer': 0.0, 'startTimeInSeconds': 1524059292, 'deviceName': 'unknown'}}
+		# userinput_activities = ast.literal_eval(userinput_activities)
 		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
 		# 	user_input__user = user,
 		# 	user_input__created_at = current_date)
@@ -1568,11 +1582,17 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
 		todays_activities_json = todays_activities
+		if userinput_activities:
+			[todays_activities_json.append(tmp) for tmp in userinput_activities.values()]
+		print("\nDileepwwwwwwwwwwwweeeeeeeeeeeeeeeeee")
+		print(todays_activities_json)
 
 		todays_manually_updated_json = {}
 		for dic in todays_manually_updated:
 			todays_manually_updated_json[dic.get('summaryId')] = dic
 
+		# todays_manually_updated_json.update(userinput_activities)
+		
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
@@ -1592,7 +1612,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
 		# Exercise
-		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json)
+		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json,userinput_activities)
 		exercise_calculated_data['did_workout'] = did_workout_today(
 				activity_stats['have_activity'],
 				safe_get(todays_daily_strong,"workout","")
@@ -1688,7 +1708,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,
 									   "prcnt_unprocessed_food_consumed_yesterday", 0)
 		food_calculated_data['non_processed_food'] = safe_get(todays_daily_strong,
-								 "list_of_unprocessed_food_consumed_yesterday", "")
+								 "list_of_unprocessed_food_consumed_yesterday", "")			
 		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
@@ -1851,6 +1871,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		SERIALIZED_DATA.append(UserQuickLookSerializer(user_ql).data)
 		#Add one day to current date
 		current_date += timedelta(days=1)
+
 		
 	return SERIALIZED_DATA
 
