@@ -324,7 +324,7 @@ def hrr_calculations(request):
 		for i,k in zip(heartrate_selected_date,timestamp_difference):
 			if (k < 60) and (k >= 0):
 				final_heartrate.extend([i])
-				final_timestamp.extend([k])
+				final_timestamp.extend([k]) 
 
 
 		below_aerobic_value = 180-user_age-30
@@ -337,6 +337,14 @@ def hrr_calculations(request):
 		anaerobic_range_list = []
 		below_aerobic_list = []
 		aerobic_list = []
+
+		# low_end_values = [-61,-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
+		# 					29,34,39,44,49,54,59]
+		# high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-21,-16,-11,0,5,10,13,18,23,28,
+		# 					33,38,43,48,53,58,63]
+		# low_end_heart = [180-40+tmp for tmp in low_end_values]
+		# high_end_heart = [180-40+tmp for tmp in high_end_values]
+
 
 		for a, b in zip(final_heartrate,final_timestamp):
 			if a > anaerobic_value:

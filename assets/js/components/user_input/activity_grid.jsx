@@ -133,6 +133,8 @@ this.state ={
     activity_start_end_min:'',
     activity_start_end_am_pm:'',
 
+    activitystarttime_calender:moment(),
+    activityendtime_calender:moment(),
     modalstarttime_activity_hour:"",
     modalstarttime_activity_min:"",
     modalstarttime_activity_ampm:"",
@@ -1672,9 +1674,9 @@ return(
 <table className="table table-bordered">  
 <thead id = "add_button">
 <td id = "add_button" className="add_button_back">Exercise Type</td>
-<td id = "add_button" className="add_button_back">Activity Average Heart Rate</td>
-<td id = "add_button" className="add_button_back">Enter the Time Your Workout Started</td>
-<td id = "add_button" className="add_button_back">Enter the Time Your Workout Ended</td>
+<td id = "add_button" className="add_button_back">Average Heart Rate</td>
+<td id = "add_button" className="add_button_back">Workout Start Time</td>
+<td id = "add_button" className="add_button_back">Workout End Time</td>
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm)</td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
