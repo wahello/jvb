@@ -369,6 +369,10 @@ class UserInputs extends React.Component{
         if(have_strong_input && data.data.strong_input.strength_workout_end)
           strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
 
+        let activities = {};
+        if(have_strong_input && canUpdateForm && data.data.strong_input.activities){
+          activities = JSON.parse(data.data.strong_input.activities);
+        }
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -422,7 +426,7 @@ class UserInputs extends React.Component{
           dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
           humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
           weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
-          activities:(have_strong_input&&canUpdateForm)?JSON.parse(data.data.strong_input.activities):{},
+          activities:activities,
 
 
           measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
@@ -480,17 +484,21 @@ class UserInputs extends React.Component{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
-              (!_.isEmpty(this.state.activities))){
+              (_.isEmpty(this.state.activities))){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
+              console.log("first Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
             else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
+              console.log("Second Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
             }
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
+             console.log("third Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
             else if(_.isEmpty(this.state.activities)){
+             console.log("fourth Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
             }
           } 
@@ -606,7 +614,7 @@ class UserInputs extends React.Component{
 
     let activities = this.state.activities;
     if(_.isEmpty(activities)){
-      activities = data.data.activities;
+      activities = data.data.activites;
     }
       
     let workout_status = this.state.workout;
@@ -622,7 +630,7 @@ class UserInputs extends React.Component{
     let weight = this.state.weight;
     let activities = this.state.activities;
     if(_.isEmpty(activities)){
-      activities = data.data.activities;
+      activities = data.data.activites;
     }
     if(data.data.weight.value)
       // convert to pound
@@ -636,9 +644,10 @@ class UserInputs extends React.Component{
 
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
+    console.log(data.data.activites);
     if(_.isEmpty(activities)){
       this.setState({
-        activities:activities
+        activities:data.data.activites
       });
     }
   }
@@ -930,19 +939,19 @@ handleScroll() {
    }
 
    infoPrint(){
-    var mywindow = window.open('', 'PRINT');
+    var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
         '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
         '.print {visibility: hidden;}' +
         '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
-        '</style><title>' + document.title  + '</title>');
+        '</style><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
-    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById('modal1').innerHTML);
     mywindow.document.write('</body></html>');
 
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
 
     mywindow.print();
     mywindow.close();
@@ -1386,13 +1395,7 @@ handleScroll() {
                            
 
                           <div id="workout">
-<<<<<<< HEAD
-                          {(this.state.report_type === 'full') &&<h3><strong>Workout Inputs</strong></h3>}
-
-                          {(this.state.report_type === "full" ) &&
-=======
                           <h3><strong>Workout Inputs</strong></h3>
->>>>>>> 1d7b9e988e22de96ca5156adf3a7454f67c45622
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
                              <span id="workoutinfo"
@@ -1474,7 +1477,6 @@ handleScroll() {
                            {(this.state.workout === "no") && this.state.report_type == 'full' &&
                           <FormGroup>
                               <Label className="padding">1.0.1 What Was The Reason You Did Not Exercise Today?</Label>
-
                                   {this.state.editable &&
                                     <div className="input1">
                                         <Input 
@@ -1624,7 +1626,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="strength_workout_start_min"
@@ -1637,7 +1638,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -1651,7 +1651,6 @@ handleScroll() {
                                     
                                      </Input>
                                       </div> 
-
                               </div>
                               </div>
                             }
@@ -1689,7 +1688,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="strength_workout_end_min"
@@ -1702,7 +1700,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -2275,7 +2272,6 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? 
-
                             <span id="fast"
                              onClick={this.toggleFasted} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -2316,7 +2312,6 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.fasted == 'yes' &&
-
                                 <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
                                   <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
@@ -2899,7 +2894,6 @@ handleScroll() {
                                   <div className="input "> 
                                 <Input type="select" name="sleep_hours_bed_time"
                                 id="bed_hr"
-
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_bed_time}
                                 onChange={this.handleChangeSleepHoursMin}>
@@ -2908,7 +2902,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="sleep_mins_bed_time"
@@ -2921,7 +2914,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -2935,7 +2927,6 @@ handleScroll() {
                                     
                                      </Input>
                                       </div> 
-
                               </div>
                               </div>
                             }
@@ -2980,7 +2971,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="sleep_mins_awake_time"
@@ -2993,7 +2983,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -3008,7 +2997,6 @@ handleScroll() {
                                     
                                      </Input>
                                </div>      
-
                               </div>
                               </div>
                             }
@@ -3620,7 +3608,6 @@ handleScroll() {
                           {(this.state.report_type === 'full') &&
                           <FormGroup>
                               <Label className="padding">13. What Type Of Diet Do You Eat?</Label>
-
                                   {this.state.editable &&
                                     <div className="input1">
                                         <Input 
@@ -3656,7 +3643,6 @@ handleScroll() {
                           {(this.state.report_type === 'full') &&
                            <FormGroup>     
                             <Label className="padding">14. Did You Stand For 3 Hours or More Yesterday? </Label>
-
                               {this.state.editable &&
                                 <div className="input1">
                                   
@@ -3689,7 +3675,6 @@ handleScroll() {
                         {(this.state.report_type === 'full') &&
                           <FormGroup>     
                             <Label className="padding">15. Did you travel somewhere today and/or spend the day today away from the city you live in? </Label>
-
                               {this.state.editable &&
                                 <div className="input1">
                                   
