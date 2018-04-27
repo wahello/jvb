@@ -486,19 +486,15 @@ class UserInputs extends React.Component{
               (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
               (_.isEmpty(this.state.activities))){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
-              console.log("first Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
             else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
-              console.log("Second Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
             }
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
-             console.log("third Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
             else if(_.isEmpty(this.state.activities)){
-             console.log("fourth Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
             }
           } 
