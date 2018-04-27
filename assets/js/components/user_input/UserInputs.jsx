@@ -478,6 +478,9 @@ class UserInputs extends React.Component{
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
+          // if(this.state.report_type == 'quick'){
+          //   userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
+          // }
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
@@ -1392,9 +1395,7 @@ handleScroll() {
                            
 
                           <div id="workout">
-                          {(this.state.report_type === 'full') &&<h3><strong>Workout Inputs</strong></h3>}
-
-                          {(this.state.report_type === "full") &&
+                          <h3><strong>Workout Inputs</strong></h3>
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
                              <span id="workoutinfo"
@@ -1437,7 +1438,7 @@ handleScroll() {
                                   <p>{this.state.workout}</p>
                                 </div>
                               }
-                          </FormGroup>}
+                          </FormGroup>
                             <Modal 
                             className="pop"
                             id="popover" 
