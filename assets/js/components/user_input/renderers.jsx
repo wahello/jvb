@@ -310,18 +310,16 @@ export function renderSubmitOverlay(){
 }
 
 export function renderActivityGrid(){
-	if(!_.isEmpty(this.state.activities)){
-		const updateParentActivities = function(activities){
-				this.setState({
-					activities:activities
-				});
-		}.bind(this);
-		return(
-			<ActivityGrid
-				updateParentActivities = {updateParentActivities}
-				activities = {this.state.activities}
-				editable = {this.state.editable}
-			/>
-		);
-	}
+	const updateParentActivities = function(activities){
+			this.setState({
+				activities:activities
+			});
+	}.bind(this);
+	return(
+		<ActivityGrid
+			updateParentActivities = {updateParentActivities}
+			activities = {this.state.activities}
+			editable = {this.state.editable}
+		/>
+	);
 }
