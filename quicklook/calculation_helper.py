@@ -624,6 +624,8 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 			return obj_in_user_activities
 		return obj
 
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
+
 	activity_stats = {
 		"have_activity":False,
 		"distance_run_miles": 0,
@@ -658,14 +660,6 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 	if userinput_activities:
 		filtered_activities += userinput_activities.values()
 
-	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
-	for i,act in enumerate(filtered_activities):
-		if act.get('activityType','') in IGNORE_ACTIVITY:
-			pass
-		else:
-			activity_stats['total_duration'] += act.get('durationInSeconds',0)
-
-
 	if len(filtered_activities):
 		runs_count = 0
 		avg_run_speed_mps = 0
@@ -683,7 +677,9 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 			activities_hr[obj_act]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj_act]['count'] += 1
-			# activity_stats['total_duration'] += obj.get('durationInSeconds',0)
+
+			if(obj.get('activityType') not in IGNORE_ACTIVITY):
+				activity_stats['total_duration'] += obj.get('durationInSeconds',0)
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -1328,28 +1324,22 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
 	# 	elif workout == 'yes': points += 1
 	
 	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
-		if strong_obj and strong_obj.workout == 'yes':
+		if strong_obj and (strong_obj.workout == 'yes'):
 			points += 1
-		elif ((not strong_obj or (strong_obj and strong_obj.workout != 'yes'))
-			and activity_list):
+		elif (
+			(not strong_obj or (strong_obj and strong_obj.workout != 'yes'))
+			and (activity_list or (strong_obj and strong_obj.activities))
+		):
 			points += 1
 	avg_point_week = points / (period/7)
 	grade_point = cal_exercise_consistency_grade(avg_point_week)
 	return grade_point 
 
-def get_workout_duration_grade(todays_activities, todays_manually_updated):
+def get_workout_duration_grade(total_duration):
 	'''
 		Returns a tuple having grade and point (grade, point)
 	'''
-	duration = 0
-	# If same summary is edited manually then give it more preference.
-	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
-
-	if todays_activities:
-		for act in todays_activities:
-			act = manually_edited(act)
-			duration += act.get('durationInSeconds',0)
-	return cal_workout_duration_grade(duration//60)
+	return cal_workout_duration_grade(total_duration//60)
 
 def get_workout_effort_grade(todays_daily_strong):
 	'''
@@ -1369,9 +1359,11 @@ def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updat
 			userinput_activities.pop(obj.get('summaryId'))
 			return obj_in_user_activities
 		return obj
+
 	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
 	filtered_activities = []
+
 	if todays_activities:
 		for obj in todays_activities:
 			obj = manually_edited(obj)
@@ -1407,7 +1399,6 @@ def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updat
 			avg_hr += (act.get('durationInSeconds',0) / total_duration) *\
 					   act.get('averageHeartRateInBeatsPerMinute',0)
 		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
-		print(avg_hr)
 		return cal_avg_exercise_heartrate_grade(avg_hr,workout_easy_hard,age)
 	else:
 		return (None, None, None)
@@ -1500,6 +1491,7 @@ def did_workout_today(have_activities,user_did_workout):
 		return "yes"
 	else:
 		return ""
+
 # def movement_consistency_cal(todays_activities,todays_manually_updated_json,todays_manually_updated):
 # 	if len(todays_activities):
 # 		for obj in todays_activities:
@@ -1755,8 +1747,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# **************************************CALCULATION OF GRADES**************************************
 		
 		# Workout duration grade calculation
-		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json,
-																 todays_manually_updated_json)
+		workout_duration_grade_pts  = get_workout_duration_grade(activity_stats.get('total_duration',0))
 		grades_calculated_data['workout_duration_grade'] = workout_duration_grade_pts[0]
 		grades_calculated_data['workout_duration_gpa'] = workout_duration_grade_pts[1]
 
