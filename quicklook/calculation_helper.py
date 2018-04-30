@@ -613,7 +613,17 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	return sleep_stats
 
-def get_activity_stats(activities_json,manually_updated_json):
+def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+
+	# If same id existed in user submited activities, give it more prefrence
+	# than manually edited activities 
+	def userinput_edited(obj):
+		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
+		if obj_in_user_activities:
+			userinput_activities.pop(obj.get('summaryId'))
+			return obj_in_user_activities
+		return obj
+
 	activity_stats = {
 		"have_activity":False,
 		"distance_run_miles": 0,
@@ -632,14 +642,34 @@ def get_activity_stats(activities_json,manually_updated_json):
 	activities_hr = {}
 	activities_duration = {}
 
-	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
+	# If same id existed in manually edited, give it more prefrence
+	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)	
 	max_duration = 0
 
-	if len(activities_json):
-		runs_count = 0
-		avg_run_speed_mps = 0
+	filtered_activities = []
+	if activities_json:
 		for obj in activities_json:
 			obj = manually_edited(obj)
+			if userinput_activities:
+				obj.update(userinput_edited(obj))
+			filtered_activities.append(obj)
+
+	# merge user created manual activities which are not provided by garmin
+	if userinput_activities:
+		filtered_activities += userinput_activities.values()
+
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
+	for i,act in enumerate(filtered_activities):
+		if act.get('activityType','') in IGNORE_ACTIVITY:
+			pass
+		else:
+			activity_stats['total_duration'] += act.get('durationInSeconds',0)
+
+
+	if len(filtered_activities):
+		runs_count = 0
+		avg_run_speed_mps = 0
+		for obj in filtered_activities:
 			if not activity_stats['have_activity']:
 				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
@@ -653,7 +683,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 			activities_hr[obj_act]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj_act]['count'] += 1
-			activity_stats['total_duration'] += obj.get('durationInSeconds',0)
+			# activity_stats['total_duration'] += obj.get('durationInSeconds',0)
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -705,7 +735,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 		activity_stats['activities_duration'] = json.dumps(activities_duration)
 		#print(activity_stats)
-			
+
 	return activity_stats
 
 def _get_avg_hr_points_range(age,workout_easy_hard):
@@ -1332,33 +1362,52 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
-										 todays_daily_strong,age):
-	filtered_activities = []
-	total_duration = 0
+										 todays_daily_strong,age,userinput_activities=None):
+	def userinput_edited(obj):
+		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
+		if obj_in_user_activities:
+			userinput_activities.pop(obj.get('summaryId'))
+			return obj_in_user_activities
+		return obj
 	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
-	for i,act in enumerate(todays_activities):
-		act = manually_edited(act)
+	filtered_activities = []
+	if todays_activities:
+		for obj in todays_activities:
+			obj = manually_edited(obj)
+			if userinput_activities:
+				obj.update(userinput_edited(obj))
+			filtered_activities.append(obj)
+
+	if userinput_activities:
+		filtered_activities += userinput_activities.values()
+
+	total_duration = 0
+	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
+	final_activities = []
+	# If same summary is edited manually then give it more preference.
+	
+	for i,act in enumerate(filtered_activities):
+
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
 			pass
 		elif 'swimming' in act.get('activityType','').lower():
 			pass
-		elif act.get('activityType','') == 'STRENGTH_TRAINING':
-			pass
-		elif act.get('activityType','') == 'OTHER':
+		elif act.get('activityType','') in IGNORE_ACTIVITY:
 			pass
 		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
 			pass
 		else:
-			filtered_activities.append(act)
+			final_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
 
-	if filtered_activities:
+	if final_activities:
 		avg_hr = 0
-		for act in filtered_activities:
+		for act in final_activities:
 			avg_hr += (act.get('durationInSeconds',0) / total_duration) *\
 					   act.get('averageHeartRateInBeatsPerMinute',0)
 		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
+		print(avg_hr)
 		return cal_avg_exercise_heartrate_grade(avg_hr,workout_easy_hard,age)
 	else:
 		return (None, None, None)
@@ -1472,6 +1521,7 @@ def did_workout_today(have_activities,user_did_workout):
 # 					print(todays_activities)
 # 		return (start_time,end_time)
 
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -1524,7 +1574,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Already parsed from json to python objects
 		weekly_activities = get_weekly_data(activities,current_date,last_seven_days_date)
 		todays_activities = weekly_activities.get(current_date.strftime('%Y-%m-%d'))
-			
 
 		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
 				user = user,calendar_date = current_date.date()).order_by('-id')]
@@ -1552,7 +1601,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 			if q.user_input.created_at == current_date.date():
 				todays_daily_strong.append(daily_strong[i])
 				break
-
+		
+		userinput_activities = safe_get(todays_daily_strong,'activities',None)
+		if userinput_activities:
+			userinput_activities = json.loads(userinput_activities)
+		
 		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
 		# 	user_input__user = user,
 		# 	user_input__created_at = current_date)
@@ -1566,12 +1619,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		daily_optional = [todays_user_input.optional_input if todays_user_input else None]
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
-		todays_activities_json = todays_activities
 
+		todays_activities_json = todays_activities
+		
 		todays_manually_updated_json = {}
 		for dic in todays_manually_updated:
 			todays_manually_updated_json[dic.get('summaryId')] = dic
 
+		# todays_manually_updated_json.update(userinput_activities)
+		
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
@@ -1591,7 +1647,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
 		# Exercise
-		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json)
+		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json,userinput_activities)
 		exercise_calculated_data['did_workout'] = did_workout_today(
 				activity_stats['have_activity'],
 				safe_get(todays_daily_strong,"workout","")
@@ -1687,7 +1743,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,
 									   "prcnt_unprocessed_food_consumed_yesterday", 0)
 		food_calculated_data['non_processed_food'] = safe_get(todays_daily_strong,
-								 "list_of_unprocessed_food_consumed_yesterday", "")
+								 "list_of_unprocessed_food_consumed_yesterday", "")			
 		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
@@ -1711,7 +1767,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Average exercise heartrate grade calculation
 		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
-									todays_manually_updated_json,todays_daily_strong, user.profile.age())
+									todays_manually_updated_json,todays_daily_strong,
+									user.profile.age(),userinput_activities)
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
@@ -1850,6 +1907,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		SERIALIZED_DATA.append(UserQuickLookSerializer(user_ql).data)
 		#Add one day to current date
 		current_date += timedelta(days=1)
+
 		
 	return SERIALIZED_DATA
 
