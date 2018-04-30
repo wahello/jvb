@@ -483,8 +483,7 @@ class UserInputs extends React.Component{
           // }
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
-              (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
-              (_.isEmpty(this.state.activities))){
+              (!this.state.weight || this.state.weight == "i do not weigh myself today")){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
@@ -494,10 +493,8 @@ class UserInputs extends React.Component{
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
-            else if(_.isEmpty(this.state.activities) || this.state.activites){
-             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
-            }
-          } 
+          }
+          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }
@@ -546,15 +543,22 @@ class UserInputs extends React.Component{
     }
 
     getMergedGarminAndUserActivities(garmin_activities,user_activities){
-      // write intelligent merging code for garmin and user activities
+      // merge garmin and user activities, in case when user already submitted 
+      // any manual activity and later on other garmin activites are available.
+
       let merged_activities = {};
       if(!_.isEmpty(user_activities) && !_.isEmpty(garmin_activities)){
-        
+        for(let[key,value] of Object.entries(user_activities)){
+          merged_activities[key] = value;
+          if(key in garmin_activities)
+            delete garmin_activities[key];
+        }
+        _.extend(merged_activities, garmin_activities);
       }
       else if(_.isEmpty(user_activities)){
         merged_activities = garmin_activities;
       }
-      else{
+      else if(_.isEmpty(garmin_activities)){
         merged_activities = user_activities;
       }
       return merged_activities;
@@ -565,11 +569,8 @@ class UserInputs extends React.Component{
       let sleep_stats = data.data.sleep_stats;
       let have_activities = data.data.have_activities;
       let activities = this.state.activities;
-
-      if(_.isEmpty(activities) && !_.isEmpty(data.data.activites)){
-        activities = data.data.activites;
-      }
-
+      activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
+     
       let weight = this.state.weight;
       if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value){
@@ -624,9 +625,7 @@ class UserInputs extends React.Component{
         weight = Math.round((data.data.weight.value)*0.00220462);
 
     let activities = this.state.activities;
-    if(_.isEmpty(activities)){
-      activities = data.data.activites;
-    }
+    activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
       
     let workout_status = this.state.workout;
     let have_activities = data.data.have_activities;
@@ -640,9 +639,7 @@ class UserInputs extends React.Component{
   onFetchGarminSuccessWeight(data){
     let weight = this.state.weight;
     let activities = this.state.activities;
-    if(_.isEmpty(activities)){
-      activities = data.data.activites;
-    }
+    activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
     if(data.data.weight.value)
       // convert to pound
       weight = Math.round(data.data.weight.value*0.00220462);
@@ -655,11 +652,10 @@ class UserInputs extends React.Component{
 
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
-    if(_.isEmpty(activities)){
-      this.setState({
-        activities:data.data.activites
-      });
-    }
+    activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
+    this.setState({
+      activities:activities
+    });
   }
   
 
