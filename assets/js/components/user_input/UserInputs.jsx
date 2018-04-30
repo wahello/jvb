@@ -486,19 +486,15 @@ class UserInputs extends React.Component{
               (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
               (_.isEmpty(this.state.activities))){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
-              console.log("first Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
             else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
-              console.log("Second Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
             }
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
-             console.log("third Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
-            else if(_.isEmpty(this.state.activities)){
-             console.log("fourth Condition");
+            else if(_.isEmpty(this.state.activities) || this.state.activites){
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
             }
           } 
@@ -547,6 +543,21 @@ class UserInputs extends React.Component{
         fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         this.onFetchFailure(data)
       }
+    }
+
+    getMergedGarminAndUserActivities(garmin_activities,user_activities){
+      // write intelligent merging code for garmin and user activities
+      let merged_activities = {};
+      if(!_.isEmpty(user_activities) && !_.isEmpty(garmin_activities)){
+        
+      }
+      else if(_.isEmpty(user_activities)){
+        merged_activities = garmin_activities;
+      }
+      else{
+        merged_activities = user_activities;
+      }
+      return merged_activities;
     }
 
     onFetchGarminSuccessSleep(data){
@@ -644,7 +655,6 @@ class UserInputs extends React.Component{
 
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
-    console.log(data.data.activites);
     if(_.isEmpty(activities)){
       this.setState({
         activities:data.data.activites
