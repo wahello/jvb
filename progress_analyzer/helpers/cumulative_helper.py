@@ -229,6 +229,19 @@ def _get_model_related_fields_names(model):
 		and f.auto_created and not f.concrete]
 	return related_fields_names
 
+def _get_model_not_related_concrete_fields(model):
+	fields_name = [f.name for f in model._meta.get_fields()
+		if f.concrete 
+		and not f.auto_created 
+		and not f.is_relation
+	]
+	return fields_name
+
+def _get_object_field_data_pair(obj):
+	fields = _get_model_not_related_concrete_fields(obj.__class__)
+	data = {f:obj.__dict__.get(f) for f in fields}
+	return data
+
 def _get_queryset(model,user,from_dt, to_dt):
 	day_before_from_date = from_dt - timedelta(days=1)
 	related_fields = _get_model_related_fields_names(model)
@@ -880,7 +893,43 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["stress_cum"] = _get_stress_cum_sum(today_ql_data, yday_cum_data)
 			data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data,yday_cum_data)
 
-		elif today_ql_data:
+		elif not today_ql_data and yday_cum_data:
+			# No quick look data today that means no user input as well,
+			# so copy yesterday PA report data
+			data["overall_health_grade_cum"] = _get_object_field_data_pair(
+				yday_cum_data.overall_health_grade_cum
+			)
+			data["non_exercise_steps_cum"] = _get_object_field_data_pair(
+				yday_cum_data.non_exercise_steps_cum
+			)
+			data["sleep_per_night_cum"] = _get_object_field_data_pair(
+				yday_cum_data.sleep_per_night_cum
+			)
+			data["movement_consistency_cum"] = _get_object_field_data_pair(
+				yday_cum_data.movement_consistency_cum
+			)
+			data["exercise_consistency_cum"] = _get_object_field_data_pair(
+				yday_cum_data.exercise_consistency_cum
+			)
+			data["nutrition_cum"] = _get_object_field_data_pair(
+				yday_cum_data.nutrition_cum
+			)
+			data["exercise_stats_cum"] = _get_object_field_data_pair(
+				yday_cum_data.exercise_stats_cum
+			)
+			data["alcohol_cum"] = _get_object_field_data_pair(
+				yday_cum_data.alcohol_cum
+			)
+			data["other_stats_cum"] = _get_object_field_data_pair(
+				yday_cum_data.other_stats_cum
+			)
+			data["sick_cum"] = _get_object_field_data_pair(yday_cum_data.sick_cum)
+			data["standing_cum"] = _get_object_field_data_pair(yday_cum_data.standing_cum)
+			data["travel_cum"] = _get_object_field_data_pair(yday_cum_data.travel_cum)
+			data["stress_cum"] = _get_object_field_data_pair(yday_cum_data.stress_cum)
+			data["meta_cum"] = _get_object_field_data_pair(yday_cum_data.meta_cum)
+
+		elif today_ql_data and not yday_cum_data:
 			# Very begining when there is no quick look data yesterday
 			# get current quicklook data and create cumulative sum
 			data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data)

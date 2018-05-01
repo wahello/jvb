@@ -2327,11 +2327,10 @@ def export_users_xls(request):
 
 
 	current_date = to_date
-	if data:
-
-		rem_row = i+len_activity-1
-	else:
-		rem_row = i-1
+	# if data:
+	rem_row = i+len_activity-1
+	# else:
+	# 	rem_row = i
 	while (current_date >= from_date):
 		# logic
 		data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)

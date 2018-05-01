@@ -54,6 +54,7 @@ class Movementquick extends Component{
         {name: 'Inactive Hours'},
         {name: 'Strength Hours'},
         {name: 'Sleeping Hours'},
+        {name: 'Exercise Hours'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
         popoverOpen: false,
@@ -167,6 +168,7 @@ class Movementquick extends Component{
            inactive_hours:'-',
            strength_hours:'-',
            sleeping_hours:'-',
+           exercise_hours:'-',
            total_steps:'-'
          }
       }
@@ -241,6 +243,7 @@ class Movementquick extends Component{
       steps_data.push(data['movement_consistency'].inactive_hours);
       steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
+      steps_data.push(data['movement_consistency'].exercise_hours);
      let totalSteps =data['movement_consistency'].total_steps;
        if(totalSteps != undefined){
           totalSteps += '';
