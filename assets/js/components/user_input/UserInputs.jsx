@@ -190,6 +190,7 @@ class UserInputs extends React.Component{
       this.handleChangeNoExerciseReason = handlers.handleChangeNoExerciseReason.bind(this);
       this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
       this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
+      this.handleQuickReportPreSubmit = handlers.handleQuickReportPreSubmit.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -206,6 +207,7 @@ class UserInputs extends React.Component{
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
       this.renderHrr = renderers.renderHrr.bind(this);
+      this.renderActivityGrid = renderers.renderActivityGrid.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
       this.onUpdate = this.onUpdate.bind(this);
@@ -245,6 +247,7 @@ class UserInputs extends React.Component{
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
       this.createWindDropdown = this.createWindDropdown.bind(this)
+      this.onFetchGarminSuccessActivities = this.onFetchGarminSuccessActivities.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -366,6 +369,10 @@ class UserInputs extends React.Component{
         if(have_strong_input && data.data.strong_input.strength_workout_end)
           strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
 
+        let activities = {};
+        if(have_strong_input && canUpdateForm && data.data.strong_input.activities){
+          activities = JSON.parse(data.data.strong_input.activities);
+        }
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -419,6 +426,7 @@ class UserInputs extends React.Component{
           dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
           humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
           weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
+          activities:activities,
 
 
           measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
@@ -470,16 +478,29 @@ class UserInputs extends React.Component{
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
+          // if(this.state.report_type == 'quick'){
+          //   userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
+          // }
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
-              !this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet' ||
-              (!this.state.weight || this.state.weight == "i do not weigh myself today")){
-            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)
+              (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
+              (!this.state.weight || this.state.weight == "i do not weigh myself today") ||
+              (_.isEmpty(this.state.activities))){
+            if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
+              console.log("first Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
-            else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet')
+            }
+            else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
+              console.log("Second Condition");
               fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
-            else if(!this.state.weight || this.state.weight == "i do not weigh myself today")
+            }
+            else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
+             console.log("third Condition");
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
-            
+            }
+            else if(_.isEmpty(this.state.activities)){
+             console.log("fourth Condition");
+             fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
+            }
           } 
           window.scrollTo(0,0);
         });
@@ -532,6 +553,12 @@ class UserInputs extends React.Component{
       let workout_status = this.state.workout;
       let sleep_stats = data.data.sleep_stats;
       let have_activities = data.data.have_activities;
+      let activities = this.state.activities;
+
+      if(_.isEmpty(activities) && !_.isEmpty(data.data.activites)){
+        activities = data.data.activites;
+      }
+
       let weight = this.state.weight;
       if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value){
@@ -573,7 +600,8 @@ class UserInputs extends React.Component{
           sleep_hours_last_night:hours,
           sleep_mins_last_night:mins,
           workout:have_activities?'yes':workout_status,
-          weight: weight?weight:"i do not weigh myself today"
+          weight: weight?weight:"i do not weigh myself today",
+          activities:activities
       });
      }
     }
@@ -583,24 +611,45 @@ class UserInputs extends React.Component{
     if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value)
         weight = Math.round((data.data.weight.value)*0.00220462);
+
+    let activities = this.state.activities;
+    if(_.isEmpty(activities)){
+      activities = data.data.activites;
+    }
       
     let workout_status = this.state.workout;
     let have_activities = data.data.have_activities;
     this.setState({
       workout: have_activities?'yes':workout_status,
-      weight: weight?weight:"i do not weigh myself today"
+      weight: weight?weight:"i do not weigh myself today",
+      activities:activities
     });
   }
 
   onFetchGarminSuccessWeight(data){
     let weight = this.state.weight;
+    let activities = this.state.activities;
+    if(_.isEmpty(activities)){
+      activities = data.data.activites;
+    }
     if(data.data.weight.value)
       // convert to pound
       weight = Math.round(data.data.weight.value*0.00220462);
 
     this.setState({
-       weight: weight?weight:"i do not weigh myself today"
+       weight: weight?weight:"i do not weigh myself today",
+       activities:activities
     });
+  }
+
+  onFetchGarminSuccessActivities(data){
+    let activities = this.state.activities;
+    console.log(data.data.activites);
+    if(_.isEmpty(activities)){
+      this.setState({
+        activities:data.data.activites
+      });
+    }
   }
   
 
@@ -729,6 +778,7 @@ getTotalSleep(){
     }
 
     onUpdate(){
+      this.handleQuickReportPreSubmit();
       this.setState({
         updating_form:true
       },function(){
@@ -738,6 +788,7 @@ getTotalSleep(){
 
     onSubmit(event){
       event.preventDefault();
+      this.handleQuickReportPreSubmit();
       this.setState({
         submitting_form:true
       },function(){
@@ -888,19 +939,19 @@ handleScroll() {
    }
 
    infoPrint(){
-    var mywindow = window.open('', 'PRINT');
+    var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
         '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
         '.print {visibility: hidden;}' +
         '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
-        '</style><title>' + document.title  + '</title>');
+        '</style><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
-    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById('modal1').innerHTML);
     mywindow.document.write('</body></html>');
 
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
 
     mywindow.print();
     mywindow.close();
@@ -1292,15 +1343,15 @@ handleScroll() {
 
                           <FormGroup>   
                               {this.state.editable &&
-                                <div className="input">
-                                     <Label check className="btn btn-secondary quickreport_class">
-                                        <Input type="radio" name="report_type" 
+                                <div className="input ">
+                                     <Label check className="btn btn-secondary quickreport_class " id = "quick_btn">
+                                        <Input type="radio" name="report_type"
                                         value="quick"
                                         checked={this.state.report_type === 'quick'}
                                         onChange={this.handleChange}/>{' '}
                                         Quick Report
                                      </Label>
-                                     <Label check className="btn btn-secondary fullreport_class">
+                                     <Label check className="btn btn-secondary fullreport_class " id = "full_btn">
                                        <Input type="radio" name="report_type" 
                                             value="full"
                                             checked={this.state.report_type === 'full'}
@@ -1310,9 +1361,19 @@ handleScroll() {
                                 </div>  
                               }
                               {
-                                !this.state.editable &&
-                                <div className="input">
-                                  <p>{this.state.report_type}</p>
+                                !this.state.editable && this.state.report_type == "quick" &&
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Quick Report</span>
+                                </div>
+                              }
+                              {
+                                !this.state.editable && this.state.report_type == "full" &&
+                                <div >
+                                <span>
+                                <Label className="padding">
+                                  <strong>Reporting Mode: </strong></Label></span><span className="padding">Full Report</span>
                                 </div>
                               }
                           </FormGroup>
@@ -1334,9 +1395,7 @@ handleScroll() {
                            
 
                           <div id="workout">
-                          {(this.state.report_type === 'full') &&<h3><strong>Workout Inputs</strong></h3>}
-
-                          {(this.state.report_type === "full") &&
+                          <h3><strong>Workout Inputs</strong></h3>
                            <FormGroup>   
                             <Label className="padding">1. Did You Workout Today?</Label>
                              <span id="workoutinfo"
@@ -1379,7 +1438,7 @@ handleScroll() {
                                   <p>{this.state.workout}</p>
                                 </div>
                               }
-                          </FormGroup>}
+                          </FormGroup>
                             <Modal 
                             className="pop"
                             id="popover" 
@@ -1411,11 +1470,13 @@ handleScroll() {
                                page and selecting any date you would like to enter information for.
                                </div>
                               </ModalBody>
-                           </Modal>       
+                           </Modal>
+
+                           {this.renderActivityGrid()}
+
                            {(this.state.workout === "no") && this.state.report_type == 'full' &&
                           <FormGroup>
                               <Label className="padding">1.0.1 What Was The Reason You Did Not Exercise Today?</Label>
-
                                   {this.state.editable &&
                                     <div className="input1">
                                         <Input 
@@ -1565,7 +1626,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="strength_workout_start_min"
@@ -1578,7 +1638,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -1592,7 +1651,6 @@ handleScroll() {
                                     
                                      </Input>
                                       </div> 
-
                               </div>
                               </div>
                             }
@@ -1630,7 +1688,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="strength_workout_end_min"
@@ -1643,7 +1700,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -1679,7 +1735,7 @@ handleScroll() {
 
                             {((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                               <FormGroup>   
-                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard”?
+                                <Label className="padding">1.2 Was Your Workout Today Easy, Medium, or Hard?
                                 <span id="easyorhard"
                              onClick={this.toggleEasyorHard} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -2216,7 +2272,6 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" &&
                            <FormGroup>
                             <Label className="padding">1.9 Were You Fasted During Your Workout? 
-
                             <span id="fast"
                              onClick={this.toggleFasted} 
                              style={{paddingLeft:"15px",color:"gray"}}>
@@ -2257,7 +2312,6 @@ handleScroll() {
                               }
                               {
                                 !this.state.editable && this.state.fasted == 'yes' &&
-
                                 <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
                                   <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
@@ -2840,7 +2894,6 @@ handleScroll() {
                                   <div className="input "> 
                                 <Input type="select" name="sleep_hours_bed_time"
                                 id="bed_hr"
-
                                 className="form-control custom-select"
                                 value={this.state.sleep_hours_bed_time}
                                 onChange={this.handleChangeSleepHoursMin}>
@@ -2849,7 +2902,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="sleep_mins_bed_time"
@@ -2862,7 +2914,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -2876,7 +2927,6 @@ handleScroll() {
                                     
                                      </Input>
                                       </div> 
-
                               </div>
                               </div>
                             }
@@ -2921,7 +2971,6 @@ handleScroll() {
                                 </Input>
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                <div className="input ">
                                 <Input type="select" name="sleep_mins_awake_time"
@@ -2934,7 +2983,6 @@ handleScroll() {
                                 </Input>                        
                                 </div>
                                 </div>
-
                                 <div className="align_width_time align_width1 margin_tp">
                                  <div className="input1 ">
                                   <Input type="select" 
@@ -2949,7 +2997,6 @@ handleScroll() {
                                     
                                      </Input>
                                </div>      
-
                               </div>
                               </div>
                             }
@@ -3398,6 +3445,8 @@ handleScroll() {
                               {this.renderPrescriptionMedication()}
                               </FormGroup>
                                </div>
+
+
                           
          
                           <div id="stress">
@@ -3533,7 +3582,7 @@ handleScroll() {
                             </FormGroup>
                           }
 
-                         {(this.state.report_type === 'full') &&
+                         {(this.state.report_type === 'full') && (this.state.gender === 'F') &&
                              <FormGroup>
                               <Label className="padding">12. Clothes Size (Womens)</Label>
                               {this.state.editable &&
@@ -3559,7 +3608,6 @@ handleScroll() {
                           {(this.state.report_type === 'full') &&
                           <FormGroup>
                               <Label className="padding">13. What Type Of Diet Do You Eat?</Label>
-
                                   {this.state.editable &&
                                     <div className="input1">
                                         <Input 
@@ -3595,7 +3643,6 @@ handleScroll() {
                           {(this.state.report_type === 'full') &&
                            <FormGroup>     
                             <Label className="padding">14. Did You Stand For 3 Hours or More Yesterday? </Label>
-
                               {this.state.editable &&
                                 <div className="input1">
                                   
@@ -3628,7 +3675,6 @@ handleScroll() {
                         {(this.state.report_type === 'full') &&
                           <FormGroup>     
                             <Label className="padding">15. Did you travel somewhere today and/or spend the day today away from the city you live in? </Label>
-
                               {this.state.editable &&
                                 <div className="input1">
                                   
@@ -3656,7 +3702,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                           <FormGroup>      
                             <Label className="padding">15.1 Where did you travel to or stay?</Label>
                               {this.state.editable &&
@@ -3676,7 +3722,7 @@ handleScroll() {
                               }
                           </FormGroup>
                         }
-                          {(this.state.travel == "yes") &&
+                          {(this.state.travel == "yes") && (this.state.report_type == 'full') &&
                            <FormGroup>   
                             <Label className="padding">15.2 Was your Travel for work, vacation, or other?</Label>
                             {this.state.editable &&
@@ -3713,7 +3759,7 @@ handleScroll() {
                           </FormGroup>
                         }
                         {
-                         (this.state.travel_purpose_checked == "other") &&
+                         (this.state.travel_purpose_checked == "other") && (this.state.report_type == 'full') &&
                           <FormGroup>              
                               {this.state.editable &&
                                 <div className="input1">

@@ -115,7 +115,8 @@ class LeaderBoard1 extends Component{
 			scrollingLock:false,
 			active_category:"",
 			active_username:"",
-			active_day:"",
+			active_category_name:"",
+			all_verbose_name:"",
 			duration_date:{
 				"week":"",
 				"today":"",
@@ -181,7 +182,8 @@ class LeaderBoard1 extends Component{
     event.preventDefault();
     this.setState({
       dateRange1:!this.state.dateRange1,
-      fetching_lb1:true
+      fetching_lb1:true,
+       isOpen1: !this.state.isOpen1,
     },()=>{
         let custom_ranges = [];
         if(this.state.lb2_start_date && this.state.lb2_end_date){
@@ -202,6 +204,7 @@ class LeaderBoard1 extends Component{
     this.setState({
       dateRange2:!this.state.dateRange2,
       fetching_lb2:true,
+       isOpen1: !this.state.isOpen1,
     },()=>{
          let custom_ranges = [];
         if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -223,6 +226,7 @@ class LeaderBoard1 extends Component{
     this.setState({
       dateRange3:!this.state.dateRange3,
       fetching_lb3:true,
+       isOpen1: !this.state.isOpen1,
     },()=>{
          let custom_ranges = [];
          if(this.state.lb1_start_date && this.state.lb1_end_date){
@@ -255,7 +259,7 @@ class LeaderBoard1 extends Component{
   	}
   	toggle1() {
 	    this.setState({
-	      isOpen1: !this.state.isOpen,
+	      isOpen1: !this.state.isOpen1,
 	    });
   	}
 	toggleCalendar(){
@@ -305,6 +309,8 @@ class LeaderBoard1 extends Component{
 	  	let scores = [];
 	  	let ranks = [];
 	  	let usernames;
+	  	let other_score_name;
+	  	let other_Scores = [];
 	  	let tableRows = [];
 	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
 	  	for(let duration of durations_type){
@@ -314,10 +320,18 @@ class LeaderBoard1 extends Component{
 	  				durations.push(this.headerDates(range));
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "user_rank"){
-			  		 		if(!category)
+			  		 		if(!category){
 			  		 			category = c_rankData.category;
+			  		 		}
+			  		 		if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+			  		 		for (let [key3,o_score] of Object.entries(c_rankData.other_scores)){
+			  		 		other_Scores.push(o_score.value);
+			  		 		other_score_name = o_score.verbose_name;
+				  		 		}
+			  		 	    }
 			  		 		usernames = c_rankData.username;
 			  		 		scores.push(c_rankData.score.value);
+			  		 
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
 	  				}
@@ -331,8 +345,16 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category){
 			  		 			category = rankData.category;
 			  		 		}
+			  		 		if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+				  		 		for (let [key3,o_score] of Object.entries(rankData.other_scores)){
+				  		 			other_Scores.push(o_score.value);
+				  		 			other_score_name = o_score.verbose_name;
+				  		 		}
+			  		 	    }
+
 			  		 		usernames = rankData.username;
 			  		 		scores.push(rankData.score.value);
+			  	
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
 			  		}
@@ -378,18 +400,16 @@ class LeaderBoard1 extends Component{
 		  			var all_cat_rank = this.state.ranking_data[
 			  					categoryMeta[category]["short_name"]]['custom_range'][rank['duration']].all_rank;
 
-		
+
 			  	}
 			  	else{
 			  		var all_cat_rank = this.state.ranking_data[
-			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank;
-
-			  				
+			  					categoryMeta[category]["short_name"]][rank['duration']].all_rank;	
 
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  		<a  onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,date)}>
+			  		<a  onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,category,other_score_name)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -418,11 +438,69 @@ class LeaderBoard1 extends Component{
 		  		);
 		  	}
 		 }
-	  	tableRows.push(<tr className = "lb_table_style_rows">{rankTableData}</tr>)
+	  	tableRows.push(<tbody><tr className = "lb_table_style_rows">{rankTableData}</tr></tbody>);
 
-	  	let scoreTableData = [<td style={{fontWeight:"bold"}}
+	  	let scoreTableData = [];
+	  	if(category == "Overall Health GPA"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
 	  							  className = "lb_table_style_rows">
-	  							  {"Scores"}</td>]
+	  							  {"Overall Health GPA"}</td>);
+	    }
+	  	else if(category == "Alcohol"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Average Drinks Per Week (7 Days)"}</td>);
+	    }
+	    else if(category == "Average Sleep"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Sleep GPA"}</td>);
+	    }
+	   //  else if(category == "Percent Unprocessed Food"){
+	  	// scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  	// 						  className = "lb_table_style_rows">
+	  	// 						  {"% Unprocessed Food"}</td>);
+	   //  }
+	    else if(category == "Total Steps"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Total Steps"}</td>);
+	    }
+	    else if(category == "Movement Consistency"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Movement Consistency Score"}</td>);
+	    }
+	    else if(category == "Exercise Consistency"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Avg # of Days Exercised/Week"}</td>);
+	    }
+	    else if(category == "Awake Time"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Awake Time Duration (hh:mm"}</td>);
+	    }
+	    else if(category == "Resting Heart Rate"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Resting Heart Rate (RHR)"}</td>);
+	    }
+	    else if(category == "Deep Sleep"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Deep Sleep Duration (hh:mm)"}</td>);
+	    }
+	    else if(category == "Non Exercise Steps"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Non Exercise Steps"}</td>);
+	    }
+	    else if(category == "Floors Climbed"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Floors Climbed"}</td>);
+	    }					
 	  	for(let score of scores){
 	  		if(category == "Total Steps"){
 	  			var value = score;
@@ -438,22 +516,57 @@ class LeaderBoard1 extends Component{
 	                scoreTableData.push(<td className="lb_table_style_rows">{x1 + x2}</td>);
     	        }
 	  		}
+	  		else if(category == "Percent Unprocessed Food"){
+	  			scoreTableData.push(null);
+	  		}
 	  		else{
 	  		scoreTableData.push(<td className = "lb_table_style_rows">{score}</td>);
 	  	    }
 	  	}
-	  	tableRows.push(<tbody><tr className = "lb_table_style_rows">{scoreTableData}</tr></tbody>)
+	  	if(category == "Percent Unprocessed Food"){
+	  		tableRows.push(null);
+	  	}
+	  	else{
+	  		tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>);
+	  	}
+
+
+	if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+	  	let other_scoresData = [];
+	  	if(category == "Average Sleep"){
+	  	other_scoresData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Sleep Duration (hh:mm)"}</td>);
+	    }
+	    else if(category == "Percent Unprocessed Food"){
+	  	other_scoresData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"% Unprocessed Food"}</td>);
+	    }
+	  	for(let otherScore of other_Scores){
+	  
+	  		other_scoresData.push(<td className = "lb_table_style_rows">{otherScore}</td>);
+	  	
+	  	}
+	  	if(category == "Percent Unprocessed Food"){
+	  		tableRows.push(<tr className = "lb_table_style_rows">{other_scoresData}</tr>);
+	    }
+	    else{
+	    	tableRows.push(<tbody><tr className = "lb_table_style_rows">{other_scoresData}</tr></tbody>);
+	    }
+	  }
 
 	  	return  <table className = "table table-striped table-bordered">{tableRows}</table>;
   	};
-  	reanderAll(value,value1,value2,event){
+  	reanderAll(value,value1,value2,value3,event){
  		if(value){
   		this.setState({
   			active_view:!this.state.active_view,
   			btnView:!this.state.btnView,
   			active_category:value,
   			active_username:value1,
-  			active_day:value2,
+  			active_category_name:value2,
+  			all_verbose_name:value3
   		});
   		};
   	};
@@ -544,7 +657,7 @@ class LeaderBoard1 extends Component{
                                           name = "bars"
                                           size = "1x"
                                         />
-                                    </div>
+                                    </div> 
                                </NavbarToggler>
                                <span id="navlink" onClick={this.toggleCalendar} id="progress">
 					                    <FontAwesome
@@ -805,7 +918,10 @@ class LeaderBoard1 extends Component{
 		        </div>
 		    }
 		      {this.state.btnView && 
-		        <AllRank_Data1 data={this.state.active_category} active_username = {this.state.active_username}/>
+		        <AllRank_Data1 data={this.state.active_category} 
+		        active_username = {this.state.active_username} 
+		        active_category_name = {this.state.active_category_name}
+		        all_verbose_name = {this.state.all_verbose_name}/>
 			  }
 	        </div>
 	        {this.renderLeaderBoardFetchOverlay()}

@@ -24,8 +24,8 @@ class UserDailyInputView(generics.ListCreateAPIView):
           then filter the userDailyInput data for provided date interval
           and return the list
     '''
-    authentication_classes = (CsrfExemptSessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    #authentication_classes = (CsrfExemptSessionAuthentication,)
+    #permission_classes = (IsAuthenticated,)
     serializer_class = UserDailyInputSerializer
 
     def get_queryset(self):

@@ -2,11 +2,9 @@ import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 ModalHeader, ModalBody, ModalFooter, Collapse,Popover,PopoverBody} from 'reactstrap';
 import Textarea from 'react-textarea-autosize';
-import NavbarMenu from './navbar';
-import CalendarWidget from 'react-calendar-widget';
-import fetchActivity from '../network/activity';
 import FontAwesome from "react-fontawesome";
 import moment from 'moment';
+import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 
@@ -71,17 +69,50 @@ const activites = { "":"Select",
 "BASKETBALL":"BASKETBALL"
 };
 
-export default class Activity_Type extends Component{
+export default class ActivityGrid extends Component{
 constructor(props){
-super(props)
+super(props);
+this.errorActivity = this.errorActivity.bind(this);
+this.initializeActivity = this.initializeActivity.bind(this);
+this.toggleModal = this.toggleModal.bind(this);
+this.handleChange=this.handleChange.bind(this);
+this.handleChange_activity = this.handleChange_activity.bind(this);
+this.handleChange_heartrate = this.handleChange_heartrate.bind(this);
+this.handleChange_time = this.handleChange_time.bind(this);
+this.handleChange_comments = this.handleChange_comments.bind(this);
+this.handleChange_start_time=this.handleChange_start_time.bind(this);
+this.handleChange_end_time=this.handleChange_end_time.bind(this);          
+this.createSleepDropdown = this.createSleepDropdown.bind(this);
+this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
+this.renderTable = this.renderTable.bind(this);
+this.renderEditActivityModal = this.renderEditActivityModal.bind(this);
+this.handleChangeModal = this.handleChangeModal.bind(this);
+this.CreateNewActivity = this.CreateNewActivity.bind(this);
+this.activitySelectOptions = this.activitySelectOptions.bind(this);
+this.toggle = this.toggle.bind(this);
+this.saveEndTimeModel = this.saveEndTimeModel.bind(this);
+this.toggle_starttime=this.toggle_starttime.bind(this);
+this.saveStartTimeModel=this.saveStartTimeModel.bind(this);
+this.deleteActivity=this.deleteActivity.bind(this);
+this.toggle_delete=this.toggle_delete.bind(this);
+this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);
+this.handleChangeActivityStartEndTime = this.handleChangeActivityStartEndTime.bind(this);
+this.handleChangeActivityDate = this.handleChangeActivityDate.bind(this);
+this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);
+this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);
+this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);
+this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);
+this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
+this.createActivityTime = this.createActivityTime.bind(this);
+this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
+let activities = this.props.activities;
 this.state ={
     activityEditModal:false,
     calendarOpen:false,
-    selected_date:new Date(),
-    activites:{},
-    activities_edit_mode:{},
-    activites_hour_min:{},
-    activity_start_end_time:{},
+    activites:activities,
+    activities_edit_mode:this.createActivityEditModeState(activities),
+    activites_hour_min:this.createActivityTime(activities),
+    activity_start_end_time:this.createStartAndEndTime(activities),
     modal_activity_type:"",
     modal_activity_id:"",
     modal_activity_heart_rate:"",
@@ -102,6 +133,8 @@ this.state ={
     activity_start_end_min:'',
     activity_start_end_am_pm:'',
 
+    activitystarttime_calender:moment(),
+    activityendtime_calender:moment(),
     modalstarttime_activity_hour:"",
     modalstarttime_activity_min:"",
     modalstarttime_activity_ampm:"",
@@ -114,39 +147,21 @@ this.state ={
     selectedId_starttime:'',
     selectedId_delete:'',
 }
-this.errorActivity = this.errorActivity.bind(this);
-this.sucessActivity = this.sucessActivity.bind(this);
-this.processDate = this.processDate.bind(this);
-this.toggleModal = this.toggleModal.bind(this);
-this.handleChange=this.handleChange.bind(this);
-this.handleChange_activity = this.handleChange_activity.bind(this);
-this.handleChange_heartrate = this.handleChange_heartrate.bind(this);
-this.handleChange_time = this.handleChange_time.bind(this);
-this.handleChange_comments = this.handleChange_comments.bind(this);
-this.handleChange_start_time=this.handleChange_start_time.bind(this);
-this.handleChange_end_time=this.handleChange_end_time.bind(this);          
-this.createSleepDropdown = this.createSleepDropdown.bind(this);
-this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
-this.renderTable = this.renderTable.bind(this);
-this.renderEditActivityModal = this.renderEditActivityModal.bind(this);
-this.handleChangeModal = this.handleChangeModal.bind(this);
-this.CreateNewActivity = this.CreateNewActivity.bind(this);
-this.toggleCalendar = this.toggleCalendar.bind(this);
-this.activitySelectOptions = this.activitySelectOptions.bind(this);
-this.toggle = this.toggle.bind(this);
-this.saveEndTimeModel = this.saveEndTimeModel.bind(this);
-this.toggle_starttime=this.toggle_starttime.bind(this);
-this.saveStartTimeModel=this.saveStartTimeModel.bind(this);
-this.deleteActivity=this.deleteActivity.bind(this);
-this.toggle_delete=this.toggle_delete.bind(this);
-this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);
-this.handleChangeActivityStartEndTime = this.handleChangeActivityStartEndTime.bind(this);
-this.handleChangeActivityDate = this.handleChangeActivityDate.bind(this);
-this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);
-this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);
-this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);
-this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);
-this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
+}
+
+initializeActivity(activities){
+    this.setState({
+      activities_edit_mode:this.createActivityEditModeState(activities),
+      activites_hour_min:this.createActivityTime(activities),
+      activity_start_end_time:this.createStartAndEndTime(activities),
+      activites:activities,
+    });
+  }
+
+componentWillReceiveProps(nextProps) {
+    if(nextProps.activities !== this.props.activities) {
+        this.initializeActivity(nextProps.activities);
+    }
 }
 
 deleteActivity(event) {
@@ -165,6 +180,8 @@ deleteActivity(event) {
         activities_edit_mode:updated_activities_edit_mode,
         activites_hour_min:updated_activites_hour_min,
         activity_start_end_time:updated_activity_start_end_time,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 
     this.toggle_delete(event);
@@ -206,7 +223,7 @@ secondsToHourMinStr(durationInSeconds){
         let min = parseInt(durationInSeconds/60);
         let hour = parseInt(min/60);
         let mins = parseInt(min%60);
-        mins = (mins && mins < 10) ? "0" + mins : mins;
+        mins = (mins < 10) ? "0" + mins : mins;
         time = hour + ":" + mins;
     }
     return time;
@@ -265,37 +282,8 @@ createStartAndEndTime(activityData){
     return activity_start_end_time;
 }
 
-sucessActivity(data){
-    this.setState({
-      selected_date:this.state.selected_date,
-      activities_edit_mode:this.createActivityEditModeState(data.data.activites),
-      activites_hour_min:this.createActivityTime(data.data.activites),
-      activity_start_end_time:this.createStartAndEndTime(data.data.activites),
-      activites:data.data.activites,
-    });
-
-  }
-
-  errorActivity(error){
+errorActivity(error){
     console.log(error);
-}
-
-processDate(date){
-this.setState({
-selected_date:date,
-calendarOpen:!this.state.calendarOpen
-});
-fetchActivity(date,this.sucessActivity,this.errorActivity);
-}
-
-componentDidMount(){
-    fetchActivity(this.state.selected_date,this.sucessActivity, this.errorActivity)
-}
-toggleCalendar(event){
- 
-this.setState({
-calendarOpen:!this.state.calendarOpen
-})
 }
 toggleModal(){
     this.setState({
@@ -371,7 +359,7 @@ editToggleHandlerActivityType(event){
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
         },()=>{
-            console.log(this.state);
+            this.props.updateParentActivities(this.state.activites);
         });
     }
 }
@@ -388,6 +376,8 @@ editToggleHandler_heartrate(event){
         this.setState({
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
         });
     }
 }
@@ -418,6 +408,8 @@ editToggleHandlerStartTime(selectedActivityId,event){
         activity_start_end_hour:activity_start_end_hour,
         activity_start_end_min:activity_start_end_min,
         activity_start_end_am_pm:activity_start_end_am_pm,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -447,6 +439,8 @@ editToggleHandlerEndTime(selectedActivityId,event){
         activity_start_end_hour:activity_start_end_hour,
         activity_start_end_min:activity_start_end_min,
         activity_start_end_am_pm:activity_start_end_am_pm,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -462,6 +456,8 @@ if(selectedActivityId){
     this.setState({
     ...this.state.activities_edit_mode,
         [selectedActivityId]:categoryMode
+      },()=>{
+        this.props.updateParentActivities(this.state.activites);
       });
    if(!categoryMode['comments']){
       $('#'+selectedActivityId).css('display','none');
@@ -478,16 +474,23 @@ editToggleHandlerDuration(event){
     let timeOriginData = this.state.activites[selectedActivityId];
     let currentHour = timeHourMin['duration_hour'];
     let currentMin = timeHourMin['duration_min'];
-    let durationInSeconds = 0;
+    let durationInSeconds = timeOriginData['durationInSeconds'];
+    let isDurationChanged = false;
+
     if(currentHour && currentMin){
         currentHour = parseInt(currentHour);
         currentMin = parseInt(currentMin);
         durationInSeconds = ((currentHour * 3600) + (currentMin * 60));
-    } 
-    timeOriginData['durationInSeconds'] = durationInSeconds;
+    }
+
+    if (this.secondsToHourMinStr(timeOriginData['durationInSeconds'])
+        != this.secondsToHourMinStr(durationInSeconds)){ 
+        isDurationChanged = true;
+    }
     timeHourMin['durationInSeconds'] = durationInSeconds;
     timeEditMode['durationInSeconds'] = !timeEditMode['durationInSeconds'] ;
-    if(selectedActivityId){
+
+    if(selectedActivityId && isDurationChanged){
         this.setState({
             activites_hour_min:{
                 ...this.state.activites_hour_min,
@@ -501,22 +504,26 @@ editToggleHandlerDuration(event){
                 ...this.state.activites,
                 [selectedActivityId]:timeOriginData
             }
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+    }
+    else{
+        this.setState({
+            activites_hour_min:{
+                ...this.state.activites_hour_min,
+                [selectedActivityId]:timeHourMin
+            },
+            activities_edit_mode: {
+                ...this.state.activities_edit_mode,
+                [selectedActivityId]:timeEditMode
+            }
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
         });
     }
 }   
 
-// handleChangeActivityCalendar(date){
- 
-//   this.setState({
-//     activity_calender: date
-//   })
-// }
-// handleChangeActivityStartTimeCalendar(date){
- 
-//   this.setState({
-//     activitystarttime_calender: date
-//   })
-// }
 handleChange_activity(event){
   const target = event.target;
   const value = target.value;
@@ -567,7 +574,6 @@ handleChange_time(event){
 
 }
   handleChange_start_time(date){
-    //let start_time_data= date._d;
      this.setState({
       workout_start_time:date
      });
@@ -575,7 +581,6 @@ handleChange_time(event){
 
   }
   handleChange_end_time(date){
-       
     this.setState({
       workout_end_time:date
     });
@@ -586,7 +591,7 @@ handleChange_heartrate(event){
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
-    activity_data['averageHeartRateInBeatsPerMinute'] = value;
+    activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
     this.setState({
         activites:{
             ...this.state.activites,
@@ -784,6 +789,11 @@ handleChange(event){
             "modal_activity_type":value
         });
     }
+    else if (name == "modal_activity_heart_rate"){
+        this.setState({
+            [name]: parseInt(value)
+        });
+    }
     else{
         this.setState({
             [name]: value
@@ -801,17 +811,11 @@ handleChange(event){
     return elements;
   }
   createSleepDropdown_heartrate(start_num , end_num, mins=false, step=1){
-    let elements = [];
+    let elements = [<option key={0} value={0}>Not Measured</option>];
     let i = start_num;
     while(i<=end_num){
-      if(i < 1)
-        elements.push(
-          <option key={0} value={0}>Not Measured</option>
-          );
-      else
-        elements.push(
-          <option key={i} value={i}>{i}</option>);
-      i=i+step;
+        elements.push(<option key={i} value={i}>{i}</option>);
+        i=i+step;
     }
     return elements;
   }
@@ -839,15 +843,17 @@ CreateNewActivity(data){
     if(activityStartTimeMObject && activityEndTimeMObject){
         durationSeconds = activityEndTimeMObject.diff(activityStartTimeMObject,'seconds');
     }
+    let timezone = moment.tz.guess();
+    let tzOffsetFromUTCInSeconds = (moment.tz(moment.utc(),timezone).utcOffset())*60;
 
     let new_value = {
-        "summaryId": newActivityID,
+        "summaryId": newActivityID.toString(),
         "activityType": this.state.modal_activity_type,
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
-        "startTimeOffsetInSeconds":234
+        "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds
     }; 
 
     let durationInHourMin = this.secondsToHourMinStr(new_value["durationInSeconds"]);
@@ -862,8 +868,6 @@ CreateNewActivity(data){
     };
 
     let activity_start_end_time_state = this.createStartAndEndTime({[newActivityID]:new_value});
-    console.log("state:",activity_start_end_time_state);
-
     this.setState({
         activites:{
             ...this.state.activites,
@@ -902,6 +906,8 @@ CreateNewActivity(data){
             ...this.state.activity_start_end_time,
             [newActivityID]:activity_start_end_time_state[newActivityID]
         }
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -1056,7 +1062,6 @@ renderTable(){
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","comments"];
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
-        console.log(key, value);
         let activityData = [];
         let summaryId; 
         let hour;
@@ -1080,19 +1085,22 @@ renderTable(){
                                           onBlur={ this.editToggleHandlerActivityType.bind(this)}>
                                                   {this.activitySelectOptions()}                                                                                                                                                                
                                           </Input> : !this.state.activites[summaryId][key]? activityType :this.state.activites[summaryId][key] }
-                                           
-                <span  data-name = {summaryId} onClick={this.editToggleHandlerActivityType.bind(this)}
+                             {this.props.editable &&               
+                            <span  data-name = {summaryId} onClick={this.editToggleHandlerActivityType.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
                         </span>
+                    }
                                                    
                         </td>);
             }
 
             else if(key === "averageHeartRateInBeatsPerMinute"){
-                let  averageHeartRateInBeatsPerMinute=keyValue;
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                                            { this.state.activities_edit_mode[summaryId][key]  ?                            
+                                        {this.state.activities_edit_mode[summaryId][key] ?                            
                                         <Input 
                                         data-name = {summaryId}
                                         type="select" 
@@ -1103,13 +1111,14 @@ renderTable(){
                                         onBlur={this.editToggleHandler_heartrate.bind(this)}>
                                         
                                         <option key="hours" value=" ">Select</option>
-                                    {this.createSleepDropdown_heartrate(90,220)}
-                                    <option value="Not Measured">Not Measured</option>     
-                                      </Input>: this.state.activites[summaryId][key]}
+                                    {this.createSleepDropdown_heartrate(90,220)}  
+                                      </Input>: hr}
+                                       {this.props.editable &&  
                                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
                         </span>
+                    }
                         </td>
                         );
             }
@@ -1117,14 +1126,15 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm a'):''}                              
+                {start_time?start_time.format('MMM D, YYYY h:mm a'):''} 
+                 {this.props.editable &&                               
                         <span 
                             data-name = {summaryId}  
                             onClick={this.editToggleHandlerStartTime.bind(this,summaryId)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
                         </span>
-
+                    }
                         <Modal 
                         isOpen={this.state.activities_edit_mode[summaryId]["startTimeInSeconds"]}
                         toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} 
@@ -1219,7 +1229,7 @@ renderTable(){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                             {end_time?end_time.format('MMM D, YYYY h:mm a'):''}  
-                                        
+                          {this.props.editable &&                 
                         <span 
                             data-name = {summaryId} 
                             className="fa fa-pencil fa-1x progressActivity1"
@@ -1227,6 +1237,7 @@ renderTable(){
                             onClick={this.editToggleHandlerEndTime.bind(this,summaryId)}
                         >
                         </span>
+                    }
                         <Modal 
                             isOpen={this.state.activities_edit_mode[summaryId]["endTimeInSeconds"]}
                             toggle={this.editToggleHandlerEndTime.bind(this,summaryId)} 
@@ -1358,10 +1369,12 @@ renderTable(){
                                     </div>
                                     </div>
                                     </div>: this.state.activites_hour_min[summaryId]? this.state.activites_hour_min[summaryId]["duration_hour"]+":"+this.state.activites_hour_min[summaryId]["duration_min"]:time}
-                            <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
-                            className="fa fa-pencil fa-1x progressActivity1 "
-                            id = "add_button">
-                            </span>
+                            {/*this.props.editable &&  
+                                <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
+                                className="fa fa-pencil fa-1x progressActivity1 "
+                                id = "add_button">
+                                </span>
+                             */}
                             </td>); 
             }
             else if(key === "comments"){
@@ -1379,11 +1392,12 @@ renderTable(){
                                           </Textarea><Button data-name={summaryId} size = "sm" id={summaryId} 
                                           className="btn btn-info save_btn" onClick={ this.editToggleHandler_comments.bind(this)}>Save
                                           </Button></div>:this.state.activites[summaryId][key]}
-                                         
+                                {this.props.editable &&            
                             <span data-name={summaryId} onClick={this.editToggleHandler_comments.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
                                   id = "add_button">
                             </span>
+                        }
                         </td>);
             }
 
@@ -1393,12 +1407,13 @@ renderTable(){
 
         }
     activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-
+                         {this.props.editable &&  
                         <span className="checkbox_delete fa fa-close martp_20"
                          data-name={summaryId}
                          style={{color:"red", marginTop:"15px"}}
                          onClick={this.toggle_delete}>  
                         </span>
+                    }
 
           <Modal 
            isOpen={this.state.modal_delete && summaryId == this.state.selectedId_delete}
@@ -1475,8 +1490,7 @@ renderEditActivityModal(){
                           value={this.state.modal_activity_heart_rate}                               
                           onChange={this.handleChange}>
                           <option key="hours" value="">Select</option>
-                          <option value="Not Measured">Not Measured</option>  
-                        {this.createSleepDropdown(90,220)}     
+                        {this.createSleepDropdown_heartrate(90,220)}     
                         </Input>
                             </div> 
                             </FormGroup>                               
@@ -1624,7 +1638,7 @@ renderEditActivityModal(){
                       </div>
                       </FormGroup>
                        <FormGroup>
-                      <Label className="padding1">4. Exercise Comments</Label>
+                      <Label className="padding1">6. Exercise Comments</Label>
                        <div className="input1 ">
                         <Textarea 
                           className="form-control"
@@ -1653,71 +1667,45 @@ render(){
 return(
 
 <div className = "container_fluid">
-<NavbarMenu fix={true}/>
 <div className="row justify-content-center">
-<div id = "activity_calender " className="cal_width">
-<span id="navlink" onClick={this.toggleCalendar} id="progress">
-                <FontAwesome
-                    name = "calendar"
-                    size = "2x"
-                />
-      </span> 
-      <Popover
-                        placement="bottom"
-                        isOpen={this.state.calendarOpen}
-                        target="progress"
-                        toggle={this.toggleCalendar}>
-                              <PopoverBody className="calendar2">
-                                <CalendarWidget  onDaySelect={this.processDate}/>
-                              </PopoverBody>
-                     </Popover> 
-                     </div>
-                       
-
-          
-
-                     <div id = "activity_table">
-                      <div className="table-responsive tableresponsive" >  
-<table className = "table table-striped table-hover table-responsive" id="dataTable">
+<div id = "activity_table">
+<div  className="table-responsive input1 tablecenter1">
+                                             
+<table className="table table-bordered">  
 <thead id = "add_button">
 <td id = "add_button" className="add_button_back">Exercise Type</td>
-<td id = "add_button" className="add_button_back">Activity Average Heart Rate</td>
-<td id = "add_button" className="add_button_back">Enter the Time Your Workout Started</td>
-<td id = "add_button" className="add_button_back">Enter the Time Your Workout Ended</td>
+<td id = "add_button" className="add_button_back">Average Heart Rate</td>
+<td id = "add_button" className="add_button_back">Workout Start Time</td>
+<td id = "add_button" className="add_button_back">Workout End Time</td>
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm)</td>
 <td id = "add_button" className="add_button_back">Comment</td>
-<td id = "add_button" className="add_button_back">Delete</td>
+ {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
 <tbody className = "tbody_styles">
 {this.renderTable()}
-
-
-
-            
-            
-
 </tbody>
 </table>
 </div>
- <div className="btn2 btn4 mar_20  row">
+{this.props.editable && 
+ <div className="activity_add_btn btn4 mar_20 row"> 
  <div>
   <Button
     id="nav-btn"
     style={{backgroundColor:"#ed9507"}}
-    type="submit"
     className="btn btn-block-lg"
     onClick={this.handleChangeModal}>
-     <span
+    <span
         id="add_button"
         data-name=""
-                              className="fa fa-plus-circle fa-1x "
-                            >
-                              </span> &nbsp; 
-                            Create Manual Activity
-                      </Button>
+        className="fa fa-plus-circle fa-1x "
+    >
+        </span> &nbsp; 
+            Create Manual Activity
+  </Button>
 </div>
 
-                                   </div>
+</div>
+}
 
 {this.renderEditActivityModal()}
 
