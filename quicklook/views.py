@@ -227,7 +227,7 @@ class SleepListView(generics.ListCreateAPIView):
 	queryset = Sleep.objects.all()
 	serializer_class = SleepSerializer
 
-def hrr_calculations(request):
+def aa_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
@@ -253,8 +253,8 @@ def hrr_calculations(request):
 	profile = Profile.objects.filter(user=request.user)
 	for tmp_profile in profile:
 		user_dob = tmp_profile.date_of_birth
-	today = date.today()
-	user_age = today.year - user_dob.year
+	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+
 	heartrate_complete = []
 	timestamp_complete = []
 	data = {"total_time":"",
@@ -270,8 +270,6 @@ def hrr_calculations(request):
 				"total_percent":""}
 	if a1:
 		x = [(FitFile(x.fit_file)).get_messages('record') for x in a1]
-		# some = {x.get_messages('record') for record in x}
-		#print(x)
 		for record in x:
 			for record_data in record:
 				for ss in record_data:
