@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.db import transaction,DatabaseError
 
-from quicklook.models import UserQuickLook
+from quicklook.models import UserQuickLook 
 from leaderboard.models import Score
 
 def _get_lst(lst,i,default = None):
@@ -18,6 +18,17 @@ def _get_lst(lst,i,default = None):
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
+
+def _hours_to_hours_min(hours):
+	if hours or hours is not None:
+		mins = hours * 60
+		hours,mins = divmod(mins,60)
+		hours = round(hours)
+		mins = round(mins)
+		if mins < 10:
+			mins = "{:02d}".format(mins) 
+		return "{}:{}".format(hours,mins)
+	return None		
 
 def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss"):
 	'''
