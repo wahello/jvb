@@ -615,7 +615,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
 
-	# If same id existed in user submited activities, give it more prefrence
+	# If same id exist in user submited activities, give it more preference
 	# than manually edited activities 
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
@@ -624,30 +624,8 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 			return obj_in_user_activities
 		return obj
 
-	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
-
-	activity_stats = {
-		"have_activity":False,
-		"distance_run_miles": 0,
-		"distance_bike_miles": 0,
-		"distance_swim_yards": 0,
-		"distance_other_miles": 0,
-		"total_duration":0,
-		"pace":'',
-		"avg_heartrate":json.dumps({}),
-		"activities_duration":json.dumps({}),
-		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
-		"latitude":None,
-		"longitude":None
-	}
-	
-	activities_hr = {}
-	activities_duration = {}
-
 	# If same id existed in manually edited, give it more prefrence
 	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)	
-	max_duration = 0
-
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
@@ -661,12 +639,11 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	if userinput_activities:
 		filtered_activities += userinput_activities.values()
 
-	print(userinput_activities)
 	return filtered_activities
 
 def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
 
-	# If same id existed in user submited activities, give it more prefrence
+	# If same id exists in user submited activities, give it more preference
 	# than manually edited activities 
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
@@ -812,16 +789,12 @@ def _get_activities_start_end_time(todays_activities,todays_manually_updated_jso
 	final_filtered_activities= get_filtered_activity_stats(activities_json=todays_activities,
 									manually_updated_json=todays_manually_updated_json,
 									userinput_activities=userinput_activities)
-	user_input_activities = get_activity_stats(activities_json=todays_activities,
-									manually_updated_json=todays_manually_updated_json,
-									userinput_activities=userinput_activities)
+
 	Time = namedtuple("Time",["start","end"])
 	activities_start_end_time = []
-	#user_edited = lambda x: filtered_activities.get(x.get('summaryId'),x)
 
 	if final_filtered_activities:
 		for activity in final_filtered_activities:
-			#activity = manually_edited(activity)
 			start_time = (
 				activity.get('startTimeInSeconds',0) 
 				+ activity.get('startTimeOffsetInSeconds')
@@ -867,12 +840,7 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 		user_input_bedtime = user_input_bedtime,
 		user_input_awake_time = user_input_awake_time,
 		user_input_timezone = user_input_timezone ,str_dt=False)
-	final_filtered_activities= get_filtered_activity_stats(activities_json=todays_activities,
-									manually_updated_json=todays_manually_updated_json,
-									userinput_activities=userinput_activities)
-	user_input_activities=get_activity_stats(activities_json=todays_activities,
-									manually_updated_json=todays_manually_updated_json,
-									userinput_activities=userinput_activities)
+	
 	activities_start_end_time =_get_activities_start_end_time(todays_activities=todays_activities,
 		todays_manually_updated_json=todays_manually_updated_json,userinput_activities=userinput_activities)
 
