@@ -613,7 +613,19 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	return sleep_stats
 
-def get_activity_stats(activities_json,manually_updated_json):
+def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+
+	# If same id existed in user submited activities, give it more prefrence
+	# than manually edited activities 
+	def userinput_edited(obj):
+		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
+		if obj_in_user_activities:
+			userinput_activities.pop(obj.get('summaryId'))
+			return obj_in_user_activities
+		return obj
+
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
+
 	activity_stats = {
 		"have_activity":False,
 		"distance_run_miles": 0,
@@ -632,14 +644,26 @@ def get_activity_stats(activities_json,manually_updated_json):
 	activities_hr = {}
 	activities_duration = {}
 
-	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)
+	# If same id existed in manually edited, give it more prefrence
+	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)	
 	max_duration = 0
 
-	if len(activities_json):
-		runs_count = 0
-		avg_run_speed_mps = 0
+	filtered_activities = []
+	if activities_json:
 		for obj in activities_json:
 			obj = manually_edited(obj)
+			if userinput_activities:
+				obj.update(userinput_edited(obj))
+			filtered_activities.append(obj)
+
+	# merge user created manual activities which are not provided by garmin
+	if userinput_activities:
+		filtered_activities += userinput_activities.values()
+
+	if len(filtered_activities):
+		runs_count = 0
+		avg_run_speed_mps = 0
+		for obj in filtered_activities:
 			if not activity_stats['have_activity']:
 				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
@@ -653,7 +677,9 @@ def get_activity_stats(activities_json,manually_updated_json):
 			activities_hr[obj_act]['hr'] += obj.get(
 											'averageHeartRateInBeatsPerMinute',0)
 			activities_hr[obj_act]['count'] += 1
-			activity_stats['total_duration'] += obj.get('durationInSeconds',0)
+
+			if(obj.get('activityType') not in IGNORE_ACTIVITY):
+				activity_stats['total_duration'] += obj.get('durationInSeconds',0)
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -705,7 +731,7 @@ def get_activity_stats(activities_json,manually_updated_json):
 
 		activity_stats['activities_duration'] = json.dumps(activities_duration)
 		#print(activity_stats)
-			
+
 	return activity_stats
 
 def _get_avg_hr_points_range(age,workout_easy_hard):
@@ -727,8 +753,42 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 		return None
 	return point_range
 
+def _get_activities_start_end_time(todays_activities,todays_manually_updated_json):
+	'''
+		Return list of named tuples containing start and end datetime
+		object of each activities
+	'''
+
+	Time = namedtuple("Time",["start","end"])
+	activities_start_end_time = []
+	manually_edited = lambda x: todays_manually_updated_json.get(x.get('summaryId'),x)
+
+	if todays_activities:
+		for activity in todays_activities:
+			activity = manually_edited(activity)
+			start_time = (
+				activity.get('startTimeInSeconds',0) 
+				+ activity.get('startTimeOffsetInSeconds')
+			)
+			end_time = start_time + activity.get('durationInSeconds',0)
+			activities_start_end_time.append(
+				Time(
+					datetime.utcfromtimestamp(start_time),
+					datetime.utcfromtimestamp(end_time),
+				)
+			)
+	return activities_start_end_time  
+
+def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
+	for activity_time in activites_time_list:
+		start = datetime.combine(activity_time.start.date(),time(activity_time.start.hour))
+		end = datetime.combine(activity_time.end.date(),time(activity_time.end.hour,59))
+		if epoch_start >= start and epoch_start <= end:
+			return True
+	return False 
+
 def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleeps_today_json,
-					user_input_todays_bedtime,user_input_bedtime = None,
+					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,user_input_bedtime = None,
 					user_input_awake_time = None,user_input_timezone = None,
 					user_input_strength_start_time=None,user_input_strength_end_time=None,
 					):
@@ -736,6 +796,7 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 	'''
 		Calculate the movement consistency summary
 	'''
+
 	if user_input_strength_start_time and user_input_strength_end_time:
 		# Stretching strength start and end time to full hour eg. 
 		# Strength start time is 8:30 AM then it'll consider 8:00 AM
@@ -750,6 +811,9 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 		user_input_bedtime = user_input_bedtime,
 		user_input_awake_time = user_input_awake_time,
 		user_input_timezone = user_input_timezone ,str_dt=False)
+	
+	activities_start_end_time =_get_activities_start_end_time(todays_activities=todays_activities,
+		todays_manually_updated_json=todays_manually_updated_json)
 
 	today_bedtime = None
 	if user_input_todays_bedtime and user_input_timezone:
@@ -767,7 +831,6 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 	# In that case we have same yesterday_bedtime and today_bedtime 
 	if today_bedtime and today_awake_time and today_bedtime <= today_awake_time:
 		today_bedtime = None
-	
 	if epochs_json and yesterday_bedtime and today_awake_time:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
@@ -791,7 +854,6 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 				time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
 				steps_in_interval = movement_consistency[time_interval].get('steps')
 				status = "sleeping"
-
 				# ex 6:00 PM, not 6:32 PM
 				hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
 
@@ -799,25 +861,27 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 					hour_start_zero_min <= today_awake_time):
 					status = "sleeping"
 				elif(hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-						today_bedtime and 
-						(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
+					today_bedtime and (hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
 					status = "sleeping"
 				elif(user_input_strength_start_time and user_input_strength_end_time and
 					hour_start >= user_input_strength_start_time and
 					hour_start <= user_input_strength_end_time):
 					status = "strength"
+				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
+					status = "exercise"
 				else:
 					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
-
+	
 		active_hours = 0
 		inactive_hours = 0
 		total_steps = 0
 		sleeping_hours = 0
 		strength_hours = 0
-		
+		exercise_hours = 0
+
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -849,6 +913,8 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 				elif(user_input_strength_end_time and user_input_strength_start_time):
 					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
 						movement_consistency[interval]['status'] = 'strength'
+				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
+					movement_consistency[interval]['status'] = 'exercise'
 
 			if values['status'] == 'active': 
 				active_hours += 1 
@@ -858,14 +924,16 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 				sleeping_hours += 1
 			elif values['status'] == 'strength':
 				strength_hours += 1
+			elif values['status'] == 'exercise':
+				exercise_hours += 1
 			total_steps += values['steps']
 
 		movement_consistency['active_hours'] = active_hours
 		movement_consistency['inactive_hours'] = inactive_hours
 		movement_consistency['sleeping_hours'] = sleeping_hours
 		movement_consistency['strength_hours'] = strength_hours
+		movement_consistency['exercise_hours'] = exercise_hours
 		movement_consistency['total_steps'] = total_steps
-
 		return movement_consistency
 
 def cal_exercise_steps_total_steps(dailies_json, todays_activities):
@@ -1298,28 +1366,22 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
 	# 	elif workout == 'yes': points += 1
 	
 	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
-		if strong_obj and strong_obj.workout == 'yes':
+		if strong_obj and (strong_obj.workout == 'yes'):
 			points += 1
-		elif ((not strong_obj or (strong_obj and strong_obj.workout != 'yes'))
-			and activity_list):
+		elif (
+			(not strong_obj or (strong_obj and strong_obj.workout != 'yes'))
+			and (activity_list or (strong_obj and strong_obj.activities))
+		):
 			points += 1
 	avg_point_week = points / (period/7)
 	grade_point = cal_exercise_consistency_grade(avg_point_week)
 	return grade_point 
 
-def get_workout_duration_grade(todays_activities, todays_manually_updated):
+def get_workout_duration_grade(total_duration):
 	'''
 		Returns a tuple having grade and point (grade, point)
 	'''
-	duration = 0
-	# If same summary is edited manually then give it more preference.
-	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
-
-	if todays_activities:
-		for act in todays_activities:
-			act = manually_edited(act)
-			duration += act.get('durationInSeconds',0)
-	return cal_workout_duration_grade(duration//60)
+	return cal_workout_duration_grade(total_duration//60)
 
 def get_workout_effort_grade(todays_daily_strong):
 	'''
@@ -1332,30 +1394,50 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
-										 todays_daily_strong,age):
-	filtered_activities = []
-	total_duration = 0
+										 todays_daily_strong,age,userinput_activities=None):
+	def userinput_edited(obj):
+		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
+		if obj_in_user_activities:
+			userinput_activities.pop(obj.get('summaryId'))
+			return obj_in_user_activities
+		return obj
+
 	# If same summary is edited manually then give it more preference.
 	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
-	for i,act in enumerate(todays_activities):
-		act = manually_edited(act)
+	filtered_activities = []
+
+	if todays_activities:
+		for obj in todays_activities:
+			obj = manually_edited(obj)
+			if userinput_activities:
+				obj.update(userinput_edited(obj))
+			filtered_activities.append(obj)
+
+	if userinput_activities:
+		filtered_activities += userinput_activities.values()
+
+	total_duration = 0
+	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
+	final_activities = []
+	# If same summary is edited manually then give it more preference.
+	
+	for i,act in enumerate(filtered_activities):
+
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
 			pass
 		elif 'swimming' in act.get('activityType','').lower():
 			pass
-		elif act.get('activityType','') == 'STRENGTH_TRAINING':
-			pass
-		elif act.get('activityType','') == 'OTHER':
+		elif act.get('activityType','') in IGNORE_ACTIVITY:
 			pass
 		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
 			pass
 		else:
-			filtered_activities.append(act)
+			final_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
 
-	if filtered_activities:
+	if final_activities:
 		avg_hr = 0
-		for act in filtered_activities:
+		for act in final_activities:
 			avg_hr += (act.get('durationInSeconds',0) / total_duration) *\
 					   act.get('averageHeartRateInBeatsPerMinute',0)
 		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
@@ -1451,6 +1533,7 @@ def did_workout_today(have_activities,user_did_workout):
 		return "yes"
 	else:
 		return ""
+
 # def movement_consistency_cal(todays_activities,todays_manually_updated_json,todays_manually_updated):
 # 	if len(todays_activities):
 # 		for obj in todays_activities:
@@ -1471,6 +1554,7 @@ def did_workout_today(have_activities,user_did_workout):
 # 						print('inactive')
 # 					print(todays_activities)
 # 		return (start_time,end_time)
+
 
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -1524,7 +1608,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Already parsed from json to python objects
 		weekly_activities = get_weekly_data(activities,current_date,last_seven_days_date)
 		todays_activities = weekly_activities.get(current_date.strftime('%Y-%m-%d'))
-			
 
 		user_metrics = [q.data for q in UserGarminDataMetrics.objects.filter(
 				user = user,calendar_date = current_date.date()).order_by('-id')]
@@ -1552,7 +1635,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 			if q.user_input.created_at == current_date.date():
 				todays_daily_strong.append(daily_strong[i])
 				break
-
+		
+		userinput_activities = safe_get(todays_daily_strong,'activities',None)
+		if userinput_activities:
+			userinput_activities = json.loads(userinput_activities)
+		
 		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
 		# 	user_input__user = user,
 		# 	user_input__created_at = current_date)
@@ -1566,12 +1653,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		daily_optional = [todays_user_input.optional_input if todays_user_input else None]
 
 		dailies_json = [ast.literal_eval(dic) for dic in dailies]
-		todays_activities_json = todays_activities
 
+		todays_activities_json = todays_activities
+		
 		todays_manually_updated_json = {}
 		for dic in todays_manually_updated:
 			todays_manually_updated_json[dic.get('summaryId')] = dic
 
+		# todays_manually_updated_json.update(userinput_activities)
+		
 		epochs_json = [ast.literal_eval(dic) for dic in epochs]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
@@ -1591,7 +1681,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
 		# Exercise
-		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json)
+		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json,userinput_activities)
 		exercise_calculated_data['did_workout'] = did_workout_today(
 				activity_stats['have_activity'],
 				safe_get(todays_daily_strong,"workout","")
@@ -1687,7 +1777,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['prcnt_non_processed_food'] = safe_get(todays_daily_strong,
 									   "prcnt_unprocessed_food_consumed_yesterday", 0)
 		food_calculated_data['non_processed_food'] = safe_get(todays_daily_strong,
-								 "list_of_unprocessed_food_consumed_yesterday", "")
+								 "list_of_unprocessed_food_consumed_yesterday", "")			
 		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
@@ -1699,8 +1789,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# **************************************CALCULATION OF GRADES**************************************
 		
 		# Workout duration grade calculation
-		workout_duration_grade_pts  = get_workout_duration_grade(todays_activities_json,
-																 todays_manually_updated_json)
+		workout_duration_grade_pts  = get_workout_duration_grade(activity_stats.get('total_duration',0))
 		grades_calculated_data['workout_duration_grade'] = workout_duration_grade_pts[0]
 		grades_calculated_data['workout_duration_gpa'] = workout_duration_grade_pts[1]
 
@@ -1711,7 +1800,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Average exercise heartrate grade calculation
 		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
-									todays_manually_updated_json,todays_daily_strong, user.profile.age())
+									todays_manually_updated_json,todays_daily_strong,
+									user.profile.age(),userinput_activities)
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
@@ -1772,15 +1862,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		movement_consistency_summary = cal_movement_consistency_summary(current_date,
 										epochs_json,sleeps_json,
 										sleeps_today_json,
+										todays_activities=todays_activities,
+										todays_manually_updated_json=todays_manually_updated_json,
 										user_input_todays_bedtime = todays_bedtime,
 										user_input_bedtime = user_input_bedtime,
 									  	user_input_awake_time = user_input_awake_time,
 									  	user_input_timezone = user_input_timezone,
 									  	user_input_strength_start_time = user_input_strength_start_time,
 									  	user_input_strength_end_time = user_input_strength_end_time)
-		# movement_constency1 = movement_consistency_cal(todays_activities=todays_activities,
-		# 											todays_manually_updated_json=todays_manually_updated_json,
-		# 											todays_manually_updated=todays_manually_updated)
+		
 		if movement_consistency_summary:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
 			inactive_hours = movement_consistency_summary.get("inactive_hours")
@@ -1850,6 +1940,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		SERIALIZED_DATA.append(UserQuickLookSerializer(user_ql).data)
 		#Add one day to current date
 		current_date += timedelta(days=1)
+
 		
 	return SERIALIZED_DATA
 

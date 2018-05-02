@@ -38,7 +38,7 @@ urlpatterns = [
 
     url(r'^print/excel$',views.export_users_xls,name="Exceldata"),
 
-    url(r'^hrr_calculations$',views.hrr_calculations,name="hrr_calculations"),
+    url(r'^aa_calculations$',views.aa_calculations,name="hrr_calculations"),
    
     # url(r'^print/movement_consistency$',views.export_movement_consistency_xls,
     # 	name="Movement_Consistency_data"),
