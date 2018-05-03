@@ -1695,7 +1695,6 @@ return(
     className="btn btn-block-lg"
     onClick={this.handleChangeModal}>
     <span
-        id="add_button"
         data-name=""
         className="fa fa-plus-circle fa-1x "
     >

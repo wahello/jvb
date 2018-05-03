@@ -27,12 +27,12 @@ import DashboardSummary from '../components/dashboard_summary';
 import TermsConditions from '../components/terms_and_conditions';
 import ServiceConnect_fitBit from '../components/serviceConnect_fitbit';
 import Activity_Type from '../components/activity_types';
-import LeaderBoard from '../components/leaderboard';
 import FitBit from '../components/fitbitData';
-import AllRank_Data from '../components/leaderboard_allrank';
 import HeartRate from '../components/Heart_rate_recovery';
 import LeaderBoard1 from '../components/leader_exp';
 import AllRank_Data1 from '../components/leader_all_exp';
+import HeartRateCal from '../components/heart_rate_calculation';
+
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -62,6 +62,7 @@ function initializeLocalState(){
 			        <Route path='/service_connect' component={RequireAuth(ServiceConnect)} />
 			        <Route path='/service_connect_fitbit' component={RequireAuth(ServiceConnect_fitBit)} />
 			        <Route path='/activity_type' component={RequireAuth(Activity_Type)} />
+			        <Route path='/hrr' component={RequireAuth(HeartRateCal)} />
 					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
 					{/*<Route path='/nes' component={RequireAuth(Nes)} /> */}
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}

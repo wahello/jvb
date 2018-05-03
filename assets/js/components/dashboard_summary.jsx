@@ -117,6 +117,8 @@ constructor(props){
         active_category:"",
         active_username:"",
         "report_date":"-",
+        active_category_name:"",
+        all_verbose_name:"",
         "rankData":rankInitialState,
         "summary":{
             "overall_health":{
@@ -1039,6 +1041,8 @@ createExcelPrintURL(){
       let durations = [];
       let scores = [];
       let ranks = [];
+      let other_Scores = [];
+      let other_score_name;
       let usernames;
       let tableRows = [];
       let durations_type = ["today","yesterday","week","month","year","custom_range"];
@@ -1049,8 +1053,15 @@ createExcelPrintURL(){
             durations.push(this.headerDates(range));
             for(let [c_key,c_rankData] of Object.entries(value1)){
               if(c_key == "user_rank"){
-                if(!category)
+                if(!category){
                   category = c_rankData.category;
+                }
+                if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+                  for (let [key3,o_score] of Object.entries(c_rankData.other_scores)){
+                  other_Scores.push(o_score.value);
+                  other_score_name = o_score.verbose_name;
+                    }
+                }
                 usernames = c_rankData.username;
                 scores.push(c_rankData.score.value);
                 ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
@@ -1066,6 +1077,13 @@ createExcelPrintURL(){
                 if(!category){
                   category = a_rankData.category;
                 }
+                if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+                  for (let [key3,o_score] of Object.entries(a_rankData.other_scores)){
+                    other_Scores.push(o_score.value);
+                    other_score_name = o_score.verbose_name;
+                  }
+                }
+
                 usernames = a_rankData.username;
                 scores.push(a_rankData.score.value);
                 ranks.push({'rank':a_rankData.rank,'duration':duration,'isCustomRange':false});
@@ -1089,7 +1107,7 @@ createExcelPrintURL(){
           }
           rankTableData.push(
             <td className = "lb_table_style_rows">
-            <a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank,usernames)}>
+            <a href ="#" onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,category,other_score_name)}>
                 <span style={{textDecoration:"underline"}}>{rank.rank}</span>
                  <span id="lbfontawesome">
                           <FontAwesome
@@ -1120,13 +1138,15 @@ createExcelPrintURL(){
      }
       return rankTableData;
     };
-reanderAll(value,value1,event){
+reanderAll(value,value1,value2,value3,event){
     if(value){
       this.setState({
         active_view:!this.state.active_view,
         btnView:!this.state.btnView,
         active_category:value,
         active_username:value1,
+        active_category_name:value2,
+        all_verbose_name:value3
       });
       };
     };
@@ -2200,7 +2220,10 @@ handleBackButton(){
     </div>
   }
         {this.state.btnView && 
-            <AllRank_Data1 data={this.state.active_category} active_username = {this.state.active_username}/>
+            <AllRank_Data1 data={this.state.active_category}
+            active_username = {this.state.active_username}
+            active_category_name = {this.state.active_category_name}
+            all_verbose_name = {this.state.all_verbose_name}/>
         }</div>
 {this.renderProgressFetchOverlay()}
 {this.renderProgress2FetchOverlay()}
