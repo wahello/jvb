@@ -140,11 +140,11 @@ def hrr_calculations(request):
 			if k <= 60:
 				min_heartrate.append(i)
 
-		HRR_activity_start_time = hrr_timestamp[0]+offset
+		HRR_activity_start_time = hrr_timestamp[0]-(offset)
 		HRR_start_beat = hrr_final_heartrate[0]
 		lowest_hrr_1min = min(min_heartrate)
 		time_99 = sum(time_toreach_99)
-		end_time_activity = workout_timestamp[-1]+offset
+		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
 		diff_actity_hrr= HRR_activity_start_time - end_time_activity
 
