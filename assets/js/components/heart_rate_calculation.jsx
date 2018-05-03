@@ -28,13 +28,14 @@ class HeartRateCal extends Component{
     	calendarOpen:false,
 	    isOpen:false,
 	    selectedDate:new Date(),
-	    "hrr_start_time":'01:02',
-	    'hrr_start_rate':148,
-	    'lowest_heart_rate':96,
-	    'time_99':'00:48',
-	    'end_time_activity':'01:15:23',
-	    'heart_rate_end_activity':149,
-	    'diff_activityend_hrrstart':'00:10',
+	   			"HRR_activity_start_time":"",
+	  			"HRR_start_beat":"",
+				"lowest_hrr_1min":"",
+				"time_99":"",
+				"end_time_activity":"",
+				"end_heartrate_activity":"",
+				"diff_actity_hrr":"",
+				"offset":"",
     }
      this.toggleCalendar = this.toggleCalendar.bind(this);
 	 this.handleLogout = this.handleLogout.bind(this);
@@ -42,16 +43,23 @@ class HeartRateCal extends Component{
 	 this.successHeart = this.successHeart.bind(this);
 	 this.errorHeart = this.errorHeart.bind(this);
 	 this.processDate = this.processDate.bind(this);
+	 this.renderTime = this.renderTime.bind(this);
   }
   successHeart(data){
   	this.setState({
-
+  	   HRR_activity_start_time:data.data.HRR_activity_start_time,
+	   HRR_start_beat:data.data.HRR_start_beat,
+	   diff_actity_hrr:data.data.diff_actity_hrr,
+	   end_heartrate_activity:data.data.end_heartrate_activity,
+	   end_time_activity:data.data.end_time_activity,
+	   lowest_hrr_1min:data.data.lowest_hrr_1min,
+	   time_99:data.data.time_99
   	});
   }
-  errorHeart(error){
+    errorHeart(error){
 		console.log(error.message);
-	}
-  processDate(selectedDate){
+    }
+    processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
@@ -60,19 +68,38 @@ class HeartRateCal extends Component{
 		});
 		
 	}
-  toggleCalendar(){
+
+	componentDidMount(){
+		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	}
+
+    toggleCalendar(){
 	    this.setState({
 	      calendarOpen:!this.state.calendarOpen
 	    });
     }
+
     handleLogout(){
     	this.props.logoutUser(this.onLogoutSuccess);
   	}
+
   	toggle() {
 	    this.setState({
 	      isOpen: !this.state.isOpen,
 	    });
   	}
+
+  	renderTime(value){
+  		var z;
+  		if(value != null && value != "00:00:00"){
+  			 z = moment.unix(value).format("hh:mm:ss a");
+  		}
+  		else if(value == "00:00:00"){
+  			 z = "-";
+  		}
+  		return z
+  	}
+
   render(){
   	const {fix} = this.props;
   	return(
@@ -81,10 +108,10 @@ class HeartRateCal extends Component{
 		         fixed={fix ? 'top' : ''}
 		          className="navbar navbar-expand-sm navbar-inverse nav6">
 		          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-		           <FontAwesome
-		                 name = "bars"
-		                 size = "1x"
-		             />
+		            <FontAwesome
+		                name = "bars"
+		                size = "1x"
+		            />
 		          </NavbarToggler>
 		          <Link to='/' >
 		            <NavbarBrand
@@ -145,37 +172,37 @@ class HeartRateCal extends Component{
 	          	    <tbody>  
 
 	          	    <tr className = "hr_table_style_rows">   
-		          	    <td className = "hr_table_style_rows">Hrr Start Time(hh:mm)</td>    
-		          	    <td className = "hr_table_style_rows">{this.state.hrr_start_time}</td>
+		          	    <td className = "hr_table_style_rows">Hrr Start Time(hh:mm:ss)</td>    
+		          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.HRR_activity_start_time)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Hrr Start Rate</td>
-		          	    <td className = "hr_table_style_rows">{this.state.hrr_start_rate}</td>
+		          	    <td className = "hr_table_style_rows">{this.state.HRR_start_beat}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">Lowest Heart Rate</td>
-		          	    <td className = "hr_table_style_rows">{this.state.lowest_heart_rate}</td>
+		          	    <td className = "hr_table_style_rows">Lowest Heart Rate Level in the 1st Minute</td>
+		          	    <td className = "hr_table_style_rows">{this.state.lowest_hrr_1min}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">Time to 99</td>
+		          	    <td className = "hr_table_style_rows">Duration (mm:ss)  for Heart Rate Time to Reach 99</td>
 						<td className = "hr_table_style_rows">{this.state.time_99}</td>
 	          	    </tr>
 
 	          	     <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">End Time Activity(hh:mm:ss)</td>
-		          	    <td className = "hr_table_style_rows">{this.state.end_time_activity}</td>
+		          	    <td className = "hr_table_style_rows">End Time of Activity(hh:mm:ss)</td>
+		          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.end_time_activity)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">Heart Rate End Activity</td>
-						<td className = "hr_table_style_rows">{this.state.heart_rate_end_activity}</td>
+		          	    <td className = "hr_table_style_rows">Heart Rate End Time Activity</td>
+						<td className = "hr_table_style_rows">{this.state.end_heartrate_activity}</td>
 	          	    </tr>
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Difference Between Activity End time and Hrr Start time(mm:ss)</td>
-		          	    <td className = "hr_table_style_rows">{this.state.diff_activityend_hrrstart}</td>
+		          	    <td className = "hr_table_style_rows">{this.state.diff_actity_hrr}</td>
 	          	    </tr>
 
 	          	    </tbody>
@@ -185,7 +212,6 @@ class HeartRateCal extends Component{
   		</div>
   		);
   }
-
 }
 function mapStateToProps(state){
   return {
