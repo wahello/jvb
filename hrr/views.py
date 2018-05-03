@@ -1,12 +1,14 @@
 import json
 import ast
 import time
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 
 from django.http import JsonResponse
 from django.shortcuts import render
+
 from user_input.models import DailyUserInputStrong
 from garmin.models import GarminFitFiles
+from fitparse import FitFile
 
 # Create your views here.
 
@@ -79,6 +81,7 @@ def hrr_calculations(request):
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
+	print(user_input_strong)
 
 	data = {"HRR_activity_start_time":'00:00:00',
 				"HRR_start_beat":'',
