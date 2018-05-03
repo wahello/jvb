@@ -18,7 +18,7 @@ import AllRank_Data1 from "./leader_all_exp";
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
 const categoryMeta = {
-	"Overall Health GPA":{
+	"Overall Health GPA":{    
 		short_name:"oh_gpa",
 		url_name:"overall-health-gpa"
 	},
