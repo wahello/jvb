@@ -14,6 +14,8 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchHeartData  from '../network/heart_cal';
+import {renderHrrSelectedDateFetchOverlay} from './dashboard_healpers';
+
 
 axiosRetry(axios, { retries: 3});
 
@@ -25,9 +27,10 @@ class HeartRateCal extends Component{
 	constructor(props) {
     super(props);
     this.state = {
-    	calendarOpen:false,
-	    isOpen:false,
-	    selectedDate:new Date(),
+		    	calendarOpen:false,
+			    isOpen:false,
+			    fetching_hrr:false,
+			    selectedDate:new Date(),
 	   			"HRR_activity_start_time":"",
 	  			"HRR_start_beat":"",
 				"lowest_hrr_1min":"",
@@ -44,9 +47,11 @@ class HeartRateCal extends Component{
 	 this.errorHeart = this.errorHeart.bind(this);
 	 this.processDate = this.processDate.bind(this);
 	 this.renderTime = this.renderTime.bind(this);
+	 this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
   }
   successHeart(data){
   	this.setState({
+  	   fetching_hrr:false,
   	   HRR_activity_start_time:data.data.HRR_activity_start_time,
 	   HRR_start_beat:data.data.HRR_start_beat,
 	   diff_actity_hrr:data.data.diff_actity_hrr,
@@ -58,11 +63,15 @@ class HeartRateCal extends Component{
   }
     errorHeart(error){
 		console.log(error.message);
+		this.setState({
+			fetching_hrr:false,
+		})
     }
     processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
+			fetching_hrr:true,
 		},()=>{
 			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 		});
@@ -70,6 +79,9 @@ class HeartRateCal extends Component{
 	}
 
 	componentDidMount(){
+		this.setState({
+			fetching_hrr:true,
+		});
 		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 	}
 
@@ -209,9 +221,10 @@ class HeartRateCal extends Component{
           	    </table>   
           	   </div>
           	  </div>
+          	  {this.renderHrrSelectedDateFetchOverlay()}
   		</div>
   		);
-  }
+    }
 }
 function mapStateToProps(state){
   return {
