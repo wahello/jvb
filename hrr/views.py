@@ -114,14 +114,15 @@ def hrr_calculations(request):
 	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = int(meta['activityIds'][0])
-		if data_id == id_act:
-			hrr.append(tmp) # getting only hrr files
-		else:
-			workout.append(tmp)
+	if activities:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if data_id == id_act:
+				hrr.append(tmp) # getting only hrr files
+			else:
+				workout.append(tmp)
 	
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
