@@ -81,7 +81,6 @@ def hrr_calculations(request):
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
-	print(user_input_strong)
 
 	data = {"HRR_activity_start_time":'00:00:00',
 				"HRR_start_beat":'',
