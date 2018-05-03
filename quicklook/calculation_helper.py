@@ -1469,6 +1469,7 @@ def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updat
 		for act in final_activities:
 			avg_hr += (act.get('durationInSeconds',0) / total_duration) *\
 					   act.get('averageHeartRateInBeatsPerMinute',0)
+		avg_hr = round(avg_hr)
 		workout_easy_hard = safe_get(todays_daily_strong,'work_out_easy_or_hard','')
 		return cal_avg_exercise_heartrate_grade(avg_hr,workout_easy_hard,age)
 	else:
