@@ -613,9 +613,37 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	return sleep_stats
 
+def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+
+	# If same id exist in user submited activities, give it more preference
+	# than manually edited activities 
+	def userinput_edited(obj):
+		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
+		if obj_in_user_activities:
+			userinput_activities.pop(obj.get('summaryId'))
+			return obj_in_user_activities
+		return obj
+
+	# If same id existed in manually edited, give it more prefrence
+	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)	
+	filtered_activities = []
+	if activities_json:
+		for obj in activities_json:
+			obj = manually_edited(obj
+				)
+			if userinput_activities:
+				obj.update(userinput_edited(obj))
+			filtered_activities.append(obj)
+
+	# merge user created manual activities which are not provided by garmin
+	if userinput_activities:
+		filtered_activities += userinput_activities.values()
+
+	return filtered_activities
+
 def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
 
-	# If same id existed in user submited activities, give it more prefrence
+	# If same id exists in user submited activities, give it more preference
 	# than manually edited activities 
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
@@ -651,7 +679,8 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
-			obj = manually_edited(obj)
+			obj = manually_edited(obj
+				)
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -730,8 +759,7 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 			activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
 
 		activity_stats['activities_duration'] = json.dumps(activities_duration)
-		#print(activity_stats)
-
+	#print('filtered:',filtered_activities,'\n','user:',userinput_activities)
 	return activity_stats
 
 def _get_avg_hr_points_range(age,workout_easy_hard):
@@ -753,19 +781,20 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 		return None
 	return point_range
 
-def _get_activities_start_end_time(todays_activities,todays_manually_updated_json):
+def _get_activities_start_end_time(todays_activities,todays_manually_updated_json,userinput_activities):
 	'''
 		Return list of named tuples containing start and end datetime
 		object of each activities
 	'''
+	final_filtered_activities= get_filtered_activity_stats(activities_json=todays_activities,
+									manually_updated_json=todays_manually_updated_json,
+									userinput_activities=userinput_activities)
 
 	Time = namedtuple("Time",["start","end"])
 	activities_start_end_time = []
-	manually_edited = lambda x: todays_manually_updated_json.get(x.get('summaryId'),x)
 
-	if todays_activities:
-		for activity in todays_activities:
-			activity = manually_edited(activity)
+	if final_filtered_activities:
+		for activity in final_filtered_activities:
 			start_time = (
 				activity.get('startTimeInSeconds',0) 
 				+ activity.get('startTimeOffsetInSeconds')
@@ -788,7 +817,7 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	return False 
 
 def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleeps_today_json,
-					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,user_input_bedtime = None,
+					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,userinput_activities,user_input_bedtime = None,
 					user_input_awake_time = None,user_input_timezone = None,
 					user_input_strength_start_time=None,user_input_strength_end_time=None,
 					):
@@ -807,13 +836,13 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 			time(user_input_strength_end_time.hour,59))
 
 	movement_consistency = OrderedDict()
-	sleep_stats = get_sleep_stats(calendar_date,sleeps_json,sleeps_today_json,
+	sleep_stats = get_sleep_stats(calendar_date,sleeps_json,sleeps_today_json, 
 		user_input_bedtime = user_input_bedtime,
 		user_input_awake_time = user_input_awake_time,
 		user_input_timezone = user_input_timezone ,str_dt=False)
 	
 	activities_start_end_time =_get_activities_start_end_time(todays_activities=todays_activities,
-		todays_manually_updated_json=todays_manually_updated_json)
+		todays_manually_updated_json=todays_manually_updated_json,userinput_activities=userinput_activities)
 
 	today_bedtime = None
 	if user_input_todays_bedtime and user_input_timezone:
@@ -1415,7 +1444,7 @@ def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updat
 
 	if userinput_activities:
 		filtered_activities += userinput_activities.values()
-
+	
 	total_duration = 0
 	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
 	final_activities = []
@@ -1533,28 +1562,6 @@ def did_workout_today(have_activities,user_did_workout):
 		return "yes"
 	else:
 		return ""
-
-# def movement_consistency_cal(todays_activities,todays_manually_updated_json,todays_manually_updated):
-# 	if len(todays_activities):
-# 		for obj in todays_activities:
-# 			if (obj['summaryId']== x for x in todays_manually_updated_json['summaryId']):
-# 				start_time=todays_manually_updated['startTimeInSeconds']
-# 				end_time=todays_manually_updated['startTimeInSeconds']+todays_manually_updated_json['durationInSeconds']
-# 				time_interval = start_time.strftime("%I:00 %p")+" to "+start_time.strftime("%I:59 %p")
-# 				todays_manually_updated['activityType']
-# 				if todays_manually_updated('durationInSeconds')<=900:
-# 					print('inactive')
-# 					print(todays_manually_updated)	
-# 				else:
-# 					start_time=todays_activities['startTimeInSeconds']
-# 					end_time=todays_activities['startTimeInSeconds']+todays_activities['durationInSeconds']
-# 					time_interval = start_time.strftime("%I:00 %p")+" to "+start_time.strftime("%I:59 %p")
-# 					activity=todays_activities['activityType']
-# 					if todays_activities('durationInSeconds')<=900:
-# 						print('inactive')
-# 					print(todays_activities)
-# 		return (start_time,end_time)
-
 
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -1864,6 +1871,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 										sleeps_today_json,
 										todays_activities=todays_activities,
 										todays_manually_updated_json=todays_manually_updated_json,
+										userinput_activities=userinput_activities,
 										user_input_todays_bedtime = todays_bedtime,
 										user_input_bedtime = user_input_bedtime,
 									  	user_input_awake_time = user_input_awake_time,

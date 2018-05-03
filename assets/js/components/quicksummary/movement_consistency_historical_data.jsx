@@ -82,6 +82,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             "inactive_hours" : [],
             "sleeping_hours" : [],
             "strength_hours" : [],
+            "exercise_hours" : [],
             "total_steps" : []
           };
         
@@ -108,6 +109,9 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                                         style:this.mcHistoricalData(value)});
                                       else if (time == "strength_hours")
                                         obj[time].push({value:mc.strength_hours,
+                                                        style:this.mcHistoricalData(value)});
+                                      else if (time == "exercise_hours")
+                                        obj[time].push({value:mc.exercise_hours,
                                                         style:this.mcHistoricalData(value)});
                                       else if (time == "sleeping_hours")
                                         obj[time].push({value:mc.sleeping_hours,
@@ -176,6 +180,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         "inactive_hours" : "Inactive Hours",
         "sleeping_hours" : "Sleeping Hours",
         "strength_hours" : "Strength Hours",
+        "exercise_hours" : "Exercise Hours",
         "total_steps" : "Total Steps",
         "dmc":"Daily Movement consistency"
       }
@@ -184,7 +189,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
       let prcnt_active_steps = '';
       if(key != "active_hours" && key != "inactive_hours" &&
          key != "sleeping_hours" && key != "strength_hours" &&
-         key != "total_steps" && key != "dmc"){
+         key != "exercise_hours" && key != "total_steps" && key != "dmc"){
         let active_days = 0;
         for(let step of col){
           if(step.value >= 300){
