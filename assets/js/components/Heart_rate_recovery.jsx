@@ -13,7 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
-import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers';
+import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers'; 
 
 
 
@@ -41,6 +41,7 @@ class HeartRate extends Component{
 	    	calendarOpen:false,
 	    	isOpen:false,
 	    	fetching_aerobic:false,
+	    	fetching_hrr:false,
 	    	aerobic_zone:"",
             anaerobic_zone:"",
             below_aerobic_zone:"",
