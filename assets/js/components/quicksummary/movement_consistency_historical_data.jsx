@@ -82,7 +82,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             "inactive_hours" : [],
             "sleeping_hours" : [],
             "strength_hours" : [],
-            "exercise_hours" : [],
+            // "exercise_hours" : [],
             "total_steps" : []
           };
         
@@ -111,8 +111,9 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                         obj[time].push({value:mc.strength_hours,
                                                         style:this.mcHistoricalData(value)});
                                       else if (time == "exercise_hours")
-                                        obj[time].push({value:mc.exercise_hours,
-                                                        style:this.mcHistoricalData(value)});
+                                        // obj[time].push({value:mc.exercise_hours,
+                                        //                 style:this.mcHistoricalData(value)});
+                                        continue;
                                       else if (time == "sleeping_hours")
                                         obj[time].push({value:mc.sleeping_hours,
                                                         style:this.mcHistoricalData(value)});
@@ -180,7 +181,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         "inactive_hours" : "Inactive Hours",
         "sleeping_hours" : "Sleeping Hours",
         "strength_hours" : "Strength Hours",
-        "exercise_hours" : "Exercise Hours",
+        // "exercise_hours" : "Exercise Hours",
         "total_steps" : "Total Steps",
         "dmc":"Daily Movement consistency"
       }
