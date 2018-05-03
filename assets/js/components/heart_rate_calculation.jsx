@@ -32,10 +32,10 @@ class HeartRateCal extends Component{
 			    fetching_hrr:false,
 			    selectedDate:new Date(),
 	   			"HRR_activity_start_time":"",
-	  			"HRR_start_beat":"",
-				"lowest_hrr_1min":"",
+	  			"HRR_start_beat":"-",
+				"lowest_hrr_1min":"-",
 				"time_99":"",
-				"end_time_activity":"",
+				"end_time_activity":"-",
 				"end_heartrate_activity":"",
 				"diff_actity_hrr":"",
 				"offset":"",
@@ -48,6 +48,7 @@ class HeartRateCal extends Component{
 	 this.processDate = this.processDate.bind(this);
 	 this.renderTime = this.renderTime.bind(this);
 	 this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
+	 this.renderSecToMin = this.renderSecToMin.bind(this);
   }
   successHeart(data){
   	this.setState({
@@ -111,7 +112,19 @@ class HeartRateCal extends Component{
   		}
   		return z
   	}
+  	renderSecToMin(value){
+  		let time;
+  		if(value != null && value != "00:00"){
+	  		let min = parseInt(value/60);
+	  		let sec = (value % 60);
+	  		time = min + ":" + sec;
+	  	}
+	  	else{
+	  		time = "-"
+	  	}
 
+  		return time;
+  	}
   render(){
   	const {fix} = this.props;
   	return(
@@ -200,7 +213,7 @@ class HeartRateCal extends Component{
 
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Duration (mm:ss)  for Heart Rate Time to Reach 99</td>
-						<td className = "hr_table_style_rows">{this.state.time_99}</td>
+						<td className = "hr_table_style_rows">{this.renderSecToMin(this.state.time_99)}</td>
 	          	    </tr>
 
 	          	     <tr className = "hr_table_style_rows">

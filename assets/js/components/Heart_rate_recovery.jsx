@@ -41,7 +41,6 @@ class HeartRate extends Component{
 	    	calendarOpen:false,
 	    	isOpen:false,
 	    	fetching_aerobic:false,
-	    	fetching_hrr:false,
 	    	aerobic_zone:"",
             anaerobic_zone:"",
             below_aerobic_zone:"",
