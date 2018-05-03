@@ -54,7 +54,7 @@ class AllRank_Data1 extends Component{
             //     }
             // }
             var rows2 = rows1 + 180;
-            var rows3 = rows2 - 650;
+            var rows3 = rows2 - 670;
             if(rows1 >= 520){
               window.scrollTo(0,  rows3);
             }

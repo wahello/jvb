@@ -1,12 +1,14 @@
 import json
 import ast
 import time
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 
 from django.http import JsonResponse
 from django.shortcuts import render
+
 from user_input.models import DailyUserInputStrong
 from garmin.models import GarminFitFiles
+from fitparse import FitFile
 
 # Create your views here.
 
