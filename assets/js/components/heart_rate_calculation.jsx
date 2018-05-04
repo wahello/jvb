@@ -34,10 +34,10 @@ class HeartRateCal extends Component{
 	   			"HRR_activity_start_time":"",
 	  			"HRR_start_beat":"-",
 				"lowest_hrr_1min":"-",
-				"time_99":"61",
+				"time_99":"",
 				"end_time_activity":"-",
 				"end_heartrate_activity":"",
-				"diff_actity_hrr":"70",
+				"diff_actity_hrr":"",
 				"offset":"",
     }
      this.toggleCalendar = this.toggleCalendar.bind(this);
