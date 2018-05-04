@@ -38,6 +38,9 @@ mcHistoricalData(score,status){
          return {background:'red',color:'white'}
       else if(status == "strength")
         return {background:"rgb(255,0,255)",color:'white'}
+      else if(status == "exercise"){
+         return {background:"yellow",color:'black'}
+      }
       else if (score >= 300 )
         return {background:'green', color:'white'};
 }
@@ -82,7 +85,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             "inactive_hours" : [],
             "sleeping_hours" : [],
             "strength_hours" : [],
-            // "exercise_hours" : [],
+            "exercise_hours" : [],
             "total_steps" : []
           };
         
@@ -111,9 +114,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                         obj[time].push({value:mc.strength_hours,
                                                         style:this.mcHistoricalData(value)});
                                       else if (time == "exercise_hours")
-                                        // obj[time].push({value:mc.exercise_hours,
-                                        //                 style:this.mcHistoricalData(value)});
-                                        continue;
+                                        obj[time].push({value:mc.exercise_hours,
+                                                        style:this.mcHistoricalData(value)});
                                       else if (time == "sleeping_hours")
                                         obj[time].push({value:mc.sleeping_hours,
                                                         style:this.mcHistoricalData(value)});
@@ -181,7 +183,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         "inactive_hours" : "Inactive Hours",
         "sleeping_hours" : "Sleeping Hours",
         "strength_hours" : "Strength Hours",
-        // "exercise_hours" : "Exercise Hours",
+        "exercise_hours" : "Exercise Hours",
         "total_steps" : "Total Steps",
         "dmc":"Daily Movement consistency"
       }
@@ -267,7 +269,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             <span className="rd_mch_color_legend_label">Strength</span>
             <div className="rd_mch_color_legend color_legend_blue"></div>
             <span className="rd_mch_color_legend_label">Sleeping</span>
-         
+            <div className="rd_mch_color_legend color_legend_yellow"></div>
+            <span className="rd_mch_color_legend_label">Exercise</span>
 
       </div>
       </div>
