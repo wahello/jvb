@@ -34,10 +34,10 @@ class HeartRateCal extends Component{
 	   			"HRR_activity_start_time":"",
 	  			"HRR_start_beat":"-",
 				"lowest_hrr_1min":"-",
-				"time_99":"",
+				"time_99":"61",
 				"end_time_activity":"-",
 				"end_heartrate_activity":"",
-				"diff_actity_hrr":"",
+				"diff_actity_hrr":"70",
 				"offset":"",
     }
      this.toggleCalendar = this.toggleCalendar.bind(this);
@@ -79,12 +79,12 @@ class HeartRateCal extends Component{
 		
 	}
 
-	componentDidMount(){
-		this.setState({
-			fetching_hrr:true,
-		});
-		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	}
+	// componentDidMount(){
+	// 	this.setState({
+	// 		fetching_hrr:true,
+	// 	});
+	// 	fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	// }
 
     toggleCalendar(){
 	    this.setState({
@@ -117,7 +117,12 @@ class HeartRateCal extends Component{
   		if(value != null && value != "00:00"){
 	  		let min = parseInt(value/60);
 	  		let sec = (value % 60);
-	  		time = min + ":" + sec;
+	  		if(sec < 10){
+	  			time = min + ":0" + sec;
+	  		}
+	  		else{
+	  			time = min + ":" + sec;
+	  		}
 	  	}
 	  	else{
 	  		time = "-"
@@ -227,7 +232,7 @@ class HeartRateCal extends Component{
 	          	    </tr>
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Difference Between Activity End time and Hrr Start time(mm:ss)</td>
-		          	    <td className = "hr_table_style_rows">{this.state.diff_actity_hrr}</td>
+		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.diff_actity_hrr)}</td>
 	          	    </tr>
 
 	          	    </tbody>
