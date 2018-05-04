@@ -227,7 +227,7 @@ class HeartRateCal extends Component{
 	          	    </tr>
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Difference Between Activity End time and Hrr Start time(mm:ss)</td>
-		          	    <td className = "hr_table_style_rows">{this.state.diff_actity_hrr}</td>
+		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.diff_actity_hrr)}</td>
 	          	    </tr>
 
 	          	    </tbody>
