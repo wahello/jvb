@@ -693,6 +693,11 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 		runs_count = 0
 		avg_run_speed_mps = 0
 		for obj in filtered_activities:
+
+			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
+			if not obj_avg_hr:
+				obj_avg_hr = 0
+
 			if not activity_stats['have_activity']:
 				activity_stats['have_activity'] = True
 			obj_act = obj.get('activityType')
@@ -703,8 +708,7 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 				activities_hr[obj_act]['hr'] = 0
 				activities_hr[obj_act]['count'] = 0
 
-			activities_hr[obj_act]['hr'] += obj.get(
-											'averageHeartRateInBeatsPerMinute',0)
+			activities_hr[obj_act]['hr'] += obj_avg_hr
 			activities_hr[obj_act]['count'] += 1
 
 			if(obj.get('activityType') not in IGNORE_ACTIVITY):
@@ -720,7 +724,7 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 					
 
 			if not activity_stats['hr90_duration_15min']:
-				if (obj.get('averageHeartRateInBeatsPerMinute',0) >= 90 and  
+				if (obj_avg_hr >= 90 and  
 					obj.get('durationInSeconds',0) >= 900):
 					activity_stats['hr90_duration_15min'] = True
 				elif ('swimming' in obj.get('activityType').lower() and #HR is not required for swimming activities
