@@ -79,12 +79,12 @@ class HeartRateCal extends Component{
 		
 	}
 
-	componentDidMount(){
-		this.setState({
-			fetching_hrr:true,
-		});
-		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	}
+	// componentDidMount(){
+	// 	this.setState({
+	// 		fetching_hrr:true,
+	// 	});
+	// 	fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	// }
 
     toggleCalendar(){
 	    this.setState({
@@ -117,7 +117,12 @@ class HeartRateCal extends Component{
   		if(value != null && value != "00:00"){
 	  		let min = parseInt(value/60);
 	  		let sec = (value % 60);
-	  		time = min + ":" + sec;
+	  		if(sec < 10){
+	  			time = min + ":0" + sec;
+	  		}
+	  		else{
+	  			time = min + ":" + sec;
+	  		}
 	  	}
 	  	else{
 	  		time = "-"
