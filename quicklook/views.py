@@ -2032,178 +2032,6 @@ def export_users_xls(request):
 		current_date -= timedelta(days=1)
 
 	
-	# from registration.models import Profile
-	# from fitparse import FitFile
-	# from garmin.models import GarminFitFiles
-	# start = "2018-04-07"
-	# end = "2018-04-08"
-	# a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
-	# kd = Profile.objects.filter(user=request.user)
-	# for ss in kd:
-	# 	cc = ss.date_of_birth
-	# today = date.today()
-	# dd = today.year - cc.year
-	# lis = []
-	# for x in a1:
-	# 	# print(x)
-	# 	fitfile = FitFile(x.fit_file)
-	# 	dic={}
-	# 	for record in fitfile.get_messages('record'):
-	# 		for record_data in record:
-	# 			if(record_data.name=='heart_rate'):
-	# 				b = record_data.value
-	# 				lis.extend([b])
-	
-	# avg = int(sum(lis)/len(lis))
-	# print(avg)
-
-	# below_aerobic_value = 180-dd-30
-	# anaerobic_value = 180-dd+5
-
-	# time_in_anaerobic = sum(1 for i in lis if i > anaerobic_value)
-	# time_in_below_aerobic = sum(1 for i in lis if i > below_aerobic_value)
-	# time_in_aerobic = abs(time_in_anaerobic+time_in_below_aerobic-len(lis))
-	# print(len(lis))
-	# print(time_in_anaerobic)
-	# print(time_in_below_aerobic)
-	# print(time_in_aerobic)
-
-
-	# Exercise Reporting
-
-	# sheet6.set_landscape()
-	# sheet6.repeat_rows(0)
-	# sheet6.repeat_columns(0)
-	# sheet6.set_row(0,30)
-	# columns = ["workout_easy_hard","workout_type","workout_time", "workout_location","workout_duration","maximum_elevation_workout","minutes_walked_before_workout",
-	# "distance_run","distance_bike","distance_swim","distance_other","pace","avg_heartrate","avg_heartrate","avg_heartrate","avg_exercise_heartrate","avg_exercise_heartrate",
-	# "elevation_gain","elevation_loss","effort_level","dew_point","temperature","humidity",
-	# "temperature_feels_like","wind","hrr_time_to_99","hrr_starting_point","hrr_beats_lowered_first_minute","resting_hr_last_night","vo2_max","running_cadence",
-	# "nose_breath_prcnt_workout","water_consumed_workout","chia_seeds_consumed_workout","fast_before_workout","pain","pain_area","stress_level","sick","drug_consumed",
-	# "drug","medication","smoke_substance","exercise_fifteen_more","workout_elapsed_time","timewatch_paused_workout","exercise_consistency",
-	# "heartrate_variability_stress","fitness_age","workout_comment"]
-	# columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)','Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 
-	# 'Distance (in Miles) - Bike', 'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)','Average Heartrate RUNNING','Average Heartrate ELLIPTICAL','Average Heartrate WALKING','Average Heartrate OTHER','Overall Average Exercise Heart Rate',
-	# 'Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)','Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',  'HRR Beats Lowered','Sleep Resting Hr Last Night','Vo2 Max','Running Cadence','Percent Breath through Nose During Workout','Water Consumed during Workout','Chia Seeds consumed during Workout','Fast Before Workout', 'Pain','Pain Area','Stress Level','Sick ', 'Drug Consumed',
-	# 'Drug','Medication','Smoke Substance', 'Exercise Fifteen More','Workout Elapsed Time','TimeWatch Paused Workout','Exercise Consistency','Heart Rate Variability Stress (Garmin)','Fitness Age','Workout Comment']
-	
-	# current_date = to_date
-	# r = 0
-	# if to_date and from_date:
-	# 	while (current_date >= from_date):
-	# 		r = r + 1
-	# 		weekday1 = calendar.day_name[current_date.weekday()]
-	# 		x= current_date.strftime('%m-%d-%y')
-	# 		current_date_split= x.split("-")
-	# 		current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
-	# 		current_date_string = str(current_date_string)
-	# 		sheet6.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
-	# 		# sheet6.write(0, r, current_date,date_format)
-	# 		current_date -= timedelta(days=1)
-	# sheet6.write(0, 0, "Exercise Reporting",bold)
-	# col_num1 = 1
-	# row_num = 0
-	# for col_num in range(len(columns8w)):
-	# 	col_num1 = col_num1 + 1
-	# 	sheet6.write(col_num1, row_num, columns8w[col_num])
-
-	# current_date = to_date
-	# # for row in exercise_qs.values():
-	# 	# print (row)
-	# while (current_date >= from_date):
-	# 	# logic
-	# 	data = exercise_datewise.get(current_date.strftime("%Y-%m-%d"),None)
-	# 	if data:
-	# 		data = data.__dict__
-	# 		# print(data)
-	# 		row_num += 1
-	# 		for i,key in enumerate(columns):
-	# 			avg_heart_rate_string = data['avg_heartrate']
-	# 			json2_data = json.loads(avg_heart_rate_string)
-
-	# 			#print(json2_data)
-
-	# 			if i == 12:
-	# 				if 'RUNNING' in json2_data:
-	# 				 	sheet6.write(i+2,row_num,json2_data['RUNNING'],format)
-	# 				else:
-	# 				 	sheet6.write(i+2,row_num,"",format)
-	# 			elif i == 13:
-	# 				if 'ELLIPTICAL' in json2_data:
-	# 				 	sheet6.write(i+2,row_num,json2_data['ELLIPTICAL'],format)
-	# 				else:
-	# 				 	sheet6.write(i+2,row_num,"",format)
-	# 			elif i == 14:
-	# 				if 'WALKING' in json2_data:
-	# 				 	sheet6.write(i+2,row_num,json2_data['WALKING'],format)
-	# 				else:
-	# 				 	sheet6.write(i+2,row_num,"",format)
-	# 			elif i == 15:
-	# 				if 'OTHER' in json2_data:
-
-	# 					sheet6.write(i+2,row_num,json2_data['OTHER'],format)
-	# 				else:
-	# 					sheet6.write(i+2,row_num,"",format)
-	# 			elif i == 4:
-	# 				if data[key] == "0:00:00":
-	# 					sheet6.write(i + 2, row_num,'No Workout')
-	# 				else:
-	# 					sheet6.write(i + 2, row_num,data[key])
-	# 			elif i == 19:
-	# 				if data[key] == 0:
-	# 					sheet6.write(i + 2, row_num,'No Workout')
-	# 				else:
-	# 					sheet6.write(i + 2, row_num,data[key])
-	# 			elif i == 29:
-	# 				if data[key] == 0:
-	# 					sheet6.write(i + 2, row_num,'Not provided')
-	# 				else:
-	# 					sheet6.write(i + 2, row_num,data[key])
-	# 			elif i == 25:
-	# 				if json2_data:
-	# 					if data[key] == '' or data[key] == ':':
-	# 						sheet6.write(i + 2, row_num,'Not Recorded')
-	# 					else:
-	# 						sheet6.write(i + 2, row_num,data[key],format)
-	# 				else:
-	# 					sheet6.write(i + 2, row_num,'No Workout')
-	# 			elif i == 26:
-	# 				if json2_data:
-	# 					if data[key] == 0:
-	# 						sheet6.write(i + 2, row_num,'Not Recorded')
-	# 					else:
-	# 						sheet6.write(i + 2, row_num,data[key],format)
-	# 				else:
-	# 					sheet6.write(i + 2, row_num,'No Workout')
-	# 			elif i == 27:
-	# 				if json2_data:
-	# 					if data[key] == 0:
-	# 						sheet6.write(i + 2, row_num,'Not Recorded')
-	# 					else:
-	# 						sheet6.write(i + 2, row_num,data[key],format)
-	# 				else:
-	# 					sheet6.write(i + 2, row_num,'No Workout')
-
-	# 			elif data[key] == None:
-	# 				sheet6.write(i + 2, row_num,'Not provided')
-	# 			elif key != 'avg_heartrate':
-	# 				sheet6.write(i + 2, row_num,data[key],format)
-
-
-	# 	else:
-	# 		row_num += 1
-	# 		sheet6.write(i + 2, row_num, '')
-	# 	current_date -= timedelta(days=1)
-
-
-
-
-
-
-
-
-
-
 
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
@@ -2408,6 +2236,7 @@ def export_users_xls(request):
 	sheet11.write(0,11,"Active",format_green)
 	sheet11.write(0,12,"Inactive",format_red_con)
 	sheet11.write(0,13,"Strength",format_purple)
+	sheet11.write(0,14,"Exercise",format_yellow)
 	sheet11.write(2,0,"Hour")
 	sheet11.write(3,0,"Date",bold)
 	format2 = book.add_format({'bold':True})
@@ -2492,8 +2321,8 @@ def export_users_xls(request):
 				if steps_string:
 					json1_data = json.loads(steps_string)
 					sheet11.write(row,col+x,json1_data['total_steps'],format)
-					# sheet11.write(row, col, ast.literal_eval(steps_data[key])['inactive_hours'])
-					# sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'])
+
+					#12 -1 
 					if json1_data['12:00 AM to 12:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_orange)
 						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
@@ -2506,8 +2335,13 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_red_con)
 						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
 							days_count['12:00 AM to 12:59 AM'] += 1
+					elif json1_data['12:00 AM to 12:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_yellow)
+						if json1_data['12:00 AM to 12:59 AM']['steps'] >= 300:
+							days_count['12:00 AM to 12:59 AM'] += 1
 					else:
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
+					#111111111111111
 					if json1_data['01:00 AM to 01:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_orange)
 						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
@@ -2516,12 +2350,16 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_green)
 						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
 							days_count['01:00 AM to 01:59 AM'] += 1
+					elif json1_data['01:00 AM to 01:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_yellow)
+						if json1_data['01:00 AM to 01:59 AM']['steps'] >= 300:
+							days_count['01:00 AM to 01:59 AM'] += 1
 					elif json1_data['01:00 AM to 01:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_red_con)
 
 					else:
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_purple)
-
+					#22222222222222222
 					if json1_data['02:00 AM to 02:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_orange)
 						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
@@ -2534,9 +2372,13 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_red_con)
 						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
 							days_count['02:00 AM to 02:59 AM'] += 1
+					elif json1_data['02:00 AM to 02:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_yellow)
+						if json1_data['02:00 AM to 02:59 AM']['steps'] >= 300:
+							days_count['02:00 AM to 02:59 AM'] += 1
 					else:
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_purple)
-
+					#333333333333333333
 					if json1_data['03:00 AM to 03:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_orange)
 						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
@@ -2549,9 +2391,13 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_red_con)
 						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
 							days_count['03:00 AM to 03:59 AM'] += 1
+					elif json1_data['03:00 AM to 03:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_yellow)
+						if json1_data['03:00 AM to 03:59 AM']['steps'] >= 300:
+							days_count['03:00 AM to 03:59 AM'] += 1
 					else:
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_purple)
-
+					#444444444444444444
 					if json1_data['04:00 AM to 04:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_orange)
 						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
@@ -2564,9 +2410,13 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_red_con)
 						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
 							days_count['04:00 AM to 04:59 AM']+= 1
+					elif json1_data['04:00 AM to 04:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_yellow)
+						if json1_data['04:00 AM to 04:59 AM']['steps'] >= 300:
+							days_count['04:00 AM to 04:59 AM']+= 1
 					else:
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_purple)
-					#5
+					#555555555555
 					if json1_data['05:00 AM to 05:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_orange)
 						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
@@ -2579,9 +2429,13 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_red_con)
 						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
 							days_count['05:00 AM to 05:59 AM']+= 1
+					elif json1_data['05:00 AM to 05:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_yellow)
+						if json1_data['05:00 AM to 05:59 AM']['steps'] >= 300:
+							days_count['05:00 AM to 05:59 AM']+= 1
 					else:
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_purple)
-					#6
+					#66666666666666
 					if json1_data['06:00 AM to 06:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_orange)
 						if json1_data['06:00 AM to 06:59 AM']['steps'] >= 300:
@@ -2590,12 +2444,16 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_green)
 						if json1_data['06:00 AM to 06:59 AM']['steps'] >= 300:
 							days_count['06:00 AM to 06:59 AM']+= 1
+					elif json1_data['06:00 AM to 06:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_yellow)
+						if json1_data['06:00 AM to 06:59 AM']['steps'] >= 300:
+							days_count['06:00 AM to 06:59 AM']+= 1
 					elif json1_data['06:00 AM to 06:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_red_con)
 
 					else:
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_purple)
-					#7
+					#77777777777777777
 					if json1_data['07:00 AM to 07:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_orange)
 						if json1_data['07:00 AM to 07:59 AM']['steps'] >= 300:
@@ -2604,11 +2462,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_green)
 						if json1_data['07:00 AM to 07:59 AM']['steps'] >= 300:
 							days_count['07:00 AM to 07:59 AM']+= 1
+					elif json1_data['07:00 AM to 07:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_yellow)
+						if json1_data['07:00 AM to 07:59 AM']['steps'] >= 300:
+							days_count['07:00 AM to 07:59 AM']+= 1
 					elif json1_data['07:00 AM to 07:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_purple)
-					#8
+					#88888888888888888888
 					if json1_data['08:00 AM to 08:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_orange)
 						if json1_data['08:00 AM to 08:59 AM']['steps'] >= 300:
@@ -2617,11 +2479,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_green)
 						if json1_data['08:00 AM to 08:59 AM']['steps'] >= 300:
 							days_count['08:00 AM to 08:59 AM']+= 1
+					elif json1_data['08:00 AM to 08:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_yellow)
+						if json1_data['08:00 AM to 08:59 AM']['steps'] >= 300:
+							days_count['08:00 AM to 08:59 AM']+= 1
 					elif json1_data['08:00 AM to 08:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_purple)
-					#9
+					#9999999999999999999
 					if json1_data['09:00 AM to 09:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_orange)
 						if json1_data['09:00 AM to 09:59 AM']['steps'] >= 300:
@@ -2630,12 +2496,16 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_green)
 						if json1_data['09:00 AM to 09:59 AM']['steps'] >= 300:
 							days_count['09:00 AM to 09:59 AM']+= 1
+					elif json1_data['09:00 AM to 09:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_yellow)
+						if json1_data['09:00 AM to 09:59 AM']['steps'] >= 300:
+							days_count['09:00 AM to 09:59 AM']+= 1
 					elif json1_data['09:00 AM to 09:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_red_con)
 
 					else:
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_purple)
-					#10
+					#101010101010
 					if json1_data['10:00 AM to 10:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_orange)
 						if json1_data['10:00 AM to 10:59 AM']['steps'] >= 300:
@@ -2644,11 +2514,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_green)
 						if json1_data['10:00 AM to 10:59 AM']['steps'] >= 300:
 							days_count['10:00 AM to 10:59 AM']+= 1
+					elif json1_data['10:00 AM to 10:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_yellow)
+						if json1_data['10:00 AM to 10:59 AM']['steps'] >= 300:
+							days_count['10:00 AM to 10:59 AM']+= 1
 					elif json1_data['10:00 AM to 10:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_purple)
-					#11
+					#11 11 11 11 11 
 					if json1_data['11:00 AM to 11:59 AM']["status"] == "sleeping":
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_orange)
 						if json1_data['11:00 AM to 11:59 AM']['steps'] >= 300:
@@ -2657,11 +2531,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_green)
 						if json1_data['11:00 AM to 11:59 AM']['steps'] >= 300:
 							days_count['11:00 AM to 11:59 AM']+= 1
+					elif json1_data['11:00 AM to 11:59 AM']["status"] == "exercise":
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_yellow)
+						if json1_data['11:00 AM to 11:59 AM']['steps'] >= 300:
+							days_count['11:00 AM to 11:59 AM']+= 1
 					elif json1_data['11:00 AM to 11:59 AM']["status"] == "inactive":
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_purple)
-					#12
+					#12 12 12 12 12 12 12
 					if json1_data['12:00 PM to 12:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_orange)
 						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
@@ -2670,11 +2548,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_green)
 						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
 							days_count['12:00 PM to 12:59 PM'] += 1
+					elif json1_data['12:00 PM to 12:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_yellow)
+						if json1_data['12:00 PM to 12:59 PM']['steps'] >= 300:
+							days_count['12:00 PM to 12:59 PM'] += 1
 					elif json1_data['12:00 PM to 12:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_purple)
-					#1
+					#1111111111111111
 					if json1_data['01:00 PM to 01:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_orange)
 						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
@@ -2683,11 +2565,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_green)
 						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
 							days_count['01:00 PM to 01:59 PM']+= 1
+					elif json1_data['01:00 PM to 01:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_yellow)
+						if json1_data['01:00 PM to 01:59 PM']['steps'] >= 300:
+							days_count['01:00 PM to 01:59 PM']+= 1
 					elif json1_data['01:00 PM to 01:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_purple)
-					#2
+					#22222222222222
 					if json1_data['02:00 PM to 02:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_orange)
 						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
@@ -2696,11 +2582,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_green)
 						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
 							days_count['02:00 PM to 02:59 PM']+= 1
+					elif json1_data['02:00 PM to 02:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_yellow)
+						if json1_data['02:00 PM to 02:59 PM']['steps'] >= 300:
+							days_count['02:00 PM to 02:59 PM']+= 1
 					elif json1_data['02:00 PM to 02:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_purple)
-					#3
+					#3333333333333333
 					if json1_data['03:00 PM to 03:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_orange)
 						if json1_data['03:00 PM to 03:59 PM']['steps'] >= 300:
@@ -2709,11 +2599,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_green)
 						if json1_data['03:00 PM to 03:59 PM']['steps'] >= 300:
 							days_count['03:00 PM to 03:59 PM']+= 1
+					elif json1_data['03:00 PM to 03:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_yellow)
+						if json1_data['03:00 PM to 03:59 PM']['steps'] >= 300:
+							days_count['03:00 PM to 03:59 PM']+= 1
 					elif json1_data['03:00 PM to 03:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_purple)
-					#4
+					#44444444444444
 					if json1_data['04:00 PM to 04:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_orange)
 						if json1_data['04:00 PM to 04:59 PM']['steps'] >= 300:
@@ -2722,11 +2616,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_green)
 						if json1_data['04:00 PM to 04:59 PM']['steps'] >= 300:
 							days_count['04:00 PM to 04:59 PM']+= 1
+					elif json1_data['04:00 PM to 04:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_yellow)
+						if json1_data['04:00 PM to 04:59 PM']['steps'] >= 300:
+							days_count['04:00 PM to 04:59 PM']+= 1
 					elif json1_data['04:00 PM to 04:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_purple)
-					#5
+					#555555555555555
 					if json1_data['05:00 PM to 05:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_orange)
 						if json1_data['05:00 PM to 05:59 PM']['steps'] >= 300:
@@ -2735,11 +2633,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_green)
 						if json1_data['05:00 PM to 05:59 PM']['steps'] >= 300:
 							days_count['05:00 PM to 05:59 PM']+= 1
+					elif json1_data['05:00 PM to 05:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_yellow)
+						if json1_data['05:00 PM to 05:59 PM']['steps'] >= 300:
+							days_count['05:00 PM to 05:59 PM']+= 1
 					elif json1_data['05:00 PM to 05:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_purple)
-					#6
+					#6666666666666666
 					if json1_data['06:00 PM to 06:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_orange)
 						if json1_data['06:00 PM to 06:59 PM']['steps'] >= 300:
@@ -2748,11 +2650,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_green)
 						if json1_data['06:00 PM to 06:59 PM']['steps'] >= 300:
 							days_count['06:00 PM to 06:59 PM']+= 1
+					elif json1_data['06:00 PM to 06:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_yellow)
+						if json1_data['06:00 PM to 06:59 PM']['steps'] >= 300:
+							days_count['06:00 PM to 06:59 PM']+= 1
 					elif json1_data['06:00 PM to 06:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_purple)
-					#7
+					#77777777777777777
 					if json1_data['07:00 PM to 07:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_orange)
 						if json1_data['07:00 PM to 07:59 PM']['steps'] >= 300:
@@ -2761,11 +2667,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_green)
 						if json1_data['07:00 PM to 07:59 PM']['steps'] >= 300:
 							days_count['07:00 PM to 07:59 PM']+= 1
+					elif json1_data['07:00 PM to 07:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_yellow)
+						if json1_data['07:00 PM to 07:59 PM']['steps'] >= 300:
+							days_count['07:00 PM to 07:59 PM']+= 1
 					elif json1_data['07:00 PM to 07:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_purple)
-					#8
+					#8888888888888888888
 					if json1_data['08:00 PM to 08:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_orange)
 						if json1_data['08:00 PM to 08:59 PM']['steps'] >= 300:
@@ -2774,11 +2684,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_green)
 						if json1_data['08:00 PM to 08:59 PM']['steps'] >= 300:
 							days_count['08:00 PM to 08:59 PM']+= 1
+					elif json1_data['08:00 PM to 08:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_yellow)
+						if json1_data['08:00 PM to 08:59 PM']['steps'] >= 300:
+							days_count['08:00 PM to 08:59 PM']+= 1
 					elif json1_data['08:00 PM to 08:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_purple)
-					#9
+					#9999999999999999
 					if json1_data['09:00 PM to 09:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_orange)
 						if json1_data['09:00 PM to 09:59 PM']['steps'] >= 300:
@@ -2787,11 +2701,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_green)
 						if json1_data['09:00 PM to 09:59 PM']['steps'] >= 300:
 							days_count['09:00 PM to 09:59 PM']+= 1
+					elif json1_data['09:00 PM to 09:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_yellow)
+						if json1_data['09:00 PM to 09:59 PM']['steps'] >= 300:
+							days_count['09:00 PM to 09:59 PM']+= 1
 					elif json1_data['09:00 PM to 09:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_purple)
-					#10
+					#10 10 10 10 10 10 
 					if json1_data['10:00 PM to 10:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_orange)
 						if json1_data['10:00 PM to 10:59 PM']['steps'] >= 300:
@@ -2800,11 +2718,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_green)
 						if json1_data['10:00 PM to 10:59 PM']['steps'] >= 300:
 							days_count['10:00 PM to 10:59 PM']+= 1
+					elif json1_data['10:00 PM to 10:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_yellow)
+						if json1_data['10:00 PM to 10:59 PM']['steps'] >= 300:
+							days_count['10:00 PM to 10:59 PM']+= 1
 					elif json1_data['10:00 PM to 10:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_purple)
-					#11
+					#11 11 11 11 11 11 
 					if json1_data['11:00 PM to 11:59 PM']["status"] == "sleeping":
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_orange)
 						if json1_data['11:00 PM to 11:59 PM']['steps'] >= 300:
@@ -2813,33 +2735,15 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_green)
 						if json1_data['11:00 PM to 11:59 PM']['steps'] >= 300:
 							days_count['11:00 PM to 11:59 PM']+= 1
+					elif json1_data['11:00 PM to 11:59 PM']["status"] == "exercise":
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_yellow)
+						if json1_data['11:00 PM to 11:59 PM']['steps'] >= 300:
+							days_count['11:00 PM to 11:59 PM']+= 1
 					elif json1_data['11:00 PM to 11:59 PM']["status"] == "inactive":
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_red_con)
 					else:
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_purple)
-					# sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
-					# sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
-					# sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
-					# sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
-					# sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
-					# sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
-					# sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
-					# sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
-					# sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
-					# sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
-					# sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
-					# sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
-					# sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
-					# sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
-					# sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
-					# sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
-					# sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
-					# sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
-					# sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
-					# sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
-					# sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
-					# sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
-					# sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
+
 					def format_active_prcnt(days_count,time_slot,total_days):
 						if total_days:
 							prcnt = round((days_count.get(time_slot,0) / total_days) * 100,2)
@@ -2875,51 +2779,6 @@ def export_users_xls(request):
 					sheet11.write(5,2+22,str(round(((days_count["09:00 PM to 09:59 PM"]/total_days))*100,2))+" %",bold)
 					sheet11.write(5,2+23,str(round(((days_count["10:00 PM to 10:59 PM"]/total_days))*100,2))+" %",bold)
 					sheet11.write(5,2+24,str(round(((days_count["11:00 PM to 11:59 PM"]/total_days))*100,2))+" %",bold)
-
-
-
-
-			# for x,key in enumerate(columns):
-			# 	steps_string = steps_data['movement_consistency']
-			# 	if steps_string:
-			# 		json1_data = json.loads(steps_string)
-			# 		sheet11.write_row(row,col+x,json1_data['total_steps'])
-					# if json1_data['12:00 AM to 12:59 AM']["status"] == "sleeping":
-					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_orange)
-					# elif json1_data['12:00 AM to 12:59 AM']["status"] == "active":
-					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_green)
-					# elif json1_data['12:00 AM to 12:59 AM']["status"] == "inactive":
-					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_red)
-					# else:
-					# 	sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
-						
-						# sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'])
-						# sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'])
-						# sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'])
-						# sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'])
-						# sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'])
-						# sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'])
-						# sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'])
-						# sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'])
-						# sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'])
-						# sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'])
-						# sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'])
-						# sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'])
-						# sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'])
-						# sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'])
-						# sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'])
-						# sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'])
-						# sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'])
-						# sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'])
-						# sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'])
-						# sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'])
-						# sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'])
-						# sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'])
-						# sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'])
-						# sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
-						# sheet11.write(row,col+x+26,json1_data['active_hours'])
-						# sheet11.write(row,col+x+27,json1_data['inactive_hours'])
-						# sheet11.write(row,col+x+28,json1_data.get('strength_hours',0))
 
 
 		else:
