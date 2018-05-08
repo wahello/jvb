@@ -2,7 +2,7 @@
 import base64
 
 from django.db import models
-from django.config import settings
+from django.conf import settings
 # from django.contrib.postgres.fields import JSONField
 
 class UserGarminDataEpoch(models.Model):
@@ -140,6 +140,14 @@ class GarminPingNotification(models.Model):
 		("userMetrics","User Metrics"),
 		("deregistration","Deregistration"),
 	)
+
+	PING_STATE_CHOICES = (
+		("unprocessed","Unprocessed"),
+		("processing","Processing"),
+		("processed","Processed"),
+		("failed","Failed"),
+	)
+
 	user = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE
@@ -151,9 +159,13 @@ class GarminPingNotification(models.Model):
 		choices = SUMMARY_TYPE_CHOICE,
 		max_length=100
 	)
+	state = models.CharField(
+		max_length = 100, 
+		choices = PING_STATE_CHOICES
+	) 
 	notification = models.TextField()
 	def __str__(self):
-		dtime = self.created_at.strftime("%Y-%m-%d %I:%m %p")
+		dtime = self.created_at.strftime("%Y-%m-%d %I:%M %p")
 		return "{}-{}".format(self.user.username,dtime)
 		
 	class Meta:

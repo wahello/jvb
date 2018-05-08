@@ -15,7 +15,7 @@ from progress_analyzer.models import CumulativeSum,\
 	StressCumulative,\
 	MetaCumulative,\
 	ProgressReportUpdateMeta
-
+	
 class OverallHealthGradeCumulativeInline(admin.StackedInline):
 	model = OverallHealthGradeCumulative
 
