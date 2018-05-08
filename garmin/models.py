@@ -161,7 +161,8 @@ class GarminPingNotification(models.Model):
 	)
 	state = models.CharField(
 		max_length = 100, 
-		choices = PING_STATE_CHOICES
+		choices = PING_STATE_CHOICES,
+		default = "unprocessed"
 	) 
 	notification = models.TextField()
 	def __str__(self):
