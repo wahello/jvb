@@ -1,8 +1,9 @@
 import re
 from datetime import datetime,timedelta
+from rauth import OAuth1Service
 
 from django.contrib.auth.models import User
-from rauth import OAuth1Service
+from django.db import DatabaseError
 
 from .models import (
 	UserGarminDataEpoch,
@@ -58,19 +59,21 @@ def store_ping_notifications(obj,dtype,user):
 		upload_start_time = int(
 			re.search('uploadStartTimeInSeconds=(\d+)*',callback_url).group(1)
 		)
-	obj = GarminPingNotification.object.create(
+	obj = GarminPingNotification.objects.create(
 		user = user,
+		summary_type = dtype,
 		upload_start_time_seconds = upload_start_time,
 		notification = obj
 	)
 	return obj
 
-def update_notification_state(instance,state):
+def update_notification_state(instance,state="unprocessed"):
 	valid_states = [x[0] for x in GarminPingNotification.PING_STATE_CHOICES]
-	if state in valid_states:
+	if state and state in valid_states:
 		instance.state = state
-	else
-		instance.state = "unprocessed"
+	else:
+		instance.state = 'unprocessed'
+
 	instance.save()
 
 def _createObjectList(user,json_data,dtype,record_dt):
@@ -127,7 +130,7 @@ def _get_data_start_time(json_data,data_type):
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
 		return start_time
 
-def store_garmin_health_push(data):
+def store_garmin_health_push(notifications):
 
 	'''
 		This function will receive Health PING API data and 
@@ -150,12 +153,12 @@ def store_garmin_health_push(data):
 	acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
 	conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556';
 	conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
-	print(data)
+	print(notifications)
 
 	MODEL_TYPES = _get_model_types()
-	for dtype in data.keys():
+	for dtype in notifications.keys():
 		if dtype in get_ping_summary_types():
-			for obj in data.get(dtype):
+			for obj in notifications.get(dtype):
 				user_key = obj.get('userAccessToken')
 				try:
 					user = User.objects.get(garmin_token__token = user_key)
@@ -166,7 +169,6 @@ def store_garmin_health_push(data):
 					# Store ping notification in database and update state to processing
 					ping_notif_obj = store_ping_notifications(obj,dtype,user)
 					update_notification_state(ping_notif_obj,"processing")
-
 					callback_url = obj.get('callbackURL')
 
 					access_token = user.garmin_token.token
@@ -195,15 +197,17 @@ def store_garmin_health_push(data):
 
 					sess = service.get_session((access_token, access_token_secret))
 					
-					r = sess.get(callback_url, header_auth=True, params=data)
-					
-					obj_list = _createObjectList(user, r.json(), dtype,upload_start_time)
-
 					try:
+						r = sess.get(callback_url, header_auth=True, params=data)
+						obj_list = _createObjectList(user, r.json(), dtype,upload_start_time)
 						MODEL_TYPES[dtype].objects.bulk_create(obj_list)
 						update_notification_state(ping_notif_obj,"processed")
 					except DatabaseError as e:
 						update_notification_state(ping_notif_obj,"failed")
+						print(str(e))
+					except Exception as e:
+						update_notification_state(ping_notif_obj,"failed")
+						print(str(e))
 
 					# Call celery task to calculate/recalculate quick look for date to
 					# which received data belongs for the target user
