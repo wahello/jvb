@@ -98,7 +98,7 @@ admin.site.register(GarminFitFiles,GarminFitFilesAdmin)
 
 @admin.register(GarminPingNotification)
 class GarminPingNotificationAdmin(admin.ModelAdmin):
-	list_display = ['user','created_at','upload_start_time_seconds','summary_type']
+	list_display = ['user','created_at','upload_start_time_seconds','summary_type','state']
 	ordering = ('-created_at',)
 	search_fields = ('user__username','user__email','user__first_name',
 		'user__last_name')
