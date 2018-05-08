@@ -202,8 +202,10 @@ def _update_helper(instance,data_dict):
 	try:
 		with transaction.atomic():
 			instance.save()
-	except DatabaseError:
-		setattr(instance,attr,attr_original_val[attr])
+	except DatabaseError as e:
+		# If any error, set instance to previous state
+		for attr, value in attr_original_val.items():
+			setattr(instance,attr,value)
 
 def _safe_get_mobj(obj,attr, default):
 	'''

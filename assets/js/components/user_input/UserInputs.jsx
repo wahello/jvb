@@ -615,6 +615,12 @@ class UserInputs extends React.Component{
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
       });
+     }else{
+        this.setState({
+          workout:have_activities?'yes':workout_status,
+          weight: weight?weight:"i do not weigh myself today",
+          activities:activities
+        });
      }
     }
     
