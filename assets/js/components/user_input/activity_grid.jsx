@@ -106,7 +106,9 @@ this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTim
 this.createActivityTime = this.createActivityTime.bind(this);
 this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
 let activities = this.props.activities;
+let selected_date = this.props.selected_date;
 this.state ={
+    selected_date:selected_date,
     activityEditModal:false,
     calendarOpen:false,
     activites:activities,
@@ -133,8 +135,8 @@ this.state ={
     activity_start_end_min:'',
     activity_start_end_am_pm:'',
 
-    activitystarttime_calender:moment(),
-    activityendtime_calender:moment(),
+    activitystarttime_calender:moment(selected_date),
+    activityendtime_calender:moment(selected_date),
     modalstarttime_activity_hour:"",
     modalstarttime_activity_min:"",
     modalstarttime_activity_ampm:"",
@@ -149,8 +151,11 @@ this.state ={
 }
 }
 
-initializeActivity(activities){
+initializeActivity(activities,selected_date){
     this.setState({
+      selected_date:selected_date,
+      activitystarttime_calender:moment(selected_date),
+      activityendtime_calender:moment(selected_date),
       activities_edit_mode:this.createActivityEditModeState(activities),
       activites_hour_min:this.createActivityTime(activities),
       activity_start_end_time:this.createStartAndEndTime(activities),
@@ -160,7 +165,7 @@ initializeActivity(activities){
 
 componentWillReceiveProps(nextProps) {
     if(nextProps.activities !== this.props.activities) {
-        this.initializeActivity(nextProps.activities);
+        this.initializeActivity(nextProps.activities,nextProps.selected_date);
     }
 }
 

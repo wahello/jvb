@@ -52,8 +52,7 @@ class HeartRate extends Component{
 			percent_below_aerobic:"",
 			percent_anaerobic:"",
 			total_percent:"",
-			empty:"",
-
+			empty:""
 	    };
 	}
 	successHeartRate(data){
