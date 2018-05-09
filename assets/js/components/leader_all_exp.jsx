@@ -43,23 +43,46 @@ class AllRank_Data1 extends Component{
   scrollCallback(operationCount) {
       if (objectLength === operationCount) {
           setTimeout(function () {
-              document.getElementById('my-row').style.background = 'lightyellow';
-              var index = -1;
-            var rows = document.getElementById("my-table").offsetHeight;
-            var rows1 = document.getElementById("my-row").offsetTop;
-            // for (var i=0;i<rows.length; i++){
-            //     if ( rows[i] == document.getElementById("my-row")){
-            //         index = i;
-            //         break;
-            //     }
-            // }
-            var rows2 = rows1 + 180;
-            var rows3 = rows2 - 662;
-            if(rows1 >= 520){
-              window.scrollTo(0,  rows3);
+            var x = window.matchMedia("(max-width: 900px)");
+            if(x.matches){
+               document.getElementById('my-row').style.background = 'lightyellow';
+                var index = -1;
+                var rows = document.getElementById("my-table").offsetHeight;
+                var rows1 = document.getElementById("my-row").offsetTop;
+                // for (var i=0;i<rows.length; i++){
+                //     if ( rows[i] == document.getElementById("my-row")){
+                //         index = i;
+                //         break;
+                //     }
+                // }
+                var rows2 = rows1 + 180;
+                var rows3 = rows2 - 712;
+                if(rows1 >= 520){
+                  window.scrollTo(0,  rows3);
+                }
+                else{
+                  window.scrollTo(0, 155);
+                }
             }
             else{
-              window.scrollTo(0, 130);
+                document.getElementById('my-row').style.background = 'lightyellow';
+                var index = -1;
+                var rows = document.getElementById("my-table").offsetHeight;
+                var rows1 = document.getElementById("my-row").offsetTop;
+                // for (var i=0;i<rows.length; i++){
+                //     if ( rows[i] == document.getElementById("my-row")){
+                //         index = i;
+                //         break;
+                //     }
+                // }
+                var rows2 = rows1 + 180;
+                var rows3 = rows2 - 662;
+                if(rows1 >= 520){
+                  window.scrollTo(0,  rows3);
+                }
+                else{
+                  window.scrollTo(0, 130);
+                }
             }
           }, 100);
       }

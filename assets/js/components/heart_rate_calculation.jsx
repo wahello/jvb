@@ -31,14 +31,26 @@ class HeartRateCal extends Component{
 			    isOpen:false,
 			    fetching_hrr:false,
 			    selectedDate:new Date(),
-	   			"HRR_activity_start_time":"",
-	  			"HRR_start_beat":"-",
-				"lowest_hrr_1min":"-",
-				"time_99":"",
-				"end_time_activity":"-",
-				"end_heartrate_activity":"",
-				"diff_actity_hrr":"",
-				"offset":"",
+	   			"Did_you_measure_HRR":"Yes",
+				"Did_heartrate_reach_99":"Yes",
+				"time_99":57,
+				"HRR_start_beat":130,
+				"lowest_hrr_1min":99,
+				"No_beats_recovered":31,
+
+				"end_time_activity":1525615373.0,
+				"diff_actity_hrr":13,
+				"HRR_activity_start_time":1525615386.0,
+				"end_heartrate_activity":142,
+				"heart_rate_down_up":2,
+				"pure_1min_heart_beats":26,
+				"pure_time_99":"1:03",
+
+				"no_fitfile_hrr_reach_99":45,
+				"lowest_hrr_no_fitfile":116,
+				"no_file_beats_recovered":16,
+
+				"offset":-14400,
     }
      this.toggleCalendar = this.toggleCalendar.bind(this);
 	 this.handleLogout = this.handleLogout.bind(this);
@@ -53,13 +65,26 @@ class HeartRateCal extends Component{
   successHeart(data){
   	this.setState({
   	   fetching_hrr:false,
-  	   HRR_activity_start_time:data.data.HRR_activity_start_time,
-	   HRR_start_beat:data.data.HRR_start_beat,
-	   diff_actity_hrr:data.data.diff_actity_hrr,
-	   end_heartrate_activity:data.data.end_heartrate_activity,
-	   end_time_activity:data.data.end_time_activity,
-	   lowest_hrr_1min:data.data.lowest_hrr_1min,
-	   time_99:data.data.time_99
+  	   			Did_you_measure_HRR:data.data.Did_you_measure_HRR,
+				Did_heartrate_reach_99:data.data.Did_heartrate_reach_99,
+				time_99:data.data.time_99,
+				HRR_start_beat:data.data.HRR_start_beat,
+				lowest_hrr_1min:data.data.lowest_hrr_1min,
+				No_beats_recovered:data.data.No_beats_recovered,
+
+				end_time_activity:data.data.end_time_activity,
+				diff_actity_hrr:data.data.diff_actity_hrr,
+				HRR_activity_start_time:data.data.HRR_activity_start_time,
+				end_heartrate_activity:data.data.end_heartrate_activity,
+				heart_rate_down_up:data.data.heart_rate_down_up,
+				pure_1min_heart_beats:data.data.pure_1min_heart_beats,
+				pure_time_99:data.data.pure_time_99,
+
+				no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
+				lowest_hrr_no_fitfile:data.data.lowest_hrr_no_fitfile,
+				no_file_beats_recovered:data.data.no_file_beats_recovered,
+
+				offset:data.data.offset,
   	});
   }
     errorHeart(error){
@@ -114,7 +139,7 @@ class HeartRateCal extends Component{
   	}
   	renderSecToMin(value){
   		let time;
-  		if(value != null && value != "00:00"){
+  		if(value != null && value != "00:00" && value != undefined && value != "00:00:00"){
 	  		let min = parseInt(value/60);
 	  		let sec = (value % 60);
 	  		if(sec < 10){
@@ -192,53 +217,143 @@ class HeartRateCal extends Component{
 	                </Popover>
 	            </div>
 
+	             {this.state.Did_you_measure_HRR == "Yes" &&
 	             <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
 	          	    <thead className = "hr_table_style_rows">
-		          	    <th className = "hr_table_style_rows">Category</th>
+		          	    <th className = "hr_table_style_rows">HRR Stats</th>
 		          	    <th className = "hr_table_style_rows">{moment(this.state.selectedDate).format("MMM DD, YYYY")}</th>
 	          	    </thead>  
 	          	    <tbody>  
 
 	          	    <tr className = "hr_table_style_rows">   
-		          	    <td className = "hr_table_style_rows">Hrr Start Time(hh:mm:ss)</td>    
-		          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.HRR_activity_start_time)}</td>
+		          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>    
+		          	    <td className = "hr_table_style_rows">{this.state.Did_you_measure_HRR}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">Hrr Start Rate</td>
-		          	    <td className = "hr_table_style_rows">{this.state.HRR_start_beat}</td>
+		          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
+		          	    <td className = "hr_table_style_rows">{this.state.Did_heartrate_reach_99}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
+		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.time_99)}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">HRR File Starting Heart Rate</td>
+						<td className = "hr_table_style_rows">{this.state.HRR_start_beat}</td>
+	          	    </tr>
+
+	          	     <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Lowest Heart Rate Level in the 1st Minute</td>
 		          	    <td className = "hr_table_style_rows">{this.state.lowest_hrr_1min}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">Duration (mm:ss)  for Heart Rate Time to Reach 99</td>
-						<td className = "hr_table_style_rows">{this.renderSecToMin(this.state.time_99)}</td>
+		          	    <td className = "hr_table_style_rows">Number of heart beats recovered in the first minute</td>
+						<td className = "hr_table_style_rows">{this.state.No_beats_recovered}</td>
+	          	    </tr>
+	          	    </tbody>
+          	    </table>   
+          	   </div>
+          	  </div>
+          	}
+          	   {this.state.Did_you_measure_HRR == "Yes" &&
+          	  <div className = "row justify-content-center hr_table_padd">
+          	    <div className = "table table-responsive">
+          	    <table className = "table table-striped table-bordered ">
+	          	    <thead className = "hr_table_style_rows">
+		          	    <th className = "hr_table_style_rows">Other HRR Stats</th>
+		          	    <th className = "hr_table_style_rows">{moment(this.state.selectedDate).format("MMM DD, YYYY")}</th>
+	          	    </thead>  
+	          	    <tbody>  
+
+	          	    <tr className = "hr_table_style_rows">   
+		          	    <td className = "hr_table_style_rows">End Time of Activity(hh:mm:ss)</td>    
+		          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.end_time_activity)}</td>
 	          	    </tr>
 
-	          	     <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">End Time of Activity(hh:mm:ss)</td>
-		          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.end_time_activity)}</td>
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Difference Between Activity End time and Hrr Start time(mm:ss)</td>
+		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.diff_actity_hrr)}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Hrr Start Time(hh:mm:ss)</td>
+		          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.HRR_activity_start_time)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Heart Rate End Time Activity</td>
 						<td className = "hr_table_style_rows">{this.state.end_heartrate_activity}</td>
 	          	    </tr>
-	          	    <tr className = "hr_table_style_rows">
-		          	    <td className = "hr_table_style_rows">Difference Between Activity End time and Hrr Start time(mm:ss)</td>
-		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.diff_actity_hrr)}</td>
+
+	          	     <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file</td>
+		          	    <td className = "hr_table_style_rows">{this.state.heart_rate_down_up}</td>
 	          	    </tr>
 
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Pure 1 Minute HRR Beats Lowered</td>
+						<td className = "hr_table_style_rows">{this.state.pure_1min_heart_beats}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Pure 1 Minute time to 99</td>
+						<td className = "hr_table_style_rows">{this.state.pure_time_99}</td>
+	          	    </tr>
 	          	    </tbody>
           	    </table>   
           	   </div>
           	  </div>
+          	}
+          	  {this.state.Did_you_measure_HRR == "No" &&
+          	   <div className = "row justify-content-center hr_table_padd">
+          	    <div className = "table table-responsive">
+          	    <table className = "table table-striped table-bordered ">
+	          	    <thead className = "hr_table_style_rows">
+		          	    <th className = "hr_table_style_rows">Hrr Automation When User Didn't Create HRR File</th>
+		          	    <th className = "hr_table_style_rows">{moment(this.state.selectedDate).format("MMM DD, YYYY")}</th>
+	          	    </thead>  
+	          	    <tbody>  
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>
+						<td className = "hr_table_style_rows">{this.state.Did_you_measure_HRR}</td>
+	          	    </tr>
+
+	          	      <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
+						<td className = "hr_table_style_rows">{this.state.Did_you_measure_HRR}</td>
+	          	    </tr>
+
+	          	     <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
+		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.no_fitfile_hrr_reach_99)}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">HRR File Starting Heart Rate</td>
+		          	    <td className = "hr_table_style_rows">{this.state.no_fitfile_hrr_reach_99}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Lowest Heart Rate Level in the 1st Minute</td>
+						<td className = "hr_table_style_rows">{this.state.lowest_hrr_no_fitfile}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Number of heart beats recovered in the first minute</td>
+						<td className = "hr_table_style_rows">{this.state.no_file_beats_recovered}</td>
+	          	    </tr>
+	          	    </tbody>
+          	    </table>   
+          	   </div>
+          	  </div>
+          	}
           	  {this.renderHrrSelectedDateFetchOverlay()}
   		</div>
   		);
