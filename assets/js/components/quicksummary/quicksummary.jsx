@@ -8,7 +8,7 @@ import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
 import axiosRetry from 'axios-retry';
-import moment from 'moment';
+import moment from 'moment'; 
 import { withRouter, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 

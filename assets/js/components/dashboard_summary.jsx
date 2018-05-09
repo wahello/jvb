@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
+        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input,Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import Dimensions from 'react-dimensions';
@@ -113,6 +113,7 @@ constructor(props){
         fetching_ql4:false,
         scrollingLock:false,
         active_view:true,
+        dropdownOpen: false,
         btnView:false,
         active_category:"",
         active_username:"",
@@ -613,6 +614,7 @@ constructor(props){
    this.reanderAll = this.reanderAll.bind(this);
    this.handleBackButton = this.handleBackButton.bind(this);
    this.renderTableHeader = this.renderTableHeader.bind(this);
+   this.toggleDropdown = this.toggleDropdown.bind(this);
 
   }
     
@@ -1014,6 +1016,11 @@ handleChange(event){
         [name]: value
       });
     }
+toggleDropdown() {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen
+    });
+}
 createExcelPrintURL(){
     // code
     let custom_ranges = [];
@@ -1241,7 +1248,8 @@ handleBackButton(){
                                     <span id="navlink">
                                             {moment(this.state.selectedDate).format('MMM D, YYYY')}
                                     </span>  
-                                </span>  
+                                </span>
+
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen1} navbar>
                                   <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
                                      <span className="pdf_button" id="pdf_button">
@@ -1259,7 +1267,7 @@ handleBackButton(){
                                         </span>
                                 </span>
                            <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
-                                  <span className="date_range_btn">
+                                  <span className="date_range_btn date_range_btn2">
                                       <Button
                                           className="daterange-btn btn"                            
                                           id="daterange"
@@ -1268,14 +1276,48 @@ handleBackButton(){
                                   </span>
                               </span>
                            <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
-                                  <span className="date_range_btn">
+                                  <span className="date_range_btn date_range_btn3">
                                       <Button
                                           className="daterange-btn btn"                            
                                           id="daterange"
                                           onClick={this.toggleDate3} >Custom Date Range3
                                       </Button>
                                   </span>
-                              </span>                                                                                                                 
+                              </span>
+                              <span className="pa_dropbutton">
+                                    <span id="spa">
+                                    <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+                                        <DropdownToggle caret style={{backgroundColor:"#40E0D0",borderColor:"#40E0D0",paddingTop:"10px"}}>
+                                            More
+                                        </DropdownToggle>
+                                        <DropdownMenu>
+                                            <DropdownItem>
+                                                <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+                                                    <span className="date_range_btn drop_date_range_btn2">
+                                                        <Button
+                                                            className="daterange-btn btn"                            
+                                                            id="daterange"
+                                                            onClick={this.toggleDate2} >Custom Date Range2
+                                                        </Button>
+                                                    </span>
+                                                </span>
+                                            </DropdownItem>
+                                            <DropdownItem>
+                                                <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+                                                    <span className="date_range_btn drop_date_range_btn3">
+                                                        <Button
+                                                          className="daterange-btn btn"                            
+                                                          id="daterange"
+                                                          onClick={this.toggleDate3} >Custom Date Range3
+                                                        </Button>
+                                                    </span>
+                                                </span>
+                                            </DropdownItem>
+                                            
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                    </span>
+                                </span>                                                                                                               
                                   </Nav>
                                 </Collapse>    
                            </Navbar> 

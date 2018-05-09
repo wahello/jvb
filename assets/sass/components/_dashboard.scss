@@ -21,13 +21,16 @@ body{
 		font-size: 14px;
 
 }
+.pa_dropbutton{
+ 		display:none;
+}
 @media (max-width: 1023px){
 .tablecenter{
 	overflow-x: scroll;
 }
 .padding{
 	padding: 15px 10px 0px 10px;
-}
+} 
 #pdf_button{
 	padding-left:12px;
 }
@@ -50,4 +53,29 @@ body{
 	border-color:lightgray;
 	width: 190px;
 	height:50px;
+}
+
+ @media (min-width: 576px) and (max-width: 852px){
+ 	.pa_dropbutton{
+ 		display:inline;
+ 		background-color: #40E0D0;
+ 		border-color: #40E0D0;
+ 		color:white;
+ 		margin-left:5px; 
+ 	}
+ 	.drop_date_range_btn3{
+ 		display: inline;
+ 	}
+ 	.date_range_btn3{
+ 		display: none;
+ 	}
+ 	.drop_date_range_btn2{
+ 		display: inline;
+ 	}
+ 	.date_range_btn2{
+ 		display: none;
+ 	}
+ 	.navbar-collapse{
+ 		box-shadow: none;
+ 	}
 }
