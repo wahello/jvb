@@ -353,7 +353,7 @@ class LeaderboardOverview(object):
 						score = data['ec']['avg_no_of_days_exercises_per_week'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'prcnt_uf':
-						score = data['nutrition']['prcnt_unprocessed_food_gpa'][dtype]
+						score = data['nutrition']['prcnt_unprocessed_volume_of_food'][dtype]
 						other_scores = {
 							"percent_unprocessed_food":{
 								"value":data['nutrition']['prcnt_unprocessed_volume_of_food'][dtype],
@@ -417,7 +417,7 @@ class LeaderboardOverview(object):
 							score = data['ec']['avg_no_of_days_exercises_per_week']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
 						elif catg == 'prcnt_uf':
-							score = data['nutrition']['prcnt_unprocessed_food_gpa']['custom_range'][str_range]['data']
+							score = data['nutrition']['prcnt_unprocessed_volume_of_food']['custom_range'][str_range]['data']
 							other_scores = {
 								"percent_unprocessed_food":{
 									"value":data['nutrition']['prcnt_unprocessed_volume_of_food']['custom_range'][str_range]['data'],
