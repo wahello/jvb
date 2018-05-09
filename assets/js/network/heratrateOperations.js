@@ -6,7 +6,7 @@ axiosRetry(axios, { retries: 4});
 
 export default function fetchHeartRateData(successHeartRate,errorHeartRate,selectedDate){   
   selectedDate = moment(selectedDate);
-  const URL=`/quicklook/aa_calculations`;
+  const URL=`/hrr/aa_calculations`;
   const config={
    method:"get",
    params:{
