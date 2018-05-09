@@ -31,27 +31,27 @@ class HeartRateCal extends Component{
 			    isOpen:false,
 			    fetching_hrr:false,
 			    selectedDate:new Date(),
-	   			"Did_you_measure_HRR":"No",
-				"Did_heartrate_reach_99":"Yes",
-				"time_99":57,
-				"HRR_start_beat":130,
-				"lowest_hrr_1min":99,
-				"No_beats_recovered":31,
+	   			"Did_you_measure_HRR":"",
+				"Did_heartrate_reach_99":"",
+				"time_99":"",
+				"HRR_start_beat":"",
+				"lowest_hrr_1min":"",
+				"No_beats_recovered":"",
 
-				"end_time_activity":1525615373.0,
-				"diff_actity_hrr":13,
-				"HRR_activity_start_time":1525615386.0,
-				"end_heartrate_activity":142,
-				"heart_rate_down_up":2,
-				"pure_1min_heart_beats":26,
-				"pure_time_99":"1:03",
+				"end_time_activity":"",
+				"diff_actity_hrr":"",
+				"HRR_activity_start_time":"",
+				"end_heartrate_activity":"",
+				"heart_rate_down_up":"",
+				"pure_1min_heart_beats":"",
+				"pure_time_99":"",
 
-				"no_fitfile_hrr_reach_99":"Yes",
-				"no_fitfile_hrr_time_reach_99":90,
-				"lowest_hrr_no_fitfile":116,
-				"no_file_beats_recovered":16,
+				"no_fitfile_hrr_reach_99":"",
+				"no_fitfile_hrr_time_reach_99":"",
+				"lowest_hrr_no_fitfile":"",
+				"no_file_beats_recovered":"",
 
-				"offset":-14400,
+				"offset":"",
     }
      this.toggleCalendar = this.toggleCalendar.bind(this);
 	 this.handleLogout = this.handleLogout.bind(this);
@@ -106,12 +106,12 @@ class HeartRateCal extends Component{
 		
 	}
 
-	// componentDidMount(){
-	// 	this.setState({
-	// 		fetching_hrr:true,
-	// 	});
-	// 	fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	// }
+	componentDidMount(){
+		this.setState({
+			fetching_hrr:true,
+		});
+		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	}
 
     toggleCalendar(){
 	    this.setState({
@@ -219,7 +219,7 @@ class HeartRateCal extends Component{
 	                </Popover>
 	            </div>
 
-	             {this.state.Did_you_measure_HRR == "Yes" &&
+	             {this.state.Did_you_measure_HRR == "Yes" || this.state.Did_you_measure_HRR == "" &&
 	             <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
@@ -263,7 +263,7 @@ class HeartRateCal extends Component{
           	   </div>
           	  </div>
           	}
-          	   {this.state.Did_you_measure_HRR == "Yes" &&
+          	   {this.state.Did_you_measure_HRR == "Yes" || this.state.Did_you_measure_HRR == "" &&
           	  <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
