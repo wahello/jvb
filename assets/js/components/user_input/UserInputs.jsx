@@ -588,7 +588,6 @@ class UserInputs extends React.Component{
       let awake_mins = sleep_stats.awake_time?sleep_stats.awake_time.split(':')[1]:'';
       awake_mins = awake_mins?parseInt(awake_mins):0
       let awake_time_in_mins = awake_hours*60 + awake_mins;
-
       if(sleep_bedtime && sleep_awake_time){
         let diff = sleep_awake_time.diff(sleep_bedtime,'minutes')-awake_time_in_mins; 
         let hours = Math.floor(diff/60);
