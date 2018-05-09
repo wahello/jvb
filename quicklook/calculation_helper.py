@@ -1893,8 +1893,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
 		exercise_steps, total_steps = cal_exercise_steps_total_steps(dailies_json,todays_activities_json)	
-		# Have to fix this
-		non_exercise_steps = (total_steps - exercise_steps) if total_steps else 0
+		if not total_steps and exercise_steps:
+			# If total step s are 0 and exercise steps are available
+			# then we assume that total steps is equal to exercise steps
+			total_steps = exercise_steps
+		non_exercise_steps = total_steps - exercise_steps
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps
