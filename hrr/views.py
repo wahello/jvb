@@ -122,8 +122,9 @@ def hrr_calculations(request):
 
 	start_date_timestamp = start_date_timestamp
 	garmin_data_daily = UserGarminDataDaily.objects.filter(user=request.user,start_time_in_seconds=start_date_timestamp).last()
-	garmin_data_daily = ast.literal_eval(garmin_data_daily.data)
-	daily_starttime = garmin_data_daily['startTimeInSeconds']
+	if garmin_data_daily:
+		garmin_data_daily = ast.literal_eval(garmin_data_daily.data)
+		daily_starttime = garmin_data_daily['startTimeInSeconds']
 
 	workout = []
 	hrr = []
