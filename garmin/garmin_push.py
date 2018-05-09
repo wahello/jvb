@@ -1,4 +1,6 @@
-import re
+# -*- coding: utf-8 -*-
+
+import re,json
 from datetime import datetime,timedelta
 from rauth import OAuth1Service
 
@@ -63,7 +65,7 @@ def store_ping_notifications(obj,dtype,user):
 		user = user,
 		summary_type = dtype,
 		upload_start_time_seconds = upload_start_time,
-		notification = obj
+		notification = json.dumps(obj)
 	)
 	return obj
 
@@ -130,23 +132,18 @@ def _get_data_start_time(json_data,data_type):
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
 		return start_time
 
-def store_garmin_health_push(notifications):
+def store_garmin_health_push(notifications,ping_notif_obj=None):
 
 	'''
-		This function will receive Health PING API data and 
-		store in database 
+	Receive Health PING notification, pull Health Data store in database.
+	Generate/update raw data report as well. Update PA reports as per need. 
+	
+	Args:
+		notification (dict): A ping notification
+		ping_notif_obj (:obj:`GarminPingNotification`, optional): A GarminPingNotification
+			object. If provided then do not create a new object for ping notification
+			instead use this object and update it's state. Default to None
 
-		DATA_TYPES = {
-				"DAILY_SUMMARIES":"dailies",
-				"ACTIVITY_SUMMARIES":"activities",
-				"MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
-				"EPOCH_SUMMARIES":"epochs",
-				"SLEEP_SUMMARIES":"sleeps",
-				"BODY_COMPOSITION":"bodyComps",
-				"STRESS_DETAILS":"stressDetails",
-				"MOVEMENT_IQ":"moveIQActivities",
-				"USER_METRICS":"userMetrics"
-			}
 	'''
 	req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
 	authurl = 'http://connect.garmin.com/oauthConfirm'
@@ -167,7 +164,9 @@ def store_garmin_health_push(notifications):
 					
 				if user:
 					# Store ping notification in database and update state to processing
-					ping_notif_obj = store_ping_notifications(obj,dtype,user)
+					# if ping_notif_obj is None
+					if not ping_notif_obj:
+						ping_notif_obj = store_ping_notifications(obj,dtype,user)
 					update_notification_state(ping_notif_obj,"processing")
 					callback_url = obj.get('callbackURL')
 

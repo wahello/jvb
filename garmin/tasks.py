@@ -40,9 +40,9 @@ def retry_failed_ping_notification():
 	for notif in failed_ping_notification_today:
 		try:
 			notif_data = {notif.summary_type:[json.loads(notif.notification)]}
-			store_garmin_health_push(notif_data)
+			store_garmin_health_push(notif_data,notif)
 			logger.info("Stored health data successfully")
 		except Exception as e:
-			message = "Retry failed for {}'s ping notification of type {} whose upload start time is {}"
-			message.format(notif.user.username,notif.summary_type,notif.upload_start_time_seconds)
+			message = "Retry failed for {}'s ping notification of type '{}'' whose upload start time is '{}'"
+			message = message.format(notif.user.username,notif.summary_type,notif.upload_start_time_seconds)
 			logger.error(message,str(e),exc_info=True)
