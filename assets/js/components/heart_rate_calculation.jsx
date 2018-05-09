@@ -31,7 +31,7 @@ class HeartRateCal extends Component{
 			    isOpen:false,
 			    fetching_hrr:false,
 			    selectedDate:new Date(),
-	   			"Did_you_measure_HRR":"Yes",
+	   			"Did_you_measure_HRR":"No",
 				"Did_heartrate_reach_99":"Yes",
 				"time_99":57,
 				"HRR_start_beat":130,
@@ -46,7 +46,8 @@ class HeartRateCal extends Component{
 				"pure_1min_heart_beats":26,
 				"pure_time_99":"1:03",
 
-				"no_fitfile_hrr_reach_99":45,
+				"no_fitfile_hrr_reach_99":"Yes",
+				"no_fitfile_hrr_time_reach_99":90,
 				"lowest_hrr_no_fitfile":116,
 				"no_file_beats_recovered":16,
 
@@ -80,6 +81,7 @@ class HeartRateCal extends Component{
 				pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 				pure_time_99:data.data.pure_time_99,
 
+				"no_fitfile_hrr_time_reach_99":data.data.no_fitfile_hrr_time_reach_99,
 				no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
 				lowest_hrr_no_fitfile:data.data.lowest_hrr_no_fitfile,
 				no_file_beats_recovered:data.data.no_file_beats_recovered,
@@ -104,12 +106,12 @@ class HeartRateCal extends Component{
 		
 	}
 
-	componentDidMount(){
-		this.setState({
-			fetching_hrr:true,
-		});
-		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	}
+	// componentDidMount(){
+	// 	this.setState({
+	// 		fetching_hrr:true,
+	// 	});
+	// 	fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	// }
 
     toggleCalendar(){
 	    this.setState({
@@ -327,17 +329,17 @@ class HeartRateCal extends Component{
 
 	          	      <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
-						<td className = "hr_table_style_rows">{this.state.Did_you_measure_HRR}</td>
+						<td className = "hr_table_style_rows">{this.state.no_fitfile_hrr_reach_99}</td>
 	          	    </tr>
 
 	          	     <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
-		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.no_fitfile_hrr_reach_99)}</td>
+		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.no_fitfile_hrr_time_reach_99)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">HRR File Starting Heart Rate</td>
-		          	    <td className = "hr_table_style_rows">{this.state.no_fitfile_hrr_reach_99}</td>
+		          	    <td className = "hr_table_style_rows">{this.state.end_heartrate_activity}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">

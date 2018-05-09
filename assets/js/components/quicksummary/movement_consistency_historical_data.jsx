@@ -39,7 +39,7 @@ mcHistoricalData(score,status){
       else if(status == "strength")
         return {background:"rgb(255,0,255)",color:'white'}
       else if(status == "exercise"){
-         return {background:"yellow",color:'black'}
+         return {background:"#FD9A44",color:'black'}
       }
       else if (score >= 300 )
         return {background:'green', color:'white'};
