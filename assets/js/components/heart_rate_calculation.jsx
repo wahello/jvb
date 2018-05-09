@@ -104,12 +104,12 @@ class HeartRateCal extends Component{
 		
 	}
 
-	// componentDidMount(){
-	// 	this.setState({
-	// 		fetching_hrr:true,
-	// 	});
-	// 	fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	// }
+	componentDidMount(){
+		this.setState({
+			fetching_hrr:true,
+		});
+		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	}
 
     toggleCalendar(){
 	    this.setState({
