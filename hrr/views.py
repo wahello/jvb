@@ -154,6 +154,7 @@ def hrr_calculations(request):
 		workout_hrr_before_hrrfile = []
 		workout_time_before_hrrfile = []
 		workout_timestamp_before_hrrfile = []
+
 		for i,k,j in zip(workout_final_heartrate,workout_final_timestamp,workout_timestamp):
 			if hrr_timestamp[1] > j:
 				workout_hrr_before_hrrfile.append(i)
