@@ -148,7 +148,7 @@ def hrr_calculations(request):
 	
 	if hrr:
 		Did_you_measure_HRR = 'Yes'
-		hrr_data = fitfile_parse(hrr,offset,start)
+		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
 
 		workout_hrr_before_hrrfile = []
