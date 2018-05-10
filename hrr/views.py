@@ -282,10 +282,29 @@ def hrr_calculations(request):
 				"pure_1min_heart_beats":pure_1min_heart_beats,
 				"pure_time_99":pure_time_99,
 
+				"no_fitfile_hrr_reach_99":'',
+				"no_fitfile_hrr_time_reach_99":"",
+				"lowest_hrr_no_fitfile":'',
+				"no_file_beats_recovered":'',
+
 				"offset":offset,
 				}
 	elif count == 1:
-		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
+		data = {
+			"Did_heartrate_reach_99":"",
+			"time_99":'',
+			"HRR_start_beat":'',
+			"lowest_hrr_1min":'',
+			"No_beats_recovered":'',
+
+			"end_time_activity":'',
+			"diff_actity_hrr":'',
+			"HRR_activity_start_time":'',
+			"heart_rate_down_up":'',
+			"pure_1min_heart_beats":'',
+			"pure_time_99":'',
+
+			"Did_you_measure_HRR":Did_you_measure_HRR,
 			"no_fitfile_hrr_reach_99":no_fitfile_hrr_reach_99,
 			"no_fitfile_hrr_time_reach_99":no_fitfile_hrr_time_reach_99,
 			"end_heartrate_activity":end_heartrate_activity,#same for without fitfile also with HRR File Starting Heart Rate
@@ -311,6 +330,7 @@ def hrr_calculations(request):
 			"pure_time_99":'',
 
 			"no_fitfile_hrr_reach_99":'',
+			"no_fitfile_hrr_time_reach_99":"",
 			"lowest_hrr_no_fitfile":'',
 			"no_file_beats_recovered":'',
 
