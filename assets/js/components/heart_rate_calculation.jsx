@@ -312,7 +312,7 @@ class HeartRateCal extends Component{
           	   </div>
           	  </div>
           	}
-          	  {this.state.Did_you_measure_HRR == "No" || this.state.Did_you_measure_HRR == "" &&
+          	  {(this.state.Did_you_measure_HRR == "No" || this.state.Did_you_measure_HRR == "") &&
           	   <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
