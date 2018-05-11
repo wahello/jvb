@@ -225,7 +225,7 @@ def hrr_calculations(request):
 			daily_diff = daily_diff + (15 - daily_activty_end)
 		else:
 			pass
-		if garmin_data_daily['timeOffsetHeartRateSamples']:
+		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
 			daily_diff_60 = str(int(daily_diff + 60))
 			daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
 			if daily_diff_data_60:
@@ -264,7 +264,7 @@ def hrr_calculations(request):
 			if daily_diff_data_90:
 				hrr_no_fitfile_90 = daily_diff_data_90
 			else:
-				hrr_no_fitfile_90 = ''
+				hrr_no_fitfile_90 = '-'
 
 		if hrr_no_fitfile_15 <= 99 :
 			no_fitfile_hrr_time_reach_99 = 15
@@ -279,7 +279,7 @@ def hrr_calculations(request):
 		elif hrr_no_fitfile_90 <= 99:
 			no_fitfile_hrr_time_reach_99 = 90
 		else:
-			no_fitfile_hrr_time_reach_99 = ''
+			no_fitfile_hrr_time_reach_99 = '-'
 
 
 

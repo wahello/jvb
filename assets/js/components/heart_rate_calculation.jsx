@@ -305,7 +305,7 @@ class HeartRateCal extends Component{
 
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Pure 1 Minute time to 99</td>
-						<td className = "hr_table_style_rows">{this.state.pure_time_99}</td>
+						<td className = "hr_table_style_rows">{this.renderSecToMin(this.state.pure_time_99)}</td>
 	          	    </tr>
 	          	    </tbody>
           	    </table>   
