@@ -264,22 +264,33 @@ def hrr_calculations(request):
 			if daily_diff_data_90:
 				hrr_no_fitfile_90 = daily_diff_data_90
 			else:
-				hrr_no_fitfile_90 = '-'
+				hrr_no_fitfile_90 = ''
+			daily_diff_105 = str(int(daily_diff + 105))
+			
+			daily_diff_data_105 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_105,None)
+			if daily_diff_data_105:
+				hrr_no_fitfile_105 = daily_diff_data_105
+			else:
+				hrr_no_fitfile_105 = ''
 
-		if hrr_no_fitfile_15 <= 99 :
-			no_fitfile_hrr_time_reach_99 = 15
-		elif hrr_no_fitfile_30 <= 99:
-			no_fitfile_hrr_time_reach_99 = 30
-		elif hrr_no_fitfile_45 <= 99:
-			no_fitfile_hrr_time_reach_99 = 45
-		elif hrr_no_fitfile <= 99:
-			no_fitfile_hrr_time_reach_99 = 60
-		elif hrr_no_fitfile_75 <= 99:
-			no_fitfile_hrr_time_reach_99 = 75
-		elif hrr_no_fitfile_90 <= 99:
-			no_fitfile_hrr_time_reach_99 = 90
+		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+			if hrr_no_fitfile_15 <= 99 :
+				no_fitfile_hrr_time_reach_99 = 15
+			elif hrr_no_fitfile_30 <= 99:
+				no_fitfile_hrr_time_reach_99 = 30
+			elif hrr_no_fitfile_45 <= 99:
+				no_fitfile_hrr_time_reach_99 = 45
+			elif hrr_no_fitfile <= 99:
+				no_fitfile_hrr_time_reach_99 = 60
+			elif hrr_no_fitfile_75 <= 99:
+				no_fitfile_hrr_time_reach_99 = 75
+			elif hrr_no_fitfile_90 <= 99:
+				no_fitfile_hrr_time_reach_99 = 90
+			elif hrr_no_fitfile_105 <= 99:
+				no_fitfile_hrr_time_reach_99 = 105
+
 		else:
-			no_fitfile_hrr_time_reach_99 = '-'
+			no_fitfile_hrr_time_reach_99 = ''
 
 
 
