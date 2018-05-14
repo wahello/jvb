@@ -9,7 +9,7 @@ from django.shortcuts import render
 
 from registration.models import Profile
 from user_input.models import DailyUserInputStrong
-from garmin.models import GarminFitFiles,UserGarminDataDaily
+from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity
 from fitparse import FitFile
 
 # Create your views here.
@@ -86,11 +86,19 @@ def hrr_calculations(request):
 	start_date_timestamp = start_date
 	start_date_timestamp = start_date_timestamp.timetuple()
 	start_date_timestamp = time.mktime(start_date_timestamp)
+	end_date_timestamp = start_date_timestamp + 86400
 
 	start_date_str = start_date.strftime('%Y-%m-%d')
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
+
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	activity_files = [pr.data for pr in activity_files_qs]
+
+	if activity_files:
+		one_activity_file_dict =  ast.literal_eval(activity_files[0])
+		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
 	data = {"HRR_activity_start_time":'00:00:00',
 				"HRR_start_beat":'',
@@ -103,6 +111,7 @@ def hrr_calculations(request):
 				}
 
 	count = 0
+	id_act = 0
 	activities = []
 	if user_input_strong:
 		for tmp in user_input_strong:
@@ -132,7 +141,7 @@ def hrr_calculations(request):
 	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 
-	if activities:
+	if a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
@@ -216,7 +225,7 @@ def hrr_calculations(request):
 
 	else:
 		Did_you_measure_HRR = 'No'
-	if (not hrr) and (count == 1):
+	if (not hrr) and workout:
 		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
 		daily_diff = end_time_activity - daily_starttime
@@ -324,7 +333,7 @@ def hrr_calculations(request):
 
 				"offset":offset,
 				}
-	elif count == 1:
+	elif count == 1 or workout:
 		data = {
 			"Did_heartrate_reach_99":"",
 			"time_99":'',
@@ -387,6 +396,18 @@ def aa_calculations(request):
 	end = start_date + timedelta(days=7)
 	start_date_str = start_date.strftime('%Y-%m-%d')
 
+	start_date_timestamp = start_date
+	start_date_timestamp = start_date_timestamp.timetuple()
+	start_date_timestamp = time.mktime(start_date_timestamp)
+	end_date_timestamp = start_date_timestamp + 86400
+
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	activity_files = [pr.data for pr in activity_files_qs]
+
+	if activity_files:
+		one_activity_file_dict =  ast.literal_eval(activity_files[0])
+		offset = one_activity_file_dict['startTimeOffsetInSeconds']
+
 	data = {"total_time":"",
 				"aerobic_zone":"",
 				"anaerobic_range":"",
@@ -404,6 +425,7 @@ def aa_calculations(request):
 		user_input__user = request.user).order_by('-user_input__created_at')
 
 	activities = []
+	id_act = 0
 	if user_input_strong:
 		for tmp in user_input_strong:
 			sn = tmp.activities
@@ -422,7 +444,7 @@ def aa_calculations(request):
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 
-	if activities:
+	if a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
