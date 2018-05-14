@@ -191,6 +191,7 @@ class UserInputs extends React.Component{
       this.handleChangeWorkoutType = handlers.handleChangeWorkoutType.bind(this);
       this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
       this.handleQuickReportPreSubmit = handlers.handleQuickReportPreSubmit.bind(this);
+      this.handleChangeReportType = handlers.handleChangeReportType.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -248,6 +249,8 @@ class UserInputs extends React.Component{
       this.getTotalSleep = this.getTotalSleep.bind(this);
       this.createWindDropdown = this.createWindDropdown.bind(this)
       this.onFetchGarminSuccessActivities = this.onFetchGarminSuccessActivities.bind(this);
+      this.onFetchRecentSuccessFullReport = this.onFetchRecentSuccessFullReport.bind(this);
+      this.userDailyInputRecentFetch = userDailyInputRecentFetch.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
@@ -312,7 +315,7 @@ class UserInputs extends React.Component{
     
     onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
-        userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
+        userDailyInputRecentFetch(this.state.selected_date,this.onFetchRecentSuccess,this.onFetchFailure);
       }
       else {
 
@@ -478,9 +481,6 @@ class UserInputs extends React.Component{
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:''
         },()=>{
-          // if(this.state.report_type == 'quick'){
-          //   userDailyInputRecentFetch(this.onFetchRecentSuccess,this.onFetchFailure);
-          // }
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today")){
@@ -496,6 +496,102 @@ class UserInputs extends React.Component{
           }
           fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
+        });
+      }
+    }
+
+    onFetchRecentSuccessFullReport(data){
+      if(!_.isEmpty(data.data)){
+        let have_strong_input = data.data.strong_input?true:false;
+        let have_optional_input = data.data.optional_input?true:false;
+        let have_encouraged_input = data.data.encouraged_input?true:false;
+        let other_diet = true;
+        const DIET_TYPE = ['','vegan','vegetarian','paleo','low carb/high fat',
+                          'high carb','ketogenic diet','whole foods/mostly unprocessed','pescetarian'];
+
+        for(let diet of DIET_TYPE){
+          if(data.data.optional_input.type_of_diet_eaten === diet)
+            other_diet = false;
+        }
+
+        let prescription_sleep_aids = this.state.prescription_sleep_aids;
+        if(!prescription_sleep_aids){
+          prescription_sleep_aids = have_strong_input?
+            data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'';
+        }
+        let sleep_aid_taken = this.state.sleep_aid_taken;
+        if(!sleep_aid_taken){
+          sleep_aid_taken = have_strong_input?data.data.strong_input.sleep_aid_taken:'';
+        }
+        let smoke_substances = this.state.smoke_substances;
+        if(!smoke_substances){
+          smoke_substances = have_strong_input?
+            data.data.strong_input.smoke_any_substances_whatsoever:'';
+        }
+        let smoked_substance_list = this.state.smoked_substance_list;
+        if(!smoked_substance_list){
+          smoked_substance_list = have_strong_input?data.data.strong_input.smoked_substance:'';
+        }
+        let medications = this.state.medications;
+        if(!medications){
+          medications = have_strong_input?
+            data.data.strong_input.prescription_or_non_prescription_medication_yesterday:'';
+        }
+        let medications_taken_list = this.state.medications_taken_list;
+        if(!medications_taken_list){
+          medications_taken_list = have_strong_input?
+            data.data.strong_input.prescription_or_non_prescription_medication_taken:'';
+        }
+        let controlled_uncontrolled_substance = this.state.controlled_uncontrolled_substance;
+        if(!controlled_uncontrolled_substance){
+          controlled_uncontrolled_substance = have_strong_input?
+            data.data.strong_input.controlled_uncontrolled_substance:'';
+        }
+        let stress = this.state.stress;
+        if(!stress){
+          stress = have_encouraged_input?
+            data.data.encouraged_input.stress_level_yesterday:'';
+        }
+        let sick = this.state.sick;
+        if(!sick){
+          sick = have_optional_input?data.data.optional_input.sick:'';
+        }
+        let sickness = this.state.sickness;
+        if(!sickness){
+          sickness = have_optional_input?data.data.optional_input.sickness:'';
+        }
+        let waist = this.state.waist;
+        if(!waist){
+          waist = have_optional_input?data.data.optional_input.waist_size:'';
+        }
+        let clothes_size = this.state.clothes_size;
+        if(!clothes_size){
+          clothes_size = have_optional_input?data.data.optional_input.clothes_size:'';
+        }
+        let diet_type = this.state.diet_type;
+        if(!diet_type){
+          diet_type = have_optional_input?data.data.optional_input.type_of_diet_eaten:'';
+        }
+        let diet_to_show = this.state.diet_to_show;
+        if(!diet_to_show){
+          diet_to_show = other_diet?'other':data.data.optional_input.type_of_diet_eaten;
+        }
+
+        this.setState({
+          prescription_sleep_aids:prescription_sleep_aids,
+          sleep_aid_taken:sleep_aid_taken,
+          smoke_substances:smoke_substances,
+          smoked_substance_list:smoked_substance_list,
+          medications:medications,
+          medications_taken_list:medications_taken_list,
+          controlled_uncontrolled_substance:controlled_uncontrolled_substance,
+          stress:stress,
+          sick:sick,
+          sickness:sickness,
+          waist:waist,
+          clothes_size:clothes_size,
+          diet_type:diet_type,
+          diet_to_show:diet_to_show
         });
       }
     }
@@ -1359,14 +1455,14 @@ handleScroll() {
                                         <Input type="radio" name="report_type"
                                         value="quick"
                                         checked={this.state.report_type === 'quick'}
-                                        onChange={this.handleChange}/>{' '}
+                                        onChange={this.handleChangeReportType}/>{' '}
                                         Quick Report
                                      </Label>
                                      <Label check className="btn btn-secondary fullreport_class " id = "full_btn">
                                        <Input type="radio" name="report_type" 
                                             value="full"
                                             checked={this.state.report_type === 'full'}
-                                            onChange={this.handleChange}/>{' '}
+                                            onChange={this.handleChangeReportType}/>{' '}
                                           Full Report
                                     </Label>
                                 </div>  
