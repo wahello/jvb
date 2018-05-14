@@ -297,6 +297,8 @@ def hrr_calculations(request):
 				no_fitfile_hrr_time_reach_99 = 90
 			elif hrr_no_fitfile_105 <= 99:
 				no_fitfile_hrr_time_reach_99 = 105
+			else:
+				no_fitfile_hrr_time_reach_99 = ''
 
 		else:
 			no_fitfile_hrr_time_reach_99 = ''
