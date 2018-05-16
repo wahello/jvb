@@ -57,7 +57,7 @@ const attrVerboseName = {
     exercise_consistency: 'Exercise Consistency',
     heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
     fitness_age: 'Fitness Age',
-    workout_comment: 'Workout Comment'                    
+    workout_comment: 'Workout Comments'                    
 }
 
 class Exercise extends Component {
@@ -65,6 +65,8 @@ constructor(props){
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
      this.getDayWithDate = this.getDayWithDate.bind(this);
+     this.renderLastSync = this.renderLastSync.bind(this);
+
      let cols = this.renderTableColumns(props.data,"exercise_reporting_ql");
 	 this.state = {
       tableAttrColumn: cols[1],
@@ -92,6 +94,13 @@ getDayWithDate(date){
    let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
+  renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
 renderTableColumns(dateWiseData,category,classes=""){
 	let columns = [];
     let avgHrKeys =  [];
@@ -245,13 +254,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={50}
+		        headerHeight={70}
 		         width={containerWidth}
                 height={containerHeight}
                 touchScrollEnabled={true}
                 {...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Exercise Reporting</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Exercise Reporting {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.tableAttrColumn[props.rowIndex].name}

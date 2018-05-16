@@ -27,9 +27,12 @@ import DashboardSummary from '../components/dashboard_summary';
 import TermsConditions from '../components/terms_and_conditions';
 import ServiceConnect_fitBit from '../components/serviceConnect_fitbit';
 import Activity_Type from '../components/activity_types';
-import LeaderBoard from '../components/leaderboard';
 import FitBit from '../components/fitbitData';
-import AllRank_Data from '../components/leaderboard_allrank';
+import HeartRate from '../components/Heart_rate_recovery';
+import LeaderBoard1 from '../components/leader_exp';
+import AllRank_Data1 from '../components/leader_all_exp';
+import HeartRateCal from '../components/heart_rate_calculation';
+
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -59,6 +62,7 @@ function initializeLocalState(){
 			        <Route path='/service_connect' component={RequireAuth(ServiceConnect)} />
 			        <Route path='/service_connect_fitbit' component={RequireAuth(ServiceConnect_fitBit)} />
 			        <Route path='/activity_type' component={RequireAuth(Activity_Type)} />
+			        <Route path='/hrr_recovery' component={RequireAuth(HeartRateCal)} />
 					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
 					{/*<Route path='/nes' component={RequireAuth(Nes)} /> */}
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}
@@ -70,8 +74,10 @@ function initializeLocalState(){
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
 					<Route path='/progressanalyzer' component={RequireAuth(DashboardSummary)} />
-					<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
-					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />				
+					{/*<Route exact path='/leaderboard/:catgname' component={RequireAuth(AllRank_Data)} />
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />*/}
+					<Route path='/leaderboard' component={RequireAuth(LeaderBoard1)} />
+					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 			    </Switch>

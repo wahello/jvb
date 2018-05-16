@@ -22,7 +22,9 @@ class Movementquick extends Component{
     this.successMCFetch = this.successMCFetch.bind(this);
     this.processDate = this.processDate.bind(this);
     this.renderTableColumns = this.renderTableColumns.bind(this);
-     this.toggle = this.toggle.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.renderLastSync = this.renderLastSync.bind(this);
+
 
      this.state = {
        tableAttrColumn: [
@@ -49,11 +51,12 @@ class Movementquick extends Component{
         {name: '08:00 PM - 08:59 PM'},        
         {name: '09:00 PM - 09:59 PM'},
         {name: '10:00 PM - 10:59 PM'},
-        {name: '11:00 PM - 11:59 AM'},
+        {name: '11:00 PM - 11:59 PM'},
         {name: 'Active Hours'},
         {name: 'Inactive Hours'},
         {name: 'Strength Hours'},
         {name: 'Sleeping Hours'},
+        {name: 'Exercise Hours'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
         popoverOpen: false,
@@ -167,6 +170,7 @@ class Movementquick extends Component{
            inactive_hours:'-',
            strength_hours:'-',
            sleeping_hours:'-',
+           exercise_hours:'-',
            total_steps:'-'
          }
       }
@@ -175,7 +179,13 @@ class Movementquick extends Component{
       mc_data:initial_data
     });
   }
-
+    renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
   successMCFetch(data){
     if(data.data.length){
       this.setState({
@@ -241,6 +251,7 @@ class Movementquick extends Component{
       steps_data.push(data['movement_consistency'].inactive_hours);
       steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
+      steps_data.push(data['movement_consistency'].exercise_hours);
      let totalSteps =data['movement_consistency'].total_steps;
        if(totalSteps != undefined){
           totalSteps += '';
@@ -300,14 +311,14 @@ render(){
      <Table
           rowsCount={rowsCount}
           rowHeight={50}
-          headerHeight={65}
+          headerHeight={95}
           width={containerWidth}
           maxHeight={containerHeight}
               touchScrollEnabled={true}
               {...props}>
           <Column
-            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency
-            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')}</span>
+            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency 
+            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')} {this.renderLastSync(this.props.last_synced)}</span>
             </Cell>}
             cell={props => (
               <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>

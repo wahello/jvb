@@ -9,8 +9,13 @@ from progress_analyzer.models import CumulativeSum,\
 	ExerciseStatsCumulative,\
 	AlcoholCumulative,\
 	OtherStatsCumulative,\
-	MetaCumulative
-
+	SickCumulative,\
+	StandingCumulative,\
+	TravelCumulative,\
+	StressCumulative,\
+	MetaCumulative,\
+	ProgressReportUpdateMeta
+	
 class OverallHealthGradeCumulativeInline(admin.StackedInline):
 	model = OverallHealthGradeCumulative
 
@@ -38,6 +43,18 @@ class AlcoholCumulativeInline(admin.StackedInline):
 class OtherStatsCumulativeInline(admin.StackedInline):
 	model = OtherStatsCumulative
 
+class SickCumulativeInline(admin.StackedInline):
+	model = SickCumulative
+
+class StandingCumulativeInline(admin.StackedInline):
+	model = StandingCumulative
+
+class TravelCumulativeInline(admin.StackedInline):
+	model = TravelCumulative
+
+class StressCumulativeInline(admin.StackedInline):
+	model = StressCumulative
+
 class MetaCumulativeInline(admin.StackedInline):
 	model = MetaCumulative
 
@@ -59,6 +76,17 @@ class CumulativeSumManager(admin.ModelAdmin):
 		NutritionCumulativeInline,
 		ExerciseStatsCumulativeInline,
 		AlcoholCumulativeInline,
+		SickCumulativeInline,
+		StandingCumulativeInline,
+		TravelCumulativeInline,
+		StressCumulativeInline,
 		OtherStatsCumulativeInline,
 		MetaCumulativeInline
 	]
+
+@admin.register(ProgressReportUpdateMeta)
+class ProgressReportUpdateMetaAdmin(admin.ModelAdmin):
+	list_display = ['user','requires_update_from']
+	ordering = ('-requires_update_from',)
+	search_fields = ('user__username','user__email','user__first_name',
+		'user__last_name')

@@ -17,6 +17,8 @@ import { Alert } from 'reactstrap';
 	super(props);
 	this.renderTableColumns = this.renderTableColumns.bind(this);
 	this.getDayWithDate = this.getDayWithDate.bind(this);
+	this.renderLastSync = this.renderLastSync.bind(this);
+
 	this.state = {
 		columnAttributeName: [
 		{name: 'Heart rate down to 99'},
@@ -76,6 +78,13 @@ import { Alert } from 'reactstrap';
 	};
 	
 }
+renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
 getDayWithDate(date){
    let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -119,13 +128,13 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			 	className="responsive"
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={50}
+		        headerHeight={70}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>User Input</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>User Input {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.columnAttributeName[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.columnAttributeName[props.rowIndex].name}

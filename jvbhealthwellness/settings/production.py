@@ -60,6 +60,16 @@ CELERY_BEAT_SCHEDULE = {
         'task':'progress_analyzer.generate_cumulative_instances',
         'schedule':crontab(minute=0, hour=1)
     },
+    #execute every day at 2:00 AM EST (America/New_york)
+    'update-obsolete-progress-analyzer-report':{
+        'task':'progress_analyzer.update_obsolete_pa_reports',
+        'schedule':crontab(minute=0, hour=2)
+    }
+    #execute every day at 3:00 AM EST (America/New_york)
+    'retry-failed-ping-notifications':{
+        'task':'garmin.retry_failed_ping_notification',
+        'schedule':crontab(minute=0, hour=3)
+    }
 }
 
 # Whitenoise

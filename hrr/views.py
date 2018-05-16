@@ -410,6 +410,7 @@ def aa_calculations(request):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
+
 	hrr_not_recorded_list = []
 	if activity_files:
 		for i in range(len(activity_files)):
@@ -425,6 +426,7 @@ def aa_calculations(request):
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 		hrr_not_recorded_format=str(datetime.timedelta(seconds=hrr_not_recorded_seconds))
 		hrr_not_recorded=float(hrr_not_recorded_format)
+
 
 
 	data = {"total_time":"",
@@ -512,6 +514,7 @@ def aa_calculations(request):
 		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 		hrr_not_recorded = hrr_not_recorded
+
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100
 			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -530,7 +533,9 @@ def aa_calculations(request):
 			percent_anaerobic=''
 			percent_below_aerobic=''
 			percent_aerobic=''
+
 			percent_hrr_not_recorded=''
+
 			total_percent=''
 			
 		data = {"total_time":total_time,
@@ -546,5 +551,6 @@ def aa_calculations(request):
 				"percent_below_aerobic":percent_below_aerobic,
 				"percent_anaerobic":percent_anaerobic,
 				"total_percent":total_percent}
-		print(data,'tydrty')
+
 	return JsonResponse(data)
+

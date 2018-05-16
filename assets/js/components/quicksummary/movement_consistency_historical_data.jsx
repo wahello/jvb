@@ -15,6 +15,8 @@ class MovementHistorical extends Component{
     this.mcHistoricalData = this.mcHistoricalData.bind(this);
     this.dailyMC = this.dailyMC.bind(this);
     this.getDayWithDate = this.getDayWithDate.bind(this);
+    this.renderLastSync = this.renderLastSync.bind(this);
+
     this.state = {
       myTableData: [{name:"% of Days User Get 300 Steps in the Hour"}]
     }
@@ -38,6 +40,9 @@ mcHistoricalData(score,status){
          return {background:'red',color:'white'}
       else if(status == "strength")
         return {background:"rgb(255,0,255)",color:'white'}
+      else if(status == "exercise"){
+         return {background:"#FD9A44",color:'black'}
+      }
       else if (score >= 300 )
         return {background:'green', color:'white'};
 }
@@ -48,6 +53,13 @@ dailyMC(score,status){
         return {background:'yellow', color:'black'};
       else if (score > 10 )
         return {background:'red', color:'white'};
+}
+renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
 }
 renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
     let columns = [];
@@ -82,6 +94,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             "inactive_hours" : [],
             "sleeping_hours" : [],
             "strength_hours" : [],
+            "exercise_hours" : [],
             "total_steps" : []
           };
         
@@ -108,6 +121,9 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                                         style:this.mcHistoricalData(value)});
                                       else if (time == "strength_hours")
                                         obj[time].push({value:mc.strength_hours,
+                                                        style:this.mcHistoricalData(value)});
+                                      else if (time == "exercise_hours")
+                                        obj[time].push({value:mc.exercise_hours,
                                                         style:this.mcHistoricalData(value)});
                                       else if (time == "sleeping_hours")
                                         obj[time].push({value:mc.sleeping_hours,
@@ -176,6 +192,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         "inactive_hours" : "Inactive Hours",
         "sleeping_hours" : "Sleeping Hours",
         "strength_hours" : "Strength Hours",
+        "exercise_hours" : "Exercise Hours",
         "total_steps" : "Total Steps",
         "dmc":"Daily Movement consistency"
       }
@@ -184,7 +201,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
       let prcnt_active_steps = '';
       if(key != "active_hours" && key != "inactive_hours" &&
          key != "sleeping_hours" && key != "strength_hours" &&
-         key != "total_steps" && key != "dmc"){
+         key != "exercise_hours" && key != "total_steps" && key != "dmc"){
         let active_days = 0;
         for(let step of col){
           if(step.value >= 300){
@@ -232,13 +249,13 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
        <Table
             rowsCount={rowsCount}
             rowHeight={50}
-            headerHeight={90}
+            headerHeight={120}
             width={containerWidth}
             height={containerHeight}
             touchScrollEnabled={true}
             {...props}>
             <Column
-              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
+              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data {this.renderLastSync(this.props.last_synced)}</Cell>}
 
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
@@ -261,7 +278,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             <span className="rd_mch_color_legend_label">Strength</span>
             <div className="rd_mch_color_legend color_legend_blue"></div>
             <span className="rd_mch_color_legend_label">Sleeping</span>
-         
+            <div className="rd_mch_color_legend color_legend_yellow"></div>
+            <span className="rd_mch_color_legend_label">Exercise</span>
 
       </div>
       </div>

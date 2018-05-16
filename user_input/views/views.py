@@ -24,8 +24,8 @@ class UserDailyInputView(generics.ListCreateAPIView):
           then filter the userDailyInput data for provided date interval
           and return the list
     '''
-    authentication_classes = (CsrfExemptSessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    #authentication_classes = (CsrfExemptSessionAuthentication,)
+    #permission_classes = (IsAuthenticated,)
     serializer_class = UserDailyInputSerializer
 
     def get_queryset(self):
@@ -79,15 +79,33 @@ class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
 
 class UserDailyInputLatestItemView(APIView):
     permission_classes = (IsAuthenticated,)
+
     def get_queryset(self):
         user = self.request.user
-        qs = UserDailyInput.objects.filter(user=user).order_by('-created_at')
+        date = self.request.query_params.get('date',None)
+        if date:
+            qs = UserDailyInput.objects.filter(
+                user = user,
+                created_at__lt = date 
+            ).order_by('-created_at')
+        else:
+            qs = UserDailyInput.objects.filter(
+                user = user
+            ).order_by('-created_at')
         return qs 
 
-    def get(self, request, format="json"):
+    def get_object(self):
         qs = self.get_queryset()
-        if qs.exists():
-            serializer = UserDailyInputSerializer(qs[0])
+        try:
+            obj = qs[0]
+            return obj
+        except UserDailyInput.DoesNotExist:
+            return None
+
+    def get(self, request, format="json"):
+        latest_userinput = self.get_object()
+        if latest_userinput:
+            serializer = UserDailyInputSerializer(latest_userinput)
             return Response(serializer.data)
         else:
             return Response({})

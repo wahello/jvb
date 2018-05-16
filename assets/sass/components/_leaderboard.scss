@@ -1,5 +1,5 @@
 .lb_table_style{
-	padding-top: 30px;
+	padding-top: 0px;
 	padding-left: 46px;
 	padding-right: 46px;
 }
@@ -8,4 +8,52 @@
 	font-size: 16px;
 	border-collapse: collapse;
 	border-color:lightgray !important;
+	width: 190px;
+	height:50px;
+}
+.ar_table_padd{
+	padding:0px 50px;
+}
+@media (max-width: 1023px){
+	.ar_table_padd{
+		padding:0px 5px;
+	}
+	.lb_table_style{
+	padding-top: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+.lbhead{	
+	width: 233px;	
+	text-align: center;
+	color: white;
+	font-family: futura-pt;
+	font-size: large;
+}
+#lbheader{
+	margin-left:15%;
+}
+} 
+.lbhead{
+	width: 230px;
+	text-align: center;	
+	color: white;
+	font-family: futura-pt;
+	font-style: normal;
+	font-size:23px;	
+}
+#lbheader{
+	margin-left:26%;
+}
+.fantawesome_style{
+	color:#4FBAEC;
+	margin-right:0px;
+	top:0px;
+	font-size: 11px;
+}
+#lbfontawesome{
+	margin-top: 5px;
+	padding: 3px 7px;
+    font-size: 16px;
+    font-family: futura-pt;
 }

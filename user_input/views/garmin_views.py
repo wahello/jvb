@@ -81,6 +81,7 @@ class GarminData(APIView):
 		activity_data = [ast.literal_eval(dic) for dic in activity_data]
 		manually_updated_activity_data = [ast.literal_eval(dic) for dic
 			in manually_updated_activity_data]
+
 		return (activity_data,manually_updated_activity_data)    
 
 	def _create_activity_stat(self,activity_obj):
@@ -88,11 +89,9 @@ class GarminData(APIView):
 			tmp = {
 					"summaryId":"",
 					"activityType":"",
-					"durationInSeconds":"",
 					"averageHeartRateInBeatsPerMinute":"",
 					"comments":"",
 					"startTimeInSeconds":"",
-					"endTimeInSeconds":"",
 					"durationInSeconds":"",
 					"startTimeOffsetInSeconds":""
 
@@ -100,16 +99,16 @@ class GarminData(APIView):
 			for k, v in activity_obj.items():
 				if k in tmp.keys():
 					tmp[k] = v
-					if tmp["startTimeInSeconds"]:
-						a = int(tmp["startTimeInSeconds"])
-					else:
-						a = 0
-					if tmp["durationInSeconds"]:
-						b = int(tmp["durationInSeconds"])
-					else:
-						b = 0
-					tmp["endTimeInSeconds"] = a + b
-			tmp.pop("durationInSeconds")
+					# if tmp["startTimeInSeconds"]:
+					# 	a = int(tmp["startTimeInSeconds"])
+					# else:
+					# 	a = 0
+					# if tmp["durationInSeconds"]:
+					# 	b = int(tmp["durationInSeconds"])
+					# else:
+					# 	b = 0
+					# tmp["endTimeInSeconds"] = a + b
+			# print(tmp)
 			return {activity_obj['summaryId']:tmp}
 		
 
@@ -125,9 +124,9 @@ class GarminData(APIView):
 		for act in activity_data:
 			act_obj = manually_edited(act)
 			finall = self._create_activity_stat(act_obj)
-			final_act_data.update(finall)
+			final_act_data.update(finall)	
 		return final_act_data
-			
+		
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)
@@ -144,3 +143,4 @@ class GarminData(APIView):
 			}
 			return Response(data)
 		return Response({})
+

@@ -10,7 +10,9 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataMetrics,\
 					UserGarminDataMoveIQ, \
 					GarminConnectToken, \
-					GarminFitFiles
+					GarminFitFiles,\
+					GarminPingNotification,\
+					UserLastSynced
 
 class UserGarminDataEpochAdmin(admin.ModelAdmin):
 	list_display = ('user','summary_id','record_date_in_seconds','start_time_in_seconds',
@@ -94,3 +96,18 @@ admin.site.register(UserGarminDataStressDetails,UserGarminDataStressDetailsAdmin
 admin.site.register(UserGarminDataMetrics,UserGarminDataMetricsAdmin)
 admin.site.register(UserGarminDataMoveIQ,UserGarminDataMoveIQAdmin)
 admin.site.register(GarminFitFiles,GarminFitFilesAdmin)
+
+@admin.register(GarminPingNotification)
+class GarminPingNotificationAdmin(admin.ModelAdmin):
+	list_display = ['user','created_at','updated_at','upload_start_time_seconds',
+		'summary_type','state']
+	ordering = ('-created_at',)
+	search_fields = ('user__username','user__email','user__first_name',
+		'user__last_name')
+
+@admin.register(UserLastSynced)
+class UserLastSyncedAdmin(admin.ModelAdmin):
+	list_display = ['user','last_synced','offset']
+	ordering = ('-last_synced',)
+	search_fields = ('user__username','user__email','user__first_name',
+		'user__last_name')

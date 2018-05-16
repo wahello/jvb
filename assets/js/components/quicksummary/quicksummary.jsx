@@ -3,21 +3,23 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
 	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
-         NavbarBrand,Container,Dropdown, DropdownToggle, DropdownMenu, DropdownItem  } from "reactstrap";
+         NavbarBrand,Container,Dropdown, DropdownToggle, DropdownMenu, DropdownItem,
+          Modal, ModalHeader, ModalBody, ModalFooter  } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
 import axiosRetry from 'axios-retry';
-import moment from 'moment';
+import moment from 'moment'; 
 import { withRouter, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
-import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/quick';
+import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync}  from '../../network/quick';
 
 
 import NavbarMenu from '../navbar';
@@ -64,7 +66,7 @@ class Quicklook extends Component{
 
 	constructor(props){
 		super(props);
-
+		this.successLastSync = this.successLastSync.bind(this);
 		this.successquick = this.successquick.bind(this);
 		this.errorquick = this.errorquick.bind(this);
 		this.userInputFetchSuccess = this.userInputFetchSuccess.bind(this);
@@ -82,6 +84,7 @@ class Quicklook extends Component{
 		this.onQuicklookFailure = this.onQuicklookFailure.bind(this);
 		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
+		this.renderModel = this.renderModel.bind(this);
 
 
 		this.toggleDate=this.toggleDate.bind(this);
@@ -89,6 +92,7 @@ class Quicklook extends Component{
 	    this.toggleDropdown = this.toggleDropdown.bind(this);
 	    this.handleLogout = this.handleLogout.bind(this);
 	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+	    this.toggleModel = this.toggleModel.bind(this);
 
 		let initial_state = getInitialState(moment().subtract(7,'days'),
 											moment());
@@ -108,7 +112,9 @@ class Quicklook extends Component{
 			creating_ql:false,
 			dateRange:false,
 			dropdownOpen: false,
+			model:true,
 			userInputData:{},
+			last_synced:null,
 			data:initial_state
 		};
 	}
@@ -363,7 +369,16 @@ class Quicklook extends Component{
              };
              return properties;
        		}
-
+    successLastSync(data){
+    	let last_synced;
+    	if(_.isEmpty(data.data))
+    		last_synced = null
+    	else
+    		 last_synced = data.data.last_synced;
+    	this.setState({
+    		last_synced:last_synced,
+    	})
+    }
 	successquick(data,start_dt,end_dt){
 		let targetTab = 'grade'
 		if (location.hash)
@@ -492,6 +507,7 @@ class Quicklook extends Component{
 		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 					  this.userInputFetchFailure);
 		 window.addEventListener('scroll', this.handleScroll);
+		 fetchLastSync(this.successLastSync,this.errorquick);
 	}
 	onDismiss(){
 		this.setState(
@@ -500,7 +516,11 @@ class Quicklook extends Component{
 				error:false
 		});
 	}
-
+	toggleModel(){
+		this.setState({
+			model:!this.state.model
+		});
+	}
 	activateTab(tab,event){
 		this.setState({
            activeTab:tab,
@@ -526,6 +546,22 @@ handleScroll() {
     this.setState({
       calendarOpen:!this.state.calendarOpen
     });
+  }
+  renderModel(){
+  	 var x = window.matchMedia("(max-width: 900px)");
+  	 let model_view;
+    if(x.matches){
+	  	model_view = <Modal isOpen={this.state.model} toggle={this.toggleModel} className={this.props.className}>
+	          <ModalHeader toggle={this.toggleModel}>Modal title</ModalHeader>
+	          <ModalBody>
+	           On a mobile device, use the Chrome brower and touch the button "Export Reports" above to easily view your formatted data; on a desktop computer, touching this button will export your reports to Excel for easy viewing.
+	          </ModalBody>
+	          <ModalFooter>
+	            <Button color="primary" onClick={this.toggleModel}>Ok</Button>
+	          </ModalFooter>
+	        </Modal>;
+    }
+    return model_view;
   }
  toggle() {
     this.setState({
@@ -959,20 +995,20 @@ onLogoutSuccess(response){
 
                     	<Container style={{maxWidth:"1600px"}}>
              		   <div className="row justify-content-center">
-                    	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
-                    	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
-                    	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
-                    	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
-                    	{this.state.activeTab === "exercise" && <Exercise data={this.state.data}/>}
-                    	{this.state.activeTab === "grade" && <Grades data={this.state.data}/>}
-                    	{this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
-                    	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
-                    	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
+                    	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "swim" && <Swim data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "bike" && <Bike data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "exercise" && <Exercise data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "grade" && <Grades data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "steps" && <Steps data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "sleep" && <Sleep data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "food" && <Food data={this.state.data} last_synced = {this.state.last_synced}/>}
                     	{this.state.activeTab === "user" &&
-	                    	 <User  data={this.state.userInputData}/>
+	                    	 <User  data={this.state.userInputData} last_synced = {this.state.last_synced}/>
                     	}
-                    	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
-                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date}/>}
+                    	{this.state.activeTab === "movement" && <Movementquick data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date} last_synced = {this.state.last_synced}/>}
 
 
 			</div>
@@ -982,6 +1018,7 @@ onLogoutSuccess(response){
 					</div>
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
+					{this.renderModel()}
 				</div>
 
 

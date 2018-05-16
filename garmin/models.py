@@ -2,6 +2,7 @@
 import base64
 
 from django.db import models
+from django.conf import settings
 # from django.contrib.postgres.fields import JSONField
 
 class UserGarminDataEpoch(models.Model):
@@ -125,3 +126,64 @@ class GarminFitFiles(models.Model):
 	created_at = models.DateTimeField(auto_now=True)
 	fit_file = models.BinaryField(blank=True)
 	meta_data_fitfile = models.TextField()
+
+class GarminPingNotification(models.Model):
+	SUMMARY_TYPE_CHOICE = (
+		("dailies","Dailies"),
+		("activities","Activities"),
+		("manuallyUpdatedActivities","Manually Updated Activities"),
+		("epochs","Epochs"),
+		("sleeps","Sleeps"),
+		("bodyComps","Body Composition"),
+		("stressDetails","Stress Details"),
+		("moveIQActivities","Move IQ Activities"),
+		("userMetrics","User Metrics"),
+		("deregistration","Deregistration"),
+	)
+
+	PING_STATE_CHOICES = (
+		("unprocessed","Unprocessed"),
+		("processing","Processing"),
+		("processed","Processed"),
+		("failed","Failed"),
+	)
+
+	user = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE
+	)
+	created_at = models.DateTimeField(auto_now_add = True)
+	updated_at = models.DateTimeField(auto_now = True)
+	upload_start_time_seconds = models.IntegerField(null=True, blank=True)
+	summary_type = models.CharField(
+		choices = SUMMARY_TYPE_CHOICE,
+		max_length=100
+	)
+	state = models.CharField(
+		max_length = 100, 
+		choices = PING_STATE_CHOICES,
+		default = "unprocessed"
+	) 
+	notification = models.TextField()
+	def __str__(self):
+		dtime = self.created_at.strftime("%Y-%m-%d %I:%M %p")
+		return "{}-{}".format(self.user.username,dtime)
+		
+	class Meta:
+		indexes = [
+			models.Index(fields=['user', 'upload_start_time_seconds']),
+			models.Index(fields=['-created_at']),
+			models.Index(fields=['upload_start_time_seconds'])
+		]
+
+class UserLastSynced(models.Model):
+	user = models.OneToOneField(
+		settings.AUTH_USER_MODEL,
+		related_name='last_synced'
+	)
+	last_synced = models.DateTimeField()
+	offset = models.IntegerField()
+
+	def __str__(self):
+		sync_time_str = self.last_synced.strftime("%Y-%m-%d %H:%M:%S")
+		return "{}-{}".format(self.user.username,sync_time_str)

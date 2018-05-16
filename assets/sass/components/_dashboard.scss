@@ -2,7 +2,7 @@ body{
 	overflow-x: hidden !important;
 }
 .padding{
-	padding: 25px 41px 0px 41px;
+	padding: 0px 41px 0px 41px; 
 }
 .table_style{
 	border-collapse: collapse;
@@ -10,10 +10,7 @@ body{
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
 	
 }
-.dashboard th,tr,td{
-width: 190px;
-height:50px;
-}
+
 .createbutton{
 		font-family:futura-pt;
 		background-color: rgb(237, 149, 7);
@@ -24,15 +21,18 @@ height:50px;
 		font-size: 14px;
 
 }
+.pa_dropbutton{
+ 		display:none;
+}
 @media (max-width: 1023px){
 .tablecenter{
 	overflow-x: scroll;
 }
 .padding{
 	padding: 15px 10px 0px 10px;
-}
+} 
 #pdf_button{
-	padding-left:110px;
+	padding-left:12px;
 }
 }
 #link_style{
@@ -51,4 +51,31 @@ height:50px;
 	font-size: 16px;
 	border-collapse: collapse;
 	border-color:lightgray;
+	width: 190px;
+	height:50px;
+}
+
+ @media (min-width: 576px) and (max-width: 852px){
+ 	.pa_dropbutton{
+ 		display:inline;
+ 		background-color: #40E0D0;
+ 		border-color: #40E0D0;
+ 		color:white;
+ 		margin-left:5px; 
+ 	}
+ 	.drop_date_range_btn3{
+ 		display: inline;
+ 	}
+ 	.date_range_btn3{
+ 		display: none;
+ 	}
+ 	.drop_date_range_btn2{
+ 		display: inline;
+ 	}
+ 	.date_range_btn2{
+ 		display: none;
+ 	}
+ 	.navbar-collapse{
+ 		box-shadow: none;
+ 	}
 }

@@ -155,6 +155,8 @@ class AllStats1 extends Component{
         this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
         this.getStylesNonProcessedFood = this.getStylesNonProcessedFood.bind(this);
         this.getDayWithDate = this.getDayWithDate.bind(this);
+        this.renderLastSync = this.renderLastSync.bind(this);
+
         let cols = this.renderTableColumns(props.data);
         this.state = {
             columns:cols[0],
@@ -177,7 +179,13 @@ class AllStats1 extends Component{
     toFahrenheit(tempInCelcius){
         return (tempInCelcius * 1.8) + 32;
     }
-
+    renderLastSync(value){
+      let time;
+      if(value != null){
+        time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+      }
+      return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+    }
     getStylesGpaBeforePanalities(score){
       if (score<1)
         return {background:'red',color:'black'};
@@ -204,11 +212,11 @@ getDayWithDate(date){
  	renderTableColumns(dateWiseData,category=undefined,classes=""){
 		let columns = [];
         const obj = {
-            A: { background: 'green', color: 'white' },
-            B: { background: 'green', color: 'white' },
-            C: { background: 'yellow', color: 'black'},
-            D: { background: 'yellow', color: 'black'},
-            F: { background: 'red', color: 'black' }
+            A: { background: 'green', color: 'white'},
+            B: { background: '#32CD32', color: 'white' },
+            C: { background: 'yellow', color:'black' },
+            D: { background: '#FF8C00', color:'black' },
+            F: { background: 'red', color: 'black' },
         };
         let avgHrKeys =  [];
         let keys = [];
@@ -476,13 +484,13 @@ getDayWithDate(date){
 			 <Table
 		        rowsCount={rowsCount}    
 		        rowHeight={50}  
-		        headerHeight={60}   
+		        headerHeight={70}   
 		        width={containerWidth}    
         		maxHeight={containerHeight}
             touchScrollEnabled={true}                  
                 {...props}>
 		        <Column 
-		          header={<Cell className={css(styles.newTableHeader)}>All Stats</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>All Stats {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.tableAttrColumn[props.rowIndex].name}
