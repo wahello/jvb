@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import {Table,Button,Form, FormGroup, Label, Input, FormText,Popover,PopoverBody,Nav, 
 	     NavItem, NavLink, Collapse, Navbar, NavbarToggler,   
-         NavbarBrand,Container,Dropdown, DropdownToggle, DropdownMenu, DropdownItem  } from "reactstrap";
+         NavbarBrand,Container,Dropdown, DropdownToggle, DropdownMenu, DropdownItem,
+          Modal, ModalHeader, ModalBody, ModalFooter  } from "reactstrap";
 import axios from 'axios';
 import FontAwesome from "react-fontawesome";
 import CalendarWidget from 'react-calendar-widget';
@@ -82,6 +83,7 @@ class Quicklook extends Component{
 		this.onQuicklookFailure = this.onQuicklookFailure.bind(this);
 		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
+		this.renderModel = this.renderModel.bind(this);
 
 
 		this.toggleDate=this.toggleDate.bind(this);
@@ -89,6 +91,7 @@ class Quicklook extends Component{
 	    this.toggleDropdown = this.toggleDropdown.bind(this);
 	    this.handleLogout = this.handleLogout.bind(this);
 	    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+	    this.toggleModel = this.toggleModel.bind(this);
 
 		let initial_state = getInitialState(moment().subtract(7,'days'),
 											moment());
@@ -108,6 +111,7 @@ class Quicklook extends Component{
 			creating_ql:false,
 			dateRange:false,
 			dropdownOpen: false,
+			model:true,
 			userInputData:{},
 			data:initial_state
 		};
@@ -500,7 +504,11 @@ class Quicklook extends Component{
 				error:false
 		});
 	}
-
+	toggleModel(){
+		this.setState({
+			model:!this.state.model
+		});
+	}
 	activateTab(tab,event){
 		this.setState({
            activeTab:tab,
@@ -526,6 +534,22 @@ handleScroll() {
     this.setState({
       calendarOpen:!this.state.calendarOpen
     });
+  }
+  renderModel(){
+  	 var x = window.matchMedia("(max-width: 900px)");
+  	 let model_view;
+    if(x.matches){
+	  	model_view = <Modal isOpen={this.state.model} toggle={this.toggleModel} className={this.props.className}>
+	          <ModalHeader toggle={this.toggleModel}>Modal title</ModalHeader>
+	          <ModalBody>
+	           On a mobile device, use the Chrome brower and touch the button "Export Reports" above to easily view your formatted data; on a desktop computer, touching this button will export your reports to Excel for easy viewing.
+	          </ModalBody>
+	          <ModalFooter>
+	            <Button color="primary" onClick={this.toggleModel}>Ok</Button>
+	          </ModalFooter>
+	        </Modal>;
+    }
+    return model_view;
   }
  toggle() {
     this.setState({
@@ -982,6 +1006,7 @@ onLogoutSuccess(response){
 					</div>
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
+					{this.renderModel()}
 				</div>
 
 
