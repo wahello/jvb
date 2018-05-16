@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 from celery.decorators import task
@@ -30,12 +30,12 @@ ERROR MESSAGE:{}"""
 def retry_failed_ping_notification():
 	'''
 		Celery task to retry all the failed ping notification
-		in every 10 min for current day (UTC)
+		for yesterday day (UTC)
 	'''
-	today_utc = datetime.now()
+	yesterday_utc = datetime.now()-timedelta(days=1)
 	failed_ping_notification_today = GarminPingNotification.objects.filter(
 		state = "failed",
-		created_at__date = today_utc.date()
+		created_at__date = yesterday_utc.date()
 	)
 	for notif in failed_ping_notification_today:
 		try:

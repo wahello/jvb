@@ -12,4 +12,5 @@ urlpatterns = [
 	    name="manually_updated_data"),
 	url(r'users/data/backfill$',views.fetchGarminBackFillData.as_view(),
 	    name="backfill_api"),
+	url(r'users/last_synced$', views.UserLastSyncedItemview.as_view(),name="last_synced"),
 ]

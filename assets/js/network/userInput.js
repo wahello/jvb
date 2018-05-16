@@ -322,11 +322,15 @@ export function userDailyInputUpdate(data,successCallback=undefined, errorCallba
 	});
 }
 
-export function userDailyInputRecentFetch(successCallback=undefined, errorCallback=undefined){
+export function userDailyInputRecentFetch(date,successCallback=undefined, errorCallback=undefined){
+	date = moment(date);
 	const URL = 'users/daily_input/item/recent/';
 	const config = {
 		url : URL,
 		method: 'get',
+		params:{
+			"date":date.format('YYYY-MM-DD')
+		},
 		withCredentials: true
 	};
 	axios(config).then(function(response){

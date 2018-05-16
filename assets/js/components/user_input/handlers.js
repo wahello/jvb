@@ -7,6 +7,27 @@ export function handleChange(event){
   }); 
 }
 
+export function handleChangeReportType(event){
+  const target = event.target;
+  const value = target.value;
+  const name = target.name;
+  if(value == "quick"){
+    this.setState({
+      [name]: value
+    });
+  }else{
+    this.setState({
+      [name]: value
+    },()=>{
+        this.userDailyInputRecentFetch(
+          this.state.selected_date,
+          this.onFetchRecentSuccessFullReport,
+          this.onFetchFailure
+        );
+    });
+  } 
+}
+
 
 export function handleChangeWorkoutType(event){
   const name = event.target.name;
