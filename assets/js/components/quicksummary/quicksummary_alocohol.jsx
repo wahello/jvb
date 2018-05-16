@@ -14,8 +14,10 @@ class Alcohol extends Component{
 	constructor(props) {
     super(props);
     this.renderTableColumns = this.renderTableColumns.bind(this);  
-this.onProfileSuccessFetch=this.onProfileSuccessFetch.bind(this);
-this.getDayWithDate = this.getDayWithDate.bind(this);
+    this.onProfileSuccessFetch=this.onProfileSuccessFetch.bind(this);
+    this.getDayWithDate = this.getDayWithDate.bind(this);
+    this.renderLastSync = this.renderLastSync.bind(this);
+
     this.state = {
     	gender:'M',
       myTableData: [
@@ -37,6 +39,13 @@ componentDidMount(){
       getUserProfile(this.onProfileSuccessFetch);
       
     }
+  renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
 getDayWithDate(date){
    let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -79,13 +88,13 @@ getDayWithDate(date){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={60}
+		        headerHeight={80}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Alcohol</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Alcohol {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}

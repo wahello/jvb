@@ -14,6 +14,8 @@ class Steps extends Component{
 	super(props);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 	 this.getDayWithDate = this.getDayWithDate.bind(this);
+	 this.renderLastSync = this.renderLastSync.bind(this);
+
 
 	 this.state = {
       myTableData: [
@@ -32,6 +34,13 @@ getDayWithDate(date){
    let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
+  renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -98,13 +107,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={60}
+		        headerHeight={80}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Steps</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Steps {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}

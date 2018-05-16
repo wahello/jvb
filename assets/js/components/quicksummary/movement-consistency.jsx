@@ -22,7 +22,9 @@ class Movementquick extends Component{
     this.successMCFetch = this.successMCFetch.bind(this);
     this.processDate = this.processDate.bind(this);
     this.renderTableColumns = this.renderTableColumns.bind(this);
-     this.toggle = this.toggle.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.renderLastSync = this.renderLastSync.bind(this);
+
 
      this.state = {
        tableAttrColumn: [
@@ -177,7 +179,13 @@ class Movementquick extends Component{
       mc_data:initial_data
     });
   }
-
+    renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
   successMCFetch(data){
     if(data.data.length){
       this.setState({
@@ -303,14 +311,14 @@ render(){
      <Table
           rowsCount={rowsCount}
           rowHeight={50}
-          headerHeight={65}
+          headerHeight={95}
           width={containerWidth}
           maxHeight={containerHeight}
               touchScrollEnabled={true}
               {...props}>
           <Column
-            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency
-            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')}</span>
+            header={<Cell className={css(styles.newTableHeader)}>Movement Consistency 
+            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')} {this.renderLastSync(this.props.last_synced)}</span>
             </Cell>}
             cell={props => (
               <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>

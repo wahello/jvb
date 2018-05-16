@@ -15,6 +15,8 @@ class MovementHistorical extends Component{
     this.mcHistoricalData = this.mcHistoricalData.bind(this);
     this.dailyMC = this.dailyMC.bind(this);
     this.getDayWithDate = this.getDayWithDate.bind(this);
+    this.renderLastSync = this.renderLastSync.bind(this);
+
     this.state = {
       myTableData: [{name:"% of Days User Get 300 Steps in the Hour"}]
     }
@@ -51,6 +53,13 @@ dailyMC(score,status){
         return {background:'yellow', color:'black'};
       else if (score > 10 )
         return {background:'red', color:'white'};
+}
+renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
 }
 renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
     let columns = [];
@@ -240,13 +249,13 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
        <Table
             rowsCount={rowsCount}
             rowHeight={50}
-            headerHeight={90}
+            headerHeight={120}
             width={containerWidth}
             height={containerHeight}
             touchScrollEnabled={true}
             {...props}>
             <Column
-              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
+              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data {this.renderLastSync(this.props.last_synced)}</Cell>}
 
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>

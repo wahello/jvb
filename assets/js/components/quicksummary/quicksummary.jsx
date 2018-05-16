@@ -12,13 +12,14 @@ import axiosRetry from 'axios-retry';
 import moment from 'moment'; 
 import { withRouter, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
-import {quicksummaryDate,userInputDate,createQuicklook}  from '../../network/quick';
+import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync}  from '../../network/quick';
 
 
 import NavbarMenu from '../navbar';
@@ -65,7 +66,7 @@ class Quicklook extends Component{
 
 	constructor(props){
 		super(props);
-
+		this.successLastSync = this.successLastSync.bind(this);
 		this.successquick = this.successquick.bind(this);
 		this.errorquick = this.errorquick.bind(this);
 		this.userInputFetchSuccess = this.userInputFetchSuccess.bind(this);
@@ -113,6 +114,7 @@ class Quicklook extends Component{
 			dropdownOpen: false,
 			model:true,
 			userInputData:{},
+			last_synced:null,
 			data:initial_state
 		};
 	}
@@ -367,7 +369,16 @@ class Quicklook extends Component{
              };
              return properties;
        		}
-
+    successLastSync(data){
+    	let last_synced;
+    	if(_.isEmpty(data.data))
+    		last_synced = null
+    	else
+    		 last_synced = data.data.last_synced;
+    	this.setState({
+    		last_synced:last_synced,
+    	})
+    }
 	successquick(data,start_dt,end_dt){
 		let targetTab = 'grade'
 		if (location.hash)
@@ -496,6 +507,7 @@ class Quicklook extends Component{
 		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 					  this.userInputFetchFailure);
 		 window.addEventListener('scroll', this.handleScroll);
+		 fetchLastSync(this.successLastSync,this.errorquick);
 	}
 	onDismiss(){
 		this.setState(
@@ -983,20 +995,20 @@ onLogoutSuccess(response){
 
                     	<Container style={{maxWidth:"1600px"}}>
              		   <div className="row justify-content-center">
-                    	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data}/>}
-                    	{this.state.activeTab === "swim" && <Swim data={this.state.data}/>}
-                    	{this.state.activeTab === "bike" && <Bike data={this.state.data}/>}
-                    	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data}/>}
-                    	{this.state.activeTab === "exercise" && <Exercise data={this.state.data}/>}
-                    	{this.state.activeTab === "grade" && <Grades data={this.state.data}/>}
-                    	{this.state.activeTab === "steps" && <Steps data={this.state.data}/>}
-                    	{this.state.activeTab === "sleep" && <Sleep data={this.state.data}/>}
-                    	{this.state.activeTab === "food" && <Food data={this.state.data}/>}
+                    	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "swim" && <Swim data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "bike" && <Bike data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "alcohol" && <Alcohol data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "exercise" && <Exercise data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "grade" && <Grades data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "steps" && <Steps data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "sleep" && <Sleep data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "food" && <Food data={this.state.data} last_synced = {this.state.last_synced}/>}
                     	{this.state.activeTab === "user" &&
-	                    	 <User  data={this.state.userInputData}/>
+	                    	 <User  data={this.state.userInputData} last_synced = {this.state.last_synced}/>
                     	}
-                    	{this.state.activeTab === "movement" && <Movementquick data={this.state.data}/>}
-                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date}/>}
+                    	{this.state.activeTab === "movement" && <Movementquick data={this.state.data} last_synced = {this.state.last_synced}/>}
+                    	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date} last_synced = {this.state.last_synced}/>}
 
 
 			</div>
