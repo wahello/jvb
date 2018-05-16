@@ -3,6 +3,7 @@
 import re,json
 from datetime import datetime,timedelta
 from rauth import OAuth1Service
+import pytz
 
 from django.contrib.auth.models import User
 from django.db import DatabaseError
@@ -18,6 +19,7 @@ from .models import (
     UserGarminDataMetrics,
     UserGarminDataMoveIQ,
     GarminPingNotification,
+    UserLastSynced
     # GarminConnectToken
 )
 
@@ -78,6 +80,28 @@ def update_notification_state(instance,state="unprocessed"):
 
 	instance.save()
 
+def create_update_sync_time(user, sync_time_timestamp, offset):
+	try:
+		# If last sync info is already present, update it
+		last_sync_obj = UserLastSynced.objects.get(user=user)
+		last_sync_obj.offset = offset if offset else last_sync_obj.offset
+		last_sync_timestamp = last_sync_obj.last_synced.timestamp()
+		if last_sync_timestamp < sync_time_timestamp:
+			last_sync_obj.last_synced = pytz.utc.localize(
+				datetime.utcfromtimestamp(sync_time_timestamp)
+			)
+		last_sync_obj.save()
+	except UserLastSynced.DoesNotExist as e:
+		# if last sync info for user is not present, create record
+		sync_date_time = pytz.utc.localize(
+			datetime.utcfromtimestamp(sync_time_timestamp)
+		)
+		UserLastSynced.objects.create(
+			user = user,
+			last_synced = sync_date_time,
+			offset = offset if offset else 0
+		)
+
 def _createObjectList(user,json_data,dtype,record_dt):
 	'''
 		Helper method to create instance of model
@@ -119,18 +143,68 @@ def _createObjectList(user,json_data,dtype,record_dt):
 
 		return objects
 
-def _get_data_start_time(json_data,data_type):
+def _get_data_start_end_time(json_data,data_type):
+	'''
+	Find the start date from which json_data have data and end date upto
+	which json_data have health data.
+
+	Args:
+		json_data (list): List of dicts where each dict represent a health
+			API summary.
+		data_type (str):  summary type of summaries which json_data have.
+			eg. sleeps or dailies etc.
+	Returns:
+		tuple: having start_time as first item and end_time as second
+			eg. ('2018-05-10', '2018-05-14') 
+
+	Example:
+		If pulled data have data from May 10, 2018 to May 14, 2018 then
+			start date will be 2018-05-10 and end date will be 2018-05-14
+	'''
 	if len(json_data):
-		obj = json_data[0]
-		if not data_type in ["userMetrics","bodyComps"]:
-			start_time = obj.get("startTimeInSeconds")+_safe_get(obj,"startTimeOffsetInSeconds",0)
+		# Garmin provided data which is already sorted based on the start
+		# time of the summary/record.
+		latest_record = json_data[-1]
+		oldest_record = json_data[0]
+		if not data_type in ["userMetrics","bodyComps","moveIQActivities"]:
+			end_time = latest_record.get("startTimeInSeconds")+\
+				latest_record.get("startTimeOffsetInSeconds",0)
+			start_time = oldest_record.get("startTimeInSeconds")+\
+				oldest_record.get("startTimeOffsetInSeconds",0)
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
+			end_time = datetime.utcfromtimestamp(int(end_time)).strftime("%Y-%m-%d")
+		elif data_type == "moveIQActivities":
+			end_time = latest_record.get("startTimeInSeconds")+\
+				latest_record.get("offsetInSeconds",0)
+			start_time = oldest_record.get("startTimeInSeconds")+\
+				oldest_record.get("offsetInSeconds",0)
+			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
+			end_time = datetime.utcfromtimestamp(int(end_time)).strftime("%Y-%m-%d")
 		elif data_type == "userMetrics":
-			start_time = obj.get("calendarDate")
+			end_time = latest_record.get("calendarDate")
+			start_time = oldest_record.get("calendarDate")
 		elif data_type == "bodyComps":
-			start_time = obj.get("measurementTimeInSeconds",0)+_safe_get(obj,"measurementTimeOffsetInSeconds",0)
+			end_time = latest_record.get("measurementTimeInSeconds",0)+\
+				latest_record.get("measurementTimeOffsetInSeconds",0)
+			start_time = oldest_record.get("measurementTimeInSeconds",0)+\
+				oldest_record.get("measurementTimeOffsetInSeconds",0)
 			start_time = datetime.utcfromtimestamp(int(start_time)).strftime("%Y-%m-%d")
-		return start_time
+			end_time = datetime.utcfromtimestamp(int(end_time)).strftime("%Y-%m-%d")
+		return (start_time,end_time)
+
+def _get_data_offset(json_data, data_type, default_offset = 0):
+	if len(json_data):
+		latest_record = json_data[-1]
+		if not data_type in ['userMetrics','bodyComps','moveIQActivities']:
+			return latest_record.get('startTimeOffsetInSeconds',default_offset)
+		elif data_type == "bodyComps":
+			return latest_record.get('measurementTimeOffsetInSeconds',default_offset)
+		elif data_type == "moveIQActivities":
+			return latest_record.get('offsetInSeconds',default_offset)
+		elif data_type == "userMetrics":
+			return default_offset
+		else:
+			return default_offset
 
 def store_garmin_health_push(notifications,ping_notif_obj=None):
 
@@ -152,6 +226,14 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 	conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9';
 	print(notifications)
 
+	service = OAuth1Service(
+		consumer_key = conskey,
+		consumer_secret = conssec,
+		request_token_url = req_url,
+		access_token_url = acc_url,
+		authorize_url = authurl, 
+	)
+
 	MODEL_TYPES = _get_model_types()
 	for dtype in notifications.keys():
 		if dtype in get_ping_summary_types():
@@ -169,17 +251,8 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 						ping_notif_obj = store_ping_notifications(obj,dtype,user)
 					update_notification_state(ping_notif_obj,"processing")
 					callback_url = obj.get('callbackURL')
-
 					access_token = user.garmin_token.token
 					access_token_secret = user.garmin_token.token_secret
-
-					service = OAuth1Service(
-						consumer_key = conskey,
-						consumer_secret = conssec,
-						request_token_url = req_url,
-						access_token_url = acc_url,
-						authorize_url = authurl, 
-					)
 					
 					upload_start_time = int(re.search('uploadStartTimeInSeconds=(\d+)*',
 										callback_url).group(1))
@@ -193,14 +266,17 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 						'uploadStartTimeInSeconds': upload_start_time,
 						'uploadEndTimeInSeconds':upload_end_time
 					}
-
 					sess = service.get_session((access_token, access_token_secret))
-					
+					offset = None
 					try:
 						r = sess.get(callback_url, header_auth=True, params=data)
 						obj_list = _createObjectList(user, r.json(), dtype,upload_start_time)
 						MODEL_TYPES[dtype].objects.bulk_create(obj_list)
 						update_notification_state(ping_notif_obj,"processed")
+
+						# Create or update the latest sync time
+						offset = _get_data_offset(r.json(),dtype,default_offset=None)
+						create_update_sync_time(user,upload_start_time,offset)
 					except DatabaseError as e:
 						update_notification_state(ping_notif_obj,"failed")
 						print(str(e))
@@ -210,28 +286,29 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 
 					# Call celery task to calculate/recalculate quick look for date to
 					# which received data belongs for the target user
-					date = _get_data_start_time(r.json(),dtype)
+					start_date, end_date = _get_data_start_end_time(r.json(),dtype)
 					yesterday = datetime.now() - timedelta(days=1)
 
-					if datetime.strptime(date,"%Y-%m-%d").date() == yesterday.date():
+					if datetime.strptime(start_date,"%Y-%m-%d").date() == yesterday.date():
 						# if receive yesterday data then update the cumulative sums for yesterday
 						# as well.  
-						yesterday = yesterday.strftime("%Y-%m-%d")
 						chain = (
-							generate_quicklook.si(user.id,date,date)|
-						 	generate_cumulative_instances_custom_range.si(user.id,date,date)
+							generate_quicklook.si(user.id,start_date,end_date)|
+						 	generate_cumulative_instances_custom_range.si(
+						 		user.id,start_date,start_date
+						 	)
 						)
 						chain.delay()
-					elif datetime.strptime(date,"%Y-%m-%d").date() != datetime.now().date():
+					elif datetime.strptime(start_date,"%Y-%m-%d").date() != datetime.now().date():
 						# if received data is not for today (some historical data) then
 						# we have to update all the PA report from that date. So we need to record
 						# this date in database and update PA later as a celery task
-						generate_quicklook.delay(user.id,date,date)
+						generate_quicklook.delay(user.id,start_date,end_date)
 						set_pa_report_update_date.delay(
 							user.id, 
-							date
+							start_date
 						)
 					else:
-						generate_quicklook.delay(user.id,date,date)
+						generate_quicklook.delay(user.id,start_date,end_date)
 		else:
 			print('Summary type "{}" is not supported'.format(dtype))

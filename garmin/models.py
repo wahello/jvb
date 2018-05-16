@@ -175,3 +175,15 @@ class GarminPingNotification(models.Model):
 			models.Index(fields=['-created_at']),
 			models.Index(fields=['upload_start_time_seconds'])
 		]
+
+class UserLastSynced(models.Model):
+	user = models.OneToOneField(
+		settings.AUTH_USER_MODEL,
+		related_name='last_synced'
+	)
+	last_synced = models.DateTimeField()
+	offset = models.IntegerField()
+
+	def __str__(self):
+		sync_time_str = self.last_synced.strftime("%Y-%m-%d %H:%M:%S")
+		return "{}-{}".format(self.user.username,sync_time_str)

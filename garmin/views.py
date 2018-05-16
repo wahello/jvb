@@ -28,7 +28,8 @@ from .serializers import UserGarminDataEpochSerializer,\
 					UserGarminDataManuallyUpdatedSerializer,\
 					UserGarminDataStressDetailSerializer,\
 					UserGarminDataMetricsSerializer,\
-					UserGarminDataMoveIQSerializer
+					UserGarminDataMoveIQSerializer,\
+					UserLastSyncedSerializer
 
 from .models import UserGarminDataEpoch,\
 					UserGarminDataSleep,\
@@ -40,7 +41,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataMetrics,\
 					UserGarminDataMoveIQ,\
 					GarminConnectToken, \
-					GarminFitFiles
+					GarminFitFiles,\
+					UserLastSynced
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -128,6 +130,26 @@ class GarminPing(APIView):
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_200_OK)
 
+class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
+	permission_classes = (IsAuthenticated,)
+	serializer_class = UserLastSyncedSerializer
+	queryset = UserLastSynced.objects.all()
+
+	def get_object(self):
+		qs = self.get_queryset()
+		try:
+			last_synced_obj = qs.get(user=self.request.user)
+			return last_synced_obj
+		except UserLastSynced.DoesNotExist as e:
+			return None
+
+	def get(self,request, format=None):
+		last_synced = self.get_object()
+		if last_synced:
+		    serializer = UserLastSyncedSerializer(last_synced)
+		    return Response(serializer.data)
+		else:
+		    return Response({})
 
 class GarminConnectPing(APIView):
 

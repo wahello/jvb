@@ -8,7 +8,8 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataManuallyUpdated,\
 					UserGarminDataStressDetails,\
 					UserGarminDataMetrics,\
-					UserGarminDataMoveIQ
+					UserGarminDataMoveIQ,\
+					UserLastSynced
 
 class UserGarminDataEpochSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -62,4 +63,10 @@ class UserGarminDataMoveIQSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
 	class Meta:
 		model = UserGarminDataMoveIQ
+		fields = ('__all__')
+
+class UserLastSyncedSerializer(serializers.ModelSerializer):
+	user = serializers.PrimaryKeyRelatedField(read_only=True)
+	class Meta:
+		model = UserLastSynced
 		fields = ('__all__')
