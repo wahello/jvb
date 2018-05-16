@@ -16,6 +16,8 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 	 this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
 	 this.getDayWithDate = this.getDayWithDate.bind(this);
+	 this.renderLastSync = this.renderLastSync.bind(this);
+
 	 this.state = {
       myTableData: [
         {name: '% Non Processed Food'},
@@ -34,6 +36,13 @@ getStylesGpaBeforePanalities(score){
         return {background:'green',color:'white'};
       
     }
+    renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
     getDayWithDate(date){
    let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -87,13 +96,13 @@ render(){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={50}
+		        headerHeight={70}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Food</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Food {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}

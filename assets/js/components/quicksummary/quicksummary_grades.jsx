@@ -8,7 +8,6 @@ import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import NumberFormat from 'react-number-format';
-
  class Grades extends Component{
 
 
@@ -18,6 +17,7 @@ import NumberFormat from 'react-number-format';
    this.getStylesGpaBeforePanalities = this.getStylesGpaBeforePanalities.bind(this);
    this.getDayWithDate = this.getDayWithDate.bind(this); 
    this.userInputsColor = this.userInputsColor.bind(this);
+   this.renderLastSync = this.renderLastSync.bind(this);
 
    this.state = {
       myTableData: [
@@ -92,7 +92,13 @@ userInputsColor(value){
   if(value == "No")
     return {background:'red',color:'black'};
 }
-
+renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
 renderTableColumns(dateWiseData,category,classes=""){
     let columns = [];
     const obj = {
@@ -265,20 +271,20 @@ renderTableColumns(dateWiseData,category,classes=""){
         className="responsive"
             rowsCount={rowsCount}
             rowHeight={50}
-            headerHeight={60}
+            headerHeight={80}
             width={containerWidth}
             height={containerHeight}
             touchScrollEnabled={true}
                 
             {...props}>
             <Column
-              header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
+              header={<Cell className={css(styles.newTableHeader)}>Grades {this.renderLastSync(this.props.last_synced)}</Cell>}
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
                   {this.state.myTableData[props.rowIndex].name}
                 </Cell>
               )}
-              width={170}
+              width={150}
               fixed={true}
             />
           {this.renderTableColumns(this.props.data,"grades_ql")}

@@ -119,3 +119,19 @@ export function downloadExcel(startDate,endDate,successPrint=undefined, errorPri
           console.log(error.message);
     });
   }
+export  function fetchLastSync(successLastSync,errorquick){
+console.log('suresh');
+  const URL = `garmin/users/last_synced`;
+    const config = {
+      method: "get",
+      url: URL,
+      withCredentials: true
+    };
+    axios(config).then ((response) => {
+      successLastSync(response);
+    }).catch((error) => {
+      errorquick(error);
+    });
+
+
+}
