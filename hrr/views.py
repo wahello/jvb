@@ -11,6 +11,7 @@ from registration.models import Profile
 from user_input.models import DailyUserInputStrong
 from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity
 from fitparse import FitFile
+from .models import Hrr
 
 # Create your views here.
 # Parse the fit files and return the heart beat and timstamp
@@ -77,11 +78,47 @@ def fitfile_parse(obj,offset,start_date_str):
 
 	return (final_heartrate,final_timestamp,to_timestamp)
 
+def update_helper(instance,data_dict):
+	'''
+		Helper function to update the instance
+		with provided key,value pair
+
+		Warning: This will not trigger any signals
+				 like post or pre save
+	'''
+	
+	# attr_original_val = {}
+	# for attr, value in data_dict.items():
+	# 	attr_original_val[attr] = getattr(instance,attr)
+	# 	setattr(instance,attr,value)
+
+	# try:
+	# 	with transaction.atomic():
+	# 		instance.save()
+	# except DatabaseError as e:
+	# 	# If any error, set instance to previous state
+	for attr, value in data_dict.items():
+		setattr(instance,attr,value)
+
+# update Hrr table
+
+def update_hrr_instance(instance, data):
+	print(data)
+	update_helper(instance, data)
+
+
+#creating hrr table
+
+def create_hrr_instance(user, data, start_date):
+	created_at = start_date
+	Hrr.objects.create(user_hrr = user,created_at = created_at,**data)
+
+
 # code for HRR Automation
 
 def hrr_calculations(request):
-	start_date = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	start_date_get = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	
 	start_date_timestamp = start_date
 	start_date_timestamp = start_date_timestamp.timetuple()
@@ -165,7 +202,7 @@ def hrr_calculations(request):
 		workout_timestamp_before_hrrfile = []
 
 		for i,k,j in zip(workout_final_heartrate,workout_final_timestamp,workout_timestamp):
-			if hrr_timestamp[1] > j:
+			if j < hrr_timestamp[1]:
 				workout_hrr_before_hrrfile.append(i)
 				workout_time_before_hrrfile.append(k)
 				workout_timestamp_before_hrrfile.append(j)
@@ -210,7 +247,7 @@ def hrr_calculations(request):
 			lowest_hrr_1min = 99
 		time_99 = sum(time_toreach_99[:-1])
 		end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
-		end_heartrate_activity  = workout_hrr_before_hrrfile[-1]
+		end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
 		diff_actity_hrr= HRR_activity_start_time - end_time_activity
 
 		No_beats_recovered = HRR_start_beat - lowest_hrr_1min
@@ -220,7 +257,7 @@ def hrr_calculations(request):
 		for i,k in zip(hrr_final_heartrate,new_L):
 			if k <= pure1min:
 				pure_1min_beats.append(i)
-		pure_1min_heart_beats = end_heartrate_activity - pure_1min_beats[-1]
+		pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
 		pure_time_99 = time_99 + diff_actity_hrr
 
 	else:
@@ -304,13 +341,15 @@ def hrr_calculations(request):
 			no_fitfile_hrr_time_reach_99 = ''
 
 
-
-		if hrr_no_fitfile <= 99:
-			no_fitfile_hrr_reach_99 = 'Yes'
+		if hrr_no_fitfile:		
+			if hrr_no_fitfile <= 99:
+				no_fitfile_hrr_reach_99 = 'Yes'
+			else:
+				no_fitfile_hrr_reach_99 = 'No'
 		else:
-			no_fitfile_hrr_reach_99 = 'No'
+			no_fitfile_hrr_reach_99 = '-'
 
-		no_file_beats_recovered = end_heartrate_activity - hrr_no_fitfile
+		no_file_beats_recovered = abs(end_heartrate_activity - hrr_no_fitfile)
 
 	if hrr:
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
@@ -329,26 +368,26 @@ def hrr_calculations(request):
 				"pure_time_99":pure_time_99,
 
 				"no_fitfile_hrr_reach_99":'',
-				"no_fitfile_hrr_time_reach_99":"",
-				"lowest_hrr_no_fitfile":'',
-				"no_file_beats_recovered":'',
+				"no_fitfile_hrr_time_reach_99":None,
+				"lowest_hrr_no_fitfile":None,
+				"no_file_beats_recovered":None,
 
 				"offset":offset,
 				}
-	elif count == 1 or workout:
+	elif workout:
 		data = {
 			"Did_heartrate_reach_99":"",
-			"time_99":'',
-			"HRR_start_beat":'',
-			"lowest_hrr_1min":'',
-			"No_beats_recovered":'',
+			"time_99":None,
+			"HRR_start_beat":None,
+			"lowest_hrr_1min":None,
+			"No_beats_recovered":None,
 
-			"end_time_activity":'',
-			"diff_actity_hrr":'',
-			"HRR_activity_start_time":'',
-			"heart_rate_down_up":'',
-			"pure_1min_heart_beats":'',
-			"pure_time_99":'',
+			"end_time_activity":None,
+			"diff_actity_hrr":None,
+			"HRR_activity_start_time":None,
+			"heart_rate_down_up":None,
+			"pure_1min_heart_beats":None,
+			"pure_time_99":None,
 
 			"Did_you_measure_HRR":Did_you_measure_HRR,
 			"no_fitfile_hrr_reach_99":no_fitfile_hrr_reach_99,
@@ -360,29 +399,32 @@ def hrr_calculations(request):
 			"offset":offset,
 			}
 	else:
-		data = {"Did_you_measure_HRR":"",
-			"Did_heartrate_reach_99":"",
-			"time_99":'',
-			"HRR_start_beat":'',
-			"lowest_hrr_1min":'',
-			"No_beats_recovered":'',
-
-			"end_time_activity":'',
-			"diff_actity_hrr":'',
-			"HRR_activity_start_time":'',
-			"end_heartrate_activity":'',
-			"heart_rate_down_up":'',
-			"pure_1min_heart_beats":'',
-			"pure_time_99":'',
-
+		data = {"Did_you_measure_HRR":'',
+			"Did_heartrate_reach_99":'',
+			"time_99":None,
+			"HRR_start_beat":None,
+			"lowest_hrr_1min":None,
+			"No_beats_recovered":None,
+			"end_time_activity":None,
+			"diff_actity_hrr":None,
+			"HRR_activity_start_time":None,
+			"end_heartrate_activity":None,
+			"heart_rate_down_up":None,
+			"pure_1min_heart_beats":None,
+			"pure_time_99":None,
 			"no_fitfile_hrr_reach_99":'',
-			"no_fitfile_hrr_time_reach_99":"",
-			"lowest_hrr_no_fitfile":'',
-			"no_file_beats_recovered":'',
-
-			"offset":'',
+			"no_fitfile_hrr_time_reach_99":None,
+			"lowest_hrr_no_fitfile":None,
+			"no_file_beats_recovered":None,
+			"offset":None,
 			}
 
+	if workout or hrr:
+		try:
+			user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
+			update_hrr_instance(user_hrr, data)
+		except Hrr.DoesNotExist:
+			create_hrr_instance(request.user, data, start_date)
 
 
 	return JsonResponse(data)
@@ -424,8 +466,6 @@ def aa_calculations(request):
 				hrr_not_recorded_list.append(hrr_not_recorded_time)
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
-		hrr_not_recorded_format=str(datetime.timedelta(seconds=hrr_not_recorded_seconds))
-		hrr_not_recorded=float(hrr_not_recorded_format)
 
 
 
@@ -513,7 +553,7 @@ def aa_calculations(request):
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-		hrr_not_recorded = hrr_not_recorded
+		hrr_not_recorded = hrr_not_recorded_seconds
 
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100

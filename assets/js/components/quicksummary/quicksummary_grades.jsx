@@ -94,10 +94,12 @@ userInputsColor(value){
 }
 renderLastSync(value){
     let time;
+    var sync = "";
     if(value != null){
-      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a");
+      sync = <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
     }
-    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+    return sync;
 }
 renderTableColumns(dateWiseData,category,classes=""){
     let columns = [];
@@ -271,14 +273,14 @@ renderTableColumns(dateWiseData,category,classes=""){
         className="responsive"
             rowsCount={rowsCount}
             rowHeight={50}
-            headerHeight={80}
+            headerHeight={60}
             width={containerWidth}
             height={containerHeight}
             touchScrollEnabled={true}
                 
             {...props}>
             <Column
-              header={<Cell className={css(styles.newTableHeader)}>Grades {this.renderLastSync(this.props.last_synced)}</Cell>}
+              header={<Cell className={css(styles.newTableHeader)}>Grades</Cell>}
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
                   {this.state.myTableData[props.rowIndex].name}

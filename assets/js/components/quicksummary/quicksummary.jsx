@@ -85,6 +85,9 @@ class Quicklook extends Component{
 		this.renderQlFetchOverlay = renderQlFetchOverlay.bind(this);
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
 		this.renderModel = this.renderModel.bind(this);
+		this.renderLastSync = this.renderLastSync.bind(this);
+
+
 
 
 		this.toggleDate=this.toggleDate.bind(this);
@@ -552,7 +555,7 @@ handleScroll() {
   	 let model_view;
     if(x.matches){
 	  	model_view = <Modal isOpen={this.state.model} toggle={this.toggleModel} className={this.props.className}>
-	          <ModalHeader toggle={this.toggleModel}>Modal title</ModalHeader>
+	          <ModalHeader toggle={this.toggleModel}></ModalHeader>
 	          <ModalBody>
 	           On a mobile device, use the Chrome brower and touch the button "Export Reports" above to easily view your formatted data; on a desktop computer, touching this button will export your reports to Excel for easy viewing.
 	          </ModalBody>
@@ -569,6 +572,15 @@ handleScroll() {
 
     });
   }
+  renderLastSync(value){
+    let time;
+    var sync = "";
+    if(value){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a");
+      sync = <div style = {{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
+    }
+    return sync;
+}
   toggleNav() {
     this.setState({
       isOpen1: !this.state.isOpen1,
@@ -994,6 +1006,7 @@ onLogoutSuccess(response){
                            </Popover>
 
                     	<Container style={{maxWidth:"1600px"}}>
+                    	<div>{this.renderLastSync(this.state.last_synced)}</div>
              		   <div className="row justify-content-center">
                     	{this.state.activeTab === "allstats1" && <AllStats1 data={this.state.data} last_synced = {this.state.last_synced}/>}
                     	{this.state.activeTab === "swim" && <Swim data={this.state.data} last_synced = {this.state.last_synced}/>}
