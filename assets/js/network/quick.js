@@ -120,7 +120,6 @@ export function downloadExcel(startDate,endDate,successPrint=undefined, errorPri
     });
   }
 export  function fetchLastSync(successLastSync,errorquick){
-console.log('suresh');
   const URL = `garmin/users/last_synced`;
     const config = {
       method: "get",
