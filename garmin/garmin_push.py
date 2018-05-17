@@ -2,6 +2,7 @@
 
 import re,json
 from datetime import datetime,timedelta
+from functools import cmp_to_key
 from rauth import OAuth1Service
 import pytz
 
@@ -143,6 +144,44 @@ def _createObjectList(user,json_data,dtype,record_dt):
 
 		return objects
 
+def _get_latest_oldest_summary(json_data,data_type):
+
+	def user_metrics_comparator(x,y):
+		x_start_date = datetime.strptime(x.get('calendarDate'),"%Y-%m-%d")
+		y_start_date = datetime.strptime(y.get('calendarDate'),"%Y-%m-%d")
+		if x_start_date < y_start_date:
+			return -1
+		elif x_start_date == y_start_date:
+			return 0
+		else:
+			return 1
+
+	oldest_record = None
+	latest_record = None
+
+	if not data_type in ["bodyComps","userMetrics"]:
+		json_data = sorted(
+			json_data,
+			key = lambda x:x.get('startTimeInSeconds',0)
+		)
+	elif data_type == "bodyComps":
+		json_data = sorted(
+			json_data,
+			key = lambda x:x.get('measurementTimeInSeconds',0)
+		)
+		oldest_record = json_data[0]
+		latest_record = json_data[-1]
+
+	elif data_type == "userMetrics":
+		json_data = sorted(
+			json_data, 
+			key = cmp_to_key(user_metrics_comparator)
+		)
+	oldest_record = json_data[0]
+	latest_record = json_data[-1]
+	return (oldest_record,latest_record)
+
+
 def _get_data_start_end_time(json_data,data_type):
 	'''
 	Find the start date from which json_data have data and end date upto
@@ -162,10 +201,7 @@ def _get_data_start_end_time(json_data,data_type):
 			start date will be 2018-05-10 and end date will be 2018-05-14
 	'''
 	if len(json_data):
-		# Garmin provided data which is already sorted based on the start
-		# time of the summary/record.
-		latest_record = json_data[-1]
-		oldest_record = json_data[0]
+		oldest_record,latest_record = _get_latest_oldest_summary(json_data,data_type)
 		if not data_type in ["userMetrics","bodyComps","moveIQActivities"]:
 			end_time = latest_record.get("startTimeInSeconds")+\
 				latest_record.get("startTimeOffsetInSeconds",0)

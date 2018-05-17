@@ -47,6 +47,8 @@ class HeartRate extends Component{
             aerobic_range:"",
             anaerobic_range:"",
             below_aerobic_range:"",
+            hrr_not_recorded:"",
+            percent_hrr_not_recorded:"",
 			total_time:"",
 			percent_aerobic:"",
 			percent_below_aerobic:"",
@@ -63,6 +65,8 @@ class HeartRate extends Component{
             aerobic_range:data.data.aerobic_range,
             anaerobic_range:data.data.anaerobic_range,
             below_aerobic_range:data.data.below_aerobic_range,
+            hrr_not_recorded:data.data.hrr_not_recorded,
+            percent_hrr_not_recorded:data.data.percent_hrr_not_recorded,
 			total_time:data.data.total_time,
 			percent_aerobic:data.data.percent_aerobic,
 			percent_below_aerobic:data.data.percent_below_aerobic,
@@ -223,8 +227,14 @@ class HeartRate extends Component{
 	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.below_aerobic_zone)}</td>
 	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
 	          	    </tr>
-	          	    <tr className = "hr_table_style_rows">
 
+	          	    <tr className = "hr_table_style_rows">
+	          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
+	          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
+	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.hrr_not_recorded)}</td>
+	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_hrr_not_recorded)}</td>
+	          	    </tr>
+	          	    <tr className = "hr_table_style_rows">
 	          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
 					<td className = "hr_table_style_rows">{(this.state.empty)}</td>
 	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
