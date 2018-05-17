@@ -466,8 +466,6 @@ def aa_calculations(request):
 				hrr_not_recorded_list.append(hrr_not_recorded_time)
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
-		hrr_not_recorded_format=str(datetime.timedelta(seconds=hrr_not_recorded_seconds))
-		hrr_not_recorded=float(hrr_not_recorded_format)
 
 
 
@@ -555,7 +553,7 @@ def aa_calculations(request):
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-		hrr_not_recorded = hrr_not_recorded
+		hrr_not_recorded = hrr_not_recorded_seconds
 
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100
