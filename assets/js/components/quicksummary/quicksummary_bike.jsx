@@ -17,6 +17,7 @@ import { StyleSheet, css } from 'aphrodite';
 	//this.bikeStatScroll=this.bikeStatScroll.bind(this);
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 	 this.getDayWithDate = this.getDayWithDate.bind(this);
+	 this.renderLastSync = this.renderLastSync.bind(this);
 
 	 this.state = {
       myTableData: [
@@ -33,6 +34,13 @@ getDayWithDate(date){
    let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
+  renderLastSync(value){
+    let time;
+    if(value != null){
+      time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+    }
+    return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+}
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -69,13 +77,13 @@ render(){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={60}
+		        headerHeight={80}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Bike Stats</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Bike Stats {this.renderLastSync(this.props.last_synced)}</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}

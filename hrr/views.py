@@ -452,6 +452,25 @@ def aa_calculations(request):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
+
+	hrr_not_recorded_list = []
+	if activity_files:
+		for i in range(len(activity_files)):
+			one_activity_file_dict =  ast.literal_eval(activity_files[i])
+			if 'averageHeartRateInBeatsPerMinute' in one_activity_file_dict.keys():
+				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or ''):
+					hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
+					hrr_not_recorded_list.append(hrr_not_recorded_time)
+			else:
+				hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
+				hrr_not_recorded_list.append(hrr_not_recorded_time)
+	if hrr_not_recorded_list:
+		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
+		hrr_not_recorded_format=str(datetime.timedelta(seconds=hrr_not_recorded_seconds))
+		hrr_not_recorded=float(hrr_not_recorded_format)
+
+
+
 	data = {"total_time":"",
 				"aerobic_zone":"",
 				"anaerobic_range":"",
@@ -459,6 +478,8 @@ def aa_calculations(request):
 				"aerobic_range":"",
 				"anaerobic_range":"",
 				"below_aerobic_range":"",
+				"hrr_not_recorded":"",
+				"percent_hrr_not_recorded":"",
 				"percent_aerobic":"",
 				"percent_below_aerobic":"",
 				"percent_anaerobic":"",
@@ -534,6 +555,8 @@ def aa_calculations(request):
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
+		hrr_not_recorded = hrr_not_recorded
+
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100
 			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -544,11 +567,17 @@ def aa_calculations(request):
 			percent_aerobic = (time_in_aerobic/total_time)*100
 			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
+			percent_hrr_not_recorded = (hrr_not_recorded/total_time)*100
+			percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
+			
 			total_percent = 100
 		except ZeroDivisionError:
 			percent_anaerobic=''
 			percent_below_aerobic=''
 			percent_aerobic=''
+
+			percent_hrr_not_recorded=''
+
 			total_percent=''
 			
 		data = {"total_time":total_time,
@@ -558,6 +587,8 @@ def aa_calculations(request):
 				"aerobic_range":aerobic_range,
 				"anaerobic_range":anaerobic_range,
 				"below_aerobic_range":below_aerobic_range,
+				"hrr_not_recorded":hrr_not_recorded,
+				"percent_hrr_not_recorded":percent_hrr_not_recorded,
 				"percent_aerobic":percent_aerobic,
 				"percent_below_aerobic":percent_below_aerobic,
 				"percent_anaerobic":percent_anaerobic,
