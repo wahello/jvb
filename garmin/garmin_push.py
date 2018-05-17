@@ -102,6 +102,14 @@ def create_update_sync_time(user, sync_time_timestamp, offset):
 			last_synced = sync_date_time,
 			offset = offset if offset else 0
 		)
+	except DatabaseError as e:
+		# In case of race conditions which result in unexpected
+		# results/errors
+		message = """
+MESSAGE: User last sync time create/update failed
+ERROR: {}  
+		"""
+		print(message.format(str(e)))
 
 def _createObjectList(user,json_data,dtype,record_dt):
 	'''
