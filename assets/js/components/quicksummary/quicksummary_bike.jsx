@@ -77,13 +77,13 @@ render(){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={80}
+		        headerHeight={60}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Bike Stats {this.renderLastSync(this.props.last_synced)}</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Bike Stats</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}

@@ -249,13 +249,13 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
        <Table
             rowsCount={rowsCount}
             rowHeight={50}
-            headerHeight={120}
+            headerHeight={75}
             width={containerWidth}
             height={containerHeight}
             touchScrollEnabled={true}
             {...props}>
             <Column
-              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data {this.renderLastSync(this.props.last_synced)}</Cell>}
+              header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
 
               cell={props => (
                 <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
@@ -295,7 +295,8 @@ const styles = StyleSheet.create({
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal',
-    fontSize:'15px'
+    fontSize:'15px',
+    color:"#111111"
   },
   newTableBody:{
   	textAlign:'center',

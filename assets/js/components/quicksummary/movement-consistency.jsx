@@ -311,14 +311,14 @@ render(){
      <Table
           rowsCount={rowsCount}
           rowHeight={50}
-          headerHeight={95}
+          headerHeight={70}
           width={containerWidth}
           maxHeight={containerHeight}
               touchScrollEnabled={true}
               {...props}>
           <Column
             header={<Cell className={css(styles.newTableHeader)}>Movement Consistency 
-            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')} {this.renderLastSync(this.props.last_synced)}</span>
+            <span> {moment(this.state.selectedDate).format('MMM D, YYYY')}</span>
             </Cell>}
             cell={props => (
               <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>

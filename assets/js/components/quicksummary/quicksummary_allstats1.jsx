@@ -484,13 +484,13 @@ getDayWithDate(date){
 			 <Table
 		        rowsCount={rowsCount}    
 		        rowHeight={50}  
-		        headerHeight={70}   
+		        headerHeight={60}   
 		        width={containerWidth}    
         		maxHeight={containerHeight}
             touchScrollEnabled={true}                  
                 {...props}>
 		        <Column 
-		          header={<Cell className={css(styles.newTableHeader)}>All Stats {this.renderLastSync(this.props.last_synced)}</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>All Stats</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.tableAttrColumn[props.rowIndex].name}
