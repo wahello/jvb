@@ -128,13 +128,13 @@ renderTableColumns(dateWiseData,category=undefined,classes=""){
 			 	className="responsive"
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={70}
+		        headerHeight={50}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>User Input {this.renderLastSync(this.props.last_synced)}</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>User Input</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.columnAttributeName[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.columnAttributeName[props.rowIndex].name}
