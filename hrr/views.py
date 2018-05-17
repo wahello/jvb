@@ -553,7 +553,8 @@ def aa_calculations(request):
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-		hrr_not_recorded = hrr_not_recorded_seconds
+		if hrr_not_recorded_list:
+			hrr_not_recorded = hrr_not_recorded_seconds
 
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100
@@ -564,9 +565,9 @@ def aa_calculations(request):
 
 			percent_aerobic = (time_in_aerobic/total_time)*100
 			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
-
-			percent_hrr_not_recorded = (hrr_not_recorded/total_time)*100
-			percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
+			if hrr_not_recorded_list:
+				percent_hrr_not_recorded = (hrr_not_recorded/total_time)*100
+				percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
 			
 			total_percent = 100
 		except ZeroDivisionError:
@@ -578,19 +579,35 @@ def aa_calculations(request):
 
 			total_percent=''
 			
-		data = {"total_time":total_time,
-				"aerobic_zone":time_in_aerobic,
-				"anaerobic_zone":time_in_anaerobic,
-				"below_aerobic_zone":time_in_below_aerobic,
-				"aerobic_range":aerobic_range,
-				"anaerobic_range":anaerobic_range,
-				"below_aerobic_range":below_aerobic_range,
-				"hrr_not_recorded":hrr_not_recorded,
-				"percent_hrr_not_recorded":percent_hrr_not_recorded,
-				"percent_aerobic":percent_aerobic,
-				"percent_below_aerobic":percent_below_aerobic,
-				"percent_anaerobic":percent_anaerobic,
-				"total_percent":total_percent}
+		if hrr_not_recorded_list:
+			data = {"total_time":total_time,
+					"aerobic_zone":time_in_aerobic,
+					"anaerobic_zone":time_in_anaerobic,
+					"below_aerobic_zone":time_in_below_aerobic,
+					"aerobic_range":aerobic_range,
+					"anaerobic_range":anaerobic_range,
+					"below_aerobic_range":below_aerobic_range,
+					"hrr_not_recorded":hrr_not_recorded,
+					"percent_hrr_not_recorded":percent_hrr_not_recorded,
+					"percent_aerobic":percent_aerobic,
+					"percent_below_aerobic":percent_below_aerobic,
+					"percent_anaerobic":percent_anaerobic,
+					"total_percent":total_percent}
+		else:
+			data = {"total_time":total_time,
+					"aerobic_zone":time_in_aerobic,
+					"anaerobic_zone":time_in_anaerobic,
+					"below_aerobic_zone":time_in_below_aerobic,
+					"aerobic_range":aerobic_range,
+					"anaerobic_range":anaerobic_range,
+					"below_aerobic_range":below_aerobic_range,
+					"hrr_not_recorded":"",
+					"percent_hrr_not_recorded":"",
+					"percent_aerobic":percent_aerobic,
+					"percent_below_aerobic":percent_below_aerobic,
+					"percent_anaerobic":percent_anaerobic,
+					"total_percent":total_percent}
+
 
 	return JsonResponse(data)
 
