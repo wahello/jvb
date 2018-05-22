@@ -162,8 +162,7 @@ def hrr_calculations(request):
 						count = count + 1
 						activities.append(di[i])
 	
-	if activities:
-		offset =  activities[0]['startTimeOffsetInSeconds']
+	
 
 	start_date_timestamp = start_date_timestamp
 	garmin_data_daily = UserGarminDataDaily.objects.filter(user=request.user,start_time_in_seconds=start_date_timestamp).last()
