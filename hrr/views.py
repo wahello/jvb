@@ -11,7 +11,7 @@ from registration.models import Profile
 from user_input.models import DailyUserInputStrong
 from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity
 from fitparse import FitFile
-from .models import Hrr
+from hrr.models import Hrr
 
 # Create your views here.
 # Parse the fit files and return the heart beat and timstamp
@@ -72,7 +72,7 @@ def fitfile_parse(obj,offset,start_date_str):
 	final_timestamp = []
 
 	for i,k in zip(heartrate_selected_date,timestamp_difference):
-		if (k < 60) and (k >= 0):
+		if (k <= 200) and (k >= 0):
 			final_heartrate.extend([i])
 			final_timestamp.extend([k]) 
 
@@ -103,7 +103,6 @@ def update_helper(instance,data_dict):
 # update Hrr table
 
 def update_hrr_instance(instance, data):
-	print(data)
 	update_helper(instance, data)
 
 
@@ -335,10 +334,10 @@ def hrr_calculations(request):
 			elif hrr_no_fitfile_105 <= 99:
 				no_fitfile_hrr_time_reach_99 = 105
 			else:
-				no_fitfile_hrr_time_reach_99 = ''
+				no_fitfile_hrr_time_reach_99 = 120
 
 		else:
-			no_fitfile_hrr_time_reach_99 = ''
+			no_fitfile_hrr_time_reach_99 = None
 
 
 		if hrr_no_fitfile:		
@@ -347,7 +346,7 @@ def hrr_calculations(request):
 			else:
 				no_fitfile_hrr_reach_99 = 'No'
 		else:
-			no_fitfile_hrr_reach_99 = '-'
+			no_fitfile_hrr_reach_99 = ''
 
 		no_file_beats_recovered = abs(end_heartrate_activity - hrr_no_fitfile)
 
@@ -419,12 +418,14 @@ def hrr_calculations(request):
 			"offset":None,
 			}
 
-	if workout or hrr:
-		try:
-			user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
-			update_hrr_instance(user_hrr, data)
-		except Hrr.DoesNotExist:
-			create_hrr_instance(request.user, data, start_date)
+	# if workout or hrr:
+	try:
+		print("Dileep")
+		user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
+		print("Dileep")
+		update_hrr_instance(user_hrr, data)
+	except Hrr.DoesNotExist:
+		create_hrr_instance(request.user, data, start_date)
 
 
 	return JsonResponse(data)
