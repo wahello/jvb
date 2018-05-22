@@ -160,7 +160,8 @@ LOGGING = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redistogo:25d4036e9cae0d7b7892f244ca708545@cod.redistogo.com:9450/1",
+        "LOCATION": "redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379/1",
+        # "LOCATION": "redis://redistogo:25d4036e9cae0d7b7892f244ca708545@cod.redistogo.com:9450/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
