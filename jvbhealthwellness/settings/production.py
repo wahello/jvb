@@ -69,6 +69,11 @@ CELERY_BEAT_SCHEDULE = {
     'retry-failed-ping-notifications':{
         'task':'garmin.retry_failed_ping_notification',
         'schedule':crontab(minute=0, hour=3)
+    },
+     #execute every one hour UTC time zone
+    'generate-log-for-incorrect-pa':{
+        'task':'progress_analyzer.generate_log_incorrect_pa',
+        'schedule':crontab(minute=0, hour='*/1')
     }
 }
 
