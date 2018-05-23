@@ -864,20 +864,15 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	userinput_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q 
 		for q in _get_queryset(UserDailyInput,user,from_dt,to_dt)}
 
-	cum_sum_datewise_data = {q.created_at.strftime("%Y-%m-%d"):q 
-		for q in _get_queryset(CumulativeSum,user,from_dt,to_dt)}
 	current_date = from_dt
 	while current_date <= to_dt:
 		data = {"created_at":current_date.strftime("%Y-%m-%d")}
 		yday_dt = current_date - timedelta(days=1)
 		today_ql_data = quicklook_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
 		today_ui_data = userinput_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
-		yday_cum_data = cum_sum_datewise_data.get(yday_dt.strftime('%Y-%m-%d'),None)
-
-		if not yday_cum_data:
-			yday_cum_data = {q.created_at.strftime("%Y-%m-%d"):q 
-				for q in _get_queryset(CumulativeSum,user,yday_dt,yday_dt)}
-			yday_cum_data = yday_cum_data.get(yday_dt.strftime('%Y-%m-%d'),None)
+		yday_cum_data = {q.created_at.strftime("%Y-%m-%d"):q 
+			for q in _get_queryset(CumulativeSum,user,yday_dt,yday_dt)}
+		yday_cum_data = yday_cum_data.get(yday_dt.strftime('%Y-%m-%d'),None)
 
 		if today_ql_data and yday_cum_data:
 			data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data,yday_cum_data)
