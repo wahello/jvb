@@ -219,7 +219,7 @@ class HeartRateCal extends Component{
 	                </Popover>
 	            </div>
 
-	             {this.state.Did_you_measure_HRR == "Yes"  &&
+	             {this.state.Did_you_measure_HRR == "yes"  &&
 	             <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
@@ -263,7 +263,7 @@ class HeartRateCal extends Component{
           	   </div>
           	  </div>
           	}
-          	   {this.state.Did_you_measure_HRR == "Yes" &&
+          	   {this.state.Did_you_measure_HRR == "yes" &&
           	  <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
@@ -312,7 +312,7 @@ class HeartRateCal extends Component{
           	   </div>
           	  </div>
           	}
-          	  {(this.state.Did_you_measure_HRR == "No" || this.state.Did_you_measure_HRR == "") &&
+          	  {(this.state.Did_you_measure_HRR == "no" || this.state.Did_you_measure_HRR == "") &&
           	   <div className = "row justify-content-center hr_table_padd">
           	    <div className = "table table-responsive">
           	    <table className = "table table-striped table-bordered ">
