@@ -6,4 +6,6 @@ urlpatterns = [
 								  name="hrr"),
 	url(r'^aa_calculations$',views.aa_calculations,
 								  name="aa"),
+	url(r'^aa_workout_calculations$',views.aa_workout_calculations,
+								  name="aa_workout"),
 	]
