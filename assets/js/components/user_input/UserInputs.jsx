@@ -767,6 +767,8 @@ class UserInputs extends React.Component{
     let lowest_hrr_1min = data.data.lowest_hrr_1min;
         if(time_99){
            min = parseInt(time_99/60);
+           if(min || min == 0)
+              min = min.toString();
            sec = (time_99 % 60);
            if(sec < 10){
             sec = "0" + sec;
