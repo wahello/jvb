@@ -11,6 +11,7 @@ from progress_analyzer.helpers.cumulative_helper import (
 	set_pa_bulk_update_start_date
 )
 from progress_analyzer.models import ProgressReportUpdateMeta
+from progress_analyzer.log_reports.log_negative_figures import generate_incorrect_pa_report
 
 logger = get_task_logger(__name__)
 
@@ -94,5 +95,20 @@ def set_pa_report_update_date(user_id,from_date):
 				user.username
 			)
 		)
+	except Exception as e:
+		logger.error(str(e),exc_info=True)
+
+@task(name="progress_analyzer.generate_log_incorrect_pa")
+def generate_log_incorrect_pa():
+	'''
+		Celery task to routinely check for incorrect PA reports 
+		(having negative numbers etc.)for every user and generate a log
+
+		This job will be executed in every one hour 
+	'''
+	try:
+		recipients = ['atulk@s7works.io','saumyag@s7works.io','jim@jvbwellness.com']
+		generate_incorrect_pa_report(recipients)
+		logger.info("Successfully generated log for incorrect Progress Analyzer reports")
 	except Exception as e:
 		logger.error(str(e),exc_info=True)
