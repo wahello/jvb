@@ -577,9 +577,7 @@ def aa_calculations(request):
 			percent_anaerobic=''
 			percent_below_aerobic=''
 			percent_aerobic=''
-
 			percent_hrr_not_recorded=''
-
 			total_percent=''
 			
 		if hrr_not_recorded_list:
@@ -610,6 +608,8 @@ def aa_calculations(request):
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
+
+
 	return JsonResponse(data)
 
 

@@ -1371,7 +1371,6 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 	return (None,None)
 
 def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
-
 	alcoholic_drink_last_week = [q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
 		for q in daily_strong]
