@@ -2040,7 +2040,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		#Add one day to current date
 		current_date += timedelta(days=1)
 
-		
 	return SERIALIZED_DATA
 
 	

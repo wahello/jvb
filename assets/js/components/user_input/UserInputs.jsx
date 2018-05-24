@@ -1167,6 +1167,7 @@ handleScroll() {
     }
 
     render(){
+      
        const {fix} = this.props;
         return(
             <div>            
