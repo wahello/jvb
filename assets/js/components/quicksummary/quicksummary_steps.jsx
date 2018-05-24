@@ -15,6 +15,8 @@ class Steps extends Component{
 	 this.renderTableColumns = this.renderTableColumns.bind(this);
 	 this.getDayWithDate = this.getDayWithDate.bind(this);
 	 this.renderLastSync = this.renderLastSync.bind(this);
+	 this.renderGetColors = this.renderGetColors.bind(this);
+	 this.renderStepsColor = this.renderStepsColor.bind(this);
 
 
 	 this.state = {
@@ -34,6 +36,40 @@ getDayWithDate(date){
    let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
+  renderGetColors(hours_inactive){
+    if (hours_inactive <= 4.5){
+        return {background:'green',color:'white'};
+    }
+    else if (hours_inactive > 4.5 && hours_inactive <= 6){
+       return {background:'#32CD32',color:'white'};
+    }
+    else if (hours_inactive > 6 && hours_inactive <= 7){
+       return {background:'yellow',color:'black'};
+    }
+    else if (hours_inactive > 7 && hours_inactive <= 10){
+       return {background:'#FF8C00',color:'black'};
+    }
+    else if (hours_inactive > 10){
+        return {background:'red',color:'black'};
+    }
+  }
+  renderStepsColor(steps){
+	if (steps >= 10000){
+        return {background:'green',color:'white'};
+	}
+    else if (steps <= 9999 && steps >= 7500){
+       return {background:'#32CD32',color:'white'};
+    }
+    else if (steps <= 7499 && steps >= 5000){
+      return {background:'yellow',color:'black'};
+    }
+    else if (steps <= 4999 && steps >= 3500){
+       return {background:'#FF8C00',color:'black'};
+    }
+    else if (steps < 3500){
+        return {background:'red',color:'black'};
+    }
+  }
   renderLastSync(value){
     let time;
     if(value != null){
@@ -47,22 +83,31 @@ renderTableColumns(dateWiseData,category,classes=""){
 			let all_data = [];
 
 			for(let [key,value] of Object.entries(data[category])){
+				console.log("**********",key);
 				if(key !== 'id' && key !== 'user_ql'){  
 					if (key == 'movement_consistency'){
 	                    let mc = value;
 	                    if( mc != undefined && mc != "" && mc != "-"){
 	                        mc = JSON.parse(mc);
-	                        all_data.push(mc.inactive_hours);
+	                        all_data.push({value:mc.inactive_hours,
+	                        			   style:this.renderGetColors(mc.inactive_hours)});
 	                	}else{
-	                		all_data.push('-')
+	                		all_data.push({value:'-',
+	                						style:""})
 	                	}
+	            	}
+	            	else if(key == "non_exercise_steps"){
+	            		all_data.push({value:value,
+	            						style:this.renderStepsColor(value)});
 	            	}
 	            	else if(key == "weight"){
 	            		if(value == "i do not weigh myself today" || value == "" || value == undefined){
-	            			all_data.push("Not Measured")
+	            			all_data.push({value:"Not Measured",
+	            							style:""})
 	            		}
 	            		else{
-	            			all_data.push(value);
+	            			all_data.push({value:value,
+	            							style:""});
 	            		}
 	            	}
 
@@ -75,7 +120,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 			            while (rgx.test(x1)) {
 				        x1 = x1.replace(rgx, '$1' + ',' + '$2');
 			            }
-					    all_data.push(x1 + x2);                  
+					    all_data.push({value:x1 + x2,
+					    				style:""});                  
 					}
 				}
 			}
@@ -84,8 +130,8 @@ renderTableColumns(dateWiseData,category,classes=""){
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}
 			        cell={props => (
-				            <Cell {...{'title':all_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
-				              {all_data[props.rowIndex]}
+				            <Cell style={all_data[props.rowIndex].style} {...{'title':all_data[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
+				              {all_data[props.rowIndex].value}
 				            </Cell>
 				          )}
 			        width={100}
@@ -141,7 +187,7 @@ const styles = StyleSheet.create({
   },
   newTableBody:{
   	textAlign:'center',
-    color: '#5e5e5e',
+   
     fontSize: '16px', 
     border: 'none',
     fontFamily:'Proxima-Nova',
