@@ -81,24 +81,24 @@ class UserDailyInputLatestItemView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        user = self.request.user
         date = self.request.query_params.get('date',None)
         if date:
             qs = UserDailyInput.objects.filter(
-                user = user,
                 created_at__lt = date 
             ).order_by('-created_at')
         else:
             qs = UserDailyInput.objects.filter(
-                user = user
             ).order_by('-created_at')
         return qs 
 
     def get_object(self):
         qs = self.get_queryset()
         try:
-            obj = qs[0]
-            return obj
+            obj = qs.filter(user = self.request.user)
+            if obj:
+                return obj[0]
+            else:
+                None
         except UserDailyInput.DoesNotExist:
             return None
 

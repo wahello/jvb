@@ -50,8 +50,8 @@ CSRF_COOKIE_HTTPONLY = True
 WEBPACK_LOADER['DEFAULT']['CACHE'] = True
 
 # Celery
-CELERY_BROKER_URL = config('REDIS_URL')
-CELERY_RESULT_BACKEND = config('REDIS_URL')
+CELERY_BROKER_URL = 'redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379'
+CELERY_RESULT_BACKEND = 'redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379'
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BEAT_SCHEDULE = {
@@ -69,6 +69,11 @@ CELERY_BEAT_SCHEDULE = {
     'retry-failed-ping-notifications':{
         'task':'garmin.retry_failed_ping_notification',
         'schedule':crontab(minute=0, hour=3)
+    },
+     #execute every one hour UTC time zone
+    'generate-log-for-incorrect-pa':{
+        'task':'progress_analyzer.generate_log_incorrect_pa',
+        'schedule':crontab(minute=0, hour='*/1')
     }
 }
 
@@ -161,7 +166,6 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379/1",
-        # "LOCATION": "redis://redistogo:25d4036e9cae0d7b7892f244ca708545@cod.redistogo.com:9450/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },

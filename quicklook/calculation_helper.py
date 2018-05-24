@@ -606,10 +606,21 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 			sleep_stats['sleep_awake_time'] = awake_time
 
 		return sleep_stats
-	
-	if not str_dt:
-		sleep_stats['sleep_bed_time'] = None
-		sleep_stats['sleep_awake_time'] = None
+
+	elif user_submitted_sleep:
+		# If there is no sleep data at all, use whatever submitted by user
+		bed_time = local_user_input_bedtime.replace(tzinfo = None)
+		awake_time = local_user_input_awake_time.replace(tzinfo = None)
+		if str_dt:
+			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
+			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		else:
+			sleep_stats['sleep_bed_time'] = bed_time
+			sleep_stats['sleep_awake_time'] = awake_time
+	else:
+		if not str_dt:
+			sleep_stats['sleep_bed_time'] = None
+			sleep_stats['sleep_awake_time'] = None
 
 	return sleep_stats
 
@@ -820,6 +831,51 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 			return True
 	return False 
 
+def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
+	active_hours = 0
+	inactive_hours = 0
+	total_steps = 0
+	sleeping_hours = 0
+	strength_hours = 0
+	exercise_hours = 0
+
+	for interval,values in list(mc_data.items()):
+		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
+			'strength_hours','exercise_hours','total_steps']
+		if interval not in non_interval_keys:
+			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
+			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
+			if am_or_pm == 'PM' and int(hour) != 12:
+				hour = int(hour) + 12
+			elif am_or_pm == 'AM' and int(hour) == 12:
+				hour = 0
+			else:
+				hour = int(hour)
+				
+			hour_start = datetime.combine(calendar_date.date(),time(hour))
+
+			if hour_start <= last_sleeping_hour:
+				mc_data[interval]['status'] = 'sleeping'
+
+			if mc_data[interval]['status'] == 'active': 
+				active_hours += 1 
+			elif mc_data[interval]['status'] == 'inactive':
+				inactive_hours += 1
+			elif mc_data[interval]['status'] == 'sleeping':
+				sleeping_hours += 1
+			elif mc_data[interval]['status'] == 'strength':
+				strength_hours += 1
+			elif mc_data[interval]['status'] == 'exercise':
+				exercise_hours += 1
+			total_steps += values['steps']
+
+	mc_data['active_hours'] = active_hours
+	mc_data['inactive_hours'] = inactive_hours
+	mc_data['sleeping_hours'] = sleeping_hours
+	mc_data['strength_hours'] = strength_hours
+	mc_data['exercise_hours'] = exercise_hours
+	mc_data['total_steps'] = total_steps
+
 def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleeps_today_json,
 					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,userinput_activities,user_input_bedtime = None,
 					user_input_awake_time = None,user_input_timezone = None,
@@ -864,7 +920,8 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 	# In that case we have same yesterday_bedtime and today_bedtime 
 	if today_bedtime and today_awake_time and today_bedtime <= today_awake_time:
 		today_bedtime = None
-	if epochs_json and yesterday_bedtime and today_awake_time:
+		
+	if epochs_json:
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
 											  epochs_json[0].get("startTimeOffsetInSeconds"))
@@ -890,11 +947,15 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 				# ex 6:00 PM, not 6:32 PM
 				hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
 
-				if (hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+				if (yesterday_bedtime and
+					today_awake_time and
+					hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
 					hour_start_zero_min <= today_awake_time):
 					status = "sleeping"
-				elif(hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-					today_bedtime and (hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
+				elif(yesterday_bedtime and
+					hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+					today_bedtime and
+					(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
 					status = "sleeping"
 				elif(user_input_strength_start_time and user_input_strength_end_time and
 					hour_start >= user_input_strength_start_time and
@@ -907,13 +968,16 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
-	
+
 		active_hours = 0
 		inactive_hours = 0
 		total_steps = 0
 		sleeping_hours = 0
 		strength_hours = 0
 		exercise_hours = 0
+		previous_hour_steps = None
+		last_sleeping_hour = None
+		have_steps_before_9_am  = False
 
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
@@ -925,8 +989,9 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 			else:
 				hour = int(hour)
 				
-			hour_start = datetime.combine(today_awake_time.date(),time(hour))
-			if hour_start < datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)):
+			hour_start = datetime.combine(calendar_date.date(),time(hour))
+			if (yesterday_bedtime and
+				hour_start < datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour))):
 				# if user slept after midnight say 01:30 AM and there are no steps then interval
 				# 12:00 - 12:59 should be marked as "inactive" instead of "sleeping" 
 				if(movement_consistency[interval]['status'] == 'sleeping' and  
@@ -934,7 +999,7 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 					movement_consistency[interval]['status'] = 'inactive'
 					movement_consistency[interval]['steps'] = 0
 
-			elif hour_start >= today_awake_time:
+			elif today_awake_time and hour_start >= today_awake_time:
 				if not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
@@ -949,15 +1014,37 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
 					movement_consistency[interval]['status'] = 'exercise'
 
-			if values['status'] == 'active': 
+			elif(not yesterday_bedtime and not today_awake_time):
+				nine_am = datetime.combine(calendar_date.date(),time(9))
+				if (movement_consistency[interval]['steps'] and hour_start < nine_am):
+					if not have_steps_before_9_am:
+						have_steps_before_9_am = True
+
+				if (movement_consistency[interval]['status'] == "sleeping" and
+					not movement_consistency[interval]['steps']):
+					movement_consistency[interval]['status'] = 'inactive'
+
+				if previous_hour_steps is None:
+					previous_hour_steps = movement_consistency[interval]['steps']
+				else:
+					diff_steps = abs(
+						movement_consistency[interval]['steps'] - 
+						previous_hour_steps
+					)
+					if diff_steps >= 150 and not last_sleeping_hour:
+						last_sleeping_hour = hour_start - timedelta(hours=1)
+					previous_hour_steps = movement_consistency[interval]['steps']
+
+
+			if movement_consistency[interval]['status'] == 'active': 
 				active_hours += 1 
-			elif values['status'] == 'inactive':
+			elif movement_consistency[interval]['status'] == 'inactive':
 				inactive_hours += 1
-			elif values['status'] == 'sleeping':
+			elif movement_consistency[interval]['status'] == 'sleeping':
 				sleeping_hours += 1
-			elif values['status'] == 'strength':
+			elif movement_consistency[interval]['status'] == 'strength':
 				strength_hours += 1
-			elif values['status'] == 'exercise':
+			elif movement_consistency[interval]['status'] == 'exercise':
 				exercise_hours += 1
 			total_steps += values['steps']
 
@@ -967,6 +1054,14 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 		movement_consistency['strength_hours'] = strength_hours
 		movement_consistency['exercise_hours'] = exercise_hours
 		movement_consistency['total_steps'] = total_steps
+
+		if(not yesterday_bedtime and not today_awake_time and have_steps_before_9_am):
+			_update_status_to_sleep_hours(
+				movement_consistency,
+				last_sleeping_hour,
+				calendar_date
+			)
+
 		return movement_consistency
 
 def cal_exercise_steps_total_steps(dailies_json, todays_activities):
@@ -1880,7 +1975,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
 		exercise_steps, total_steps = cal_exercise_steps_total_steps(dailies_json,todays_activities_json)	
-		if not total_steps and exercise_steps:
+		if ((not total_steps and exercise_steps) or (total_steps and total_steps < exercise_steps)):
 			# If total step s are 0 and exercise steps are available
 			# then we assume that total steps is equal to exercise steps
 			total_steps = exercise_steps
@@ -1945,7 +2040,6 @@ def create_quick_look(user,from_date=None,to_date=None):
 		#Add one day to current date
 		current_date += timedelta(days=1)
 
-		
 	return SERIALIZED_DATA
 
 	

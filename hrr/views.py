@@ -9,8 +9,10 @@ from django.shortcuts import render
 
 from registration.models import Profile
 from user_input.models import DailyUserInputStrong
-from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity
+from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity,UserGarminDataManuallyUpdated
+from quicklook.calculation_helper import get_filtered_activity_stats
 from fitparse import FitFile
+
 from hrr.models import Hrr
 
 # Create your views here.
@@ -428,6 +430,7 @@ def hrr_calculations(request):
 			"offset":None,
 			}
 
+
 	# if workout or hrr:
 	try:
 		user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
@@ -461,8 +464,8 @@ def aa_calculations(request):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
-
 	hrr_not_recorded_list = []
+	hrr_recorded = []
 	if activity_files:
 		for i in range(len(activity_files)):
 			one_activity_file_dict =  ast.literal_eval(activity_files[i])
@@ -475,7 +478,6 @@ def aa_calculations(request):
 				hrr_not_recorded_list.append(hrr_not_recorded_time)
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
-
 
 
 	data = {"total_time":"",
@@ -631,4 +633,92 @@ def aa_calculations(request):
 
 
 	return JsonResponse(data)
+
+
+def aa_workout_calculations(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	start_date_str = start_date.strftime('%Y-%m-%d')
+
+	start_date_timestamp = start_date
+	start_date_timestamp = start_date_timestamp.timetuple()
+	start_date_timestamp = time.mktime(start_date_timestamp)
+	end_date_timestamp = start_date_timestamp + 86400
+
+	user_input_strong = DailyUserInputStrong.objects.filter(
+	user_input__created_at=(start_date),
+	user_input__user = request.user).order_by('-user_input__created_at')
+	
+	activities=[]
+	activities_dic={}
+	if user_input_strong:
+		user_input_activities =[act.activities for act in user_input_strong]
+		for i,k in enumerate(user_input_activities):
+			input_files=ast.literal_eval(user_input_activities[i])
+			summaryId = []
+			for keys in input_files.keys():
+				summaryId.append(keys)
+			for i in range(len(summaryId)):
+				activities.append(input_files[summaryId[i]])
+				activities_dic[summaryId[i]]=input_files[summaryId[i]]
+	
+	manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	manually_edited_dic = {}
+	manually_edited_list = []
+	if manually_updated_activities:
+		manual_activity_files = [activity.data for activity in manually_updated_activities]
+		for i,k in enumerate(manual_activity_files):
+			manual_files=ast.literal_eval(manual_activity_files[i])
+			manual_act_id=manual_files['summaryId']
+			manually_edited_dic[manual_act_id]=manual_files
+			manually_edited_list.append(manual_files)
+		
+	garmin_data_activities = UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	garmin_list = []
+	garmin_dic = {}
+	if garmin_data_activities:
+		garmin_activity_files = [pr.data for pr in garmin_data_activities]
+		for i,k in enumerate(garmin_activity_files):
+			act_files=ast.literal_eval(garmin_activity_files[i])
+			act_id=act_files['summaryId']
+			garmin_dic[act_id]=act_files
+			garmin_list.append(act_files)
+
+	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													manually_updated_json=manually_edited_dic,
+													userinput_activities=activities_dic)
+	
+	data={"date":"",
+		  "workout_type":"",
+		  "duration":"",
+		  "average_heart_rate":"",
+		  "total_time":"",
+		  "avg_hrr":""
+			}
+	time_duration = []
+	heart_rate = []
+	data1={}
+	if filtered_activities_files:
+		start_date_timestamp = filtered_activities_files[0]['startTimeInSeconds']
+		start_date = datetime.utcfromtimestamp(start_date_timestamp)
+		date = start_date.strftime('%d-%b-%y')
+		
+		for i,k in enumerate(filtered_activities_files):
+			act_date = date
+			summaryId = filtered_activities_files[i]['summaryId']
+			workout_type = filtered_activities_files[i]['activityType']
+			duration = filtered_activities_files[i]['durationInSeconds']
+			time_duration.append(duration)
+			avg_heart_rate = filtered_activities_files[i]['averageHeartRateInBeatsPerMinute']
+			heart_rate.append(avg_heart_rate)
+			
+			data = {"date":act_date,
+				  "workout_type":workout_type,
+				  "duration":duration,
+				  "average_heart_rate":avg_heart_rate,
+				  "total_time":sum(time_duration),
+				  "avg_hrr":sum(heart_rate)/len(heart_rate)
+					}
+			data1[summaryId] = data
+	return JsonResponse(data1)
 
