@@ -33,7 +33,6 @@ class HeartRate extends Component{
 	    this.renderTime = this.renderTime.bind(this);
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
 	    this.renderpercentage = this.renderpercentage.bind(this);
-	    this.handleLogout = this.handleLogout.bind(this);
 		this.toggle = this.toggle.bind(this);
 		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
 	    this.state = {
@@ -86,9 +85,7 @@ class HeartRate extends Component{
 			fetching_aerobic:false,
 		})
 	}
-	handleLogout(){
-    	this.props.logoutUser(this.onLogoutSuccess);
-  	}
+	
   	toggle() {
 	    this.setState({
 	      isOpen: !this.state.isOpen,
@@ -142,43 +139,7 @@ class HeartRate extends Component{
 		const {fix} = this.props;
 		return(
 			<div className = "container-fluid">
-			<Navbar toggleable
-		         fixed={fix ? 'top' : ''}
-		          className="navbar navbar-expand-sm navbar-inverse nav6">
-		          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-		           <FontAwesome
-		                 name = "bars"
-		                 size = "1x"
-		             />
-		          </NavbarToggler>
-		          <Link to='/' >
-		            <NavbarBrand
-		              className="navbar-brand float-sm-left"
-		              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-		              <img className="img-fluid"
-		               style={{maxWidth:"200px"}}
-		               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-		            </NavbarBrand>
-		          </Link>
-		            <span id="header">
-		            <h4 className="head" id="head" style = {{fontSize:"22px"}}>Heartrate Aerobic/Anaerobic Ranges
-		            </h4>
-		            </span>
-		          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
-		            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-		              <NavItem className="float-sm-right">
-		                <Link id="logout"className="nav-link" to='/'>Home</Link>
-		              </NavItem>
-		               <NavItem className="float-sm-right">
-		                   <NavLink
-		                   className="nav-link"
-		                   id="logout"
-		                   onClick={this.handleLogout}>Log Out
-		                    </NavLink>
-		              </NavItem>
-		            </Nav>
-		          </Collapse>
-		        </Navbar>
+		    <NavbarMenu title = {<span style = {{fontSize:"22px"}}>Heartrate Aerobic/Anaerobic Ranges</span>} />
 			 <div className="col-md-12,col-sm-12,col-lg-12">
 	            <div className="row" style = {{marginTop:"10px"}}>
 	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
@@ -250,14 +211,5 @@ class HeartRate extends Component{
 		)
 	}
 }
-function mapStateToProps(state){
-  return {
-    errorMessage: state.garmin_auth.error,
-    message : state.garmin_auth.message
-  };
-}
-export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(HeartRate));
-Navbar.propTypes={
-    fixed: PropTypes.string,
-    color: PropTypes.string,
-} 
+
+export default HeartRate;

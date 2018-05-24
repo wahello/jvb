@@ -7,6 +7,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input,Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
@@ -1186,7 +1187,7 @@ handleBackButton(){
         <div className="container-fluid">
         
 
-         <Navbar toggleable
+         {/*<Navbar toggleable
          fixed={fix ? 'top' : ''}
           className="navbar navbar-expand-sm navbar-inverse nav6">
           <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
@@ -1225,7 +1226,8 @@ handleBackButton(){
               </NavItem>
             </Nav>
           </Collapse>
-        </Navbar>
+        </Navbar>*/}
+        <NavbarMenu title = {"Progress Analyzer"} />
       </div> 
       {this.state.active_view &&
       <div className="nav3" id='bottom-nav'>

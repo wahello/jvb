@@ -7,6 +7,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import NavbarMenu from './navbar';
 
 import {renderLeaderBoardFetchOverlay,renderLeaderBoard2FetchOverlay,renderLeaderBoard3FetchOverlay,renderLeaderBoardSelectedDateFetchOverlay} from './leaderboard_healpers';
 import { getGarminToken,logoutUser} from '../network/auth';
@@ -127,7 +128,6 @@ class LeaderBoard1 extends Component{
 			},
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
-		this.handleLogout = this.handleLogout.bind(this);
 		this.toggle = this.toggle.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
@@ -282,9 +282,6 @@ class LeaderBoard1 extends Component{
       dateRange3:!this.state.dateRange3
     });
    }
-    handleLogout(){
-    	this.props.logoutUser(this.onLogoutSuccess);
-  	}
   	handleChange(event){
       const target = event.target;
       const value = target.value;
@@ -608,43 +605,7 @@ class LeaderBoard1 extends Component{
 		return(
 			<div className="container-fluid" >
 			<div id = "hambergar">
-		         <Navbar toggleable
-		         fixed={fix ? 'top' : ''}
-		          className="navbar navbar-expand-sm navbar-inverse nav6">
-		          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle}>
-		           <FontAwesome
-		                 name = "bars"
-		                 size = "1x"
-		             />
-		          </NavbarToggler>
-		          <Link to='/' >
-		            <NavbarBrand
-		              className="navbar-brand float-sm-left"
-		              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-		              <img className="img-fluid"
-		               style={{maxWidth:"200px"}}
-		               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-		            </NavbarBrand>
-		          </Link>
-		            <span id="header">
-		            <h2 className="head" id="head">My Ranking
-		            </h2>
-		            </span>
-		          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
-		            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-		              <NavItem className="float-sm-right">
-		                <Link id="logout"className="nav-link" to='/'>Home</Link>
-		              </NavItem>
-		               <NavItem className="float-sm-right">
-		                   <NavLink
-		                   className="nav-link"
-		                   id="logout"
-		                   onClick={this.handleLogout}>Log Out
-		                    </NavLink>
-		              </NavItem>
-		            </Nav>
-		          </Collapse>
-		        </Navbar>
+		        <NavbarMenu title = {"My Ranking"} />
 		    </div>
 
 		    {this.state.active_view &&
@@ -933,14 +894,5 @@ class LeaderBoard1 extends Component{
 	}
 	
 }
-function mapStateToProps(state){
-  return {
-    errorMessage: state.garmin_auth.error,
-    message : state.garmin_auth.message
-  };
-}
-export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(LeaderBoard1));
-Navbar.propTypes={
-    fixed: PropTypes.string,
-    color: PropTypes.string,
-} 
+
+export default LeaderBoard1;

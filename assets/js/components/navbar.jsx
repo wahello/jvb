@@ -59,6 +59,11 @@ class NavbarMenu extends React.Component {
                src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
             </NavbarBrand>
           </Link>
+           <span id="header">
+            <h2 className="head" id="head">{this.props.title}
+            
+            </h2>
+            </span>
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
             <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
               <NavItem className="float-sm-right">  

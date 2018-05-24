@@ -71,7 +71,7 @@ export function renderDietType(){
 }
 
 export function renderProcessedFoodModal(){
-	if(this.state.prcnt_processed_food > 0 ){
+	if((this.state.prcnt_processed_food > 0)){
 	  const updateState = function(val,name){
 						  this.setState({
 						  [name]: val
@@ -83,6 +83,7 @@ export function renderProcessedFoodModal(){
 		unprocessed_food_list={this.state.unprocessed_food_list}
 		updateState={updateState}
 		editable = {this.state.editable}
+		report_type = {this.state.report_type}
 	  />
 	  );
 	}

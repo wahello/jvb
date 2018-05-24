@@ -13,12 +13,13 @@ export default class UnprocesedFoodModal extends Component{
 			collapse:true,
 			enter_food:(unprocessed_food_list !== '') ? true : false,
 			unprocessed_food_list:unprocessed_food_list,
-			processed_food_list:processed_food_list
+			processed_food_list:processed_food_list,
+			enter_process_food:(processed_food_list !== '') ? true : false,
 		};
 		
 		this.handleChange = this.handleChange.bind(this);
 		this.onClickFoodList=this.onClickFoodList.bind(this);
-		
+		this.onClickProcessFoodList =this.onClickProcessFoodList.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -26,6 +27,7 @@ export default class UnprocesedFoodModal extends Component{
   	  	 (nextProps.processed_food_list !== this.props.processed_food_list)) {
     	  	this.setState({
     	  		enter_food:(nextProps.unprocessed_food_list !== '') ? true : false,
+    	  		enter_process_food:(nextProps.processed_food_list !== '') ? true : false,
     	  		unprocessed_food_list:nextProps.unprocessed_food_list,
     	  		processed_food_list:nextProps.processed_food_list
     	  	});
@@ -47,8 +49,11 @@ export default class UnprocesedFoodModal extends Component{
 				enter_food:!this.state.enter_food
 			});
 	}
-
-
+	onClickProcessFoodList(event){
+			this.setState({
+				enter_process_food:!this.state.enter_process_food
+			});
+	}
 
 	render(){
 		return(
@@ -57,7 +62,15 @@ export default class UnprocesedFoodModal extends Component{
 						<FormGroup>   
                             	{this.props.editable && 
                             		<div>
-                            		
+                            		 <div className="unprocess_food">
+						                        <Input type="checkbox"
+						                        id="unprocess_check"
+					                           	onClick={this.onClickProcessFoodList}
+					                           	checked={this.state.enter_process_food ? 'checked':''}
+					                           	/>                           		  
+		                            			<Label id="text" className="LAbel">I Want to enter in the processed foods I consumed yesterday</Label>
+	                            			</div>
+	                            	<Collapse isOpen={this.state.enter_process_food}>
                             		 <Label className="LAbel">5.1 What Processed Food were Consumed?</Label>
 											<div className="input1">	
 					                            <Textarea 
@@ -69,17 +82,20 @@ export default class UnprocesedFoodModal extends Component{
 						                            onChange={this.handleChange}
 						                             />
 					                        </div>
+					                </Collapse>
+					                        {(this.props.report_type == "full") &&
 					                        <div className="unprocess_food">
 						                        <Input type="checkbox"
 						                        id="unprocess_check"
 					                           	onClick={this.onClickFoodList}
 					                           	checked={this.state.enter_food ? 'checked':''}
 					                           	/>                           		  
-		                            			 <Label id="text" className="LAbel">I Want To Enter A List Of &nbsp;
+		                            			<Label id="text" className="LAbel">I Want To Enter A List Of &nbsp;
 			                            			 <span style={{fontWeight:"bold"}}>
 						                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
 						                             </span> Foods I Consumed</Label>
 	                            			</div>
+	                            		}
                             			<div>
 										<Collapse isOpen={this.state.enter_food}>
 
@@ -104,18 +120,24 @@ export default class UnprocesedFoodModal extends Component{
 					                    </div>
 			                    }
 			                    {!this.props.editable &&
-	                             
+	                             <div>
 	                              <div className="input">
 	                              	<Label className="LAbel">5.1 What Processed Food Were Consumed?</Label><br/>
 	                              	
 	                                <p>{this.state.processed_food_list}</p>
+	                                </div>
+	                                {(this.props.report_type == "full") &&
+	                                <div className="input">
+	                                
 	                                <Label>5.2 What &nbsp;
 	                                <span style={{fontWeight:"bold"}}>
 		                             	<span style={{textDecoration:"underline"}}>Un</span>processed?
 		                             </span> Food Were Consumed?</Label>
 	                                <p >{this.state.unprocessed_food_list}</p>
+	                           		
 	                              </div>
-	                             
+	                             }
+	                             </div>
 	                            }
                           </FormGroup> 			
 				</Collapse>

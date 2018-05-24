@@ -365,3 +365,25 @@ export function fetchGarminData(date, successCallback=undefined, errorCallback=u
 		}
 	});
 }
+
+export function fetchGarminHrrData(start_date, successCallback=undefined, errorCallback=undefined){
+	start_date = moment(start_date)
+	const URL = `/hrr/hrr_calculations`;
+	const config = {
+		url : URL,
+		method: 'get',
+		params:{
+			"start_date":start_date.format('YYYY-MM-DD')
+		},
+		withCredentials: true
+	};
+	axios(config).then(function(response){
+		if(successCallback != undefined){
+			successCallback(response);
+		}
+	}).catch((error) => {
+		if(errorCallback != undefined){
+			errorCallback(error);
+		}
+	});
+}

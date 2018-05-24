@@ -28,7 +28,7 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate,userDailyInputRecentFetch,
-        fetchGarminData} from '../../network/userInput';
+        fetchGarminData,fetchGarminHrrData} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
@@ -244,6 +244,7 @@ class UserInputs extends React.Component{
       this.onFetchGarminSuccessSleep = this.onFetchGarminSuccessSleep.bind(this);
       this.onFetchGarminSuccessWorkout = this.onFetchGarminSuccessWorkout.bind(this);
       this.onFetchGarminSuccessWeight = this.onFetchGarminSuccessWeight.bind(this);
+      this.onFetchGarminSuccessHrr = this.onFetchGarminSuccessHrr.bind(this);
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
@@ -253,7 +254,6 @@ class UserInputs extends React.Component{
       this.userDailyInputRecentFetch = userDailyInputRecentFetch.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
-    this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
     this.workoutTab = this.workoutTab.bind(this);
     this.sleepTab = this.sleepTab.bind(this);
@@ -316,6 +316,7 @@ class UserInputs extends React.Component{
     onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
         userDailyInputRecentFetch(this.state.selected_date,this.onFetchRecentSuccess,this.onFetchFailure);
+        fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
       }
       else {
 
@@ -494,6 +495,7 @@ class UserInputs extends React.Component{
              fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
           }
+          fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
@@ -750,7 +752,39 @@ class UserInputs extends React.Component{
        activities:activities
     });
   }
+  onFetchGarminSuccessHrr(data){
+    let min,sec;
+    let measured_hr = this.state.measured_hr;
+    let measure_hrr = data.data.Did_you_measure_HRR;
+    let hr_down_99 = this.state.hr_down_99;
+    let hrr_reach_99 = data.data.Did_heartrate_reach_99;
+    let time_to_99_min = this.state.time_to_99_min;
+    let time_to_99_sec = this.state.time_to_99_sec;
+    let time_99 = data.data.time_99;
+    let hr_level = this.state.hr_level;
+    let HRR_start_beat = data.data.HRR_start_beat;
+    let lowest_hr_first_minute = this.state.lowest_hr_first_minute;
+    let lowest_hrr_1min = data.data.lowest_hrr_1min;
+        if(time_99){
+           min = parseInt(time_99/60);
+           if(min || min == 0)
+              min = min.toString();
+           sec = (time_99 % 60);
+           if(sec < 10){
+            sec = "0" + sec;
+           }
+        }
+        
+        this.setState({
+          measured_hr:measured_hr?measured_hr:measure_hrr,
+          hr_down_99:hr_down_99?hr_down_99:hrr_reach_99,
+          time_to_99_min:time_to_99_min?time_to_99_min:min,
+          time_to_99_sec:time_to_99_sec?time_to_99_sec:sec,
+          hr_level:hr_level?hr_level:HRR_start_beat,
+          lowest_hr_first_minute:lowest_hr_first_minute?lowest_hr_first_minute:lowest_hrr_1min,
 
+        });
+  }
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
@@ -983,9 +1017,7 @@ createDropdown(start_num , end_num, step=1){
     this.props.history.push("/#logout");
   }
 
-  handleLogout(){
-    this.props.logoutUser(this.onLogoutSuccess);
-  }
+ 
 
 componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
@@ -1172,60 +1204,18 @@ handleScroll() {
         return(
             <div>            
         <div id="hambergar" className="container-fluid">
-
-        <Navbar toggleable 
-         fixed={fix ? 'top' : ''} 
-          className="navbar navbar-expand-sm navbar-inverse ">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle1} >
-           <FontAwesome 
-                 name = "bars"
-                 size = "1x"
-                                          
-             />
-
-          </NavbarToggler>
-
-          <Link to='/'>
-            <NavbarBrand 
-              className="navbar-brand float-sm-left" 
-              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-              <img className="img-fluid"
-               style={{maxWidth:"200px"}}
-               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-            </NavbarBrand>
-          </Link>
-            <div id="header">
-              <h2 className="head">Daily User Inputs 
+      <NavbarMenu title = {<span> User Inputs
               <span id="infobutton"
               onClick={this.toggleInfo}                   
               >
               <a  className="infoBtn"> 
-                             <FontAwesome 
-                                          name = "info-circle"
-                                          size = "1x"                                      
-                                        
-                              />
-                              </a>
-                              </span> 
-                             </h2>
-                             
-                              </div>
-
-          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen1} navbar>
-            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>            
-              <NavItem className="float-sm-right">  
-                <Link id="logout"className="nav-link" to='/'>Home</Link>
-              </NavItem>
-               <NavItem className="float-sm-right">                
-                   <NavLink  
-                   className="nav-link"
-                   id="logout"                    
-                   onClick={this.handleLogout}>Log Out
-                    </NavLink>               
-              </NavItem>  
-            </Nav>
-          </Collapse>
-        </Navbar>
+                 <FontAwesome 
+                              name = "info-circle"
+                              size = "1x"                                      
+                            
+                  />
+              </a>
+              </span> </span>} />
         </div>                                                                                    
                             <Modal
                             id="popover"                          
@@ -3261,11 +3251,11 @@ handleScroll() {
                                   <p>{this.state.prcnt_processed_food}</p>
                                 </div>
                               }
-                              {this.state.report_type == 'full' &&
+                             
                             <FormGroup id="padd"> 
                             {this.renderProcessedFoodModal()}
                             </FormGroup>
-                          }
+                        
                           </FormGroup>
                            <Modal
                            id="popover" 
@@ -3955,17 +3945,5 @@ handleScroll() {
         );
     }
 }
+export default UserInputs;
 
-function mapStateToProps(state){
-  return {
-    errorMessage: state.garmin_auth.error,
-    message : state.garmin_auth.message
-  };
-}
-
-export default connect(mapStateToProps,{getGarminToken,logoutUser})(withRouter(UserInputs));
-
-Navbar.propTypes={
-    fixed: PropTypes.string,
-    color: PropTypes.string,
-}
