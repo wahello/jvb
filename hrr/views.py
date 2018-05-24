@@ -610,8 +610,6 @@ def aa_calculations(request):
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
-
-
 	return JsonResponse(data)
 
 
@@ -624,45 +622,52 @@ def aa_workout_calculations(request):
 	start_date_timestamp = start_date_timestamp.timetuple()
 	start_date_timestamp = time.mktime(start_date_timestamp)
 	end_date_timestamp = start_date_timestamp + 86400
+	try:
+		user_input_strong = DailyUserInputStrong.objects.filter(
+		user_input__created_at=(start_date),
+		user_input__user = request.user).order_by('-user_input__created_at')
+		activities=[]
+		activities_dic={}
+		if user_input_strong:
+			user_input_activities =[act.activities for act in user_input_strong]
+			for i,k in enumerate(user_input_activities):
+				input_files=ast.literal_eval(user_input_activities[i])
+				summaryId = []
+				for keys in input_files.keys():
+					summaryId.append(keys)
+				for i in range(len(summaryId)):
+					activities.append(input_files[summaryId[i]])
+					activities_dic[summaryId[i]]=input_files[summaryId[i]]
+	except (ValueError, SyntaxError):
+		pass
 
-	user_input_strong = DailyUserInputStrong.objects.filter(
-	user_input__created_at=(start_date),
-	user_input__user = request.user).order_by('-user_input__created_at')
-	
-	activities=[]
-	activities_dic={}
-	if user_input_strong:
-		user_input_activities =[act.activities for act in user_input_strong]
-		for i,k in enumerate(user_input_activities):
-			input_files=ast.literal_eval(user_input_activities[i])
-			summaryId = []
-			for keys in input_files.keys():
-				summaryId.append(keys)
-			for i in range(len(summaryId)):
-				activities.append(input_files[summaryId[i]])
-				activities_dic[summaryId[i]]=input_files[summaryId[i]]
-	
-	manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
-	manually_edited_dic = {}
-	manually_edited_list = []
-	if manually_updated_activities:
-		manual_activity_files = [activity.data for activity in manually_updated_activities]
-		for i,k in enumerate(manual_activity_files):
-			manual_files=ast.literal_eval(manual_activity_files[i])
-			manual_act_id=manual_files['summaryId']
-			manually_edited_dic[manual_act_id]=manual_files
-			manually_edited_list.append(manual_files)
-		
-	garmin_data_activities = UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
-	garmin_list = []
-	garmin_dic = {}
-	if garmin_data_activities:
-		garmin_activity_files = [pr.data for pr in garmin_data_activities]
-		for i,k in enumerate(garmin_activity_files):
-			act_files=ast.literal_eval(garmin_activity_files[i])
-			act_id=act_files['summaryId']
-			garmin_dic[act_id]=act_files
-			garmin_list.append(act_files)
+	try:
+		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+		manually_edited_dic = {}
+		manually_edited_list = []
+		if manually_updated_activities:
+			manual_activity_files = [activity.data for activity in manually_updated_activities]
+			for i,k in enumerate(manual_activity_files):
+				manual_files=ast.literal_eval(manual_activity_files[i])
+				manual_act_id=manual_files['summaryId']
+				manually_edited_dic[manual_act_id]=manual_files
+				manually_edited_list.append(manual_files)
+	except (ValueError, SyntaxError):
+		pass
+
+	try:
+		garmin_data_activities = UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+		garmin_list = []
+		garmin_dic = {}
+		if garmin_data_activities:
+			garmin_activity_files = [pr.data for pr in garmin_data_activities]
+			for i,k in enumerate(garmin_activity_files):
+				act_files=ast.literal_eval(garmin_activity_files[i])
+				act_id=act_files['summaryId']
+				garmin_dic[act_id]=act_files
+				garmin_list.append(act_files)
+	except (ValueError, SyntaxError):
+		pass
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
@@ -672,12 +677,16 @@ def aa_workout_calculations(request):
 		  "workout_type":"",
 		  "duration":"",
 		  "average_heart_rate":"",
+		  "max_heart_rate":"",
 		  "total_time":"",
-		  "avg_hrr":""
+		  "avg_hrr":"",
+		  "max_hrr":""
 			}
 	time_duration = []
 	heart_rate = []
+	max_hrr = []
 	data1={}
+
 	if filtered_activities_files:
 		start_date_timestamp = filtered_activities_files[0]['startTimeInSeconds']
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
@@ -691,14 +700,18 @@ def aa_workout_calculations(request):
 			time_duration.append(duration)
 			avg_heart_rate = filtered_activities_files[i]['averageHeartRateInBeatsPerMinute']
 			heart_rate.append(avg_heart_rate)
-			
+			max_heart_rate = filtered_activities_files[i]['maxHeartRateInBeatsPerMinute']
+			max_hrr.append(max_heart_rate)
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
 				  "average_heart_rate":avg_heart_rate,
+				  "max_heart_rate":max_heart_rate,
 				  "total_time":sum(time_duration),
-				  "avg_hrr":sum(heart_rate)/len(heart_rate)
+				  "avg_hrr":sum(heart_rate)/len(heart_rate),
+				  "max_hrr":sum(max_hrr)/len(max_hrr)
 					}
+			print(filtered_activities_files)
 			data1[summaryId] = data
 	return JsonResponse(data1)
 
