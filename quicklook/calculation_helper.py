@@ -1385,26 +1385,13 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 	return alcohol_stats
 
 def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
-	# activity_weekly_stats = []
-	# for (act,manual_act) in zip(list(weekly_activities.values()),
-	# 							list(weekly_manual_activities.values())):
-	# 	manual_act_indexed = {dic.get('summaryId'):dic for dic in manual_act }
-	# 	activity_weekly_stats.append(get_activity_stats(act,manual_act_indexed))
-
-	# hr90_duration_15min = [stat['hr90_duration_15min'] for stat in activity_weekly_stats]
-
 	points = 0
-	# for (workout,hr_over_90) in zip(workout_over_period,hr90_duration_15min):
-	# 	if hr_over_90: points += 1
-	# 	elif workout == 'yes': points += 1
-	
 	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
+		have_no_workout = not strong_obj or (strong_obj and strong_obj.workout != "yes")
+		have_activities = activity_list or (strong_obj and json.loads(strong_obj.activities))
 		if strong_obj and (strong_obj.workout == 'yes'):
 			points += 1
-		elif (
-			(not strong_obj or (strong_obj and strong_obj.workout != 'yes'))
-			and (activity_list or (strong_obj and strong_obj.activities))
-		):
+		elif(have_no_workout and have_activities):
 			points += 1
 	avg_point_week = points / (period/7)
 	grade_point = cal_exercise_consistency_grade(avg_point_week)

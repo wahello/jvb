@@ -149,13 +149,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={80}
+		        headerHeight={60}
 		        width={containerWidth}
         		height={containerHeight}
         		touchScrollEnabled={true}
         		{...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Sleep {this.renderLastSync(this.props.last_synced)}</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Sleep</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.myTableData[props.rowIndex].name}
@@ -177,7 +177,8 @@ const styles = StyleSheet.create({
   	textAlign:'center', 
     border: 'none',
     fontFamily:'Proxima-Nova',
-    fontStyle:'normal'
+    fontStyle:'normal',
+    color:'#111111'
   },
   newTableBody:{
   	textAlign:'center',

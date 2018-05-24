@@ -254,13 +254,13 @@ renderTableColumns(dateWiseData,category,classes=""){
 			 <Table
 		        rowsCount={rowsCount}
 		        rowHeight={50}
-		        headerHeight={70}
+		        headerHeight={50}
 		         width={containerWidth}
                 height={containerHeight}
                 touchScrollEnabled={true}
                 {...props}>
 		        <Column
-		          header={<Cell className={css(styles.newTableHeader)}>Exercise Reporting {this.renderLastSync(this.props.last_synced)}</Cell>}
+		          header={<Cell className={css(styles.newTableHeader)}>Exercise Reporting</Cell>}
 		          cell={props => (
 		            <Cell {...{'title':this.state.tableAttrColumn[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
 		              {this.state.tableAttrColumn[props.rowIndex].name}

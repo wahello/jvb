@@ -64,7 +64,7 @@ CELERY_BEAT_SCHEDULE = {
     'update-obsolete-progress-analyzer-report':{
         'task':'progress_analyzer.update_obsolete_pa_reports',
         'schedule':crontab(minute=0, hour=2)
-    }
+    },
     #execute every day at 3:00 AM EST (America/New_york)
     'retry-failed-ping-notifications':{
         'task':'garmin.retry_failed_ping_notification',
@@ -160,7 +160,8 @@ LOGGING = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://h:p66111d958aa92704fb0fba2e9fd54fe4536e81afd19510078eeeebc6a29e2243@ec2-34-198-168-102.compute-1.amazonaws.com:8339/1",
+        "LOCATION": "redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379/1",
+        # "LOCATION": "redis://redistogo:25d4036e9cae0d7b7892f244ca708545@cod.redistogo.com:9450/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
