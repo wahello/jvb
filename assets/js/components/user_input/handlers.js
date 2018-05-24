@@ -464,7 +464,6 @@ export function handleQuickReportPreSubmit(){
       workout_effort:'',
       workout_effort_hard_portion:'',
       unprocessed_food_list:'',
-      processed_food_list:'',
       alcohol_drink_consumed_list:'',
       sleep_comment:'',
       sleep_aid_taken:'',

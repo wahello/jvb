@@ -68,7 +68,9 @@ const activites = { "":"Select",
 "GYMNASTICS":"GYMNASTICS",
 "BASKETBALL":"BASKETBALL",
 "TENNIS":"TENNIS",
-"GARDENING":"GARDENING"
+"GARDENING":"GARDENING",
+"YOGA":"YOGA",
+"PILATES":"PILATES"
 };
 
 export default class ActivityGrid extends Component{
