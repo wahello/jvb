@@ -25,7 +25,19 @@ class Workout extends Component{
 		this.state = {
 			selectedDate:new Date(),
 			calendarOpen:false,
-			data:{}
+			data1:{
+				"2551701200":{"duration": 3786,
+					 "avg_hrr": 129.0,
+					 "date": "12-Mar-18",
+					 "workout_type": "RUNNING",
+					 "total_time": 3786,
+					 "average_heart_rate": 129},
+				"2551706480": {"duration": 61,
+					  "avg_hrr": 117.0,
+					  "date": "12-Mar-18", 
+					  "workout_type": "HEART_RATE_RECOVERY", 
+					  "total_time": 3847, 
+					  "average_heart_rate": 105}}
 		}
 		this.renderTable = this.renderTable.bind(this);
 		this.successWorkout =this.successWorkout.bind(this);
@@ -36,7 +48,7 @@ class Workout extends Component{
 	}
 	successWorkout(data){
 		this.setState({
-			data:data.data
+			data1:data.data
 		});
 	}
 	errorWorkout(error){
@@ -51,25 +63,26 @@ class Workout extends Component{
 		});
 		
 	}
-	componentDidMount(){
-		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-	}
+	// componentDidMount(){
+	// 	fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+	// }
 	toggleCalendar(){
 	    this.setState({
 	      calendarOpen:!this.state.calendarOpen
 	    });
     }
 	renderTable(data){
-		let td_values = [];
-		let td_rows = [];
+		var td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate"];
-			let keyvalue;
+		for(let[key1,value] of Object.entries(data)){
+			let td_values = [];
 			for(let key of keys){
-				 keyvalue = data[key];
+				 let keyvalue = value[key];
 				 td_values.push(<td>{keyvalue}</td>);
 			}
 			td_rows.push(<tr>{td_values}</tr>);
-			return td_rows;
+		}
+		return td_rows;
 	}
 	render(){
 		return(
@@ -95,21 +108,21 @@ class Workout extends Component{
 		                </PopoverBody>
 	                </Popover>
 	            </div>
-				 <div className = "row justify-content-center hr_table_padd">
-          	    <div className = "table table-responsive">
-          	    <table className = "table table-striped table-bordered ">
-					<thead>
-					<th>Date</th>
-					<th>Workout Type</th>
-					<th>Duration</th>
-					<th>Average Heartrate</th>
-					</thead>
-					<tbody>
-						{this.renderTable(this.state.data)}
-					</tbody>
-				</table>
+	            <div className = "row">
+					<div className= "col-md-4">
+		          	    <table className = "table table-striped table-bordered ">
+							<tr>
+							<th>Date</th>
+							<th>Workout Type</th>
+							<th>Duration</th>
+							<th>Average Heartrate</th>
+							</tr>
+								{this.renderTable(this.state.data1)}
+						</table>
+					</div>
+				
 				</div>
-				</div>
+				
 				</div>
 			</div>
 		);
