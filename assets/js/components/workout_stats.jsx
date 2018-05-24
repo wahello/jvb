@@ -11,29 +11,54 @@ import { Collapse, Navbar, NavbarToggler,
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
-import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers'; 
+import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers';
+import fetchWorkoutData from '../network/workout';
 
+axiosRetry(axios, { retries: 3});
+
+
+var CalendarWidget = require('react-calendar-widget');
+var ReactDOM = require('react-dom');
 class Workout extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			data:{
-			    "date":"10-MAR-2018",
-			    "workout_type":"RUNNING",
-			    "duration":1500,
-			    "average_heart_rate":135,
-			    "total_time":3000,
-			    "avg_hrr":75,
-			    "date":"10-MAR-2019",
-			    "workout_type":"walking",
-			    "duration":1500,
-			    "average_heart_rate":135,
-			    "total_time":3000,
-			    "avg_hrr":75
-			}
+			selectedDate:new Date(),
+			calendarOpen:false,
+			data:{}
 		}
 		this.renderTable = this.renderTable.bind(this);
+		this.successWorkout =this.successWorkout.bind(this);
+		this.toggleCalendar = this.toggleCalendar.bind(this);
+		this.errorWorkout =this.errorWorkout.bind(this);
+		this.processDate = this.processDate.bind(this);
+
 	}
+	successWorkout(data){
+		this.setState({
+			data:data.data
+		});
+	}
+	errorWorkout(error){
+		console.log(error.message);
+	}
+	processDate(selectedDate){
+		this.setState({
+			selectedDate:selectedDate,
+			calendarOpen:!this.state.calendarOpen,
+		},()=>{
+			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+		});
+		
+	}
+	componentDidMount(){
+		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+	}
+	toggleCalendar(){
+	    this.setState({
+	      calendarOpen:!this.state.calendarOpen
+	    });
+    }
 	renderTable(data){
 		let td_values = [];
 		let td_rows = [];
@@ -50,7 +75,29 @@ class Workout extends Component{
 		return(
 			<div className = "container_fluid">
 				<NavbarMenu title = {"Workout Stats"}/>
-				<table>
+				<div className="col-md-12,col-sm-12,col-lg-12">
+				 <div className="row" style = {{marginTop:"10px"}}>
+	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
+	                    <FontAwesome
+	                        name = "calendar"
+	                        size = "2x"
+	                    />
+	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+
+                	</span> 
+	            	<Popover
+			            placement="bottom"
+			            isOpen={this.state.calendarOpen}
+			            target="progress"
+			            toggle={this.toggleCalendar}>
+		                <PopoverBody className="calendar2">
+		                <CalendarWidget  onDaySelect={this.processDate}/>
+		                </PopoverBody>
+	                </Popover>
+	            </div>
+				 <div className = "row justify-content-center hr_table_padd">
+          	    <div className = "table table-responsive">
+          	    <table className = "table table-striped table-bordered ">
 					<thead>
 					<th>Date</th>
 					<th>Workout Type</th>
@@ -61,6 +108,9 @@ class Workout extends Component{
 						{this.renderTable(this.state.data)}
 					</tbody>
 				</table>
+				</div>
+				</div>
+				</div>
 			</div>
 		);
 	}
