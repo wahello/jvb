@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 		ModalHeader, ModalBody, ModalFooter, Collapse} from 'reactstrap';
 import Textarea from 'react-textarea-autosize';
+import moment from 'moment'
 
 export default class Hrr extends Component{
 	constructor(props){
@@ -126,7 +127,8 @@ toggle() {
     });
   }
 	render(){
-
+var ddyy = moment.utc("2018-05-02")
+      console.log("date", ddyy)
 		return(
 			<div>
 			<Collapse isOpen={this.state.collapse}>
