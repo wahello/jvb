@@ -138,21 +138,21 @@ def hrr_calculations(request):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
-	# count = 0
-	# id_act = 0
-	# activities = []
-	# if user_input_strong:
-	# 	for tmp in user_input_strong:
-	# 		sn = tmp.activities
-	# 		if sn:
-	# 			sn = ast.literal_eval(sn)
-	# 			di = sn.values()
-	# 			di = list(di)
-	# 			for i,k in enumerate(di):
-	# 				if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-	# 					id_act = int(di[i]['summaryId'])
-	# 					count = count + 1
-	# 					activities.append(di[i])
+	count = 0
+	id_act = 0
+	activities = []
+	if user_input_strong:
+		for tmp in user_input_strong:
+			sn = tmp.activities
+			if sn:
+				sn = ast.literal_eval(sn)
+				di = sn.values()
+				di = list(di)
+				for i,k in enumerate(di):
+					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
+						id_act = int(di[i]['summaryId'])
+						count = count + 1
+						activities.append(di[i])
 	
 	
 
@@ -168,16 +168,26 @@ def hrr_calculations(request):
 
 	workout = []
 	hrr = []
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = meta['activityIds'][0]
-		for i,k in enumerate(activity_files):
-			activity_files_dict = ast.literal_eval(activity_files[i])
-			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+	if activities:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if id_act == data_id:
 				hrr.append(tmp)
-			elif activity_files_dict.get("summaryId",None) == str(data_id):
+			else:
 				workout.append(tmp)
+	else:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
 	
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
