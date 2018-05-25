@@ -1811,7 +1811,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		hr_at_start_of_hrr = safe_get(daily_encouraged,"hr_level",0)
 		lowest_hr_first_minute = safe_get(daily_encouraged,"lowest_hr_first_minute",0)
 		if (hr_at_start_of_hrr and lowest_hr_first_minute 
-			and hr_at_start_of_hrr > lowest_hr_first_minute):
+			and hr_at_start_of_hrr >= lowest_hr_first_minute):
 			hr_lowered = hr_at_start_of_hrr - lowest_hr_first_minute
 			exercise_calculated_data['hrr_beats_lowered_first_minute'] = hr_lowered 
 
@@ -1819,9 +1819,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 			'restingHeartRateInBeatsPerMinute',0)
 		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
 			daily_encouraged,"lowest_hr_first_minute",0)
-		
-		# exercise_calculated_data['highest_hr_first_minute'] = f
-		
+				
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
 		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
 											'averageRunCadenceInStepsPerMinute')
