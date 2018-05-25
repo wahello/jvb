@@ -1483,7 +1483,9 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
 	points = 0
 	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
 		have_no_workout = not strong_obj or (strong_obj and strong_obj.workout != "yes")
-		have_activities = activity_list or (strong_obj and json.loads(strong_obj.activities))
+		have_activities = activity_list or (
+			strong_obj and strong_obj.activities and json.loads(strong_obj.activities)
+		)
 		if strong_obj and (strong_obj.workout == 'yes'):
 			points += 1
 		elif(have_no_workout and have_activities):
