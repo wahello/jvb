@@ -197,7 +197,7 @@ def hrr_calculations(request):
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
 		hrr_difference = hrr_final_heartrate[0]-hrr_final_heartrate[-1]
-		if hrr_difference > 10:
+		if (hrr_difference > 10) or activities:
 			Did_you_measure_HRR = 'yes'
 			workout_hrr_before_hrrfile = []
 			workout_time_before_hrrfile = []
