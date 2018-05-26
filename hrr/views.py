@@ -509,19 +509,19 @@ def aa_calculations(request):
 		user_input__created_at=(start_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
 
-	# activities = []
-	# id_act = 0
-	# if user_input_strong:
-	# 	for tmp in user_input_strong:
-	# 		sn = tmp.activities
-	# 		if sn:
-	# 			sn = ast.literal_eval(sn)
-	# 			di = sn.values()
-	# 			di = list(di)
-	# 			for i,k in enumerate(di):
-	# 				if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-	# 					id_act = int(di[i]['summaryId'])
-	# 					activities.append(di[i])
+	activities = []
+	id_act = 0
+	if user_input_strong:
+		for tmp in user_input_strong:
+			sn = tmp.activities
+			if sn:
+				sn = ast.literal_eval(sn)
+				di = sn.values()
+				di = list(di)
+				for i,k in enumerate(di):
+					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
+						id_act = int(di[i]['summaryId'])
+						activities.append(di[i])
 
 	workout = []
 	hrr = []
@@ -529,17 +529,26 @@ def aa_calculations(request):
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = meta['activityIds'][0]
-		for i,k in enumerate(activity_files):
-			activity_files_dict = ast.literal_eval(activity_files[i])
-			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
+	if activities:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if id_act == data_id:
 				hrr.append(tmp)
-			elif activity_files_dict.get("summaryId",None) == str(data_id) :
+			else:
 				workout.append(tmp)
-
+	else:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
 
 	# if a1:
 	# 	for tmp in a1:
