@@ -48,8 +48,7 @@ def get_ping_summary_types():
 	return [
 		"dailies", "activities", "manuallyUpdatedActivities",
 		"epochs", "sleeps", "bodyComps", "stressDetails",
-		"moveIQActivities", "userMetrics", "deregistration"
-	]
+		"moveIQActivities", "userMetrics"]
 
 def _safe_get(data,attr,default):
 		data_item = data.get(attr,None)
@@ -60,10 +59,13 @@ def _safe_get(data,attr,default):
 def store_ping_notifications(obj,dtype,user):
 	callback_url = obj.get('callbackURL')
 	upload_start_time = None
-	if dtype != "deregistration":
+	if dtype != "deregistrations":
 		upload_start_time = int(
 			re.search('uploadStartTimeInSeconds=(\d+)*',callback_url).group(1)
 		)
+	else:
+		upload_start_time = int(pytz.utc.localize(datetime.utcnow()).timestamp())
+
 	obj = GarminPingNotification.objects.create(
 		user = user,
 		summary_type = dtype,
@@ -250,6 +252,28 @@ def _get_data_offset(json_data, data_type, default_offset = 0):
 		else:
 			return default_offset
 
+def deregister_user(user,notification,ping_notif_obj):
+	'''
+	Receive Deregistrations ping notification and delete Garmin Health 
+	Token for that user and store "Deregistrations" ping notification
+
+	Args:
+		user(:obj:`User`): A User object
+		notification (dict): A "Deregistration" ping notification
+		ping_notif_obj (:obj:`GarminPingNotification`, optional): A GarminPingNotification
+			object. If provided then do not create a new object for ping notification
+			instead use this object and update it's state. Default to None
+	'''
+	if not ping_notif_obj:
+		ping_notif_obj = store_ping_notifications(notification,"deregistrations",user)
+	update_notification_state(ping_notif_obj,"processing")
+	try:
+		user.garmin_token.delete()
+		update_notification_state(ping_notif_obj,"processed")
+	except DatabaseError as e:
+		update_notification_state(ping_notif_obj,"failed")
+		print(str(e))
+
 def store_garmin_health_push(notifications,ping_notif_obj=None):
 
 	'''
@@ -354,5 +378,14 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 						)
 					else:
 						generate_quicklook.delay(user.id,start_date,end_date)
+		elif dtype == "deregistrations":
+			for obj in notifications.get(dtype):
+				user_key = obj.get('userAccessToken')
+				try:
+					user = User.objects.get(garmin_token__token = user_key)
+				except User.DoesNotExist:
+					user = None
+				if user:
+					deregister_user(user,obj,ping_notif_obj)
 		else:
 			print('Summary type "{}" is not supported'.format(dtype))
