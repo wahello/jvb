@@ -2810,6 +2810,7 @@ def export_users_xls(request):
 	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
 	red = book.add_format({'align':'left', 'bg_color': 'red'})
 	orange = book.add_format({'align':'left', 'bg_color': 'orange'})
+	num_format = book.add_format({'align':'left','num_format': '#,##0'})
 
 	border_format=book.add_format({
 							'border':1,
@@ -3014,11 +3015,11 @@ def export_users_xls(request):
 		sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
 		sheet10.write(12,c,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		
-		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],num_format)
 		sheet10.write(16,c,rank_data['total_steps'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
 		sheet10.write(18,c,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
-		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],num_format)
 		
 		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
 		sheet10.write(23,c,rank_data['prcnt_uf'][time1[i]]['user_rank']['rank'],format_align)
