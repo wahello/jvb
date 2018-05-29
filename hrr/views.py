@@ -442,12 +442,12 @@ def hrr_calculations(request):
 			}
 
 
-	# if workout or hrr:
-	try:
-		user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
-		update_hrr_instance(user_hrr, data)
-	except Hrr.DoesNotExist:
-		create_hrr_instance(request.user, data, start_date)
+	if workout or hrr:
+		try:
+			user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
+			update_hrr_instance(user_hrr, data)
+		except Hrr.DoesNotExist:
+			create_hrr_instance(request.user, data, start_date)
 
 
 	return JsonResponse(data)
