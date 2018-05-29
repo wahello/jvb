@@ -264,14 +264,15 @@ def deregister_user(user,notification,ping_notif_obj):
 			object. If provided then do not create a new object for ping notification
 			instead use this object and update it's state. Default to None
 	'''
-	if not ping_notif_obj:
-		ping_notif_obj = store_ping_notifications(notification,"deregistrations",user)
-	update_notification_state(ping_notif_obj,"processing")
+	local_ping_obj = ping_notif_obj
+	if not local_ping_obj:
+		local_ping_obj = store_ping_notifications(notification,"deregistrations",user)
+	update_notification_state(local_ping_obj,"processing")
 	try:
 		user.garmin_token.delete()
-		update_notification_state(ping_notif_obj,"processed")
+		update_notification_state(local_ping_obj,"processed")
 	except DatabaseError as e:
-		update_notification_state(ping_notif_obj,"failed")
+		update_notification_state(local_ping_obj,"failed")
 		print(str(e))
 
 def store_garmin_health_push(notifications,ping_notif_obj=None):
@@ -315,9 +316,10 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 				if user:
 					# Store ping notification in database and update state to processing
 					# if ping_notif_obj is None
-					if not ping_notif_obj:
-						ping_notif_obj = store_ping_notifications(obj,dtype,user)
-					update_notification_state(ping_notif_obj,"processing")
+					local_ping_obj = ping_notif_obj
+					if not local_ping_obj:
+						local_ping_obj = store_ping_notifications(obj,dtype,user)
+					update_notification_state(local_ping_obj,"processing")
 					callback_url = obj.get('callbackURL')
 					access_token = user.garmin_token.token
 					access_token_secret = user.garmin_token.token_secret
@@ -340,16 +342,16 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 						r = sess.get(callback_url, header_auth=True, params=data)
 						obj_list = _createObjectList(user, r.json(), dtype,upload_start_time)
 						MODEL_TYPES[dtype].objects.bulk_create(obj_list)
-						update_notification_state(ping_notif_obj,"processed")
+						update_notification_state(local_ping_obj,"processed")
 
 						# Create or update the latest sync time
 						offset = _get_data_offset(r.json(),dtype,default_offset=None)
 						create_update_sync_time(user,upload_start_time,offset)
 					except DatabaseError as e:
-						update_notification_state(ping_notif_obj,"failed")
+						update_notification_state(local_ping_obj,"failed")
 						print(str(e))
 					except Exception as e:
-						update_notification_state(ping_notif_obj,"failed")
+						update_notification_state(local_ping_obj,"failed")
 						print(str(e))
 
 					# Call celery task to calculate/recalculate quick look for date to
