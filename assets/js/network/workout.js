@@ -5,7 +5,7 @@ import moment from 'moment';
 axiosRetry(axios, { retries: 4}); 
 
 export function fetchWorkoutData(successWorkout,errorWorkout,selectedDate){
-  selectedDate = moment(selectedDate);
+  {/*selectedDate = moment(selectedDate);
   const URL=`/hrr/aa_workout_calculations`;
   const config={
    method:"get",
@@ -19,11 +19,11 @@ export function fetchWorkoutData(successWorkout,errorWorkout,selectedDate){
    successWorkout(response);
   }).catch(function(error){
     errorWorkout(error);
-  });
+  });*/}
 
 }
 export  function fetchAaWorkoutData(successWorkout1,errorWorkout,selectedDate){
-  selectedDate = moment(selectedDate);
+ {/* selectedDate = moment(selectedDate);
   const URL=`/hrr/daily_aa_calculations`;
   const config={
    method:"get",
@@ -37,6 +37,6 @@ export  function fetchAaWorkoutData(successWorkout1,errorWorkout,selectedDate){
    successWorkout1(response);
   }).catch(function(error){
     errorWorkout(error);
-  });
+  });*/}
 
 }
