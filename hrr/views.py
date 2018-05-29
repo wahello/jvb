@@ -794,7 +794,12 @@ def daily_aa_calculations(request):
 				"percent_aerobic":"",
 				"percent_below_aerobic":"",
 				"percent_anaerobic":"",
-				"total_percent":""}
+				"total_percent":"",
+				"total_aerobic_range":"",
+				"total_anaerobic_range":"",
+				"total_below_aerobic_range":"",
+				"total_prcnt_aerobic":"",
+				"total_prcnt_anaerobic":""}
 
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
@@ -858,23 +863,38 @@ def daily_aa_calculations(request):
 				else:
 					aerobic_list.append(tm)
 			return aerobic_list,below_aerobic_list,anaerobic_range_list
+		aerobic_duration = []
+		anaerobic_duration = []
+		below_aerobic_duration = []
+
+		prcnt_aerobic_duration = []
+		prcnt_anaerobic_duration = []
+		prcnt_below_aerobic_duration = []
+
+
 		for i in range(len(all_activities_heartrate)):
 			single_activity_file = individual_activity(all_activities_heartrate[i],all_activities_timestamp[i])
 			single_activity_list =list(single_activity_file)
 			time_in_aerobic = sum(single_activity_list[0])
+			aerobic_duration.append(time_in_aerobic)
 			time_in_below_aerobic = sum(single_activity_list[1])
+			below_aerobic_duration.append(time_in_below_aerobic)
 			time_in_anaerobic = sum(single_activity_list[2])
+			anaerobic_duration.append(time_in_anaerobic)
 			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 
 			try:
 				percent_anaerobic = (time_in_anaerobic/total_time)*100
 				percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+				prcnt_anaerobic_duration.append(percent_anaerobic)
 
 				percent_below_aerobic = (time_in_below_aerobic/total_time)*100
 				percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+				prcnt_below_aerobic_duration.append(percent_below_aerobic)
 
 				percent_aerobic = (time_in_aerobic/total_time)*100
 				percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+				prcnt_aerobic_duration.append(percent_aerobic)
 				
 				total_percent = 100
 			except ZeroDivisionError:
@@ -893,7 +913,12 @@ def daily_aa_calculations(request):
 					"percent_aerobic":percent_aerobic,
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
-					"total_percent":total_percent}
+					"total_percent":total_percent,
+					"total_aerobic_range":sum(aerobic_duration),
+					"total_anaerobic_range":sum(anaerobic_duration),
+					"total_below_aerobic_range":sum(below_aerobic_duration),
+					"total_prcnt_aerobic":sum(prcnt_aerobic_duration),
+					"total_prcnt_anaerobic":sum(prcnt_anaerobic_duration)}
 			daily_aa_data[data_summaryid[i]] =data
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
