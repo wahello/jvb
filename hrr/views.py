@@ -799,6 +799,7 @@ def daily_aa_calculations(request):
 
 	workout = []
 	hrr = []
+	data_summaryid = []
 	start = start_date
 	end = start_date + timedelta(days=1)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
@@ -807,6 +808,7 @@ def daily_aa_calculations(request):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
+			data_summaryid.append(data_id)
 			for i,k in enumerate(activity_files):
 				activity_files_dict = ast.literal_eval(activity_files[i])
 				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
@@ -889,7 +891,7 @@ def daily_aa_calculations(request):
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
-			daily_aa_data[i] =data
+			daily_aa_data[data_summaryid[i]] =data
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
