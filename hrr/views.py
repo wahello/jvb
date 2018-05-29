@@ -442,12 +442,12 @@ def hrr_calculations(request):
 			}
 
 
-	# if workout or hrr:
-	try:
-		user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
-		update_hrr_instance(user_hrr, data)
-	except Hrr.DoesNotExist:
-		create_hrr_instance(request.user, data, start_date)
+	if workout or hrr:
+		try:
+			user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
+			update_hrr_instance(user_hrr, data)
+		except Hrr.DoesNotExist:
+			create_hrr_instance(request.user, data, start_date)
 
 
 	return JsonResponse(data)
@@ -743,10 +743,10 @@ def aa_workout_calculations(request):
 			heart_rate.append(avg_heart_rate)
 			max_heart_rate = filtered_activities_files[i]['maxHeartRateInBeatsPerMinute']
 			max_hrr.append(max_heart_rate)
-			if filtered_activities_files[i]['activityType']!='HEART_RATE_RECOVERY':
-				exercise_steps = filtered_activities_files[i]['steps']
-			else:
+			if filtered_activities_files[i]['durationInSeconds'] <= 1200:
 				exercise_steps = ''
+			else:
+				exercise_steps = filtered_activities_files[i]['steps']
 
 			data = {"date":act_date,
 				  "workout_type":workout_type,

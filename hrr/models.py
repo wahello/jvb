@@ -42,3 +42,9 @@ class Hrr(models.Model):
 		]
 
 
+# class AaCalculations(models.Model):
+# 	user_hrr = models.ForeignKey(User, on_delete=models.CASCADE)
+# 	created_at = models.DateField()
+# 	updated_at = models.DateTimeField(auto_now=True)
+
+	
