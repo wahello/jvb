@@ -63,6 +63,7 @@ class Workout extends Component{
 				 	  'total_percent': 100}}
 		}
 		this.renderTable = this.renderTable.bind(this);
+		this.renderTable1 = this.renderTable1.bind(this);
 		this.successWorkout =this.successWorkout.bind(this);
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.errorWorkout =this.errorWorkout.bind(this);
@@ -88,10 +89,10 @@ class Workout extends Component{
 		});
 		
 	}
-	componentDidMount(){
-		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-		fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-	}
+	// componentDidMount(){
+	// 	fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+	// 	fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+	// }
 	toggleCalendar(){
 	    this.setState({
 	      calendarOpen:!this.state.calendarOpen
@@ -100,6 +101,19 @@ class Workout extends Component{
 	renderTable(data){
 		var td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate"];
+		for(let[key1,value] of Object.entries(data)){
+			let td_values = [];
+			for(let key of keys){
+				 let keyvalue = value[key];
+				 td_values.push(<td>{keyvalue}</td>);
+			}
+			td_rows.push(<tr>{td_values}</tr>);
+		}
+		return td_rows;
+	}
+	renderTable1(data){
+		var td_rows = [];
+		let keys = ["aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
@@ -135,7 +149,7 @@ class Workout extends Component{
 	                </Popover>
 	            </div>
 	            <div className = "row">
-					<div className= "col-md-4">
+					<div className= "col-md-5">
 		          	    <table className = "table table-striped table-bordered ">
 							<tr>
 							<th>Date</th>
@@ -146,10 +160,23 @@ class Workout extends Component{
 								{this.renderTable(this.state.data1)}
 						</table>
 					</div>
-				
+					
+					<div className= "col-md-7" >
+		          	    <table className = "table table-striped table-bordered ">
+							<tr>
+							<th>Duration in Aerobic Range (hh:mm:ss)</th>
+							<th>% Aerobic</th>
+							<th>Duration in Anaerobic Range (hh:mm:ss)</th>
+							<th>% Anaerobic</th>
+							<th>Duration Below Aerobic Range (hh:mm:ss)</th>
+							</tr>
+								{this.renderTable1(this.state.data)}
+						</table>
+					</div>
+					</div>
 				</div>
 				
-				</div>
+				
 			</div>
 		);
 	}

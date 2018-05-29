@@ -14,6 +14,9 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
 import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers'; 
+import Workout from './workout_stats';
+import {fetchWorkoutData,fetchAaWorkoutData} from '../network/workout';
+
 
 
 
@@ -34,6 +37,10 @@ class HeartRate extends Component{
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
 	    this.renderpercentage = this.renderpercentage.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.renderTable = this.renderTable.bind(this);
+		this.renderTable1 = this.renderTable1.bind(this);
+		this.successWorkout =this.successWorkout.bind(this);
+		this.errorWorkout =this.errorWorkout.bind(this);
 		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
@@ -53,7 +60,43 @@ class HeartRate extends Component{
 			percent_below_aerobic:"",
 			percent_anaerobic:"",
 			total_percent:"",
-			empty:""
+			empty:"",
+			data1:{
+				"2551701200":{"duration": 3786,
+					 "avg_hrr": 129.0,
+					 "date": "12-Mar-18",
+					 "workout_type": "RUNNING",
+					 "total_time": 3786,
+					 "average_heart_rate": 129},
+				"2551706480": {"duration": 61,
+					  "avg_hrr": 117.0,
+					  "date": "12-Mar-18", 
+					  "workout_type": "HEART_RATE_RECOVERY", 
+					  "total_time": 3847, 
+					  "average_heart_rate": 105}},
+			data:{
+				"0": {'total_time': 3775.0,
+					    'aerobic_zone': 3527.0,
+					    'anaerobic_zone': 225.0,
+					    'below_aerobic_zone': 23.0, 
+					    'aerobic_range': '102-137', 
+					    'anaerobic_range': '138 or above', 
+					    'below_aerobic_range': 'below 102', 
+					    'percent_aerobic': 93, 
+					    'percent_below_aerobic': 1, 
+					    'percent_anaerobic': 6, 
+					    'total_percent': 100},
+			 	"1": {'total_time': 121.0, 
+				 	  'aerobic_zone': 95.0, 
+				 	  'anaerobic_zone': 0, 
+				 	  'below_aerobic_zone': 26.0, 
+				 	  'aerobic_range': '102-137', 
+				 	  'anaerobic_range': '138 or above', 
+				 	  'below_aerobic_range': 'below 102', 
+				 	  'percent_aerobic': 79, 
+				 	  'percent_below_aerobic': 21, 
+				 	  'percent_anaerobic': 0, 
+				 	  'total_percent': 100}}
 	    };
 	}
 	successHeartRate(data){
@@ -85,7 +128,15 @@ class HeartRate extends Component{
 			fetching_aerobic:false,
 		})
 	}
-	
+	successWorkout(data){
+		this.setState({
+			data1:data.data,
+			data:data.data
+		});
+	}
+	errorWorkout(error){
+		console.log(error.message);
+	}
   	toggle() {
 	    this.setState({
 	      isOpen: !this.state.isOpen,
@@ -126,14 +177,66 @@ class HeartRate extends Component{
 			fetching_aerobic:true,
 		},()=>{
 			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
+			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 		});
 		
+	}
+	renderTable(data){
+		var td_rows = [];
+		let keys = ["date","workout_type","duration","average_heart_rate"];
+		for(let[key1,value] of Object.entries(data)){
+			let td_values = [];
+			for(let key of keys){
+				if(key == "duration"){
+					let keyvalue = this.renderTime(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else{
+					let keyvalue = value[key];
+					td_values.push(<td>{keyvalue}</td>);
+				}
+				 
+			}
+			td_rows.push(<tr>{td_values}</tr>);
+				
+		}
+		return td_rows;
+	}
+	renderTable1(data){
+		var td_rows = [];
+		let keys = ["aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone"];
+		for(let[key1,value] of Object.entries(data)){
+			let td_values = [];
+			for(let key of keys){
+				if(key == "aerobic_zone"){
+					let keyvalue = this.renderTime(value[key]);
+					 td_values.push(<td>{keyvalue}</td>);	
+				}
+				else if(key == "anaerobic_zone"){
+				let keyvalue = this.renderTime(value[key]);
+				td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "below_aerobic_zone"){
+				let keyvalue = this.renderTime(value[key]);
+				td_values.push(<td>{keyvalue}</td>);
+				}
+				else{
+					 let keyvalue = this.renderpercentage(value[key]);
+					 td_values.push(<td>{keyvalue}</td>);
+				}
+			}
+			td_rows.push(<tr>{td_values}</tr>);
+		}
+		return td_rows;
 	}
 	componentDidMount(){
 		this.setState({
 			fetching_aerobic:false,
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
+		// fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+		// fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 	}
 	render(){
 		const {fix} = this.props;
@@ -205,6 +308,40 @@ class HeartRate extends Component{
           	    </table>   
           	   </div>
           	  </div>
+          	   <div className = "row">
+					<div className= "col-md-5 ">
+					 <div className = "table table-responsive">
+		          	    <table className = "table table-striped table-bordered ">
+							<tr>
+							<th>Date</th>
+							<th>Workout Type</th>
+							<th>Duration</th>
+							<th>Average Heartrate</th>
+							</tr>
+							<tbody>
+								{this.renderTable(this.state.data1)}
+								</tbody>
+						</table>
+					</div>
+					</div>
+					
+					<div className= "col-md-7" >
+					 <div className = "table table-responsive">
+		          	    <table className = "table table-striped table-bordered ">
+							<tr>
+							<th>Duration in Aerobic Range (hh:mm:ss)</th>
+							<th>% Aerobic</th>
+							<th>Duration in Anaerobic Range (hh:mm:ss)</th>
+							<th>% Anaerobic</th>
+							<th>Duration Below Aerobic Range (hh:mm:ss)</th>
+							</tr>
+							<tbody>
+								{this.renderTable1(this.state.data)}
+								</tbody>
+						</table>
+					</div>
+					</div>
+					</div>
           	  {this.renderAerobicSelectedDateFetchOverlay()}
           	  </div>
 			</div>
