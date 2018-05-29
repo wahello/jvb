@@ -151,7 +151,7 @@ class GarminData(APIView):
 						pass
 			finall = self._create_activity_stat(act_obj,current_date)
 			final_act_data.update(finall)
-		print(final_act_data)
+		# print(final_act_data)
 		return final_act_data
 		
 
