@@ -12,7 +12,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers';
-import fetchWorkoutData from '../network/workout';
+import {fetchWorkoutData,fetchAaWorkoutData} from '../network/workout';
 
 axiosRetry(axios, { retries: 3});
 
@@ -37,7 +37,30 @@ class Workout extends Component{
 					  "date": "12-Mar-18", 
 					  "workout_type": "HEART_RATE_RECOVERY", 
 					  "total_time": 3847, 
-					  "average_heart_rate": 105}}
+					  "average_heart_rate": 105}},
+			data:{
+				"0": {'total_time': 3775.0,
+					    'aerobic_zone': 3527.0,
+					    'anaerobic_zone': 225.0,
+					    'below_aerobic_zone': 23.0, 
+					    'aerobic_range': '102-137', 
+					    'anaerobic_range': '138 or above', 
+					    'below_aerobic_range': 'below 102', 
+					    'percent_aerobic': 93, 
+					    'percent_below_aerobic': 1, 
+					    'percent_anaerobic': 6, 
+					    'total_percent': 100},
+			 	"1": {'total_time': 121.0, 
+				 	  'aerobic_zone': 95.0, 
+				 	  'anaerobic_zone': 0, 
+				 	  'below_aerobic_zone': 26.0, 
+				 	  'aerobic_range': '102-137', 
+				 	  'anaerobic_range': '138 or above', 
+				 	  'below_aerobic_range': 'below 102', 
+				 	  'percent_aerobic': 79, 
+				 	  'percent_below_aerobic': 21, 
+				 	  'percent_anaerobic': 0, 
+				 	  'total_percent': 100}}
 		}
 		this.renderTable = this.renderTable.bind(this);
 		this.successWorkout =this.successWorkout.bind(this);
@@ -48,7 +71,8 @@ class Workout extends Component{
 	}
 	successWorkout(data){
 		this.setState({
-			data1:data.data
+			data1:data.data,
+			data:data.data
 		});
 	}
 	errorWorkout(error){
@@ -60,12 +84,14 @@ class Workout extends Component{
 			calendarOpen:!this.state.calendarOpen,
 		},()=>{
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 		});
 		
 	}
-	// componentDidMount(){
-	// 	fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-	// }
+	componentDidMount(){
+		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+		fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+	}
 	toggleCalendar(){
 	    this.setState({
 	      calendarOpen:!this.state.calendarOpen
