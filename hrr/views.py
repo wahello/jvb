@@ -138,21 +138,21 @@ def hrr_calculations(request):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
-	# count = 0
-	# id_act = 0
-	# activities = []
-	# if user_input_strong:
-	# 	for tmp in user_input_strong:
-	# 		sn = tmp.activities
-	# 		if sn:
-	# 			sn = ast.literal_eval(sn)
-	# 			di = sn.values()
-	# 			di = list(di)
-	# 			for i,k in enumerate(di):
-	# 				if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-	# 					id_act = int(di[i]['summaryId'])
-	# 					count = count + 1
-	# 					activities.append(di[i])
+	count = 0
+	id_act = 0
+	activities = []
+	if user_input_strong:
+		for tmp in user_input_strong:
+			sn = tmp.activities
+			if sn:
+				sn = ast.literal_eval(sn)
+				di = sn.values()
+				di = list(di)
+				for i,k in enumerate(di):
+					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
+						id_act = int(di[i]['summaryId'])
+						count = count + 1
+						activities.append(di[i])
 	
 	
 
@@ -168,108 +168,119 @@ def hrr_calculations(request):
 
 	workout = []
 	hrr = []
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = meta['activityIds'][0]
-		for i,k in enumerate(activity_files):
-			activity_files_dict = ast.literal_eval(activity_files[i])
-			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
+	if activities:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if id_act == data_id:
 				hrr.append(tmp)
-			elif activity_files_dict.get("summaryId",None) == str(data_id):
+			else:
 				workout.append(tmp)
+	else:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
 	
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
 	
 	if hrr:
-		Did_you_measure_HRR = 'yes'
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
+		hrr_difference = hrr_final_heartrate[0]-hrr_final_heartrate[-1]
+		if (hrr_difference > 10) or activities:
+			Did_you_measure_HRR = 'yes'
+			workout_hrr_before_hrrfile = []
+			workout_time_before_hrrfile = []
+			workout_timestamp_before_hrrfile = []
 
-		workout_hrr_before_hrrfile = []
-		workout_time_before_hrrfile = []
-		workout_timestamp_before_hrrfile = []
+			for i,k,j in zip(workout_final_heartrate,workout_final_timestamp,workout_timestamp):
+				if j < hrr_timestamp[1]:
+					workout_hrr_before_hrrfile.append(i)
+					workout_time_before_hrrfile.append(k)
+					workout_timestamp_before_hrrfile.append(j)
 
-		for i,k,j in zip(workout_final_heartrate,workout_final_timestamp,workout_timestamp):
-			if j < hrr_timestamp[1]:
-				workout_hrr_before_hrrfile.append(i)
-				workout_time_before_hrrfile.append(k)
-				workout_timestamp_before_hrrfile.append(j)
+			time_toreach_99 = []
+			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
+				if i >= 99:
+					time_toreach_99.append(k)
+					if(i == 99):
+						break
 
-		time_toreach_99 = []
-		for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
-			if i >= 99:
-				time_toreach_99.append(k)
-				if(i == 99):
-					break
-
-		new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
-		min_heartrate = []
-		for i,k in zip(hrr_final_heartrate,new_L):
-			if k <= 60:
-				min_heartrate.append(i)
-
-		b = []
-		a = len(hrr_final_heartrate)-len(min_heartrate)
-		if a > 0:
-			b =  hrr_final_heartrate[-a:]
-		elif a == 0:
-			b = [min(min_heartrate)]
-		else:
-			min_heartrate.reverse()
-			b = min_heartrate
-		
-		if b and min(min_heartrate) < b[0]:
-			b = [min(min_heartrate)]
-
-		if min(hrr_final_heartrate) <= 99:
-			Did_heartrate_reach_99 = 'yes'
-		else:
-			Did_heartrate_reach_99 = 'no'
-
-
-		HRR_activity_start_time = hrr_timestamp[0]-(offset)
-		HRR_start_beat = hrr_final_heartrate[0]
-		try:
-			lowest_hrr_1min = b[0]
-		except IndexError:
-			lowest_hrr_1min = 99
-		time_99 = sum(time_toreach_99[:-1])
-		end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
-		end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
-		diff_actity_hrr= HRR_activity_start_time - end_time_activity
-
-		No_beats_recovered = HRR_start_beat - lowest_hrr_1min
-		heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
-		pure_1min_beats = []
-		pure1min = 60-diff_actity_hrr
-		if pure1min >= 0:
+			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
+			min_heartrate = []
 			for i,k in zip(hrr_final_heartrate,new_L):
-				if k <= pure1min:
-					pure_1min_beats.append(i)
-		else:
-			daily_diff_hrr = end_time_activity - daily_starttime
-			daily_activty_end = daily_diff_hrr % 15
-			if daily_activty_end != 0:
-				daily_diff_hrr = daily_diff_hrr + (15 - daily_activty_end)
+				if k <= 60:
+					min_heartrate.append(i)
+
+			b = []
+			a = len(hrr_final_heartrate)-len(min_heartrate)
+			if a > 0:
+				b =  hrr_final_heartrate[-a:]
+			elif a == 0:
+				b = [min(min_heartrate)]
 			else:
-				pass
-			if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-				daily_diff_60 = str(int(daily_diff_hrr + 60))
-				daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
-			if daily_diff_data_60:
-				hrr_no_fitfile = daily_diff_data_60
+				min_heartrate.reverse()
+				b = min_heartrate
+			
+			if b and min(min_heartrate) < b[0]:
+				b = [min(min_heartrate)]
+
+			if min(hrr_final_heartrate) <= 99:
+				Did_heartrate_reach_99 = 'yes'
 			else:
-				hrr_no_fitfile = None
-		if pure1min >= 0:		
-			pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
-		elif hrr_no_fitfile:
-			pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
-		else:
-			pure_1min_heart_beats = 0
-		pure_time_99 = time_99 + diff_actity_hrr
+				Did_heartrate_reach_99 = 'no'
+
+
+			HRR_activity_start_time = hrr_timestamp[0]-(offset)
+			HRR_start_beat = hrr_final_heartrate[0]
+			try:
+				lowest_hrr_1min = b[0]
+			except IndexError:
+				lowest_hrr_1min = 99
+			time_99 = sum(time_toreach_99[:-1])
+			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
+			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+			diff_actity_hrr= HRR_activity_start_time - end_time_activity
+
+			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
+			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
+			pure_1min_beats = []
+			pure1min = 60-diff_actity_hrr
+			if pure1min >= 0:
+				for i,k in zip(hrr_final_heartrate,new_L):
+					if k <= pure1min:
+						pure_1min_beats.append(i)
+			else:
+				daily_diff_hrr = end_time_activity - daily_starttime
+				daily_activty_end = daily_diff_hrr % 15
+				if daily_activty_end != 0:
+					daily_diff_hrr = daily_diff_hrr + (15 - daily_activty_end)
+				else:
+					pass
+				if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+					daily_diff_60 = str(int(daily_diff_hrr + 60))
+					daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
+				if daily_diff_data_60:
+					hrr_no_fitfile = daily_diff_data_60
+				else:
+					hrr_no_fitfile = None
+			if pure1min >= 0:		
+				pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
+			elif hrr_no_fitfile:
+				pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
+			else:
+				pure_1min_heart_beats = 0
+			pure_time_99 = time_99 + diff_actity_hrr
 
 	else:
 		Did_you_measure_HRR = 'no'
@@ -498,19 +509,19 @@ def aa_calculations(request):
 		user_input__created_at=(start_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
 
-	# activities = []
-	# id_act = 0
-	# if user_input_strong:
-	# 	for tmp in user_input_strong:
-	# 		sn = tmp.activities
-	# 		if sn:
-	# 			sn = ast.literal_eval(sn)
-	# 			di = sn.values()
-	# 			di = list(di)
-	# 			for i,k in enumerate(di):
-	# 				if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-	# 					id_act = int(di[i]['summaryId'])
-	# 					activities.append(di[i])
+	activities = []
+	id_act = 0
+	if user_input_strong:
+		for tmp in user_input_strong:
+			sn = tmp.activities
+			if sn:
+				sn = ast.literal_eval(sn)
+				di = sn.values()
+				di = list(di)
+				for i,k in enumerate(di):
+					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
+						id_act = int(di[i]['summaryId'])
+						activities.append(di[i])
 
 	workout = []
 	hrr = []
@@ -518,17 +529,26 @@ def aa_calculations(request):
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = meta['activityIds'][0]
-		for i,k in enumerate(activity_files):
-			activity_files_dict = ast.literal_eval(activity_files[i])
-			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
+	if activities:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if id_act == data_id:
 				hrr.append(tmp)
-			elif activity_files_dict.get("summaryId",None) == str(data_id) :
+			else:
 				workout.append(tmp)
-
+	else:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
 
 	# if a1:
 	# 	for tmp in a1:

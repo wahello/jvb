@@ -753,7 +753,8 @@ class UserInputs extends React.Component{
     });
   }
   onFetchGarminSuccessHrr(data){
-    let min,sec;
+    let min = "";
+    let sec = "";
     let measured_hr = this.state.measured_hr;
     let measure_hrr = data.data.Did_you_measure_HRR;
     let hr_down_99 = this.state.hr_down_99;
@@ -763,27 +764,33 @@ class UserInputs extends React.Component{
     let time_99 = data.data.time_99;
     let hr_level = this.state.hr_level;
     let HRR_start_beat = data.data.HRR_start_beat;
+    if(!HRR_start_beat)
+      HRR_start_beat = "";
+
     let lowest_hr_first_minute = this.state.lowest_hr_first_minute;
     let lowest_hrr_1min = data.data.lowest_hrr_1min;
-        if(time_99){
-           min = parseInt(time_99/60);
-           if(min || min == 0)
-              min = min.toString();
-           sec = (time_99 % 60);
-           if(sec < 10){
-            sec = "0" + sec;
-           }
-        }
-        
-        this.setState({
-          measured_hr:measured_hr?measured_hr:measure_hrr,
-          hr_down_99:hr_down_99?hr_down_99:hrr_reach_99,
-          time_to_99_min:time_to_99_min?time_to_99_min:min,
-          time_to_99_sec:time_to_99_sec?time_to_99_sec:sec,
-          hr_level:hr_level?hr_level:HRR_start_beat,
-          lowest_hr_first_minute:lowest_hr_first_minute?lowest_hr_first_minute:lowest_hrr_1min,
+    if(!lowest_hrr_1min)
+      lowest_hrr_1min = "";
 
-        });
+    if(time_99){
+       min = parseInt(time_99/60);
+       if(min || min == 0)
+          min = min.toString();
+       sec = (time_99 % 60);
+       if(sec < 10){
+        sec = "0" + sec;
+       }
+    }
+    
+    this.setState({
+      measured_hr:measured_hr?measured_hr:measure_hrr,
+      hr_down_99:hr_down_99?hr_down_99:hrr_reach_99,
+      time_to_99_min:time_to_99_min?time_to_99_min:min,
+      time_to_99_sec:time_to_99_sec?time_to_99_sec:sec,
+      hr_level:hr_level?hr_level:HRR_start_beat,
+      lowest_hr_first_minute:lowest_hr_first_minute?lowest_hr_first_minute:lowest_hrr_1min,
+
+    });
   }
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
