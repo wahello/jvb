@@ -14,6 +14,10 @@ from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
 	UserGarminDataManuallyUpdated)
+from hrr.models import Hrr
+from garmin.models import GarminFitFiles
+from django.contrib.auth.models import User
+
 
 class GarminData(APIView):
 	permission_classes = (IsAuthenticated,)
@@ -84,7 +88,11 @@ class GarminData(APIView):
 
 		return (activity_data,manually_updated_activity_data)    
 
-	def _create_activity_stat(self,activity_obj):
+	def _create_activity_stat(self,activity_obj,current_date):
+		hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
+		if hrr_data:
+			measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
+
 		if activity_obj:
 			tmp = {
 					"summaryId":"",
@@ -113,18 +121,37 @@ class GarminData(APIView):
 		
 
 	def _get_activities(self,target_date):
+		current_date = str_to_datetime(target_date)
+		hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
+		if hrr_data:
+			measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
 		act_data = self._get_activities_data(target_date)
 		activity_data = act_data[0]
 		manually_updated_act_data = act_data[1]
+
 		final_act_data = {}
 		comments = {}
 		manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
 		manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 		act_obj = {}
+		start = current_date
+		end = current_date + timedelta(days=3)
+		a1=GarminFitFiles.objects.filter(user=self.request.user,created_at__range=[start,end])
+
 		for act in activity_data:
 			act_obj = manually_edited(act)
-			finall = self._create_activity_stat(act_obj)
-			final_act_data.update(finall)	
+			if a1:
+				for tmp in a1:
+					meta = tmp.meta_data_fitfile
+					meta = ast.literal_eval(meta)
+					data_id = meta['activityIds'][0]
+					if ((act_obj.get("summaryId",None) == str(data_id)) and (act_obj.get("durationInSeconds",0) <= 1200) and (act_obj.get("distanceInMeters",0) <= 200.00)):
+						act_obj["activityType"] = "HEART_RATE_RECOVERY"
+					else:
+						pass
+			finall = self._create_activity_stat(act_obj,current_date)
+			final_act_data.update(finall)
+		print(final_act_data)
 		return final_act_data
 		
 
