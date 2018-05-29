@@ -1926,7 +1926,7 @@ handleBackButton(){
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_highest_hr_in_first_min.custom_range)}
             </tr>
             <tr className="progress_table">
-                <td className="progress_table">HRR (lowest heart rate point)</td>     
+                <td className="progress_table">HRR (lowest heart rate point in 1st Minute)</td>     
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.today}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.yesterday}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.week}</td>
