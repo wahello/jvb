@@ -743,10 +743,10 @@ def aa_workout_calculations(request):
 			heart_rate.append(avg_heart_rate)
 			max_heart_rate = filtered_activities_files[i]['maxHeartRateInBeatsPerMinute']
 			max_hrr.append(max_heart_rate)
-			if filtered_activities_files[i]['durationInSeconds'] <= 1200:
-				exercise_steps = ''
-			else:
+			if filtered_activities_files[i]['activityType']!='HEART_RATE_RECOVERY':
 				exercise_steps = filtered_activities_files[i]['steps']
+			else:
+				exercise_steps = ''
 
 			data = {"date":act_date,
 				  "workout_type":workout_type,

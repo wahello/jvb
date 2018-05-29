@@ -22,7 +22,7 @@ export function fetchWorkoutData(successWorkout,errorWorkout,selectedDate){
   });
 
 }
-export  function fetchAaWorkoutData(successWorkout,errorWorkout,selectedDate){
+export  function fetchAaWorkoutData(successWorkout1,errorWorkout,selectedDate){
   selectedDate = moment(selectedDate);
   const URL=`/hrr/daily_aa_calculations`;
   const config={
@@ -34,7 +34,7 @@ export  function fetchAaWorkoutData(successWorkout,errorWorkout,selectedDate){
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successWorkout(response);
+   successWorkout1(response);
   }).catch(function(error){
     errorWorkout(error);
   });

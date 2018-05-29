@@ -41,6 +41,7 @@ class HeartRate extends Component{
 		this.renderTable1 = this.renderTable1.bind(this);
 		this.successWorkout =this.successWorkout.bind(this);
 		this.errorWorkout =this.errorWorkout.bind(this);
+		this.successWorkout1 = this.successWorkout1.bind(this);
 		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
@@ -95,11 +96,18 @@ class HeartRate extends Component{
 		})
 	}
 	successWorkout(data){
+		console.log("++++++++++++",data);
 		this.setState({
 			data1:data.data,
+		});
+	}
+	successWorkout1(data){	
+		console.log("************************",data);
+		this.setState({
 			data:data.data
 		});
 	}
+	
 	errorWorkout(error){
 		console.log(error.message);
 	}
@@ -144,11 +152,12 @@ class HeartRate extends Component{
 		},()=>{
 			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchAaWorkoutData(this.successWorkout1,this.errorWorkout,this.state.selectedDate);
 		});
 		
 	}
 	renderTable(data){
+		
 		var td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps"];
 		for(let[key1,value] of Object.entries(data)){
@@ -171,7 +180,7 @@ class HeartRate extends Component{
 	}
 	renderTable1(data){
 		var td_rows = [];
-		let keys = ["aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone"];
+		let keys = ["aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
@@ -202,7 +211,7 @@ class HeartRate extends Component{
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 		// fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-		// fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+		// fetchAaWorkoutData(this.successWorkout1,this.errorWorkout,this.state.selectedDate);
 	}
 	render(){
 		const {fix} = this.props;
@@ -302,6 +311,7 @@ class HeartRate extends Component{
 							<th>Duration in Anaerobic Range (hh:mm:ss)</th>
 							<th>% Anaerobic</th>
 							<th>Duration Below Aerobic Range (hh:mm:ss)</th>
+							<th>% Below Aerobic</th>
 							</tr>
 							<tbody>
 								{this.renderTable1(this.state.data)}
