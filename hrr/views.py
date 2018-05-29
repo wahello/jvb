@@ -760,7 +760,10 @@ def aa_workout_calculations(request):
 					}
 			
 			data1[summaryId] = data
-	return JsonResponse(data1)
+	if data1:
+		return JsonResponse(data1)
+	else:
+		return JsonResponse(data)
 
 def daily_aa_calculations(request):
 	start_date = request.GET.get('start_date',None)
