@@ -97,7 +97,15 @@ renderTableColumns(dateWiseData,category,classes=""){
 	                	}
 	            	}
 	            	else if(key == "non_exercise_steps"){
-	            		all_data.push({value:value,
+	            		value += '';
+		             	var x = value.split('.');
+		            	var x1 = x[0];
+			            var x2 = x.length > 1 ? '.' + x[1] : '';
+			            var rgx = /(\d+)(\d{3})/;
+			            while (rgx.test(x1)) {
+				        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+			            }
+	            		all_data.push({value:x1 + x2,
 	            						style:this.renderStepsColor(value)});
 	            	}
 	            	else if(key == "weight"){

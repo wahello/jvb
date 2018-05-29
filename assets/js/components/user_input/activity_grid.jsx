@@ -70,7 +70,9 @@ const activites = { "":"Select",
 "TENNIS":"TENNIS",
 "GARDENING":"GARDENING",
 "YOGA":"YOGA",
-"PILATES":"PILATES"
+"PILATES":"PILATES",
+"KICKBALL":"KICKBALL",
+"DANCING":"DANCING"
 };
 
 export default class ActivityGrid extends Component{
@@ -266,6 +268,7 @@ createActivityTime(activityData){
 }
 
 createStartAndEndTime(activityData){
+    console.log("*****************",activityData);
     let activity_start_end_time= {}
     for(let [id,data] of Object.entries(activityData)){
         let start_time_seconds = data["startTimeInSeconds"]; 
