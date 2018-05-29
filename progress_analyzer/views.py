@@ -84,6 +84,7 @@ def progress_excel_export(request):
 	yellow = book.add_format({'align':'left', 'bg_color': 'yellow'})
 	red = book.add_format({'align':'left', 'bg_color': 'red'})
 	orange = book.add_format({'align':'left', 'bg_color': 'orange'})
+	num_format = book.add_format({'align':'left','num_format': '#,##0'})
 
 	border_format=book.add_format({
                             'border':1,
@@ -281,11 +282,11 @@ def progress_excel_export(request):
 		sheet10.write(11,c,DATA['summary']['mc']['movement_consistency_grade'][time1[i]],format_align)
 		sheet10.write(12,c,DATA['summary']['mc']['movement_consistency_gpa'][time1[i]],format_align1)
 		
-		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],format_align)
+		sheet10.write(15,c,DATA['summary']['non_exercise']['non_exercise_steps'][time1[i]],num_format)
 		sheet10.write(16,c,rank_data['total_steps'][time1[i]]['user_rank']['rank'],format_align)
 		sheet10.write(17,c,DATA['summary']['non_exercise']['movement_non_exercise_step_grade'][time1[i]],format_align)
 		sheet10.write(18,c,DATA['summary']['non_exercise']['non_exericse_steps_gpa'][time1[i]],format_align1)
-		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],format_align)
+		sheet10.write(19,c,DATA['summary']['non_exercise']['total_steps'][time1[i]],num_format)
 		
 		sheet10.write(22,c,DATA['summary']['nutrition']['prcnt_unprocessed_volume_of_food'][time1[i]],format_align)
 		sheet10.write(23,c,rank_data['prcnt_uf'][time1[i]]['user_rank']['rank'],format_align)
@@ -485,9 +486,6 @@ def progress_excel_export(request):
 		else:
 			sheet10.write(41,c,DATA['summary']['exercise']['workout_duration_hours_min'][time1[i]],format_align)
 
-
-		
-
 	#conditions for custom_ranges
 	if (len(a) == 2):
 		custom_ranges1_start = datetime.strptime(a[0], "%Y-%m-%d").date()
@@ -500,27 +498,7 @@ def progress_excel_export(request):
 		cr1 = '{},{}'.format(custom_ranges1_start,custom_ranges1_end)
 		sheet10.set_column('H:H',16)
 		
-		
-		# sheet10.conditional_format('B4:H7', {'type': 'no_errors',
-                                          # 'format': border_format})
-		# sheet10.conditional_format('B11:H15', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('B19:H22', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('B25:H27', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('B32:H37', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('J4:P8', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('J11:P14', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('J19:P22', {'type': 'no_errors',
-	 #                                          'format': border_format})
-		# sheet10.conditional_format('J25:P28', {'type': 'no_errors',
-	 #                                          'format': border_format})
-
-		
+	
 		query_params = {
 		"date":rdate,
 		"duration":"today,yesterday,week,month,year",
@@ -560,11 +538,11 @@ def progress_excel_export(request):
 			# r=14
 			# for n in range(len(non_exe)):
 			# 	r= r+1	
-			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][custom_range1]['data'],format_align)
+			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][custom_range1]['data'],num_format)
 			sheet10.write(16,c,rank_data['total_steps']['custom_range'][custom_range1]['user_rank']['rank'],format_align)
 			sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][custom_range1]['data'],format_align1)
 			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][custom_range1]['data'],format_align1)
-			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][custom_range1]['data'],format_align1)
+			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][custom_range1]['data'],non_exe)
 
 			# r=21
 			# for n in range(len(nutri)):
@@ -834,11 +812,11 @@ def progress_excel_export(request):
 			sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list1[i]]['data'],format_align)	
 			sheet10.write(12,c,DATA['summary']['mc'][mc[2]]['custom_range'][list1[i]]['data'],format_align1)	
 			
-			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][list1[i]]['data'],format_align)
+			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][list1[i]]['data'],num_format)
 			sheet10.write(16,c,rank_data['total_steps']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
 			sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list1[i]]['data'],format_align1)
 			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list1[i]]['data'],format_align1)
-			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list1[i]]['data'],format_align1)
+			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list1[i]]['data'],num_format)
 
 			sheet10.write(22,c,DATA['summary']['nutrition'][nutri[0]]['custom_range'][list1[i]]['data'],format_align)
 			sheet10.write(23,c,rank_data['prcnt_uf']['custom_range'][list1[i]]['user_rank']['rank'],format_align)
@@ -1096,11 +1074,11 @@ def progress_excel_export(request):
 			sheet10.write(11,c,DATA['summary']['mc'][mc[1]]['custom_range'][list2[i]]['data'],format_align)	
 			sheet10.write(12,c,DATA['summary']['mc'][mc[2]]['custom_range'][list2[i]]['data'],format_align1)	
 				
-			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][list2[i]]['data'],format_align)
+			sheet10.write(15,c,DATA['summary']['non_exercise'][non_exe[0]]['custom_range'][list2[i]]['data'],num_format)
 			sheet10.write(16,c,rank_data['total_steps']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
 			sheet10.write(17,c,DATA['summary']['non_exercise'][non_exe[1]]['custom_range'][list2[i]]['data'],format_align1)
 			sheet10.write(18,c,DATA['summary']['non_exercise'][non_exe[2]]['custom_range'][list2[i]]['data'],format_align1)
-			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list2[i]]['data'],format_align1)
+			sheet10.write(19,c,DATA['summary']['non_exercise'][non_exe[3]]['custom_range'][list2[i]]['data'],num_format)
 
 			sheet10.write(22,c,DATA['summary']['nutrition'][nutri[0]]['custom_range'][list2[i]]['data'],format_align)
 			sheet10.write(23,c,rank_data['prcnt_uf']['custom_range'][list2[i]]['user_rank']['rank'],format_align)
