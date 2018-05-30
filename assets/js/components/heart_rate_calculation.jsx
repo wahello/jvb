@@ -48,6 +48,7 @@ class HeartRateCal extends Component{
 
 				"no_fitfile_hrr_reach_99":"",
 				"no_fitfile_hrr_time_reach_99":"",
+				"time_heart_rate_reached_99":"",
 				"lowest_hrr_no_fitfile":"",
 				"no_file_beats_recovered":"",
 
@@ -83,6 +84,7 @@ class HeartRateCal extends Component{
 
 				"no_fitfile_hrr_time_reach_99":data.data.no_fitfile_hrr_time_reach_99,
 				no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
+				time_heart_rate_reached_99:data.data.time_heart_rate_reached_99,
 				lowest_hrr_no_fitfile:data.data.lowest_hrr_no_fitfile,
 				no_file_beats_recovered:data.data.no_file_beats_recovered,
 
@@ -292,6 +294,11 @@ class HeartRateCal extends Component{
 	          	    <tbody>  
 
 	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">End Time of Activity(hh:mm:ss)</td>
+						<td className = "hr_table_style_rows">{this.renderTime(this.state.end_time_activity)}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>
 						<td className = "hr_table_style_rows">{this.renderNoworkout(this.state.Did_you_measure_HRR)}</td>
 	          	    </tr>
@@ -304,6 +311,11 @@ class HeartRateCal extends Component{
 	          	     <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
 		          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.no_fitfile_hrr_time_reach_99)}</td>
+	          	    </tr>
+
+	          	    <tr className = "hr_table_style_rows">
+		          	    <td className = "hr_table_style_rows">Time Heart Rate Reached 99 (hh:mm:ss)</td>
+						<td className = "hr_table_style_rows">{this.renderTime(this.state.time_heart_rate_reached_99)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
