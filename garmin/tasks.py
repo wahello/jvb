@@ -6,6 +6,7 @@ from celery.utils.log import get_task_logger
 
 from .garmin_push import store_garmin_health_push
 from .models import GarminPingNotification
+from .routine_jobs.garmin_token_validator import validate_garmin_tokens
 
 logger = get_task_logger(__name__)
 
@@ -46,3 +47,18 @@ def retry_failed_ping_notification():
 			message = "Retry failed for {}'s ping notification of type '{}'' whose upload start time is '{}'"
 			message = message.format(notif.user.username,notif.summary_type,notif.upload_start_time_seconds)
 			logger.error(message,str(e),exc_info=True)
+
+@task(name="garmin.validate_garmin_health_token")
+def validate_garmin_health_token():
+	'''
+		Celery task to check for invalid garmin health tokens
+		Runs everyday at 5 am NY Timezone 
+	'''
+	try:
+		recipients = ['atulk@s7works.io','saumyag@s7works.io','jim@jvbwellness.com']
+		validate_garmin_tokens(recipients)
+		logger.info("Check for invalid garmin health token succeeded")
+
+	except Exception as e:
+		message = "Check for invalid garmin health token failed"
+		logger.error(message.format(str(e)), exc_info=True)
