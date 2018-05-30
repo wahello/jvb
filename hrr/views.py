@@ -622,7 +622,6 @@ def aa_calculations(request):
 
 	return JsonResponse(data)
 
-
 def aa_workout_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -682,7 +681,23 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
-	
+	workout = []
+	hrr = []
+	start = start_date
+	end = start_date + timedelta(days=7)
+	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	if filtered_activities_files:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			
+			# print(data_id)
+			for i,k in enumerate(filtered_activities_files):
+				if ((filtered_activities_files[i]["summaryId"] == str(data_id)) and (filtered_activities_files[i]["durationInSeconds"] <= 500) and (filtered_activities_files[i]["distanceInMeters"] <= 200.00)):
+					hrr.append(filtered_activities_files[i])
+				elif filtered_activities_files[i]["summaryId"] == str(data_id):
+					workout.append(filtered_activities_files[i])
 	data={"date":"",
 		  "workout_type":"",
 		  "duration":"",
@@ -698,26 +713,23 @@ def aa_workout_calculations(request):
 	max_hrr = []
 	data1={}
 
-	if filtered_activities_files:
-		start_date_timestamp = filtered_activities_files[0]['startTimeInSeconds']
+	if workout:
+		start_date_timestamp = workout[0]['startTimeInSeconds']
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
 		
-		for i,k in enumerate(filtered_activities_files):
+		for i,k in enumerate(workout):
 			act_date = date
-			summaryId = filtered_activities_files[i]['summaryId']
-			workout_type = filtered_activities_files[i]['activityType']
-			duration = filtered_activities_files[i]['durationInSeconds']
+			summaryId = workout[i]['summaryId']
+			workout_type = workout[i]['activityType']
+			duration = workout[i]['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = filtered_activities_files[i]['averageHeartRateInBeatsPerMinute']
+			avg_heart_rate = workout[i]['averageHeartRateInBeatsPerMinute']
 			heart_rate.append(avg_heart_rate)
-			max_heart_rate = filtered_activities_files[i]['maxHeartRateInBeatsPerMinute']
+			max_heart_rate = workout[i]['maxHeartRateInBeatsPerMinute']
 			max_hrr.append(max_heart_rate)
-			if filtered_activities_files[i]['activityType']!='HEART_RATE_RECOVERY':
-				exercise_steps = filtered_activities_files[i]['steps']
-			else:
-				exercise_steps = ''
-
+			exercise_steps = workout[i]['steps']
+			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
@@ -779,7 +791,7 @@ def daily_aa_calculations(request):
 	hrr = []
 	data_summaryid = []
 	start = start_date
-	end = start_date + timedelta(days=1)
+	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	if a1:
 		for tmp in a1:
@@ -890,6 +902,7 @@ def daily_aa_calculations(request):
 					"total_prcnt_aerobic":sum(prcnt_aerobic_duration),
 					"total_prcnt_anaerobic":sum(prcnt_anaerobic_duration)}
 			daily_aa_data[data_summaryid[i]] =data
+
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
