@@ -100,7 +100,9 @@ def update_helper(instance,data_dict):
 	# except DatabaseError as e:
 	# 	# If any error, set instance to previous state
 	for attr, value in data_dict.items():
+		print(instance,attr,value)
 		setattr(instance,attr,value)
+	instance.save()
 
 # update Hrr table
 
@@ -274,13 +276,17 @@ def hrr_calculations(request):
 					hrr_no_fitfile = daily_diff_data_60
 				else:
 					hrr_no_fitfile = None
-			if pure1min >= 0:		
+			if pure1min >= 0:
 				pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
 			elif hrr_no_fitfile:
 				pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
 			else:
 				pure_1min_heart_beats = 0
 			pure_time_99 = time_99 + diff_actity_hrr
+			
+			if Did_heartrate_reach_99 == 'no':
+				pure_time_99 = None
+
 
 	else:
 		Did_you_measure_HRR = 'no'
@@ -296,82 +302,43 @@ def hrr_calculations(request):
 		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
 			daily_diff_60 = str(int(daily_diff + 60))
 			daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
+			daily_diff_99 = daily_diff_60
+			daily_diff_data_99 = daily_diff_data_60
+			if daily_diff_data_99:
+				while daily_diff_data_99 >= 99:
+					daily_diff_data_99 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_99,None)
+					daily_diff_99 = int(daily_diff_99) + 15
+					daily_diff_99 = str(daily_diff_99)
+
 			if daily_diff_data_60:
-				hrr_no_fitfile = daily_diff_data_60
+				if daily_diff_data_60 < 99:
+					no_fitfile_hrr_time_reach_99 = daily_diff_data_60
+				if daily_diff_data_60 >= 99:
+					no_fitfile_hrr_time_reach_99 = int(daily_diff_99)-int(daily_diff_60)-15
 			else:
-				hrr_no_fitfile = ''
-			daily_diff_15 = str(int(daily_diff + 15))
-			daily_diff_data_15 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_15,None)
-			if daily_diff_data_15:
-				hrr_no_fitfile_15 = daily_diff_data_15
-			else:
-				hrr_no_fitfile_15 = ''
-			daily_diff_30 = str(int(daily_diff + 30))
-			daily_diff_data_30 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_30,None)
-			if daily_diff_data_30:
-				hrr_no_fitfile_30 = daily_diff_data_30
-			else:
-				hrr_no_fitfile_30 = ''
-
-			daily_diff_45 = str(int(daily_diff + 45))
-			daily_diff_data_45 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_45,None)
-			if daily_diff_data_45:
-				hrr_no_fitfile_45 = daily_diff_data_45
-			else:
-				hrr_no_fitfile_45 = ''
-
-			daily_diff_75 = str(int(daily_diff + 75))
-			daily_diff_data_75 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_75,None)
-			if daily_diff_data_75:
-				hrr_no_fitfile_75 = daily_diff_data_75
-			else:
-				hrr_no_fitfile_75 = ''
-
-			daily_diff_90 = str(int(daily_diff + 90))
-			daily_diff_data_90 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_90,None)
-			if daily_diff_data_90:
-				hrr_no_fitfile_90 = daily_diff_data_90
-			else:
-				hrr_no_fitfile_90 = ''
-			daily_diff_105 = str(int(daily_diff + 105))
-			
-			daily_diff_data_105 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_105,None)
-			if daily_diff_data_105:
-				hrr_no_fitfile_105 = daily_diff_data_105
-			else:
-				hrr_no_fitfile_105 = ''
-
-		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-			if hrr_no_fitfile_15 <= 99 :
-				no_fitfile_hrr_time_reach_99 = 15
-			elif hrr_no_fitfile_30 <= 99:
-				no_fitfile_hrr_time_reach_99 = 30
-			elif hrr_no_fitfile_45 <= 99:
-				no_fitfile_hrr_time_reach_99 = 45
-			elif hrr_no_fitfile <= 99:
-				no_fitfile_hrr_time_reach_99 = 60
-			elif hrr_no_fitfile_75 <= 99:
-				no_fitfile_hrr_time_reach_99 = 75
-			elif hrr_no_fitfile_90 <= 99:
-				no_fitfile_hrr_time_reach_99 = 90
-			elif hrr_no_fitfile_105 <= 99:
-				no_fitfile_hrr_time_reach_99 = 105
-			else:
-				no_fitfile_hrr_time_reach_99 = 120
-
+				no_fitfile_hrr_time_reach_99 = None
 		else:
 			no_fitfile_hrr_time_reach_99 = None
+		if daily_diff_data_60:
+			hrr_no_fitfile = daily_diff_data_60
+		else:
+			hrr_no_fitfile = None
 
-
-		if hrr_no_fitfile:		
-			if hrr_no_fitfile <= 99:
+		if daily_diff_data_60:		
+			if daily_diff_data_60 <= 99:
 				no_fitfile_hrr_reach_99 = 'yes'
 			else:
 				no_fitfile_hrr_reach_99 = 'no'
 		else:
 			no_fitfile_hrr_reach_99 = ''
-
-		no_file_beats_recovered = abs(end_heartrate_activity - hrr_no_fitfile)
+		if daily_diff_data_60:
+			no_file_beats_recovered = abs(end_heartrate_activity - daily_diff_data_60)
+		else:
+			no_file_beats_recovered = 0
+		if no_fitfile_hrr_time_reach_99:
+			time_heart_rate_reached_99 = end_time_activity + no_fitfile_hrr_time_reach_99
+		else:
+			time_heart_rate_reached_99 = None
 
 	if hrr:
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
@@ -391,6 +358,7 @@ def hrr_calculations(request):
 
 				"no_fitfile_hrr_reach_99":'',
 				"no_fitfile_hrr_time_reach_99":None,
+				"time_heart_rate_reached_99":None,
 				"lowest_hrr_no_fitfile":None,
 				"no_file_beats_recovered":None,
 
@@ -414,6 +382,7 @@ def hrr_calculations(request):
 			"Did_you_measure_HRR":Did_you_measure_HRR,
 			"no_fitfile_hrr_reach_99":no_fitfile_hrr_reach_99,
 			"no_fitfile_hrr_time_reach_99":no_fitfile_hrr_time_reach_99,
+			"time_heart_rate_reached_99":time_heart_rate_reached_99,
 			"end_heartrate_activity":end_heartrate_activity,#same for without fitfile also with HRR File Starting Heart Rate
 			"lowest_hrr_no_fitfile":hrr_no_fitfile,
 			"no_file_beats_recovered":no_file_beats_recovered,
@@ -436,6 +405,7 @@ def hrr_calculations(request):
 			"pure_time_99":None,
 			"no_fitfile_hrr_reach_99":'',
 			"no_fitfile_hrr_time_reach_99":None,
+			"time_heart_rate_reached_99":None,
 			"lowest_hrr_no_fitfile":None,
 			"no_file_beats_recovered":None,
 			"offset":None,
@@ -652,7 +622,6 @@ def aa_calculations(request):
 
 	return JsonResponse(data)
 
-
 def aa_workout_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -712,7 +681,23 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
-	
+	workout = []
+	hrr = []
+	start = start_date
+	end = start_date + timedelta(days=7)
+	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	if filtered_activities_files:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			
+			# print(data_id)
+			for i,k in enumerate(filtered_activities_files):
+				if ((filtered_activities_files[i]["summaryId"] == str(data_id)) and (filtered_activities_files[i]["durationInSeconds"] <= 500) and (filtered_activities_files[i]["distanceInMeters"] <= 200.00)):
+					hrr.append(filtered_activities_files[i])
+				elif filtered_activities_files[i]["summaryId"] == str(data_id):
+					workout.append(filtered_activities_files[i])
 	data={"date":"",
 		  "workout_type":"",
 		  "duration":"",
@@ -728,26 +713,23 @@ def aa_workout_calculations(request):
 	max_hrr = []
 	data1={}
 
-	if filtered_activities_files:
-		start_date_timestamp = filtered_activities_files[0]['startTimeInSeconds']
+	if workout:
+		start_date_timestamp = workout[0]['startTimeInSeconds']
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
 		
-		for i,k in enumerate(filtered_activities_files):
+		for i,k in enumerate(workout):
 			act_date = date
-			summaryId = filtered_activities_files[i]['summaryId']
-			workout_type = filtered_activities_files[i]['activityType']
-			duration = filtered_activities_files[i]['durationInSeconds']
+			summaryId = workout[i]['summaryId']
+			workout_type = workout[i]['activityType']
+			duration = workout[i]['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = filtered_activities_files[i]['averageHeartRateInBeatsPerMinute']
+			avg_heart_rate = workout[i]['averageHeartRateInBeatsPerMinute']
 			heart_rate.append(avg_heart_rate)
-			max_heart_rate = filtered_activities_files[i]['maxHeartRateInBeatsPerMinute']
+			max_heart_rate = workout[i]['maxHeartRateInBeatsPerMinute']
 			max_hrr.append(max_heart_rate)
-			if filtered_activities_files[i]['durationInSeconds'] <= 1200:
-				exercise_steps = ''
-			else:
-				exercise_steps = filtered_activities_files[i]['steps']
-
+			exercise_steps = workout[i]['steps']
+			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
@@ -809,7 +791,7 @@ def daily_aa_calculations(request):
 	hrr = []
 	data_summaryid = []
 	start = start_date
-	end = start_date + timedelta(days=1)
+	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	if a1:
 		for tmp in a1:
@@ -920,6 +902,7 @@ def daily_aa_calculations(request):
 					"total_prcnt_aerobic":sum(prcnt_aerobic_duration),
 					"total_prcnt_anaerobic":sum(prcnt_anaerobic_duration)}
 			daily_aa_data[data_summaryid[i]] =data
+
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:

@@ -138,7 +138,7 @@ class GarminPingNotification(models.Model):
 		("stressDetails","Stress Details"),
 		("moveIQActivities","Move IQ Activities"),
 		("userMetrics","User Metrics"),
-		("deregistration","Deregistration"),
+		("deregistrations","Deregistration"),
 	)
 
 	PING_STATE_CHOICES = (
