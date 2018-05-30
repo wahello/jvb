@@ -4,7 +4,7 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function haveGarminToken(successTocken,errorTocken){   
+export default function haveGarminToken(successToken,errorToken){   
   const URL=` /garmin/users/have_tokens`;
   const config={
    method:"get",
@@ -12,9 +12,9 @@ export default function haveGarminToken(successTocken,errorTocken){
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successTocken(response);
+   successToken(response);
   }).catch(function(error){
-    errorTocken(error);
+    errorToken(error);
   });
 
 }
