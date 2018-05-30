@@ -2,12 +2,30 @@ import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import { Link,withRouter } from 'react-router-dom';
 import NavbarMenu from '../navbar';
+import haveGarminToken from "../../network/dashboard";
 class Dashboard extends Component {
 
 	constructor(props){
 		super(props);
+		this.stat = {
+			"have_garmin_connect_token":"",
+    		"have_garmin_health_token": ""
+		};
+		this.successTocken = this.successTocken.bind(this);
+		this.errorTocken = this.errorTocken.bind(this);
 	}
-
+	successTocken(data){
+		this.setState({
+			have_garmin_connect_token:data.data.have_garmin_connect_token,
+			have_garmin_health_token:data.data.have_garmin_connect_token,
+		});
+	}
+	errorTocken(error){
+		console.log(error.message);
+	}
+	componentDidMount(){
+		haveGarminToken(this.successTocken,this.errorTocken);
+	}
 	render(){
 		return (
 			<div>
