@@ -13,6 +13,7 @@ class Dashboard extends Component {
 			"have_garmin_connect_token":true,
     		"have_garmin_health_token":true
 		};
+		this.noGarminTokenModel = this.noGarminTokenModel.bind(this);
 		this.successToken = this.successToken.bind(this);
 		this.errorToken = this.errorToken.bind(this);
 		this.garminHealthModel = this.garminHealthModel.bind(this);
@@ -22,7 +23,7 @@ class Dashboard extends Component {
 	successToken(data){
 		// this.setState({
 		// 	have_garmin_connect_token:data.data.have_garmin_connect_token,
-		// 	have_garmin_health_token:data.data.have_garmin_connect_token,
+		// 	have_garmin_health_token:data.data.have_garmin_health_token,
 		// });
 	}
 	toggle() {
@@ -30,7 +31,20 @@ class Dashboard extends Component {
 	      modal: !this.state.modal
 	    });
   	}
+	noGarminTokenModel(){
+			let modal =  <Modal isOpen={this.state.modal} toggle = {this.toggle} className={this.props.className}>
+					          <ModalHeader>Connect Garmin Account</ModalHeader>
+					          <ModalBody>
+					            	Provide you consent to Garmin Connect sharing your health information and FIT files with JVB Wellness.
+					            	Click on link under the "Set up Links to Garmin".
+					          </ModalBody>
+					          <ModalFooter>
+					            	<Button color="primary" onClick={this.toggle}>Ok</Button>
+					          </ModalFooter>
+				        </Modal>
 
+	        return modal;
+		}
 	garminHealthModel(){
 		let modal =  <Modal isOpen={this.state.modal} toggle = {this.toggle} className={this.props.className}>
 				          <ModalHeader>Garmin Health Connect</ModalHeader>
@@ -101,6 +115,7 @@ class Dashboard extends Component {
 								  <h3 id="link_style">Set up Links to Garmin</h3>
 								  <a href='/users/request_token'>Garmin Health Connect</a><br/>
 								  <a href='/users/connect_request_token'>Garmin Connect</a><br/>
+								  {this.noGarminTokenModel()}
 							  </div>
 							}
 							{(this.state.have_garmin_connect_token == true && this.state.have_garmin_health_token == false) &&
