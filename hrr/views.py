@@ -100,7 +100,9 @@ def update_helper(instance,data_dict):
 	# except DatabaseError as e:
 	# 	# If any error, set instance to previous state
 	for attr, value in data_dict.items():
+		print(instance,attr,value)
 		setattr(instance,attr,value)
+	instance.save()
 
 # update Hrr table
 
@@ -274,13 +276,17 @@ def hrr_calculations(request):
 					hrr_no_fitfile = daily_diff_data_60
 				else:
 					hrr_no_fitfile = None
-			if pure1min >= 0:		
+			if pure1min >= 0:
 				pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
 			elif hrr_no_fitfile:
 				pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
 			else:
 				pure_1min_heart_beats = 0
 			pure_time_99 = time_99 + diff_actity_hrr
+			
+			if Did_heartrate_reach_99 == 'no':
+				pure_time_99 = None
+
 
 	else:
 		Did_you_measure_HRR = 'no'
@@ -296,82 +302,43 @@ def hrr_calculations(request):
 		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
 			daily_diff_60 = str(int(daily_diff + 60))
 			daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
+			daily_diff_99 = daily_diff_60
+			daily_diff_data_99 = daily_diff_data_60
+			if daily_diff_data_99:
+				while daily_diff_data_99 >= 99:
+					daily_diff_data_99 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_99,None)
+					daily_diff_99 = int(daily_diff_99) + 15
+					daily_diff_99 = str(daily_diff_99)
+
 			if daily_diff_data_60:
-				hrr_no_fitfile = daily_diff_data_60
+				if daily_diff_data_60 < 99:
+					no_fitfile_hrr_time_reach_99 = daily_diff_data_60
+				if daily_diff_data_60 >= 99:
+					no_fitfile_hrr_time_reach_99 = int(daily_diff_99)-int(daily_diff_60)-15
 			else:
-				hrr_no_fitfile = ''
-			daily_diff_15 = str(int(daily_diff + 15))
-			daily_diff_data_15 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_15,None)
-			if daily_diff_data_15:
-				hrr_no_fitfile_15 = daily_diff_data_15
-			else:
-				hrr_no_fitfile_15 = ''
-			daily_diff_30 = str(int(daily_diff + 30))
-			daily_diff_data_30 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_30,None)
-			if daily_diff_data_30:
-				hrr_no_fitfile_30 = daily_diff_data_30
-			else:
-				hrr_no_fitfile_30 = ''
-
-			daily_diff_45 = str(int(daily_diff + 45))
-			daily_diff_data_45 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_45,None)
-			if daily_diff_data_45:
-				hrr_no_fitfile_45 = daily_diff_data_45
-			else:
-				hrr_no_fitfile_45 = ''
-
-			daily_diff_75 = str(int(daily_diff + 75))
-			daily_diff_data_75 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_75,None)
-			if daily_diff_data_75:
-				hrr_no_fitfile_75 = daily_diff_data_75
-			else:
-				hrr_no_fitfile_75 = ''
-
-			daily_diff_90 = str(int(daily_diff + 90))
-			daily_diff_data_90 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_90,None)
-			if daily_diff_data_90:
-				hrr_no_fitfile_90 = daily_diff_data_90
-			else:
-				hrr_no_fitfile_90 = ''
-			daily_diff_105 = str(int(daily_diff + 105))
-			
-			daily_diff_data_105 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_105,None)
-			if daily_diff_data_105:
-				hrr_no_fitfile_105 = daily_diff_data_105
-			else:
-				hrr_no_fitfile_105 = ''
-
-		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-			if hrr_no_fitfile_15 <= 99 :
-				no_fitfile_hrr_time_reach_99 = 15
-			elif hrr_no_fitfile_30 <= 99:
-				no_fitfile_hrr_time_reach_99 = 30
-			elif hrr_no_fitfile_45 <= 99:
-				no_fitfile_hrr_time_reach_99 = 45
-			elif hrr_no_fitfile <= 99:
-				no_fitfile_hrr_time_reach_99 = 60
-			elif hrr_no_fitfile_75 <= 99:
-				no_fitfile_hrr_time_reach_99 = 75
-			elif hrr_no_fitfile_90 <= 99:
-				no_fitfile_hrr_time_reach_99 = 90
-			elif hrr_no_fitfile_105 <= 99:
-				no_fitfile_hrr_time_reach_99 = 105
-			else:
-				no_fitfile_hrr_time_reach_99 = 120
-
+				no_fitfile_hrr_time_reach_99 = None
 		else:
 			no_fitfile_hrr_time_reach_99 = None
+		if daily_diff_data_60:
+			hrr_no_fitfile = daily_diff_data_60
+		else:
+			hrr_no_fitfile = None
 
-
-		if hrr_no_fitfile:		
-			if hrr_no_fitfile <= 99:
+		if daily_diff_data_60:		
+			if daily_diff_data_60 <= 99:
 				no_fitfile_hrr_reach_99 = 'yes'
 			else:
 				no_fitfile_hrr_reach_99 = 'no'
 		else:
 			no_fitfile_hrr_reach_99 = ''
-
-		no_file_beats_recovered = abs(end_heartrate_activity - hrr_no_fitfile)
+		if daily_diff_data_60:
+			no_file_beats_recovered = abs(end_heartrate_activity - daily_diff_data_60)
+		else:
+			no_file_beats_recovered = 0
+		if no_fitfile_hrr_time_reach_99:
+			time_heart_rate_reached_99 = end_time_activity + no_fitfile_hrr_time_reach_99
+		else:
+			time_heart_rate_reached_99 = None
 
 	if hrr:
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
@@ -391,6 +358,7 @@ def hrr_calculations(request):
 
 				"no_fitfile_hrr_reach_99":'',
 				"no_fitfile_hrr_time_reach_99":None,
+				"time_heart_rate_reached_99":None,
 				"lowest_hrr_no_fitfile":None,
 				"no_file_beats_recovered":None,
 
@@ -414,6 +382,7 @@ def hrr_calculations(request):
 			"Did_you_measure_HRR":Did_you_measure_HRR,
 			"no_fitfile_hrr_reach_99":no_fitfile_hrr_reach_99,
 			"no_fitfile_hrr_time_reach_99":no_fitfile_hrr_time_reach_99,
+			"time_heart_rate_reached_99":time_heart_rate_reached_99,
 			"end_heartrate_activity":end_heartrate_activity,#same for without fitfile also with HRR File Starting Heart Rate
 			"lowest_hrr_no_fitfile":hrr_no_fitfile,
 			"no_file_beats_recovered":no_file_beats_recovered,
@@ -436,6 +405,7 @@ def hrr_calculations(request):
 			"pure_time_99":None,
 			"no_fitfile_hrr_reach_99":'',
 			"no_fitfile_hrr_time_reach_99":None,
+			"time_heart_rate_reached_99":None,
 			"lowest_hrr_no_fitfile":None,
 			"no_file_beats_recovered":None,
 			"offset":None,
