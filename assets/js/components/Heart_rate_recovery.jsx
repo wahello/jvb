@@ -96,13 +96,13 @@ class HeartRate extends Component{
 		})
 	}
 	successWorkout(data){
-		console.log("++++++++++++",data);
+	
 		this.setState({
 			data1:data.data,
 		});
 	}
 	successWorkout1(data){	
-		console.log("************************",data);
+		
 		this.setState({
 			data:data.data
 		});
