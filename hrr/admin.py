@@ -5,7 +5,7 @@ from .models import Hrr
 class HrrAdmin(admin.ModelAdmin):
 	list_display = ('user_hrr','created_at','updated_at')
 
-	search_fields = ('user__username','user__email','user__first_name',
-					 'user__last_name',)
+	search_fields = ('user_hrr__username','user_hrr__email','user_hrr__first_name',
+					 'user_hrr__last_name',)
 
 admin.site.register(Hrr,HrrAdmin)

@@ -26,6 +26,7 @@ class Hrr(models.Model):
 
 	no_fitfile_hrr_reach_99 = models.CharField(max_length=3,blank=True,null=True)
 	no_fitfile_hrr_time_reach_99 = models.FloatField(blank=True,null=True)
+	time_heart_rate_reached_99 = models.FloatField(blank=True,null=True)
 	lowest_hrr_no_fitfile = models.FloatField(blank=True,null=True)
 	no_file_beats_recovered = models.FloatField(blank=True,null=True)
 

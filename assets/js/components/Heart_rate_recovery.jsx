@@ -283,7 +283,7 @@ class HeartRate extends Component{
           	    </table>   
           	   </div>
           	  </div>
-          	  {/*
+          	  
           	   <div className = "row">
 					<div className= "col-md-6" style = {{paddingLeft:"50px"}}>
 					 <div className = "table table-responsive">
@@ -321,7 +321,7 @@ class HeartRate extends Component{
 					</div>
 					</div>
 				
-					</div>*/}
+					</div>
           	  {this.renderAerobicSelectedDateFetchOverlay()}
           	  </div>
 			</div>
