@@ -10,8 +10,8 @@ class Dashboard extends Component {
 		super(props);
 		this.state = {
 			 modal: true,
-			"have_garmin_connect_token":true,
-    		"have_garmin_health_token":true
+			"have_garmin_connect_token":"",
+    		"have_garmin_health_token":""
 		};
 		this.noGarminTokenModel = this.noGarminTokenModel.bind(this);
 		this.successToken = this.successToken.bind(this);
@@ -21,10 +21,10 @@ class Dashboard extends Component {
 		this.toggle = this.toggle.bind(this);
 	}
 	successToken(data){
-		// this.setState({
-		// 	have_garmin_connect_token:data.data.have_garmin_connect_token,
-		// 	have_garmin_health_token:data.data.have_garmin_health_token,
-		// });
+		this.setState({
+			have_garmin_connect_token:data.data.have_garmin_connect_token,
+			have_garmin_health_token:data.data.have_garmin_health_token,
+		});
 	}
 	toggle() {
 	    this.setState({
@@ -76,9 +76,9 @@ class Dashboard extends Component {
 	errorToken(error){
 		console.log(error.message);
 	}
-	// componentDidMount(){
-	// 	haveGarminToken(this.successToken,this.errorToken);
-	// }
+	componentDidMount(){
+		haveGarminToken(this.successToken,this.errorToken);
+	}
 	render(){
 		return (
 			<div>
