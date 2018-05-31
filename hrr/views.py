@@ -372,7 +372,7 @@ def hrr_calculations(request):
 			"lowest_hrr_1min":None,
 			"No_beats_recovered":None,
 
-			"end_time_activity":None,
+			"end_time_activity":end_time_activity,
 			"diff_actity_hrr":None,
 			"HRR_activity_start_time":None,
 			"heart_rate_down_up":None,
