@@ -799,12 +799,13 @@ def daily_aa_calculations(request):
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
 			data_summaryid.append(data_id)
-			for i,k in enumerate(activity_files):
-				activity_files_dict = ast.literal_eval(activity_files[i])
-				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
-					hrr.append(tmp)
-				elif activity_files_dict.get("summaryId",None) == str(data_id) :
-					workout.append(tmp)
+			if activity_files_qs:
+				for i,k in enumerate(activity_files):
+					activity_files_dict = ast.literal_eval(activity_files[i])
+					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
+						hrr.append(tmp)
+					elif activity_files_dict.get("summaryId",None) == str(data_id) :
+						workout.append(tmp)
 
 	profile = Profile.objects.filter(user=request.user)
 	if profile:
