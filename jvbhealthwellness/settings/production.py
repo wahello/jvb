@@ -74,6 +74,11 @@ CELERY_BEAT_SCHEDULE = {
     'generate-log-for-incorrect-pa':{
         'task':'progress_analyzer.generate_log_incorrect_pa',
         'schedule':crontab(minute=0, hour='*/1')
+    },
+    #execute every day at 4:00 AM EST (America/New_york)
+    "validate-garmin-health-token":{
+        'task':'garmin.validate_garmin_health_token',
+        'schedule':crontab(minute=0, hour=4)
     }
 }
 
