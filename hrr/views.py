@@ -745,7 +745,7 @@ def aa_workout_calculations(request):
 	if data1:
 		return JsonResponse(data1)
 	else:
-		return JsonResponse(data)
+		return JsonResponse({})
 
 def daily_aa_calculations(request):
 	start_date = request.GET.get('start_date',None)
@@ -906,4 +906,4 @@ def daily_aa_calculations(request):
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
-		return JsonResponse(data)
+		return JsonResponse({})
