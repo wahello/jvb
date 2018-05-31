@@ -372,7 +372,7 @@ def hrr_calculations(request):
 			"lowest_hrr_1min":None,
 			"No_beats_recovered":None,
 
-			"end_time_activity":None,
+			"end_time_activity":end_time_activity,
 			"diff_actity_hrr":None,
 			"HRR_activity_start_time":None,
 			"heart_rate_down_up":None,
@@ -745,7 +745,7 @@ def aa_workout_calculations(request):
 	if data1:
 		return JsonResponse(data1)
 	else:
-		return JsonResponse(data)
+		return JsonResponse({})
 
 def daily_aa_calculations(request):
 	start_date = request.GET.get('start_date',None)
@@ -906,4 +906,4 @@ def daily_aa_calculations(request):
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
-		return JsonResponse(data)
+		return JsonResponse({})
