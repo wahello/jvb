@@ -372,7 +372,7 @@ def hrr_calculations(request):
 			"lowest_hrr_1min":None,
 			"No_beats_recovered":None,
 
-			"end_time_activity":None,
+			"end_time_activity":end_time_activity,
 			"diff_actity_hrr":None,
 			"HRR_activity_start_time":None,
 			"heart_rate_down_up":None,
@@ -691,10 +691,8 @@ def aa_workout_calculations(request):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			
-			# print(data_id)
 			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i]["summaryId"] == str(data_id)) and (filtered_activities_files[i]["durationInSeconds"] <= 500) and (filtered_activities_files[i]["distanceInMeters"] <= 200.00)):
+				if ((filtered_activities_files[i]["summaryId"] == str(data_id)) and (filtered_activities_files[i]["durationInSeconds"] <= 1200)):
 					hrr.append(filtered_activities_files[i])
 				elif filtered_activities_files[i]["summaryId"] == str(data_id):
 					workout.append(filtered_activities_files[i])
@@ -704,8 +702,8 @@ def aa_workout_calculations(request):
 		  "average_heart_rate":"",
 		  "max_heart_rate":"",
 		  "total_time":"",
-		  "avg_hrr":"",
-		  "max_hrr":"",
+		  # "avg_hrr":"",
+		  # "max_hrr":"",
 		  "steps":""
 			}
 	time_duration = []
@@ -724,11 +722,11 @@ def aa_workout_calculations(request):
 			workout_type = workout[i]['activityType']
 			duration = workout[i]['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = workout[i]['averageHeartRateInBeatsPerMinute']
+			avg_heart_rate = workout[i].get('averageHeartRateInBeatsPerMinute')
 			heart_rate.append(avg_heart_rate)
-			max_heart_rate = workout[i]['maxHeartRateInBeatsPerMinute']
+			max_heart_rate = workout[i].get('maxHeartRateInBeatsPerMinute')
 			max_hrr.append(max_heart_rate)
-			exercise_steps = workout[i]['steps']
+			exercise_steps = workout[i].get("steps")
 			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
@@ -736,8 +734,8 @@ def aa_workout_calculations(request):
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
 				  "total_time":sum(time_duration),
-				  "avg_hrr":sum(heart_rate)/len(heart_rate),
-				  "max_hrr":sum(max_hrr)/len(max_hrr),
+				  # "avg_hrr":sum(heart_rate)/len(heart_rate),
+				  # "max_hrr":sum(max_hrr)/len(max_hrr),
 				  "steps":exercise_steps
 					}
 			
@@ -745,7 +743,7 @@ def aa_workout_calculations(request):
 	if data1:
 		return JsonResponse(data1)
 	else:
-		return JsonResponse(data)
+		return JsonResponse({})
 
 def daily_aa_calculations(request):
 	start_date = request.GET.get('start_date',None)
@@ -799,12 +797,13 @@ def daily_aa_calculations(request):
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
 			data_summaryid.append(data_id)
-			for i,k in enumerate(activity_files):
-				activity_files_dict = ast.literal_eval(activity_files[i])
-				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 500) and (activity_files_dict.get("distanceInMeters",None) <= 200.00)):
-					hrr.append(tmp)
-				elif activity_files_dict.get("summaryId",None) == str(data_id) :
-					workout.append(tmp)
+			if activity_files_qs:
+				for i,k in enumerate(activity_files):
+					activity_files_dict = ast.literal_eval(activity_files[i])
+					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+						hrr.append(tmp)
+					elif activity_files_dict.get("summaryId",None) == str(data_id) :
+						workout.append(tmp)
 
 	profile = Profile.objects.filter(user=request.user)
 	if profile:
@@ -906,4 +905,4 @@ def daily_aa_calculations(request):
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
-		return JsonResponse(data)
+		return JsonResponse({})

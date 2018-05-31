@@ -9,7 +9,7 @@ class Dashboard extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			 modal: true,
+			 modal: false,
 			"have_garmin_connect_token":"",
     		"have_garmin_health_token":""
 		};
@@ -22,6 +22,7 @@ class Dashboard extends Component {
 	}
 	successToken(data){
 		this.setState({
+			modal:true,
 			have_garmin_connect_token:data.data.have_garmin_connect_token,
 			have_garmin_health_token:data.data.have_garmin_health_token,
 		});

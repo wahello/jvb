@@ -96,13 +96,11 @@ class HeartRate extends Component{
 		})
 	}
 	successWorkout(data){
-	
 		this.setState({
 			data1:data.data,
 		});
 	}
 	successWorkout1(data){	
-		
 		this.setState({
 			data:data.data
 		});
@@ -210,8 +208,8 @@ class HeartRate extends Component{
 			fetching_aerobic:false,
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
-		// fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-		// fetchAaWorkoutData(this.successWorkout1,this.errorWorkout,this.state.selectedDate);
+		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+		fetchAaWorkoutData(this.successWorkout1,this.errorWorkout,this.state.selectedDate);
 	}
 	render(){
 		const {fix} = this.props;
