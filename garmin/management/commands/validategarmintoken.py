@@ -6,10 +6,7 @@ from rauth import OAuth1Service
 
 from users.models import GarminToken
 
-class Command(BaseCommand):
-	help = 'Validate the existing Garmin Health and Garmin Connect access token'
-
-	def _is_valid(self,session):
+def _is_valid(session):
 		today = datetime.combine(datetime.now().date(),time(0))
 		uploadStartTimeInSeconds = int(today.replace(tzinfo=timezone.utc).timestamp())
 		uploadEndTimeInSeconds = uploadStartTimeInSeconds + 86400
@@ -23,12 +20,7 @@ class Command(BaseCommand):
 			return not(r.json().get('errorMessage') == 'Unknown UserAccessToken')
 		return True
 
-	def _validate_options(self,options):
-		if options['all'] == False and options['email'] == None:
-			raise CommandError("No arguments are provided. Type -h or --help for more information")
-		return True
-
-	def _validate_token(self,email,options):
+def _validate_token(email,options):
 		REQ_URL = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
 		AUTH_URL = 'http://connect.garmin.com/oauthConfirm'
 		ACC_URL = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
@@ -48,13 +40,36 @@ class Command(BaseCommand):
 					authorize_url = AUTH_URL, 
 				)
 				sess = service.get_session((access_token, access_token_secret))
-				if self._is_valid(sess):
-					self.stdout.write(self.style.SUCCESS('\nEmail "%s" has valid Garmin Health Token' % email))
+				if _is_valid(sess):
+					message = {
+						"status":"success",
+						"have_token":True,
+						"message":"User having email '%s' has valid Garmin Health Token" % email
+					}
+					return message
 				else:
-					self.stdout.write(self.style.ERROR('\nEmail "%s" has invalid Garmin Health Token' % email))
+					message = {
+						"status":"error",
+						"have_token":True,
+						"message":"User having email '%s' has invalid Garmin Health Token" % email
+					}
+					return message
 
 		except (GarminToken.DoesNotExist):
-			self.stdout.write(self.style.ERROR('Token for email "%s" does not exist' % email))
+			message = {
+				"status":"error",
+				"have_token":False,
+				"message":"Token for user having email '%s' does not exist" % email
+			}
+			return message
+
+class Command(BaseCommand):
+	help = 'Validate the existing Garmin Health and Garmin Connect access token'
+
+	def _validate_options(self,options):
+		if options['all'] == False and options['email'] == None:
+			raise CommandError("No arguments are provided. Type -h or --help for more information")
+		return True
 
 	def add_arguments(self, parser):
 		parser.add_argument(
@@ -89,9 +104,17 @@ class Command(BaseCommand):
 		if self._validate_options(options):
 			if not options['all'] and options['email']:
 				for email in options['email']:
-					self._validate_token(email,options)
+					message = _validate_token(email,options)
+					if message["status"] == "success":
+						self.stdout.write(self.style.SUCCESS('\n %s' % message["message"]))
+					else:
+						self.stdout.write(self.style.ERROR('\n %s' % message["message"]))
 			elif options['all'] and not options['email']:
 				for token in GarminToken.objects.all():
-					self._validate_token(token.user.email,options)
+					message = _validate_token(token.user.email,options)
+					if message["status"] == "success":
+						self.stdout.write(self.style.SUCCESS('\n %s' % message["message"]))
+					else:
+						self.stdout.write(self.style.ERROR('\n %s' % message["message"]))
 			else:
 				raise CommandError('Provide either --all or --email, not both')
