@@ -907,7 +907,7 @@ def daily_aa_calculations(request):
 		return JsonResponse({})
 
 
-def hrr_calculations(user,start_date):
+def hrr_data(user,start_date):
 	
 	start_date_timestamp = start_date
 	start_date_timestamp = start_date_timestamp.timetuple()
@@ -1199,14 +1199,14 @@ def hrr_calculations(user,start_date):
 
 	return data
 
-def hrr_calculations_api(request):
+def hrr_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
-	hrr_data = hrr_calculations(request.user,start_date)
-	if hrr_data.get('Did_you_measure_HRR'):
+	data = hrr_data(request.user,start_date)
+	if data.get('Did_you_measure_HRR'):
 		try:
 			user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
-			update_hrr_instance(user_hrr, hrr_data)
+			update_hrr_instance(user_hrr, data)
 		except Hrr.DoesNotExist:
-			create_hrr_instance(request.user, hrr_data, start_date)
-	return JsonResponse(hrr_data)
+			create_hrr_instance(request.user, data, start_date)
+	return JsonResponse(data)

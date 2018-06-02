@@ -6,7 +6,7 @@ axiosRetry(axios, { retries: 4});
 
 export default function fetchHeartData(successHeart,errorHeart,selectedDate){   
   selectedDate = moment(selectedDate);
-  const URL=`/hrr/hrr_calculations_api`;
+  const URL=`/hrr/hrr_calculations`;
   const config={
    method:"get",
    params:{
