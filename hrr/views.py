@@ -906,7 +906,7 @@ def daily_aa_calculations(request):
 	else:
 		return JsonResponse({})
 
-
+# in arguments start_date should be datime.date object
 def hrr_calculations(user,start_date):
 	
 	start_date_timestamp = start_date
