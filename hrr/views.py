@@ -749,7 +749,7 @@ def daily_aa_calculations(request):
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
 	start = start_date
-	end = start_date + timedelta(days=1)
+	end = start_date + timedelta(days=7)
 	start_date_str = start_date.strftime('%Y-%m-%d')
 
 	start_date_timestamp = start_date
@@ -787,15 +787,14 @@ def daily_aa_calculations(request):
 	workout = []
 	hrr = []
 	data_summaryid = []
-	start = start_date
-	end = start_date + timedelta(days=7)
+
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	
 	if a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			data_summaryid.append(data_id)
 			if activity_files_qs:
 				for i,k in enumerate(activity_files):
 					activity_files_dict = ast.literal_eval(activity_files[i])
@@ -803,7 +802,7 @@ def daily_aa_calculations(request):
 						hrr.append(tmp)
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
 						workout.append(tmp)
-
+						data_summaryid.append(data_id)
 	profile = Profile.objects.filter(user=request.user)
 	if profile:
 		for tmp_profile in profile:
