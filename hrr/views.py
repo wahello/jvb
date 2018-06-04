@@ -702,8 +702,8 @@ def aa_workout_calculations(request):
 		  "average_heart_rate":"",
 		  "max_heart_rate":"",
 		  "total_time":"",
-		  # "avg_hrr":"",
-		  # "max_hrr":"",
+		  "avg_hrr":"",
+		  "max_hrr":"",
 		  "steps":""
 			}
 	time_duration = []
@@ -738,7 +738,7 @@ def aa_workout_calculations(request):
 				  "max_hrr":sum(max_hrr)/len(max_hrr),
 				  "steps":exercise_steps
 					}
-			
+			print(summaryId)
 			data1[summaryId] = data
 	if data1:
 		return JsonResponse(data1)
@@ -796,14 +796,16 @@ def daily_aa_calculations(request):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			data_summaryid.append(data_id)
+			
 			if activity_files_qs:
 				for i,k in enumerate(activity_files):
+					# print(i,k)
 					activity_files_dict = ast.literal_eval(activity_files[i])
 					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 						hrr.append(tmp)
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
 						workout.append(tmp)
+						data_summaryid.append(data_id)
 
 	profile = Profile.objects.filter(user=request.user)
 	if profile:
@@ -902,7 +904,7 @@ def daily_aa_calculations(request):
 					"total_prcnt_aerobic":total_prcnt_aerobic,
 					"total_prcnt_anaerobic":total_prcnt_anaerobic,
 					"total_prcnt_below_aerobic":total_prcnt_below_aerobic}
-
+			
 			daily_aa_data[data_summaryid[i]] =data
 
 	if daily_aa_data:
@@ -962,7 +964,8 @@ def aa_low_high_end_calculations(request):
 			"high_end":"",
 			"classificaton":"",
 			"time_in_zone":"",
-			"prcnt_in_zone":""}
+			"prcnt_in_zone":"",
+			"total_duration":""}
 
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
@@ -1001,7 +1004,8 @@ def aa_low_high_end_calculations(request):
 			  "high_end":b,
 			  "classificaton":classification_dic[a],
 			  "time_in_zone":low_end_dict[a],
-			  "prcnt_in_zone":prcnt_in_zone}
+			  "prcnt_in_zone":prcnt_in_zone,
+			  "total_duration":total_time_duration}
 			data2[a]=data
 		
 	if data2:
