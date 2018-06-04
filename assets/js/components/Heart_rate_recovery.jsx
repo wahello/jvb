@@ -183,15 +183,20 @@ class HeartRate extends Component{
 	}
 
 	stepsValue(value){
-		value += '';
-     	var x = value.split('.');
-    	var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
+		if(value){
+			value += '';
+	     	var x = value.split('.');
+	    	var x1 = x[0];
+	        var x2 = x.length > 1 ? '.' + x[1] : '';
+	        var rgx = /(\d+)(\d{3})/;
+	        while (rgx.test(x1)) {
+	        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	        }
+	        return x1 + x2;
+	    }
+	    else{
+	    	return "-";
+	    }
 	}
 
 	renderpercentage(value){
@@ -347,7 +352,7 @@ class HeartRate extends Component{
 			          	    </div>
 		          	    </div>
 		          	  
-			      	    <div className = "row">
+			      	    <div className = "row justify-content-center hr_table_padd">
 							<div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
 									<tr>
