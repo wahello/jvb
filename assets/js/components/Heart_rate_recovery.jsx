@@ -17,13 +17,7 @@ import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers';
 import Workout from './workout_stats';
 import {fetchWorkoutData,fetchAaWorkoutData} from '../network/workout';
 
-
-
-
-
 axiosRetry(axios, { retries: 3});
-
-
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
@@ -38,11 +32,10 @@ class HeartRate extends Component{
 	    this.renderpercentage = this.renderpercentage.bind(this);
 		this.toggle = this.toggle.bind(this);
 		this.renderTable = this.renderTable.bind(this);
-		this.renderTable1 = this.renderTable1.bind(this);
 		this.successWorkout =this.successWorkout.bind(this);
 		this.errorWorkout =this.errorWorkout.bind(this);
-		this.successWorkout1 = this.successWorkout1.bind(this);
 		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
+		this.renderValue = this.renderValue.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
 	    	calendarOpen:false,
@@ -62,8 +55,7 @@ class HeartRate extends Component{
 			percent_anaerobic:"",
 			total_percent:"",
 			empty:"",
-			data1:{},
-			data:{},
+			aa_data:{},
 	    };
 	}
 	successHeartRate(data){
@@ -84,36 +76,93 @@ class HeartRate extends Component{
 			fetching_aerobic:false,
 		});
 	}
+
 	toggleCalendar(){
 	    this.setState({
-	      calendarOpen:!this.state.calendarOpen
+	    	calendarOpen:!this.state.calendarOpen
 	    });
     }
+
 	errorHeartRate(error){
 		console.log(error.message);
 		this.setState({
 			fetching_aerobic:false,
-		})
+		});
 	}
+
+	getEmptyActivityFieldsForAA(){
+	    let val = {
+					"date":"",
+					"workout_type":"",
+					"duration":"",
+					"average_heart_rate":"",
+					"max_heart_rate":"",
+					"total_time":"",
+					"avg_hrr":"",
+					"max_hrr":"",
+					"steps":"",
+					"total_time":"",
+					"aerobic_zone":"",
+					"anaerobic_range":"",
+					"below_aerobic_zone":"",
+					"aerobic_range":"",
+					"anaerobic_range":"",
+					"below_aerobic_range":"",
+					"percent_aerobic":"",
+					"percent_below_aerobic":"",
+					"percent_anaerobic":"",
+					"total_percent":"",
+					"total_aerobic_range":"",
+					"total_anaerobic_range":"",
+					"total_below_aerobic_range":"",
+					"total_prcnt_aerobic":"",
+					"total_prcnt_anaerobic":""
+			      };
+	    return val;
+	} 
+
 	successWorkout(data){
-		this.setState({
-			data1:data.data,
-		});
-	}
-	successWorkout1(data){	
-		this.setState({
-			data:data.data
-		});
+		if(!_.isEmpty(data.data)){
+			for(let[key,value] of Object.entries(data.data)){
+				if(this.state.aa_data[key]){
+					// if activity is already present in aa_data state
+					let updated_value= {...this.state.aa_data[key]}
+					for(let[field,field_data] of Object.entries(value)){
+						updated_value[field] = field_data;
+					}
+					this.setState({
+						aa_data:{
+							...this.state.aa_data,
+							[key]:updated_value
+						}
+					});
+				}
+				else{
+					let empty_data = this.getEmptyActivityFieldsForAA()
+					for(let[field,field_data] of Object.entries(value)){
+						empty_data[field] = field_data;
+					}
+					this.setState({
+						aa_data:{
+							...this.state.aa_data,
+							[key]:empty_data
+						}
+					});
+				}
+			}
+		}
 	}
 	
 	errorWorkout(error){
 		console.log(error.message);
 	}
+
   	toggle() {
 	    this.setState({
-	      isOpen: !this.state.isOpen,
+	      	isOpen: !this.state.isOpen,
 	    });
   	}
+
 	renderTime(value){
 		if(value>0){
 			var sec_num = parseInt(value); 
@@ -130,8 +179,17 @@ class HeartRate extends Component{
 			time = value;
 		}
 		
-		    return time;
+		return time;
 	}
+
+	renderValue(value){
+		let steps;
+		if(value){
+			steps = value + ' ';
+		}
+		return steps;
+	}
+
 	renderpercentage(value){
 		let percentage
 		if(value){
@@ -142,22 +200,25 @@ class HeartRate extends Component{
 		}
 		return percentage;
 	}
+
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_aerobic:true,
+			aa_data:{}
 		},()=>{
 			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-			fetchAaWorkoutData(this.successWorkout1,this.errorWorkout,this.state.selectedDate);
+			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 		});
 		
 	}
+
 	renderTable(data){
-		
 		var td_rows = [];
-		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps"];
+		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
+		"aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
@@ -165,6 +226,41 @@ class HeartRate extends Component{
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
+				else if(key == "aerobic_zone"){
+					let keyvalue = this.renderTime(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "anaerobic_zone"){
+					let keyvalue = this.renderTime(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "below_aerobic_zone"){
+					let keyvalue = this.renderTime(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "percent_aerobic"){
+					let keyvalue = this.renderpercentage(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "percent_anaerobic"){
+					let keyvalue = this.renderpercentage(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "percent_below_aerobic"){
+					let keyvalue = this.renderpercentage(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "steps"){
+						let keyvalue = this.renderValue(value[key]);
+		             	var x = keyvalue.split('.');
+		            	var x1 = x[0];
+			            var x2 = x.length > 1 ? '.' + x[1] : '';
+			            var rgx = /(\d+)(\d{3})/;
+			            while (rgx.test(x1)) {
+				        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+			            }
+	            		td_values.push(<td>{x1 + x2}</td>);
+	            	}
 				else{
 					let keyvalue = value[key];
 					td_values.push(<td>{keyvalue}</td>);
@@ -172,45 +268,19 @@ class HeartRate extends Component{
 				 
 			}
 			td_rows.push(<tr>{td_values}</tr>);
-				
 		}
 		return td_rows;
 	}
-	renderTable1(data){
-		var td_rows = [];
-		let keys = ["aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic"];
-		for(let[key1,value] of Object.entries(data)){
-			let td_values = [];
-			for(let key of keys){
-				if(key == "aerobic_zone"){
-					let keyvalue = this.renderTime(value[key]);
-					 td_values.push(<td>{keyvalue}</td>);	
-				}
-				else if(key == "anaerobic_zone"){
-				let keyvalue = this.renderTime(value[key]);
-				td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "below_aerobic_zone"){
-				let keyvalue = this.renderTime(value[key]);
-				td_values.push(<td>{keyvalue}</td>);
-				}
-				else{
-					 let keyvalue = this.renderpercentage(value[key]);
-					 td_values.push(<td>{keyvalue}</td>);
-				}
-			}
-			td_rows.push(<tr>{td_values}</tr>);
-		}
-		return td_rows;
-	}
+
 	componentDidMount(){
 		this.setState({
 			fetching_aerobic:false,
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
-		fetchAaWorkoutData(this.successWorkout1,this.errorWorkout,this.state.selectedDate);
+		fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 	}
+
 	render(){
 		const {fix} = this.props;
 		return(
@@ -224,7 +294,6 @@ class HeartRate extends Component{
 	                        size = "2x"
 	                    />
 	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
-
                 	</span> 
 	            	<Popover
 			            placement="bottom"
@@ -237,53 +306,52 @@ class HeartRate extends Component{
 	                </Popover>
 	            </div>
           	    <div className = "row justify-content-center hr_table_padd">
-          	    <div className = "table table-responsive">
-          	    <table className = "table table-striped table-bordered ">
-	          	    <thead className = "hr_table_style_rows">
-		          	    <th className = "hr_table_style_rows">Ranges</th>
-		          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
-		          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
-		          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
-	          	    </thead>  
-	          	    <tbody>   
-	          	    <tr className = "hr_table_style_rows">   
-	          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
-	          	    <td className = "hr_table_style_rows">{(this.state.aerobic_range)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.aerobic_zone)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_aerobic)}</td>
-	          	    </tr>
-	          	    <tr className = "hr_table_style_rows">
-	          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
-	          	    <td className = "hr_table_style_rows">{(this.state.anaerobic_range)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.anaerobic_zone)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_anaerobic)}</td>
-	          	    </tr>
-	          	    <tr className = "hr_table_style_rows">
-	          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
-	          	    <td className = "hr_table_style_rows">{(this.state.below_aerobic_range)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.below_aerobic_zone)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
-	          	    </tr>
+	          	    <div className = "table table-responsive">
+		          	    <table className = "table table-striped table-bordered ">
+			          	    <thead className = "hr_table_style_rows">
+				          	    <th className = "hr_table_style_rows">Ranges</th>
+				          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
+				          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
+				          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
+			          	    </thead>  
+			          	    <tbody>   
+				          	    <tr className = "hr_table_style_rows">   
+					          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
+					          	    <td className = "hr_table_style_rows">{(this.state.aerobic_range)}</td>
+					          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.aerobic_zone)}</td>
+					          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_aerobic)}</td>
+				          	    </tr>
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
+					          	    <td className = "hr_table_style_rows">{(this.state.anaerobic_range)}</td>
+					          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.anaerobic_zone)}</td>
+					          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_anaerobic)}</td>
+				          	    </tr>
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
+					          	    <td className = "hr_table_style_rows">{(this.state.below_aerobic_range)}</td>
+					          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.below_aerobic_zone)}</td>
+					          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
+				          	    </tr>
 
-	          	    <tr className = "hr_table_style_rows">
-	          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
-	          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.hrr_not_recorded)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_hrr_not_recorded)}</td>
-	          	    </tr>
-	          	    <tr className = "hr_table_style_rows">
-	          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
-					<td className = "hr_table_style_rows">{(this.state.empty)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
-	          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.total_percent)}</td>
-	          	    </tr>
-	          	    </tbody>
-          	    </table>   
-          	   </div>
+				          	    <tr className = "hr_table_style_rows">
+				          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
+				          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
+				          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.hrr_not_recorded)}</td>
+				          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_hrr_not_recorded)}</td>
+				          	    </tr>
+				          	    <tr className = "hr_table_style_rows">
+				          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
+								<td className = "hr_table_style_rows">{(this.state.empty)}</td>
+				          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
+				          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.total_percent)}</td>
+				          	    </tr>
+			          	    </tbody>
+		          	    </table>   
+	          	   </div>
           	  </div>
           	  
           	   <div className = "row">
-					<div className= "col-md-6" style = {{paddingLeft:"50px"}}>
 					 <div className = "table table-responsive">
 		          	    <table className = "table table-striped table-bordered ">
 							<tr>
@@ -293,18 +361,6 @@ class HeartRate extends Component{
 							<th>Average Heartrate</th>
 							<th>Max Heartrate</th>
 							<th>Steps</th>
-							</tr>
-							<tbody>
-								{this.renderTable(this.state.data1)}
-								</tbody>
-						</table>
-					</div>
-					</div>
-					
-					<div className= "col-md-6" style = {{paddingRight:"50px"}}>
-					 <div className = "table table-responsive">
-		          	    <table className = "table table-striped table-bordered ">
-							<tr>
 							<th>Duration in Aerobic Range (hh:mm:ss)</th>
 							<th>% Aerobic</th>
 							<th>Duration in Anaerobic Range (hh:mm:ss)</th>
@@ -313,12 +369,10 @@ class HeartRate extends Component{
 							<th>% Below Aerobic</th>
 							</tr>
 							<tbody>
-								{this.renderTable1(this.state.data)}
+								{this.renderTable(this.state.aa_data)}
 								</tbody>
 						</table>
 					</div>
-					</div>
-				
 					</div>
           	  {this.renderAerobicSelectedDateFetchOverlay()}
           	  </div>

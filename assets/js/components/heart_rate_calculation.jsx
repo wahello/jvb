@@ -63,6 +63,7 @@ class HeartRateCal extends Component{
 	 this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
 	 this.renderSecToMin = this.renderSecToMin.bind(this);
 	 this.renderNoworkout = this.renderNoworkout.bind(this);
+	 this.captilizeYes = this.captilizeYes.bind(this);
   }
   successHeart(data){
   	this.setState({
@@ -113,6 +114,13 @@ class HeartRateCal extends Component{
 			fetching_hrr:true,
 		});
 		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	}
+	captilizeYes(value){
+		let cpatilize;
+		if(value){
+			cpatilize = value[0].toUpperCase()+value.slice(1);
+	    }
+		return cpatilize;
 	}
 	renderNoworkout(value){
 		if(value == null || value == undefined || value == ""){
@@ -202,12 +210,12 @@ class HeartRateCal extends Component{
 
 	          	    <tr className = "hr_table_style_rows">   
 		          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>    
-		          	    <td className = "hr_table_style_rows">{this.state.Did_you_measure_HRR}</td>
+		          	    <td className = "hr_table_style_rows">{this.captilizeYes(this.state.Did_you_measure_HRR)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
-		          	    <td className = "hr_table_style_rows">{this.state.Did_heartrate_reach_99}</td>
+		          	    <td className = "hr_table_style_rows">{this.captilizeYes(this.state.Did_heartrate_reach_99)}</td>
 	          	    </tr>
 
 	          	    <tr className = "hr_table_style_rows">
@@ -305,7 +313,7 @@ class HeartRateCal extends Component{
 
 	          	      <tr className = "hr_table_style_rows">
 		          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
-						<td className = "hr_table_style_rows">{this.state.no_fitfile_hrr_reach_99}</td>
+						<td className = "hr_table_style_rows">{this.captilizeYes(this.state.no_fitfile_hrr_reach_99)}</td>
 	          	    </tr>
 
 	          	     <tr className = "hr_table_style_rows">
