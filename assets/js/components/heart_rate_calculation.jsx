@@ -174,7 +174,11 @@ class HeartRateCal extends Component{
 	  	}
   		return time;
   	}
-
+  	toggleCalendar(){
+	    this.setState({
+	    	calendarOpen:!this.state.calendarOpen
+	    });
+    }
   render(){
   	const {fix} = this.props;
   	return(
