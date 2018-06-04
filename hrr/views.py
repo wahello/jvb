@@ -961,7 +961,8 @@ def aa_low_high_end_calculations(request):
 	data = {"low_end":"",
 			"high_end":"",
 			"classificaton":"",
-			"time_in_zone":""}
+			"time_in_zone":"",
+			"prcnt_in_zone":""}
 
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
@@ -985,23 +986,25 @@ def aa_low_high_end_calculations(request):
 			for c,d in zip(workout_final_heartrate,workout_final_timestamp):
 				if c>=a and c<=b:
 					low_end_dict[a] = low_end_dict[a] + d
-				# total_time = sum(low_end_dict[a])
-				# prcnt_in_zone = (low_end_dict[a]/sum(workout_final_timestamp))*100
-			
+		total_time_duration = sum(low_end_dict.values())
+				
+		for a,b in zip(low_end_heart,high_end_heart):	
 			if a and b > anaerobic_value:
 				classification_dic[a] = 'anaerobic_zone'
 			elif a and b < below_aerobic_value:
 				classification_dic[a] = 'below_aerobic_zone'
 			else:
 				classification_dic[a] = 'aerobic_zone'
-		
+			prcnt_in_zone = (low_end_dict[a]/total_time_duration)*100
+			prcnt_in_zone = int(Decimal(prcnt_in_zone).quantize(0,ROUND_HALF_UP))
 			data={"low_end":a,
 			  "high_end":b,
 			  "classificaton":classification_dic[a],
 			  "time_in_zone":low_end_dict[a],
-			  "prcnt_in_zone":""}
+			  "prcnt_in_zone":prcnt_in_zone}
 			data2[a]=data
-		total_time = sum(low_end_dict.values())
-		prcnt_in_zone = [x for x in low_end_dict.values()/total_time]
-			
-	return JsonResponse(data2)
+		
+	if data2:
+		return JsonResponse(data2)
+	else:
+		return JsonResponse({})
