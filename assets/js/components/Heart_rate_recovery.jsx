@@ -35,7 +35,7 @@ class HeartRate extends Component{
 		this.successWorkout =this.successWorkout.bind(this);
 		this.errorWorkout =this.errorWorkout.bind(this);
 		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
-		this.renderValue = this.renderValue.bind(this);
+		this.stepsValue = this.stepsValue.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
 	    	calendarOpen:false,
@@ -182,12 +182,16 @@ class HeartRate extends Component{
 		return time;
 	}
 
-	renderValue(value){
-		let steps;
-		if(value){
-			steps = value + ' ';
-		}
-		return steps;
+	stepsValue(value){
+		value += '';
+     	var x = value.split('.');
+    	var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
 	}
 
 	renderpercentage(value){
@@ -251,15 +255,8 @@ class HeartRate extends Component{
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "steps"){
-						let keyvalue = this.renderValue(value[key]);
-		             	var x = keyvalue.split('.');
-		            	var x1 = x[0];
-			            var x2 = x.length > 1 ? '.' + x[1] : '';
-			            var rgx = /(\d+)(\d{3})/;
-			            while (rgx.test(x1)) {
-				        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-			            }
-	            		td_values.push(<td>{x1 + x2}</td>);
+						let keyvalue = this.stepsValue(value[key]);
+	            		td_values.push(<td>{keyvalue}</td>);
 	            	}
 				else{
 					let keyvalue = value[key];
@@ -284,99 +281,98 @@ class HeartRate extends Component{
 	render(){
 		const {fix} = this.props;
 		return(
-			<div className = "container-fluid">
-		    <NavbarMenu title = {<span style = {{fontSize:"22px"}}>Heartrate Aerobic/Anaerobic Ranges</span>} />
-			 <div className="col-md-12,col-sm-12,col-lg-12">
-	            <div className="row" style = {{marginTop:"10px"}}>
-	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
-	                    <FontAwesome
-	                        name = "calendar"
-	                        size = "2x"
-	                    />
-	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
-                	</span> 
-	            	<Popover
-			            placement="bottom"
-			            isOpen={this.state.calendarOpen}
-			            target="progress"
-			            toggle={this.toggleCalendar}>
-		                <PopoverBody className="calendar2">
-		                <CalendarWidget  onDaySelect={this.processDate}/>
-		                </PopoverBody>
-	                </Popover>
-	            </div>
-          	    <div className = "row justify-content-center hr_table_padd">
-	          	    <div className = "table table-responsive">
-		          	    <table className = "table table-striped table-bordered ">
-			          	    <thead className = "hr_table_style_rows">
-				          	    <th className = "hr_table_style_rows">Ranges</th>
-				          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
-				          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
-				          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
-			          	    </thead>  
-			          	    <tbody>   
-				          	    <tr className = "hr_table_style_rows">   
-					          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
-					          	    <td className = "hr_table_style_rows">{(this.state.aerobic_range)}</td>
-					          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.aerobic_zone)}</td>
-					          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_aerobic)}</td>
-				          	    </tr>
-				          	    <tr className = "hr_table_style_rows">
-					          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
-					          	    <td className = "hr_table_style_rows">{(this.state.anaerobic_range)}</td>
-					          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.anaerobic_zone)}</td>
-					          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_anaerobic)}</td>
-				          	    </tr>
-				          	    <tr className = "hr_table_style_rows">
-					          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
-					          	    <td className = "hr_table_style_rows">{(this.state.below_aerobic_range)}</td>
-					          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.below_aerobic_zone)}</td>
-					          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
-				          	    </tr>
-
-				          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
-				          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
-				          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.hrr_not_recorded)}</td>
-				          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_hrr_not_recorded)}</td>
-				          	    </tr>
-				          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
-								<td className = "hr_table_style_rows">{(this.state.empty)}</td>
-				          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
-				          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.total_percent)}</td>
-				          	    </tr>
-			          	    </tbody>
-		          	    </table>   
-	          	   </div>
-          	  </div>
-          	  
-          	   <div className = "row">
-					 <div className = "table table-responsive">
-		          	    <table className = "table table-striped table-bordered ">
-							<tr>
-							<th>Date</th>
-							<th>Workout Type</th>
-							<th>Duration</th>
-							<th>Average Heartrate</th>
-							<th>Max Heartrate</th>
-							<th>Steps</th>
-							<th>Duration in Aerobic Range (hh:mm:ss)</th>
-							<th>% Aerobic</th>
-							<th>Duration in Anaerobic Range (hh:mm:ss)</th>
-							<th>% Anaerobic</th>
-							<th>Duration Below Aerobic Range (hh:mm:ss)</th>
-							<th>% Below Aerobic</th>
-							</tr>
-							<tbody>
-								{this.renderTable(this.state.aa_data)}
-								</tbody>
-						</table>
-					</div>
-					</div>
-          	  {this.renderAerobicSelectedDateFetchOverlay()}
-          	  </div>
-			</div>
+				<div className = "container-fluid">
+			    	<NavbarMenu title = {<span style = {{fontSize:"22px"}}>Heartrate Aerobic/Anaerobic Ranges</span>} />
+					<div className="col-md-12,col-sm-12,col-lg-12">
+			            <div className="row" style = {{marginTop:"10px"}}>
+			            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
+			                    <FontAwesome
+			                        name = "calendar"
+			                        size = "2x"
+			                    />
+			                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+		                	</span> 
+			            	<Popover
+					            placement="bottom"
+					            isOpen={this.state.calendarOpen}
+					            target="progress"
+					            toggle={this.toggleCalendar}>
+				                <PopoverBody className="calendar2">
+				                <CalendarWidget  onDaySelect={this.processDate}/>
+				                </PopoverBody>
+			                </Popover>
+			            </div>
+		          	    <div className = "row justify-content-center hr_table_padd">
+			          	    <div className = "table table-responsive">
+				          	    <table className = "table table-striped table-bordered ">
+					          	    <thead className = "hr_table_style_rows">
+						          	    <th className = "hr_table_style_rows">Ranges</th>
+						          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
+						          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
+						          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
+					          	    </thead>  
+					          	    <tbody>   
+						          	    <tr className = "hr_table_style_rows">   
+							          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
+							          	    <td className = "hr_table_style_rows">{(this.state.aerobic_range)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.aerobic_zone)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_aerobic)}</td>
+						          	    </tr>
+						          	    <tr className = "hr_table_style_rows">
+							          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
+							          	    <td className = "hr_table_style_rows">{(this.state.anaerobic_range)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.anaerobic_zone)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_anaerobic)}</td>
+						          	    </tr>
+						          	    <tr className = "hr_table_style_rows">
+							          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
+							          	    <td className = "hr_table_style_rows">{(this.state.below_aerobic_range)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.below_aerobic_zone)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
+						          	    </tr>
+						          	    <tr className = "hr_table_style_rows">
+							          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
+							          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.hrr_not_recorded)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_hrr_not_recorded)}</td>
+						          	    </tr>
+						          	    <tr className = "hr_table_style_rows">
+							          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
+											<td className = "hr_table_style_rows">{(this.state.empty)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.total_percent)}</td>
+						          	    </tr>
+					          	    </tbody>
+				          	    </table>   
+			          	    </div>
+		          	    </div>
+		          	  
+			      	    <div className = "row">
+							<div className = "table table-responsive">
+				          	    <table className = "table table-striped table-bordered ">
+									<tr>
+										<th>Date</th>
+										<th>Workout Type</th>
+										<th>Duration</th>
+										<th>Average Heartrate</th>
+										<th>Max Heartrate</th>
+										<th>Exercise Steps</th>
+										<th>Duration in Aerobic Range (hh:mm:ss)</th>
+										<th>% Aerobic</th>
+										<th>Duration in Anaerobic Range (hh:mm:ss)</th>
+										<th>% Anaerobic</th>
+										<th>Duration Below Aerobic Range (hh:mm:ss)</th>
+										<th>% Below Aerobic</th>
+									</tr>
+									<tbody>
+										{this.renderTable(this.state.aa_data)}
+									</tbody>
+								</table>
+							</div>
+						</div>
+		          	  	{this.renderAerobicSelectedDateFetchOverlay()}
+		          	</div>
+				</div>
 		)
 	}
 }
