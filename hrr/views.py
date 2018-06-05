@@ -680,10 +680,11 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
+
 	workout = []
 	hrr = []
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=17)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	if filtered_activities_files:
 		for tmp in a1:
@@ -749,7 +750,7 @@ def daily_aa_calculations(request):
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=17)
 	start_date_str = start_date.strftime('%Y-%m-%d')
 
 	start_date_timestamp = start_date
@@ -955,27 +956,28 @@ def hrr_data(user,start_date):
 
 	workout = []
 	hrr = []
-	if activities:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = int(meta['activityIds'][0])
-			if id_act == data_id:
+	# if not activities:
+	for tmp in a1:
+		meta = tmp.meta_data_fitfile
+		meta = ast.literal_eval(meta)
+		data_id = meta['activityIds'][0]
+		for i,k in enumerate(activity_files):
+			activity_files_dict = ast.literal_eval(activity_files[i])
+			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 				hrr.append(tmp)
-			else:
+			elif activity_files_dict.get("summaryId",None) == str(data_id) :
 				workout.append(tmp)
-	else:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = meta['activityIds'][0]
-			for i,k in enumerate(activity_files):
-				activity_files_dict = ast.literal_eval(activity_files[i])
-				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-					hrr.append(tmp)
-				elif activity_files_dict.get("summaryId",None) == str(data_id) :
-					workout.append(tmp)
-	
+	# else:
+	# 	for tmp in a1:
+	# 		meta = tmp.meta_data_fitfile
+	# 		meta = ast.literal_eval(meta)
+	# 		data_id = int(meta['activityIds'][0])
+	# 		if id_act == data_id:
+	# 			hrr.append(tmp)
+	# 		else:
+	# 			workout.append(tmp)
+	print(workout)
+	print(hrr)
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
