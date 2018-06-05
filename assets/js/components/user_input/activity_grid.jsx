@@ -268,7 +268,6 @@ createActivityTime(activityData){
 }
 
 createStartAndEndTime(activityData){
-    console.log("*****************",activityData);
     let activity_start_end_time= {}
     for(let [id,data] of Object.entries(activityData)){
         let start_time_seconds = data["startTimeInSeconds"]; 
