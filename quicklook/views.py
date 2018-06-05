@@ -1398,10 +1398,19 @@ def export_users_xls(request):
 			sheet1.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
 			# sheet1.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
+
+	sync_date_formats = ('mmm dd,yyyy "@" hh:mm am/pm')
+	sync_time = book.add_format({'num_format': sync_date_formats,'align': 'left'})
+	
 	last_sycn_obj = UserLastSynced.objects.filter(user = request.user)
-	last_sycn = last_sycn_obj.last_synced
-	last_sycn_offset = last_sycn_obj.offset
-	print(last_sycn,last_sycn_offset)
+	last_sycn = [tmp.last_synced for tmp in last_sycn_obj]
+	last_sycn_offset = [tmp.offset for tmp in last_sycn_obj]
+	import time
+	unixtime = time.mktime(last_sycn[0].timetuple())
+	local_time = unixtime + last_sycn_offset[0]
+	value_last_sycn = datetime.fromtimestamp(local_time).strftime('%b %d,%Y "@" %I:%M %p')
+	matter = 'Wearable Device Last Synced on'
+	sheet1.write_rich_string(0,0,matter,'\n',value_last_sycn,sync_time)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
 	col_num1 = 2
@@ -2346,7 +2355,6 @@ def export_users_xls(request):
 				for i,key in enumerate(hrr_available_keys):
 					if key == 'end_time_activity' or key == 'HRR_activity_start_time':
 						offset = data['offset']
-						print(offset)
 						value = datetime.fromtimestamp(data[key]+offset)
 						sheet12.write(i + 2, row_num,value,timestamp_todata)
 					elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
