@@ -2326,6 +2326,7 @@ def export_users_xls(request):
 		else:
 			pass
 		current_date -= timedelta(days=1)
+	# print(len_hrr,hrr_recorded,hrr_not_recorded)
 	if len_hrr == hrr_recorded and len_hrr != 0:
 		col_num1 = 1
 		row_num = 0
@@ -2339,16 +2340,12 @@ def export_users_xls(request):
 				data = data.__dict__
 				row_num += 1
 				for i,key in enumerate(hrr_available_keys):
-					if key == 'end_time_activity':
+					if key == 'end_time_activity' or key == 'HRR_activity_start_time':
 						offset = data['offset']
 						print(offset)
 						value = datetime.fromtimestamp(data[key]+offset)
 						sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'HRR_activity_start_time':
-						if data[key]:
-							value = datetime.fromtimestamp(data.get(key)+offset)
-							sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'time_99':
+					elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
 						if data[key]:
 							time = data[key]
 							minutes = time // 60
@@ -2357,6 +2354,7 @@ def export_users_xls(request):
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
 							else:
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
 			else:
@@ -2396,18 +2394,11 @@ def export_users_xls(request):
 				data = data.__dict__
 				row_num += 1
 				for i,key in enumerate(hrr_all_keys):
-					if key == 'end_time_activity':
-						offset = data['offset']
-						print(offset)
-						value = datetime.fromtimestamp(data[key]+offset)
-						sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'HRR_activity_start_time':
+					if key == 'end_time_activity' or key == 'HRR_activity_start_time' or key == 'time_heart_rate_reached_99':
 						if data[key]:
-							value = datetime.fromtimestamp(data.get(key)+offset)
-							sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'time_heart_rate_reached_99':
-						if data[key]:
-							value = datetime.fromtimestamp(data.get(key)+offset)
+							offset = data['offset']
+							print(offset)
+							value = datetime.fromtimestamp(data[key]+offset)
 							sheet12.write(i + 2, row_num,value,timestamp_todata)
 					elif key == 'no_fitfile_hrr_time_reach_99':
 						if data[key]:
