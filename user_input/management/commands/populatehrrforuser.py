@@ -9,6 +9,16 @@ from hrr.views import hrr_data
 logger = logging.getLogger(__name__)
 
 def _str_to_datetime(str_date):
+	'''
+	Convert date string to datetime object
+	
+	Args:
+		str_date (str): Date string eg. 2018-06-05
+
+	Examples:
+		>>> _str_to_datetime('2018-06-05')
+		datetime.datetime(2018, 6, 5, 0, 0)
+	'''
 	y,m,d = map(int,str_date.split('-'))
 	return datetime(y,m,d,0,0,0)
 
@@ -20,7 +30,7 @@ def _sec_to_min_sec_str(seconds):
 		seconds (int): seconds
 
 	Examples:
-		>>> _str_to_datetime(140)
+		>>> _sec_to_min_sec_str(140)
 		"2:20"
 	'''
 	if seconds:
@@ -47,20 +57,21 @@ def populate_userinput_hrr(user,from_date, to_date):
 	)
 	for user_input in user_inputs_in_duration:
 		try:
-			data = hrr_data(user,user_input.created_at)
-			measured_hrr = user_input.encouraged_input.measured_hrr
-			if (data['Did_you_measure_HRR'] == 'yes' and (not measured_hrr or measured_hrr == "no")):
-				if data['Did_you_measure_HRR']:
-					user_input.encouraged_input.measured_hr = data['Did_you_measure_HRR']
-				if data['Did_heartrate_reach_99']:
-					user_input.encouraged_input.hr_down_99 = data['Did_heartrate_reach_99']
-				if data['HRR_start_beat']:
-					user_input.encouraged_input.hr_level = str(data['HRR_start_beat'])
-				if data['lowest_hrr_1min']:
-					user_input.encouraged_input.lowest_hr_first_minute = str(data['lowest_hrr_1min'])
-				if data['time_99']:
-					user_input.encouraged_input.time_to_99 = _sec_to_min_sec_str(int(data['time_99']))
-				user_input.encouraged_input.save()
+			measured_hr = user_input.encouraged_input.measured_hr
+			if not measured_hr or measured_hr == "no":
+				data = hrr_data(user,user_input.created_at)
+				if data['Did_you_measure_HRR'] == 'yes':
+					if data['Did_you_measure_HRR']:
+						user_input.encouraged_input.measured_hr = data['Did_you_measure_HRR']
+					if data['Did_heartrate_reach_99']:
+						user_input.encouraged_input.hr_down_99 = data['Did_heartrate_reach_99']
+					if data['HRR_start_beat']:
+						user_input.encouraged_input.hr_level = str(data['HRR_start_beat'])
+					if data['lowest_hrr_1min']:
+						user_input.encouraged_input.lowest_hr_first_minute = str(data['lowest_hrr_1min'])
+					if data['time_99']:
+						user_input.encouraged_input.time_to_99 = _sec_to_min_sec_str(int(data['time_99']))
+					user_input.encouraged_input.save()
 		except Exception as e:
 			logger.exception("Cannot update user input for user {} on {}".format(
 					user.username,
