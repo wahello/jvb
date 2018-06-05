@@ -680,7 +680,7 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
-	
+	print(filtered_activities_files)
 	workout = []
 	hrr = []
 	start = start_date
@@ -692,9 +692,9 @@ def aa_workout_calculations(request):
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
 			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i]["summaryId"] == str(data_id)) and (filtered_activities_files[i]["durationInSeconds"] <= 1200)):
+				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and (filtered_activities_files[i].get("durationInSeconds") <= 1200) and (filtered_activities_files[i].get("distanceInMeters") <= 200.00)):
 					hrr.append(filtered_activities_files[i])
-				elif filtered_activities_files[i]["summaryId"] == str(data_id):
+				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
 	data={"date":"",
 		  "workout_type":"",
@@ -702,8 +702,8 @@ def aa_workout_calculations(request):
 		  "average_heart_rate":"",
 		  "max_heart_rate":"",
 		  "total_time":"",
-		  # "avg_hrr":"",
-		  # "max_hrr":"",
+		  "avg_hrr":"",
+		  "max_hrr":"",
 		  "steps":""
 			}
 	time_duration = []
@@ -734,8 +734,8 @@ def aa_workout_calculations(request):
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
 				  "total_time":sum(time_duration),
-				  # "avg_hrr":sum(heart_rate)/len(heart_rate),
-				  # "max_hrr":sum(max_hrr)/len(max_hrr),
+				  "avg_hrr":sum(heart_rate)/len(heart_rate),
+				  "max_hrr":sum(max_hrr)/len(max_hrr),
 				  "steps":exercise_steps
 					}
 			
@@ -779,6 +779,7 @@ def daily_aa_calculations(request):
 				"total_anaerobic_range":"",
 				"total_below_aerobic_range":"",
 				"total_prcnt_aerobic":"",
+				"total_prcnt_anaerobic":"",
 				"total_prcnt_anaerobic":""}
 
 	user_input_strong = DailyUserInputStrong.objects.filter(
@@ -846,11 +847,7 @@ def daily_aa_calculations(request):
 		aerobic_duration = []
 		anaerobic_duration = []
 		below_aerobic_duration = []
-
-		prcnt_aerobic_duration = []
-		prcnt_anaerobic_duration = []
-		prcnt_below_aerobic_duration = []
-
+		total_duration = []
 		for i in range(len(all_activities_heartrate)):
 			single_activity_file = individual_activity(all_activities_heartrate[i],all_activities_timestamp[i])
 			single_activity_list =list(single_activity_file)
@@ -861,19 +858,24 @@ def daily_aa_calculations(request):
 			time_in_anaerobic = sum(single_activity_list[2])
 			anaerobic_duration.append(time_in_anaerobic)
 			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
+			total_duration.append(total_time)
 
 			try:
 				percent_anaerobic = (time_in_anaerobic/total_time)*100
 				percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
-				prcnt_anaerobic_duration.append(percent_anaerobic)
-
+				total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
+				total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
+				
 				percent_below_aerobic = (time_in_below_aerobic/total_time)*100
 				percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
-				prcnt_below_aerobic_duration.append(percent_below_aerobic)
-
+				total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
+				total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
+				
 				percent_aerobic = (time_in_aerobic/total_time)*100
 				percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
-				prcnt_aerobic_duration.append(percent_aerobic)
+				total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
+				total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
+				
 				
 				total_percent = 100
 			except ZeroDivisionError:
@@ -896,8 +898,9 @@ def daily_aa_calculations(request):
 					"total_aerobic_range":sum(aerobic_duration),
 					"total_anaerobic_range":sum(anaerobic_duration),
 					"total_below_aerobic_range":sum(below_aerobic_duration),
-					"total_prcnt_aerobic":sum(prcnt_aerobic_duration),
-					"total_prcnt_anaerobic":sum(prcnt_anaerobic_duration)}
+					"total_prcnt_aerobic":total_prcnt_aerobic,
+					"total_prcnt_anaerobic":total_prcnt_anaerobic,
+					"total_prcnt_below_aerobic":total_prcnt_below_aerobic}
 			daily_aa_data[data_summaryid[i]] =data
 
 	if daily_aa_data:
