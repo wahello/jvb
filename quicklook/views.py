@@ -2339,7 +2339,26 @@ def export_users_xls(request):
 				data = data.__dict__
 				row_num += 1
 				for i,key in enumerate(hrr_available_keys):
-					sheet12.write(i + 2, row_num,data[key],format)
+					if key == 'end_time_activity':
+						offset = data['offset']
+						print(offset)
+						value = datetime.fromtimestamp(data[key]+offset)
+						sheet12.write(i + 2, row_num,value,timestamp_todata)
+					elif key == 'HRR_activity_start_time':
+						if data[key]:
+							value = datetime.fromtimestamp(data.get(key)+offset)
+							sheet12.write(i + 2, row_num,value,timestamp_todata)
+					elif key == 'time_99':
+						if data[key]:
+							time = data[key]
+							minutes = time // 60
+							sec = time % 60
+							if sec >= 10:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							else:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+					else:
+						sheet12.write(i + 2, row_num,data[key],format)
 			else:
 				row_num += 1
 				sheet12.write(i + 2, row_num, '')
@@ -2395,7 +2414,11 @@ def export_users_xls(request):
 							time = data[key]
 							minutes = time // 60
 							sec = time % 60
-							sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							if sec >= 10:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							else:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
 			else:
