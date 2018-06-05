@@ -2281,7 +2281,6 @@ def export_users_xls(request):
 	"Hrr Start Time(hh:mm:ss)","Heart Rate End Time Activity",
 	"Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file",
 	"Pure 1 Minute HRR Beats Lowered","Pure 1 Minute time to 99",
-	"Did you measure your heart rate recovery (HRR) after today’s aerobic workout?",
 	"Did your heart rate go down to 99 beats per minute or lower?",
 	"Duration (mm:ss) for Heart Rate Time to Reach 99",
 	"Time Heart Rate Reached 99 (hh:mm:ss)",
@@ -2291,7 +2290,7 @@ def export_users_xls(request):
 	hrr_all_keys = ["Did_you_measure_HRR","Did_heartrate_reach_99","time_99","HRR_start_beat",
 	"lowest_hrr_1min","No_beats_recovered","end_time_activity","diff_actity_hrr",
 	"HRR_activity_start_time","end_heartrate_activity","heart_rate_down_up","pure_1min_heart_beats",
-	"pure_time_99","Did_you_measure_HRR","no_fitfile_hrr_reach_99",
+	"pure_time_99","no_fitfile_hrr_reach_99",
 	"no_fitfile_hrr_time_reach_99","time_heart_rate_reached_99","end_heartrate_activity",
 	"lowest_hrr_no_fitfile","no_file_beats_recovered"]
 
@@ -2400,7 +2399,7 @@ def export_users_xls(request):
 							print(offset)
 							value = datetime.fromtimestamp(data[key]+offset)
 							sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'no_fitfile_hrr_time_reach_99':
+					elif key == 'no_fitfile_hrr_time_reach_99' or key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99':
 						if data[key]:
 							time = data[key]
 							minutes = time // 60
