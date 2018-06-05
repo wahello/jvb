@@ -680,6 +680,7 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
+	
 	workout = []
 	hrr = []
 	start = start_date
@@ -850,7 +851,6 @@ def daily_aa_calculations(request):
 		prcnt_anaerobic_duration = []
 		prcnt_below_aerobic_duration = []
 
-
 		for i in range(len(all_activities_heartrate)):
 			single_activity_file = individual_activity(all_activities_heartrate[i],all_activities_timestamp[i])
 			single_activity_list =list(single_activity_file)
@@ -904,6 +904,101 @@ def daily_aa_calculations(request):
 		return JsonResponse(daily_aa_data)
 	else:
 		return JsonResponse({})
+def aa_low_high_end_calculations(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+
+	start = start_date
+	end = start_date + timedelta(days=1)
+	start_date_str = start_date.strftime('%Y-%m-%d')
+
+	start_date_timestamp = start_date
+	start_date_timestamp = start_date_timestamp.timetuple()
+	start_date_timestamp = time.mktime(start_date_timestamp)
+	end_date_timestamp = start_date_timestamp + 86400
+
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	if activity_files_qs:
+		activity_files = [pr.data for pr in activity_files_qs]
+		one_activity_file_dict =  ast.literal_eval(activity_files[0])
+		offset = one_activity_file_dict['startTimeOffsetInSeconds']
+
+	user_input_strong = DailyUserInputStrong.objects.filter(
+		user_input__created_at=(start_date),
+		user_input__user = request.user).order_by('-user_input__created_at')
+
+	workout = []
+	hrr = []
+	data2 = {}
+	classification_dic = {}
+	start = start_date
+	end = start_date + timedelta(days=7)
+	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	if a1:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			if activity_files_qs:
+				for i,k in enumerate(activity_files):
+					activity_files_dict = ast.literal_eval(activity_files[i])
+					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+						hrr.append(tmp)
+					elif activity_files_dict.get("summaryId",None) == str(data_id) :
+						workout.append(tmp)
+
+	profile = Profile.objects.filter(user=request.user)
+	if profile:
+		for tmp_profile in profile:
+			user_dob = tmp_profile.date_of_birth
+		user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+	data = {"low_end":"",
+			"high_end":"",
+			"classificaton":"",
+			"time_in_zone":"",
+			"prcnt_in_zone":"",
+			"total_duration":""}
+
+	below_aerobic_value = 180-user_age-30
+	anaerobic_value = 180-user_age+5
+
+	if workout:
+		workout_data = fitfile_parse(workout,offset,start_date_str)
+		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+
+		low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
+							29,34,39,44,49,54,59]
+		high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-11,0,5,10,13,18,23,28,
+							33,38,43,48,53,58,63]
+
+		low_end_heart = [180-user_age+tmp for tmp in low_end_values]
+		high_end_heart = [180-user_age+tmp for tmp in high_end_values]
+
+		low_end_dict = dict.fromkeys(low_end_heart,0)
+		# high_end_dict = dict.fromkeys(high_end_heart,0)
+
+		for a,b in zip(low_end_heart,high_end_heart):
+			for c,d in zip(workout_final_heartrate,workout_final_timestamp):
+				if c>=a and c<=b:
+					low_end_dict[a] = low_end_dict[a] + d
+		total_time_duration = sum(low_end_dict.values())
+				
+		for a,b in zip(low_end_heart,high_end_heart):	
+			if a and b > anaerobic_value:
+				classification_dic[a] = 'anaerobic_zone'
+			elif a and b < below_aerobic_value:
+				classification_dic[a] = 'below_aerobic_zone'
+			else:
+				classification_dic[a] = 'aerobic_zone'
+			prcnt_in_zone = (low_end_dict[a]/total_time_duration)*100
+			prcnt_in_zone = int(Decimal(prcnt_in_zone).quantize(0,ROUND_HALF_UP))
+			data={"low_end":a,
+			  "high_end":b,
+			  "classificaton":classification_dic[a],
+			  "time_in_zone":low_end_dict[a],
+			  "prcnt_in_zone":prcnt_in_zone,
+			  "total_duration":total_time_duration}
+			data2[a]=data
 
 
 def hrr_data(user,start_date):
@@ -1072,150 +1167,9 @@ def hrr_data(user,start_date):
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
 
+			else:
+				Did_you_measure_HRR = 'no'
 
-	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
-													manually_updated_json=manually_edited_dic,
-													userinput_activities=activities_dic)
-	workout = []
-	hrr = []
-	start = start_date
-	end = start_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
-	if filtered_activities_files:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = meta['activityIds'][0]
-			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i]["summaryId"] == str(data_id)) and (filtered_activities_files[i]["durationInSeconds"] <= 1200)):
-					hrr.append(filtered_activities_files[i])
-				elif filtered_activities_files[i]["summaryId"] == str(data_id):
-					workout.append(filtered_activities_files[i])
-	data={"date":"",
-		  "workout_type":"",
-		  "duration":"",
-		  "average_heart_rate":"",
-		  "max_heart_rate":"",
-		  "total_time":"",
-		  "avg_hrr":"",
-		  "max_hrr":"",
-		  "steps":""
-			}
-	time_duration = []
-	heart_rate = []
-	max_hrr = []
-	data1={}
-
-	if workout:
-		start_date_timestamp = workout[0]['startTimeInSeconds']
-		start_date = datetime.utcfromtimestamp(start_date_timestamp)
-		date = start_date.strftime('%d-%b-%y')
-		
-		for i,k in enumerate(workout):
-			act_date = date
-			summaryId = workout[i]['summaryId']
-			workout_type = workout[i]['activityType']
-			duration = workout[i]['durationInSeconds']
-			time_duration.append(duration)
-			avg_heart_rate = workout[i].get('averageHeartRateInBeatsPerMinute')
-			heart_rate.append(avg_heart_rate)
-			max_heart_rate = workout[i].get('maxHeartRateInBeatsPerMinute')
-			max_hrr.append(max_heart_rate)
-			exercise_steps = workout[i].get("steps",0)
-			
-			data = {"date":act_date,
-				  "workout_type":workout_type,
-				  "duration":duration,
-				  "average_heart_rate":avg_heart_rate,
-				  "max_heart_rate":max_heart_rate,
-				  "total_time":sum(time_duration),
-				  "avg_hrr":sum(heart_rate)/len(heart_rate),
-				  "max_hrr":sum(max_hrr)/len(max_hrr),
-				  "steps":exercise_steps
-					}
-			print(summaryId)
-			data1[summaryId] = data
-	if data1:
-		return JsonResponse(data1)
-	else:
-		return JsonResponse({})
-
-def daily_aa_calculations(request):
-	start_date = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-
-	start = start_date
-	end = start_date + timedelta(days=1)
-	start_date_str = start_date.strftime('%Y-%m-%d')
-
-	start_date_timestamp = start_date
-	start_date_timestamp = start_date_timestamp.timetuple()
-	start_date_timestamp = time.mktime(start_date_timestamp)
-	end_date_timestamp = start_date_timestamp + 86400
-
-	activity_files_qs=UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
-	if activity_files_qs:
-		activity_files = [pr.data for pr in activity_files_qs]
-		one_activity_file_dict =  ast.literal_eval(activity_files[0])
-		offset = one_activity_file_dict['startTimeOffsetInSeconds']
-
-	data = {"total_time":"",
-				"aerobic_zone":"",
-				"anaerobic_range":"",
-				"below_aerobic_zone":"",
-				"aerobic_range":"",
-				"anaerobic_range":"",
-				"below_aerobic_range":"",
-				"percent_aerobic":"",
-				"percent_below_aerobic":"",
-				"percent_anaerobic":"",
-				"total_percent":"",
-				"total_aerobic_range":"",
-				"total_anaerobic_range":"",
-				"total_below_aerobic_range":"",
-				"total_prcnt_aerobic":"",
-				"total_prcnt_anaerobic":""}
-
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = request.user).order_by('-user_input__created_at')
-
-	workout = []
-	hrr = []
-	data_summaryid = []
-	start = start_date
-	end = start_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
-	if a1:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = meta['activityIds'][0]
-			
-			if activity_files_qs:
-				for i,k in enumerate(activity_files):
-					# print(i,k)
-					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-						hrr.append(tmp)
-					elif activity_files_dict.get("summaryId",None) == str(data_id) :
-						workout.append(tmp)
-						data_summaryid.append(data_id)
-
-	profile = Profile.objects.filter(user=request.user)
-	if profile:
-		for tmp_profile in profile:
-			user_dob = tmp_profile.date_of_birth
-		user_age = (date.today() - user_dob) // timedelta(days=365.2425)
-
-	all_activities_heartrate = []
-	all_activities_timestamp = []
-	activies_timestamp = []
-	daily_aa_data={}
-
-
-	else:
-		Did_you_measure_HRR = 'no'
 	if (not hrr) and workout:
 		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
@@ -1235,7 +1189,6 @@ def daily_aa_calculations(request):
 					daily_diff_data_99 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_99,None)
 					daily_diff_99 = int(daily_diff_99) + 15
 					daily_diff_99 = str(daily_diff_99)
->>>>>>> 6911ad3eb7d5993630724d866dc72eb7fd17d510
 
 			if daily_diff_data_60:
 				if daily_diff_data_60 < 99:
@@ -1274,171 +1227,6 @@ def daily_aa_calculations(request):
 				"HRR_start_beat":HRR_start_beat,
 				"lowest_hrr_1min":lowest_hrr_1min,
 				"No_beats_recovered":No_beats_recovered,
-
-<<<<<<< HEAD
-		total_duration = []
-
-		for i in range(len(all_activities_heartrate)):
-			single_activity_file = individual_activity(all_activities_heartrate[i],all_activities_timestamp[i])
-			single_activity_list =list(single_activity_file)
-			time_in_aerobic = sum(single_activity_list[0])
-			aerobic_duration.append(time_in_aerobic)
-			time_in_below_aerobic = sum(single_activity_list[1])
-			below_aerobic_duration.append(time_in_below_aerobic)
-			time_in_anaerobic = sum(single_activity_list[2])
-			anaerobic_duration.append(time_in_anaerobic)
-			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-			total_duration.append(total_time)
-			
-			try:
-				percent_anaerobic = (time_in_anaerobic/total_time)*100
-				percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
-				total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration))*100
-				total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
-
-				percent_below_aerobic = (time_in_below_aerobic/total_time)*100
-				percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
-				total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration))*100
-				total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
-				
-				percent_aerobic = (time_in_aerobic/total_time)*100
-				percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
-				total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration))*100
-				total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
-	
-				total_percent = 100
-			except ZeroDivisionError:
-				percent_anaerobic=''
-				percent_below_aerobic=''
-				percent_aerobic=''
-				total_percent=''
-
-			data = {"total_time":total_time,
-					"aerobic_zone":time_in_aerobic,
-					"anaerobic_zone":time_in_anaerobic,
-					"below_aerobic_zone":time_in_below_aerobic,
-					"aerobic_range":aerobic_range,
-					"anaerobic_range":anaerobic_range,
-					"below_aerobic_range":below_aerobic_range,
-					"percent_aerobic":percent_aerobic,
-					"percent_below_aerobic":percent_below_aerobic,
-					"percent_anaerobic":percent_anaerobic,
-					"total_percent":total_percent,
-					"total_aerobic_range":sum(aerobic_duration),
-					"total_anaerobic_range":sum(anaerobic_duration),
-					"total_below_aerobic_range":sum(below_aerobic_duration),
-					"total_prcnt_aerobic":total_prcnt_aerobic,
-					"total_prcnt_anaerobic":total_prcnt_anaerobic,
-					"total_prcnt_below_aerobic":total_prcnt_below_aerobic}
-			
-			daily_aa_data[data_summaryid[i]] =data
-
-	if daily_aa_data:
-		return JsonResponse(daily_aa_data)
-	else:
-		return JsonResponse({})
-
-def aa_low_high_end_calculations(request):
-	start_date = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-
-	start = start_date
-	end = start_date + timedelta(days=1)
-	start_date_str = start_date.strftime('%Y-%m-%d')
-
-	start_date_timestamp = start_date
-	start_date_timestamp = start_date_timestamp.timetuple()
-	start_date_timestamp = time.mktime(start_date_timestamp)
-	end_date_timestamp = start_date_timestamp + 86400
-
-	activity_files_qs=UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
-	if activity_files_qs:
-		activity_files = [pr.data for pr in activity_files_qs]
-		one_activity_file_dict =  ast.literal_eval(activity_files[0])
-		offset = one_activity_file_dict['startTimeOffsetInSeconds']
-
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = request.user).order_by('-user_input__created_at')
-
-	workout = []
-	hrr = []
-	data2 = {}
-	classification_dic = {}
-	start = start_date
-	end = start_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
-	if a1:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = meta['activityIds'][0]
-			if activity_files_qs:
-				for i,k in enumerate(activity_files):
-					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-						hrr.append(tmp)
-					elif activity_files_dict.get("summaryId",None) == str(data_id) :
-						workout.append(tmp)
-
-	profile = Profile.objects.filter(user=request.user)
-	if profile:
-		for tmp_profile in profile:
-			user_dob = tmp_profile.date_of_birth
-		user_age = (date.today() - user_dob) // timedelta(days=365.2425)
-	data = {"low_end":"",
-			"high_end":"",
-			"classificaton":"",
-			"time_in_zone":"",
-			"prcnt_in_zone":"",
-			"total_duration":""}
-
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
-
-	if workout:
-		workout_data = fitfile_parse(workout,offset,start_date_str)
-		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
-
-		low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
-							29,34,39,44,49,54,59]
-		high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-11,0,5,10,13,18,23,28,
-							33,38,43,48,53,58,63]
-
-		low_end_heart = [180-user_age+tmp for tmp in low_end_values]
-		high_end_heart = [180-user_age+tmp for tmp in high_end_values]
-
-		low_end_dict = dict.fromkeys(low_end_heart,0)
-		# high_end_dict = dict.fromkeys(high_end_heart,0)
-
-		for a,b in zip(low_end_heart,high_end_heart):
-			for c,d in zip(workout_final_heartrate,workout_final_timestamp):
-				if c>=a and c<=b:
-					low_end_dict[a] = low_end_dict[a] + d
-		total_time_duration = sum(low_end_dict.values())
-				
-		for a,b in zip(low_end_heart,high_end_heart):	
-			if a and b > anaerobic_value:
-				classification_dic[a] = 'anaerobic_zone'
-			elif a and b < below_aerobic_value:
-				classification_dic[a] = 'below_aerobic_zone'
-			else:
-				classification_dic[a] = 'aerobic_zone'
-			prcnt_in_zone = (low_end_dict[a]/total_time_duration)*100
-			prcnt_in_zone = int(Decimal(prcnt_in_zone).quantize(0,ROUND_HALF_UP))
-			data={"low_end":a,
-			  "high_end":b,
-			  "classificaton":classification_dic[a],
-			  "time_in_zone":low_end_dict[a],
-			  "prcnt_in_zone":prcnt_in_zone,
-			  "total_duration":total_time_duration}
-			data2[a]=data
-		
-	if data2:
-		return JsonResponse(data2)
-	else:
-		return JsonResponse({})
-=======
 				"end_time_activity":end_time_activity,
 				"diff_actity_hrr":diff_actity_hrr,
 				"HRR_activity_start_time":HRR_activity_start_time,
@@ -1515,4 +1303,3 @@ def hrr_calculations(request):
 		except Hrr.DoesNotExist:
 			create_hrr_instance(request.user, data, start_date)
 	return JsonResponse(data)
->>>>>>> 6911ad3eb7d5993630724d866dc72eb7fd17d510
