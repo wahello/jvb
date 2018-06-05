@@ -104,7 +104,7 @@ class HeartRate extends Component{
 					"steps":"",
 					"total_time":"",
 					"aerobic_zone":"",
-					"anaerobic_range":"",
+					"anaerobic_zone":"",
 					"below_aerobic_zone":"",
 					"aerobic_range":"",
 					"anaerobic_range":"",
