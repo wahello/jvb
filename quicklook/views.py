@@ -18,7 +18,8 @@ from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from fitparse import FitFile
 from garmin.models import GarminFitFiles ,\
-						  UserGarminDataActivity
+						  UserGarminDataActivity,\
+						  UserLastSynced
 
 from registration.models import Profile
 
@@ -1397,6 +1398,10 @@ def export_users_xls(request):
 			sheet1.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
 			# sheet1.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
+	last_sycn_obj = UserLastSynced.objects.filter(user = request.user)
+	last_sycn = last_sycn_obj.last_synced
+	last_sycn_offset = last_sycn_obj.offset
+	print(last_sycn,last_sycn_offset)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
 	col_num1 = 2
@@ -2268,7 +2273,7 @@ def export_users_xls(request):
 	"No_beats_recovered","end_time_activity","diff_actity_hrr","HRR_activity_start_time",
 	"end_heartrate_activity","heart_rate_down_up","pure_1min_heart_beats","pure_time_99"]
 
-	hrr_not_available = ["end_time_activity","Did_you_measure_HRR","no_fitfile_hrr_reach_99",
+	hrr_not_available_keys = ["end_time_activity","Did_you_measure_HRR","no_fitfile_hrr_reach_99",
 	"no_fitfile_hrr_time_reach_99","time_heart_rate_reached_99","end_heartrate_activity",
 	"lowest_hrr_no_fitfile","no_file_beats_recovered"]
 
@@ -2373,8 +2378,24 @@ def export_users_xls(request):
 			if data:
 				data = data.__dict__
 				row_num += 1
-				for i,key in enumerate(hrr_not_available):
-					sheet12.write(i + 2, row_num,data[key],format)
+				for i,key in enumerate(hrr_not_available_keys):
+					if key == 'end_time_activity' or key == 'time_heart_rate_reached_99':
+						if data[key]:
+							offset = data['offset']
+							print(offset)
+							value = datetime.fromtimestamp(data[key]+offset)
+							sheet12.write(i + 2, row_num,value,timestamp_todata)
+					elif key == 'no_fitfile_hrr_time_reach_99':
+						if data[key]:
+							time = data[key]
+							minutes = time // 60
+							sec = time % 60
+							if sec >= 10:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							else:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+					else:
+						sheet12.write(i + 2, row_num,data[key],format)
 			else:
 				row_num += 1
 				sheet12.write(i + 2, row_num, '')
