@@ -1,10 +1,12 @@
 from django.db.models import Q
+from django.db import IntegrityError
 
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication 
+from rest_framework import status
 
 from user_input.serializers import UserDailyInputSerializer
 
@@ -39,6 +41,19 @@ class UserDailyInputView(generics.ListCreateAPIView):
                                                  user = user)
         else:
             return UserDailyInput.objects.all()
+
+    def create(self, request,*args,**kwargs):
+        try:
+            return super(UserDailyInputView,self).create(request,*args,**kwargs)
+        except IntegrityError as e:
+            # if user inputs is already present on date of submission
+            response_data = {
+                'status':'error',
+                'message':'User input already present on {}'.format(
+                    request.data.get('created_at')
+                )
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDailyInputItemView(generics.RetrieveUpdateDestroyAPIView):
     '''
