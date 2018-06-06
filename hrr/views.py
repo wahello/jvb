@@ -1173,8 +1173,8 @@ def hrr_data(user,start_date):
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
 
-		else:
-			Did_you_measure_HRR = 'no'
+	else:
+		Did_you_measure_HRR = 'no'
 
 	if (not hrr) and workout:
 		end_time_activity = workout_timestamp[-1]-(offset)
