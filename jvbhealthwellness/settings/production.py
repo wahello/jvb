@@ -60,10 +60,10 @@ CELERY_BEAT_SCHEDULE = {
         'task':'progress_analyzer.generate_cumulative_instances',
         'schedule':crontab(minute=0, hour=1)
     },
-    #execute every day at 2:00 AM EST (America/New_york)
+    #execute every quarter to hour. Ex 10:45, 9:45 etc.
     'update-obsolete-progress-analyzer-report':{
         'task':'progress_analyzer.update_obsolete_pa_reports',
-        'schedule':crontab(minute=0, hour=2)
+        'schedule':crontab(minute=45, hour='*/1')
     },
     #execute every day at 3:00 AM EST (America/New_york)
     'retry-failed-ping-notifications':{
