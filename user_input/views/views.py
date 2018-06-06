@@ -25,7 +25,7 @@ class UserDailyInputView(generics.ListCreateAPIView):
           and return the list
     '''
     #authentication_classes = (CsrfExemptSessionAuthentication,)
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserDailyInputSerializer
 
     def get_queryset(self):
