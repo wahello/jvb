@@ -683,7 +683,7 @@ def aa_workout_calculations(request):
 	workout = []
 	hrr = []
 	start = start_date
-	end = start_date + timedelta(days=17)
+	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	if filtered_activities_files:
 		for tmp in a1:
@@ -703,9 +703,6 @@ def aa_workout_calculations(request):
 		  "duration":"",
 		  "average_heart_rate":"",
 		  "max_heart_rate":"",
-		  "total_time":"",
-		  "avg_hrr":"",
-		  "max_hrr":"",
 		  "steps":""
 			}
 	time_duration = []
@@ -724,24 +721,39 @@ def aa_workout_calculations(request):
 			workout_type = workout[i]['activityType']
 			duration = workout[i]['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = workout[i].get('averageHeartRateInBeatsPerMinute')
+			avg_heart_rate = workout[i].get('averageHeartRateInBeatsPerMinute',0)
 			heart_rate.append(avg_heart_rate)
-			max_heart_rate = workout[i].get('maxHeartRateInBeatsPerMinute')
+			max_heart_rate = workout[i].get('maxHeartRateInBeatsPerMinute',0)
 			max_hrr.append(max_heart_rate)
-			exercise_steps = workout[i].get("steps")
+			exercise_steps = workout[i].get("steps",0)
 			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
-				  "total_time":sum(time_duration),
-				  # "avg_hrr":sum(heart_rate)/len(heart_rate),
-				  # "max_hrr":sum(max_hrr)/len(max_hrr),
 				  "steps":exercise_steps
 					}
 			
 			data1[summaryId] = data
+		try:
+			avg_hrr = sum(heart_rate)/len(heart_rate)
+			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
+		except ZeroDivisionError:
+			avg_hrr = ""
+		try:
+			maxi_hrr = max(max_hrr)
+		except ValueError:
+			maxi_hrr = ''
+
+		total = {"date":date,
+				 "workout_type":"Totals",
+				 "duration":sum(time_duration),
+				 "average_heart_rate":avg_hrr,
+				 "max_heart_rate":maxi_hrr,
+				 "steps":exercise_steps}
+		data1['total'] = total
+
 	if data1:
 		return JsonResponse(data1)
 	else:
@@ -862,23 +874,17 @@ def daily_aa_calculations(request):
 			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 			total_duration.append(total_time)
 
+
 			try:
 				percent_anaerobic = (time_in_anaerobic/total_time)*100
 				percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
-				total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
-				total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
-				
+			
 				percent_below_aerobic = (time_in_below_aerobic/total_time)*100
 				percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
-				total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
-				total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
 				
 				percent_aerobic = (time_in_aerobic/total_time)*100
 				percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
-				total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
-				total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
-				
-				
+			
 				total_percent = 100
 			except ZeroDivisionError:
 				percent_anaerobic=''
@@ -890,20 +896,35 @@ def daily_aa_calculations(request):
 					"aerobic_zone":time_in_aerobic,
 					"anaerobic_zone":time_in_anaerobic,
 					"below_aerobic_zone":time_in_below_aerobic,
-					"aerobic_range":aerobic_range,
-					"anaerobic_range":anaerobic_range,
-					"below_aerobic_range":below_aerobic_range,
 					"percent_aerobic":percent_aerobic,
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent,
-					"total_aerobic_range":sum(aerobic_duration),
-					"total_anaerobic_range":sum(anaerobic_duration),
-					"total_below_aerobic_range":sum(below_aerobic_duration),
-					"total_prcnt_aerobic":total_prcnt_aerobic,
-					"total_prcnt_anaerobic":total_prcnt_anaerobic,
-					"total_prcnt_below_aerobic":total_prcnt_below_aerobic}
+					}
 			daily_aa_data[data_summaryid[i]] =data
+		try:
+			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
+			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
+			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
+			total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
+			total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
+			total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
+		except ZeroDivisionError:
+			total_prcnt_anaerobic = ''
+			total_prcnt_anaerobic = ''
+			total_prcnt_below_aerobic = ''
+
+		total =  {"total_time":"",
+				  "aerobic_zone":sum(aerobic_duration),
+				  "anaerobic_zone":sum(anaerobic_duration),
+				  "below_aerobic_zone":sum(below_aerobic_duration),
+				  "percent_aerobic":total_prcnt_aerobic,
+				  "percent_below_aerobic":total_prcnt_below_aerobic,
+				  "percent_anaerobic":total_prcnt_anaerobic,
+				  "total_percent":""
+					}
+		
+	daily_aa_data['total'] = total
 
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
