@@ -1056,25 +1056,30 @@ def hrr_data(user,start_date):
 	workout = []
 	hrr = []
 	# if not activities:
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = meta['activityIds'][0]
-		for i,k in enumerate(activity_files):
-			activity_files_dict = ast.literal_eval(activity_files[i])
-			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+	try:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
+	except:
+		pass
+
+		
+	if (not workout) and (not hrr): 
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if id_act == data_id:
 				hrr.append(tmp)
-			elif activity_files_dict.get("summaryId",None) == str(data_id) :
+			else:
 				workout.append(tmp)
-	# else:
-	# 	for tmp in a1:
-	# 		meta = tmp.meta_data_fitfile
-	# 		meta = ast.literal_eval(meta)
-	# 		data_id = int(meta['activityIds'][0])
-	# 		if id_act == data_id:
-	# 			hrr.append(tmp)
-	# 		else:
-	# 			workout.append(tmp)
 	print(workout)
 	print(hrr)
 	if workout:
@@ -1185,6 +1190,11 @@ def hrr_data(user,start_date):
 			daily_diff = daily_diff + (15 - daily_activty_end)
 		else:
 			pass
+		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+			daily_diff1 = str(int(daily_diff))
+			data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
+		if data_end_activity:
+			end_heartrate_activity = data_end_activity
 		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
 			daily_diff_60 = str(int(daily_diff + 60))
 			daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
