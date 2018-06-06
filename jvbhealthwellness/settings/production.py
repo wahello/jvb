@@ -178,4 +178,13 @@ CACHES = {
     }
 }
 
-
+# Elastic APM settings
+INSTALLED_APPS.insert(0,"elasticapm.contrib.django")
+MIDDLEWARE.insert(0,'elasticapm.contrib.django.middleware.TracingMiddleware')
+ELASTIC_APM = {
+    # allowed characters in SERVICE_NAME: a-z, A-Z, 0-9, -, _, and space
+    'SERVICE_NAME': 'JVB-Production',
+    'SECRET_TOKEN': 'health',
+    'SERVER_URL': 'http://13.232.8.152:8200',
+    'DEBUG': True,
+}
