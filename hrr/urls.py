@@ -10,6 +10,6 @@ urlpatterns = [
 								  name="aa_workout"),
 	url(r'^daily_aa_calculations$',views.daily_aa_calculations,
 								  name="daily_aa"),
-	# url(r'^weekly_aerobic_anaerobic_summary$',views.weekly_aerobic_anaerobic_summary,
-	# 								name="weekly_a/a")
+	url(r'^aa_low_high_calculations$',views.aa_low_high_end_calculations,
+									name="aa_classification chart")
 	]
