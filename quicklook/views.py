@@ -2363,7 +2363,13 @@ def export_users_xls(request):
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
 							else:
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
-
+					elif key == "Did_you_measure_HRR" or key == "Did_heartrate_reach_99":
+						if key == "Did_you_measure_HRR":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						elif data["Did_heartrate_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
 			else:
@@ -2387,7 +2393,6 @@ def export_users_xls(request):
 					if key == 'end_time_activity' or key == 'time_heart_rate_reached_99':
 						if data[key]:
 							offset = data['offset']
-							print(offset)
 							value = datetime.fromtimestamp(data[key]+offset)
 							sheet12.write(i + 2, row_num,value,timestamp_todata)
 					elif key == 'no_fitfile_hrr_time_reach_99':
@@ -2399,6 +2404,13 @@ def export_users_xls(request):
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
 							else:
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99":
+						if key == "Did_you_measure_HRR":
+							sheet12.write(i + 2, row_num,"No",format)
+						elif data["no_fitfile_hrr_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
 			else:
@@ -2434,7 +2446,19 @@ def export_users_xls(request):
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
 							else:
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
-
+					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99" or key == "Did_heartrate_reach_99":
+						if data["Did_you_measure_HRR"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+						if data["no_fitfile_hrr_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+						if data["Did_heartrate_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
 			else:
