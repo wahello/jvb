@@ -1105,7 +1105,6 @@ handleChangeModalActivityTime(event){
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
-            console.log("Duration:",duration);
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
