@@ -15,7 +15,7 @@ from quicklook.calculation_helper import get_filtered_activity_stats
 from fitparse import FitFile
 
 from hrr.models import Hrr
-
+import pprint
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
 	heartrate_complete = []
@@ -680,7 +680,6 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
-
 	workout = []
 	hrr = []
 	start = start_date
@@ -692,10 +691,13 @@ def aa_workout_calculations(request):
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
 			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and (filtered_activities_files[i].get("durationInSeconds") <= 1200) and (filtered_activities_files[i].get("distanceInMeters") <= 200.00)):
+				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and (filtered_activities_files[i].get("durationInSeconds",0) <= 1200) and (filtered_activities_files[i].get("distanceInMeters",0) <= 200.00)):
 					hrr.append(filtered_activities_files[i])
 				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
+				elif ((filtered_activities_files[i].get("summaryId") != str(data_id)) and (filtered_activities_files[i].get("durationInSeconds",0) > 1200)):
+				 	workout.append(filtered_activities_files[i])
+	
 	data={"date":"",
 		  "workout_type":"",
 		  "duration":"",
@@ -734,8 +736,8 @@ def aa_workout_calculations(request):
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
 				  "total_time":sum(time_duration),
-				  "avg_hrr":sum(heart_rate)/len(heart_rate),
-				  "max_hrr":sum(max_hrr)/len(max_hrr),
+				  # "avg_hrr":sum(heart_rate)/len(heart_rate),
+				  # "max_hrr":sum(max_hrr)/len(max_hrr),
 				  "steps":exercise_steps
 					}
 			
@@ -1171,8 +1173,8 @@ def hrr_data(user,start_date):
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
 
-			else:
-				Did_you_measure_HRR = 'no'
+		else:
+			Did_you_measure_HRR = 'no'
 
 	if (not hrr) and workout:
 		end_time_activity = workout_timestamp[-1]-(offset)

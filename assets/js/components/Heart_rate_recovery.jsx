@@ -36,6 +36,7 @@ class HeartRate extends Component{
 		this.errorWorkout =this.errorWorkout.bind(this);
 		this.renderAerobicSelectedDateFetchOverlay = renderAerobicSelectedDateFetchOverlay.bind(this);
 		this.stepsValue = this.stepsValue.bind(this);
+		this.renderNullValue = this.renderNullValue.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
 	    	calendarOpen:false,
@@ -103,7 +104,7 @@ class HeartRate extends Component{
 					"steps":"",
 					"total_time":"",
 					"aerobic_zone":"",
-					"anaerobic_range":"",
+					"anaerobic_zone":"",
 					"below_aerobic_zone":"",
 					"aerobic_range":"",
 					"anaerobic_range":"",
@@ -162,21 +163,36 @@ class HeartRate extends Component{
 	      	isOpen: !this.state.isOpen,
 	    });
   	}
-
+  	renderNullValue(value){
+  		let values;
+  		if(value){
+  			values = value;
+  		}
+  		else if(value == null || value == undefined){
+  			values = "-"
+  		}
+  		return values;
+  	}
 	renderTime(value){
-		if(value>0){
-			var sec_num = parseInt(value); 
-		    var hours   = Math.floor(sec_num / 3600);
-		    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-		    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+		var time;
+		if(value){
+			if(value>0){
+				var sec_num = parseInt(value); 
+			    var hours   = Math.floor(sec_num / 3600);
+			    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+			    var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-		    if (hours   < 10) {hours   = "0"+hours;}
-		    if (minutes < 10) {minutes = "0"+minutes;}
-		    if (seconds < 10) {seconds = "0"+seconds;}
-		    var time = hours+':'+minutes+':'+seconds;
+			    if (hours   < 10) {hours   = "0"+hours;}
+			    if (minutes < 10) {minutes = "0"+minutes;}
+			    if (seconds < 10) {seconds = "0"+seconds;}
+			    time = hours+':'+minutes+':'+seconds;
+			}
+		}
+		else if(value == 0){
+			time = "00:00:00";
 		}
 		else{
-			time = value;
+			time = "-";
 		}
 		
 		return time;
@@ -194,18 +210,24 @@ class HeartRate extends Component{
 	        }
 	        return x1 + x2;
 	    }
+	    else if(value == 0){
+	    	return "0";
+	    }
 	    else{
 	    	return "-";
 	    }
 	}
 
 	renderpercentage(value){
-		let percentage
+		let percentage;
 		if(value){
 			percentage = value +"%";
 		}
-		else if(value == 0 || value == null || value == undefined){
+		else if(value == 0){
 			percentage = "0%";
+		}
+		else if(value == null || value == undefined){
+			percentage = "-";
 		}
 		return percentage;
 	}
@@ -264,7 +286,7 @@ class HeartRate extends Component{
 	            		td_values.push(<td>{keyvalue}</td>);
 	            	}
 				else{
-					let keyvalue = value[key];
+					let keyvalue = this.renderNullValue(value[key]);
 					td_values.push(<td>{keyvalue}</td>);
 				}
 				 
