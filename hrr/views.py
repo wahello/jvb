@@ -1176,7 +1176,7 @@ def hrr_data(user,start_date):
 	else:
 		Did_you_measure_HRR = 'no'
 
-	if (not hrr) and workout:
+	if (not hrr) and workout and workout_final_heartrate:
 		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
 		daily_diff = end_time_activity - daily_starttime
@@ -1249,7 +1249,7 @@ def hrr_data(user,start_date):
 
 				"offset":offset,
 				}
-	elif workout:
+	elif workout and workout_final_heartrate:
 		data = {
 			"Did_heartrate_reach_99":"",
 			"time_99":None,
