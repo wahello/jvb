@@ -1721,7 +1721,7 @@ renderEditActivityModal(){
                       </div>
                          </FormGroup>
                        <FormGroup>
-                     <Label className="padding1">5. Exercise Duration (hh:mm)</Label>
+                     <Label className="padding1">5. Exercise Duration (hh:mm:ss)</Label>
                      <div className=" display_flex margin_lft0" >
                          <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
