@@ -618,6 +618,7 @@ def aa_calculations(request):
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
 	return JsonResponse(data)
+
 time_duration1 = []
 def aa_workout_calculations(request):
 	start_date = request.GET.get('start_date',None)
@@ -697,7 +698,7 @@ def aa_workout_calculations(request):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
 			if ((x.get("summaryId") not in act_id) and (x.get("durationInSeconds",0) > 1200)):
-				workout.append(filtered_activities_files[i])
+				workout.append(x)
 
 	data={"date":"",
 		  "workout_type":"",
@@ -747,7 +748,6 @@ def aa_workout_calculations(request):
 			maxi_hrr = ''
 		time_total = sum(time_duration)
 		
-
 		total = {"date":date,
 				 "workout_type":"Totals",
 				 "duration":sum(time_duration),
@@ -851,7 +851,6 @@ def daily_aa_calculations(request):
 		anaerobic_range = '{} or above'.format(anaerobic_value+1)
 		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
 		
-		
 		def individual_activity(heart,time):
 			anaerobic_range_list = []
 			below_aerobic_list = []
@@ -891,7 +890,7 @@ def daily_aa_calculations(request):
 				percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 			
 				total_percent = 100
-			except ZeroDivisionError:
+			except (ZeroDivisionError):
 				percent_anaerobic=''
 				percent_below_aerobic=''
 				percent_aerobic=''
@@ -914,7 +913,7 @@ def daily_aa_calculations(request):
 			total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
 			total_prcnt_aerobic = (sum(aerobic_duration)/sum(time_duration1[0])*100)
 			total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
-		except ZeroDivisionError:
+		except (ZeroDivisionError,IndexError):
 			total_prcnt_anaerobic = ''
 			total_prcnt_below_aerobic = ''
 			total_prcnt_aerobic = ''

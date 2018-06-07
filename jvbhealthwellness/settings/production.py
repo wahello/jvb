@@ -105,9 +105,9 @@ LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
 LOG_REQUESTS = True
 
 # Opbeat
-INSTALLED_APPS += ['opbeat.contrib.django']
-MIDDLEWARE.insert(  # insert OpbeatAPMMiddleware on the top
-    0, 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware')
+# INSTALLED_APPS += ['opbeat.contrib.django']
+# MIDDLEWARE.insert(  # insert OpbeatAPMMiddleware on the top
+#     0, 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware')
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  
