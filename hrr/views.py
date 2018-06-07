@@ -698,7 +698,7 @@ def aa_workout_calculations(request):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
 			if ((x.get("summaryId") not in act_id) and (x.get("durationInSeconds",0) > 1200)):
-				workout.append(filtered_activities_files[i])
+				workout.append(x)
 
 	data={"date":"",
 		  "workout_type":"",
@@ -1085,31 +1085,35 @@ def hrr_data(user,start_date):
 	workout = []
 	hrr = []
 	# if not activities:
-	for tmp in a1:
-		meta = tmp.meta_data_fitfile
-		meta = ast.literal_eval(meta)
-		data_id = meta['activityIds'][0]
-		for i,k in enumerate(activity_files):
-			activity_files_dict = ast.literal_eval(activity_files[i])
-			if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+	try:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
+	except:
+		pass
+
+		
+	if (not workout) and (not hrr): 
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = int(meta['activityIds'][0])
+			if id_act == data_id:
 				hrr.append(tmp)
-			elif activity_files_dict.get("summaryId",None) == str(data_id) :
+			else:
 				workout.append(tmp)
-	# else:
-	# 	for tmp in a1:
-	# 		meta = tmp.meta_data_fitfile
-	# 		meta = ast.literal_eval(meta)
-	# 		data_id = int(meta['activityIds'][0])
-	# 		if id_act == data_id:
-	# 			hrr.append(tmp)
-	# 		else:
-	# 			workout.append(tmp)
-	print(workout)
-	print(hrr)
+
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
-	
+	Did_you_measure_HRR = ""
 	if hrr:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
@@ -1158,6 +1162,8 @@ def hrr_data(user,start_date):
 				Did_heartrate_reach_99 = 'no'
 
 
+
+
 			HRR_activity_start_time = hrr_timestamp[0]-(offset)
 			HRR_start_beat = hrr_final_heartrate[0]
 			try:
@@ -1167,8 +1173,21 @@ def hrr_data(user,start_date):
 			time_99 = sum(time_toreach_99[:-1])
 			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
 			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+			
+			end_time_activity = workout_timestamp[-1]-(offset)
+			end_heartrate_activity  = workout_final_heartrate[-1]
+			daily_diff = end_time_activity - daily_starttime
+			daily_activty_end = daily_diff % 15
+			if daily_activty_end != 0:
+				daily_diff = daily_diff + (15 - daily_activty_end)
+			else:
+				pass
+			if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+				daily_diff1 = str(int(daily_diff))
+				data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
+			if data_end_activity:
+				end_heartrate_activity = data_end_activity
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
-
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
 			pure_1min_beats = []
@@ -1202,6 +1221,20 @@ def hrr_data(user,start_date):
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
 
+			# end_time_activity = workout_timestamp[-1]-(offset)
+			# end_heartrate_activity  = workout_final_heartrate[-1]
+			# daily_diff = end_time_activity - daily_starttime
+			# daily_activty_end = daily_diff % 15
+			# if daily_activty_end != 0:
+			# 	daily_diff = daily_diff + (15 - daily_activty_end)
+			# else:
+			# 	pass
+			# if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+			# 	daily_diff1 = str(int(daily_diff))
+			# 	data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
+			# if data_end_activity:
+			# 	end_heartrate_activity = data_end_activity
+
 	else:
 		Did_you_measure_HRR = 'no'
 
@@ -1214,6 +1247,11 @@ def hrr_data(user,start_date):
 			daily_diff = daily_diff + (15 - daily_activty_end)
 		else:
 			pass
+		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+			daily_diff1 = str(int(daily_diff))
+			data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
+		if data_end_activity:
+			end_heartrate_activity = data_end_activity
 		if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
 			daily_diff_60 = str(int(daily_diff + 60))
 			daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
