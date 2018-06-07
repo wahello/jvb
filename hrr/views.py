@@ -1134,6 +1134,8 @@ def hrr_data(user,start_date):
 				Did_heartrate_reach_99 = 'no'
 
 
+
+
 			HRR_activity_start_time = hrr_timestamp[0]-(offset)
 			HRR_start_beat = hrr_final_heartrate[0]
 			try:
@@ -1143,8 +1145,21 @@ def hrr_data(user,start_date):
 			time_99 = sum(time_toreach_99[:-1])
 			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
 			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+			
+			end_time_activity = workout_timestamp[-1]-(offset)
+			end_heartrate_activity  = workout_final_heartrate[-1]
+			daily_diff = end_time_activity - daily_starttime
+			daily_activty_end = daily_diff % 15
+			if daily_activty_end != 0:
+				daily_diff = daily_diff + (15 - daily_activty_end)
+			else:
+				pass
+			if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+				daily_diff1 = str(int(daily_diff))
+				data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
+			if data_end_activity:
+				end_heartrate_activity = data_end_activity
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
-
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
 			pure_1min_beats = []
@@ -1177,6 +1192,20 @@ def hrr_data(user,start_date):
 			
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
+
+			# end_time_activity = workout_timestamp[-1]-(offset)
+			# end_heartrate_activity  = workout_final_heartrate[-1]
+			# daily_diff = end_time_activity - daily_starttime
+			# daily_activty_end = daily_diff % 15
+			# if daily_activty_end != 0:
+			# 	daily_diff = daily_diff + (15 - daily_activty_end)
+			# else:
+			# 	pass
+			# if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+			# 	daily_diff1 = str(int(daily_diff))
+			# 	data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
+			# if data_end_activity:
+			# 	end_heartrate_activity = data_end_activity
 
 	else:
 		Did_you_measure_HRR = 'no'
