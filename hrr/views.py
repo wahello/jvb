@@ -1110,12 +1110,11 @@ def hrr_data(user,start_date):
 				hrr.append(tmp)
 			else:
 				workout.append(tmp)
-	print(workout)
-	print(hrr)
+
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
-	
+	Did_you_measure_HRR = ""
 	if hrr:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
