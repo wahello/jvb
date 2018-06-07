@@ -759,7 +759,6 @@ def aa_workout_calculations(request):
 		else:
 			data1['Totals'] = {}
 		time_duration1.append(time_duration)
-		print(time_duration1)
 
 	if data1:
 		return JsonResponse(data1)
