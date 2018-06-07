@@ -617,10 +617,8 @@ def aa_calculations(request):
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
-
-
 	return JsonResponse(data)
-
+time_duration1 = []
 def aa_workout_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -680,6 +678,7 @@ def aa_workout_calculations(request):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
+	act_id = []
 	workout = []
 	hrr = []
 	start = start_date
@@ -690,14 +689,16 @@ def aa_workout_calculations(request):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
+			act_id.append(str(data_id))
 			for i,k in enumerate(filtered_activities_files):
 				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and (filtered_activities_files[i].get("durationInSeconds",0) <= 1200) and (filtered_activities_files[i].get("distanceInMeters",0) <= 200.00)):
 					hrr.append(filtered_activities_files[i])
 				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
-				elif ((filtered_activities_files[i].get("summaryId") != str(data_id)) and (filtered_activities_files[i].get("durationInSeconds",0) > 1200)):
-				 	workout.append(filtered_activities_files[i])
-	
+		for x in filtered_activities_files:
+			if ((x.get("summaryId") not in act_id) and (x.get("durationInSeconds",0) > 1200)):
+				workout.append(filtered_activities_files[i])
+
 	data={"date":"",
 		  "workout_type":"",
 		  "duration":"",
@@ -709,24 +710,23 @@ def aa_workout_calculations(request):
 	heart_rate = []
 	max_hrr = []
 	data1={}
-
+	steps = []
 	if workout:
 		start_date_timestamp = workout[0]['startTimeInSeconds']
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
-		
-		for i,k in enumerate(workout):
+		for workout in workout:
 			act_date = date
-			summaryId = workout[i]['summaryId']
-			workout_type = workout[i]['activityType']
-			duration = workout[i]['durationInSeconds']
+			summaryId = workout['summaryId']
+			workout_type = workout['activityType']
+			duration = workout['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = workout[i].get('averageHeartRateInBeatsPerMinute',0)
+			avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute',0)
 			heart_rate.append(avg_heart_rate)
-			max_heart_rate = workout[i].get('maxHeartRateInBeatsPerMinute',0)
+			max_heart_rate = workout.get('maxHeartRateInBeatsPerMinute',0)
 			max_hrr.append(max_heart_rate)
-			exercise_steps = workout[i].get("steps",0)
-			
+			exercise_steps = workout.get("steps",0)
+			steps.append(exercise_steps)
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
@@ -745,14 +745,21 @@ def aa_workout_calculations(request):
 			maxi_hrr = max(max_hrr)
 		except ValueError:
 			maxi_hrr = ''
+		time_total = sum(time_duration)
+		
 
 		total = {"date":date,
 				 "workout_type":"Totals",
 				 "duration":sum(time_duration),
 				 "average_heart_rate":avg_hrr,
 				 "max_heart_rate":maxi_hrr,
-				 "steps":exercise_steps}
-		data1['total'] = total
+				 "steps":sum(steps)}
+		if total:	
+			data1['Totals'] = total
+		else:
+			data1['Totals'] = {}
+		time_duration1.append(time_duration)
+		print(time_duration1)
 
 	if data1:
 		return JsonResponse(data1)
@@ -873,8 +880,7 @@ def daily_aa_calculations(request):
 			anaerobic_duration.append(time_in_anaerobic)
 			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 			total_duration.append(total_time)
-
-
+			
 			try:
 				percent_anaerobic = (time_in_anaerobic/total_time)*100
 				percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -903,16 +909,16 @@ def daily_aa_calculations(request):
 					}
 			daily_aa_data[data_summaryid[i]] =data
 		try:
-			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
+			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(time_duration1[0])*100)
 			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
+			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(time_duration1[0])*100)
 			total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
+			total_prcnt_aerobic = (sum(aerobic_duration)/sum(time_duration1[0])*100)
 			total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
 		except ZeroDivisionError:
 			total_prcnt_anaerobic = ''
-			total_prcnt_anaerobic = ''
 			total_prcnt_below_aerobic = ''
+			total_prcnt_aerobic = ''
 
 		total =  {"total_time":"",
 				  "aerobic_zone":sum(aerobic_duration),
@@ -924,12 +930,16 @@ def daily_aa_calculations(request):
 				  "total_percent":""
 					}
 		
-	daily_aa_data['total'] = total
-
+		if total:
+			daily_aa_data['Totals'] = total
+		else:
+			daily_aa_data['Totals'] = {}
+	
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
 		return JsonResponse({})
+
 def aa_low_high_end_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
