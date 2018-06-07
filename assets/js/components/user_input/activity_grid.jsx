@@ -1804,7 +1804,7 @@ return(
 <td id = "add_button" className="add_button_back">Average Heart Rate</td>
 <td id = "add_button" className="add_button_back">Workout Start Time</td>
 <td id = "add_button" className="add_button_back">Workout End Time</td>
-<td id = "add_button" className="add_button_back">Exercise Duration (hh:mm)</td>
+<td id = "add_button" className="add_button_back">Exercise Duration (hh:mm:ss)</td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
