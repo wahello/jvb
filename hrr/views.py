@@ -1038,6 +1038,24 @@ def aa_low_high_end_calculations(request):
 
 def hrr_data(user,start_date):
 	
+	Did_heartrate_reach_99 = ''
+	time_99 = 0.0
+	HRR_start_beat = 0.0
+	lowest_hrr_1min = 0.0
+	No_beats_recovered = 0.0
+	end_time_activity = 0.0
+	diff_actity_hrr = 0.0
+	HRR_activity_start_time = 0.0
+	end_heartrate_activity = 0.0
+	heart_rate_down_up = 0.0 
+	pure_1min_heart_beats = 0.0
+	pure_time_99 = 0.0 
+	no_fitfile_hrr_reach_99 = ''
+	no_fitfile_hrr_time_reach_99 = 0.0
+	time_heart_rate_reached_99 = 0.0
+	lowest_hrr_no_fitfile = 0.0 
+	no_file_beats_recovered = 0.0
+
 	start_date_timestamp = start_date
 	start_date_timestamp = start_date_timestamp.timetuple()
 	start_date_timestamp = time.mktime(start_date_timestamp)
@@ -1051,6 +1069,7 @@ def hrr_data(user,start_date):
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
 
+	offset = 0
 	if activity_files:
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
@@ -1175,8 +1194,8 @@ def hrr_data(user,start_date):
 			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
 			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
 			
-			end_time_activity = workout_timestamp[-1]-(offset)
-			end_heartrate_activity  = workout_final_heartrate[-1]
+			# end_time_activity = workout_timestamp[-1]-(offset)
+			# end_heartrate_activity  = workout_final_heartrate[-1]
 			daily_diff = end_time_activity - daily_starttime
 			daily_activty_end = daily_diff % 15
 			if daily_activty_end != 0:
