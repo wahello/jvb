@@ -697,7 +697,7 @@ def aa_workout_calculations(request):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
 			if ((x.get("summaryId") not in act_id) and (x.get("durationInSeconds",0) > 1200)):
-				workout.append(filtered_activities_files[i])
+				workout.append(x)
 
 	data={"date":"",
 		  "workout_type":"",
