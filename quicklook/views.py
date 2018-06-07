@@ -18,7 +18,8 @@ from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from fitparse import FitFile
 from garmin.models import GarminFitFiles ,\
-						  UserGarminDataActivity
+						  UserGarminDataActivity,\
+						  UserLastSynced
 
 from registration.models import Profile
 
@@ -55,6 +56,7 @@ from progress_analyzer.models import OverallHealthGradeCumulative, \
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
+from hrr.models import Hrr
 # from .calculation_helper import *
 
 
@@ -437,10 +439,11 @@ def export_users_xls(request):
 	sheet4 = book.add_worksheet('Food')
 	sheet5 = book.add_worksheet('Alcohol')
 	sheet6 = book.add_worksheet('Exercise Reporting')
+	sheet12 = book.add_worksheet('HRR')
 	sheet7 = book.add_worksheet('Swim Stats')
 	sheet8 = book.add_worksheet('Bike Stats')
-
 	sheet9 = book.add_worksheet('All Stats')
+	
 	sheet1.set_column(1,1000,11)
 	sheet2.set_column(1,1000,11)
 	sheet3.set_column(1,1000,11)
@@ -451,6 +454,7 @@ def export_users_xls(request):
 	sheet8.set_column(1,1000,11)
 	sheet9.set_column(1,1000,11)
 	sheet10.set_column(2,1000,11)
+	sheet12.set_column(1,1000,11)
 	sheet1.freeze_panes(1, 1)
 	sheet1.set_column('A:A',40)
 	sheet2.freeze_panes(1, 1)
@@ -474,6 +478,8 @@ def export_users_xls(request):
 	sheet9.set_row(33, 150)
 	sheet9.set_landscape()
 	sheet9.set_row(0,30)
+	sheet12.freeze_panes(1, 1)
+	sheet12.set_column('A:A',40)
 
 	bold = book.add_format({'bold': True})
 	date_format = book.add_format({'num_format': 'm-d-yy'})
@@ -609,6 +615,11 @@ def export_users_xls(request):
 	health_grade_cum_datewise = {q.user_cum.created_at.strftime("%Y-%m-%d"):q
 		 for q in health_grade_cum }
 
+	hrr = Hrr.objects.filter(created_at__range=(from_date, to_date),
+		user_hrr = request.user).order_by('-created_at')
+
+	hrr_datewise = {q.created_at.strftime("%Y-%m-%d"):q
+		 for q in hrr }
 
 	current_date = to_date
 	r = 0
@@ -1387,6 +1398,16 @@ def export_users_xls(request):
 			sheet1.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
 			# sheet1.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
+	
+	last_sycn_obj = UserLastSynced.objects.filter(user = request.user)
+	last_sycn = [tmp.last_synced for tmp in last_sycn_obj]
+	last_sycn_offset = [tmp.offset for tmp in last_sycn_obj]
+	import time
+	unixtime = time.mktime(last_sycn[0].timetuple())
+	local_time = unixtime + last_sycn_offset[0]
+	value_last_sycn = datetime.fromtimestamp(local_time).strftime('%b %d,%Y @ %I:%M %p')
+	matter = 'Wearable Device Last Synced on'
+	sheet1.write_rich_string(0,0,matter,'\n',value_last_sycn)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
 	col_num1 = 2
@@ -2036,7 +2057,7 @@ def export_users_xls(request):
 		current_date -= timedelta(days=1)
 
 	
-
+	#exercise reporting
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
 	sheet6.repeat_columns(0)
@@ -2076,7 +2097,6 @@ def export_users_xls(request):
 			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
 			current_date_string = str(current_date_string)
 			sheet6.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
-			# sheet6.write(0, r, current_date,date_format)
 			current_date -= timedelta(days=1)
 	sheet6.write(0, 0, "Exercise Reporting",bold)
 	col_num1 = 1
@@ -2230,6 +2250,226 @@ def export_users_xls(request):
 			sheet6.write(rem_row+4+i, row_num - column_no - no_days - 1,'')
 		current_date -= timedelta(days=1)
 	
+	#HRR
+	sheet12.set_landscape()
+	sheet12.repeat_rows(0)
+	sheet12.repeat_columns(0)
+	sheet12.set_row(0,30)
+	date_formats = ('hh:mm:ss AM/PM')
+	timestamp_todata = book.add_format({'num_format': date_formats,'align': 'left'})
+	hrr_available = ["Did you measure your heart rate recovery (HRR) after today’s aerobic workout?",
+	"Did your heart rate go down to 99 beats per minute or lower?",
+	"Duration (mm:ss) for Heart Rate Time to Reach 99","HRR File Starting Heart Rate",
+	"Lowest Heart Rate Level in the 1st Minute",
+	"Number of heart beats recovered in the first minute",
+	"End Time of Activity(hh:mm:ss)","Difference Between Activity End time and Hrr Start time(mm:ss)",
+	"Hrr Start Time(hh:mm:ss)","Heart Rate End Time Activity",
+	"Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file",
+	"Pure 1 Minute HRR Beats Lowered","Pure 1 Minute time to 99"]
+
+	hrr_not_available = ["End Time of Activity(hh:mm:ss)",
+	"Did you measure your heart rate recovery (HRR) after today’s aerobic workout?",
+	"Did your heart rate go down to 99 beats per minute or lower?",
+	"Duration (mm:ss) for Heart Rate Time to Reach 99",
+	"Time Heart Rate Reached 99 (hh:mm:ss)",
+	"HRR File Starting Heart Rate","Lowest Heart Rate Level in the 1st Minute",
+	"Number of heart beats recovered in the first minute"]
+
+	hrr_available_keys = ["Did_you_measure_HRR","Did_heartrate_reach_99","time_99","HRR_start_beat","lowest_hrr_1min",
+	"No_beats_recovered","end_time_activity","diff_actity_hrr","HRR_activity_start_time",
+	"end_heartrate_activity","heart_rate_down_up","pure_1min_heart_beats","pure_time_99"]
+
+	hrr_not_available_keys = ["end_time_activity","Did_you_measure_HRR","no_fitfile_hrr_reach_99",
+	"no_fitfile_hrr_time_reach_99","time_heart_rate_reached_99","end_heartrate_activity",
+	"lowest_hrr_no_fitfile","no_file_beats_recovered"]
+
+	hrr_all_fields = ["Did you measure your heart rate recovery (HRR) after today’s aerobic workout?",
+	"Did your heart rate go down to 99 beats per minute or lower?",
+	"Duration (mm:ss) for Heart Rate Time to Reach 99","HRR File Starting Heart Rate",
+	"Lowest Heart Rate Level in the 1st Minute",
+	"Number of heart beats recovered in the first minute",
+	"End Time of Activity(hh:mm:ss)","Difference Between Activity End time and Hrr Start time(mm:ss)",
+	"Hrr Start Time(hh:mm:ss)","Heart Rate End Time Activity",
+	"Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file",
+	"Pure 1 Minute HRR Beats Lowered","Pure 1 Minute time to 99",
+	"Did your heart rate go down to 99 beats per minute or lower?",
+	"Duration (mm:ss) for Heart Rate Time to Reach 99",
+	"Time Heart Rate Reached 99 (hh:mm:ss)",
+	"HRR File Starting Heart Rate","Lowest Heart Rate Level in the 1st Minute",
+	"Number of heart beats recovered in the first minute"]
+
+	hrr_all_keys = ["Did_you_measure_HRR","Did_heartrate_reach_99","time_99","HRR_start_beat",
+	"lowest_hrr_1min","No_beats_recovered","end_time_activity","diff_actity_hrr",
+	"HRR_activity_start_time","end_heartrate_activity","heart_rate_down_up","pure_1min_heart_beats",
+	"pure_time_99","no_fitfile_hrr_reach_99",
+	"no_fitfile_hrr_time_reach_99","time_heart_rate_reached_99","end_heartrate_activity",
+	"lowest_hrr_no_fitfile","no_file_beats_recovered"]
+
+
+	current_date = to_date
+	r = 0
+	if to_date and from_date:
+		while (current_date >= from_date):
+			r = r + 1
+			weekday1 = calendar.day_name[current_date.weekday()]
+			x= current_date.strftime('%m-%d-%y')
+			current_date_split= x.split("-")
+			current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
+			current_date_string = str(current_date_string)
+			sheet12.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
+			current_date -= timedelta(days=1)
+	sheet12.write(0,0,"HRR",bold) #(row,column,matter to be shown,styling)
+
+	len_hrr = len(hrr_datewise)
+	hrr_recorded = 0
+	hrr_not_recorded = 0
+	current_date = to_date
+	while (current_date >= from_date):
+		data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+		if data:
+			data = data.__dict__
+			count = 0
+			if (data.get("Did_you_measure_HRR",None)) == 'yes':
+				hrr_recorded = hrr_recorded + 1
+			elif (data.get("Did_you_measure_HRR",None)) == 'no':
+				hrr_not_recorded = hrr_not_recorded + 1
+		else:
+			pass
+		current_date -= timedelta(days=1)
+	# print(len_hrr,hrr_recorded,hrr_not_recorded)
+	if len_hrr == hrr_recorded and len_hrr != 0:
+		col_num1 = 1
+		row_num = 0
+		for col_num in range(len(hrr_available)):
+			col_num1 = col_num1 + 1
+			sheet12.write(col_num1, row_num, hrr_available[col_num])
+		current_date = to_date
+		while (current_date >= from_date):
+			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+			if data:
+				data = data.__dict__
+				row_num += 1
+				for i,key in enumerate(hrr_available_keys):
+					if key == 'end_time_activity' or key == 'HRR_activity_start_time':
+						offset = data['offset']
+						value = datetime.fromtimestamp(data[key]+offset)
+						sheet12.write(i + 2, row_num,value,timestamp_todata)
+					elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
+						if data[key]:
+							time = data[key]
+							minutes = time // 60
+							sec = time % 60
+							if sec >= 10:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							else:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+					elif key == "Did_you_measure_HRR" or key == "Did_heartrate_reach_99":
+						if key == "Did_you_measure_HRR":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						elif data["Did_heartrate_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+					else:
+						sheet12.write(i + 2, row_num,data[key],format)
+			else:
+				row_num += 1
+				sheet12.write(i + 2, row_num, '')
+			current_date -= timedelta(days=1)
+
+	elif len_hrr == hrr_not_recorded and len_hrr != 0:
+		col_num1 = 1
+		row_num = 0
+		for col_num in range(len(hrr_not_available)):
+			col_num1 = col_num1 + 1
+			sheet12.write(col_num1, row_num, hrr_not_available[col_num])
+		current_date = to_date
+		while (current_date >= from_date):
+			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+			if data:
+				data = data.__dict__
+				row_num += 1
+				for i,key in enumerate(hrr_not_available_keys):
+					if key == 'end_time_activity' or key == 'time_heart_rate_reached_99':
+						if data[key]:
+							offset = data['offset']
+							value = datetime.fromtimestamp(data[key]+offset)
+							sheet12.write(i + 2, row_num,value,timestamp_todata)
+					elif key == 'no_fitfile_hrr_time_reach_99':
+						if data[key]:
+							time = data[key]
+							minutes = time // 60
+							sec = time % 60
+							if sec >= 10:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							else:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99":
+						if key == "Did_you_measure_HRR":
+							sheet12.write(i + 2, row_num,"No",format)
+						elif data["no_fitfile_hrr_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+					else:
+						sheet12.write(i + 2, row_num,data[key],format)
+			else:
+				row_num += 1
+				sheet12.write(i + 2, row_num, '')
+			current_date -= timedelta(days=1)
+
+	elif len_hrr != 0:
+		col_num1 = 1
+		row_num = 0
+		for col_num in range(len(hrr_all_fields)):
+			col_num1 = col_num1 + 1
+			sheet12.write(col_num1, row_num, hrr_all_fields[col_num])
+		current_date = to_date
+		while (current_date >= from_date):
+			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
+			if data:
+				data = data.__dict__
+				row_num += 1
+				for i,key in enumerate(hrr_all_keys):
+					if key == 'end_time_activity' or key == 'HRR_activity_start_time' or key == 'time_heart_rate_reached_99':
+						if data[key]:
+							offset = data['offset']
+							print(offset)
+							value = datetime.fromtimestamp(data[key]+offset)
+							sheet12.write(i + 2, row_num,value,timestamp_todata)
+					elif key == 'no_fitfile_hrr_time_reach_99' or key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99':
+						if data[key]:
+							time = data[key]
+							minutes = time // 60
+							sec = time % 60
+							if sec >= 10:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+							else:
+								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99" or key == "Did_heartrate_reach_99":
+						if data["Did_you_measure_HRR"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+						if data["no_fitfile_hrr_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+						if data["Did_heartrate_reach_99"] == "yes":
+							sheet12.write(i + 2, row_num,"Yes",format)
+						else:
+							sheet12.write(i + 2, row_num,"No",format)
+					else:
+						sheet12.write(i + 2, row_num,data[key],format)
+			else:
+				row_num += 1
+				sheet12.write(i + 2, row_num, '')
+			current_date -= timedelta(days=1)
+
+
+
+
+
 	#movement consistenct
 	sheet11 = book.add_worksheet('Movement Consistency')
 	sheet11.set_landscape()

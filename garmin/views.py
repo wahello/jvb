@@ -138,6 +138,7 @@ class HaveGarminTokens(APIView):
 	Check availability of garmin connect and garmin health token
 	for current user
 	'''
+	permission_classes = (IsAuthenticated,)
 	def get(self,request,format="json"):
 		have_tokens = {
 			"have_garmin_health_token":False,
