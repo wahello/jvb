@@ -1171,9 +1171,9 @@ def hrr_data(user,start_date):
 			else:
 				min_heartrate.reverse()
 				b = min_heartrate
-			
-			if b and min(min_heartrate) < b[0]:
-				b = [min(min_heartrate)]
+			if min_heartrate:
+				if b and min(min_heartrate) < b[0]:
+					b = [min(min_heartrate)]
 
 			if min(hrr_final_heartrate) <= 99:
 				Did_heartrate_reach_99 = 'yes'
@@ -1211,6 +1211,7 @@ def hrr_data(user,start_date):
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
 			pure_1min_beats = []
 			pure1min = 60-diff_actity_hrr
+			hrr_no_fitfile = None
 			if pure1min >= 0:
 				for i,k in zip(hrr_final_heartrate,new_L):
 					if k <= pure1min:
@@ -1229,7 +1230,7 @@ def hrr_data(user,start_date):
 					hrr_no_fitfile = daily_diff_data_60
 				else:
 					hrr_no_fitfile = None
-			if pure1min >= 0:
+			if pure1min >= 0 and pure_1min_beats:
 				pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
 			elif hrr_no_fitfile:
 				pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
