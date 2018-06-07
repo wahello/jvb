@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/WORK/healthtracker/assets/bundles/main.js"}]}}
+=======
+{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/atuls7inc/projects/S7inc/jvbhealth/healthtracker/assets/bundles/main.js"}]}}
+>>>>>>> 3550f0197fbe71e36ac95de97958e9f660bf4387

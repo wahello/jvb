@@ -128,7 +128,6 @@ toggle() {
   }
 	render(){
 var ddyy = moment.utc("2018-05-02")
-      console.log("date", ddyy)
 		return(
 			<div>
 			<Collapse isOpen={this.state.collapse}>
