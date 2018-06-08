@@ -12,6 +12,7 @@ from rest_framework.authentication import SessionAuthentication
 
 from .serializers import UserSerializer, UserProfileSerializer
 from .models import Profile,TermsConditions,TermsConditionsText
+from .custom_signals import post_registration_notify
 
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
@@ -40,17 +41,22 @@ class Logout(APIView):
 		return Response(status=status.HTTP_200_OK)
 
 class UserCreate(APIView):
-    def post(self, request, format="json"):
-        serializer = UserProfileSerializer(data=request.data)
-       
-        if serializer.is_valid():
-            user = serializer.save()
-            if user:
-                user = authenticate(request,username=request.data['username'],
-                                        password=request.data['password'])
-                login(request,user)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	def post(self, request, format="json"):
+		serializer = UserProfileSerializer(data=request.data)
+		if serializer.is_valid():
+			user = serializer.save()
+			if user:
+				user = authenticate(request,
+					username = request.data['username'],
+					password = request.data['password']
+				)
+				login(request,user)
+				post_registration_notify.send(
+					sender = self.__class__,
+					email_address = user.email
+				)
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserItemView(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
