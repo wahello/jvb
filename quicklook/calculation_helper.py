@@ -1064,16 +1064,44 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, todays_activities):
+def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
+		todays_manually_updated_json, userinput_activities, age):
 	'''
-		Calculate exercise steps
+		Calculate exercise steps and total steps
 	'''	
+	filtered_activities = get_filtered_activity_stats(
+		todays_activities_json,
+		todays_manually_updated_json,
+		userinput_activities
+	)
+	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
+
 	total_steps = 0
 	exercise_steps = 0
-	if len(todays_activities):
-		for obj in todays_activities:
-			exercise_steps += obj.get('steps',0)
+	activities_below_aerobic_zone = 0
+	shortest_activity = None
+	aerobic_zone = 180 - age - 30
+	if len(filtered_activities):
+		for obj in filtered_activities:
+			activity_type = obj.get('activityType')
+			activity_avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
+			
+			if not shortest_activity:
+				shortest_activity = obj
+			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
+				shortest_activity = obj
 
+			if (activity_avg_hr >= aerobic_zone and activity_type not in IGNORE_ACTIVITY):
+				# If activity heartrate is above or in aerobic zone and it's not HRR 
+				# then only activity is considered as an exercise and steps are included.
+				exercise_steps += obj.get('steps',0)
+			elif activity_avg_hr < aerobic_zone:
+				activities_below_aerobic_zone += 1
+
+		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
+			# If all the activities are below aerobic zone then steps of the 
+			# shortest activity will be considered as exercise steps.
+			exercise_steps = shortest_activity.get('steps',0)
 	if dailies_json:
 		total_steps = dailies_json[0].get('steps',0)
 
@@ -1979,7 +2007,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
-		exercise_steps, total_steps = cal_exercise_steps_total_steps(dailies_json,todays_activities_json)	
+		exercise_steps, total_steps = cal_exercise_steps_total_steps(
+			dailies_json,
+			todays_activities_json,
+			todays_manually_updated_json,
+			userinput_activities,
+			user.profile.age()
+		)	
 		if ((not total_steps and exercise_steps) or (total_steps and total_steps < exercise_steps)):
 			# If total step s are 0 and exercise steps are available
 			# then we assume that total steps is equal to exercise steps
@@ -2046,6 +2080,3 @@ def create_quick_look(user,from_date=None,to_date=None):
 		current_date += timedelta(days=1)
 
 	return SERIALIZED_DATA
-
-	
-	
