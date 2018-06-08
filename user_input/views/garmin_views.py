@@ -1,4 +1,4 @@
-from datetime import timezone,timedelta
+from datetime import timezone,timedelta,date
 import ast
 
 from rest_framework.views import APIView
@@ -14,9 +14,11 @@ from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
 	UserGarminDataManuallyUpdated)
+
 from hrr.models import Hrr
 from garmin.models import GarminFitFiles
 from django.contrib.auth.models import User
+from registration.models import Profile
 
 
 class GarminData(APIView):
@@ -89,9 +91,26 @@ class GarminData(APIView):
 		return (activity_data,manually_updated_activity_data)    
 
 	def _create_activity_stat(self,activity_obj,current_date):
-		hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
-		if hrr_data:
-			measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
+		'''
+			this funtion accepts the single activity object at a time
+			and returns only very few key and values which are to be shown in activity grid
+
+		Args:
+			param1: single activity object
+			param1: current data
+		Returms:
+			keys as summary id and value as a dictonary, in the dictonary modified key and values
+			which are to be shown in activity grid
+		'''
+		profile = Profile.objects.filter(user=self.request.user)
+		
+		for tmp_profile in profile:
+			user_dob = tmp_profile.date_of_birth
+		user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+		
+		below_aerobic_value = 180-user_age-30
+		anaerobic_value = 180-user_age+5
+		aerobic_value_half = 180-user_age-15
 
 		if activity_obj:
 			tmp = {
@@ -101,30 +120,34 @@ class GarminData(APIView):
 					"comments":"",
 					"startTimeInSeconds":"",
 					"durationInSeconds":"",
-					"startTimeOffsetInSeconds":""
+					"startTimeOffsetInSeconds":"",
+					"averageHeartRateInBeatsPerMinute":0,
+					"steps_type":"",
+					"can_update_steps_type":True,
+					"steps":0,
 
 				}
 			for k, v in activity_obj.items():
 				if k in tmp.keys():
 					tmp[k] = v
-					# if tmp["startTimeInSeconds"]:
-					# 	a = int(tmp["startTimeInSeconds"])
-					# else:
-					# 	a = 0
-					# if tmp["durationInSeconds"]:
-					# 	b = int(tmp["durationInSeconds"])
-					# else:
-					# 	b = 0
-					# tmp["endTimeInSeconds"] = a + b
-			# print(tmp)
+					if (int(tmp.get("averageHeartRateInBeatsPerMinute",0)) < below_aerobic_value or
+						tmp.get("activityType","") == "HEART_RATE_RECOVERY"):
+						tmp["steps_type"] = "Non Exercise Steps"
+					else:
+						tmp["steps_type"] = "Exercise Steps"
+					if int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
+						tmp["can_update_steps_type"] = False
+					elif int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > aerobic_value_half:
+						tmp["can_update_steps_type"] = False
+
 			return {activity_obj['summaryId']:tmp}
 		
 
 	def _get_activities(self,target_date):
 		current_date = str_to_datetime(target_date)
-		hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
-		if hrr_data:
-			measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
+		# hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
+		# if hrr_data:
+		# 	measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
 		act_data = self._get_activities_data(target_date)
 		activity_data = act_data[0]
 		manually_updated_act_data = act_data[1]
@@ -145,7 +168,9 @@ class GarminData(APIView):
 					meta = tmp.meta_data_fitfile
 					meta = ast.literal_eval(meta)
 					data_id = meta['activityIds'][0]
-					if ((act_obj.get("summaryId",None) == str(data_id)) and (act_obj.get("durationInSeconds",0) <= 1200) and (act_obj.get("distanceInMeters",0) <= 200.00)):
+					if (((act_obj.get("summaryId",None) == str(data_id)) and 
+						(act_obj.get("durationInSeconds",0) <= 1200) and 
+						(act_obj.get("distanceInMeters",0) <= 200.00))):
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 					else:
 						pass
