@@ -1083,19 +1083,19 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 	aerobic_zone = 180 - age - 30
 	if len(filtered_activities):
 		for obj in filtered_activities:
-			activity_type = obj.get('activityType')
-			activity_avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
-			
+
 			if not shortest_activity:
 				shortest_activity = obj
 			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
 				shortest_activity = obj
 
-			if (activity_avg_hr >= aerobic_zone and activity_type not in IGNORE_ACTIVITY):
+			if ((obj.get("averageHeartRateInBeatsPerMinute",0) >= aerobic_zone 
+					and obj.get('activityType') not in IGNORE_ACTIVITY)
+					or obj.get("steps_type","") == "exercise"):
 				# If activity heartrate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
 				exercise_steps += obj.get('steps',0)
-			elif activity_avg_hr < aerobic_zone:
+			elif obj.get("averageHeartRateInBeatsPerMinute",0) < aerobic_zone:
 				activities_below_aerobic_zone += 1
 
 		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
