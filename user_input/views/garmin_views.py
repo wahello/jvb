@@ -132,9 +132,9 @@ class GarminData(APIView):
 					tmp[k] = v
 					if (int(tmp.get("averageHeartRateInBeatsPerMinute",0)) < below_aerobic_value or
 						tmp.get("activityType","") == "HEART_RATE_RECOVERY"):
-						tmp["steps_type"] = "Non Exercise Steps"
+						tmp["steps_type"] = "non_exercise"
 					else:
-						tmp["steps_type"] = "Exercise Steps"
+						tmp["steps_type"] = "exercise"
 					if int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
 						tmp["can_update_steps_type"] = False
 					elif int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > aerobic_value_half:
