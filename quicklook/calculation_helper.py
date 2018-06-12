@@ -3,6 +3,7 @@ from collections import OrderedDict,namedtuple
 from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
+import copy
 
 from django.db.models import Q
 
@@ -628,11 +629,26 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 
 	# If same id exist in user submited activities, give it more preference
 	# than manually edited activities 
+
+	activities_json = copy.deepcopy(activities_json)
+	userinput_activities = copy.deepcopy(userinput_activities)
+	manually_updated_json = copy.deepcopy(manually_updated_json)
+
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
 		if obj_in_user_activities:
 			userinput_activities.pop(obj.get('summaryId'))
-			return obj_in_user_activities
+			filtered_obj = {}
+			for key,val in obj_in_user_activities.items():
+				# if any key have empty, null or 0 value then remove it
+				# and look for that key in original garmin provided summary because
+				# sometimes user submitted activities might have no value for fields
+				# like - avgHeartRateInBeatsPerMinute, steps etc. In that case empty value 
+				# will be taken for those keys even though value exist in original 
+				# summary provided by garmin 
+				if val:
+					filtered_obj[key] = val
+			return filtered_obj
 		return obj
 
 	# If same id existed in manually edited, give it more prefrence
@@ -640,8 +656,7 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
-			obj = manually_edited(obj
-				)
+			obj = manually_edited(obj)
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -653,15 +668,6 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	return filtered_activities
 
 def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
-
-	# If same id exists in user submited activities, give it more preference
-	# than manually edited activities 
-	def userinput_edited(obj):
-		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
-		if obj_in_user_activities:
-			userinput_activities.pop(obj.get('summaryId'))
-			return obj_in_user_activities
-		return obj
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 
@@ -682,23 +688,11 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 	
 	activities_hr = {}
 	activities_duration = {}
-
-	# If same id existed in manually edited, give it more prefrence
-	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)	
 	max_duration = 0
 
-	filtered_activities = []
-	if activities_json:
-		for obj in activities_json:
-			obj = manually_edited(obj
-				)
-			if userinput_activities:
-				obj.update(userinput_edited(obj))
-			filtered_activities.append(obj)
-
-	# merge user created manual activities which are not provided by garmin
-	if userinput_activities:
-		filtered_activities += userinput_activities.values()
+	filtered_activities = get_filtered_activity_stats(activities_json,
+		manually_updated_json,userinput_activities
+	)
 
 	if len(filtered_activities):
 		runs_count = 0
@@ -1539,27 +1533,10 @@ def get_workout_effort_grade(todays_daily_strong):
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
 										 todays_daily_strong,age,userinput_activities=None):
-	def userinput_edited(obj):
-		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
-		if obj_in_user_activities:
-			userinput_activities.pop(obj.get('summaryId'))
-			return obj_in_user_activities
-		return obj
-
-	# If same summary is edited manually then give it more preference.
-	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
-	filtered_activities = []
-
-	if todays_activities:
-		for obj in todays_activities:
-			obj = manually_edited(obj)
-			if userinput_activities:
-				obj.update(userinput_edited(obj))
-			filtered_activities.append(obj)
-
-	if userinput_activities:
-		filtered_activities += userinput_activities.values()
 	
+	filtered_activities = get_filtered_activity_stats(
+		todays_activities,todays_manually_updated,userinput_activities
+	)
 	total_duration = 0
 	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
 	final_activities = []
