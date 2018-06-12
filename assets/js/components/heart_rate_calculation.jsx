@@ -103,6 +103,28 @@ class HeartRateCal extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_hrr:true,
+			"Did_you_measure_HRR":"",
+			"Did_heartrate_reach_99":"",
+			"time_99":"",
+			"HRR_start_beat":"",
+			"lowest_hrr_1min":"",
+			"No_beats_recovered":"",
+
+			"end_time_activity":"",
+			"diff_actity_hrr":"",
+			"HRR_activity_start_time":"",
+			"end_heartrate_activity":"",
+			"heart_rate_down_up":"",
+			"pure_1min_heart_beats":"",
+			"pure_time_99":"",
+
+			"no_fitfile_hrr_reach_99":"",
+			"no_fitfile_hrr_time_reach_99":"",
+			"time_heart_rate_reached_99":"",
+			"lowest_hrr_no_fitfile":"",
+			"no_file_beats_recovered":"",
+
+			"offset":"",
 		},()=>{
 			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 		});
@@ -133,8 +155,7 @@ class HeartRateCal extends Component{
 		}
 		return value;
 	}
-    t
-    oggleCalendar(){
+    toggleCalendar(){
 	    this.setState({
 	      calendarOpen:!this.state.calendarOpen
 	    });
@@ -298,6 +319,59 @@ class HeartRateCal extends Component{
           	}
 
           	{(this.state.Did_you_measure_HRR == "no" || this.state.Did_you_measure_HRR == "") &&
+          	    <div className = "row justify-content-center hr_table_padd">
+	          	    <div className = "table table-responsive">
+		          	    <table className = "table table-striped table-bordered ">
+			          	    <thead className = "hr_table_style_rows">
+				          	    <th className = "hr_table_style_rows">Hrr Automation When User Didn't Create HRR File</th>
+				          	    <th className = "hr_table_style_rows">{moment(this.state.selectedDate).format("MMM DD, YYYY")}</th>
+			          	    </thead>  
+			          	    <tbody>  
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">End Time of Activity(hh:mm:ss)</td>
+									<td className = "hr_table_style_rows">{this.renderTime(this.state.end_time_activity)}</td>
+				          	    </tr>
+
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>
+									<td className = "hr_table_style_rows">{this.renderNoworkout(this.state.Did_you_measure_HRR)}</td>
+				          	    </tr>
+
+				          	      <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
+									<td className = "hr_table_style_rows">{this.captilizeYes(this.state.no_fitfile_hrr_reach_99)}</td>
+				          	    </tr>
+
+				          	     <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
+					          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.no_fitfile_hrr_time_reach_99)}</td>
+				          	    </tr>
+
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Time Heart Rate Reached 99 (hh:mm:ss)</td>
+									<td className = "hr_table_style_rows">{this.renderTime(this.state.time_heart_rate_reached_99)}</td>
+				          	    </tr>
+
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">HRR File Starting Heart Rate</td>
+					          	    <td className = "hr_table_style_rows">{this.state.end_heartrate_activity}</td>
+				          	    </tr>
+
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Lowest Heart Rate Level in the 1st Minute</td>
+									<td className = "hr_table_style_rows">{this.state.lowest_hrr_no_fitfile}</td>
+				          	    </tr>
+
+				          	    <tr className = "hr_table_style_rows">
+					          	    <td className = "hr_table_style_rows">Number of heart beats recovered in the first minute</td>
+									<td className = "hr_table_style_rows">{this.state.no_file_beats_recovered}</td>
+				          	    </tr>
+			          	    </tbody>
+		          	    </table>   
+	          	    </div>
+          	    </div>
+          	}
+          	{(this.state.Did_you_measure_HRR == "Heart Rate Data Not Provided") &&
           	    <div className = "row justify-content-center hr_table_padd">
 	          	    <div className = "table table-responsive">
 		          	    <table className = "table table-striped table-bordered ">
