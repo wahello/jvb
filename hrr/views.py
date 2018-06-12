@@ -1107,31 +1107,37 @@ def hrr_data(user,start_date):
 
 	workout = []
 	hrr = []
-	# if not activities:
+	
+	'''
+		Below try block do, first capture data from user input form and identify file as  
+		hrr file if it fails then else block will do assumtion calculation for idetifying
+		the HRR fit file
+	'''
+
 	try:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = meta['activityIds'][0]
-			for i,k in enumerate(activity_files):
-				activity_files_dict = ast.literal_eval(activity_files[i])
-				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+		if activities:
+			for tmp in a1:
+				meta = tmp.meta_data_fitfile
+				meta = ast.literal_eval(meta)
+				data_id = int(meta['activityIds'][0])
+				if id_act == data_id:
 					hrr.append(tmp)
-				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+				else:
 					workout.append(tmp)
+		else:
+			for tmp in a1:
+				meta = tmp.meta_data_fitfile
+				meta = ast.literal_eval(meta)
+				data_id = meta['activityIds'][0]
+				for i,k in enumerate(activity_files):
+					activity_files_dict = ast.literal_eval(activity_files[i])
+					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+						hrr.append(tmp)
+					elif activity_files_dict.get("summaryId",None) == str(data_id) :
+						workout.append(tmp)
 	except:
 		pass
 
-		
-	if (not workout) and (not hrr): 
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = int(meta['activityIds'][0])
-			if id_act == data_id:
-				hrr.append(tmp)
-			else:
-				workout.append(tmp)
 
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
