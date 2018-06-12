@@ -1103,6 +1103,13 @@ def hrr_data(user,start_date):
 
 	workout = []
 	hrr = []
+	
+	'''
+		Below try block do, first capture data from user input form and identify file as  
+		hrr file if it fails then else block will do assumtion calculation for idetifying
+		the HRR fit file
+	'''
+
 	try:
 		if activities:
 			for tmp in a1:
