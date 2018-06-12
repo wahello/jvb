@@ -1054,6 +1054,7 @@ def hrr_data(user,start_date):
 	time_heart_rate_reached_99 = 0.0
 	lowest_hrr_no_fitfile = 0.0 
 	no_file_beats_recovered = 0.0
+	daily_starttime = 0
 
 	start_date_timestamp = start_date
 	start_date_timestamp = start_date_timestamp.timetuple()
