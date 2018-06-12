@@ -103,28 +103,31 @@ def fetching_data_fitbit(request):
 	activity_fitbit = activity_fitbit.json()
 	heartrate_fitbit = heartrate_fitbit.json()
 
-	# try:
-	# 	if sleep_fitbit:
-	# 		date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
-	# 		UserFitbitDataSleep.objects.update_or_create(user=request.user,date_of_sleep=date_of_sleep,data=sleep_fitbit)
-	# except (KeyError, IndexError):
-	# 	pass
+	try:
+		if sleep_fitbit:
+			date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
+			UserFitbitDataSleep.objects.update_or_create(user=request.user,
+				date_of_sleep=date_of_sleep,sleep_data=sleep_fitbit)
+	except (KeyError, IndexError):
+		pass
 
-	# try:
-	# 	if heartrate_fitbit:
-	# 		date_of_heartrate = heartrate_fitbit['activities-heart'][0]['dateTime']
-	# 		UserFitbitDataHeartRate.objects.update_or_create(user=request.user,date_of_heartrate=date_of_heartrate,data=heartrate_fitbit)
-	# except (KeyError, IndexError):
-	# 	pass
+	try:
+		if heartrate_fitbit:
+			date_of_heartrate = heartrate_fitbit['activities-heart'][0]['dateTime']
+			UserFitbitDataHeartRate.objects.update_or_create(user=request.user,
+				date_of_heartrate=date_of_heartrate,heartrate_data=heartrate_fitbit)
+	except (KeyError, IndexError):
+		pass
 
 	# try:
 	# 	if activity_fitbit:
-	# 		# date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
-	# 		UserFitbitDataActivities.objects.update_or_create(user=request.user,data=activity_fitbit)
+	# 		date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
+	# 		UserFitbitDataActivities.objects.update_or_create(user=request.user,
+	#data=activity_fitbit)
 	# except (KeyError, IndexError):
 	# 	pass
 
-	# print(pprint.pprint(sleep_fitbit))
+	print(pprint.pprint(sleep_fitbit))
 	# print(pprint.pprint(activity_fitbit))
 	# print(pprint.pprint(heartrate_fitbit))
 
