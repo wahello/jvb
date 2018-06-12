@@ -114,6 +114,7 @@ this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTim
 this.createActivityTime = this.createActivityTime.bind(this);
 this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
 this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
+this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
 let selected_date = this.props.selected_date;
 this.state ={
@@ -196,6 +197,17 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
+addingCommaToSteps(value){
+                value += '';
+                var x = value.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+            return x1 + x2;
+}
 setActivitiesEditModeFalse(){
     //it will do set the state true to false of activity.
     //it will do hide the fields when you click on the
@@ -1591,7 +1603,7 @@ renderTable(){
                                               onChange={this.handleChange_steps}
                                               onBlur={this.editToggleHandler_steps.bind(this)}>                       
                                           </Input>
-                                          </div>:this.state.activites[summaryId][key]}
+                                          </div>:this.addingCommaToSteps(this.state.activites[summaryId][key])}
                                 {this.props.editable &&            
                             <span data-name={summaryId} onClick={this.editToggleHandler_steps.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
