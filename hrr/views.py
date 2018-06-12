@@ -1282,6 +1282,9 @@ def hrr_data(user,start_date):
 					daily_diff_data_99 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_99,None)
 					daily_diff_99 = int(daily_diff_99) + 15
 					daily_diff_99 = str(daily_diff_99)
+					if daily_diff_data_99 == None:
+						Did_you_measure_HRR = "Heart Rate Data Not Provided"
+						break
 
 			if daily_diff_data_60:
 				if daily_diff_data_60 < 99:
@@ -1313,7 +1316,8 @@ def hrr_data(user,start_date):
 		else:
 			time_heart_rate_reached_99 = None
 
-	if hrr:
+	if (hrr and (Did_you_measure_HRR == 'yes' or
+		Did_you_measure_HRR == 'no')):
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
 				"Did_heartrate_reach_99":Did_heartrate_reach_99,
 				"time_99":time_99,
@@ -1336,7 +1340,8 @@ def hrr_data(user,start_date):
 
 				"offset":offset,
 				}
-	elif workout and workout_final_heartrate:
+	elif (workout and workout_final_heartrate and (Did_you_measure_HRR == 'yes' or
+		Did_you_measure_HRR == 'no')):
 		data = {
 			"Did_heartrate_reach_99":"",
 			"time_99":None,
@@ -1350,7 +1355,6 @@ def hrr_data(user,start_date):
 			"heart_rate_down_up":None,
 			"pure_1min_heart_beats":None,
 			"pure_time_99":None,
-
 			"Did_you_measure_HRR":Did_you_measure_HRR,
 			"no_fitfile_hrr_reach_99":no_fitfile_hrr_reach_99,
 			"no_fitfile_hrr_time_reach_99":no_fitfile_hrr_time_reach_99,
@@ -1360,6 +1364,27 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":no_file_beats_recovered,
 
 			"offset":offset,
+			}
+	elif Did_you_measure_HRR == 'Heart Rate Data Not Provided':
+		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
+			"Did_heartrate_reach_99":'',
+			"time_99":None,
+			"HRR_start_beat":None,
+			"lowest_hrr_1min":None,
+			"No_beats_recovered":None,
+			"end_time_activity":None,
+			"diff_actity_hrr":None,
+			"HRR_activity_start_time":None,
+			"end_heartrate_activity":None,
+			"heart_rate_down_up":None,
+			"pure_1min_heart_beats":None,
+			"pure_time_99":None,
+			"no_fitfile_hrr_reach_99":'',
+			"no_fitfile_hrr_time_reach_99":None,
+			"time_heart_rate_reached_99":None,
+			"lowest_hrr_no_fitfile":None,
+			"no_file_beats_recovered":None,
+			"offset":None,
 			}
 	else:
 		data = {"Did_you_measure_HRR":'',
