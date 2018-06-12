@@ -113,6 +113,7 @@ this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStar
 this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
 this.createActivityTime = this.createActivityTime.bind(this);
 this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
+this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
 let activities = this.props.activities;
 let selected_date = this.props.selected_date;
 this.state ={
@@ -165,7 +166,7 @@ this.state ={
 }
 }
 
-initializeActivity(activities,selected_date){
+initializeActivity(activities,selected_date,isEditable,callback){
     this.setState({
       selected_date:selected_date,
       activitystarttime_calender:moment(selected_date),
@@ -174,13 +175,39 @@ initializeActivity(activities,selected_date){
       activites_hour_min:this.createActivityTime(activities),
       activity_start_end_time:this.createStartAndEndTime(activities),
       activites:activities,
+    },()=>{
+        if(!isEditable)
+            callback();
     });
   }
 
 componentWillReceiveProps(nextProps) {
     if(nextProps.activities !== this.props.activities) {
-        this.initializeActivity(nextProps.activities,nextProps.selected_date);
+        this.initializeActivity(
+            nextProps.activities,
+            nextProps.selected_date,
+            nextProps.editable,
+            this.setActivitiesEditModeFalse
+        );
     }
+    else if(!_.isEmpty(this.state.activities_edit_mode)
+            && !nextProps.editable){
+        this.setActivitiesEditModeFalse();
+    }
+}
+
+setActivitiesEditModeFalse(){
+    //it will do set the state true to false of activity.
+    //it will do hide the fields when you click on the
+    // "View Form" button with out click on the pencile.
+    let falseEditMode = this.state.activities_edit_mode
+    for(let [id,data] of Object.entries(falseEditMode)){
+        for(let [key,val] of Object.entries(data))
+            falseEditMode[id][key] = false;
+    }
+    this.setState({
+        activities_edit_mode:falseEditMode
+    });
 }
 
 deleteActivity(event) {
@@ -741,28 +768,20 @@ handleChange_steps(event){
 }
 handleChange_steps_type(event){
   const target = event.target;
-  const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
   let activity_data = this.state.activites[selectedActivityId];
-  activity_data['steps_type'] = value;
-  this.setState({
-  activites:{...this.state.activites,
-  [selectedActivityId]:activity_data,
-
-  }
-     });
-
-    if(name == "modal_exercise_steps_status"){
-  this.setState({
-[selectedActivityId]: value,
-"modal_exercise_steps_status":value
-  });
-
-  }
-  this.setState({
-[selectedActivityId]: value,
-
-  });
+  let steps_type = activity_data['steps_type'];
+  if(steps_type == "exercise")
+    steps_type = "non_exercise";
+  else
+    steps_type = "exercise";
+  
+  activity_data['steps_type'] = steps_type;
+  if(activity_data['can_update_steps_type']){
+      this.setState({
+        [selectedActivityId]: activity_data
+      });
+    }
 }
 getDTMomentObj(dt,hour,min,sec,am_pm){
   hour = hour ? parseInt(hour) : 0;
@@ -985,7 +1004,8 @@ CreateNewActivity(data){
         "steps_type":this.state.modal_exercise_steps_status,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
-        "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds
+        "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds,
+        "can_update_steps_type":true
     }; 
 
     let durationInHourMin = this.secondsToHourMinStr(new_value["durationInSeconds"]);
@@ -1584,8 +1604,10 @@ renderTable(){
              else if(key === "steps_type"){
                  let  steps_type=keyValue;
                 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
-                                              { this.state.activities_edit_mode[summaryId][key] ? <div>
-                                                <span>{this.state.activites[summaryId][key]}</span>
+                                              { this.state.activities_edit_mode[summaryId][key]?
+                                               <div>
+                                                <span>{this.state.activites[summaryId][key] == "exercise" ?
+                                                 "Exercise" : "Non Exercise"}</span>
                                                 <span>
                                                 <label className="switch">
                                                       <input type="checkbox"
@@ -1596,18 +1618,19 @@ renderTable(){
                                                         value={this.state.activites[summaryId][key]} 
                                                         onChange={this.handleChange_steps_type}
                                                         checked = {this.state.activites[summaryId][key] == "exercise"}
-                                                        disabled = {this.state.activites[summaryId]["can_update_steps_type"]}
+                                                        disabled = {!this.state.activites[summaryId]["can_update_steps_type"]}
                                                         onBlur={this.editToggleHandler_steps_type.bind(this)}
                                                        />
                                                       <span className="slider round"></span>
                                                 </label>
                                                 </span>
-                                          </div>:this.state.activites[summaryId][key]}
-                                {this.props.editable &&            
+                                          </div>:(this.state.activites[summaryId][key] == "exercise" ?
+                                                 "Exercise" : "Non Exercise")}
+                           {this.props.editable &&            
                             <span data-name={summaryId} onClick={this.editToggleHandler_steps_type.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
                                   id = "add_button">
-                            </span>
+                             </span>
                         }
                         </td>);
             }
@@ -1983,7 +2006,7 @@ return(
 <td id = "add_button" className="add_button_back">Workout End Time</td>
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm:ss)</td>
 <td id = "add_button" className="add_button_back">Exercise Steps</td>
-<td id = "add_button" className="add_button_back">Change Exercise Steps to Non Exercise Steps</td>
+<td id = "add_button" className="add_button_back">Steps Type </td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
