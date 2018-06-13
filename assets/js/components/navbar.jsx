@@ -7,7 +7,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button} from 'reactstrap';
 import PropTypes from 'prop-types';
 
-import { getGarminToken,logoutUser} from '../network/auth';
+import { getGarminToken,logoutUser,getUserProfile} from '../network/auth';
 
 class NavbarMenu extends React.Component {
   constructor(props) {
@@ -15,8 +15,10 @@ class NavbarMenu extends React.Component {
     this.toggle = this.toggle.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+    this.successProfile = this.successProfile.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      username:"",
     };
   }
 
@@ -26,13 +28,20 @@ class NavbarMenu extends React.Component {
      
     });
   }
-
+  successProfile(data){
+    this.setState({
+      username:data.data.username
+    })
+  }
   onLogoutSuccess(response){
     this.props.history.push("/#logout");
   }
 
   handleLogout(){
     this.props.logoutUser(this.onLogoutSuccess);
+  }
+  componentDidMount(){
+    getUserProfile(this.successProfile);
   }
 
   render() {
@@ -69,7 +78,17 @@ class NavbarMenu extends React.Component {
               <NavItem className="float-sm-right">  
                 <Link className="nav-link" to='/'>Home</Link>
               </NavItem>
-               <NavItem className="float-sm-right">                
+              <NavItem className="float-sm-right">  
+                <Link className="nav-link" to='/'>
+                <span>
+                    <FontAwesome
+                              style = {{fontSize:"17px",marginRight:"6px"}}
+                              name = "user"
+                             
+                    />
+                </span><span>{this.state.username}</span></Link>
+              </NavItem>
+              <NavItem className="float-sm-right">                
                    <NavLink  
                    className="nav-link"                    
                    onClick={this.handleLogout}>Log Out

@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
 	username = serializers.CharField(source='user.username')
 	email = serializers.EmailField(source='user.email')
-	password = serializers.CharField(source='user.password')
+	password = serializers.CharField(source='user.password',write_only=True)
 	first_name = serializers.CharField(source='user.first_name')
 	last_name  = serializers.CharField(source='user.last_name')
 
@@ -33,9 +33,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		fields = ('id','username','email','password','first_name','last_name',
 				  'gender','height','weight','date_of_birth','sleep_goals','goals',
 				  'created_at','updated_at','terms_conditions')
-		extra_kwargs = {
-			'password': {'write_only': True}
-		}
+		
 	def create(self,validated_data):
 		user_data = validated_data.pop('user')
 		user = User.objects.create_user(**user_data)
