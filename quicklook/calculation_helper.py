@@ -1084,7 +1084,8 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 				shortest_activity = obj
 
 			if ((obj.get("averageHeartRateInBeatsPerMinute",0) >= aerobic_zone 
-					and obj.get('activityType') not in IGNORE_ACTIVITY)
+					and obj.get('activityType') not in IGNORE_ACTIVITY
+					and obj.get("steps_type","") != "non_exercise")
 					or obj.get("steps_type","") == "exercise"):
 				# If activity heartrate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
