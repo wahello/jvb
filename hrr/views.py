@@ -705,13 +705,16 @@ def aa_workout_calculations(request):
 		  "duration":"",
 		  "average_heart_rate":"",
 		  "max_heart_rate":"",
-		  "steps":""
+		  "steps":"",
+		  "hrr_not_recorded":"",
+		  "prcnt_hrr_not_recorded":""
 			}
 	time_duration = []
 	heart_rate = []
 	max_hrr = []
 	data1={}
 	steps = []
+	hrr_not_recorded_list = []
 	if workout:
 		start_date_timestamp = workout[0]['startTimeInSeconds']
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
@@ -728,17 +731,27 @@ def aa_workout_calculations(request):
 			max_hrr.append(max_heart_rate)
 			exercise_steps = workout.get("steps",0)
 			steps.append(exercise_steps)
+			if workout[i].get('averageHeartRateInBeatsPerMinute') == 0 or "":
+				hrr_not_recorded = workout['durationInSeconds']
+				hrr_not_recorded_list.append(hrr_not_recorded)
+			else:
+				hrr_not_recorded = 0
+				hrr_not_recorded_list.append(hrr_not_recorded)
+
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
-				  "steps":exercise_steps
+				  "steps":exercise_steps,
+				  "hrr_not_recorded":hrr_not_recorded,
+				  "prcnt_hrr_not_recorded":""
 					}
+			
 			
 			data1[summaryId] = data
 		try:
-			avg_hrr = sum(heart_rate)/len(heart_rate)
+			avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
 			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
 		except ZeroDivisionError:
 			avg_hrr = ""
@@ -907,11 +920,11 @@ def daily_aa_calculations(request):
 					}
 			daily_aa_data[data_summaryid[i]] =data
 		try:
-			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(time_duration1[0])*100)
+			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
 			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(time_duration1[0])*100)
+			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
 			total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_aerobic = (sum(aerobic_duration)/sum(time_duration1[0])*100)
+			total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
 			total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
 		except (ZeroDivisionError,IndexError):
 			total_prcnt_anaerobic = ''
