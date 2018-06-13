@@ -451,7 +451,7 @@ class HeartRate extends Component{
 					          	    	<th>Heart Rate Zone Low End</th>
 					          	    	<th>Heart Rate Zone Heigh End</th>
 					          	    	<th>Classification</th>
-					          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
+					          	    	<th>Time in Zone(hh:mm:ss)</th>
 					          	    	<th>% of Total Duration in Zone</th>
 				          	    	</thead>
 				          	    	<tbody>
