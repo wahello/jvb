@@ -60,10 +60,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.sleep_goals = validated_data.get('sleep_goals',instance.sleep_goals)
 		instance.goals = validated_data.get('goals',instance.goals)
 		instance.save()
-		
 		return instance
 		
-
 	def linktotc(self,validated_data):
 		user_data = validated_data.pop('user')
 		user = User.objects.create_user(**user_data)

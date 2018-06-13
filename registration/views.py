@@ -56,7 +56,7 @@ class UserCreate(APIView):
 					email_address = user.email,
 					username = user.username,
 					first_name = user.first_name
-					)
+				)
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

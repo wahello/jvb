@@ -9,7 +9,7 @@ logger = get_task_logger(__name__)
 def notify_users_task(user_mail,username,first_name):
 	'''
 		Celery task to send email when user successfully 
-		submits/updates user inputs
+		registered on the app
 	'''
 	try:
 		user_email_confirmation(user_mail,username,first_name)
