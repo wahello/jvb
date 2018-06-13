@@ -24,8 +24,8 @@ from .models import FitbitConnectToken,\
 # Create your views here.
 def request_token_fitbit(request):
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')  
@@ -43,8 +43,8 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN46'
-	client_secret='94d717c6ec36c270ed59cc8b5564166f'
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -83,8 +83,8 @@ def fetching_data_fitbit(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%m-%d-%Y").date()
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -133,8 +133,8 @@ def fetching_data_fitbit(request):
 
 	if statuscode == 401:
 		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
-			client_id='22CN46'
-			client_secret='94d717c6ec36c270ed59cc8b5564166f'
+			client_id='22CN2D'
+			client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 			access_token_url='https://api.fitbit.com/oauth2/token'
 			token = FitbitConnectToken.objects.get(user = request.user)
 			refresh_token_acc = token.refresh_token
@@ -179,3 +179,11 @@ def refresh_token_fitbit(request):
 	#print(type(a))
 
 
+'''
+	jvb 
+		client id 		---- 22CN2D
+		client secret   ---- e83ed7f9b5c3d49c89d6bdd0b4671b2b
+	test
+		client id 		---- 22CN46
+		client secret   ---- 94d717c6ec36c270ed59cc8b5564166f
+'''		 
