@@ -126,6 +126,7 @@ this.state ={
     modal_activity_heart_rate:"",
     modal_activity_hour:"",
     modal_activity_min:"",
+    modal_activity_sec:"",
     modal_activity_comment:"",
     activity_display_name:"",
     editToggle_heartrate:false,
@@ -139,15 +140,18 @@ this.state ={
     activity_start_end_date:null,
     activity_start_end_hour:'',
     activity_start_end_min:'',
+    activity_start_end_sec:'',
     activity_start_end_am_pm:'',
 
     activitystarttime_calender:moment(selected_date),
     activityendtime_calender:moment(selected_date),
     modalstarttime_activity_hour:"",
     modalstarttime_activity_min:"",
+    modalstarttime_activity_sec:"",
     modalstarttime_activity_ampm:"",
     modalendtime_activity_hour:"",
     modalendtime_activity_min:"",
+    modalendtime_activity_sec:"",
     modalendtime_activity_ampm:"",
     button_state: "",
     modal_delete:false,
@@ -229,13 +233,17 @@ toggle_delete(event){
   }
 
 secondsToHourMinStr(durationInSeconds){
-    let time = "0:00";
+    let time = "0:00:00";
     if(durationInSeconds){
-        let min = parseInt(durationInSeconds/60);
-        let hour = parseInt(min/60);
-        let mins = parseInt(min%60);
-        mins = (mins < 10) ? "0" + mins : mins;
-        time = hour + ":" + mins;
+        let hours   = Math.floor(durationInSeconds / 3600);
+        let mins = Math.floor((durationInSeconds - (hours * 3600)) / 60);
+        let secs = durationInSeconds - (hours * 3600) - (mins * 60);
+        if (secs < 10)
+        secs = `0${secs}`;
+
+        if(mins < 10)
+        mins = `0${mins}`;
+        time = hours+":"+mins+":"+secs;
     }
     return time;
 }
@@ -257,10 +265,12 @@ createActivityTime(activityData){
         let durationInHourMin = this.secondsToHourMinStr(data["durationInSeconds"]);
         let duration_hour = durationInHourMin.split(":")[0];
         let duration_min = durationInHourMin.split(":")[1];
+        let duration_sec = durationInHourMin.split(":")[2];
         let tmp = {
             "durationInSeconds":data["durationInSeconds"],
             "duration_hour":duration_hour,
-            "duration_min":duration_min
+            "duration_min":duration_min,
+            "duration_sec":duration_sec
         };
         activites_hour_min[id] = tmp;
     }
@@ -268,7 +278,6 @@ createActivityTime(activityData){
 }
 
 createStartAndEndTime(activityData){
-    console.log("*****************",activityData);
     let activity_start_end_time= {}
     for(let [id,data] of Object.entries(activityData)){
         let start_time_seconds = data["startTimeInSeconds"]; 
@@ -399,6 +408,7 @@ editToggleHandlerStartTime(selectedActivityId,event){
     let activity_start_end_date = null;
     let activity_start_end_hour = "";
     let activity_start_end_min = "";
+    let activity_start_end_sec = "";
     let activity_start_end_am_pm = "";
     categoryEditMode['startTimeInSeconds'] = !categoryEditMode['startTimeInSeconds'];
 
@@ -408,6 +418,7 @@ editToggleHandlerStartTime(selectedActivityId,event){
         activity_start_end_date = start_time_info.calendarDate;
         activity_start_end_hour = start_time_info.hour;
         activity_start_end_min = start_time_info.min;
+        activity_start_end_sec = start_time_info.sec;
         activity_start_end_am_pm = start_time_info.meridiem;
     }
 
@@ -419,6 +430,7 @@ editToggleHandlerStartTime(selectedActivityId,event){
         activity_start_end_date:activity_start_end_date,
         activity_start_end_hour:activity_start_end_hour,
         activity_start_end_min:activity_start_end_min,
+        activity_start_end_sec:activity_start_end_sec,
         activity_start_end_am_pm:activity_start_end_am_pm,
     },()=>{
         this.props.updateParentActivities(this.state.activites);
@@ -430,6 +442,7 @@ editToggleHandlerEndTime(selectedActivityId,event){
     let activity_start_end_date = null;
     let activity_start_end_hour = "";
     let activity_start_end_min = "";
+    let activity_start_end_sec = "";
     let activity_start_end_am_pm = "";
     categoryEditMode['endTimeInSeconds'] = !categoryEditMode['endTimeInSeconds'];
 
@@ -439,6 +452,7 @@ editToggleHandlerEndTime(selectedActivityId,event){
         activity_start_end_date = end_time_info.calendarDate;
         activity_start_end_hour = end_time_info.hour;
         activity_start_end_min = end_time_info.min;
+        activity_start_end_sec = end_time_info.sec;
         activity_start_end_am_pm = end_time_info.meridiem;
     }
 
@@ -450,6 +464,7 @@ editToggleHandlerEndTime(selectedActivityId,event){
         activity_start_end_date:activity_start_end_date,
         activity_start_end_hour:activity_start_end_hour,
         activity_start_end_min:activity_start_end_min,
+        activity_start_end_sec:activity_start_end_sec,
         activity_start_end_am_pm:activity_start_end_am_pm,
     },()=>{
         this.props.updateParentActivities(this.state.activites);
@@ -658,9 +673,10 @@ const target = event.target;
   });
 }
 
-getDTMomentObj(dt,hour,min,am_pm){
+getDTMomentObj(dt,hour,min,sec,am_pm){
   hour = hour ? parseInt(hour) : 0;
   min = min ? parseInt(min) : 0;
+  sec = sec ? parseInt(sec): 0;
 
   if(am_pm == 'am' && hour && hour == 12){
     hour = 0
@@ -676,7 +692,8 @@ getDTMomentObj(dt,hour,min,am_pm){
     month :m,
     day :d,
     hour :hour,
-    minute :min
+    minute :min,
+    second :sec
   });
   return sleep_bedtime_dt;
 }
@@ -686,6 +703,7 @@ DurationOnStartEndTimeChange(startTime, endTime, selectedActivityId){
     let durationInHourMin = this.secondsToHourMinStr(durationInSeconds);
     let strHour = durationInHourMin.split(':')[0];
     let strMin = durationInHourMin.split(':')[1];
+    let strSec = durationInHourMin.split(':')[2];
 
     let timeOriginData = this.state.activites[selectedActivityId];
     let timeHourMin = this.state.activites_hour_min[selectedActivityId];
@@ -694,6 +712,7 @@ DurationOnStartEndTimeChange(startTime, endTime, selectedActivityId){
     timeHourMin['durationInSeconds'] = durationInSeconds;
     timeHourMin['duration_hour'] = strHour;
     timeHourMin['duration_min'] = strMin;
+    timeHourMin['duration_sec'] = strSec;
 
     // First is updated "activites" state object for current summary id
     // Second is updated "activites_hour_min" state object for current summary id
@@ -708,6 +727,7 @@ saveStartTimeModel(event){
         this.state.activity_start_end_date,
         this.state.activity_start_end_hour,
         this.state.activity_start_end_min,
+        this.state.activity_start_end_sec,
         this.state.activity_start_end_am_pm
     );
     let durationUpdatedStateObjs = this.DurationOnStartEndTimeChange(
@@ -744,6 +764,7 @@ saveEndTimeModel(event){
         this.state.activity_start_end_date,
         this.state.activity_start_end_hour,
         this.state.activity_start_end_min,
+        this.state.activity_start_end_sec,
         this.state.activity_start_end_am_pm
     );
     let durationUpdatedStateObjs = this.DurationOnStartEndTimeChange(
@@ -835,20 +856,26 @@ handleChange(event){
 
 CreateNewActivity(data){
     let newActivityID = Math.floor(1000000000 + Math.random() * 900000000);
+    let durationsecs = this.state.modal_activity_sec;
     let durationmins = this.state.modal_activity_min;
     let durationhours = this.state.modal_activity_hour;
-    let durationSeconds = parseInt(durationhours)*3600 + parseInt(durationmins)*60;
+    let durationSeconds = (parseInt(durationhours)*3600 
+        + parseInt(durationmins)*60
+        + parseInt(durationsecs)
+    );
 
     let activityStartTimeMObject = this.getDTMomentObj(
         this.state.activitystarttime_calender,
         this.state.modalstarttime_activity_hour,
         this.state.modalstarttime_activity_min,
+        this.state.modalstarttime_activity_sec,
         this.state.modalstarttime_activity_ampm
     );
     let activityEndTimeMObject = this.getDTMomentObj(
         this.state.activityendtime_calender,
         this.state.modalendtime_activity_hour,
         this.state.modalendtime_activity_min,
+        this.state.modalendtime_activity_sec,
         this.state.modalendtime_activity_ampm
     );
 
@@ -876,7 +903,8 @@ CreateNewActivity(data){
     let activity_hour_min_state = {
         "durationInSeconds":new_value["durationInSeconds"],
         "duration_hour":durationInHourMin.split(":")[0],
-        "duration_min":durationInHourMin.split(":")[1]
+        "duration_min":durationInHourMin.split(":")[1],
+        "duration_sec":durationInHourMin.split(":")[2]
     };
 
     let activity_start_end_time_state = this.createStartAndEndTime({[newActivityID]:new_value});
@@ -943,6 +971,7 @@ _extractDateTimeInfo(dateObj){
         calendarDate:null,
         hour:'',
         min:'',
+        sec:'',
         meridiem:''
       }
 
@@ -970,6 +999,10 @@ _extractDateTimeInfo(dateObj){
         let mins = dateObj.minute();
         mins = (mins < 10) ? '0'+mins : mins;
         datetimeInfo['min'] = mins;
+
+        let secs = dateObj.second();
+        secs = (secs < 10) ? '0'+secs : secs;
+        datetimeInfo['sec'] = secs;
       }
       return datetimeInfo;
     }
@@ -992,35 +1025,45 @@ getTotalActivityDuration(){
     let activityStartTimeDate = this.state.activitystarttime_calender;
     let activityStartTimeHour = this.state.modalstarttime_activity_hour;
     let activityStartTimeMin = this.state.modalstarttime_activity_min;
+    let activityStartTimeSec = this.state.modalstarttime_activity_sec;
     let activityStartTimeAmPm = this.state.modalstarttime_activity_ampm;
     let activityStartTime = null;
     if (activityStartTimeDate && activityStartTimeHour
-    && activityStartTimeMin && activityStartTimeAmPm){
+    && activityStartTimeMin && activityStartTimeSec
+    && activityStartTimeAmPm){
         activityStartTime = this.getDTMomentObj(
             activityStartTimeDate,activityStartTimeHour,
-            activityStartTimeMin,activityStartTimeAmPm
+            activityStartTimeMin,activityStartTimeSec,
+            activityStartTimeAmPm
         )
     }
 
     let activityEndTimeDate = this.state.activityendtime_calender;
     let activityEndTimeHour = this.state.modalendtime_activity_hour;
     let activityEndTimeMin = this.state.modalendtime_activity_min;
+    let activityEndTimeSec = this.state.modalendtime_activity_sec;
     let activityEndTimeAmPm = this.state.modalendtime_activity_ampm;
     let activityEndTime = null;
     if (activityEndTimeDate && activityEndTimeHour
-        && activityEndTimeMin && activityEndTimeAmPm){
+        && activityEndTimeMin && activityEndTimeSec 
+        && activityEndTimeAmPm){
         activityEndTime = this.getDTMomentObj(
             activityEndTimeDate,activityEndTimeHour,
-            activityEndTimeMin,activityEndTimeAmPm
+            activityEndTimeMin,activityEndTimeSec,
+            activityEndTimeAmPm
         )
     }
     if(activityStartTime && activityEndTime){
-        let diff = activityEndTime.diff(activityStartTime,'minutes');
-        let hours = Math.floor(diff/60);
-        let mins = diff % 60;
+        let diff = activityEndTime.diff(activityStartTime,'seconds'); 
+        let hours   = Math.floor(diff / 3600);
+        let mins = Math.floor((diff - (hours * 3600)) / 60);
+        let secs = diff - (hours * 3600) - (mins * 60);
+        if (secs < 10)
+        secs = `0${secs}`;
+
         if(mins < 10)
         mins = `0${mins}`;
-        return hours+":"+mins;
+        return hours+":"+mins+":"+secs;
     }else
         return '';
 }
@@ -1034,6 +1077,7 @@ handleChangeModelActivityStartTimeDate(date){
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
+                    modal_activity_sec:duration.split(":")[2]
                 });
             }
     });
@@ -1048,6 +1092,7 @@ handleChangeModelActivityEndTimeDate(date){
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
+                    modal_activity_sec:duration.split(":")[2]
                 });
             }
     });
@@ -1064,6 +1109,7 @@ handleChangeModalActivityTime(event){
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
+                    modal_activity_sec:duration.split(":")[2]
                 });
             }
     });
@@ -1138,7 +1184,7 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm a'):''} 
+                {start_time?start_time.format('MMM D, YYYY h:mm:ss a'):''} 
                  {this.props.editable &&                               
                         <span 
                             data-name = {summaryId}  
@@ -1199,7 +1245,20 @@ renderTable(){
                                                 </Input>                        
                                                 </div>
                                                 </div>
-
+                                                <div className="align_width_time align_width1 margin_tp">
+                                               <div className="input ">
+                                                <Input type="select" 
+                                                 id="bed_min"
+                                                 name="activity_start_end_sec"
+                                                 data-name={summaryId}
+                                                className="form-control custom-select "
+                                                value={this.state.activity_start_end_sec}
+                                                onChange={this.handleChangeActivityStartEndTime}>
+                                                 <option key="mins" value="">Seconds</option>
+                                                {this.createSleepDropdown(0,59,true)}                        
+                                                </Input>                        
+                                                </div>
+                                                </div>
                                                 <div className="align_width_time align_width1 margin_tp">
                                                  <div className="input1 ">
                                                   <Input type="select" 
@@ -1240,7 +1299,7 @@ renderTable(){
             else if(key === "endTimeInSeconds"){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            {end_time?end_time.format('MMM D, YYYY h:mm a'):''}  
+                            {end_time?end_time.format('MMM D, YYYY h:mm:ss a'):''}  
                           {this.props.editable &&                 
                         <span 
                             data-name = {summaryId} 
@@ -1291,7 +1350,7 @@ renderTable(){
 
                                                 <div className="align_width_time align_width1 margin_tp">
                                                <div className="input ">
-                                                <Input type="select" name="sleep_mins_bed_time"
+                                                <Input type="select"
                                                 id="bed_min"
                                                 name="activity_start_end_min"
                                                 data-name={summaryId}
@@ -1303,7 +1362,20 @@ renderTable(){
                                                 </Input>                        
                                                 </div>
                                                 </div>
-
+                                                <div className="align_width_time align_width1 margin_tp">
+                                               <div className="input ">
+                                                <Input type="select" 
+                                                id="bed_min"
+                                                name="activity_start_end_sec"
+                                                data-name={summaryId}
+                                                className="form-control custom-select "
+                                                value={this.state.activity_start_end_sec}
+                                                onChange={this.handleChangeActivityStartEndTime}>
+                                                 <option key="mins" value="">Seconds</option>
+                                                {this.createSleepDropdown(0,59,true)}                        
+                                                </Input>                        
+                                                </div>
+                                                </div>
                                                 <div className="align_width_time align_width1 margin_tp">
                                                  <div className="input1 ">
                                                   <Input type="select" 
@@ -1380,7 +1452,10 @@ renderTable(){
 
                                     </div>
                                     </div>
-                                    </div>: this.state.activites_hour_min[summaryId]? this.state.activites_hour_min[summaryId]["duration_hour"]+":"+this.state.activites_hour_min[summaryId]["duration_min"]:time}
+                                    </div>:this.state.activites_hour_min[summaryId]?
+                                    this.state.activites_hour_min[summaryId]["duration_hour"]+":"+
+                                    this.state.activites_hour_min[summaryId]["duration_min"]+":"+
+                                    this.state.activites_hour_min[summaryId]["duration_sec"]:time}
                             {/*this.props.editable &&  
                                 <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
                                 className="fa fa-pencil fa-1x progressActivity1 "
@@ -1548,6 +1623,19 @@ renderEditActivityModal(){
                       </Input>                        
                       </div>
                       </div>
+
+                       <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modalstarttime_activity_sec"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modalstarttime_activity_sec}
+                      onChange={this.handleChangeModalActivityTime}>
+                       <option key="mins" value="">Seconds</option>
+                      {this.createSleepDropdown(0,59,true)}                        
+                      </Input>                        
+                      </div>
+                      </div>
                        <div className="align_width align_width1">
                      <div className="input " style = {{marginLeft:"15px"}}>
                       <Input type="select" name="modalstarttime_activity_ampm"
@@ -1592,7 +1680,7 @@ renderEditActivityModal(){
                       </div>
                       </div>
 
-                  <div className="align_width align_width1">
+                    <div className="align_width align_width1">
                      <div className="input " style = {{marginLeft:"15px"}}>
                       <Input type="select" name="modalendtime_activity_min"
                        id="bed_min"
@@ -1600,6 +1688,19 @@ renderEditActivityModal(){
                       value={this.state.modalendtime_activity_min}
                       onChange={this.handleChangeModalActivityTime}>
                        <option key="mins" value="">Minutes</option>
+                      {this.createSleepDropdown(0,59,true)}                        
+                      </Input>                        
+                      </div>
+                      </div>
+
+                       <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modalendtime_activity_sec"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modalendtime_activity_sec}
+                      onChange={this.handleChangeModalActivityTime}>
+                       <option key="mins" value="">Seconds</option>
                       {this.createSleepDropdown(0,59,true)}                        
                       </Input>                        
                       </div>
@@ -1620,7 +1721,7 @@ renderEditActivityModal(){
                       </div>
                          </FormGroup>
                        <FormGroup>
-                     <Label className="padding1">5. Exercise Duration (hh:mm)</Label>
+                     <Label className="padding1">5. Exercise Duration (hh:mm:ss)</Label>
                      <div className=" display_flex margin_lft0" >
                          <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
@@ -1643,6 +1744,20 @@ renderEditActivityModal(){
                       value={this.state.modal_activity_min}
                       onChange={this.handleChange}>
                        <option key="mins" value="">Minutes</option>
+                      {this.createSleepDropdown(0,59,true)}                        
+                      </Input>                        
+                      </div>
+                      </div>
+
+
+                      <div className="align_width align_width1">
+                     <div className="input " style = {{marginLeft:"15px"}}>
+                      <Input type="select" name="modal_activity_sec"
+                       id="bed_min"
+                      className="form-control custom-select "                   
+                      value={this.state.modal_activity_sec}
+                      onChange={this.handleChange}>
+                       <option key="mins" value="">Seconds</option>
                       {this.createSleepDropdown(0,59,true)}                        
                       </Input>                        
                       </div>
@@ -1689,7 +1804,7 @@ return(
 <td id = "add_button" className="add_button_back">Average Heart Rate</td>
 <td id = "add_button" className="add_button_back">Workout Start Time</td>
 <td id = "add_button" className="add_button_back">Workout End Time</td>
-<td id = "add_button" className="add_button_back">Exercise Duration (hh:mm)</td>
+<td id = "add_button" className="add_button_back">Exercise Duration (hh:mm:ss)</td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>

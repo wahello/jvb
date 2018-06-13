@@ -9,7 +9,7 @@ class Hrr(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 
-	Did_you_measure_HRR = models.CharField(max_length=3,blank=True,null=True)
+	Did_you_measure_HRR = models.CharField(max_length=100,blank=True,null=True)
 	Did_heartrate_reach_99 = models.CharField(max_length=3,blank=True,null=True)
 	time_99 = models.FloatField(blank=True,null=True)
 	HRR_start_beat = models.FloatField(blank=True,null=True)

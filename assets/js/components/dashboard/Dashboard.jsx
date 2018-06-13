@@ -5,7 +5,6 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import NavbarMenu from '../navbar';
 import haveGarminToken from "../../network/dashboard";
 class Dashboard extends Component {
-
 	constructor(props){
 		super(props);
 		this.state = {
@@ -20,6 +19,7 @@ class Dashboard extends Component {
 		this.garminConnectModel = this.garminConnectModel.bind(this);
 		this.toggle = this.toggle.bind(this);
 	}
+
 	successToken(data){
 		this.setState({
 			modal:true,
@@ -27,59 +27,68 @@ class Dashboard extends Component {
 			have_garmin_health_token:data.data.have_garmin_health_token,
 		});
 	}
+
 	toggle() {
 	    this.setState({
 	      modal: !this.state.modal
 	    });
   	}
+
+  	/* If we don't have two garmin tokents and even single tokent below model functions will be work*/
 	noGarminTokenModel(){
 			let modal =  <Modal isOpen={this.state.modal} toggle = {this.toggle} className={this.props.className}>
-					          <ModalHeader>Connect Garmin Account</ModalHeader>
+					          <ModalHeader>Connect Garmin Accounts</ModalHeader>
 					          <ModalBody>
-					            	Provide you consent to Garmin Connect sharing your health information and FIT files with JVB Wellness.
-					            	Click on link under the "Set up Links to Garmin".
+					            	We noticed that you have not linked your Garmin Health account and Garmin Connect account to us yet.
+					            	Click the links below to link your account so we can provide you with lots of cool reporting, grades from your data and analysis from your workouts!
 					          </ModalBody>
 					          <ModalFooter>
-					            	<Button color="primary" onClick={this.toggle}>Ok</Button>
+					          	    <a href='/users/request_token' className = "garminlink"><Button color="primary" style = {{fontSize:"13px"}}>Link Garmin Health Data<br/></Button></a>
+									<a href='/users/connect_request_token' className = "garminlink"><Button color="primary" style = {{fontSize:"13px"}}> Link Garmin Connect Data<br/></Button></a>
+					            	<Button color="primary" onClick={this.toggle} style = {{fontSize:"13px"}}>Ok</Button>
 					          </ModalFooter>
 				        </Modal>
-
 	        return modal;
-		}
+	}
+
 	garminHealthModel(){
 		let modal =  <Modal isOpen={this.state.modal} toggle = {this.toggle} className={this.props.className}>
 				          <ModalHeader>Garmin Health Connect</ModalHeader>
 				          <ModalBody>
-				            	Provide you consent to Garmin Connect sharing your health information with JVB Wellness.
-				            	Click on "Garmin Health Connect" link under the "Set up Links to Garmin"
+				            	We noticed that you have not linked your Garmin Health account to us yet.
+				            	Click the link below to link your account so we can provide you with lots of cool reporting and grades from your data!
 				          </ModalBody>
 				          <ModalFooter>
-				            	<Button color="primary" onClick={this.toggle}>Ok</Button>
+				          		<a href='/users/request_token' className = "garminlink"><Button color="primary"style = {{fontSize:"13px"}} >Link Garmin Health Data<br/></Button></a>
+				            	<Button color="primary" onClick={this.toggle} style = {{fontSize:"13px"}}>Ok</Button>
 				          </ModalFooter>
 			        </Modal>
-
         return modal;
 	}
+
 	garminConnectModel(){
 		let modal =  <Modal isOpen={this.state.modal} toggle = {this.toggle} className={this.props.className}>
 				          <ModalHeader>Garmin Connect</ModalHeader>
 				          <ModalBody>
-				          Provide you consent to Garmin Connect sharing your FIT files Information with JVB Wellness.
-				          Click on "Garmin Connect" link under the "Set up Links to Garmin".
+				          We noticed that you have not linked your Garmin Connect account to us yet.  
+				          Click the link below to link your account so we can provide you with lots of cool data and analysis from your workouts!
 				          </ModalBody>
 				          <ModalFooter>
-				            	<Button color="primary" onClick={this.toggle}>Ok</Button>
+				          		<a href='/users/connect_request_token' className = "garminlink"><Button color="primary" style = {{fontSize:"13px"}}> Link Garmin Connect Data<br/></Button></a>
+				            	<Button color="primary" onClick={this.toggle} style = {{fontSize:"13px"}}>Ok</Button>
 				          </ModalFooter>
 			        </Modal>
-
         return modal;
 	}
+
 	errorToken(error){
 		console.log(error.message);
 	}
+
 	componentDidMount(){
 		haveGarminToken(this.successToken,this.errorToken);
 	}
+
 	render(){
 		return (
 			<div>
@@ -87,9 +96,9 @@ class Dashboard extends Component {
 				<div>
 					  <div className="row">
 						<div className="col-sm-6 col-sm-offset-3 social-login" style={{marginTop:"80px"}}>
-						  <h3 id="link_style">User Inputs</h3>
-						  <div className="social-login-buttons">
-	  
+						    <h3 id="link_style">User Inputs</h3>
+						    <div className="social-login-buttons">
+
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
@@ -140,6 +149,7 @@ class Dashboard extends Component {
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
 							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>							 
 						  </div>
+
 						</div>
 					</div>
 				</div>
