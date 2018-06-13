@@ -44,7 +44,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		if validated_data['terms_conditions']:
 			terms = TermsConditionsText.objects.get(version='1.0')
 			TermsConditions.objects.create(user=user,
-				terms_conditions_version=terms)
+		  		terms_conditions_version=terms)
 		return profile
 
 	def update(self, instance, validated_data):
@@ -60,7 +60,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.sleep_goals = validated_data.get('sleep_goals',instance.sleep_goals)
 		instance.goals = validated_data.get('goals',instance.goals)
 		instance.save()
+		
 		return instance
+		
 
 	def linktotc(self,validated_data):
 		user_data = validated_data.pop('user')
