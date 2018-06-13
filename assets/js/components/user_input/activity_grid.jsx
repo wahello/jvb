@@ -751,7 +751,7 @@ handleChange_steps(event){
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
   let activity_data = this.state.activites[selectedActivityId];
-  activity_data['steps'] = value;
+  activity_data['steps'] = parseInt(value);
   this.setState({
   activites:{...this.state.activites,
   [selectedActivityId]:activity_data,
@@ -944,7 +944,8 @@ handleChange(event){
             "modal_activity_type":value
         });
     }
-    else if (name == "modal_activity_heart_rate"){
+    else if (name == "modal_activity_heart_rate"
+        || name == "modal_exercise_steps"){
         this.setState({
             [name]: parseInt(value)
         });
