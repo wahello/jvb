@@ -854,7 +854,7 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 				
 			hour_start = datetime.combine(calendar_date.date(),time(hour))
 
-			if hour_start <= last_sleeping_hour:
+			if last_sleeping_hour and hour_start <= last_sleeping_hour:
 				mc_data[interval]['status'] = 'sleeping'
 
 			if mc_data[interval]['status'] == 'active': 
@@ -1466,7 +1466,6 @@ def get_unprocessed_food_grade(daily_strong,current_date):
 	return (None,None)
 
 def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
-
 	alcoholic_drink_last_week = [q.number_of_alcohol_consumed_yesterday
 		if not q.number_of_alcohol_consumed_yesterday in [None,''] else 0
 		for q in daily_strong]
@@ -1483,7 +1482,9 @@ def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
 	points = 0
 	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
 		have_no_workout = not strong_obj or (strong_obj and strong_obj.workout != "yes")
-		have_activities = activity_list or (strong_obj and json.loads(strong_obj.activities))
+		have_activities = activity_list or (
+			strong_obj and strong_obj.activities and json.loads(strong_obj.activities)
+		)
 		if strong_obj and (strong_obj.workout == 'yes'):
 			points += 1
 		elif(have_no_workout and have_activities):
@@ -1805,15 +1806,19 @@ def create_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['wind'] = weather_data['windSpeed']
 		exercise_calculated_data['hrr_time_to_99'] = safe_get(daily_encouraged,"time_to_99","") 
 		exercise_calculated_data['hrr_starting_point'] = safe_get(daily_encouraged,"hr_level",0)
-		exercise_calculated_data['hrr_beats_lowered_first_minute'] = safe_get(
-			daily_encouraged,"hr_level",0)-safe_get(daily_encouraged,"lowest_hr_first_minute",0)
+
+		hr_at_start_of_hrr = safe_get(daily_encouraged,"hr_level",0)
+		lowest_hr_first_minute = safe_get(daily_encouraged,"lowest_hr_first_minute",0)
+		if (hr_at_start_of_hrr and lowest_hr_first_minute 
+			and hr_at_start_of_hrr >= lowest_hr_first_minute):
+			hr_lowered = hr_at_start_of_hrr - lowest_hr_first_minute
+			exercise_calculated_data['hrr_beats_lowered_first_minute'] = hr_lowered 
+
 		exercise_calculated_data['resting_hr_last_night'] = safe_get_dict(dailies_json,
 			'restingHeartRateInBeatsPerMinute',0)
 		exercise_calculated_data['lowest_hr_during_hrr'] = safe_get(
 			daily_encouraged,"lowest_hr_first_minute",0)
-		
-		# exercise_calculated_data['highest_hr_first_minute'] = f
-		
+				
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
 		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
 											'averageRunCadenceInStepsPerMinute')

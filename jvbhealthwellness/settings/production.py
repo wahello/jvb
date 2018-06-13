@@ -50,8 +50,8 @@ CSRF_COOKIE_HTTPONLY = True
 WEBPACK_LOADER['DEFAULT']['CACHE'] = True
 
 # Celery
-CELERY_BROKER_URL = 'redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379'
-CELERY_RESULT_BACKEND = 'redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379'
+CELERY_BROKER_URL = 'redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379'
+CELERY_RESULT_BACKEND = 'redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379'
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BEAT_SCHEDULE = {
@@ -60,10 +60,10 @@ CELERY_BEAT_SCHEDULE = {
         'task':'progress_analyzer.generate_cumulative_instances',
         'schedule':crontab(minute=0, hour=1)
     },
-    #execute every day at 2:00 AM EST (America/New_york)
+    #execute every quarter to hour. Ex 10:45, 9:45 etc.
     'update-obsolete-progress-analyzer-report':{
         'task':'progress_analyzer.update_obsolete_pa_reports',
-        'schedule':crontab(minute=0, hour=2)
+        'schedule':crontab(minute=45, hour='*/1')
     },
     #execute every day at 3:00 AM EST (America/New_york)
     'retry-failed-ping-notifications':{
@@ -74,6 +74,11 @@ CELERY_BEAT_SCHEDULE = {
     'generate-log-for-incorrect-pa':{
         'task':'progress_analyzer.generate_log_incorrect_pa',
         'schedule':crontab(minute=0, hour='*/1')
+    },
+    #execute every day at 4:00 AM EST (America/New_york)
+    "validate-garmin-health-token":{
+        'task':'garmin.validate_garmin_health_token',
+        'schedule':crontab(minute=0, hour=4)
     }
 }
 
@@ -100,9 +105,9 @@ LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
 LOG_REQUESTS = True
 
 # Opbeat
-INSTALLED_APPS += ['opbeat.contrib.django']
-MIDDLEWARE.insert(  # insert OpbeatAPMMiddleware on the top
-    0, 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware')
+# INSTALLED_APPS += ['opbeat.contrib.django']
+# MIDDLEWARE.insert(  # insert OpbeatAPMMiddleware on the top
+#     0, 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware')
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  
@@ -165,7 +170,7 @@ LOGGING = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://ec2-52-3-229-118.compute-1.amazonaws.com:6379/1",
+        "LOCATION": "redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
@@ -173,4 +178,13 @@ CACHES = {
     }
 }
 
-
+# Elastic APM settings
+INSTALLED_APPS.insert(0,"elasticapm.contrib.django")
+MIDDLEWARE.insert(0,'elasticapm.contrib.django.middleware.TracingMiddleware')
+ELASTIC_APM = {
+    # allowed characters in SERVICE_NAME: a-z, A-Z, 0-9, -, _, and space
+    'SERVICE_NAME': 'JVB-Production',
+    'SECRET_TOKEN': 'health',
+    'SERVER_URL': 'http://13.232.8.152:8200',
+    'DEBUG': True,
+}

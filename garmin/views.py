@@ -42,7 +42,10 @@ from .models import UserGarminDataEpoch,\
 					UserGarminDataMoveIQ,\
 					GarminConnectToken, \
 					GarminFitFiles,\
-					UserLastSynced
+					UserLastSynced,\
+					GarminConnectToken
+
+from users.models import GarminToken
 
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
@@ -130,6 +133,25 @@ class GarminPing(APIView):
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_200_OK)
 
+class HaveGarminTokens(APIView):
+	'''
+	Check availability of garmin connect and garmin health token
+	for current user
+	'''
+	permission_classes = (IsAuthenticated,)
+	def get(self,request,format="json"):
+		have_tokens = {
+			"have_garmin_health_token":False,
+			"have_garmin_connect_token":False
+		}
+
+		if GarminToken.objects.filter(user=request.user).exists():
+			have_tokens['have_garmin_health_token'] = True
+		if GarminConnectToken.objects.filter(user=request.user).exists():
+			have_tokens['have_garmin_connect_token'] = True
+
+		return Response(have_tokens,status=status.HTTP_200_OK)
+
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
 	serializer_class = UserLastSyncedSerializer
@@ -174,16 +196,15 @@ class GarminConnectPing(APIView):
 			# print(user)
 		except User.DoesNotExist:
 			user = None
-		print(user)
 		if user:
 			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
 
-		mail = EmailMessage()
-		mail.subject = "Garmin connect Push | Files"
-		mail.body = request.data['uploadMetaData']
-		mail.to = ['atulk@s7works.io']
-		mail.attach(file.name, file.read(), file.content_type)
-		mail.send()
+		# mail = EmailMessage()
+		# mail.subject = "Garmin connect Push | Files"
+		# mail.body = request.data['uploadMetaData']
+		# mail.to = ['atulk@s7works.io']
+		# mail.attach(file.name, file.read(), file.content_type)
+		# mail.send()
 		headers={"Location":"/"}
 		return Response(status = status.HTTP_201_CREATED,headers=headers)
 
@@ -261,66 +282,3 @@ def connect_receive_token(request):
 									   token_secret=access_token_secret)
 
 	return redirect('/service_connect')
-
-class fetchGarminBackFillData(APIView):
-	permission_classes = (IsAuthenticated,)
-	DATA_TYPES = {
-		"DAILY_SUMMARIES":"dailies",
-		"ACTIVITY_SUMMARIES":"activities",
-		"MANUALLY_UPDATED_ACTIVITY_SUMMARIES":"manuallyUpdatedActivities",
-		"EPOCH_SUMMARIES":"epochs",
-		"SLEEP_SUMMARIES":"sleeps",
-		"BODY_COMPOSITION":"bodyComps",
-		"STRESS_DETAILS":"stressDetails",
-		"MOVEMENT_IQ":"moveiq",
-		"USER_METRICS":"userMetrics"
-	}
-
-	def get(self, request, format="json",to_date=None,from_date=None):
-		req_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
-		authurl = 'http://connect.garmin.com/oauthConfirm'
-		acc_url = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
-		conskey = '6c1a770b-60b9-4d7e-83a2-3726080f5556'
-		conssec = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9'
-
-		# start_date = '2017-09-13'
-		# y,m,d = map(int,request.GET.get('start_date').split('-'))
-
-		# start_date_dt = datetime(y,m,d,0,0,0)
-
-		# startDateTimeInSeconds = int(start_date_dt.replace(tzinfo=timezone.utc).timestamp())
-		user = request.user
-
-		access_token = user.garmin_token.token
-		access_token_secret = user.garmin_token.token_secret
-		User_Reg_Date = user.date_joined
-		startDateTimeInSeconds = int(time.mktime(User_Reg_Date.timetuple()))
-		to_date = int(time.mktime(to_date.timetuple()))
-		from_date = int(time.mktime(from_date.timetuple()))
-
-		if access_token and access_token_secret:
-			service = OAuth1Service(
-				consumer_key = conskey,
-				consumer_secret = conssec,
-				request_token_url = req_url,
-				access_token_url = acc_url,
-				authorize_url = authurl
-			)
-			sess = service.get_session((access_token, access_token_secret))
-
-			if (from_date - to_date) <= 7776000:
-				data = {
-				'summaryStartTimeInSeconds': to_date,
-				'summaryEndTimeInSeconds': from_date
-				}
-			else:
-				print("Date Range should be in the range of 90 days only because garmin sends the date for one call only 90 days data")
-
-			ROOT_URL = 'https://healthapi.garmin.com/wellness-api/rest/backfill/{}'
-
-			# for dtype in self.DATA_TYPES.values():
-			# 	URL = ROOT_URL.format(dtype)
-			# 	r = sess.get(URL, header_auth=True, params=data)
-				
-			return Response(status = status.HTTP_202_ACCEPTED)
-		return Response(status = status.HTTP_403_FORBIDDEN)

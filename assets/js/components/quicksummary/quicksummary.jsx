@@ -556,7 +556,9 @@ handleScroll() {
 	  	model_view = <Modal isOpen={this.state.model} toggle={this.toggleModel} className={this.props.className}>
 	          <ModalHeader toggle={this.toggleModel}></ModalHeader>
 	          <ModalBody>
-	           On a mobile device, use the Chrome brower and touch the button "Export Reports" above to easily view your formatted data; on a desktop computer, touching this button will export your reports to Excel for easy viewing.
+	          On a mobile device, touch the button "Export Reports" below to easily view your formatted data and various tabs
+	          (on an iPhone, upgrade to OS 11.4 for the reports to be displayed); 
+	          on your desktop computer, touching this button will export your reports to Excel for easy viewing.
 	          </ModalBody>
 	          <ModalFooter>
 	            <Button color="primary" onClick={this.toggleModel}>Ok</Button>

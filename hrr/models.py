@@ -9,7 +9,7 @@ class Hrr(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 
-	Did_you_measure_HRR = models.CharField(max_length=3,blank=True,null=True)
+	Did_you_measure_HRR = models.CharField(max_length=100,blank=True,null=True)
 	Did_heartrate_reach_99 = models.CharField(max_length=3,blank=True,null=True)
 	time_99 = models.FloatField(blank=True,null=True)
 	HRR_start_beat = models.FloatField(blank=True,null=True)
@@ -26,6 +26,7 @@ class Hrr(models.Model):
 
 	no_fitfile_hrr_reach_99 = models.CharField(max_length=3,blank=True,null=True)
 	no_fitfile_hrr_time_reach_99 = models.FloatField(blank=True,null=True)
+	time_heart_rate_reached_99 = models.FloatField(blank=True,null=True)
 	lowest_hrr_no_fitfile = models.FloatField(blank=True,null=True)
 	no_file_beats_recovered = models.FloatField(blank=True,null=True)
 
@@ -42,3 +43,9 @@ class Hrr(models.Model):
 		]
 
 
+# class AaCalculations(models.Model):
+# 	user_hrr = models.ForeignKey(User, on_delete=models.CASCADE)
+# 	created_at = models.DateField()
+# 	updated_at = models.DateTimeField(auto_now=True)
+
+	

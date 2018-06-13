@@ -691,7 +691,9 @@ class ProgressReport():
 						val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
 					prcnt = 0
 					if val:
-						prcnt = (val / self.duration_denominator[alias])*100
+						# if duration denominator is greator than 0
+						if self.duration_denominator[alias]:
+							prcnt = (val / self.duration_denominator[alias])*100
 						prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
 					return prcnt
 
