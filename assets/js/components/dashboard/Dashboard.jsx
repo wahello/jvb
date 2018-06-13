@@ -103,6 +103,7 @@ class Dashboard extends Component {
 							  <Link to='/leaderboard'>My Rankings</Link><br/>
 							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
 							   <Link to='/hrr_recovery'>Heartrate Recovery</Link><br/>
+							   <Link to='/heartrate_zone'>Time in Heart -Rate Zones Chart</Link><br/>
 							   {/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
 							   
 							  <h3 id="link_style">Raw Data</h3>		  
