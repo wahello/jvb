@@ -19,4 +19,7 @@ def init_new_user(sender, instance=None, created=False, **kwargs):
 @receiver(post_registration_notify,sender=UserCreate)
 def notify_users(sender, **kwargs):
 	email_address = kwargs.get('email_address')
-	notify_users_task.delay(email_address)
+	username = kwargs.get('username')
+	first_name = kwargs.get('first_name')
+
+	notify_users_task.delay(email_address,username,first_name)
