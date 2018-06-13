@@ -257,7 +257,8 @@ class HeartRate extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_aerobic:true,
-			aa_data:{}
+			aa_data:{},
+			hr_zone:{},
 		},()=>{
 			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
