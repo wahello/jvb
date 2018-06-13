@@ -175,7 +175,7 @@ initializeActivity(activities,selected_date,isEditable,callback){
       activities_edit_mode:this.createActivityEditModeState(activities),
       activites_hour_min:this.createActivityTime(activities),
       activity_start_end_time:this.createStartAndEndTime(activities),
-      activites:activities,
+      activites:activities
     },()=>{
         if(!isEditable)
             callback();
@@ -1615,11 +1615,16 @@ renderTable(){
 
              else if(key === "steps_type"){
                  let  steps_type=keyValue;
+                 let exerciseTypeLabel = "Not Categorized";
+                 if(this.state.activites[summaryId][key] == "exercise")
+                    exerciseTypeLabel = "Exercise";
+                 else if (this.state.activites[summaryId][key] == "non_exercise")
+                    exerciseTypeLabel = "Non Exercise";
+
                 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
                                               { this.state.activities_edit_mode[summaryId][key]?
                                                <div>
-                                                <span>{this.state.activites[summaryId][key] == "exercise" ?
-                                                 "Exercise" : "Non Exercise"}</span>
+                                                <span>{exerciseTypeLabel}</span>
                                                 <span>
                                                 <label className="switch">
                                                       <input type="checkbox"
@@ -1636,8 +1641,7 @@ renderTable(){
                                                       <span className="slider round"></span>
                                                 </label>
                                                 </span>
-                                          </div>:(this.state.activites[summaryId][key] == "exercise" ?
-                                                 "Exercise" : "Non Exercise")}
+                                          </div>:exerciseTypeLabel}
                            {this.props.editable &&            
                             <span data-name={summaryId} onClick={this.editToggleHandler_steps_type.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
