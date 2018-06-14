@@ -149,9 +149,10 @@ class HeartRateCal extends Component{
 	renderNoworkout(value){
 		if(value == null || value == undefined || value == ""){
 			value = "No Workout";
+			value = value[0].toUpperCase()+value.slice(1);
 		}
 		else{
-			value = value;
+			value = value[0].toUpperCase()+value.slice(1);
 		}
 		return value;
 	}
