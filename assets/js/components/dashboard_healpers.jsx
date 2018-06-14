@@ -137,3 +137,26 @@ export function renderHrrSelectedDateFetchOverlay(){
 		);
 	}
 }
+
+export function renderTimeTohrrZoneSelectedDateFetchOverlay(){
+	if(this.state.fetching_hrr_zone){
+		let selectedDate = moment(this.state.selectedDate);
+
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Time to Heartrate Zone Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
