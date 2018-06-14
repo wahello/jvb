@@ -484,7 +484,7 @@ def aa_calculations(request):
 		for tmp in user_input_strong:
 			sn = tmp.activities
 			if sn:
-				sn = ast.literal_eval(sn)
+				sn = json.loads(sn)
 				di = sn.values()
 				di = list(di)
 				for i,k in enumerate(di):
