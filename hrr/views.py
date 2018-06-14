@@ -1055,12 +1055,15 @@ def aa_low_high_end_calculations(request):
 			  "classificaton":classification_dic[a],
 			  "time_in_zone":low_end_dict[a],
 			  "prcnt_in_zone":prcnt_in_zone,
-			  "total_duration":total_time_duration}
+			 }
 			data2[a]=data
-	if data2:
-		return JsonResponse(data2)
-	else:
-		return JsonResponse({})
+		total = {"total_duration":total_time_duration,
+				"total_percent":"100%"}
+		data2['total'] = total
+		if data2:
+			return JsonResponse(data2)
+		else:
+			return JsonResponse({})
 
 def hrr_data(user,start_date):
 	
