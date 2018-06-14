@@ -264,6 +264,20 @@ class HeartRate extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_aerobic:true,
+			aerobic_zone:"",
+            anaerobic_zone:"",
+            below_aerobic_zone:"",
+            aerobic_range:"",
+            anaerobic_range:"",
+            below_aerobic_range:"",
+            hrr_not_recorded:"",
+            percent_hrr_not_recorded:"",
+			total_time:"",
+			percent_aerobic:"",
+			percent_below_aerobic:"",
+			percent_anaerobic:"",
+			total_percent:"",
+			empty:"",
 			aa_data:{},
 			hr_zone:{},
 		},()=>{
@@ -286,6 +300,19 @@ class HeartRate extends Component{
 				if(key == "time_in_zone"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "classificaton"){
+					let keyvalue = value[key];
+					if(keyvalue == "below_aerobic_zone"){
+						 td_values.push(<td>Below Aerobic Zone</td>);
+					}
+					else if(keyvalue == "aerobic_zone"){
+						 td_values.push(<td>Aerobic Zone</td>);
+					}
+					else{
+						td_values.push(<td>Anaerobic Zone</td>);
+					}
+				   
 				}
 				else if(key == "prcnt_in_zone"){
 					let keyvalue = this.renderpercentage(value[key]);
@@ -471,7 +498,7 @@ class HeartRate extends Component{
 			          	    	<table className = "table table-striped table-bordered ">
 				          	    	<thead>
 					          	    	<th>Heart Rate Zone Low End</th>
-					          	    	<th>Heart Rate Zone Heigh End</th>
+					          	    	<th>Heart Rate Zone High End</th>
 					          	    	<th>Classification</th>
 					          	    	<th>Time in Zone(hh:mm:ss)</th>
 					          	    	<th>% of Total Duration in Zone</th>
