@@ -137,7 +137,10 @@ class HeartRate extends Component{
 					"total_anaerobic_range":"",
 					"total_below_aerobic_range":"",
 					"total_prcnt_aerobic":"",
-					"total_prcnt_anaerobic":""
+					"total_prcnt_anaerobic":"",
+					"hrr_not_recorded":"",
+					"prcnt_hrr_not_recorded":"",
+					
 			      };
 	    return val;
 	} 
@@ -303,12 +306,20 @@ class HeartRate extends Component{
 	renderTable(data){
 		var td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
-		"aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic"];
+		"aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic","hrr_not_recorded","prcnt_hrr_not_recorded"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
 				if(key == "duration"){
 					let keyvalue = this.renderTime(value[key]);
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "hrr_not_recorded"){
+					let keyvalue = value[key];
+				    td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "prcnt_hrr_not_recorded"){
+					let keyvalue = value[key];
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "aerobic_zone"){
@@ -445,6 +456,9 @@ class HeartRate extends Component{
 										<th>% Anaerobic</th>
 										<th>Duration Below Aerobic Range (hh:mm:ss)</th>
 										<th>% Below Aerobic</th>
+										<th>Heart Rate Not recorded (hh:mm:ss)</th>
+										<th>% Heart Rate Not recorded</th>
+										
 									</tr>
 									<tbody>
 										{this.renderTable(this.state.aa_data)}

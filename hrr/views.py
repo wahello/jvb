@@ -705,13 +705,16 @@ def aa_workout_calculations(request):
 		  "duration":"",
 		  "average_heart_rate":"",
 		  "max_heart_rate":"",
-		  "steps":""
+		  "steps":"",
+		  "hrr_not_recorded":"",
+		  "prcnt_hrr_not_recorded":""
 			}
 	time_duration = []
 	heart_rate = []
 	max_hrr = []
 	data1={}
 	steps = []
+	hrr_not_recorded_list = []
 	if workout:
 		start_date_timestamp = workout[0]['startTimeInSeconds']
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
@@ -728,17 +731,36 @@ def aa_workout_calculations(request):
 			max_hrr.append(max_heart_rate)
 			exercise_steps = workout.get("steps",0)
 			steps.append(exercise_steps)
+			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
-				  "steps":exercise_steps
+				  "steps":exercise_steps,
+				  "hrr_not_recorded":"",
+				  "prcnt_hrr_not_recorded":""
 					}
-			
-			data1[summaryId] = data
+			data1[summaryId] = data 
+			if "averageHeartRateInBeatsPerMinute" in workout.keys():
+				if workout['averageHeartRateInBeatsPerMinute'] == 0 or "":
+					hrr_not_recorded = workout['durationInSeconds']
+					hrr_not_recorded_list.append(hrr_not_recorded)
+					data['hrr_not_recorded'] = hrr_not_recorded
+			else:
+				hrr_not_recorded = workout['durationInSeconds']
+				hrr_not_recorded_list.append(hrr_not_recorded)
+				data['hrr_not_recorded'] = hrr_not_recorded
+		for tm in hrr_not_recorded_list:
+			try:
+				prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
+				data['prcnt_hrr_not_recorded']=prcnt_hrr_not_recorded
+			except ZeroDivisionError:
+				prcnt_hrr_not_recorded = ""
+				data['prcnt_hrr_not_recorded'] = prcnt_hrr_not_recorded
+
 		try:
-			avg_hrr = sum(heart_rate)/len(heart_rate)
+			avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
 			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
 		except ZeroDivisionError:
 			avg_hrr = ""
@@ -753,13 +775,16 @@ def aa_workout_calculations(request):
 				 "duration":sum(time_duration),
 				 "average_heart_rate":avg_hrr,
 				 "max_heart_rate":maxi_hrr,
-				 "steps":sum(steps)}
+				 "steps":sum(steps),
+				 "hrr_not_recorded":sum(hrr_not_recorded_list),
+				 "prcnt_hrr_not_recorded":(sum(hrr_not_recorded_list)/sum(time_duration))*100
+				 }
 		if total:	
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
 		time_duration1.append(time_duration)
-
+	
 	if data1:
 		return JsonResponse(data1)
 	else:
@@ -907,25 +932,24 @@ def daily_aa_calculations(request):
 					}
 			daily_aa_data[data_summaryid[i]] =data
 		try:
-			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(time_duration1[0])*100)
+			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
 			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(time_duration1[0])*100)
+			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
 			total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_aerobic = (sum(aerobic_duration)/sum(time_duration1[0])*100)
+			total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
 			total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
 		except (ZeroDivisionError,IndexError):
 			total_prcnt_anaerobic = ''
 			total_prcnt_below_aerobic = ''
 			total_prcnt_aerobic = ''
 
-		total =  {"total_time":"",
+		total =  {
 				  "aerobic_zone":sum(aerobic_duration),
 				  "anaerobic_zone":sum(anaerobic_duration),
 				  "below_aerobic_zone":sum(below_aerobic_duration),
 				  "percent_aerobic":total_prcnt_aerobic,
 				  "percent_below_aerobic":total_prcnt_below_aerobic,
 				  "percent_anaerobic":total_prcnt_anaerobic,
-				  "total_percent":""
 					}
 		
 		if total:
@@ -1017,7 +1041,7 @@ def aa_low_high_end_calculations(request):
 					low_end_dict[a] = low_end_dict[a] + d
 		total_time_duration = sum(low_end_dict.values())
 				
-		for a,b in zip(low_end_heart,high_end_heart):	
+		for a,b in zip(low_end_heart,high_end_heart):					
 			if a and b > anaerobic_value:
 				classification_dic[a] = 'anaerobic_zone'
 			elif a and b < below_aerobic_value:
