@@ -6,17 +6,18 @@ from rauth import OAuth1Service
 import time
 import datetime
 
-'''
-	how backfillingdata works 
-	command is 
-	python manage.py backfillingdata -e email@email.com -u username -d year-month-date year-month-date
-
-	commentes code is for making when duaration is in timestamp
-
-'''
-
 
 class Command(BaseCommand):
+
+	'''
+		management command for backfilling data
+		
+		python manage.py backfillingdata -e email@email.com -u username 
+		-d year-month-date year-month-date
+
+		commented  code is when duaration is in timestamp
+
+	'''
 
 	def __init__(self,*args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -56,7 +57,7 @@ class Command(BaseCommand):
 
 	def _is_valid(self,session,from_date=None,to_date=None):
 		# if to_date and from_date:
-			print(from_date,to_date)
+			print(from_date,to_date,"Stard date and end date of backfilling data")
 			# if type(from_date_timestamp) == int:
 			# uploadStartTimeInSeconds = from_date_timestamp
 			# uploadEndTimeInSeconds = to_date_timestamp
