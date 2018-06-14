@@ -731,25 +731,34 @@ def aa_workout_calculations(request):
 			max_hrr.append(max_heart_rate)
 			exercise_steps = workout.get("steps",0)
 			steps.append(exercise_steps)
-			if workout[i].get('averageHeartRateInBeatsPerMinute') == 0 or "":
-				hrr_not_recorded = workout['durationInSeconds']
-				hrr_not_recorded_list.append(hrr_not_recorded)
-			else:
-				hrr_not_recorded = 0
-				hrr_not_recorded_list.append(hrr_not_recorded)
-
+			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
 				  "duration":duration,
 				  "average_heart_rate":avg_heart_rate,
 				  "max_heart_rate":max_heart_rate,
 				  "steps":exercise_steps,
-				  "hrr_not_recorded":hrr_not_recorded,
+				  "hrr_not_recorded":"",
 				  "prcnt_hrr_not_recorded":""
 					}
-			
-			
-			data1[summaryId] = data
+			data1[summaryId] = data 
+			if "averageHeartRateInBeatsPerMinute" in workout.keys():
+				if workout['averageHeartRateInBeatsPerMinute'] == 0 or "":
+					hrr_not_recorded = workout['durationInSeconds']
+					hrr_not_recorded_list.append(hrr_not_recorded)
+					data['hrr_not_recorded'] = hrr_not_recorded
+			else:
+				hrr_not_recorded = workout['durationInSeconds']
+				hrr_not_recorded_list.append(hrr_not_recorded)
+				data['hrr_not_recorded'] = hrr_not_recorded
+		for tm in hrr_not_recorded_list:
+			try:
+				prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
+				data['prcnt_hrr_not_recorded']=prcnt_hrr_not_recorded
+			except ZeroDivisionError:
+				prcnt_hrr_not_recorded = ""
+				data['prcnt_hrr_not_recorded'] = prcnt_hrr_not_recorded
+
 		try:
 			avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
 			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
@@ -766,13 +775,16 @@ def aa_workout_calculations(request):
 				 "duration":sum(time_duration),
 				 "average_heart_rate":avg_hrr,
 				 "max_heart_rate":maxi_hrr,
-				 "steps":sum(steps)}
+				 "steps":sum(steps),
+				 "hrr_not_recorded":sum(hrr_not_recorded_list),
+				 "prcnt_hrr_not_recorded":(sum(hrr_not_recorded_list)/sum(time_duration))*100
+				 }
 		if total:	
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
 		time_duration1.append(time_duration)
-
+	
 	if data1:
 		return JsonResponse(data1)
 	else:
@@ -945,7 +957,7 @@ def daily_aa_calculations(request):
 			daily_aa_data['Totals'] = total
 		else:
 			daily_aa_data['Totals'] = {}
-	
+	 
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
@@ -1030,7 +1042,7 @@ def aa_low_high_end_calculations(request):
 					low_end_dict[a] = low_end_dict[a] + d
 		total_time_duration = sum(low_end_dict.values())
 				
-		for a,b in zip(low_end_heart,high_end_heart):	
+		for a,b in zip(low_end_heart,high_end_heart):					
 			if a and b > anaerobic_value:
 				classification_dic[a] = 'anaerobic_zone'
 			elif a and b < below_aerobic_value:
@@ -1046,6 +1058,10 @@ def aa_low_high_end_calculations(request):
 			  "prcnt_in_zone":prcnt_in_zone,
 			  "total_duration":total_time_duration}
 			data2[a]=data
+		if data2:
+			return JsonResponse(data2)
+		else:
+			return JsonResponse({})
 
 
 def hrr_data(user,start_date):
