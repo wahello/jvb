@@ -184,6 +184,7 @@ class HeartRate extends Component{
 	    });
   	}
   	renderNullValue(value){
+  		// This function will add the (-) for when the values get null
   		let values;
   		if(value){
   			values = value;
@@ -194,6 +195,7 @@ class HeartRate extends Component{
   		return values;
   	}
 	renderTime(value){
+		// This function will devide the seconds to hh:mm:ss format.
 		var time;
 		if(value){
 			if(value>0){
@@ -219,6 +221,7 @@ class HeartRate extends Component{
 	}
 
 	stepsValue(value){
+		// This function will add the (,) for the steps values
 		if(value){
 			value += '';
 	     	var x = value.split('.');
@@ -239,6 +242,7 @@ class HeartRate extends Component{
 	}
 
 	renderpercentage(value){
+		// This function will add the "%" symbol for the persentage values. 
 		let percentage;
 		if(value){
 			percentage = value +"%";
@@ -268,8 +272,11 @@ class HeartRate extends Component{
 		
 	}
 	renderHrrZoneTable(data){
+		// This function create the dynamic table data
+		// and table rows for the Time of heart rate zone 
 		var td_rows = [];
-		let keys = ["low_end","high_end","classificaton","time_in_zone","prcnt_in_zone"];
+		let keys = ["low_end","high_end","classificaton",
+		"time_in_zone","prcnt_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
