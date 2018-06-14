@@ -86,6 +86,8 @@ this.handleChange_activity = this.handleChange_activity.bind(this);
 this.handleChange_heartrate = this.handleChange_heartrate.bind(this);
 this.handleChange_time = this.handleChange_time.bind(this);
 this.handleChange_comments = this.handleChange_comments.bind(this);
+this.handleChange_steps = this.handleChange_steps.bind(this);
+this.handleChange_steps_type = this.handleChange_steps_type.bind(this);
 this.handleChange_start_time=this.handleChange_start_time.bind(this);
 this.handleChange_end_time=this.handleChange_end_time.bind(this);          
 this.createSleepDropdown = this.createSleepDropdown.bind(this);
@@ -111,6 +113,8 @@ this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStar
 this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
 this.createActivityTime = this.createActivityTime.bind(this);
 this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
+this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
+this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
 let selected_date = this.props.selected_date;
 this.state ={
@@ -127,6 +131,8 @@ this.state ={
     modal_activity_hour:"",
     modal_activity_min:"",
     modal_activity_sec:"",
+    modal_exercise_steps:"",
+    modal_exercise_steps_status:"",
     modal_activity_comment:"",
     activity_display_name:"",
     editToggle_heartrate:false,
@@ -161,7 +167,7 @@ this.state ={
 }
 }
 
-initializeActivity(activities,selected_date){
+initializeActivity(activities,selected_date,isEditable,callback){
     this.setState({
       selected_date:selected_date,
       activitystarttime_calender:moment(selected_date),
@@ -169,14 +175,51 @@ initializeActivity(activities,selected_date){
       activities_edit_mode:this.createActivityEditModeState(activities),
       activites_hour_min:this.createActivityTime(activities),
       activity_start_end_time:this.createStartAndEndTime(activities),
-      activites:activities,
+      activites:activities
+    },()=>{
+        if(!isEditable)
+            callback();
     });
   }
 
 componentWillReceiveProps(nextProps) {
     if(nextProps.activities !== this.props.activities) {
-        this.initializeActivity(nextProps.activities,nextProps.selected_date);
+        this.initializeActivity(
+            nextProps.activities,
+            nextProps.selected_date,
+            nextProps.editable,
+            this.setActivitiesEditModeFalse
+        );
     }
+    else if(!_.isEmpty(this.state.activities_edit_mode)
+            && !nextProps.editable){
+        this.setActivitiesEditModeFalse();
+    }
+}
+
+addingCommaToSteps(value){
+                value += '';
+                var x = value.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+            return x1 + x2;
+}
+setActivitiesEditModeFalse(){
+    //it will do set the state true to false of activity.
+    //it will do hide the fields when you click on the
+    // "View Form" button with out click on the pencile.
+    let falseEditMode = this.state.activities_edit_mode
+    for(let [id,data] of Object.entries(falseEditMode)){
+        for(let [key,val] of Object.entries(data))
+            falseEditMode[id][key] = false;
+    }
+    this.setState({
+        activities_edit_mode:falseEditMode
+    });
 }
 
 deleteActivity(event) {
@@ -312,6 +355,8 @@ toggleModal(){
       modal_activity_heart_rate:"",
       modal_activity_hour:"",
       modal_activity_min:"",
+      modal_exercise_steps:"",
+      modal_exercise_steps_status:"",
       modal_activity_comment:"",
       selectedActivityId:"",
       activitystarttime_calender:"",
@@ -362,6 +407,8 @@ handleChangeModal(event){
     modal_activity_heart_rate:current_activity?current_activity.averageHeartRateInBeatsPerMinute:"",
     modal_activity_hour:hour,
     modal_activity_min:mins,
+    modal_exercise_steps:current_activity?current_activity.steps:"",
+    modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
     modal_activity_comment:current_activity?current_activity.comments:"",
     selectedActivityId:selectedActivityId,
     activityEditModal:true,
@@ -492,7 +539,34 @@ if(selectedActivityId){
    }
     }
   }
-
+  editToggleHandler_steps(event){
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+    categoryMode['steps'] = !categoryMode['steps'] 
+    if(selectedActivityId){
+        this.setState({
+            ...this.state.activities_edit_mode,
+            [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+    }
+}
+editToggleHandler_steps_type(event){
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+    categoryMode['steps_type'] = !categoryMode['steps_type'] 
+    if(selectedActivityId){
+        this.setState({
+            ...this.state.activities_edit_mode,
+            [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+    }
+}
 editToggleHandlerDuration(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -672,7 +746,55 @@ const target = event.target;
 
   });
 }
+handleChange_steps(event){
+  const target = event.target;
+  const value = target.value;
+  const selectedActivityId = target.getAttribute('data-name');
+  let activity_data = this.state.activites[selectedActivityId];
+  activity_data['steps'] = parseInt(value);
+  this.setState({
+  activites:{...this.state.activites,
+  [selectedActivityId]:activity_data,
 
+  }
+     });
+  $('#'+selectedActivityId).css('display','none');
+   if(value== "OTHER"){
+  this.setState({
+[selectedActivityId]: value,
+"modal_exercise_steps":""
+  });
+  }
+
+  else if(name == "modal_exercise_steps"){
+  this.setState({
+[selectedActivityId]: value,
+"modal_exercise_steps":value
+  });
+
+  }
+  this.setState({
+[selectedActivityId]: value,
+
+  });
+}
+handleChange_steps_type(event){
+  const target = event.target;
+  const selectedActivityId = target.getAttribute('data-name');
+  let activity_data = this.state.activites[selectedActivityId];
+  let steps_type = activity_data['steps_type'];
+  if(steps_type == "exercise")
+    steps_type = "non_exercise";
+  else
+    steps_type = "exercise";
+  
+  activity_data['steps_type'] = steps_type;
+  if(activity_data['can_update_steps_type']){
+      this.setState({
+        [selectedActivityId]: activity_data
+      });
+    }
+}
 getDTMomentObj(dt,hour,min,sec,am_pm){
   hour = hour ? parseInt(hour) : 0;
   min = min ? parseInt(min) : 0;
@@ -822,7 +944,8 @@ handleChange(event){
             "modal_activity_type":value
         });
     }
-    else if (name == "modal_activity_heart_rate"){
+    else if (name == "modal_activity_heart_rate"
+        || name == "modal_exercise_steps"){
         this.setState({
             [name]: parseInt(value)
         });
@@ -890,9 +1013,12 @@ CreateNewActivity(data){
         "activityType": this.state.modal_activity_type,
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
+        "steps":this.state.modal_exercise_steps,
+        "steps_type":this.state.modal_exercise_steps_status,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
-        "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds
+        "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds,
+        "can_update_steps_type":true
     }; 
 
     let durationInHourMin = this.secondsToHourMinStr(new_value["durationInSeconds"]);
@@ -918,6 +1044,8 @@ CreateNewActivity(data){
         modal_activity_heart_rate:"",
         modal_activity_hour:"",
         modal_activity_min:"",
+        modal_exercise_steps:"",
+        modal_exercise_steps_status:"",
         modal_activity_comment:"",
         activitystarttime_calender:"",
         modalstarttime_activity_hour:"",
@@ -1117,7 +1245,7 @@ handleChangeModalActivityTime(event){
  
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
-        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","comments"];
+        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","comments"];
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
         let activityData = [];
@@ -1464,6 +1592,65 @@ renderTable(){
                              */}
                             </td>); 
             }
+            else if(key === "steps"){
+                 let  steps=keyValue;
+                activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
+                                              { this.state.activities_edit_mode[summaryId][key] ? <div><Input
+                                              type = "number" 
+                                              data-name={summaryId}
+                                              id="text_area"
+                                              className="form-control"
+                                              value={this.state.activites[summaryId][key]} 
+                                              onChange={this.handleChange_steps}
+                                              onBlur={this.editToggleHandler_steps.bind(this)}>                       
+                                          </Input>
+                                          </div>:this.addingCommaToSteps(this.state.activites[summaryId][key])}
+                                {this.props.editable &&            
+                            <span data-name={summaryId} onClick={this.editToggleHandler_steps.bind(this)}
+                                  className="fa fa-pencil fa-1x progressActivity1 "
+                                  id = "add_button">
+                            </span>
+                        }
+                        </td>);
+            }
+
+             else if(key === "steps_type"){
+                 let  steps_type=keyValue;
+                 let exerciseTypeLabel = "Not Categorized";
+                 if(this.state.activites[summaryId][key] == "exercise")
+                    exerciseTypeLabel = "Exercise";
+                 else if (this.state.activites[summaryId][key] == "non_exercise")
+                    exerciseTypeLabel = "Non Exercise";
+
+                activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
+                                              { this.state.activities_edit_mode[summaryId][key]?
+                                               <div>
+                                                <span>{exerciseTypeLabel}</span>
+                                                <span>
+                                                <label className="switch">
+                                                      <input type="checkbox"
+                                                        data-name={summaryId}
+                                                        id="text_area"
+                                                        style = {{marginLeft:"60px"}}
+                                                        className="form-control"
+                                                        value={this.state.activites[summaryId][key]} 
+                                                        onChange={this.handleChange_steps_type}
+                                                        checked = {this.state.activites[summaryId][key] == "exercise"}
+                                                        disabled = {!this.state.activites[summaryId]["can_update_steps_type"]}
+                                                        onBlur={this.editToggleHandler_steps_type.bind(this)}
+                                                       />
+                                                      <span className="slider round"></span>
+                                                </label>
+                                                </span>
+                                          </div>:exerciseTypeLabel}
+                           {this.props.editable &&            
+                            <span data-name={summaryId} onClick={this.editToggleHandler_steps_type.bind(this)}
+                                  className="fa fa-pencil fa-1x progressActivity1 "
+                                  id = "add_button">
+                             </span>
+                        }
+                        </td>);
+            }
             else if(key === "comments"){
                 let  comments=keyValue;
                 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
@@ -1764,8 +1951,38 @@ renderEditActivityModal(){
                       </div>
                       </div>
                       </FormGroup>
+                       <FormGroup>                            
+                        <Label className="padding1">6. Exercise Steps</Label>
+                        <div className="input ">
+                           <Input 
+                            type="number" 
+                            className="form-control"
+                            name="modal_exercise_steps"
+                            value={this.state.modal_exercise_steps}                                       
+                            onChange={this.handleChange}>                                                                                                                                                             
+                            </Input>
+                        </div>
+                       </FormGroup>
                        <FormGroup>
-                      <Label className="padding1">6. Exercise Comments</Label>
+                       <Label className="padding1">7. Change Exercise Steps to Non Exercise Steps</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_exercise_steps_status" 
+                                value="exercise" 
+                                checked={this.state.modal_exercise_steps_status === 'exercise'}
+                                onChange={this.handleChange}/> Exercise Steps
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_exercise_steps_status" 
+                                value="non_exercise"
+                                checked={this.state.modal_exercise_steps_status === 'non_exercise'}
+                                onChange={this.handleChange}/> Non Exercise Steps
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                      <Label className="padding1">8. Exercise Comments</Label>
                        <div className="input1 ">
                         <Textarea 
                           className="form-control"
@@ -1805,6 +2022,8 @@ return(
 <td id = "add_button" className="add_button_back">Workout Start Time</td>
 <td id = "add_button" className="add_button_back">Workout End Time</td>
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm:ss)</td>
+<td id = "add_button" className="add_button_back">Exercise Steps</td>
+<td id = "add_button" className="add_button_back">Steps Type </td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
