@@ -6,6 +6,16 @@ from rauth import OAuth1Service
 import time
 import datetime
 
+'''
+	how backfillingdata works 
+	command is 
+	python manage.py backfillingdata -e email@email.com -u username -d year-month-date year-month-date
+
+	commentes code is for making when duaration is in timestamp
+
+'''
+
+
 class Command(BaseCommand):
 
 	def __init__(self,*args, **kwargs):
@@ -46,8 +56,7 @@ class Command(BaseCommand):
 
 	def _is_valid(self,session,from_date=None,to_date=None):
 		# if to_date and from_date:
-			print(to_date)
-			print(from_date)
+			print(from_date,to_date)
 			# if type(from_date_timestamp) == int:
 			# uploadStartTimeInSeconds = from_date_timestamp
 			# uploadEndTimeInSeconds = to_date_timestamp
@@ -193,11 +202,7 @@ class Command(BaseCommand):
 		# 	help = 'Range of date [from, to] eg "-d 13154824646 16857229289"'
 		# )
 
-'''
-	how backfillingdata works 
-	command is 
-	python manage.py backfillingdata -e email@email.com -u username -d year-month-date year-month-date
-'''
+
 
 	def handle(self, *args, **options):
 		# if options['duration'][0]:
