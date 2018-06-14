@@ -63,7 +63,11 @@ class HeartRate extends Component{
 			total_percent:"",
 			empty:"",
 			aa_data:{},
-			 hr_zone:{},
+			hr_zone:{},
+			total:{
+				total_duration:"",
+				total_percent:"",
+			},
 	    };
 	}
 	successHeartRate(data){
@@ -93,6 +97,10 @@ class HeartRate extends Component{
     successHeartrateZone(data){
 	  	this.setState({
 	  		hr_zone:data.data,
+	  		total:{
+				total_duration:data.data.total.total_duration,
+				total_percent:data.data.total.total_percent,
+			},
 	  		fetching_hrr_zone:false
 	  	});
   	}
@@ -278,6 +286,11 @@ class HeartRate extends Component{
 		// This function create the dynamic table data
 		// and table rows for the Time of heart rate zone 
 		var td_rows = [];
+		let total = null;
+		if(data){
+			total = data.total;
+			delete data.total;
+		}
 		let keys = ["low_end","high_end","classificaton",
 		"time_in_zone","prcnt_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
@@ -299,6 +312,15 @@ class HeartRate extends Component{
 			}
 			td_rows.push(<tr>{td_values}</tr>);
 				
+		}
+		if(total){
+			td_rows.push(
+				<tr>
+					<td colSpan="3">Total</td>
+					<td>{this.renderTime(total.total_duration)}</td>
+					<td>{total.total_percent}</td>
+				</tr>
+			);
 		}
 		return td_rows;
 	}
@@ -478,6 +500,7 @@ class HeartRate extends Component{
 				          	    	</thead>
 				          	    	<tbody>
 				          	    	{this.renderHrrZoneTable(this.state.hr_zone)}
+				          	    	<tr></tr>
 				          	    	</tbody>
 			          	    	</table>
 		          	    	</div>

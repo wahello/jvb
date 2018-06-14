@@ -1060,10 +1060,10 @@ def aa_low_high_end_calculations(request):
 		total = {"total_duration":total_time_duration,
 				"total_percent":"100%"}
 		data2['total'] = total
-		if data2:
-			return JsonResponse(data2)
-		else:
-			return JsonResponse({})
+	if data2:
+		return JsonResponse(data2)
+	else:
+		return JsonResponse({})
 
 def hrr_data(user,start_date):
 	
