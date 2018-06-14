@@ -943,14 +943,13 @@ def daily_aa_calculations(request):
 			total_prcnt_below_aerobic = ''
 			total_prcnt_aerobic = ''
 
-		total =  {"total_time":"",
+		total =  {
 				  "aerobic_zone":sum(aerobic_duration),
 				  "anaerobic_zone":sum(anaerobic_duration),
 				  "below_aerobic_zone":sum(below_aerobic_duration),
 				  "percent_aerobic":total_prcnt_aerobic,
 				  "percent_below_aerobic":total_prcnt_below_aerobic,
 				  "percent_anaerobic":total_prcnt_anaerobic,
-				  "total_percent":""
 					}
 		
 		if total:
