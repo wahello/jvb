@@ -484,7 +484,7 @@ def aa_calculations(request):
 		for tmp in user_input_strong:
 			sn = tmp.activities
 			if sn:
-				sn = ast.literal_eval(sn)
+				sn = json.loads(sn)
 				di = sn.values()
 				di = list(di)
 				for i,k in enumerate(di):
@@ -638,7 +638,7 @@ def aa_workout_calculations(request):
 		if user_input_strong:
 			user_input_activities =[act.activities for act in user_input_strong]
 			for i,k in enumerate(user_input_activities):
-				input_files=ast.literal_eval(user_input_activities[i])
+				input_files=json.loads(user_input_activities[i])
 				summaryId = []
 				for keys in input_files.keys():
 					summaryId.append(keys)
@@ -655,7 +655,7 @@ def aa_workout_calculations(request):
 		if manually_updated_activities:
 			manual_activity_files = [activity.data for activity in manually_updated_activities]
 			for i,k in enumerate(manual_activity_files):
-				manual_files=ast.literal_eval(manual_activity_files[i])
+				manual_files=json.loads(manual_activity_files[i])
 				manual_act_id=manual_files['summaryId']
 				manually_edited_dic[manual_act_id]=manual_files
 				manually_edited_list.append(manual_files)
@@ -669,7 +669,7 @@ def aa_workout_calculations(request):
 		if garmin_data_activities:
 			garmin_activity_files = [pr.data for pr in garmin_data_activities]
 			for i,k in enumerate(garmin_activity_files):
-				act_files=ast.literal_eval(garmin_activity_files[i])
+				act_files=json.loads(garmin_activity_files[i])
 				act_id=act_files['summaryId']
 				garmin_dic[act_id]=act_files
 				garmin_list.append(act_files)
@@ -1100,7 +1100,7 @@ def hrr_data(user,start_date):
 
 	offset = 0
 	if activity_files:
-		one_activity_file_dict =  ast.literal_eval(activity_files[0])
+		one_activity_file_dict =  json.loads(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
 	count = 0
@@ -1110,7 +1110,7 @@ def hrr_data(user,start_date):
 		for tmp in user_input_strong:
 			sn = tmp.activities
 			if sn:
-				sn = ast.literal_eval(sn)
+				sn = json.loads(sn)
 				di = sn.values()
 				di = list(di)
 				for i,k in enumerate(di):
@@ -1157,7 +1157,7 @@ def hrr_data(user,start_date):
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
 				for i,k in enumerate(activity_files):
-					activity_files_dict = ast.literal_eval(activity_files[i])
+					activity_files_dict = json.loads(activity_files[i])
 					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 						hrr.append(tmp)
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
