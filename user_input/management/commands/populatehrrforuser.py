@@ -57,21 +57,24 @@ def populate_userinput_hrr(user,from_date, to_date):
 	)
 	for user_input in user_inputs_in_duration:
 		try:
-			measured_hr = user_input.encouraged_input.measured_hr
-			if not measured_hr or measured_hr == "no":
-				data = hrr_data(user,user_input.created_at)
-				if data['Did_you_measure_HRR'] == 'yes':
-					if data['Did_you_measure_HRR']:
-						user_input.encouraged_input.measured_hr = data['Did_you_measure_HRR']
-					if data['Did_heartrate_reach_99']:
-						user_input.encouraged_input.hr_down_99 = data['Did_heartrate_reach_99']
-					if data['HRR_start_beat']:
-						user_input.encouraged_input.hr_level = str(data['HRR_start_beat'])
-					if data['lowest_hrr_1min']:
-						user_input.encouraged_input.lowest_hr_first_minute = str(data['lowest_hrr_1min'])
-					if data['time_99']:
-						user_input.encouraged_input.time_to_99 = _sec_to_min_sec_str(int(data['time_99']))
-					user_input.encouraged_input.save()
+			data = hrr_data(user,user_input.created_at)
+			if data['Did_you_measure_HRR'] == 'yes':
+				if data['Did_you_measure_HRR'] and not user_input.encouraged_input.measured_hr:
+					user_input.encouraged_input.measured_hr = data['Did_you_measure_HRR']
+				if data['Did_heartrate_reach_99'] and not user_input.encouraged_input.hr_down_99:
+					user_input.encouraged_input.hr_down_99 = data['Did_heartrate_reach_99']
+				if data['HRR_start_beat'] and not user_input.encouraged_input.hr_level:
+					user_input.encouraged_input.hr_level = str(data['HRR_start_beat'])
+				if (data['lowest_hrr_1min'] and 
+						not user_input.encouraged_input.lowest_hr_first_minute):
+					user_input.encouraged_input.lowest_hr_first_minute = str(
+						data['lowest_hrr_1min']
+					)
+				if data['time_99'] and not user_input.encouraged_input.time_to_99:
+					user_input.encouraged_input.time_to_99 = _sec_to_min_sec_str(
+						int(data['time_99'])
+					)
+				user_input.encouraged_input.save()
 		except Exception as e:
 			logger.exception("Cannot update user input for user {} on {}".format(
 					user.username,

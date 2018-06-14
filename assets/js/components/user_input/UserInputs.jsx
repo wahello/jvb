@@ -312,6 +312,30 @@ class UserInputs extends React.Component{
       }
       return durationInfo;
     }
+
+transformActivity(activity){
+  /* 
+      Takes an activity object and add keys which are not 
+      already present in the activity to support existing 
+      activity grid structure for backward compatibility
+  */ 
+  let defaultActivityObject = {
+      "activityType":"",
+      "averageHeartRateInBeatsPerMinute":0,
+      "can_update_steps_type":true,
+      "comments":"",
+      "durationInSeconds":"",
+      "startTimeInSeconds":"",
+      "startTimeOffsetInSeconds":"",
+      "steps":0,
+      "steps_type":"",
+      "summaryId":""
+  }
+  for(let[key,value] of Object.entries(activity)){
+      defaultActivityObject[key] = value
+  }
+  return defaultActivityObject;
+}
     
     onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
@@ -376,6 +400,7 @@ class UserInputs extends React.Component{
         let activities = {};
         if(have_strong_input && canUpdateForm && data.data.strong_input.activities){
           activities = JSON.parse(data.data.strong_input.activities);
+          activities = _.mapValues(activities,this.transformActivity);
         }
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
@@ -659,7 +684,7 @@ class UserInputs extends React.Component{
       else if(_.isEmpty(garmin_activities)){
         merged_activities = user_activities;
       }
-      return merged_activities;
+      return _.mapValues(merged_activities,this.transformActivity);
     }
 
     onFetchGarminSuccessSleep(data){
