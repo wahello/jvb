@@ -754,6 +754,7 @@ def aa_workout_calculations(request):
 		for tm in hrr_not_recorded_list:
 			try:
 				prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
+				prcnt_hrr_not_recorded = int(Decimal(prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
 				data['prcnt_hrr_not_recorded']=prcnt_hrr_not_recorded
 			except ZeroDivisionError:
 				prcnt_hrr_not_recorded = ""
@@ -1057,9 +1058,13 @@ def aa_low_high_end_calculations(request):
 			  "prcnt_in_zone":prcnt_in_zone,
 			 }
 			data2[a]=data
+
 		total = {"total_duration":total_time_duration,
 				"total_percent":"100%"}
-		data2['total'] = total
+		if total:
+			data2['total'] = total
+		else:
+			data2['total'] = ""
 	if data2:
 		return JsonResponse(data2)
 	else:
