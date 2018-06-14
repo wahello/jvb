@@ -957,7 +957,7 @@ def daily_aa_calculations(request):
 			daily_aa_data['Totals'] = total
 		else:
 			daily_aa_data['Totals'] = {}
-	 
+	
 	if daily_aa_data:
 		return JsonResponse(daily_aa_data)
 	else:
@@ -1058,10 +1058,6 @@ def aa_low_high_end_calculations(request):
 			  "prcnt_in_zone":prcnt_in_zone,
 			  "total_duration":total_time_duration}
 			data2[a]=data
-		if data2:
-			return JsonResponse(data2)
-		else:
-			return JsonResponse({})
 
 
 def hrr_data(user,start_date):
