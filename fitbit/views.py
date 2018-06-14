@@ -31,7 +31,7 @@ def request_token_fitbit(request):
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -59,7 +59,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -183,7 +183,9 @@ def refresh_token_fitbit(request):
 	jvb 
 		client id 		---- 22CN2D
 		client secret   ---- e83ed7f9b5c3d49c89d6bdd0b4671b2b
+		redirect url    ---- https://app.jvbwellness.com/callbacks/fitbit
 	test
 		client id 		---- 22CN46
 		client secret   ---- 94d717c6ec36c270ed59cc8b5564166f
+		redirect url    ---- http://127.0.0.1:8000/callbacks/fitbit
 '''		 
