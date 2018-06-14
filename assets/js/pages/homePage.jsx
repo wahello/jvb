@@ -33,6 +33,7 @@ import LeaderBoard1 from '../components/leader_exp';
 import AllRank_Data1 from '../components/leader_all_exp';
 import HeartRateCal from '../components/heart_rate_calculation';
 import Workout from '../components/workout_stats';
+import HeartrateZone from '../components/heart_rate_zone';
 
 
 
@@ -66,6 +67,7 @@ function initializeLocalState(){
 			        <Route path='/activity_type' component={RequireAuth(Activity_Type)} />
 			        <Route path='/hrr_recovery' component={RequireAuth(HeartRateCal)} />
 			        <Route path='/workout_stats' component={RequireAuth(Workout)} />
+			        <Route path='/heartrate_zone' component={RequireAuth(HeartrateZone)} />
 					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
 					{/*<Route path='/nes' component={RequireAuth(Nes)} /> */}
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}
