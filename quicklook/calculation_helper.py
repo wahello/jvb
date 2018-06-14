@@ -1083,14 +1083,20 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
 				shortest_activity = obj
 
-			if ((obj.get("averageHeartRateInBeatsPerMinute",0) >= aerobic_zone 
+			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
+			# If avgerage heart rate in beats per minute is not submitted by user
+			# then it would be by default empty string. In that case default it to 0 
+			if not avg_hr:
+				avg_hr = 0
+
+			if ((avg_hr >= aerobic_zone 
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
 					or obj.get("steps_type","") == "exercise"):
 				# If activity heartrate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
 				exercise_steps += obj.get('steps',0)
-			elif obj.get("averageHeartRateInBeatsPerMinute",0) < aerobic_zone:
+			elif avg_hr < aerobic_zone:
 				activities_below_aerobic_zone += 1
 
 		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
