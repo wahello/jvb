@@ -697,7 +697,7 @@ def aa_workout_calculations(request):
 				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
-			if ((x.get("summaryId") not in act_id) and (x.get("durationInSeconds",0) > 1200)):
+			if ((x.get("summaryId") not in act_id) and (x.get("activityType") != "HEART_RATE_RECOVERY")):
 				workout.append(x)
 
 	data={"date":"",
