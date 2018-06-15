@@ -656,7 +656,15 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
+			non_edited_steps = obj.get('steps',None)
 			obj = manually_edited(obj)
+			manually_edited_steps = obj.get('steps',None)
+			if (not non_edited_steps is None) and not manually_edited_steps:
+				# Manually edited summaries drop steps data, so if steps
+				# data in manually edited summary is not present but
+				# it was present in normal unedited version of summary, in
+				# that case add the previous step data to the current summary
+				obj['steps'] = non_edited_steps
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
