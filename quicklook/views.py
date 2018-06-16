@@ -2255,6 +2255,7 @@ def export_users_xls(request):
 	sheet12.repeat_rows(0)
 	sheet12.repeat_columns(0)
 	sheet12.set_row(0,30)
+
 	date_formats = ('hh:mm:ss AM/PM')
 	timestamp_todata = book.add_format({'num_format': date_formats,'align': 'left'})
 	hrr_available = ["Did you measure your heart rate recovery (HRR) after today’s aerobic workout?",
@@ -2292,7 +2293,6 @@ def export_users_xls(request):
 	"Hrr Start Time(hh:mm:ss)","Heart Rate End Time Activity",
 	"Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file",
 	"Pure 1 Minute HRR Beats Lowered","Pure 1 Minute time to 99",
-	"Did your heart rate go down to 99 beats per minute or lower?",
 	"Duration (mm:ss) for Heart Rate Time to Reach 99",
 	"Time Heart Rate Reached 99 (hh:mm:ss)",
 	"HRR File Starting Heart Rate","Lowest Heart Rate Level in the 1st Minute",
@@ -2301,8 +2301,7 @@ def export_users_xls(request):
 	hrr_all_keys = ["Did_you_measure_HRR","Did_heartrate_reach_99","time_99","HRR_start_beat",
 	"lowest_hrr_1min","No_beats_recovered","end_time_activity","diff_actity_hrr",
 	"HRR_activity_start_time","end_heartrate_activity","heart_rate_down_up","pure_1min_heart_beats",
-	"pure_time_99","no_fitfile_hrr_reach_99",
-	"no_fitfile_hrr_time_reach_99","time_heart_rate_reached_99","end_heartrate_activity",
+	"pure_time_99","no_fitfile_hrr_time_reach_99","time_heart_rate_reached_99","end_heartrate_activity",
 	"lowest_hrr_no_fitfile","no_file_beats_recovered"]
 
 
@@ -2320,6 +2319,8 @@ def export_users_xls(request):
 			current_date -= timedelta(days=1)
 	sheet12.write(0,0,"HRR",bold) #(row,column,matter to be shown,styling)
 
+
+	print(hrr_datewise)
 	len_hrr = len(hrr_datewise)
 	hrr_recorded = 0
 	hrr_not_recorded = 0
@@ -2331,18 +2332,26 @@ def export_users_xls(request):
 			count = 0
 			if (data.get("Did_you_measure_HRR",None)) == 'yes':
 				hrr_recorded = hrr_recorded + 1
-			elif (data.get("Did_you_measure_HRR",None)) == 'no':
+			elif ((data.get("Did_you_measure_HRR",None)) == 'no' or 
+			(data.get("Did_you_measure_HRR",None)) == 'Heart Rate Data Not Provided'):
 				hrr_not_recorded = hrr_not_recorded + 1
 		else:
 			pass
 		current_date -= timedelta(days=1)
-	# print(len_hrr,hrr_recorded,hrr_not_recorded)
+	print(len_hrr,hrr_recorded,hrr_not_recorded)
 	if len_hrr == hrr_recorded and len_hrr != 0:
+		sheet12.set_row(2,30)
+		wrapped_text = book.add_format({'text_wrap': 1, 'valign': 'top'})
+		sheet12.set_row(3,30)
+		sheet12.set_row(4,30)
+		sheet12.set_row(7,30)
+		sheet12.set_row(9,30)
+		sheet12.set_row(12,30)
 		col_num1 = 1
 		row_num = 0
 		for col_num in range(len(hrr_available)):
 			col_num1 = col_num1 + 1
-			sheet12.write(col_num1, row_num, hrr_available[col_num])
+			sheet12.write(col_num1, row_num, hrr_available[col_num],wrapped_text)
 		current_date = to_date
 		while (current_date >= from_date):
 			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2370,6 +2379,9 @@ def export_users_xls(request):
 							sheet12.write(i + 2, row_num,"Yes",format)
 						else:
 							sheet12.write(i + 2, row_num,"No",format)
+					elif key == "No_beats_recovered":
+						print(data[key])
+						sheet12.write(i + 2, row_num,data[key],format)
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
 			else:
@@ -2378,11 +2390,16 @@ def export_users_xls(request):
 			current_date -= timedelta(days=1)
 
 	elif len_hrr == hrr_not_recorded and len_hrr != 0:
+		sheet12.set_row(3,30)
+		wrapped_text = book.add_format({'text_wrap': 1, 'valign': 'top'})
+		sheet12.set_row(4,30)
+		sheet12.set_row(5,30)
+		sheet12.set_row(9,30)
 		col_num1 = 1
 		row_num = 0
 		for col_num in range(len(hrr_not_available)):
 			col_num1 = col_num1 + 1
-			sheet12.write(col_num1, row_num, hrr_not_available[col_num])
+			sheet12.write(col_num1, row_num, hrr_not_available[col_num],wrapped_text)
 		current_date = to_date
 		while (current_date >= from_date):
 			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2405,8 +2422,10 @@ def export_users_xls(request):
 							else:
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
 					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99":
-						if key == "Did_you_measure_HRR":
+						if data["Did_you_measure_HRR"] == 'no':
 							sheet12.write(i + 2, row_num,"No",format)
+						elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
+							sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",format)
 						elif data["no_fitfile_hrr_reach_99"] == "yes":
 							sheet12.write(i + 2, row_num,"Yes",format)
 						else:
@@ -2419,6 +2438,13 @@ def export_users_xls(request):
 			current_date -= timedelta(days=1)
 
 	elif len_hrr != 0:
+		sheet12.set_row(2,30)
+		wrapped_text = book.add_format({'text_wrap': 1, 'valign': 'top'})
+		sheet12.set_row(3,30)
+		sheet12.set_row(4,30)
+		sheet12.set_row(7,30)
+		sheet12.set_row(9,30)
+		sheet12.set_row(12,30)
 		col_num1 = 1
 		row_num = 0
 		for col_num in range(len(hrr_all_fields)):
@@ -2447,17 +2473,20 @@ def export_users_xls(request):
 							else:
 								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
 					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99" or key == "Did_heartrate_reach_99":
+						print(data["Did_you_measure_HRR"])
 						if data["Did_you_measure_HRR"] == "yes":
 							sheet12.write(i + 2, row_num,"Yes",format)
-						else:
+						elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
+							sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",format)
+						elif data["Did_you_measure_HRR"] == "no":
 							sheet12.write(i + 2, row_num,"No",format)
 						if data["no_fitfile_hrr_reach_99"] == "yes":
 							sheet12.write(i + 2, row_num,"Yes",format)
-						else:
+						elif data["no_fitfile_hrr_reach_99"] == "no":
 							sheet12.write(i + 2, row_num,"No",format)
 						if data["Did_heartrate_reach_99"] == "yes":
 							sheet12.write(i + 2, row_num,"Yes",format)
-						else:
+						elif data["Did_heartrate_reach_99"] == "no":
 							sheet12.write(i + 2, row_num,"No",format)
 					else:
 						sheet12.write(i + 2, row_num,data[key],format)
