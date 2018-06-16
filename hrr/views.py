@@ -1252,6 +1252,8 @@ def hrr_data(user,start_date):
 					data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
 			if data_end_activity:
 				end_heartrate_activity = data_end_activity
+			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
@@ -1455,7 +1457,7 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":None,
 			"offset":None,
 			}
-
+	# print(data)
 	return data
 
 def hrr_calculations(request):
