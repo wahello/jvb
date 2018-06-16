@@ -42,10 +42,49 @@ class Hrr(models.Model):
 			models.Index(fields=['created_at']),
 		]
 
+class AaCalculations(models.Model):
+	user_aa = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	avg_heart_rate = models.FloatField(blank=True,null=True)
+	max_heart_rate = models.FloatField(blank=True,null=True)
+	total_duration = models.FloatField(blank=True,null=True)
+	duration_in_aerobic_range = models.FloatField(blank=True,null=True)
+	percent_aerobic = models.FloatField(blank=True,null=True)
+	duration_in_anaerobic_range = models.FloatField(blank=True,null=True)
+	percent_anaerobic = models.FloatField(blank=True,null=True)
+	duration_below_aerobic_range = models.FloatField(blank=True,null=True)
+	percent_below_aerobic = models.FloatField(blank=True,null=True)
+	duration_hrr_not_recorded = models.FloatField(blank=True,null=True)
+	percent_hrr_not_recorded = models.FloatField(blank=True,null=True)
 
-# class AaCalculations(models.Model):
-# 	user_hrr = models.ForeignKey(User, on_delete=models.CASCADE)
-# 	created_at = models.DateField()
-# 	updated_at = models.DateTimeField(auto_now=True)
+	def __str__(self):
+		return str((self.user_aa))
 
-	
+	class Meta:
+		unique_together = ("user_aa", "created_at")
+		indexes = [
+			models.Index(fields=['user_aa', '-created_at']),
+			models.Index(fields=['created_at']),
+		]
+
+
+class TimeHeartZones(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	heart_rate_zone_low_end = models.TextField(blank=True,null=True)
+	heart_rate_zone_high_end = models.TextField(blank=True,null=True)
+	time_in_zone_for_last_7_days = models.TextField(blank=True,null=True)
+	prcnt_total_duration_in_zone = models.TextField(blank=True,null=True)
+
+	def __str__(self):
+		return str((self.user))
+
+
+	class Meta:
+		unique_together = ("user", "created_at")
+		indexes = [
+			models.Index(fields=['user', '-created_at']),
+			models.Index(fields=['created_at']),
+		]
