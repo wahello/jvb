@@ -6,6 +6,7 @@ import webbrowser
 import pprint
 from datetime import datetime, timedelta , date
 import ast
+import logging
 
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -36,7 +37,7 @@ def store_data(sleep_fitbit,heartrate_fitbit,steps_fitbit,user,start_date):
 				date_of_sleep=date_of_sleep,sleep_data=sleep_fitbit,
 				defaults={'created_at': start_date,})
 	except (KeyError, IndexError):
-		pass	# After 8 hours fitbit tokens expire to avoid excetion passing it empty
+		logging.exception("message")
 
 	try:
 		if heartrate_fitbit:
@@ -45,7 +46,7 @@ def store_data(sleep_fitbit,heartrate_fitbit,steps_fitbit,user,start_date):
 				date_of_heartrate=date_of_heartrate,heartrate_data=heartrate_fitbit,
 				defaults={'created_at': start_date,})
 	except (KeyError, IndexError):
-		pass
+		logging.exception("message")
 
 	try:
 		if steps_fitbit:
@@ -54,14 +55,13 @@ def store_data(sleep_fitbit,heartrate_fitbit,steps_fitbit,user,start_date):
 				date_of_steps=date_of_steps,steps_data=steps_fitbit,
 				defaults={'created_at': start_date,})
 	except (KeyError, IndexError):
-		pass
+		logging.exception("message")
 	return None
 
-def refresh_token(sleep_fitbit):
+def refresh_token():
 	'''
 	This function updates the expired tokens in database
-	Args: Any expired api header data
-	Return None
+	Return: refresh token and access token
 	'''
 	if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
 		client_id='22CN2D'
@@ -78,12 +78,19 @@ def refresh_token(sleep_fitbit):
 			'grant_type' : 'refresh_token',
 			'refresh_token': refresh_token_acc,
 		}
-		r = requests.post(access_token_url,headers=headers,data=data)
-		c = r.json()
-		print(pprint.pprint(c))
-		FitbitConnectToken.objects.filter(user=request.user).update(refresh_token=c['refresh_token'],access_token=c['access_token'])
-		fetching_data_fitbit(request)
-	return None
+		request_data = requests.post(access_token_url,headers=headers,data=data)
+		request_data_json = request_data.json()
+		print(pprint.pprint(request_data_json))
+		try: 
+			token_object = FitbitConnectToken.objects.filter(user=request.user).update(
+				refresh_token=request_data_json['refresh_token'],
+				access_token=request_data_json['access_token']
+			)
+			fetching_data_fitbit(request)
+		except:
+			logging.exception("message")
+	if token_object:
+		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
 def session_fitbit():
 	'''
@@ -185,7 +192,12 @@ def fetching_data_fitbit(request):
 	steps_fitbit = steps_fitbit.json()
 
 	if statuscode == 401: # if status 401 means fitbit tokens are expired below does generate tokens
-		refresh_token(sleep_fitbit)
+		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
+			refresh_token()
+	fitbit_data = []
+	fitbit_data.append(sleep_fitbit)
+	fitbit_data.append(heartrate_fitbit)
+	fitbit_data.append(steps_fitbit)
 
 	store_data(sleep_fitbit,heartrate_fitbit,steps_fitbit,request.user,start_date)
 
