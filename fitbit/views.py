@@ -24,38 +24,44 @@ from .models import FitbitConnectToken,\
 
 # Create your views here.
 
-def store_data(sleep_fitbit,heartrate_fitbit,steps_fitbit,user,start_date):
+def store_data(fitbit_all_data,user,start_date,data_type=None):
 	'''
 	this function takes json data as parameter and store in database
-	Args: Json data,user,start date
+	Args: fitbit_all_data should be in dict. If bulk data want to store, all data should be
+		  inside dict 
+		  user name,start data
 	Return: None
 	''' 
-	try:
-		if sleep_fitbit: 
-			date_of_sleep = sleep_fitbit['sleep'][0]['dateOfSleep']
-			UserFitbitDataSleep.objects.update_or_create(user=user,
-				date_of_sleep=date_of_sleep,sleep_data=sleep_fitbit,
-				defaults={'created_at': start_date,})
-	except (KeyError, IndexError):
-		logging.exception("message")
+	if data_type:
+		fitbit_all_data[data_type] = fitbit_all_data
+	for key,value in fitbit_all_data.items():
 
-	try:
-		if heartrate_fitbit:
-			date_of_heartrate = heartrate_fitbit['activities-heart'][0]['dateTime']
-			UserFitbitDataHeartRate.objects.update_or_create(user=user,
-				date_of_heartrate=date_of_heartrate,heartrate_data=heartrate_fitbit,
-				defaults={'created_at': start_date,})
-	except (KeyError, IndexError):
-		logging.exception("message")
+		try:
+			if "sleep_fitbit" == key: 
+				date_of_sleep = value['sleep'][0]['dateOfSleep']
+				UserFitbitDataSleep.objects.update_or_create(user=user,
+					date_of_sleep=date_of_sleep,sleep_data=value,
+					defaults={'created_at': start_date,})
+		except (KeyError, IndexError):
+			logging.exception("message")
 
-	try:
-		if steps_fitbit:
-			date_of_steps = steps_fitbit['activities-steps'][0]['dateTime']
-			instance = UserFitbitDataSteps.objects.update_or_create(user=user,
-				date_of_steps=date_of_steps,steps_data=steps_fitbit,
-				defaults={'created_at': start_date,})
-	except (KeyError, IndexError):
-		logging.exception("message")
+		try:
+			if "heartrate_fitbit" == key:
+				date_of_heartrate = value['activities-heart'][0]['dateTime']
+				UserFitbitDataHeartRate.objects.update_or_create(user=user,
+					date_of_heartrate=date_of_heartrate,heartrate_data=value,
+					defaults={'created_at': start_date,})
+		except (KeyError, IndexError):
+			logging.exception("message")
+
+		try:
+			if "steps_fitbit" == key:
+				date_of_steps = value['activities-steps'][0]['dateTime']
+				instance = UserFitbitDataSteps.objects.update_or_create(user=user,
+					date_of_steps=date_of_steps,steps_data=value,
+					defaults={'created_at': start_date,})
+		except (KeyError, IndexError):
+			logging.exception("message")
 	return None
 
 def refresh_token():
@@ -194,12 +200,12 @@ def fetching_data_fitbit(request):
 	if statuscode == 401: # if status 401 means fitbit tokens are expired below does generate tokens
 		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
 			refresh_token()
-	fitbit_data = []
-	fitbit_data.append(sleep_fitbit)
-	fitbit_data.append(heartrate_fitbit)
-	fitbit_data.append(steps_fitbit)
+	fitbit_all_data = {}
+	fitbit_all_data['sleep_fitbit'] = sleep_fitbit
+	fitbit_all_data['heartrate_fitbit'] = heartrate_fitbit
+	fitbit_all_data['steps_fitbit'] = steps_fitbit
 
-	store_data(sleep_fitbit,heartrate_fitbit,steps_fitbit,request.user,start_date)
+	store_data(fitbit_all_data,request.user,start_date)
 
 	fitbit_data = {"sleep_fitbit":sleep_fitbit,
 					"heartrate_fitbit":heartrate_fitbit,
