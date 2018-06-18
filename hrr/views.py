@@ -1198,9 +1198,9 @@ def hrr_data(user,start_date):
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
 					time_toreach_99.append(k)
-					if(i == 99):
+				if(i == 99) or (i < 99):
 						break
-
+						
 			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
 			min_heartrate = []
 			for i,k in zip(hrr_final_heartrate,new_L):
