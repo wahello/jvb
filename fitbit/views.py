@@ -90,8 +90,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
