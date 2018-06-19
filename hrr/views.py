@@ -638,7 +638,7 @@ def aa_workout_calculations(request):
 		if user_input_strong:
 			user_input_activities =[act.activities for act in user_input_strong]
 			for i,k in enumerate(user_input_activities):
-				input_files=ast.literal_eval(user_input_activities[i])
+				input_files=json.loads(user_input_activities[i])
 				summaryId = []
 				for keys in input_files.keys():
 					summaryId.append(keys)
@@ -754,6 +754,7 @@ def aa_workout_calculations(request):
 		for tm in hrr_not_recorded_list:
 			try:
 				prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
+				prcnt_hrr_not_recorded = int(Decimal(prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
 				data['prcnt_hrr_not_recorded']=prcnt_hrr_not_recorded
 			except ZeroDivisionError:
 				prcnt_hrr_not_recorded = ""
@@ -1055,8 +1056,15 @@ def aa_low_high_end_calculations(request):
 			  "classificaton":classification_dic[a],
 			  "time_in_zone":low_end_dict[a],
 			  "prcnt_in_zone":prcnt_in_zone,
-			  "total_duration":total_time_duration}
+			 }
 			data2[a]=data
+
+		total = {"total_duration":total_time_duration,
+				"total_percent":"100%"}
+		if total:
+			data2['total'] = total
+		else:
+			data2['total'] = ""
 	if data2:
 		return JsonResponse(data2)
 	else:
@@ -1110,7 +1118,7 @@ def hrr_data(user,start_date):
 		for tmp in user_input_strong:
 			sn = tmp.activities
 			if sn:
-				sn = ast.literal_eval(sn)
+				sn = json.loads(sn)
 				di = sn.values()
 				di = list(di)
 				for i,k in enumerate(di):
@@ -1190,9 +1198,9 @@ def hrr_data(user,start_date):
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
 					time_toreach_99.append(k)
-					if(i == 99):
-						break
-
+				if(i == 99) or (i < 99):
+					break
+						
 			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
 			min_heartrate = []
 			for i,k in zip(hrr_final_heartrate,new_L):
@@ -1244,6 +1252,8 @@ def hrr_data(user,start_date):
 					data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
 			if data_end_activity:
 				end_heartrate_activity = data_end_activity
+			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
@@ -1447,7 +1457,7 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":None,
 			"offset":None,
 			}
-
+	# print(data)
 	return data
 
 def hrr_calculations(request):

@@ -16,7 +16,7 @@ export function getInitialState(start_dt, end_dt){
  	}
  		 	
 	let blank_properties={
-		"created_at":'',	
+		"created_at":'', 	
 		"grades_ql":{
 		    "overall_health_grade": '-',
 	        "overall_health_gpa": '-',
