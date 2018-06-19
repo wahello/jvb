@@ -116,7 +116,6 @@ class GarminData(APIView):
 			tmp = {
 					"summaryId":"",
 					"activityType":"",
-					"averageHeartRateInBeatsPerMinute":"",
 					"comments":"",
 					"startTimeInSeconds":"",
 					"durationInSeconds":"",
@@ -153,7 +152,6 @@ class GarminData(APIView):
 		manually_updated_act_data = act_data[1]
 
 		final_act_data = {}
-		comments = {}
 		manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
 		manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 		act_obj = {}
@@ -162,7 +160,15 @@ class GarminData(APIView):
 		a1=GarminFitFiles.objects.filter(user=self.request.user,created_at__range=[start,end])
 
 		for act in activity_data:
+			non_edited_steps = act.get('steps',None)
 			act_obj = manually_edited(act)
+			manually_edited_steps = act_obj.get('steps',None)
+			if (not non_edited_steps is None) and not manually_edited_steps:
+				# Manually edited summaries drop steps data, so if steps
+				# data in manually edited summary is not present but
+				# it was present in normal unedited version of summary, in
+				# that case add the previous step data to the current summary
+				act_obj['steps'] = non_edited_steps
 			if a1:
 				for tmp in a1:
 					meta = tmp.meta_data_fitfile

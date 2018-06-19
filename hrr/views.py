@@ -655,7 +655,7 @@ def aa_workout_calculations(request):
 		if manually_updated_activities:
 			manual_activity_files = [activity.data for activity in manually_updated_activities]
 			for i,k in enumerate(manual_activity_files):
-				manual_files=json.loads(manual_activity_files[i])
+				manual_files=ast.literal_eval(manual_activity_files[i])
 				manual_act_id=manual_files['summaryId']
 				manually_edited_dic[manual_act_id]=manual_files
 				manually_edited_list.append(manual_files)
@@ -669,7 +669,7 @@ def aa_workout_calculations(request):
 		if garmin_data_activities:
 			garmin_activity_files = [pr.data for pr in garmin_data_activities]
 			for i,k in enumerate(garmin_activity_files):
-				act_files=json.loads(garmin_activity_files[i])
+				act_files=ast.literal_eval(garmin_activity_files[i])
 				act_id=act_files['summaryId']
 				garmin_dic[act_id]=act_files
 				garmin_list.append(act_files)
@@ -1108,7 +1108,7 @@ def hrr_data(user,start_date):
 
 	offset = 0
 	if activity_files:
-		one_activity_file_dict =  json.loads(activity_files[0])
+		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 
 	count = 0
@@ -1165,7 +1165,7 @@ def hrr_data(user,start_date):
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
 				for i,k in enumerate(activity_files):
-					activity_files_dict = json.loads(activity_files[i])
+					activity_files_dict = ast.literal_eval(activity_files[i])
 					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 						hrr.append(tmp)
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
@@ -1198,9 +1198,9 @@ def hrr_data(user,start_date):
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
 					time_toreach_99.append(k)
-					if(i == 99):
-						break
-
+				if(i == 99) or (i < 99):
+					break
+						
 			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
 			min_heartrate = []
 			for i,k in zip(hrr_final_heartrate,new_L):
@@ -1252,6 +1252,8 @@ def hrr_data(user,start_date):
 					data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
 			if data_end_activity:
 				end_heartrate_activity = data_end_activity
+			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
@@ -1455,7 +1457,7 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":None,
 			"offset":None,
 			}
-
+	# print(data)
 	return data
 
 def hrr_calculations(request):

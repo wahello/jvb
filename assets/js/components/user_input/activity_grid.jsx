@@ -751,6 +751,7 @@ handleChange_steps(event){
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
   let activity_data = this.state.activites[selectedActivityId];
+  
   activity_data['steps'] = parseInt(value);
   this.setState({
   activites:{...this.state.activites,
@@ -1008,12 +1009,16 @@ CreateNewActivity(data){
     let timezone = moment.tz.guess();
     let tzOffsetFromUTCInSeconds = (moment.tz(moment.utc(),timezone).utcOffset())*60;
 
+    let steps = this.state.modal_exercise_steps;
+    if(!steps)
+        steps = 0
+
     let new_value = {
         "summaryId": newActivityID.toString(),
         "activityType": this.state.modal_activity_type,
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
-        "steps":this.state.modal_exercise_steps,
+        "steps":steps,
         "steps_type":this.state.modal_exercise_steps_status,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
