@@ -656,7 +656,15 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
+			non_edited_steps = obj.get('steps',None)
 			obj = manually_edited(obj)
+			manually_edited_steps = obj.get('steps',None)
+			if (not non_edited_steps is None) and not manually_edited_steps:
+				# Manually edited summaries drop steps data, so if steps
+				# data in manually edited summary is not present but
+				# it was present in normal unedited version of summary, in
+				# that case add the previous step data to the current summary
+				obj['steps'] = non_edited_steps
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -1083,20 +1091,34 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
 				shortest_activity = obj
 
-			if ((obj.get("averageHeartRateInBeatsPerMinute",0) >= aerobic_zone 
+			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
+			# If avgerage heart rate in beats per minute is not submitted by user
+			# then it would be by default empty string. In that case default it to 0 
+			if not avg_hr:
+				avg_hr = 0
+
+			steps = obj.get("steps",0)
+			if not steps:
+				steps = 0
+
+			if ((avg_hr >= aerobic_zone 
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
 					or obj.get("steps_type","") == "exercise"):
 				# If activity heartrate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
-				exercise_steps += obj.get('steps',0)
-			elif obj.get("averageHeartRateInBeatsPerMinute",0) < aerobic_zone:
+				exercise_steps += steps
+			elif avg_hr < aerobic_zone:
 				activities_below_aerobic_zone += 1
 
 		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
 			# If all the activities are below aerobic zone then steps of the 
 			# shortest activity will be considered as exercise steps.
 			exercise_steps = shortest_activity.get('steps',0)
+			if not exercise_steps:
+				# In case of user created manual activity, if user does not submit steps data
+				# then by default it would be empty string. In that case, default it to 0
+				exercise_steps = 0
 	if dailies_json:
 		total_steps = dailies_json[0].get('steps',0)
 

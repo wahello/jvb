@@ -7,6 +7,7 @@ import fetchHeartRateData  from '../network/heratrateOperations';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
+import _ from 'lodash';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
@@ -63,7 +64,7 @@ class HeartRate extends Component{
 			total_percent:"",
 			empty:"",
 			aa_data:{},
-			 hr_zone:{},
+			hr_zone:{},
 	    };
 	}
 	successHeartRate(data){
@@ -264,6 +265,20 @@ class HeartRate extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_aerobic:true,
+			aerobic_zone:"",
+            anaerobic_zone:"",
+            below_aerobic_zone:"",
+            aerobic_range:"",
+            anaerobic_range:"",
+            below_aerobic_range:"",
+            hrr_not_recorded:"",
+            percent_hrr_not_recorded:"",
+			total_time:"",
+			percent_aerobic:"",
+			percent_below_aerobic:"",
+			percent_anaerobic:"",
+			total_percent:"",
+			empty:"",
 			aa_data:{},
 			hr_zone:{},
 		},()=>{
@@ -277,34 +292,59 @@ class HeartRate extends Component{
 	renderHrrZoneTable(data){
 		// This function create the dynamic table data
 		// and table rows for the Time of heart rate zone 
-		var td_rows = [];
+		let td_rows = [];
+		let total = null;
+		if(!_.isEmpty(data)){
+			total = data.total;
+		}
 		let keys = ["low_end","high_end","classificaton",
 		"time_in_zone","prcnt_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
-			let td_values = [];
-			for(let key of keys){
-				if(key == "time_in_zone"){
-					let keyvalue = this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
+			if(key1 !== "total"){
+				let td_values = [];
+				for(let key of keys){
+					if(key == "time_in_zone"){
+						let keyvalue = this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "classificaton"){
+						let keyvalue = value[key];
+						if(keyvalue == "below_aerobic_zone"){
+							 td_values.push(<td>Below Aerobic Zone</td>);
+						}
+						else if(keyvalue == "aerobic_zone"){
+							 td_values.push(<td>Aerobic Zone</td>);
+						}
+						else{
+							td_values.push(<td>Anaerobic Zone</td>);
+						}
+					   
+					}
+					else if(key == "prcnt_in_zone"){
+						let keyvalue = this.renderpercentage(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else{
+						let keyvalue = value[key];
+						td_values.push(<td>{keyvalue}</td>);
+					}
 				}
-				else if(key == "prcnt_in_zone"){
-					let keyvalue = this.renderpercentage(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else{
-					let keyvalue = value[key];
-					td_values.push(<td>{keyvalue}</td>);
-				}
-				 
+				td_rows.push(<tr>{td_values}</tr>);
 			}
+		}
+		if(total){
+			let td_values = [
+				<td colSpan="3">{"Total"}</td>,
+				<td>{this.renderTime(total.total_duration)}</td>,
+				<td>{total.total_percent}</td>
+			];
 			td_rows.push(<tr>{td_values}</tr>);
-				
 		}
 		return td_rows;
 	}
 
 	renderTable(data){
-		var td_rows = [];
+		let td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
 		"aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic","hrr_not_recorded","prcnt_hrr_not_recorded"];
 		for(let[key1,value] of Object.entries(data)){
@@ -471,13 +511,14 @@ class HeartRate extends Component{
 			          	    	<table className = "table table-striped table-bordered ">
 				          	    	<thead>
 					          	    	<th>Heart Rate Zone Low End</th>
-					          	    	<th>Heart Rate Zone Heigh End</th>
+					          	    	<th>Heart Rate Zone High End</th>
 					          	    	<th>Classification</th>
 					          	    	<th>Time in Zone(hh:mm:ss)</th>
 					          	    	<th>% of Total Duration in Zone</th>
 				          	    	</thead>
 				          	    	<tbody>
 				          	    	{this.renderHrrZoneTable(this.state.hr_zone)}
+				          	    	<tr></tr>
 				          	    	</tbody>
 			          	    	</table>
 		          	    	</div>
