@@ -6,7 +6,18 @@ from rauth import OAuth1Service
 import time
 import datetime
 
+
 class Command(BaseCommand):
+
+	'''
+		management command for backfilling data
+		
+		python manage.py backfillingdata -e email@email.com -u username 
+		-d year-month-date year-month-date
+
+		commented  code is when duaration is in timestamp
+
+	'''
 
 	def __init__(self,*args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -37,6 +48,7 @@ class Command(BaseCommand):
 		'''
 		flags = {
 			'email':('email','-e','--email',2),
+			'username':('username','-u','--username'),
 			'all':('all','-a','--all',1),
 			'duration':('duration','-d','--duration',6),
 			# 'timestamp':('timestamp','-t','--timestamp'),
@@ -45,8 +57,7 @@ class Command(BaseCommand):
 
 	def _is_valid(self,session,from_date=None,to_date=None):
 		# if to_date and from_date:
-			# print(to_date)
-			# print(from_date)
+			print(from_date,to_date,"Stard date and end date of backfilling data")
 			# if type(from_date_timestamp) == int:
 			# uploadStartTimeInSeconds = from_date_timestamp
 			# uploadEndTimeInSeconds = to_date_timestamp
@@ -85,6 +96,9 @@ class Command(BaseCommand):
 		if not options['email'] and not options['all']:
 			raise CommandError("Provide either --email or --all")
 
+		if not options['username'] and not options['all']:
+			raise CommandError("Provide either --username or --all")
+
 		# give "all" flag more preference over "email" 
 		if options['all']:
 			self.email_or_all_flag = 'all'	
@@ -93,12 +107,15 @@ class Command(BaseCommand):
 		# if more than one flag  from Group 2 is provided then
 		# use flags with most priority (lowest value) 
 		flags.pop('email')
+		flags.pop('username')
 		flags.pop('all')
+		
 		common_flags = set([f for f in flags.keys()]).intersection(
 					   set(list(filter(lambda x:options[x],[o for o in options.keys()]))))
 		
 		for f in common_flags:
 			if self.date_range_flag and self.date_range_flag != 'today':
+				print(flags.get(f)[0],flags.get(f)[1],flags.get(f)[2])
 				if flags.get(f)[3] < flags.get(self.date_range_flag)[3]:
 					self.date_range_flag = f
 			else:
@@ -106,16 +123,18 @@ class Command(BaseCommand):
 
 		return True
 
-	def _validate_token(self,email,options):
+	def _validate_token(self,email,options,username):
 		REQ_URL = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/request_token'
 		AUTH_URL = 'http://connect.garmin.com/oauthConfirm'
 		ACC_URL = 'http://connectapi.garmin.com/oauth-service-1.0/oauth/access_token'
 		HEALTH_CONSKEY = '6c1a770b-60b9-4d7e-83a2-3726080f5556'
 		HEALTH_CONSSEC = '9Mic4bUkfqFRKNYfM3Sy6i0Ovc9Pu2G4ws9'
+
 		try:
 			global sess
 			# if options['api'] == 'health':
-			token = GarminToken.objects.get(user__email= email)
+			token = GarminToken.objects.get(user__email= email,user__username=username[0])
+
 			access_token = token.token
 			access_token_secret = token.token_secret
 			service = OAuth1Service(
@@ -149,6 +168,14 @@ class Command(BaseCommand):
 			help = "Email(s)"
 		)
 
+		parser.add_argument(
+			flags.get('username')[2],
+			flags.get('username')[1],
+			nargs = '+',
+			type = str,
+			dest = flags.get('username')[0],
+			help = "Email(s)"
+		)
 
 		parser.add_argument(
 			flags.get('all')[2],
@@ -164,7 +191,7 @@ class Command(BaseCommand):
 			type = str,
 			nargs = 2,
 			dest = flags.get('duration')[0],
-			help = 'Range of date [from, to] eg "-d 2017-11-01 2017-11-10"'
+			help = 'Range of date [from, to] eg "-d 2017-11-01 2017-11-10"' # year-month-date
 		)
 
 		# parser.add_argument(
@@ -175,6 +202,8 @@ class Command(BaseCommand):
 		# 	dest = flags.get('timestamp')[0],
 		# 	help = 'Range of date [from, to] eg "-d 13154824646 16857229289"'
 		# )
+
+
 
 	def handle(self, *args, **options):
 		# if options['duration'][0]:
@@ -192,11 +221,11 @@ class Command(BaseCommand):
 			if self.date_range_flag == 'duration':
 				pass
 
-			if not options['all'] and options['email']:
+			if not options['all'] and options['email'] and options['username']:
 				for email in options['email']:
-					print(options)
-					if self._validate_token(email,options):
-						# print(sess,from_date,to_date)
+					# print(options)
+					if self._validate_token(email,options,options['username']):
+						# print(from_date,to_date,"Dileep")
 						self._is_valid(sess,from_date,to_date)
 
 			elif options['all'] and not options['email']:

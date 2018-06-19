@@ -27,7 +27,7 @@ class DailyUserInputStrongSerializer(serializers.ModelSerializer):
 			data['prcnt_unprocessed_food_consumed_yesterday'] = prcnt_food
 		return data
 
-	class Meta:
+	class Meta:  
 		model = DailyUserInputStrong
 		fields = ('__all__')
 

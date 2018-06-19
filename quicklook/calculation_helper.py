@@ -3,6 +3,7 @@ from collections import OrderedDict,namedtuple
 from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
+import copy
 
 from django.db.models import Q
 
@@ -628,11 +629,26 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 
 	# If same id exist in user submited activities, give it more preference
 	# than manually edited activities 
+
+	activities_json = copy.deepcopy(activities_json)
+	userinput_activities = copy.deepcopy(userinput_activities)
+	manually_updated_json = copy.deepcopy(manually_updated_json)
+
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
 		if obj_in_user_activities:
 			userinput_activities.pop(obj.get('summaryId'))
-			return obj_in_user_activities
+			filtered_obj = {}
+			for key,val in obj_in_user_activities.items():
+				# if any key have empty, null or 0 value then remove it
+				# and look for that key in original garmin provided summary because
+				# sometimes user submitted activities might have no value for fields
+				# like - avgHeartRateInBeatsPerMinute, steps etc. In that case empty value 
+				# will be taken for those keys even though value exist in original 
+				# summary provided by garmin 
+				if val:
+					filtered_obj[key] = val
+			return filtered_obj
 		return obj
 
 	# If same id existed in manually edited, give it more prefrence
@@ -640,8 +656,15 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
-			obj = manually_edited(obj
-				)
+			non_edited_steps = obj.get('steps',None)
+			obj = manually_edited(obj)
+			manually_edited_steps = obj.get('steps',None)
+			if (not non_edited_steps is None) and not manually_edited_steps:
+				# Manually edited summaries drop steps data, so if steps
+				# data in manually edited summary is not present but
+				# it was present in normal unedited version of summary, in
+				# that case add the previous step data to the current summary
+				obj['steps'] = non_edited_steps
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -653,15 +676,6 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	return filtered_activities
 
 def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
-
-	# If same id exists in user submited activities, give it more preference
-	# than manually edited activities 
-	def userinput_edited(obj):
-		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
-		if obj_in_user_activities:
-			userinput_activities.pop(obj.get('summaryId'))
-			return obj_in_user_activities
-		return obj
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 
@@ -682,23 +696,11 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 	
 	activities_hr = {}
 	activities_duration = {}
-
-	# If same id existed in manually edited, give it more prefrence
-	manually_edited = lambda x: manually_updated_json.get(x.get('summaryId'),x)	
 	max_duration = 0
 
-	filtered_activities = []
-	if activities_json:
-		for obj in activities_json:
-			obj = manually_edited(obj
-				)
-			if userinput_activities:
-				obj.update(userinput_edited(obj))
-			filtered_activities.append(obj)
-
-	# merge user created manual activities which are not provided by garmin
-	if userinput_activities:
-		filtered_activities += userinput_activities.values()
+	filtered_activities = get_filtered_activity_stats(activities_json,
+		manually_updated_json,userinput_activities
+	)
 
 	if len(filtered_activities):
 		runs_count = 0
@@ -1064,16 +1066,59 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, todays_activities):
+def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
+		todays_manually_updated_json, userinput_activities, age):
 	'''
-		Calculate exercise steps
+		Calculate exercise steps and total steps
 	'''	
+	filtered_activities = get_filtered_activity_stats(
+		todays_activities_json,
+		todays_manually_updated_json,
+		userinput_activities
+	)
+	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
+
 	total_steps = 0
 	exercise_steps = 0
-	if len(todays_activities):
-		for obj in todays_activities:
-			exercise_steps += obj.get('steps',0)
+	activities_below_aerobic_zone = 0
+	shortest_activity = None
+	aerobic_zone = 180 - age - 30
+	if len(filtered_activities):
+		for obj in filtered_activities:
 
+			if not shortest_activity:
+				shortest_activity = obj
+			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
+				shortest_activity = obj
+
+			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
+			# If avgerage heart rate in beats per minute is not submitted by user
+			# then it would be by default empty string. In that case default it to 0 
+			if not avg_hr:
+				avg_hr = 0
+
+			steps = obj.get("steps",0)
+			if not steps:
+				steps = 0
+
+			if ((avg_hr >= aerobic_zone 
+					and obj.get('activityType') not in IGNORE_ACTIVITY
+					and obj.get("steps_type","") != "non_exercise")
+					or obj.get("steps_type","") == "exercise"):
+				# If activity heartrate is above or in aerobic zone and it's not HRR 
+				# then only activity is considered as an exercise and steps are included.
+				exercise_steps += steps
+			elif avg_hr < aerobic_zone:
+				activities_below_aerobic_zone += 1
+
+		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
+			# If all the activities are below aerobic zone then steps of the 
+			# shortest activity will be considered as exercise steps.
+			exercise_steps = shortest_activity.get('steps',0)
+			if not exercise_steps:
+				# In case of user created manual activity, if user does not submit steps data
+				# then by default it would be empty string. In that case, default it to 0
+				exercise_steps = 0
 	if dailies_json:
 		total_steps = dailies_json[0].get('steps',0)
 
@@ -1511,27 +1556,10 @@ def get_workout_effort_grade(todays_daily_strong):
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
 										 todays_daily_strong,age,userinput_activities=None):
-	def userinput_edited(obj):
-		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
-		if obj_in_user_activities:
-			userinput_activities.pop(obj.get('summaryId'))
-			return obj_in_user_activities
-		return obj
-
-	# If same summary is edited manually then give it more preference.
-	manually_edited = lambda x: todays_manually_updated.get(x.get('summaryId'),x)
-	filtered_activities = []
-
-	if todays_activities:
-		for obj in todays_activities:
-			obj = manually_edited(obj)
-			if userinput_activities:
-				obj.update(userinput_edited(obj))
-			filtered_activities.append(obj)
-
-	if userinput_activities:
-		filtered_activities += userinput_activities.values()
 	
+	filtered_activities = get_filtered_activity_stats(
+		todays_activities,todays_manually_updated,userinput_activities
+	)
 	total_duration = 0
 	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
 	final_activities = []
@@ -1979,7 +2007,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
-		exercise_steps, total_steps = cal_exercise_steps_total_steps(dailies_json,todays_activities_json)	
+		exercise_steps, total_steps = cal_exercise_steps_total_steps(
+			dailies_json,
+			todays_activities_json,
+			todays_manually_updated_json,
+			userinput_activities,
+			user.profile.age()
+		)	
 		if ((not total_steps and exercise_steps) or (total_steps and total_steps < exercise_steps)):
 			# If total step s are 0 and exercise steps are available
 			# then we assume that total steps is equal to exercise steps
@@ -2046,6 +2080,3 @@ def create_quick_look(user,from_date=None,to_date=None):
 		current_date += timedelta(days=1)
 
 	return SERIALIZED_DATA
-
-	
-	

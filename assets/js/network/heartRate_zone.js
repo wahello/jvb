@@ -4,9 +4,9 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function fetchHeartData(successHeart,errorHeart,selectedDate){   
+export default function fetchHeartrateZoneData(successHeartrateZone,errorHeartrateZone,selectedDate){   
   selectedDate = moment(selectedDate);
-  const URL=`/hrr/hrr_calculations`;
+  const URL=`/hrr/aa_low_high_calculations`;
   const config={
    method:"get",
    params:{
@@ -16,9 +16,9 @@ export default function fetchHeartData(successHeart,errorHeart,selectedDate){
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successHeart(response);
+   successHeartrateZone(response);
   }).catch(function(error){
-    errorHeart(error);
+    errorHeartrateZone(error);
   });
 
 }
