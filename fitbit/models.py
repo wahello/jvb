@@ -39,3 +39,12 @@ class UserFitbitDataActivities(models.Model):
 
 	def __str__(self):
 		return "%s"%(self.user.username)
+
+class UserFitbitDataSteps(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="fitbit_steps_data")
+	created_at = models.DateField(default=datetime.now, blank=True)
+	date_of_steps = models.TextField()
+	steps_data = models.TextField(null=True)
+
+	def __str__(self):
+		return "%s"%(self.user.username)
