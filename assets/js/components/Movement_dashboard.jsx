@@ -23,13 +23,14 @@ class Movement_Dashboard extends Component{
 			today_nonexercise_steps:9000,
 			todays_exercise_steps:12000,
 			today_total_steps:37000
-
 		}
 		this.renderHourStepsColor = this.renderHourStepsColor.bind(this);
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
 		this.renderMcsColors = this.renderMcsColors.bind(this);
 	}
 	renderCommaInSteps(value){
+		/* Adding comma (,) to steps when we get steps greater then 999
+		 this function will work and will add (,)*/
 		value += '';
      	var x = value.split('.');
     	var x1 = x[0];
@@ -42,6 +43,7 @@ class Movement_Dashboard extends Component{
         return score;
 	}
 	renderHourStepsColor(score){
+		/* adding background color to card depends upon their steps ranges*/
 		setTimeout(function () {
             if(score >= 300){
                	document.getElementById('my-card').style.background = 'green';
@@ -58,6 +60,7 @@ class Movement_Dashboard extends Component{
 		return score1;
 	}
 	renderHourNonExerciseStepsColor(score){
+		/* adding background color to card depends upon their Non-Exercise steps ranges*/
 		setTimeout(function () {
             if(score >= 10000){
            		document.getElementById('my-card-nonexercise').style.background = 'green';
@@ -84,12 +87,13 @@ class Movement_Dashboard extends Component{
                 document.getElementById('my-card-nonexercise').style.color = 'black';
                 document.getElementById('hr-style-nonexercise').style.background = 'black';
             }
-          }, 100);
+        }, 100);
 
 		let score1 = this.renderCommaInSteps(score);
 		return score1;
 	}
 	renderMcsColors(score){
+		/* adding background color to card depends upon their Movement Consistency Score ranges*/
 		var score = parseFloat(score); 
 		setTimeout(function () {
             if(score <= "4.5"){
@@ -126,16 +130,16 @@ class Movement_Dashboard extends Component{
 				<NavbarMenu title={"Movement Dashboard"} />
 				<div className = "row">
 					<div className = "col-md-4 col-md-offset-1 table_margin ">
-					<Card className = "card_style" id = "my-card">
-				        <CardBody>
-				          	<CardTitle className = "header_style">Steps This Hour</CardTitle>
-				          	<hr className = "hr_style" id = "hr-style"/>
-				          	<CardText className = "value_style">{this.renderHourStepsColor(this.state.steps_this_hour)}</CardText>
-				        </CardBody>
-				    </Card>
+						<Card className = "card_style" id = "my-card">
+					        <CardBody>
+					          	<CardTitle className = "header_style">Steps This Hour</CardTitle>
+					          	<hr className = "hr_style" id = "hr-style"/>
+					          	<CardText className = "value_style">{this.renderHourStepsColor(this.state.steps_this_hour)}</CardText>
+					        </CardBody>
+					    </Card>
 				    </div>
 					<div className = "col-md-4 col-md-offset-2 table_margin ">
-			      	<Card className = "card_style" id = "my-card-nonexercise">
+			      		<Card className = "card_style" id = "my-card-nonexercise">
 				        	<CardBody>
 					          	<CardTitle className = "header_style">Today's Non Exercise Steps</CardTitle>
 					          	<hr className = "hr_style" id = "hr-style-nonexercise"/>
@@ -154,26 +158,26 @@ class Movement_Dashboard extends Component{
 				        	</CardBody>
 			      		</Card>
 				    </div>
-				<div className = "col-md-4 col-md-offset-2 table_margin ">
-					<Card className = "card_style">
-				        <CardBody>
-				          	<CardTitle className = "header_style">Today's Exercise/Activity Steps (MCS)</CardTitle>
-				          	<hr className = "hr_style"/>
-				          	<CardText className = "value_style">{this.renderCommaInSteps(this.state.todays_exercise_steps)}</CardText>
-				        </CardBody>
-				    </Card>
-			    </div>
+					<div className = "col-md-4 col-md-offset-2 table_margin ">
+						<Card className = "card_style">
+					        <CardBody>
+					          	<CardTitle className = "header_style">Today's Exercise/Activity Steps (MCS)</CardTitle>
+					          	<hr className = "hr_style"/>
+					          	<CardText className = "value_style">{this.renderCommaInSteps(this.state.todays_exercise_steps)}</CardText>
+					        </CardBody>
+					    </Card>
+				    </div>
 				</div>
 				<div className = "row">
-				<div className = "col-md-4 col-md-offset-4 table_margin ">
-					<Card className = "card_style">
-			        	<CardBody>
-			          		<CardTitle className = "header_style">Total Steps Today</CardTitle>
-			          		<hr className = "hr_style"/>
-			          		<CardText className = "value_style">{this.renderCommaInSteps(this.state.today_total_steps)}</CardText>
-			        	</CardBody>
-			      	</Card>
-			    </div>
+					<div className = "col-md-4 col-md-offset-4 table_margin ">
+						<Card className = "card_style">
+				        	<CardBody>
+				          		<CardTitle className = "header_style">Total Steps Today</CardTitle>
+				          		<hr className = "hr_style"/>
+				          		<CardText className = "value_style">{this.renderCommaInSteps(this.state.today_total_steps)}</CardText>
+				        	</CardBody>
+				      	</Card>
+				    </div>
 				</div>
 			</div>
 		);
