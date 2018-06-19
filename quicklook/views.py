@@ -536,7 +536,7 @@ def export_users_xls(request):
 	format_limegreen_overall = book.add_format({'align':'left', 'bg_color': '#32CD32','num_format': '0.00','font_color': 'black'})
 	format_yellow_overall= book.add_format({'align':'left', 'bg_color': 'yellow','num_format': '0.00'})
 	format_orange_overall= book.add_format({'align':'left', 'bg_color': '#FF8C00','num_format': '0.00'})
-
+	format_green_hrr = book.add_format({'align':'left', 'bg_color': 'green','font_color': 'white'})
 	format_points= book.add_format({'align':'left','num_format': '0.00'})
 
 	# Grades
@@ -2317,10 +2317,14 @@ def export_users_xls(request):
 			current_date_string = str(current_date_string)
 			sheet12.write_rich_string(0,r,weekday1,'\n',current_date_string,format_week)
 			current_date -= timedelta(days=1)
-	sheet12.write(0,0,"HRR",bold) #(row,column,matter to be shown,styling)
+	sheet12.write(0,0,"Heart Rate Recovery (HRR)",bold) #(row,column,matter to be shown,styling)
+	
+	profile = Profile.objects.filter(user=request.user)
+	for tmp_profile in profile:
+		user_dob = tmp_profile.date_of_birth
+	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+	aerobic_value = 180-user_age+4+10
 
-
-	print(hrr_datewise)
 	len_hrr = len(hrr_datewise)
 	hrr_recorded = 0
 	hrr_not_recorded = 0
@@ -2338,10 +2342,10 @@ def export_users_xls(request):
 		else:
 			pass
 		current_date -= timedelta(days=1)
-	print(len_hrr,hrr_recorded,hrr_not_recorded)
+	# print(len_hrr,hrr_recorded,hrr_not_recorded)
 	if len_hrr == hrr_recorded and len_hrr != 0:
 		sheet12.set_row(2,30)
-		wrapped_text_colour = book.add_format({'text_wrap': 1, 'valign': 'top','bg_color': '#D3D3D3'})
+		wrapped_text_colour = book.add_format({'text_wrap': 1, 'valign': 'top',"align":'left','bg_color': '#D3D3D3'})
 		wrapped_text = book.add_format({'text_wrap': 1, 'valign': 'top'})
 		sheet12.set_row(3,30)
 		sheet12.set_row(4,30)
@@ -2367,35 +2371,109 @@ def export_users_xls(request):
 				data = data.__dict__
 				row_num += 1
 				for i,key in enumerate(hrr_available_keys):
-					if key == 'end_time_activity' or key == 'HRR_activity_start_time':
-						offset = data['offset']
-						value = datetime.fromtimestamp(data[key]+offset)
-						sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
-						if data[key]:
-							time = data[key]
-							minutes = time // 60
-							sec = time % 60
-							if sec >= 10:
-								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)))
+					end_heartrate_activity = data['end_heartrate_activity']
+					if (i%2) == 0:
+						if key == 'end_time_activity' or key == 'HRR_activity_start_time':
+							offset = data['offset']
+							value = datetime.fromtimestamp(data[key]+offset)
+							sheet12.write(i + 2, row_num,value,timestamp_todata)
+						elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
+							if data[key]:
+								time = data[key]
+								minutes = time // 60
+								sec = time % 60
+								if sec >= 10:
+									hrr_time = str(int(minutes)),':',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+								else:
+									hrr_time = str(int(minutes)),':','0',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+								if key == 'time_99' or key == 'pure_time_99':
+									if end_heartrate_activity < aerobic_value:
+										if data[key] <= 120: # Green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+										elif data[key] < 180 and data[key] > 121: # light green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+										elif data[key] < 480 and data[key] > 181: # yellow
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+										elif data[key] < 600 and data[key] > 481: # orange
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+										elif dta[key] > 601: # red
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+										
+									elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
+										if data[key] <= 240: # Green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+										elif data[key] < 360 and data[key] > 241: # light green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+										elif data[key] < 600 and data[key] > 361: # yellow
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+										elif data[key] < 720 and data[key] > 601: # orange
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+										elif dta[key] > 721: # red
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+									elif end_heartrate_activity > aerobic_value + 15:
+										if data[key] <= 360: # Green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+										elif data[key] < 480 and data[key] > 361: # light green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+										elif data[key] < 720 and data[key] > 481: # yellow
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+										elif data[key] < 1800 and data[key] > 721: # orange
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+										elif dta[key] > 1801: # red
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+								elif key == 'diff_actity_hrr':
+									if sec >= 10:
+										sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),wrapped_text_colour)
+									else:
+										sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),wrapped_text_colour)
+						elif key == "Did_you_measure_HRR" or key == "Did_heartrate_reach_99":
+							if key == "Did_you_measure_HRR":
+								sheet12.write(i + 2, row_num,"Yes")
+							elif data["Did_heartrate_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes")
 							else:
-								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)))
-					elif key == "Did_you_measure_HRR" or key == "Did_heartrate_reach_99":
-						if key == "Did_you_measure_HRR":
-							sheet12.write(i + 2, row_num,"Yes")
-						elif data["Did_heartrate_reach_99"] == "yes":
-							sheet12.write(i + 2, row_num,"Yes")
+								sheet12.write(i + 2, row_num,"No")
+						elif key == "No_beats_recovered" or key == "pure_1min_heart_beats":
+							if data[key] >= 20.0:
+								sheet12.write(i + 2, row_num,data[key],format_green)
+							elif data[key] > 19.0 and data[key] <= 12.0:
+							 	sheet12.write(i + 2, row_num,data[key],format_yellow)
+							elif data[key] < 12.0:
+							 	sheet12.write(i + 2, row_num,data[key],format_red)
 						else:
-							sheet12.write(i + 2, row_num,"No")
-					elif key == "No_beats_recovered" or key == "pure_1min_heart_beats":
-						if data[key] >= 20.0:
-							sheet12.write(i + 2, row_num,data[key],format_green)
-						elif data[key] > 19.0 and data[key] <= 12.0:
-						 	sheet12.write(i + 2, row_num,data[key],format_yellow)
-						elif data[key] < 12.0:
-						 	sheet12.write(i + 2, row_num,data[key],format_red)
+							sheet12.write(i + 2, row_num,data[key],format)
 					else:
-						sheet12.write(i + 2, row_num,data[key],)
+						if key == 'end_time_activity' or key == 'HRR_activity_start_time':
+							offset = data['offset']
+							value = datetime.fromtimestamp(data[key]+offset)
+							sheet12.write(i + 2, row_num,value,timestamp_todata)
+						elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
+							if data[key]:
+								time = data[key]
+								minutes = time // 60
+								sec = time % 60
+								if sec >= 10:
+									sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),wrapped_text_colour)
+								else:
+									sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),wrapped_text_colour)
+						elif key == "Did_you_measure_HRR" or key == "Did_heartrate_reach_99":
+							if key == "Did_you_measure_HRR":
+								sheet12.write(i + 2, row_num,"Yes",wrapped_text_colour)
+							elif data["Did_heartrate_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",wrapped_text_colour)
+							else:
+								sheet12.write(i + 2, row_num,"No",wrapped_text_colour)
+						elif key == "No_beats_recovered" or key == "pure_1min_heart_beats":
+							if data[key] >= 20.0:
+								sheet12.write(i + 2, row_num,data[key],format_green)
+							elif data[key] > 19.0 and data[key] <= 12.0:
+							 	sheet12.write(i + 2, row_num,data[key],format_yellow)
+							elif data[key] < 12.0:
+							 	sheet12.write(i + 2, row_num,data[key],format_red)
+						else:
+							sheet12.write(i + 2, row_num,data[key],wrapped_text_colour)
 			else:	
 				row_num += 1
 				sheet12.write(i + 2, row_num, '')
@@ -2404,6 +2482,7 @@ def export_users_xls(request):
 	elif len_hrr == hrr_not_recorded and len_hrr != 0:
 		sheet12.set_row(3,30)
 		wrapped_text = book.add_format({'text_wrap': 1, 'valign': 'top'})
+		wrapped_text_colour = book.add_format({'text_wrap': 1, 'valign': 'top','align':'left','bg_color': '#D3D3D3'})
 		sheet12.set_row(4,30)
 		sheet12.set_row(5,30)
 		sheet12.set_row(9,30)
@@ -2411,7 +2490,10 @@ def export_users_xls(request):
 		row_num = 0
 		for col_num in range(len(hrr_not_available)):
 			col_num1 = col_num1 + 1
-			sheet12.write(col_num1, row_num, hrr_not_available[col_num],wrapped_text)
+			if (col_num1%2) == 0:
+				sheet12.write(col_num1, row_num, hrr_not_available[col_num],wrapped_text)
+			else:
+				sheet12.write(col_num1, row_num, hrr_not_available[col_num],wrapped_text_colour)
 		current_date = to_date
 		while (current_date >= from_date):
 			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2419,31 +2501,96 @@ def export_users_xls(request):
 				data = data.__dict__
 				row_num += 1
 				for i,key in enumerate(hrr_not_available_keys):
-					if key == 'end_time_activity' or key == 'time_heart_rate_reached_99':
-						if data[key]:
-							offset = data['offset']
-							value = datetime.fromtimestamp(data[key]+offset)
-							sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'no_fitfile_hrr_time_reach_99':
-						if data[key]:
-							time = data[key]
-							minutes = time // 60
-							sec = time % 60
-							if sec >= 10:
-								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+					end_heartrate_activity = data['end_heartrate_activity']
+					if (i%2) == 0:
+						if key == 'end_time_activity' or key == 'time_heart_rate_reached_99':
+							if data[key]:
+								offset = data['offset']
+								value = datetime.fromtimestamp(data[key]+offset)
+								sheet12.write(i + 2, row_num,value,timestamp_todata)
+						elif key == 'no_fitfile_hrr_time_reach_99':
+							if data[key]:
+								time = data[key]
+								minutes = time // 60
+								sec = time % 60
+								if sec >= 10:
+									sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
+								else:
+									sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
+						elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99":
+							if data["Did_you_measure_HRR"] == 'no':
+								sheet12.write(i + 2, row_num,"No",format)
+							elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
+								sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",format)
+							elif data["no_fitfile_hrr_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",format)
 							else:
-								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)
-					elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99":
-						if data["Did_you_measure_HRR"] == 'no':
-							sheet12.write(i + 2, row_num,"No",format)
-						elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
-							sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",format)
-						elif data["no_fitfile_hrr_reach_99"] == "yes":
-							sheet12.write(i + 2, row_num,"Yes",format)
+								sheet12.write(i + 2, row_num,"No",format)
 						else:
-							sheet12.write(i + 2, row_num,"No",format)
+							sheet12.write(i + 2, row_num,data[key],format)
 					else:
-						sheet12.write(i + 2, row_num,data[key],format)
+						if key == 'end_time_activity' or key == 'time_heart_rate_reached_99':
+							if data[key]:
+								offset = data['offset']
+								value = datetime.fromtimestamp(data[key]+offset)
+								sheet12.write(i + 2, row_num,value,timestamp_todata)
+						elif key == 'no_fitfile_hrr_time_reach_99':
+							if data[key]:
+								time = data[key]
+								minutes = time // 60
+								sec = time % 60
+								if sec >= 10:
+									hrr_time = str(int(minutes)),':',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+								else:
+									hrr_time = str(int(minutes)),':','0',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+			
+								if end_heartrate_activity < aerobic_value:
+									if data[key] <= 120: # Green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+									elif data[key] < 180 and data[key] > 121: # light green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+									elif data[key] < 480 and data[key] > 181: # yellow
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+									elif data[key] < 600 and data[key] > 481: # orange
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+									elif dta[key] > 601: # red
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+									
+								elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
+									if data[key] <= 240: # Green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+									elif data[key] < 360 and data[key] > 241: # light green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+									elif data[key] < 600 and data[key] > 361: # yellow
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+									elif data[key] < 720 and data[key] > 601: # orange
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+									elif dta[key] > 721: # red
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+								elif end_heartrate_activity > aerobic_value + 15:
+									if data[key] <= 360: # Green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+									elif data[key] < 480 and data[key] > 361: # light green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+									elif data[key] < 720 and data[key] > 481: # yellow
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+									elif data[key] < 1800 and data[key] > 721: # orange
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+									elif dta[key] > 1801: # red
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+						elif key == "Did_you_measure_HRR" or key == "no_fitfile_hrr_reach_99":
+							if data["Did_you_measure_HRR"] == 'no':
+								sheet12.write(i + 2, row_num,"No",wrapped_text_colour)
+							elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
+								sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",wrapped_text_colour)
+							elif data["no_fitfile_hrr_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",wrapped_text_colour)
+							else:
+								sheet12.write(i + 2, row_num,"No",wrapped_text_colour)
+						else:
+							sheet12.write(i + 2, row_num,data[key],wrapped_text_colour)
 			else:
 				row_num += 1
 				sheet12.write(i + 2, row_num, '')
@@ -2452,6 +2599,7 @@ def export_users_xls(request):
 	elif len_hrr != 0:
 		sheet12.set_row(2,30)
 		wrapped_text = book.add_format({'text_wrap': 1, 'valign': 'top'})
+		wrapped_text_colour = book.add_format({'text_wrap': 1, 'valign': 'top','align':'left','bg_color': '#D3D3D3'})
 		sheet12.set_row(3,30)
 		sheet12.set_row(4,30)
 		sheet12.set_row(7,30)
@@ -2463,7 +2611,10 @@ def export_users_xls(request):
 		row_num = 0
 		for col_num in range(len(hrr_all_fields)):
 			col_num1 = col_num1 + 1
-			sheet12.write(col_num1, row_num, hrr_all_fields[col_num],wrapped_text)
+			if (col_num1%2) == 0: 
+				sheet12.write(col_num1, row_num, hrr_all_fields[col_num],wrapped_text)
+			else:
+				sheet12.write(col_num1, row_num, hrr_all_fields[col_num],wrapped_text_colour)
 		current_date = to_date
 		while (current_date >= from_date):
 			data = hrr_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2471,48 +2622,172 @@ def export_users_xls(request):
 				data = data.__dict__
 				row_num += 1
 				for i,key in enumerate(hrr_all_keys):
-					if key == 'end_time_activity' or key == 'HRR_activity_start_time' or key == 'time_heart_rate_reached_99':
-						if data[key]:
-							offset = data['offset']
-							print(offset)
-							value = datetime.fromtimestamp(data[key]+offset)
-							sheet12.write(i + 2, row_num,value,timestamp_todata)
-					elif key == 'no_fitfile_hrr_time_reach_99' or key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99':
-						if data[key]:
-							time = data[key]
-							minutes = time // 60
-							sec = time % 60
-							if sec >= 10:
-								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),format)
-							else:
-								sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),format)		
-					elif key == "Did_you_measure_HRR":
-						if data["Did_you_measure_HRR"] == "yes":
-							sheet12.write(i + 2, row_num,"Yes",format)
-						elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
-							sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",format)
-						elif data["Did_you_measure_HRR"] == "no":
-							sheet12.write(i + 2, row_num,"No",format)
-					elif key == "no_fitfile_hrr_reach_99":
-						if data["no_fitfile_hrr_reach_99"] == "yes":
-							sheet12.write(i + 2, row_num,"Yes",format)
-						elif data["no_fitfile_hrr_reach_99"] == "no":
-							sheet12.write(i + 2, row_num,"No",format)
-					elif key == "Did_heartrate_reach_99":
-						if data["Did_heartrate_reach_99"] == "yes":
-							sheet12.write(i + 2, row_num,"Yes",format)
-						elif data["Did_heartrate_reach_99"] == "no":
-							sheet12.write(i + 2, row_num,"No",format)
-					elif key == "No_beats_recovered" or key == "pure_1min_heart_beats":
-						if data[key]:
-							if data[key] >= 20.0:
-								sheet12.write(i + 2, row_num,data[key],format_green)
-							elif data[key] > 19.0 and data[key] <= 12.0:
-							 	sheet12.write(i + 2, row_num,data[key],format_yellow)
-							elif data[key] < 12.0:
-							 	sheet12.write(i + 2, row_num,data[key],format_red)
+					end_heartrate_activity = data['end_heartrate_activity']
+					if (i%2) == 0:
+						if key == 'end_time_activity' or key == 'HRR_activity_start_time' or key == 'time_heart_rate_reached_99':
+							if data[key]:
+								offset = data['offset']
+								
+								value = datetime.fromtimestamp(data[key]+offset)
+								sheet12.write(i + 2, row_num,value,timestamp_todata)
+						elif key == 'time_99' or key == 'diff_actity_hrr' or key == 'pure_time_99': 
+							if data[key]:
+								time = data[key]
+								minutes = time // 60
+								sec = time % 60
+								if sec >= 10:
+									hrr_time = str(int(minutes)),':',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+								else:
+									hrr_time = str(int(minutes)),':','0',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+								if key == 'time_99' or key == 'pure_time_99':
+									if end_heartrate_activity < aerobic_value:
+										if data[key] <= 120: # Green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+										elif data[key] < 180 and data[key] > 121: # light green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+										elif data[key] < 480 and data[key] > 181: # yellow
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+										elif data[key] < 600 and data[key] > 481: # orange
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+										elif dta[key] > 601: # red
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+										
+									elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
+										if data[key] <= 240: # Green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+										elif data[key] < 360 and data[key] > 241: # light green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+										elif data[key] < 600 and data[key] > 361: # yellow
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+										elif data[key] < 720 and data[key] > 601: # orange
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+										elif dta[key] > 721: # red
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+									elif end_heartrate_activity > aerobic_value + 15:
+										if data[key] <= 360: # Green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+										elif data[key] < 480 and data[key] > 361: # light green
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+										elif data[key] < 720 and data[key] > 481: # yellow
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+										elif data[key] < 1800 and data[key] > 721: # orange
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+										elif dta[key] > 1801: # red
+											sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+								elif key == 'diff_actity_hrr':
+									if sec >= 10:
+										sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':',str(int(sec)),wrapped_text_colour)
+									else:
+										sheet12.write_rich_string(i + 2, row_num,str(int(minutes)),':','0',str(int(sec)),wrapped_text_colour)		
+						elif key == "Did_you_measure_HRR":
+							if data["Did_you_measure_HRR"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",format)
+							elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
+								sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",format)
+							elif data["Did_you_measure_HRR"] == "no":
+								sheet12.write(i + 2, row_num,"No",format)
+						elif key == "no_fitfile_hrr_reach_99":
+							if data["no_fitfile_hrr_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",format)
+							elif data["no_fitfile_hrr_reach_99"] == "no":
+								sheet12.write(i + 2, row_num,"No",format)
+						elif key == "Did_heartrate_reach_99":
+							if data["Did_heartrate_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",format)
+							elif data["Did_heartrate_reach_99"] == "no":
+								sheet12.write(i + 2, row_num,"No",format)
+						elif key == "No_beats_recovered" or key == "pure_1min_heart_beats":
+							if data[key]:
+								if data[key] >= 20.0:
+									sheet12.write(i + 2, row_num,data[key],format_green)
+								elif data[key] > 19.0 and data[key] <= 12.0:
+								 	sheet12.write(i + 2, row_num,data[key],format_yellow)
+								elif data[key] < 12.0:
+								 	sheet12.write(i + 2, row_num,data[key],format_red)
+						else:
+							sheet12.write(i + 2, row_num,data[key],format)
 					else:
-						sheet12.write(i + 2, row_num,data[key],format)
+						if key == 'end_time_activity' or key == 'HRR_activity_start_time' or key == 'time_heart_rate_reached_99':
+							if data[key]:
+								offset = data['offset']
+								
+								value = datetime.fromtimestamp(data[key]+offset)
+								sheet12.write(i + 2, row_num,value,timestamp_todata)
+						elif key == 'no_fitfile_hrr_time_reach_99':
+							if data[key]:
+								time = data[key]
+								minutes = time // 60
+								sec = time % 60
+								if sec >= 10:
+									hrr_time = str(int(minutes)),':',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+								else:
+									hrr_time = str(int(minutes)),':','0',str(int(sec))
+									hrr_time_99 = ''.join(hrr_time)
+			
+								if end_heartrate_activity < aerobic_value:
+									if data[key] <= 120: # Green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+									elif data[key] < 180 and data[key] > 121: # light green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+									elif data[key] < 480 and data[key] > 181: # yellow
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+									elif data[key] < 600 and data[key] > 481: # orange
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+									elif dta[key] > 601: # red
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+									
+								elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
+									if data[key] <= 240: # Green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+									elif data[key] < 360 and data[key] > 241: # light green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+									elif data[key] < 600 and data[key] > 361: # yellow
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+									elif data[key] < 720 and data[key] > 601: # orange
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+									elif dta[key] > 721: # red
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
+								elif end_heartrate_activity > aerobic_value + 15:
+									if data[key] <= 360: # Green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_green_hrr)
+									elif data[key] < 480 and data[key] > 361: # light green
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_limegreen)
+									elif data[key] < 720 and data[key] > 481: # yellow
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
+									elif data[key] < 1800 and data[key] > 721: # orange
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
+									elif dta[key] > 1801: # red
+										sheet12.write_rich_string(i + 2, row_num,hrr_time_99,format_red)		
+						elif key == "Did_you_measure_HRR":
+							if data["Did_you_measure_HRR"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",wrapped_text_colour)
+							elif data["Did_you_measure_HRR"] == "Heart Rate Data Not Provided":
+								sheet12.write(i + 2, row_num,"Heart Rate Data Not Provided",wrapped_text_colour)
+							elif data["Did_you_measure_HRR"] == "no":
+								sheet12.write(i + 2, row_num,"No",wrapped_text_colour)
+						elif key == "no_fitfile_hrr_reach_99":
+							if data["no_fitfile_hrr_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",wrapped_text_colour)
+							elif data["no_fitfile_hrr_reach_99"] == "no":
+								sheet12.write(i + 2, row_num,"No",wrapped_text_colour)
+						elif key == "Did_heartrate_reach_99":
+							if data["Did_heartrate_reach_99"] == "yes":
+								sheet12.write(i + 2, row_num,"Yes",wrapped_text_colour)
+							elif data["Did_heartrate_reach_99"] == "no":
+								sheet12.write(i + 2, row_num,"No",wrapped_text_colour)
+						elif key == "No_beats_recovered" or key == "pure_1min_heart_beats":
+							if data[key]:
+								if data[key] >= 20.0:
+									sheet12.write(i + 2, row_num,data[key],format_green)
+								elif data[key] > 19.0 and data[key] <= 12.0:
+								 	sheet12.write(i + 2, row_num,data[key],format_yellow)
+								elif data[key] < 12.0:
+								 	sheet12.write(i + 2, row_num,data[key],format_red)
+						else:
+							sheet12.write(i + 2, row_num,data[key],wrapped_text_colour)
 			else:
 				row_num += 1
 				sheet12.write(i + 2, row_num, '')
