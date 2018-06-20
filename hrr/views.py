@@ -7,14 +7,17 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
 from registration.models import Profile
 from user_input.models import DailyUserInputStrong
 from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity,UserGarminDataManuallyUpdated
 from quicklook.calculation_helper import get_filtered_activity_stats
 from fitparse import FitFile
-
-from hrr.models import Hrr
+from .serializers import AaSerializer,HeartzoneSerializer
+from hrr.models import Hrr,AaCalculations,TimeHeartZones
 import pprint
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
@@ -1471,3 +1474,46 @@ def hrr_calculations(request):
 		except Hrr.DoesNotExist:
 			create_hrr_instance(request.user, data, start_date)
 	return JsonResponse(data)
+
+class UserheartzoneView(generics.ListCreateAPIView):
+
+	permission_classes = (IsAuthenticated,)
+	serializer_class = HeartzoneSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
+
+		if start_dt and end_dt:
+			queryset = TimeHeartZones.objects.filter(Q(created_at__gte=start_dt)&
+							  Q(created_at__lte=end_dt),
+							  user=user)
+		else:
+			queryset = TimeHeartZones.objects.all()
+
+		return queryset
+
+
+
+class UserAaView(generics.ListCreateAPIView):
+
+	permission_classes = (IsAuthenticated,)
+	serializer_class = AaSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
+
+		if start_dt and end_dt:
+			queryset = AaCalculations.objects.filter(Q(created_at__gte=start_dt)&
+							  Q(created_at__lte=end_dt),
+							  user_aa=user)
+		else:
+			queryset = AaCalculations.objects.all()
+
+		return queryset
+
