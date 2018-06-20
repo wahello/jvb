@@ -34,6 +34,7 @@ export function getInitialStateHrr(start_dt, end_dt){
 		"end_heartrate_activity1":'-',
 		"lowest_hrr_no_fitfile":'-',
 		"no_file_beats_recovered":'-',
+		"age":'-',
 	};
 	for(const day of Object.keys(initial_state)){
 			initial_state[day] = blank_properties

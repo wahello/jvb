@@ -42,6 +42,8 @@ class Raw_Hrr extends Component{
     	this.renderSecToMin = this.renderSecToMin.bind(this);
     	this.renderNoworkout = this.renderNoworkout.bind(this);
     	this.heartBeatsColors = this.heartBeatsColors.bind(this);
+    	this.renderTimeColors = this.renderTimeColors.bind(this);
+    	this.strToSecond = this.strToSecond.bind(this);
   	}
 
   	getDayWithDate(date){
@@ -96,7 +98,71 @@ class Raw_Hrr extends Component{
   			return {background:"red",color:"black"};
   		}
   	}
-
+  	strToSecond(value){
+  		/*Convering mm:ss to only seconds format*/
+    	let time = value.split(':');
+    	let min = parseInt(time[0])*60;
+    	let sec = parseInt(time[1]);
+    	let s_time = min + sec;
+    	return s_time;
+	}
+  	renderTimeColors(value,age,beats){
+  		/*Adding the background colors for the table data depends upon the Scenarios
+  		 in "time to reach 99" and "pure time to reach time to 99"*/
+  		if(value && age && beats){
+  			if(beats < (180 - age + 4 + 10)){
+  				if(value <= this.strToSecond("2:00")){
+  					return {background:"green",color:"white"}
+  				}
+  				else if((value > this.strToSecond("2:00")) && (value <= this.strToSecond("3:00"))){
+  					return {background:"#32CD32",color:"white"}
+  				}
+  				else if((value > this.strToSecond("3:00")) && (value <= this.strToSecond("8:00"))){
+  					return {background:'yellow',color:'black'};
+  				}
+  				else if((value > this.strToSecond("8:00")) && (value <= this.strToSecond("10:00"))){
+  					return {background:'#FF8C00',color:'black'};
+  				}
+  				else if((value > this.strToSecond("10:00"))){
+  					return {background:'red',color:'black'};
+  				}
+  			}
+  			else if(((180 - age + 4 + 25) < beats) && (beats > (180 - age + 4 + 10))){
+  				if(value <= this.strToSecond("4:00")){
+  					return {background:"green",color:"white"}
+  				}
+  				else if((value > this.strToSecond("4:00")) && (value <= this.strToSecond("6:00"))){
+  					return {background:"#32CD32",color:"white"}
+  				}
+  				else if((value > this.strToSecond("6:00")) && (value <= this.strToSecond("10:00"))){
+  					return {background:'yellow',color:'black'};
+  				}
+  				else if((value > this.strToSecond("10:00")) && (value <= this.strToSecond("12:00"))){
+  					return {background:'#FF8C00',color:'black'};
+  				}
+  				else if((value > this.strToSecond("12:00"))){
+  					return {background:'red',color:'black'};
+  				}
+  			}
+  			else if(beats > (180 - age + 4 + 25)){
+  				if(value <= this.strToSecond("6:00")){
+  					return {background:"green",color:"white"}
+  				}
+  				else if((value > this.strToSecond("6:00")) && (value <= this.strToSecond("8:00"))){
+  					return {background:"#32CD32",color:"white"}
+  				}
+  				else if((value > this.strToSecond("8:00")) && (value <= this.strToSecond("20:00"))){
+  					return {background:'yellow',color:'black'};
+  				}
+  				else if((value > this.strToSecond("20:00")) && (value <= this.strToSecond("30:00"))){
+  					return {background:'#FF8C00',color:'black'};
+  				}
+  				else if((value > this.strToSecond("30:00"))){
+  					return {background:'red',color:'black'};
+  				}
+  			}
+  		}
+  	}
   	renderNoworkout(value){
   		/* If you got null or undefined or empty value for "Did_you_measure_HRR" 
   		it will show the comment "No Workout"*/
@@ -135,8 +201,8 @@ class Raw_Hrr extends Component{
 					all_data.push({value:this.renderTime(value),
 									style:''});
 				}
-				else if(key == "time_99" || key == "diff_actity_hrr" ||
-				 key == "pure_time_99" || key == "no_fitfile_hrr_time_reach_99"){
+				else if(key == "diff_actity_hrr" ||
+				 key == "no_fitfile_hrr_time_reach_99"){
 					all_data.push({value:this.renderSecToMin(value),
 									style:''});
 				}
@@ -148,12 +214,19 @@ class Raw_Hrr extends Component{
 					all_data.push({value:value,
 									style:this.heartBeatsColors(value)});
 				}
+				else if(key == "time_99" || key == "pure_time_99"){
+					let time = value;
+					let age = data['age'];
+					let beats = data['end_heartrate_activity'];
+					all_data.push({value:this.renderSecToMin(time),
+									style:this.renderTimeColors(value,age,beats)});
+				}
 				else{
 					all_data.push({value:value,
 									style:''});
 				}
 			}
-
+	
 			columns.push(
 				<Column 
 					header={<Cell className={css(styles.newTableHeader)}>{this.getDayWithDate(date)}</Cell>}

@@ -397,6 +397,7 @@ class Quicklook extends Component{
 					"end_heartrate_activity1":data.end_heartrate_activity,
 					"lowest_hrr_no_fitfile":data.lowest_hrr_no_fitfile,
 					"no_file_beats_recovered":data.no_file_beats_recovered,
+					"age":data.age
              	};
              return properties;
     }
