@@ -26,10 +26,12 @@ def fitfile_parse(obj,offset,start_date_str):
 	obj_start_date = int(start_date_str.split('-')[2])
 	
 	x = [(FitFile(x.fit_file)).get_messages('record') for x in obj]
-	
 	for record in x:
+		# print(type(record)) # generator
 		for record_data in record:
+			# print(type(record_data)) # <class 'fitparse.records.DataMessage'>
 			for ss in record_data:
+				# print(type(ss)) # <class 'fitparse.records.FieldData'>
 				if(ss.name=='heart_rate'):
 					b = ss.value
 					heartrate_complete.extend([b])
