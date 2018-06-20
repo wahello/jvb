@@ -18,8 +18,9 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';
+import {getInitialStateHrr} from './initialStateHrr';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
-import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync}  from '../../network/quick';
+import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync,hrrDate}  from '../../network/quick';
 
 
 import NavbarMenu from '../navbar';
@@ -36,6 +37,7 @@ import User from './user_inputs';
 import AllStats1 from './quicksummary_allstats1';
 import Movementquick from './movement-consistency';
 import MovementHistorical from './movement_consistency_historical_data';
+import Raw_Hrr from './rawdata_hrr';
 
 
 
@@ -71,6 +73,8 @@ class Quicklook extends Component{
 		this.errorquick = this.errorquick.bind(this);
 		this.userInputFetchSuccess = this.userInputFetchSuccess.bind(this);
 		this.userInputFetchFailure = this.userInputFetchFailure.bind(this);
+		this.hrrFetchSuccess = this.hrrFetchSuccess.bind(this);
+		this.hrrFetchFailure = this.hrrFetchFailure.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.onDismiss = this.onDismiss.bind(this);
 		this.updateDateState=this.updateDateState.bind(this);
@@ -116,6 +120,7 @@ class Quicklook extends Component{
 			dropdownOpen: false,
 			model:true,
 			userInputData:{},
+			hrrData:{},
 			last_synced:null,
 			data:initial_state
 		};
@@ -371,6 +376,30 @@ class Quicklook extends Component{
              };
              return properties;
        		}
+    updateHrrDateState(data){
+   				var properties={
+       				"Did_you_measure_HRR":data.Did_you_measure_HRR,
+					"Did_heartrate_reach_99":data.Did_heartrate_reach_99,
+					"time_99":data.time_99,
+					"HRR_start_beat":data.HRR_start_beat,
+					"lowest_hrr_1min":data.lowest_hrr_1min,
+					"No_beats_recovered":data.No_beats_recovered,
+					"end_time_activity":data.end_time_activity,
+					"diff_actity_hrr":data.diff_actity_hrr,
+					"HRR_activity_start_time":data.HRR_activity_start_time,
+					"end_heartrate_activity":data.end_heartrate_activity,
+					"heart_rate_down_up":data.heart_rate_down_up,
+					"pure_1min_heart_beats":data.pure_1min_heart_beats,
+					"pure_time_99":data.pure_time_99,
+					"no_fitfile_hrr_reach_99":data.no_fitfile_hrr_reach_99,
+					"no_fitfile_hrr_time_reach_99":data.no_fitfile_hrr_time_reach_99,
+					"time_heart_rate_reached_99":data.time_heart_rate_reached_99,
+					"end_heartrate_activity1":data.end_heartrate_activity,
+					"lowest_hrr_no_fitfile":data.lowest_hrr_no_fitfile,
+					"no_file_beats_recovered":data.no_file_beats_recovered,
+             	};
+             return properties;
+    }
     successLastSync(data){
     	let last_synced;
     	if(_.isEmpty(data.data))
@@ -453,6 +482,41 @@ class Quicklook extends Component{
 		});
 	}
 
+	hrrFetchSuccess(data){
+		let initial_state = getInitialStateHrr(this.state.start_date,
+													 this.state.end_date);
+		if(data.data.length){
+			const dates = [];
+			for(let date of Object.keys(initial_state)){
+				dates.push(date);
+			}
+		    if (data.data.length > 0){
+			 	 for(var dataitem of data.data){
+			      	const date = moment(dataitem.created_at).format('M-D-YY');
+			      	let obj = this.updateHrrDateState(dataitem);
+			      	initial_state[date] = obj;
+			      }
+		     }
+		}
+		this.setState({
+			hrrData:initial_state,
+			selected_date:this.state.selected_date,
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+		});
+	}
+	hrrFetchFailure(error){
+		let initial_state = getInitialStateHrr(this.state.start_date,
+													 this.state.end_date);
+
+		this.setState({
+			hrrData:initial_state,
+			selected_date:this.state.selected_date, 
+		},()=>{
+			quicksummaryDate(this.state.start_date, this.state.end_date, this.successquick,this.errorquick);
+		});
+	}
+
 	userInputFetchFailure(error){
 		let initial_state = getInitialStateUserInput(this.state.start_date,
 													 this.state.end_date);
@@ -474,10 +538,13 @@ class Quicklook extends Component{
 			selected_date:date,
 			start_date : start_dt.toDate(),
 			end_date : end_dt.toDate(),
-			fetching_ql:true
+			fetching_ql:true,
+			calendarOpen:!this.state.calendarOpen
 		},()=>{
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 						  this.userInputFetchFailure);
+			hrrDate(this.state.start_date, this.state.end_date, this.hrrFetchSuccess,
+						  this.hrrFetchFailure);
 		});
 	}
 
@@ -502,12 +569,16 @@ class Quicklook extends Component{
 		},()=>{
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 						  this.userInputFetchFailure);
+			hrrDate(this.state.start_date, this.state.end_date, this.hrrFetchSuccess,
+						  this.hrrFetchFailure);
 		});
   }
 
 	componentDidMount(){
 		userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 					  this.userInputFetchFailure);
+		hrrDate(this.state.start_date, this.state.end_date, this.hrrFetchSuccess,
+						  this.hrrFetchFailure);
 		 window.addEventListener('scroll', this.handleScroll);
 		 fetchLastSync(this.successLastSync,this.errorquick);
 	}
@@ -649,6 +720,7 @@ onLogoutSuccess(response){
         const class_user=`nav-link ${activeTab === "user" ? 'active':''}`;
         const class_movement=`nav-link ${activeTab === "movement" ? 'active':''}`;
         const class_movementHistorical=`nav-link ${activeTab === "movementhistorical" ? 'active':''}`;
+        const class_hrr=`nav-link ${activeTab === "hrr" ? 'active':''}`;
 	return(
 		<div className="hori">
 		<div className="container-fluid">
@@ -891,7 +963,16 @@ onLogoutSuccess(response){
                                             </abbr>
                                             </span>
                                           </NavItem>
-                                       
+                                       	<NavItem onClick={this.toggle} className="hrr">
+                                          <span id="spa">
+                                            <abbr id="abbri"  title="Heart Rate Recovery">
+                                              <NavLink id="headernames" href="#" className={class_hrr} value="hrr"
+						    								 onClick={this.activateTab.bind(this,"hrr")}>
+                                               Heart Rate Recovery
+                                              </NavLink>
+                                            </abbr>
+                                            </span>
+                                          </NavItem>
 
                                        <span className="dropbutton">
                                          
@@ -925,6 +1006,8 @@ onLogoutSuccess(response){
 						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser"className={class_hrr} value="hrr"
+						    								 onClick={this.activateTab.bind(this,"hrr")}>User Inputs</DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>
@@ -976,7 +1059,7 @@ onLogoutSuccess(response){
                     	}
                     	{this.state.activeTab === "movement" && <Movementquick data={this.state.data} last_synced = {this.state.last_synced}/>}
                     	{this.state.activeTab === "movementhistorical" && <MovementHistorical data={this.state.data} start_date={this.state.start_date} end_date = {this.state.end_date} last_synced = {this.state.last_synced}/>}
-
+                    	{this.state.activeTab === "hrr" && <Raw_Hrr data={this.state.hrrData}/>}
 
 			</div>
 

@@ -214,13 +214,9 @@ class HeartRate extends Component{
 			    time = hours+':'+minutes+':'+seconds;
 			}
 		}
-		else if(value == 0){
+		else if(value == 0 || value == null){
 			time = "00:00:00";
 		}
-		else{
-			time = "-";
-		}
-		
 		return time;
 	}
 
