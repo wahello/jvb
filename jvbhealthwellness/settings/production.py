@@ -185,6 +185,6 @@ ELASTIC_APM = {
     # allowed characters in SERVICE_NAME: a-z, A-Z, 0-9, -, _, and space
     'SERVICE_NAME': 'JVB-Production',
     'SECRET_TOKEN': 'health',
-    'SERVER_URL': 'http://13.232.8.152:8200',
+    'SERVER_URL': 'http://13.232.104.156:8200',
     'DEBUG': True,
 }
