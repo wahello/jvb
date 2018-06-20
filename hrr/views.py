@@ -46,6 +46,7 @@ class UserHrrView(generics.ListCreateAPIView):
 			queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
 							  Q(created_at__lte=end_dt),
 							  user_hrr=user)
+			
 		else:
 			queryset = Hrr.objects.all()
 
