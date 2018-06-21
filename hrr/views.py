@@ -899,6 +899,7 @@ def daily_aa_calculations(request):
 				hrr.append(tmp)
 			else:
 				workout.append(tmp)
+				data_summaryid.append(data_id)
 	else:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
