@@ -7,15 +7,51 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
+
 
 from registration.models import Profile
 from user_input.models import DailyUserInputStrong
-from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity,UserGarminDataManuallyUpdated
+from garmin.models import GarminFitFiles,\
+						UserGarminDataDaily,\
+						UserGarminDataActivity,\
+						UserGarminDataManuallyUpdated
 from quicklook.calculation_helper import get_filtered_activity_stats
 from fitparse import FitFile
-
+from .serializers import HrrSerializer
 from hrr.models import Hrr
 import pprint
+
+class UserHrrView(generics.ListCreateAPIView):
+	'''
+		- Create the Hrr instance
+		- List all the Hrr instance
+		- If query parameters "to" and "from" are provided
+		  then filter the Hrr data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = HrrSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
+
+		if start_dt and end_dt:
+			queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
+							  Q(created_at__lte=end_dt),
+							  user_hrr=user)
+			
+		else:
+			queryset = Hrr.objects.all()
+
+		return queryset
+
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
 	heartrate_complete = []
