@@ -2395,7 +2395,7 @@ def export_users_xls(request):
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 										elif data[key] < 600 and data[key] > 481: # orange
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-										elif dta[key] > 601: # red
+										elif data[key] > 601: # red
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 										
 									elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
@@ -2407,7 +2407,7 @@ def export_users_xls(request):
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 										elif data[key] < 720 and data[key] > 601: # orange
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-										elif dta[key] > 721: # red
+										elif data[key] > 721: # red
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 									elif end_heartrate_activity > aerobic_value + 15:
 										if data[key] <= 360: # Green
@@ -2418,7 +2418,7 @@ def export_users_xls(request):
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 										elif data[key] < 1800 and data[key] > 721: # orange
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-										elif dta[key] > 1801: # red
+										elif data[key] > 1801: # red
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 								elif key == 'diff_actity_hrr':
 									if sec >= 10:
@@ -2552,7 +2552,7 @@ def export_users_xls(request):
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 									elif data[key] < 600 and data[key] > 481: # orange
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-									elif dta[key] > 601: # red
+									elif data[key] > 601: # red
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 									
 								elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
@@ -2564,7 +2564,7 @@ def export_users_xls(request):
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 									elif data[key] < 720 and data[key] > 601: # orange
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-									elif dta[key] > 721: # red
+									elif data[key] > 721: # red
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 								elif end_heartrate_activity > aerobic_value + 15:
 									if data[key] <= 360: # Green
@@ -2648,7 +2648,7 @@ def export_users_xls(request):
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 										elif data[key] < 600 and data[key] > 481: # orange
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-										elif dta[key] > 601: # red
+										elif data[key] > 601: # red
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 										
 									elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
@@ -2671,7 +2671,7 @@ def export_users_xls(request):
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 										elif data[key] < 1800 and data[key] > 721: # orange
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-										elif dta[key] > 1801: # red
+										elif data[key] > 1801: # red
 											hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 								elif key == 'diff_actity_hrr':
 									if sec >= 10:
@@ -2733,7 +2733,7 @@ def export_users_xls(request):
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 									elif data[key] < 600 and data[key] > 481: # orange
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-									elif dta[key] > 601: # red
+									elif data[key] > 601: # red
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 									
 								elif end_heartrate_activity > aerobic_value and end_heartrate_activity < aerobic_value + 15:
@@ -2745,7 +2745,7 @@ def export_users_xls(request):
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 									elif data[key] < 720 and data[key] > 601: # orange
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-									elif dta[key] > 721: # red
+									elif data[key] > 721: # red
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)
 								elif end_heartrate_activity > aerobic_value + 15:
 									if data[key] <= 360: # Green
@@ -2756,7 +2756,7 @@ def export_users_xls(request):
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_yellow)
 									elif data[key] < 1800 and data[key] > 721: # orange
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_orange)
-									elif dta[key] > 1801: # red
+									elif data[key] > 1801: # red
 										hrr_sheet.write_rich_string(i + 2, row_num,hrr_time_99,format_red)		
 						elif key == "Did_you_measure_HRR":
 							if data["Did_you_measure_HRR"] == "yes":
