@@ -691,7 +691,9 @@ def aa_workout_calculations(request):
 			data_id = meta['activityIds'][0]
 			act_id.append(str(data_id))
 			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and (filtered_activities_files[i].get("durationInSeconds",0) <= 1200) and (filtered_activities_files[i].get("distanceInMeters",0) <= 200.00)):
+				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and 
+					(filtered_activities_files[i].get("durationInSeconds",0) <= 1200) and 
+					(filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY")):
 					hrr.append(filtered_activities_files[i])
 				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
@@ -783,7 +785,7 @@ def aa_workout_calculations(request):
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
-		time_duration1.append(time_duration)
+		
 	
 	if data1:
 		return JsonResponse(data1)
@@ -867,7 +869,9 @@ def daily_aa_calculations(request):
 			data_id = meta['activityIds'][0]
 			for i,k in enumerate(activity_files):
 				activity_files_dict = ast.literal_eval(activity_files[i])
-				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and 
+					(activity_files_dict.get("durationInSeconds",None) <= 1200) and 
+					(activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 					hrr.append(tmp)
 				elif activity_files_dict.get("summaryId",None) == str(data_id) :
 					workout.append(tmp)
