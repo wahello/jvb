@@ -886,6 +886,7 @@ def daily_aa_calculations(request):
 
 	workout = []
 	hrr = []
+	data_summaryid = []
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
