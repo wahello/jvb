@@ -13,7 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
-import fetchHeartrateZoneData  from '../network/heartRate_zone';
+import {fetchHrrWeeklyData}  from '../network/heartRate_zone';
 import {renderTimeTohrrZoneSelectedDateFetchOverlay} from './dashboard_healpers';
 
 axiosRetry(axios, { retries: 3});
@@ -30,6 +30,8 @@ class HeartrateZone extends Component{
 				    isOpen:false,
 				    fetching_hrr_zone:false,
 				    selectedDate:new Date(),
+				    start_date:moment().subtract(7,'days').toDate(),
+					end_date:moment().toDate(),
 				    hr_zone:{},
 	    }
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
@@ -40,6 +42,7 @@ class HeartrateZone extends Component{
 	 	this.renderTable = this.renderTable.bind(this);
 	 	this.renderTime = this.renderTime.bind(this);
 	 	this.renderpercentage = this.renderpercentage.bind(this);
+	 	this.onSubmitDate = this.onSubmitDate.bind(this);
 	 	this.renderTimeTohrrZoneSelectedDateFetchOverlay = renderTimeTohrrZoneSelectedDateFetchOverlay.bind(this);
 	}
 
@@ -98,21 +101,43 @@ class HeartrateZone extends Component{
 		return percentage;
 	}
   	processDate(selectedDate){
+  		let end_dt = moment(selectedDate);
+		let start_dt = moment(selectedDate).subtract(7,'days');
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
+			start_date : start_dt.toDate(),
+			end_date : end_dt.toDate(),
 			fetching_hrr_zone:true,
 			hr_zone:{},
 		},()=>{
-			fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
+			fetchHrrWeeklyData(this.state.start_date, this.state.end_date,this.successHeartrateZone,this.errorHeartrateZone);
 		});
 	}
+
+	onSubmitDate(event){
+  	event.preventDefault();
+  	let start_dt = moment(this.state.start_date);
+  	let end_dt = moment(this.state.end_date);
+  	this.setState({
+			start_date : start_dt.toDate(),
+			end_date : end_dt.toDate(),
+			dateRange:!this.state.dateRange,
+			fetching_ql:true
+		},()=>{
+			fetchHrrWeeklyData(this.state.start_date, this.state.end_date,
+					this.successHeartrateZone,this.errorHeartrateZone);
+
+		});
+  }
 	componentDidMount(){
 		this.setState({
 			fetching_hrr_zone:true,
 		});
-		fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
+		fetchHrrWeeklyData(this.state.start_date, this.state.end_date,
+				this.successHeartrateZone,this.errorHeartrateZone);
 	}
+
 	renderTable(data){
 		var td_rows = [];
 		let keys = ["low_end","high_end","classificaton","time_in_zone","prcnt_in_zone"];
@@ -152,7 +177,18 @@ class HeartrateZone extends Component{
 		                        size = "2x"
 		                    />
 		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
-	                	</span> 
+	                	</span>
+	                	 <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
+									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
+									        </span>
+									        <span className="date_range_btn">
+									         <Button
+		                                        className="daterange-btn btn"		                         
+									            id="daterange"
+									            
+									            onClick={this.toggleDate} >Date Range
+									        </Button>
+									        </span>
 		            	<Popover
 				            placement="bottom"
 				            isOpen={this.state.calendarOpen}
@@ -164,6 +200,46 @@ class HeartrateZone extends Component{
 		                </Popover>
 		            </div>
 
+		            <Popover
+                            placement="bottom"
+                            isOpen={this.state.dateRange}
+                            target="daterange"
+                            toggle={this.toggleDate}>
+                              <PopoverBody>
+                                <div >
+
+				           <Form>
+						        <div style={{paddingBottom:"12px"}} className="justify-content-center">
+						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          <Input type="date"
+						           name="start_date"
+						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+						        </div>
+						        <div id="date" className="justify-content-center">
+
+						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          <Input type="date"
+						           name="end_date"
+						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
+						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+						        </div>
+						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+						        <button
+						        id="nav-btn"
+						         style={{backgroundColor:"#ed9507"}}
+						         type="submit"
+						         className="btn btn-block-lg"
+						         onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
+						         </div>
+
+						  		 </Form>
+							</div>
+                           </PopoverBody>
+                           </Popover>
 		            <div className = "row justify-content-center hr_table_padd">
 	          	    	<div className = "table table-responsive">
 		          	    	<table className = "table table-striped table-bordered ">
