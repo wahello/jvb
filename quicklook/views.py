@@ -4,8 +4,6 @@ from decimal import Decimal, ROUND_HALF_UP
 import calendar
 import ast
 import json
-import xlsxwriter
-import pprint
 
 from django.http import JsonResponse  
 from django.shortcuts import get_object_or_404
@@ -17,20 +15,20 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from fitparse import FitFile
-from garmin.models import GarminFitFiles ,\
+from garmin.models import GarminFitFiles,\
 						  UserGarminDataActivity,\
 						  UserLastSynced
 
 from registration.models import Profile
 
-from user_input.models import DailyUserInputOptional ,\
+from user_input.models import DailyUserInputOptional,\
 							  DailyUserInputEncouraged,\
 							  DailyUserInputStrong
 
 from .serializers import UserQuickLookSerializer,\
-						 GradesSerializer,\
-						 StepsSerializer,\
-						 SleepSerializer
+							GradesSerializer,\
+							StepsSerializer,\
+							SleepSerializer
 
 
 from .models import UserQuickLook,\
