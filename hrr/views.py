@@ -734,7 +734,7 @@ def aa_workout_calculations(request):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
 			if (x.get("summaryId") not in act_id and 
-			    x.get("activityType") != "HEART_RATE_RECOVERY":
+			    x.get("activityType") != "HEART_RATE_RECOVERY"):
 				workout.append(x)
 
 	data={"date":"",
