@@ -120,7 +120,6 @@ def update_helper(instance,data_dict):
 	'''
 		Helper function to update the instance
 		with provided key,value pair
-
 		Warning: This will not trigger any signals
 				 like post or pre save
 	'''
@@ -1213,6 +1212,7 @@ def hrr_data(user,start_date):
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+		
 	Did_you_measure_HRR = ""
 	if hrr:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
@@ -1451,7 +1451,7 @@ def hrr_data(user,start_date):
 
 			"offset":offset,
 			}
-	elif Did_you_measure_HRR == 'Heart Rate Data Not Provided' or garmin_data_daily == None:
+	elif Did_you_measure_HRR == 'Heart Rate Data Not Provided':
 		data = {"Did_you_measure_HRR":'Heart Rate Data Not Provided',
 			"Did_heartrate_reach_99":'',
 			"time_99":None,
