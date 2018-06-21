@@ -726,14 +726,16 @@ def aa_workout_calculations(request):
 			data_id = meta['activityIds'][0]
 			act_id.append(str(data_id))
 			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and 
-					(filtered_activities_files[i].get("durationInSeconds",0) <= 1200) and 
-					(filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY")):
+				if (filtered_activities_files[i].get("summaryId") == str(data_id) and 
+					filtered_activities_files[i].get("durationInSeconds",0) <= 1200 and 
+					filtered_activities_files[i].get("distanceInMeters",0) <200) or (filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY"):
 					hrr.append(filtered_activities_files[i])
 				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
-			if ((x.get("summaryId") not in act_id) and (x.get("activityType") != "HEART_RATE_RECOVERY")):
+			if (x.get("summaryId") not in act_id and 
+			   x.get("durationInSeconds",0)>=1200 and
+			   x.get("distanceInMeters",0)>200) or x.get("activityType") != "HEART_RATE_RECOVERY":
 				workout.append(x)
 
 	data={"date":"",
