@@ -69,32 +69,31 @@ def refresh_token():
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
-		client_id='22CN2D'
-		client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
-		access_token_url='https://api.fitbit.com/oauth2/token'
-		token = FitbitConnectToken.objects.get(user = request.user)
-		refresh_token_acc = token.refresh_token
-		client_id_secret = '{}:{}'.format(client_id,client_secret).encode()
-		headers = {
-			'Authorization':'Basic'+' '+base64.b64encode(client_id_secret).decode('utf-8'),
-			'Content-Type':'application/x-www-form-urlencoded'
-		}
-		data = {
-			'grant_type' : 'refresh_token',
-			'refresh_token': refresh_token_acc,
-		}
-		request_data = requests.post(access_token_url,headers=headers,data=data)
-		request_data_json = request_data.json()
-		print(pprint.pprint(request_data_json))
-		try: 
-			token_object = FitbitConnectToken.objects.filter(user=request.user).update(
-				refresh_token=request_data_json['refresh_token'],
-				access_token=request_data_json['access_token']
-			)
-			fetching_data_fitbit(request)
-		except:
-			logging.exception("message")
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	access_token_url='https://api.fitbit.com/oauth2/token'
+	token = FitbitConnectToken.objects.get(user = request.user)
+	refresh_token_acc = token.refresh_token
+	client_id_secret = '{}:{}'.format(client_id,client_secret).encode()
+	headers = {
+		'Authorization':'Basic'+' '+base64.b64encode(client_id_secret).decode('utf-8'),
+		'Content-Type':'application/x-www-form-urlencoded'
+	}
+	data = {
+		'grant_type' : 'refresh_token',
+		'refresh_token': refresh_token_acc,
+	}
+	request_data = requests.post(access_token_url,headers=headers,data=data)
+	request_data_json = request_data.json()
+	print(pprint.pprint(request_data_json))
+	try: 
+		token_object = FitbitConnectToken.objects.filter(user=request.user).update(
+			refresh_token=request_data_json['refresh_token'],
+			access_token=request_data_json['access_token']
+		)
+		fetching_data_fitbit(request)
+	except:
+		logging.exception("message")
 	if token_object:
 		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
