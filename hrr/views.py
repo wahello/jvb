@@ -675,7 +675,7 @@ def daily_aa_data(user, start_date):
 					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
 					}
 			daily_aa_data[data_summaryid[i]] =data
-
+	
 		try:
 			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
 			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -720,7 +720,7 @@ def update_aa_instance(instance, data):
 
 def create_aa_instance(user, data, start_date):
 	created_at = start_date
-	AaCalculations.objects.create(user_aa = user,created_at = created_at,**data)
+	AaCalculations.objects.create(user_aa = user,created_at = created_at,data=data)
 
 def daily_aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
@@ -830,7 +830,7 @@ def aa_low_high_end_data(user,start_date):
 			  "prcnt_total_duration_in_zone":prcnt_in_zone,
 			  "classificaton":classification_dic[a]
 			 }
-			data2[a]=data
+			data2[str(a)]=data
 
 		total = {"total_duration":total_time_duration,
 				"total_percent":"100%"}
@@ -853,7 +853,7 @@ def update_heartzone_instance(instance, data):
 
 def create_heartzone_instance(user, data, start_date):
 	created_at = start_date
-	TimeHeartZones.objects.create(user = user,created_at = created_at,**data)
+	TimeHeartZones.objects.create(user = user,created_at = created_at,data=data)
 
 def aa_low_high_end_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
