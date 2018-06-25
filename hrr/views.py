@@ -7,8 +7,13 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
 from django.db.models import Q
 
 from registration.models import Profile
@@ -674,7 +679,7 @@ def daily_aa_data(user, start_date):
 					"duration_hrr_not_recorded":hrr_not_recorded_list[i],
 					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
 					}
-			daily_aa_data[data_summaryid[i]] =data
+			daily_aa_data[str(data_summaryid[i])] =data
 	
 		try:
 			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
@@ -726,6 +731,7 @@ def daily_aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = daily_aa_data(request.user,start_date)
+	data = json.dumps(data)
 	try:
 		user_aa = AaCalculations.objects.get(user_aa=request.user, created_at=start_date)
 		update_aa_instance(user_aa, data)
@@ -786,7 +792,7 @@ def aa_low_high_end_data(user,start_date):
 	data = {"heart_rate_zone_low_end":"",
 				"heart_rate_zone_high_end":"",
 				"classification":"",
-				"time_in_zone_for_last_7_days":"",
+				"time_in_zone":"",
 				"prcnt_total_duration_in_zone":"",
 				}
 
@@ -826,7 +832,7 @@ def aa_low_high_end_data(user,start_date):
 			data={"heart_rate_zone_low_end":a,
 			  "heart_rate_zone_high_end":b,
 			  "classificaton":classification_dic[a],
-			  "time_in_zone_for_last_7_days":low_end_dict[a],
+			  "time_in_zone":low_end_dict[a],
 			  "prcnt_total_duration_in_zone":prcnt_in_zone,
 			  "classificaton":classification_dic[a]
 			 }
@@ -838,6 +844,7 @@ def aa_low_high_end_data(user,start_date):
 			data2['total'] = total
 		else:
 			data2['total'] = ""
+
 	if data2:
 		return data2
 	else:
@@ -859,6 +866,7 @@ def aa_low_high_end_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = aa_low_high_end_data(request.user,start_date)
+	data = json.dumps(data)
 	try:
 		user = TimeHeartZones.objects.get(user=request.user, created_at=start_date)
 		update_heartzone_instance(user, data)
@@ -1267,10 +1275,56 @@ def hrr_calculations(request):
 			create_hrr_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-class UserheartzoneView(generics.ListCreateAPIView):
+class UserheartzoneView(APIView):
 
 	permission_classes = (IsAuthenticated,)
 	serializer_class = HeartzoneSerializer
+	def calculate_weekly_zone_data(self,zone_weekly_qs):
+		hr_data_values = [hr_data.data for hr_data in zone_weekly_qs]
+		hr_values = [ast.literal_eval(hr) for hr in hr_data_values]
+
+		lists = [[],[]]
+		heartzone_dic = {}
+		for hr in hr_values:
+			hr_keys = hr.keys()
+			hr_keys = list(hr_keys)
+
+			for i in range(len(hr_keys)):
+				lists[0].append([])
+				lists[1].append([])
+
+			for key,li_time,li_prcnt in zip(hr_keys,lists[0],lists[1]):
+				duration_in_zone = hr[key].get('time_in_zone',0)
+				li_time.append(duration_in_zone)
+				percent_in_zone = hr[key].get('prcnt_total_duration_in_zone',0)
+				li_prcnt.append(percent_in_zone)
+		
+		for hr in hr_values:
+			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
+				low_end = hr[key].get('heart_rate_zone_low_end',0)
+				high_end = hr[key].get('heart_rate_zone_high_end',0)
+				classification = hr[key].get('classificaton')
+				time = sum(time)
+				try:
+					percent_duration = sum(prcnt)/len(prcnt)
+					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
+				except ZeroDivisionError:
+					percent_duration = ""
+
+				heartzone_data = {"heart_rate_zone_low_end":low_end,
+								  "heart_rate_zone_high_end":high_end,
+								  "classificaton":classification,
+								  "time_in_zone":time,
+								  "prcnt_total_duration_in_zone":percent_duration
+								  }
+				heartzone_dic[low_end] = heartzone_data
+
+		return heartzone_dic
+
+
+	def get(self,request,format="json"):
+		weekly_zone_data = self.calculate_weekly_zone_data(self.get_queryset())
+		return Response(weekly_zone_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
 		user = self.request.user
@@ -1284,15 +1338,77 @@ class UserheartzoneView(generics.ListCreateAPIView):
 							  user=user)
 		else:
 			queryset = TimeHeartZones.objects.all()
-
+		
 		return queryset
 
-
-
-class UserAaView(generics.ListCreateAPIView):
+class UserAaView(APIView):
 
 	permission_classes = (IsAuthenticated,)
 	serializer_class = AaSerializer
+
+	def calculate_weekly_aa_data(self,aa_weekly_qs):
+		data_values = [aa_data.data for aa_data in aa_weekly_qs]
+		keys = ['avg_heart_rate','max_heart_rate','total_duration','duration_in_aerobic_range',
+				'percent_aerobic','duration_in_anaerobic_range','percent_anaerobic','duration_below_aerobic_range',
+				'percent_below_aerobic','duration_hrr_not_recorded','percent_hrr_not_recorded']
+		lists = [[],[],[],[],[],[],[],[],[],[],[]]
+		for aa in data_values:
+			aa_dic = ast.literal_eval(aa)
+			aa_totals = aa_dic['Totals']
+			for key,li in zip(keys,lists):
+				aa_values = aa_totals[key]
+				li.append(aa_values)
+		try:
+			avg_heart_rate = sum(lists[0])/len(lists[0])
+			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
+			
+			percent_aerobic = sum(lists[4])/len(lists[4])
+			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+
+			percent_anaerobic = sum(lists[6])/len(lists[6])
+			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+
+			percent_below_aerobic = sum(lists[8])/len(lists[8])
+			percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+
+			percent_hrr_not_recorded = sum(lists[10])/len(lists[10])
+			percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+		except ZeroDivisionError:
+			avg_heart_rate = ""
+			percent_aerobic = ""
+			percent_anaerobic = ""
+			percent_below_aerobic = ""
+			percent_hrr_not_recorded = ""
+		try:
+			max_heart_rate = max(lists[1])
+		except ValueError:
+			max_heart_rate = ""
+		
+		total_duration = sum(lists[2])
+		duration_in_aerobic_range = sum(lists[3])
+		duration_in_anaerobic_range = sum(lists[5])
+		duration_below_aerobic_range = sum(lists[7])
+		duration_hrr_not_recorded = sum(lists[9])
+
+		total_data = {"avg_heart_rate":avg_heart_rate,
+					"max_heart_rate":max_heart_rate,
+					"total_duration":total_duration,
+					"duration_in_aerobic_range":duration_in_aerobic_range,
+					"percent_aerobic":percent_aerobic,
+					"duration_in_anaerobic_range":duration_in_anaerobic_range,
+					"percent_anaerobic":percent_anaerobic,
+					"duration_below_aerobic_range":duration_below_aerobic_range,
+					"percent_below_aerobic":percent_below_aerobic,
+					"duration_hrr_not_recorded":duration_hrr_not_recorded,
+					"percent_hrr_not_recorded":percent_hrr_not_recorded}
+		# print("jofdjodnbinfgibnfinbfngbifnbionronbr",type([total_data]))
+		
+		return total_data
+
+	def get(self,request,format="json"):
+		weekly_aa_data = self.calculate_weekly_aa_data(self.get_queryset())
+		return Response(weekly_aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
 		user = self.request.user
