@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^callbacks/garminconnect$',garmin_views.connect_receive_token, name='connect_receive_token'),
 
     url(r'^callbacks/garmin/push$',garmin_views.GarminPing.as_view(), name="garmin_ping"),
+    url(r'^callbacks/fitbit/push$',fitbitViews.FitbitPush.as_view(), name="fitbit_push"),
     url(r'^callbacks/garminconnectpush$', garmin_views.GarminConnectPing.as_view(), name="garmin_connect_ping"),
     url(r'^callbacks/fitbit$', fitbitViews.receive_token_fitbit, name='receive_token_fitbit'),
 
