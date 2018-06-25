@@ -674,7 +674,7 @@ def daily_aa_data(user, start_date):
 					"duration_hrr_not_recorded":hrr_not_recorded_list[i],
 					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
 					}
-			daily_aa_data[data_summaryid[i]] =data
+			daily_aa_data[str(data_summaryid[i])] =data
 	
 		try:
 			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
@@ -826,9 +826,8 @@ def aa_low_high_end_data(user,start_date):
 			data={"heart_rate_zone_low_end":a,
 			  "heart_rate_zone_high_end":b,
 			  "classificaton":classification_dic[a],
-			  "time_in_zone_for_last_7_days":low_end_dict[a],
+			  "time_in_zone":low_end_dict[a],
 			  "prcnt_total_duration_in_zone":prcnt_in_zone,
-			  "classificaton":classification_dic[a]
 			 }
 			data2[str(a)]=data
 

@@ -140,25 +140,28 @@ class HeartrateZone extends Component{
 
 	renderTable(data){
 		var td_rows = [];
-		let keys = ["low_end","high_end","classificaton","time_in_zone","prcnt_in_zone"];
+		let keys = ["heart_rate_zone_low_end","heart_rate_zone_high_end","classificaton", 
+		"time_in_zone","prcnt_total_duration_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
-			let td_values = [];
-			for(let key of keys){
-				if(key == "time_in_zone"){
-					let keyvalue = this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
+			for (let [key2,value1] of Object.entries(value)){
+				let td_values = [];
+				for(let key of keys){
+					if(key == "time_in_zone"){
+						let keyvalue = this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "prcnt_in_zone"){
+						let keyvalue = this.renderpercentage(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else{
+						let keyvalue = value[key];
+						td_values.push(<td>{keyvalue}</td>);
+					}
 				}
-				else if(key == "prcnt_in_zone"){
-					let keyvalue = this.renderpercentage(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else{
-					let keyvalue = value[key];
-					td_values.push(<td>{keyvalue}</td>);
-				}
-				 
+				td_rows.push(<tr>{td_values}</tr>);
 			}
-			td_rows.push(<tr>{td_values}</tr>);
+			
 				
 		}
 		return td_rows;
