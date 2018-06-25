@@ -1080,16 +1080,9 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 
 	total_steps = 0
 	exercise_steps = 0
-	activities_below_aerobic_zone = 0
-	shortest_activity = None
 	aerobic_zone = 180 - age - 30
 	if len(filtered_activities):
 		for obj in filtered_activities:
-
-			if not shortest_activity:
-				shortest_activity = obj
-			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
-				shortest_activity = obj
 
 			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
 			# If avgerage heart rate in beats per minute is not submitted by user
@@ -1099,6 +1092,8 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 
 			steps = obj.get("steps",0)
 			if not steps:
+				# In case of user created manual activity, if user does not submit steps data
+				# then by default it would be empty string. In that case, default it to 0
 				steps = 0
 
 			if ((avg_hr >= aerobic_zone 
@@ -1108,17 +1103,7 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 				# If activity heartrate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
 				exercise_steps += steps
-			elif avg_hr < aerobic_zone:
-				activities_below_aerobic_zone += 1
 
-		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
-			# If all the activities are below aerobic zone then steps of the 
-			# shortest activity will be considered as exercise steps.
-			exercise_steps = shortest_activity.get('steps',0)
-			if not exercise_steps:
-				# In case of user created manual activity, if user does not submit steps data
-				# then by default it would be empty string. In that case, default it to 0
-				exercise_steps = 0
 	if dailies_json:
 		total_steps = dailies_json[0].get('steps',0)
 
