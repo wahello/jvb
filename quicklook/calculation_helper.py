@@ -427,7 +427,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	recent_auto_manual = None
 	recent_auto_final = None
-	recent_auto_tentative = None
+	recent_tentative = None
 	target_sleep_data = None
 
 	user_submitted_sleep = False
@@ -467,15 +467,15 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 				# 	recent_auto_manual = obj
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
 					recent_auto_final = obj
-				elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
-					recent_auto_tentative = obj
+				elif ('TENTATIVE' in obj.get('validation',None) and not recent_tentative):
+					recent_tentative = obj
 
 		if recent_auto_manual:
 			target_sleep_data = recent_auto_manual
 		elif recent_auto_final:
 			target_sleep_data = recent_auto_final
 		else:
-			target_sleep_data = recent_auto_tentative
+			target_sleep_data = recent_tentative
 
 	if not target_sleep_data:
 		max_end_time = None
@@ -503,7 +503,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 						break
 					continue
 
-				if (obj.get('validation',None) == 'AUTO_TENTATIVE' and
+				if ('TENTATIVE' in obj.get('validation',None) and
 					obj_start_time < max_end_time):
 					target_sleep_data = obj
 					max_end_time = obj_end_time
@@ -520,7 +520,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and
 					  obj_start_time < max_end_time and
-					  target_sleep_data.get('validation',None) == 'AUTO_TENTATIVE'):
+					  'TENTATIVE' in target_sleep_data.get('validation',None)):
 					target_sleep_data = obj
 					max_end_time = obj_end_time
 
