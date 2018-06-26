@@ -28,15 +28,17 @@ class ProgressReportView(APIView):
 	'''Generate Progress Analyzer Reports on the fly'''
 
 	permission_classes = (IsAuthenticated,)
+
 	def get(self, request, format="json"):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
 		#print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
 
 class ProgressReportSyncedDateView(APIView):
-		'''Provided scheduled update date for PA report'''
+	'''Provided scheduled update date for PA report'''
 
 	permission_classes = (IsAuthenticated,)
+
 	def get(self, request, format="json"):
 		try:
 			scheduled_date = ProgressReportUpdateMeta.objects.get(
