@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.core.exceptions import ObjectDoesNotExist
+from .models import ProgressReportUpdateMeta
 from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
 
@@ -30,7 +32,28 @@ class ProgressReportView(APIView):
 		DATA = ProgressReport(request.user, request.query_params).get_progress_report()
 		#print(pprint.pprint(DATA))
 		return Response(DATA,status=status.HTTP_200_OK)
-	
+
+class ProgressReportSyncedDateView(APIView):
+		'''Provided scheduled update date for PA report'''
+
+	permission_classes = (IsAuthenticated,)
+	def get(self, request, format="json"):
+		try:
+			scheduled_date = ProgressReportUpdateMeta.objects.get(
+				user = request.user
+			)
+			scheduled_date = scheduled_date.requires_update_from
+		except ProgressReportUpdateMeta.DoesNotExist as e:
+			scheduled_date = None
+
+		response = {
+			"user" : request.user.username,
+			"scheduled_date": None 
+		}
+		if scheduled_date:
+			response["scheduled_date"] = scheduled_date.strftime("%Y-%m-%d")
+
+		return Response(response,status=status.HTTP_200_OK)
 
 def progress_excel_export(request):
 	date2 = request.GET.get('date',None)
