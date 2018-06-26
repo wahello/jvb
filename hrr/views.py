@@ -1280,7 +1280,10 @@ class UserheartzoneView(APIView):
 	serializer_class = HeartzoneSerializer
 	def calculate_weekly_zone_data(self,zone_weekly_qs):
 		hr_data_values = [hr_data.data for hr_data in zone_weekly_qs]
-		hr_values = [ast.literal_eval(hr) for hr in hr_data_values]
+		hr_values = []
+		for hr in hr_data_values:
+			if hr:
+				hr_values.append(ast.literal_eval(hr))
 
 		lists = [[],[]]
 		heartzone_dic = {}
@@ -1317,7 +1320,6 @@ class UserheartzoneView(APIView):
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
-
 		return heartzone_dic
 
 
@@ -1352,8 +1354,10 @@ class UserAaView(APIView):
 				'percent_below_aerobic','duration_hrr_not_recorded','percent_hrr_not_recorded']
 		lists = [[],[],[],[],[],[],[],[],[],[],[]]
 		for aa in data_values:
-			aa_dic = ast.literal_eval(aa)
-			aa_totals = aa_dic['Totals']
+			try:
+				aa_dic = ast.literal_eval(aa)
+			except (ValueError,SyntaxError):
+				aa_totals = aa_dic['Totals']
 			for key,li in zip(keys,lists):
 				aa_values = aa_totals[key]
 				li.append(aa_values)

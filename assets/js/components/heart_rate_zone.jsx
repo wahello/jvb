@@ -13,7 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
-import {fetchHrrWeeklyData}  from '../network/heartRate_zone';
+import {fetchHrrWeeklyData,fetchHrrWeeklyAaData}  from '../network/heartRate_zone';
 import {renderTimeTohrrZoneSelectedDateFetchOverlay} from './dashboard_healpers';
 
 axiosRetry(axios, { retries: 3});
@@ -28,13 +28,16 @@ class HeartrateZone extends Component{
 	    this.state = {
 			    	calendarOpen:false,
 				    isOpen:false,
+				    dateRange:false,
 				    fetching_hrr_zone:false,
 				    selectedDate:new Date(),
 				    start_date:moment().subtract(7,'days').toDate(),
 					end_date:moment().toDate(),
 				    hr_zone:{},
+				    weekly_aa_data:{},
 	    }
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
+	    this.toggleDate = this.toggleDate.bind(this);
 	 	this.toggle = this.toggle.bind(this);
 	 	this.processDate = this.processDate.bind(this);
 	 	this.successHeartrateZone = this.successHeartrateZone.bind(this);
@@ -43,6 +46,9 @@ class HeartrateZone extends Component{
 	 	this.renderTime = this.renderTime.bind(this);
 	 	this.renderpercentage = this.renderpercentage.bind(this);
 	 	this.onSubmitDate = this.onSubmitDate.bind(this);
+	 	this.handleChange = this.handleChange.bind(this);
+	 	this.successHrrWeeklyAaData = this.successHrrWeeklyAaData.bind(this);
+	 	this.errorHrrWeeklyAaData = this.errorHrrWeeklyAaData.bind(this);
 	 	this.renderTimeTohrrZoneSelectedDateFetchOverlay = renderTimeTohrrZoneSelectedDateFetchOverlay.bind(this);
 	}
 
@@ -52,14 +58,31 @@ class HeartrateZone extends Component{
 	  		fetching_hrr_zone:false
 	  	});
   	}
-
+  	successHrrWeeklyAaData(data){
+	  	this.setState({
+	  		weekly_aa_data:data.data,
+	  		fetching_hrr_zone:false
+	  	},()=>{
+	  		console.log("*************",this.state.weekly_aa_data);
+	  	});
+  	}
+  	toggleDate(){
+  		this.setState({
+	      dateRange:!this.state.dateRange
+	    });
+  	}
   	errorHeartrateZone(error){
 		console.log(error.message);
 		this.setState({
 	  		fetching_hrr_zone:false
 	  	});
     }
-
+	errorHrrWeeklyAaData(data){
+	  	this.setState({
+	  		weekly_aa_data:data.data,
+	  		fetching_hrr_zone:false
+	  	});
+  	}
 	toggleCalendar(){
 	    this.setState({
 	      calendarOpen:!this.state.calendarOpen
@@ -72,6 +95,14 @@ class HeartrateZone extends Component{
 	    });
   	}
 
+  	handleChange(event){
+      const target = event.target;
+      const value = target.value;
+      const name = target.name;
+      this.setState({
+        [name]: value
+      });
+    }
   	renderTime(value){
 		if(value>0){
 			var sec_num = parseInt(value); 
@@ -112,6 +143,7 @@ class HeartrateZone extends Component{
 			hr_zone:{},
 		},()=>{
 			fetchHrrWeeklyData(this.state.start_date, this.state.end_date,this.successHeartrateZone,this.errorHeartrateZone);
+			fetchHrrWeeklyAaData(this.state.start_date, this.state.end_date,this.successHrrWeeklyAaData,this.errorHrrWeeklyAaData);
 		});
 	}
 
@@ -127,6 +159,8 @@ class HeartrateZone extends Component{
 		},()=>{
 			fetchHrrWeeklyData(this.state.start_date, this.state.end_date,
 					this.successHeartrateZone,this.errorHeartrateZone);
+			fetchHrrWeeklyAaData(this.state.start_date, this.state.end_date,this.successHrrWeeklyAaData,this.errorHrrWeeklyAaData);
+
 
 		});
   }
@@ -136,6 +170,7 @@ class HeartrateZone extends Component{
 		});
 		fetchHrrWeeklyData(this.state.start_date, this.state.end_date,
 				this.successHeartrateZone,this.errorHeartrateZone);
+		fetchHrrWeeklyAaData(this.state.start_date, this.state.end_date,this.successHrrWeeklyAaData,this.errorHrrWeeklyAaData);
 	}
 
 	renderTable(data){
@@ -143,14 +178,13 @@ class HeartrateZone extends Component{
 		let keys = ["heart_rate_zone_low_end","heart_rate_zone_high_end","classificaton", 
 		"time_in_zone","prcnt_total_duration_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
-			for (let [key2,value1] of Object.entries(value)){
 				let td_values = [];
 				for(let key of keys){
 					if(key == "time_in_zone"){
 						let keyvalue = this.renderTime(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);
 					}
-					else if(key == "prcnt_in_zone"){
+					else if(key == "prcnt_total_duration_in_zone"){
 						let keyvalue = this.renderpercentage(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);
 					}
@@ -159,10 +193,7 @@ class HeartrateZone extends Component{
 						td_values.push(<td>{keyvalue}</td>);
 					}
 				}
-				td_rows.push(<tr>{td_values}</tr>);
-			}
-			
-				
+				td_rows.push(<tr>{td_values}</tr>);	
 		}
 		return td_rows;
 	}
@@ -181,7 +212,7 @@ class HeartrateZone extends Component{
 		                    />
 		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 	                	</span>
-	                	 <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
+	                	 <span  onClick={this.toggleDate} id="daterange">
 									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 									        </span>
 									        <span className="date_range_btn">
@@ -244,6 +275,22 @@ class HeartrateZone extends Component{
                            </PopoverBody>
                            </Popover>
 		            <div className = "row justify-content-center hr_table_padd">
+	          	    	<div className = "table table-responsive">
+		          	    	<table className = "table table-striped table-bordered ">
+			          	    	<thead>
+				          	    	<th>Heart Rate Zone Low End</th>
+				          	    	<th>Heart Rate Zone Heigh End</th>
+				          	    	<th>Classification</th>
+				          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
+				          	    	<th>% of Total Duration in Zone</th>
+			          	    	</thead>
+			          	    	<tbody>
+			          	    	{this.renderTable(this.state.hr_zone)}
+			          	    	</tbody>
+		          	    	</table>
+	          	    	</div>
+          	    	</div>
+          	    	 <div className = "row justify-content-center hr_table_padd">
 	          	    	<div className = "table table-responsive">
 		          	    	<table className = "table table-striped table-bordered ">
 			          	    	<thead>
