@@ -50,7 +50,7 @@ class UserFitbitDataSteps(models.Model):
 		return "%s"%(self.user.username)
 
 class FitbitNotifications(models.Model):
-	created_at = models.DateField(default=datetime.now, blank=True)
+	created_at = models.DateTimeField(auto_now=True,blank=True)
 	data_notification = models.TextField()
 	def __str__(self):
 		return "%s"%(self.created_at)

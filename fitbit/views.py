@@ -8,6 +8,7 @@ from datetime import datetime, timedelta , date
 import ast
 import logging
 
+from django.db.models import Q
 from django.shortcuts import render
 from django.core.mail import EmailMessage
 from django.shortcuts import redirect
@@ -22,10 +23,30 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataSleep,\
 					UserFitbitDataHeartRate,\
 					UserFitbitDataActivities,\
-					UserFitbitDataSteps
+					UserFitbitDataSteps,\
+					FitbitNotifications
 
 
 # Create your views here.
+
+class FitbitPush(APIView):
+	'''
+		This view will receive fitbit push notification data and 
+		call the signal to store that data in database
+	'''
+	def post(self, request, format="json"):
+		data = request.data
+		FitbitNotifications.objects.create(data_notification=data)
+		return Response(status=status.HTTP_204_NO_CONTENT)
+
+	def get(self, request, format="json"):
+		return Response(status = status.HTTP_204_NO_CONTENT)
+
+	time = datetime.now() - timedelta(minutes=15)
+	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
+	if updated_data:
+		for tmp in updated_data:
+			print(tmp.data_notification)
 
 def store_data(fitbit_all_data,user,start_date,data_type=None):
 	'''
@@ -248,14 +269,8 @@ def refresh_token_fitbit(request):
 		redirect url    ---- http://127.0.0.1:8000/callbacks/fitbit
 '''		 
 
-class FitbitPush(APIView):
-	'''
-		This view will receive fitbit push notification data and 
-		call the signal to store that data in database
-	'''
-	def post(self, request, format="json"):
-		print(request)
-		return Response(status=status.HTTP_204_NO_CONTENT)
-		
-	def get(self, request, format="json"):
-		return Response(status = status.HTTP_204_NO_CONTENT)
+def call_push_api():
+	time = datetime.now() - timedelta(minutes=15)
+	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
+	if updated_data:
+		pass
