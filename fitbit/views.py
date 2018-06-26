@@ -42,11 +42,7 @@ class FitbitPush(APIView):
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_204_NO_CONTENT)
 
-	time = datetime.now() - timedelta(minutes=15)
-	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
-	if updated_data:
-		for tmp in updated_data:
-			print(tmp.data_notification)
+
 
 def store_data(fitbit_all_data,user,start_date,data_type=None):
 	'''
@@ -270,30 +266,44 @@ def refresh_token_fitbit(request):
 '''		 
 
 def call_push_api():
+	
 	time = datetime.now() - timedelta(minutes=15)
 	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
 	if updated_data:
 
 		for i,k in enumerate(updated_data):
 			date = k[i]['date']
-			user = k[i]['ownerId']
+			user_id = k[i]['ownerId']
 			data_type = k[i]['collectionType']
-			call_api(date,user,data_type)
+			user = FitbitConnectToken.objects.get(user_id_fitbit=user_id)
+			call_api(date,user_id,data_type,user)
 
-def call_api(date,user,data_type):
+
+def call_api(date,user_id,data_type,user):
+
 	if data_type == 'sleep':
 		sleep_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
-			user,data_type,date))
+			user_id,data_type,date))
+		sleep_fitbit = sleep_fitbit.json()
+		store_data(sleep_fitbit,user,date,data_type)
 	elif data_type == 'activities':
 		activity_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/date/{}.json".format(
-			user,date_fitbit))
+		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+			user_id,date))
 		heartrate_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
-			user,date_fitbit))
+			user_id,date_fitbit))
 		steps_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
-			user,date_fitbit))
-
+			user_id,date_fitbit))
+		if activity_fitbit:
+			activity_fitbit = activity_fitbit.json()
+			store_data(activity_fitbit,user,date,data_type)
+		if heartrate_fitbit:
+			heartrate_fitbit = heartrate_fitbit.json()
+			store_data(heartrate_fitbit,user,date,data_type)
+		if steps_fitbit:
+			steps_fitbit = steps_fitbit.json()
+			store_data(steps_fitbit,user,date,data_type)
 	
