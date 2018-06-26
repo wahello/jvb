@@ -273,4 +273,27 @@ def call_push_api():
 	time = datetime.now() - timedelta(minutes=15)
 	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
 	if updated_data:
-		pass
+
+		for i,k in enumerate(updated_data):
+			date = k[i]['date']
+			user = k[i]['ownerId']
+			data_type = k[i]['collectionType']
+			call_api(date,user,data_type)
+
+def call_api(date,user,data_type):
+	if data_type == 'sleep':
+		sleep_fitbit = session.get(
+			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
+			user,data_type,date))
+	elif data_type == 'activities':
+		activity_fitbit = session.get(
+		"https://api.fitbit.com/1/user/{}/activities/date/{}.json".format(
+			user,date_fitbit))
+		heartrate_fitbit = session.get(
+		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
+			user,date_fitbit))
+		steps_fitbit = session.get(
+		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
+			user,date_fitbit))
+
+	
