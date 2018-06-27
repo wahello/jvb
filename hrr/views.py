@@ -771,14 +771,13 @@ def daily_aa_calculations(request):
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = daily_aa_data(request.user,start_date)
 	# data = json.dumps(data)
-	try:
-		print("Entered into try block")
-		user_aa = AaCalculations.objects.get(
-			user_aa=request.user, created_at=start_date)
-		update_aa_instance(request.user,start_date,data)
-	except AaCalculations.DoesNotExist:
-		print("except block")
-		create_aa_instance(request.user, data, start_date)
+	if data:
+		try:
+			user_aa = AaCalculations.objects.get(
+				user_aa=request.user, created_at=start_date)
+			update_aa_instance(request.user,start_date,data)
+		except AaCalculations.DoesNotExist:
+			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
 
@@ -919,12 +918,13 @@ def aa_low_high_end_calculations(request):
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = aa_low_high_end_data(request.user,start_date)
 	# data = json.dumps(data)
-	try:
-		user = TimeHeartZones.objects.get(
-			user=request.user, created_at=start_date)
-		update_heartzone_instance(request.user, start_date,data)
-	except TimeHeartZones.DoesNotExist:
-		create_heartzone_instance(request.user, data, start_date)
+	if data:
+		try:
+			user = TimeHeartZones.objects.get(
+				user=request.user, created_at=start_date)
+			update_heartzone_instance(request.user, start_date,data)
+		except TimeHeartZones.DoesNotExist:
+			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
 	
 
