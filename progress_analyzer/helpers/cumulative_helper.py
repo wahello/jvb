@@ -594,7 +594,7 @@ def _get_hrr_api_data(user,date):
 
 def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 	'''
-	Returns the HRR information from given quick look report.
+	Returns the HRR information from given Raw data report.
 	If HRR information is not present in the Raw report, then 
 	tries to get the HRR information from HRR API which
 	calculates it from FIT files.
