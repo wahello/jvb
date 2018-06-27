@@ -1482,7 +1482,7 @@ handleBackButton(){
           </div>
         }
         {this.state.scheduled_date &&
-        <div style = {{fontWeight:"bold"}}>Progress Analyzer Updated Time:- {moment(this.state.scheduled_date).format('MMM DD, YYYY')}</div>
+        <div className = "row justify-content-center"style = {{fontWeight:"bold"}}>Progress Analyzer reports are scheduled for an updated from {moment(this.state.scheduled_date).format('MMM DD, YYYY')}</div>
         }
         {this.state.active_view &&
             <div className="row justify-content-center padding" style = {{paddingTop:"25px"}}>
