@@ -42,6 +42,45 @@ class FitbitPush(APIView):
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_204_NO_CONTENT)
 
+	
+	# time = datetime.now() - timedelta(minutes=15)
+	# updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
+	
+	# if updated_data:
+	# 	for i,k in enumerate(updated_data):
+	# 		k = ast.literal_eval(k.data_notification)
+	# 		date = k[i]['date']
+	# 		user_id = k[i]['ownerId']
+	# 		data_type = k[i]['collectionType']
+	# 		user = FitbitConnectToken.objects.get(user_id_fitbit=user_id)
+	# 		call_api(date,user_id,data_type,user)
+
+	# def call_api(date,user_id,data_type,user):
+	# 	if data_type == 'sleep':
+	# 		sleep_fitbit = session.get(
+	# 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
+	# 			user_id,data_type,date))
+	# 		sleep_fitbit = sleep_fitbit.json()
+	# 		store_data(sleep_fitbit,user,date,data_type)
+	# 	elif data_type == 'activities':
+	# 		activity_fitbit = session.get(
+	# 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+	# 			user_id,date))
+	# 		heartrate_fitbit = session.get(
+	# 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
+	# 			user_id,date_fitbit))
+	# 		steps_fitbit = session.get(
+	# 		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
+	# 			user_id,date_fitbit))
+	# 		if activity_fitbit:
+	# 			activity_fitbit = activity_fitbit.json()
+	# 			store_data(activity_fitbit,user,date,data_type)
+	# 		if heartrate_fitbit:
+	# 			heartrate_fitbit = heartrate_fitbit.json()
+	# 			store_data(heartrate_fitbit,user,date,data_type)
+	# 		if steps_fitbit:
+	# 			steps_fitbit = steps_fitbit.json()
+	# 			store_data(steps_fitbit,user,date,data_type)
 
 
 def store_data(fitbit_all_data,user,start_date,data_type=None):
@@ -143,14 +182,14 @@ def api_fitbit(session,date_fitbit):
 
 def request_token_fitbit(request):
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -162,8 +201,8 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -178,7 +217,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -265,19 +304,19 @@ def refresh_token_fitbit(request):
 		redirect url    ---- http://127.0.0.1:8000/callbacks/fitbit
 '''		 
 
-def call_push_api():
-	
+def call_push_api(request):
+	print("Dileep")
 	time = datetime.now() - timedelta(minutes=15)
 	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
 	if updated_data:
-
 		for i,k in enumerate(updated_data):
+			k = ast.literal_eval(k.data_notification)
 			date = k[i]['date']
 			user_id = k[i]['ownerId']
 			data_type = k[i]['collectionType']
 			user = FitbitConnectToken.objects.get(user_id_fitbit=user_id)
 			call_api(date,user_id,data_type,user)
-
+	return None
 
 def call_api(date,user_id,data_type,user):
 
