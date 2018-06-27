@@ -758,17 +758,13 @@ def daily_aa_data(user, start_date):
 	else:
 		return ({})
 
-def update_helper(instance,data_dict):
-	for attr, value in data_dict.items():
-		setattr(instance,attr,value)
-	instance.save()
-
-def update_aa_instance(instance, data):
-	update_helper(instance, data)
+def update_aa_instance(user,start_date,data):
+	AaCalculations.objects.filter(
+			user_aa=user, created_at=start_date).update(data=data)
 
 def create_aa_instance(user, data, start_date):
-	created_at = start_date
-	AaCalculations.objects.create(user_aa = user,created_at = created_at,data=data)
+	AaCalculations.objects.create(
+		user_aa = user,created_at = start_date,data=data)
 
 def daily_aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
@@ -776,10 +772,12 @@ def daily_aa_calculations(request):
 	data = daily_aa_data(request.user,start_date)
 	# data = json.dumps(data)
 	try:
-		user_aa = AaCalculations.objects.filter(
-			user_aa=request.user, created_at=start_date).update(data=data)
-		# update_aa_instance(user_aa, data)
+		print("Entered into try block")
+		user_aa = AaCalculations.objects.get(
+			user_aa=request.user, created_at=start_date)
+		update_aa_instance(request.user,start_date,data)
 	except AaCalculations.DoesNotExist:
+		print("except block")
 		create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
@@ -906,13 +904,11 @@ def aa_low_high_end_data(user,start_date):
 	else:
 		return ({})
 
-def update_helper(instance,data_dict):
-	for attr, value in data_dict.items():
-		setattr(instance,attr,value)
-	instance.save()
 
-def update_heartzone_instance(instance, data):
-	update_helper(instance, data)
+
+def update_heartzone_instance(user, start_date,data):
+	user = TimeHeartZones.objects.filter(
+			user=user, created_at=start_date).update(data=data)
 
 def create_heartzone_instance(user, data, start_date):
 	created_at = start_date
@@ -924,8 +920,9 @@ def aa_low_high_end_calculations(request):
 	data = aa_low_high_end_data(request.user,start_date)
 	# data = json.dumps(data)
 	try:
-		user = TimeHeartZones.objects.filter(user=request.user, created_at=start_date).update(data=data)
-		# update_heartzone_instance(user, data)
+		user = TimeHeartZones.objects.get(
+			user=request.user, created_at=start_date)
+		update_heartzone_instance(request.user, start_date,data)
 	except TimeHeartZones.DoesNotExist:
 		create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -1414,12 +1411,16 @@ class UserAaView(APIView):
 		for aa in data_values:
 			try:
 				aa_dic = ast.literal_eval(aa)
-				aa_totals = aa_dic['Totals']
+				if aa_dic:
+					aa_totals = aa_dic['Totals']
+				else:
+					aa_totals = ''
 			except (ValueError,SyntaxError):
 				aa_totals = aa_dic.Totals
 			for key,li in zip(keys,lists):
-				aa_values = aa_totals[key]
-				li.append(aa_values)
+				if li:
+					aa_values = aa_totals[key]
+					li.append(aa_values)
 		try:
 			avg_heart_rate = sum(lists[0])/len(lists[0])
 			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
