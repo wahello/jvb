@@ -1356,8 +1356,9 @@ class UserAaView(APIView):
 		for aa in data_values:
 			try:
 				aa_dic = ast.literal_eval(aa)
-			except (ValueError,SyntaxError):
 				aa_totals = aa_dic['Totals']
+			except (ValueError,SyntaxError):
+				aa_totals = aa_dic.Totals
 			for key,li in zip(keys,lists):
 				aa_values = aa_totals[key]
 				li.append(aa_values)
