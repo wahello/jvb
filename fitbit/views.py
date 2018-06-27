@@ -7,6 +7,8 @@ import pprint
 from datetime import datetime, timedelta , date
 import ast
 import logging
+import schedule
+import time
 
 from django.db.models import Q
 from django.shortcuts import render
@@ -44,46 +46,6 @@ class FitbitPush(APIView):
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_204_NO_CONTENT)
 
-	
-	# time = datetime.now() - timedelta(minutes=15)
-	# updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
-	
-	# if updated_data:
-	# 	for i,k in enumerate(updated_data):
-	# 		k = ast.literal_eval(k.data_notification)
-	# 		date = k[i]['date']
-	# 		user_id = k[i]['ownerId']
-	# 		data_type = k[i]['collectionType']
-	# 		user = FitbitConnectToken.objects.get(user_id_fitbit=user_id)
-	# 		call_api(date,user_id,data_type,user)
-
-	# def call_api(date,user_id,data_type,user):
-	# 	if data_type == 'sleep':
-	# 		sleep_fitbit = session.get(
-	# 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
-	# 			user_id,data_type,date))
-	# 		sleep_fitbit = sleep_fitbit.json()
-	# 		store_data(sleep_fitbit,user,date,data_type)
-	# 	elif data_type == 'activities':
-	# 		activity_fitbit = session.get(
-	# 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
-	# 			user_id,date))
-	# 		heartrate_fitbit = session.get(
-	# 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
-	# 			user_id,date_fitbit))
-	# 		steps_fitbit = session.get(
-	# 		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
-	# 			user_id,date_fitbit))
-	# 		if activity_fitbit:
-	# 			activity_fitbit = activity_fitbit.json()
-	# 			store_data(activity_fitbit,user,date,data_type)
-	# 		if heartrate_fitbit:
-	# 			heartrate_fitbit = heartrate_fitbit.json()
-	# 			store_data(heartrate_fitbit,user,date,data_type)
-	# 		if steps_fitbit:
-	# 			steps_fitbit = steps_fitbit.json()
-	# 			store_data(steps_fitbit,user,date,data_type)
-
 
 def store_data(fitbit_all_data,user,start_date,data_type=None):
 	'''
@@ -94,15 +56,19 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 	Return: None
 	''' 
 	if data_type:
+		print("Step 1")
 		fitbit_all_data[data_type] = fitbit_all_data
+	print(data_type)
 	for key,value in fitbit_all_data.items():
-
+		print(key)
 		try:
-			if "sleep_fitbit" == key: 
+			print("\nUser:",type(user))
+			if "sleep_fitbit" == key:
+				print("step 2")
 				date_of_sleep = value['sleep'][0]['dateOfSleep']
-				UserFitbitDataSleep.objects.update_or_create(user=user,
+				UserFitbitDataSleep.objects.update_or_create(user = user,
 					date_of_sleep=date_of_sleep,sleep_data=value,
-					defaults={'created_at': start_date,})
+					defaults={'created_at': start_date})
 		except (KeyError, IndexError):
 			logging.exception("message")
 
@@ -164,8 +130,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -306,28 +272,50 @@ def refresh_token_fitbit(request):
 		redirect url    ---- http://127.0.0.1:8000/callbacks/fitbit
 '''		 
 
-def call_push_api(request):
-	print("Dileep")
-	time = datetime.now() - timedelta(minutes=15)
-	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
-	if updated_data:
-		for i,k in enumerate(updated_data):
-			k = ast.literal_eval(k.data_notification)
-			date = k[i]['date']
-			user_id = k[i]['ownerId']
-			data_type = k[i]['collectionType']
-			user = FitbitConnectToken.objects.get(user_id_fitbit=user_id)
-			call_api(date,user_id,data_type,user)
+def call_push_api():
+	'''
+		This function takes the notificatin messages which are stored in last 10 min
+		creates a session
+	'''
+	print("Startes for checking notifications in database")
+	# time = datetime.now() - timedelta(minutes=15) 
+	# updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
+	# if updated_data:
+	# 	service = session_fitbit()
+	# 	tokens = FitbitConnectToken.objects.get(user = request.user)
+	# 	access_token = tokens.access_token
+	# 	session = service.get_session(access_token)
+	# 	for i,k in enumerate(updated_data):
+	# 		k = ast.literal_eval(k.data_notification)
+	# 		date = k[i]['date']
+	# 		user_id = k[i]['ownerId']
+	# 		data_type = k[i]['collectionType']
+	# 		try:
+	# 			user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
+	# 		except FitbitConnectToken.DoesNotExist as e:
+	# 			user = None
+	# 		call_api(date,user_id,data_type,user,session)
+	# return HttpResponse('Final return')
 	return None
 
-def call_api(date,user_id,data_type,user):
+def call_api(date,user_id,data_type,user,session):
+	'''
+		This function call push notification messages and then store in to the 
+		database
 
+	Args: date(date which comes in push message)
+		  user_id
+		  data_type(type of data)
+		  user(user instance)
+		  session(created sesssion)
+	Return: returns nothing
+	'''
 	if data_type == 'sleep':
 		sleep_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
 			user_id,data_type,date))
 		sleep_fitbit = sleep_fitbit.json()
-		store_data(sleep_fitbit,user,date,data_type)
+		store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
 	elif data_type == 'activities':
 		activity_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
@@ -343,10 +331,11 @@ def call_api(date,user_id,data_type,user):
 			store_data(activity_fitbit,user,date,data_type)
 		if heartrate_fitbit:
 			heartrate_fitbit = heartrate_fitbit.json()
-			store_data(heartrate_fitbit,user,date,data_type)
+			store_data(heartrate_fitbit,user,date,data_type="heartrate_fitbit")
 		if steps_fitbit:
 			steps_fitbit = steps_fitbit.json()
-			store_data(steps_fitbit,user,date,data_type)
+			store_data(steps_fitbit,user,date,data_type="steps_fitbit")
+	return None
 
 class HaveFitbitTokens(APIView):
 	'''
@@ -362,4 +351,8 @@ class HaveFitbitTokens(APIView):
 			have_tokens['have_fitbit_tokens'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
+
+
+
+
 
