@@ -13,7 +13,7 @@ urlpatterns = [
 	url(r'^aa_low_high_calculations$',views.aa_low_high_end_calculations,
 									name="aa_classification chart"),	
 	url(r'^user/weekly_aa_data$',views.UserAaView.as_view(),name="weekly_aa_api"),
-	url(r'^user/heartzone_data$',views.UserheartzoneView.as_view(),name="hearzone_api")
+	url(r'^user/heartzone_data$',views.UserheartzoneView.as_view(),name="hearzone_api"),
 	url(r'^user/hrr_data$',views.UserHrrView.as_view(),
 								  name="hrr_api"),
 ]

@@ -774,10 +774,11 @@ def daily_aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = daily_aa_data(request.user,start_date)
-	data = json.dumps(data)
+	# data = json.dumps(data)
 	try:
-		user_aa = AaCalculations.objects.get(user_aa=request.user, created_at=start_date)
-		update_aa_instance(user_aa, data)
+		user_aa = AaCalculations.objects.filter(
+			user_aa=request.user, created_at=start_date).update(data=data)
+		# update_aa_instance(user_aa, data)
 	except AaCalculations.DoesNotExist:
 		create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -921,10 +922,10 @@ def aa_low_high_end_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = aa_low_high_end_data(request.user,start_date)
-	data = json.dumps(data)
+	# data = json.dumps(data)
 	try:
-		user = TimeHeartZones.objects.get(user=request.user, created_at=start_date)
-		update_heartzone_instance(user, data)
+		user = TimeHeartZones.objects.filter(user=request.user, created_at=start_date).update(data=data)
+		# update_heartzone_instance(user, data)
 	except TimeHeartZones.DoesNotExist:
 		create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
