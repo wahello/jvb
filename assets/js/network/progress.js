@@ -44,3 +44,17 @@ export function fetchUserRank(successRank,errorProgress,selectedDate,custom_rang
   });
 
 }
+export function progressAnalyzerUpdateTime(successUpdateTime,errorUpdateTime){   
+  const URL=`/progress/user/report/update_schedule`;
+  const config={
+   method:"get",
+   url:URL,
+   withCredentials: true
+  };
+  axios(config).then((response)=>{
+   successUpdateTime(response);
+  }).catch(function(error){
+    errorUpdateTime(error);
+  });
+
+}
