@@ -4,6 +4,7 @@ import json
 from django.db import transaction,DatabaseError
 from django.core.exceptions import ObjectDoesNotExist
 
+from hrr.views import hrr_data
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
 
@@ -213,7 +214,7 @@ def _safe_get_mobj(obj,attr, default):
 		of attribute from the object. If value is None
 		then return the default provided
 
-		type obj: model objct
+		type obj: model object
 		type attr: string
 		type default: any type
 	'''
@@ -544,7 +545,125 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 	return alcohol_cum_data
 
 
-def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
+def _get_hrr_api_data(user,date):
+	'''
+	Get the HRR data from the HRR API. If there is no
+	data or any exception occurs return None
+
+	Args:
+		user (:obj:`User`): User object
+		date (datetime.date): Date for which HRR have to be looked
+
+	Returns:
+		dict: Dictionary having HRR data
+		None: If any error occurs or no data returned from API 
+	'''
+	try:
+		data = hrr_data(user,date)
+		formated_data = {
+			"hrr_starting_point":0,
+			"lowest_hr_during_hrr":0,
+			"hrr_beats_lowered_first_minute":0,
+			"hrr_time_to_99":0
+		}
+		if data.get('Did_you_measure_HRR') == 'yes':
+			if(data.get('HRR_start_beat')):
+				formated_data['hrr_starting_point'] = data.get(
+					'HRR_start_beat'
+				)
+
+			if(data.get('lowest_hrr_1min')):
+				formated_data['lowest_hr_during_hrr'] = data.get(
+					'lowest_hrr_1min'
+				)
+
+			if(data.get('time_99')):
+				time_in_mins = data.get('time_99') / 60
+				time_in_mins = round(time_in_mins,3)
+				formated_data['hrr_time_to_99'] = time_in_mins
+
+			if(data.get('HRR_start_beat') and data.get('lowest_hrr_1min')
+				and data.get('HRR_start_beat') >= data.get('lowest_hrr_1min')):
+				formated_data['hrr_beats_lowered_first_minute'] = (
+					data.get('HRR_start_beat') - data.get('lowest_hrr_1min')
+				)
+			return formated_data
+		return None
+	except Exception as e:
+		return None
+
+def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
+	'''
+	Returns the HRR information from given quick look report.
+	If HRR information is not present in the Raw report, then 
+	tries to get the HRR information from HRR API which
+	calculates it from FIT files.
+
+	Args:
+		user (:obj:`User`): User object
+
+		today_ql_data(:obj:`UserQuickLook`): Raw data report from which
+			HRR data have to be extracted
+
+		hrr_api_lookup(bool): If True, try to get HRR data from the 
+			HRR API if HRR data is not present in Raw report. If False,
+			do not make call to API. Default is True
+
+	Returns:
+		dict: Dictionary containing HRR data.
+	'''
+	data = {
+		"hrr_starting_point":0,
+		"lowest_hr_during_hrr":0,
+		"hrr_beats_lowered_first_minute":0,
+		"hrr_time_to_99":0
+	}
+
+	if hrr_api_lookup:
+		hrr_api_data = _get_hrr_api_data(user,today_ql_data.created_at)
+	else:
+		hrr_api_data = None
+
+	hrr_time_to_99 = _safe_get_mobj(
+		today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0
+	)
+	if hrr_time_to_99 and type(hrr_time_to_99) == str and hrr_time_to_99 != ":":
+		hrr_time_to_99 = round(
+			_str_to_hours_min_sec(hrr_time_to_99,'minute',"mm:ss"),3
+		)
+	elif(hrr_api_data):
+		hrr_time_to_99 = hrr_api_data.get("hrr_time_to_99")
+	else:
+		hrr_time_to_99 = 0
+
+	data['hrr_time_to_99'] = hrr_time_to_99
+
+	hrr_starting_point = _safe_get_mobj(
+		today_ql_data.exercise_reporting_ql,"hrr_starting_point",0
+	)
+	if not hrr_starting_point and hrr_api_data:
+		hrr_starting_point = hrr_api_data.get("hrr_starting_point")
+	data['hrr_starting_point'] = hrr_starting_point
+
+	lowest_hr_during_hrr = _safe_get_mobj(
+		today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0
+	)
+	if not lowest_hr_during_hrr and hrr_api_data:
+		lowest_hr_during_hrr = hrr_api_data.get("lowest_hr_during_hrr")
+	data['lowest_hr_during_hrr'] = lowest_hr_during_hrr
+
+	hrr_beats_lowered_first_minute = _safe_get_mobj(
+		today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0
+	)
+	if not hrr_beats_lowered_first_minute and hrr_api_data:
+		hrr_beats_lowered_first_minute = hrr_api_data.get(
+			"hrr_beats_lowered_first_minute"
+		)
+	data['hrr_beats_lowered_first_minute'] = hrr_beats_lowered_first_minute
+	return data
+
+
+def _get_other_stats_cum_sum(today_ql_data,user_hrr_data,yday_cum_data=None):
 	other_stats_cum_data = _get_blank_pa_model_fields("other_stats")
 
 	if today_ql_data and yday_cum_data:
@@ -552,22 +671,34 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum, "cum_resting_hr",0)
 
-		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = round(
-			_str_to_hours_min_sec(_safe_get_mobj(
-				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute',"mm:ss"),3) \
-			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_hrr_time_to_99_in_mins",0)
+		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = (
+			user_hrr_data['hrr_time_to_99']
+			+ _safe_get_mobj(
+				yday_cum_data.other_stats_cum,"cum_hrr_time_to_99_in_mins",0
+			)
+		)
 
-		other_stats_cum_data['cum_hrr_beats_lowered_in_first_min'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0) \
-			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_hrr_beats_lowered_in_first_min",0)
+		other_stats_cum_data['cum_hrr_beats_lowered_in_first_min'] = (
+			user_hrr_data['hrr_beats_lowered_first_minute']
+			+ _safe_get_mobj(
+				yday_cum_data.other_stats_cum,
+				"cum_hrr_beats_lowered_in_first_min",0
+			)
+		)
 
-		other_stats_cum_data['cum_highest_hr_in_first_min'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0) \
-			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_highest_hr_in_first_min",0)
+		other_stats_cum_data['cum_highest_hr_in_first_min'] = (
+			user_hrr_data["hrr_starting_point"]
+			+ _safe_get_mobj(
+				yday_cum_data.other_stats_cum,"cum_highest_hr_in_first_min",0
+			)
+		)
 
-		other_stats_cum_data['cum_hrr_lowest_hr_point'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0) \
-			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_hrr_lowest_hr_point",0)
+		other_stats_cum_data['cum_hrr_lowest_hr_point'] = (
+			user_hrr_data["lowest_hr_during_hrr"]
+			+ _safe_get_mobj(
+				yday_cum_data.other_stats_cum,"cum_hrr_lowest_hr_point",0
+			)
+		)
 
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
 			today_ql_data.steps_ql,"floor_climed",0) \
@@ -577,18 +708,19 @@ def _get_other_stats_cum_sum(today_ql_data, yday_cum_data=None):
 		other_stats_cum_data['cum_resting_hr'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0)
 
-		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = round(
-			_str_to_hours_min_sec(_safe_get_mobj(
-				today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0),'minute',"mm:ss"),3)
+		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = user_hrr_data[
+			'hrr_time_to_99'
+		]
+		other_stats_cum_data['cum_hrr_beats_lowered_in_first_min'] = user_hrr_data[
+			'hrr_beats_lowered_first_minute'
+		]
+		other_stats_cum_data['cum_highest_hr_in_first_min'] = user_hrr_data[
+			"hrr_starting_point"
+		]
 
-		other_stats_cum_data['cum_hrr_beats_lowered_in_first_min'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
-
-		other_stats_cum_data['cum_highest_hr_in_first_min'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0)
-
-		other_stats_cum_data['cum_hrr_lowest_hr_point'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
+		other_stats_cum_data['cum_hrr_lowest_hr_point'] = user_hrr_data[
+			"lowest_hr_during_hrr"
+		]
 
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
 			today_ql_data.steps_ql,"floor_climed",0)
@@ -697,7 +829,8 @@ def _get_stress_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return stress_cum_data
 
-def _get_meta_cum_sum(today_ql_data, today_ui_data, yday_cum_data=None):
+def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
+		yday_cum_data = None):
 	meta_cum_data = _get_blank_pa_model_fields("meta")
 	
 	if today_ql_data and yday_cum_data:
@@ -736,27 +869,21 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, yday_cum_data=None):
 		meta_cum_data['cum_avg_exercise_hr_days_count'] = avg_exercise_heartrate \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_avg_exercise_hr_days_count",0)
 
-		hrr_to_99 = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_time_to_99",""
-		)
-		hrr_to_99 = 1 if (hrr_to_99 and hrr_to_99 != ":") else 0
+		hrr_to_99 = 1 if user_hrr_data['hrr_time_to_99'] else 0
 		meta_cum_data['cum_hrr_to_99_days_count'] = hrr_to_99 \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_to_99_days_count",0)
 
-		hrr_beats_lowered_in_first_min = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0)
-		hrr_beats_lowered_in_first_min = 1 if hrr_beats_lowered_in_first_min else 0
+		hrr_beats_lowered_in_first_min = user_hrr_data["hrr_beats_lowered_first_minute"]
+		hrr_beats_lowered_in_first_min = 1 if hrr_beats_lowered_in_first_min  else 0
 		meta_cum_data['cum_hrr_beats_lowered_in_first_min_days_count'] = hrr_beats_lowered_in_first_min \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_beats_lowered_in_first_min_days_count",0)
 
-		highest_hr_in_first_min = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"hrr_starting_point",0)
+		highest_hr_in_first_min = user_hrr_data["hrr_starting_point"]
 		highest_hr_in_first_min = 1 if highest_hr_in_first_min else 0
 		meta_cum_data['cum_highest_hr_in_first_min_days_count'] = highest_hr_in_first_min \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_highest_hr_in_first_min_days_count",0)
 
-		hrr_lowest_hr_point = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0)
+		hrr_lowest_hr_point = user_hrr_data['lowest_hr_during_hrr']
 		hrr_lowest_hr_point = 1 if hrr_lowest_hr_point else 0
 		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = hrr_beats_lowered_in_first_min \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_lowest_hr_point_days_count",0)
@@ -883,12 +1010,21 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data, yday_cum_data)
 			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
-			data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
+
+			user_hrr_data = _get_user_hrr_data(
+				user,today_ql_data,hrr_api_lookup = True
+			)
+			data["other_stats_cum"] = _get_other_stats_cum_sum(
+				today_ql_data,user_hrr_data,yday_cum_data
+			)
+			
 			data["sick_cum"] = _get_sick_cum_sum(today_ql_data, yday_cum_data)
 			data["standing_cum"] = _get_standing_cum_sum(today_ui_data, yday_cum_data)
 			data["travel_cum"] = _get_travel_cum_sum(today_ui_data, yday_cum_data)
 			data["stress_cum"] = _get_stress_cum_sum(today_ql_data, yday_cum_data)
-			data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data,yday_cum_data)
+			data["meta_cum"] = _get_meta_cum_sum(
+				today_ql_data,today_ui_data,user_hrr_data,yday_cum_data
+			)
 
 		elif not today_ql_data and yday_cum_data:
 			# No quick look data today that means no user input as well,
@@ -927,8 +1063,8 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["meta_cum"] = _get_object_field_data_pair(yday_cum_data.meta_cum)
 
 		elif today_ql_data and not yday_cum_data:
-			# Very begining when there is no quick look data yesterday
-			# get current quicklook data and create cumulative sum
+			# Very beginning when there is no quick look data yesterday
+			# get current quick look data and create cumulative sum
 			data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data)
 			data["non_exercise_steps_cum"] = _get_non_exercise_steps_cum_sum(today_ql_data)
 			data["sleep_per_night_cum"] = _get_sleep_per_night_cum_sum(today_ql_data)
@@ -937,12 +1073,21 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data)
 			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
-			data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data)
+
+			user_hrr_data = _get_user_hrr_data(
+				user, today_ql_data, hrr_api_lookup = True
+			)
+			data["other_stats_cum"] = _get_other_stats_cum_sum(
+				today_ql_data,user_hrr_data
+			)
+
 			data["sick_cum"] = _get_sick_cum_sum(today_ql_data)
 			data["standing_cum"] = _get_standing_cum_sum(today_ui_data)
 			data["travel_cum"] = _get_travel_cum_sum(today_ui_data)
 			data["stress_cum"] = _get_stress_cum_sum(today_ql_data)
-			data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data)
+			data["meta_cum"] = _get_meta_cum_sum(
+				today_ql_data,today_ui_data,user_hrr_data
+			)
 		else:
 			# Insufficient data, do not create cumulative sum for current date
 			current_date += timedelta(days = 1)
@@ -956,9 +1101,8 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 		current_date += timedelta(days = 1)
 
 
-def create_cum_raw_data(today_ql_data,today_ui_data,yday_cum_data=None):
+def create_cum_raw_data(user,today_ql_data,today_ui_data,yday_cum_data=None):
 	data = {"created_at":today_ql_data.created_at.strftime("%Y-%m-%d")}
-
 	if today_ql_data and yday_cum_data:
 		data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data,yday_cum_data)
 		data["non_exercise_steps_cum"] = _get_non_exercise_steps_cum_sum(today_ql_data,yday_cum_data)
@@ -968,15 +1112,23 @@ def create_cum_raw_data(today_ql_data,today_ui_data,yday_cum_data=None):
 		data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data, yday_cum_data)
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
-		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data, yday_cum_data)
+
+		user_hrr_data = _get_user_hrr_data(
+			user,today_ql_data,hrr_api_lookup = True
+		)
+		data["other_stats_cum"] = _get_other_stats_cum_sum(
+			today_ql_data, user_hrr_data, yday_cum_data
+		)
 		data["sick_cum"] = _get_sick_cum_sum(today_ql_data, yday_cum_data)
 		data["standing_cum"] = _get_standing_cum_sum(today_ui_data, yday_cum_data)
 		data["travel_cum"] = _get_travel_cum_sum(today_ui_data, yday_cum_data)
 		data["stress_cum"] = _get_stress_cum_sum(today_ql_data, yday_cum_data)
-		data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data,yday_cum_data)
+		data["meta_cum"] = _get_meta_cum_sum(
+			today_ql_data,today_ui_data,user_hrr_data,yday_cum_data
+		)
 
 	elif today_ql_data:
-		# get current quicklook data and create cumulative sum
+		# get current quick look data and create cumulative sum
 		data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data)
 		data["non_exercise_steps_cum"] = _get_non_exercise_steps_cum_sum(today_ql_data)
 		data["sleep_per_night_cum"] = _get_sleep_per_night_cum_sum(today_ql_data)
@@ -985,12 +1137,20 @@ def create_cum_raw_data(today_ql_data,today_ui_data,yday_cum_data=None):
 		data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data)
 		data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
 		data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
-		data["other_stats_cum"] = _get_other_stats_cum_sum(today_ql_data)
+
+		user_hrr_data = _get_user_hrr_data(
+			user,today_ql_data,hrr_api_lookup = True
+		)
+		data["other_stats_cum"] = _get_other_stats_cum_sum(
+			today_ql_data,user_hrr_data
+		)
 		data["sick_cum"] = _get_sick_cum_sum(today_ql_data)
 		data["standing_cum"] = _get_standing_cum_sum(today_ui_data)
 		data["travel_cum"] = _get_travel_cum_sum(today_ui_data)
 		data["stress_cum"] = _get_stress_cum_sum(today_ql_data)
-		data["meta_cum"] = _get_meta_cum_sum(today_ql_data,today_ui_data)
+		data["meta_cum"] = _get_meta_cum_sum(
+			today_ql_data,today_ui_data,user_hrr_data
+		)
 
 	return data
 
