@@ -7,6 +7,11 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
+
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -18,12 +23,46 @@ from django.db.models import Q
 
 from registration.models import Profile
 from user_input.models import DailyUserInputStrong
-from garmin.models import GarminFitFiles,UserGarminDataDaily,UserGarminDataActivity,UserGarminDataManuallyUpdated
+from garmin.models import GarminFitFiles,\
+						UserGarminDataDaily,\
+						UserGarminDataActivity,\
+						UserGarminDataManuallyUpdated
 from quicklook.calculation_helper import get_filtered_activity_stats
 from fitparse import FitFile
+
 from .serializers import AaSerializer,HeartzoneSerializer
 from hrr.models import Hrr,AaCalculations,TimeHeartZones
+from .serializers import HrrSerializer
+from hrr.models import Hrr
 import pprint
+
+class UserHrrView(generics.ListCreateAPIView):
+	'''
+		- Create the Hrr instance
+		- List all the Hrr instance
+		- If query parameters "to" and "from" are provided
+		  then filter the Hrr data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = HrrSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
+
+		if start_dt and end_dt:
+			queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
+							  Q(created_at__lte=end_dt),
+							  user_hrr=user)
+			
+		else:
+			queryset = Hrr.objects.all()
+
+		return queryset
+
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
 	heartrate_complete = []
@@ -92,7 +131,6 @@ def update_helper(instance,data_dict):
 	'''
 		Helper function to update the instance
 		with provided key,value pair
-
 		Warning: This will not trigger any signals
 				 like post or pre save
 	'''
@@ -318,7 +356,6 @@ def aa_calculations(request):
 					"total_percent":total_percent}
 	return JsonResponse(data)
 
-time_duration1 = []
 def aa_workout_calculations(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -391,12 +428,15 @@ def aa_workout_calculations(request):
 			data_id = meta['activityIds'][0]
 			act_id.append(str(data_id))
 			for i,k in enumerate(filtered_activities_files):
-				if ((filtered_activities_files[i].get("summaryId") == str(data_id)) and (filtered_activities_files[i].get("durationInSeconds",0) <= 1200) and (filtered_activities_files[i].get("distanceInMeters",0) <= 200.00)):
+				if (filtered_activities_files[i].get("summaryId") == str(data_id) and 
+					filtered_activities_files[i].get("durationInSeconds",0) <= 1200 and 
+					filtered_activities_files[i].get("distanceInMeters",0) <200) or (filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY"):
 					hrr.append(filtered_activities_files[i])
 				elif filtered_activities_files[i].get("summaryId") == str(data_id):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
-			if ((x.get("summaryId") not in act_id) and (x.get("durationInSeconds",0) > 1200)):
+			if (x.get("summaryId") not in act_id and 
+			    x.get("activityType") != "HEART_RATE_RECOVERY"):
 				workout.append(x)
 
 	data={"date":"",
@@ -469,21 +509,25 @@ def aa_workout_calculations(request):
 		except ValueError:
 			maxi_hrr = ''
 		time_total = sum(time_duration)
-		
+		try:
+			total_prcnt_hrr_not_recorded = (sum(hrr_not_recorded_list)/sum(time_duration))*100
+			total_prcnt_hrr_not_recorded = int(Decimal(total_prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+		except ZeroDivisionError:
+			total_prcnt_hrr_not_recorded = ""
 		total = {"date":date,
 				 "workout_type":"Totals",
-				 "duration":sum(time_duration),
+				 "duration":time_total,
 				 "average_heart_rate":avg_hrr,
 				 "max_heart_rate":maxi_hrr,
 				 "steps":sum(steps),
 				 "hrr_not_recorded":sum(hrr_not_recorded_list),
-				 "prcnt_hrr_not_recorded":(sum(hrr_not_recorded_list)/sum(time_duration))*100
+				 "prcnt_hrr_not_recorded":total_prcnt_hrr_not_recorded
 				 }
 		if total:	
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
-		time_duration1.append(time_duration)
+		
 	
 	if data1:
 		return JsonResponse(data1)
@@ -545,7 +589,6 @@ def daily_aa_data(user, start_date):
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-	
 	if a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
@@ -731,10 +774,11 @@ def daily_aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = daily_aa_data(request.user,start_date)
-	data = json.dumps(data)
+	# data = json.dumps(data)
 	try:
-		user_aa = AaCalculations.objects.get(user_aa=request.user, created_at=start_date)
-		update_aa_instance(user_aa, data)
+		user_aa = AaCalculations.objects.filter(
+			user_aa=request.user, created_at=start_date).update(data=data)
+		# update_aa_instance(user_aa, data)
 	except AaCalculations.DoesNotExist:
 		create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -763,10 +807,22 @@ def aa_low_high_end_data(user,start_date):
 		user_input__created_at=(start_date),
 		user_input__user = user).order_by('-user_input__created_at')
 
+	activities = []
+	id_act = 0
+	if user_input_strong:
+		for tmp in user_input_strong:
+			sn = tmp.activities
+			if sn:
+				sn = json.loads(sn)
+				di = sn.values()
+				di = list(di)
+				for i,k in enumerate(di):
+					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
+						id_act = int(di[i]['summaryId'])
+						activities.append(di[i])
+
 	workout = []
 	hrr = []
-	data2 = {}
-	classification_dic = {}
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user= user,created_at__range=[start,end])
@@ -775,13 +831,13 @@ def aa_low_high_end_data(user,start_date):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			if activity_files_qs:
-				for i,k in enumerate(activity_files):
-					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-						hrr.append(tmp)
-					elif activity_files_dict.get("summaryId",None) == str(data_id) :
-						workout.append(tmp)
+			for i,k in enumerate(activity_files):
+				activity_files_dict = ast.literal_eval(activity_files[i])
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					hrr.append(tmp)
+				elif activity_files_dict.get("summaryId",None) == str(data_id) :
+					workout.append(tmp)
+
 
 	profile = Profile.objects.filter(user=user)
 	if profile:
@@ -798,7 +854,8 @@ def aa_low_high_end_data(user,start_date):
 
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
-
+	data2 = {}
+	classification_dic = {}
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
@@ -865,10 +922,10 @@ def aa_low_high_end_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = aa_low_high_end_data(request.user,start_date)
-	data = json.dumps(data)
+	# data = json.dumps(data)
 	try:
-		user = TimeHeartZones.objects.get(user=request.user, created_at=start_date)
-		update_heartzone_instance(user, data)
+		user = TimeHeartZones.objects.filter(user=request.user, created_at=start_date).update(data=data)
+		# update_heartzone_instance(user, data)
 	except TimeHeartZones.DoesNotExist:
 		create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -979,6 +1036,7 @@ def hrr_data(user,start_date):
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+		
 	Did_you_measure_HRR = ""
 	if hrr:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
@@ -1217,7 +1275,7 @@ def hrr_data(user,start_date):
 
 			"offset":offset,
 			}
-	elif Did_you_measure_HRR == 'Heart Rate Data Not Provided' or garmin_data_daily == None:
+	elif Did_you_measure_HRR == 'Heart Rate Data Not Provided':
 		data = {"Did_you_measure_HRR":'Heart Rate Data Not Provided',
 			"Did_heartrate_reach_99":'',
 			"time_99":None,
@@ -1428,4 +1486,3 @@ class UserAaView(APIView):
 			queryset = AaCalculations.objects.all()
 
 		return queryset
-

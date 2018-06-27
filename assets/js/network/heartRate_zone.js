@@ -22,6 +22,7 @@ export default function fetchHeartrateZoneData(successHeartrateZone,errorHeartra
   });
 
 }
+
 export function fetchHrrWeeklyData(startDate,endDate,successHeartrateZone, errorHeartrateZone){  
     startDate = moment(startDate);
     endDate = moment(endDate);
