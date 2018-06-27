@@ -44,7 +44,7 @@ export function fetchUserRank(successRank,errorProgress,selectedDate,custom_rang
   });
 
 }
-export function userinputUpdateTime(successUpdateTime,errorUpdateTime){   
+export function progressAnalyzerUpdateTime(successUpdateTime,errorUpdateTime){   
   const URL=`/progress/user/report/update_schedule`;
   const config={
    method:"get",

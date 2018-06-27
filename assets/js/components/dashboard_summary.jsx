@@ -11,7 +11,7 @@ import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
-import fetchProgress,{fetchUserRank,userinputUpdateTime} from '../network/progress';
+import fetchProgress,{fetchUserRank,progressAnalyzerUpdateTime} from '../network/progress';
 import AllRank_Data1 from "./leader_all_exp";
 import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay    } from './dashboard_healpers';
 
@@ -964,7 +964,7 @@ headerDates(value){
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
       fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,true);
       window.addEventListener('scroll', this.handleScroll);
-      userinputUpdateTime(this.successUpdateTime,this.errorUpdateTime);
+      progressAnalyzerUpdateTime(this.successUpdateTime,this.errorUpdateTime);
 
     }
     componentWillUnmount() {
