@@ -13,6 +13,7 @@ from progress_analyzer import urls as progressUrls
 from leaderboard import urls as leaderboardUrls
 from fitbit import views as fitbitViews
 from hrr import urls as hrrUrls
+from fitbit import urls as fitbitUrls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -54,6 +55,7 @@ urlpatterns = [
     url(r'^leaderboard/', include(leaderboardUrls)),
     url(r'^hrr/', include(hrrUrls)),
     url(r'^users/',include(userInputUrls)),
+    url(r'^fitbit/',include(fitbitUrls)),
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^service_connect$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
