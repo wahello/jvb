@@ -11,7 +11,7 @@ import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
-import fetchProgress,{fetchUserRank} from '../network/progress';
+import fetchProgress,{fetchUserRank,userinputUpdateTime} from '../network/progress';
 import AllRank_Data1 from "./leader_all_exp";
 import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay    } from './dashboard_healpers';
 
@@ -576,7 +576,8 @@ constructor(props){
            "week": "-",
            "today": "-",
            "yesterday": "-"
-       }
+       },
+       scheduled_date:''
 
     };
     this.successProgress = this.successProgress.bind(this);
@@ -616,6 +617,8 @@ constructor(props){
    this.handleBackButton = this.handleBackButton.bind(this);
    this.renderTableHeader = this.renderTableHeader.bind(this);
    this.toggleDropdown = this.toggleDropdown.bind(this);
+   this.successUpdateTime = this.successUpdateTime.bind(this);
+   this.errorUpdateTime =this.errorUpdateTime.bind(this);
 
   }
     
@@ -946,7 +949,14 @@ headerDates(value){
             let date = date1 + ' to ' + date2;
             return date;
 }
-
+   successUpdateTime(data){
+      this.setState({
+        scheduled_date:data.data.scheduled_date
+      });
+    }
+    errorUpdateTime(error){
+      console.log(error.message);
+    }
     componentDidMount(){
       this.setState({
          fetching_ql4 :true,     
@@ -954,6 +964,7 @@ headerDates(value){
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
       fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,true);
       window.addEventListener('scroll', this.handleScroll);
+      userinputUpdateTime(this.successUpdateTime,this.errorUpdateTime);
 
     }
     componentWillUnmount() {
@@ -1469,6 +1480,9 @@ handleBackButton(){
             <div className = "row justify-content-center">
             <span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
           </div>
+        }
+        {this.state.scheduled_date &&
+        <div style = {{fontWeight:"bold"}}>Progress Analyzer Updated Time:- {moment(this.state.scheduled_date).format('MMM DD, YYYY')}</div>
         }
         {this.state.active_view &&
             <div className="row justify-content-center padding" style = {{paddingTop:"25px"}}>
