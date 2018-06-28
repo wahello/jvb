@@ -43,6 +43,7 @@ class FitbitPush(APIView):
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
 	def get(self, request, format="json"):
+		
 		return Response(status = status.HTTP_204_NO_CONTENT)
 
 
