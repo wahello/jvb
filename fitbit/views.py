@@ -67,6 +67,15 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 			logging.exception("message")
 
 		try:
+			if "activity_fitbit" == key:
+				date_of_activity = value['pagination']['afterDate']
+				UserFitbitDataActivities.objects.update_or_create(user=user,
+					date_of_activities=date_of_activity,activities_data=value,
+					defaults={'created_at': start_date,})
+		except (KeyError, IndexError):
+			logging.exception("message")
+
+		try:
 			if "heartrate_fitbit" == key:
 				date_of_heartrate = value['activities-heart'][0]['dateTime']
 				UserFitbitDataHeartRate.objects.update_or_create(user=user,
@@ -136,7 +145,9 @@ def api_fitbit(session,date_fitbit):
 	Takes session and start date then call the fitbit api,return the fitbit api
 	'''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
-	activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
+	activity_fitbit = session.get(
+	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+	date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
 
@@ -215,6 +226,7 @@ def fetching_data_fitbit(request):
 	statuscode = sleep_fitbit.status_code
 	#converting str to dict
 	sleep_fitbit = sleep_fitbit.json()
+	activity_fitbit = activity_fitbit.json()
 	heartrate_fitbit = heartrate_fitbit.json()
 	steps_fitbit = steps_fitbit.json()
 
@@ -224,12 +236,14 @@ def fetching_data_fitbit(request):
 			refresh_token(user)
 	fitbit_all_data = {}
 	fitbit_all_data['sleep_fitbit'] = sleep_fitbit
+	fitbit_all_data['activity_fitbit'] = activity_fitbit
 	fitbit_all_data['heartrate_fitbit'] = heartrate_fitbit
 	fitbit_all_data['steps_fitbit'] = steps_fitbit
 
 	store_data(fitbit_all_data,request.user,start_date)
 
 	fitbit_data = {"sleep_fitbit":sleep_fitbit,
+					"activity_fitbit":activity_fitbit,
 					"heartrate_fitbit":heartrate_fitbit,
 					"steps_fitbit":steps_fitbit}
 	data = json.dumps(fitbit_data)
