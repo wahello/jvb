@@ -13,7 +13,7 @@ function createMomentObj(dt,hour,min,am_pm){
 	  if(am_pm == 'am' && hour && hour == 12){
 	    hour = 0
 	  }
-	  if (am_pm == 'pm' && hour && hour != 12){
+	  if (am_pm == 'pm' && hour && hour != 12){  
 	    hour = parseInt(hour)+12;
 	  }
 	  let y = dt.year();
@@ -387,3 +387,4 @@ export function fetchGarminHrrData(start_date, successCallback=undefined, errorC
 		}
 	});
 }
+
