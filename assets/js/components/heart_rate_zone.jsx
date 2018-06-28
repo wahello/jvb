@@ -54,12 +54,14 @@ class HeartrateZone extends Component{
 	}
 
 	successHeartrateZone(data){
+		/*Getting data successfully from API*/
 	  	this.setState({
 	  		hr_zone:data.data,
 	  		fetching_hrr_zone:false
 	  	});
   	}
   	successHrrWeeklyAaData(data){
+  		/*Getting data successfully from API*/
 	  	this.setState({
 	  		weekly_aa_data:data.data,
 	  		fetching_hrr_zone:false
@@ -103,6 +105,7 @@ class HeartrateZone extends Component{
       });
     }
   	renderTime(value){
+  		/*Converting Milliseconds to HH:MM:SS format */
 		if(value>0){
 			var sec_num = parseInt(value); 
 		    var hours   = Math.floor(sec_num / 3600);
@@ -121,6 +124,7 @@ class HeartrateZone extends Component{
 		    return time;
 	}
 	renderpercentage(value){
+		/*Adding % symbol to Percentage value*/
 		let percentage
 		if(value){
 			percentage = value +"%";
@@ -131,6 +135,7 @@ class HeartrateZone extends Component{
 		return percentage;
 	}
   	processDate(selectedDate){
+  		/*When we select a Date It will fetch the selected date value*/
   		let end_dt = moment(selectedDate);
 		let start_dt = moment(selectedDate).subtract(7,'days');
 		this.setState({
@@ -147,6 +152,7 @@ class HeartrateZone extends Component{
 	}
 
 	onSubmitDate(event){
+		/*It will fetch the custom date values when we gave the range of dates*/
   	event.preventDefault();
   	let start_dt = moment(this.state.start_date);
   	let end_dt = moment(this.state.end_date);
@@ -173,6 +179,7 @@ class HeartrateZone extends Component{
 	}
 
 	renderTable(data){
+		/*Creating table data and columns dynamically for Heart Rate zone table*/
 		var td_rows = [];
 		let keys = ["heart_rate_zone_low_end","heart_rate_zone_high_end","classificaton", 
 		"time_in_zone","prcnt_total_duration_in_zone"];
@@ -197,6 +204,7 @@ class HeartrateZone extends Component{
 		return td_rows;
 	}
 	renderTableWeeklyAaData(data){
+		/*Creating table data and columns dynamically for Heart Rate Weekly Aa data table*/
 		var td_rows = [];
 		let keys = ["duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range", 
 		"percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
@@ -225,121 +233,112 @@ class HeartrateZone extends Component{
 	render(){
 		return(
 			<div>
-
 				<NavbarMenu/>
+			 	<div className="row" style = {{marginTop:"10px"}}>
+	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
+	                    <FontAwesome
+	                        name = "calendar"
+	                        size = "2x"
+	                    />
+	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+                	</span>
+                	<span className="date_range_btn" style = {{marginLeft:"20px"}}>
+				        <Button
+                            className="daterange-btn btn"		                         
+				            id="daterange"
+				            onClick={this.toggleDate} >Date Range
+				        </Button>
+			        </span>
+                	<span  onClick={this.toggleDate} id="daterange" style={{fontWeight:"bold",marginTop:"10px",marginLeft:"10px"}}>
+				        {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
+			        </span>
+			        
+	            	<Popover
+			            placement="bottom"
+			            isOpen={this.state.calendarOpen}
+			            target="progress"
+			            toggle={this.toggleCalendar}>
+		                <PopoverBody className="calendar2">
+		                <CalendarWidget  onDaySelect={this.processDate}/>
+		                </PopoverBody>
+	                </Popover>
+	            </div>
 
-				 	<div className="row" style = {{marginTop:"10px"}}>
-		            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
-		                    <FontAwesome
-		                        name = "calendar"
-		                        size = "2x"
-		                    />
-		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
-	                	</span>
-	                	 <span  onClick={this.toggleDate} id="daterange">
-									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
-									        </span>
-									        <span className="date_range_btn">
-									         <Button
-		                                        className="daterange-btn btn"		                         
-									            id="daterange"
-									            
-									            onClick={this.toggleDate} >Date Range
-									        </Button>
-									        </span>
-		            	<Popover
-				            placement="bottom"
-				            isOpen={this.state.calendarOpen}
-				            target="progress"
-				            toggle={this.toggleCalendar}>
-			                <PopoverBody className="calendar2">
-			                <CalendarWidget  onDaySelect={this.processDate}/>
-			                </PopoverBody>
-		                </Popover>
-		            </div>
-
-		            <Popover
-                            placement="bottom"
-                            isOpen={this.state.dateRange}
-                            target="daterange"
-                            toggle={this.toggleDate}>
-                              <PopoverBody>
-                                <div >
-
-				           <Form>
+	            <Popover
+                    placement="bottom"
+                    isOpen={this.state.dateRange}
+                    target="daterange"
+                    toggle={this.toggleDate}>
+                    <PopoverBody>
+                        <div >
+			           		<Form>
 						        <div style={{paddingBottom:"12px"}} className="justify-content-center">
-						          <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-						          <Input type="date"
-						           name="start_date"
-						           value={moment(this.state.start_date).format('YYYY-MM-DD')}
-						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-
+							       	<Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+							        <Input type="date"
+							        name="start_date"
+							        value={moment(this.state.start_date).format('YYYY-MM-DD')}
+							        onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 						        </div>
 						        <div id="date" className="justify-content-center">
-
-						          <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-						          <Input type="date"
-						           name="end_date"
-						           value={moment(this.state.end_date).format('YYYY-MM-DD')}
-						           onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-
+						          	<Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+						          	<Input type="date"
+						           	name="end_date"
+						           	value={moment(this.state.end_date).format('YYYY-MM-DD')}
+						           	onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 						        </div>
 						        <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
-
-						        <button
-						        id="nav-btn"
-						         style={{backgroundColor:"#ed9507"}}
-						         type="submit"
-						         className="btn btn-block-lg"
-						         onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
-						         </div>
-
-						  		 </Form>
-							</div>
-                           </PopoverBody>
-                           </Popover>
-		            <div className = "row justify-content-center hr_table_padd">
-	          	    	<div className = "table table-responsive">
-		          	    	<table className = "table table-striped table-bordered ">
-			          	    	<thead>
-				          	    	<th>Heart Rate Zone Low End</th>
-				          	    	<th>Heart Rate Zone Heigh End</th>
-				          	    	<th>Classification</th>
-				          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
-				          	    	<th>% of Total Duration in Zone</th>
-			          	    	</thead>
-			          	    	<tbody>
-			          	    	{this.renderTable(this.state.hr_zone)}
-			          	    	</tbody>
-		          	    	</table>
-	          	    	</div>
+							        <button
+							        id="nav-btn"
+							        style={{backgroundColor:"#ed9507"}}
+							        type="submit"
+							        className="btn btn-block-lg"
+							        onClick={this.onSubmitDate} style={{width:"175px"}}>SUBMIT</button>
+						        </div>
+					  		</Form>
+						</div>
+                   	</PopoverBody>
+                </Popover>
+                <div className = "row justify-content-center hr_table_padd">
+          	    	<div className = "table table-responsive">
+	          	    	<table className = "table table-striped table-bordered ">
+		          	    	<thead>
+								<th>Duration in Aerobic Range (hh:mm:ss)</th>
+								<th>% Aerobic</th>
+								<th>Duration in Anaerobic Range (hh:mm:ss)</th>
+								<th>% Anaerobic</th>
+								<th>Duration Below Aerobic Range (hh:mm:ss)</th>
+								<th>% Below Aerobic</th>
+								<th>Heart Rate Not recorded (hh:mm:ss)</th>
+								<th>% Heart Rate Not recorded</th>
+								<th>Max Heartrate</th>
+								<th>Average Heartrate</th>
+								<th>Total Duration(hh:mm:ss)</th>
+		          	    	</thead>
+		          	    	<tbody>
+		          	    	{this.renderTableWeeklyAaData(this.state.weekly_aa_data)}
+		          	    	</tbody>
+	          	    	</table>
           	    	</div>
-          	    	 <div className = "row justify-content-center hr_table_padd">
-	          	    	<div className = "table table-responsive">
-		          	    	<table className = "table table-striped table-bordered ">
-			          	    	<thead>
-				          	    	
-										<th>Duration in Aerobic Range (hh:mm:ss)</th>
-										<th>% Aerobic</th>
-										<th>Duration in Anaerobic Range (hh:mm:ss)</th>
-										<th>% Anaerobic</th>
-										<th>Duration Below Aerobic Range (hh:mm:ss)</th>
-										<th>% Below Aerobic</th>
-										<th>Heart Rate Not recorded (hh:mm:ss)</th>
-										<th>% Heart Rate Not recorded</th>
-										<th>Max Heartrate</th>
-										<th>Average Heartrate</th>
-										<th>Total Duration(hh:mm:ss)</th>
-			          	    	</thead>
-			          	    	<tbody>
-			          	    	{this.renderTableWeeklyAaData(this.state.weekly_aa_data)}
-			          	    	</tbody>
-		          	    	</table>
-	          	    	</div>
+      	    	</div>       
+	            <div className = "row justify-content-center hr_table_padd">
+          	    	<div className = "table table-responsive">
+	          	    	<table className = "table table-striped table-bordered ">
+		          	    	<thead>
+			          	    	<th>Heart Rate Zone Low End</th>
+			          	    	<th>Heart Rate Zone Heigh End</th>
+			          	    	<th>Classification</th>
+			          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
+			          	    	<th>% of Total Duration in Zone</th>
+		          	    	</thead>
+		          	    	<tbody>
+		          	    	{this.renderTable(this.state.hr_zone)}
+		          	    	</tbody>
+	          	    	</table>
           	    	</div>
-          	    	{this.renderTimeTohrrZoneSelectedDateFetchOverlay()}
+      	    	</div>
+      	    	{this.renderTimeTohrrZoneSelectedDateFetchOverlay()}
 			</div>
-			);
+		);
 	}
 }
 export default HeartrateZone;
