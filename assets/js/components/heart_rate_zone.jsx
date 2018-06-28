@@ -49,6 +49,7 @@ class HeartrateZone extends Component{
 	 	this.handleChange = this.handleChange.bind(this);
 	 	this.successHrrWeeklyAaData = this.successHrrWeeklyAaData.bind(this);
 	 	this.errorHrrWeeklyAaData = this.errorHrrWeeklyAaData.bind(this);
+	 	this.renderTableWeeklyAaData = this.renderTableWeeklyAaData.bind(this);
 	 	this.renderTimeTohrrZoneSelectedDateFetchOverlay = renderTimeTohrrZoneSelectedDateFetchOverlay.bind(this);
 	}
 
@@ -62,8 +63,6 @@ class HeartrateZone extends Component{
 	  	this.setState({
 	  		weekly_aa_data:data.data,
 	  		fetching_hrr_zone:false
-	  	},()=>{
-	  		console.log("*************",this.state.weekly_aa_data);
 	  	});
   	}
   	toggleDate(){
@@ -197,7 +196,32 @@ class HeartrateZone extends Component{
 		}
 		return td_rows;
 	}
-
+	renderTableWeeklyAaData(data){
+		var td_rows = [];
+		let keys = ["duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range", 
+		"percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
+		"duration_hrr_not_recorded","percent_hrr_not_recorded","max_heart_rate","avg_heart_rate","total_duration"];
+		let td_values = [];
+			for(let key of keys){
+				if(key == "duration_in_aerobic_range" ||key == "duration_in_anaerobic_range" ||
+					key == "duration_below_aerobic_range" || key == "duration_hrr_not_recorded" ||
+					key == "total_duration"){
+				let keyvalue = this.renderTime(data[key]);
+				td_values.push(<td>{keyvalue}</td>);
+				}
+				else if(key == "percent_aerobic" ||key == "percent_anaerobic" ||
+					key == "percent_below_aerobic" || key == "percent_hrr_not_recorded"){
+					let keyvalue = this.renderpercentage(data[key]);
+					td_values.push(<td>{keyvalue}</td>);
+				}
+				else{
+					let keyvalue = data[key];
+					td_values.push(<td>{keyvalue}</td>);
+				}
+			}
+			td_rows.push(<tr>{td_values}</tr>);
+		return td_rows;
+	}
 	render(){
 		return(
 			<div>
@@ -294,14 +318,21 @@ class HeartrateZone extends Component{
 	          	    	<div className = "table table-responsive">
 		          	    	<table className = "table table-striped table-bordered ">
 			          	    	<thead>
-				          	    	<th>Heart Rate Zone Low End</th>
-				          	    	<th>Heart Rate Zone Heigh End</th>
-				          	    	<th>Classification</th>
-				          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
-				          	    	<th>% of Total Duration in Zone</th>
+				          	    	
+										<th>Duration in Aerobic Range (hh:mm:ss)</th>
+										<th>% Aerobic</th>
+										<th>Duration in Anaerobic Range (hh:mm:ss)</th>
+										<th>% Anaerobic</th>
+										<th>Duration Below Aerobic Range (hh:mm:ss)</th>
+										<th>% Below Aerobic</th>
+										<th>Heart Rate Not recorded (hh:mm:ss)</th>
+										<th>% Heart Rate Not recorded</th>
+										<th>Max Heartrate</th>
+										<th>Average Heartrate</th>
+										<th>Total Duration(hh:mm:ss)</th>
 			          	    	</thead>
 			          	    	<tbody>
-			          	    	{this.renderTable(this.state.hr_zone)}
+			          	    	{this.renderTableWeeklyAaData(this.state.weekly_aa_data)}
 			          	    	</tbody>
 		          	    	</table>
 	          	    	</div>
