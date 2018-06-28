@@ -12,6 +12,10 @@ from django.shortcuts import render
 from django.core.mail import EmailMessage
 from django.shortcuts import redirect
 from django.http import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from rauth import OAuth2Service, OAuth2Session
 
@@ -244,3 +248,18 @@ def refresh_token_fitbit(request):
 		client secret   ---- 94d717c6ec36c270ed59cc8b5564166f
 		redirect url    ---- http://127.0.0.1:8000/callbacks/fitbit
 '''		 
+
+class HaveFitbitTokens(APIView):
+	'''
+	Check availability of fitbit tokens for current user
+	'''
+	permission_classes = (IsAuthenticated,)
+	def get(self,request,format="json"):
+		have_tokens = {
+			"have_fitbit_tokens":False
+		}
+
+		if FitbitConnectToken.objects.filter(user=request.user).exists():
+			have_tokens['have_fitbit_tokens'] = True
+
+		return Response(have_tokens,status=status.HTTP_200_OK)
