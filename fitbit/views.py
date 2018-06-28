@@ -7,7 +7,6 @@ import pprint
 from datetime import datetime, timedelta , date
 import ast
 import logging
-import schedule
 import time
 
 from django.db.models import Q
@@ -56,14 +55,10 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 	Return: None
 	''' 
 	if data_type:
-		print("Step 1")
 		fitbit_all_data[data_type] = fitbit_all_data
-	print(data_type)
 	for key,value in fitbit_all_data.items():
-		print(key)
 		try:
 			if "sleep_fitbit" == key:
-				print("step 2")
 				date_of_sleep = value['sleep'][0]['dateOfSleep']
 				UserFitbitDataSleep.objects.update_or_create(user = user,
 					date_of_sleep=date_of_sleep,sleep_data=value,
@@ -350,8 +345,3 @@ class HaveFitbitTokens(APIView):
 			have_tokens['have_fitbit_tokens'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
-
-
-
-
-
