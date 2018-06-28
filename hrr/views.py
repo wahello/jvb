@@ -1408,17 +1408,15 @@ class UserAaView(APIView):
 				'percent_aerobic','duration_in_anaerobic_range','percent_anaerobic','duration_below_aerobic_range',
 				'percent_below_aerobic','duration_hrr_not_recorded','percent_hrr_not_recorded']
 		lists = [[],[],[],[],[],[],[],[],[],[],[]]
+
 		for aa in data_values:
-			try:
-				aa_dic = ast.literal_eval(aa)
-				if aa_dic:
-					aa_totals = aa_dic['Totals']
-				else:
-					aa_totals = ''
-			except (ValueError,SyntaxError):
-				aa_totals = aa_dic.Totals
-			for key,li in zip(keys,lists):
-				if li:
+			aa = ast.literal_eval(aa)
+			if aa:
+				try:
+					aa_totals = aa['Totals']
+				except (ValueError,SyntaxError):
+					aa_totals = aa['Totals']
+				for key,li in zip(keys,lists):
 					aa_values = aa_totals[key]
 					li.append(aa_values)
 		try:
