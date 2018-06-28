@@ -67,15 +67,6 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 			logging.exception("message")
 
 		try:
-			if "activity_fitbit" == key:
-				date_of_activity = value['pagination']['afterDate']
-				UserFitbitDataActivities.objects.update_or_create(user=user,
-					date_of_activities=date_of_activity,activities_data=value,
-					defaults={'created_at': start_date,})
-		except (KeyError, IndexError):
-			logging.exception("message")
-
-		try:
 			if "heartrate_fitbit" == key:
 				date_of_heartrate = value['activities-heart'][0]['dateTime']
 				UserFitbitDataHeartRate.objects.update_or_create(user=user,
@@ -133,8 +124,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -145,19 +136,22 @@ def api_fitbit(session,date_fitbit):
 	Takes session and start date then call the fitbit api,return the fitbit api
 	'''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
-	activity_fitbit = session.get(
-	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
-	date_fitbit))
+	activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
 
 	return(sleep_fitbit,activity_fitbit,heartrate_fitbit,steps_fitbit)
 
 def request_token_fitbit(request):
-	service = session_fitbit()
+	service = OAuth2Service(
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 access_token_url='https://api.fitbit.com/oauth2/token',
+					 authorize_url='https://www.fitbit.com/oauth2/authorize',
+					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -169,8 +163,8 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN46'
-	client_secret='94d717c6ec36c270ed59cc8b5564166f'
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -185,7 +179,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
+			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -221,10 +215,8 @@ def fetching_data_fitbit(request):
 	statuscode = sleep_fitbit.status_code
 	#converting str to dict
 	sleep_fitbit = sleep_fitbit.json()
-	activity_fitbit = activity_fitbit.json()
 	heartrate_fitbit = heartrate_fitbit.json()
 	steps_fitbit = steps_fitbit.json()
-	print(pprint.pprint((activity_fitbit.keys())))
 
 	if statuscode == 401: # if status 401 means fitbit tokens are expired below does generate tokens
 		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
@@ -232,14 +224,12 @@ def fetching_data_fitbit(request):
 			refresh_token(user)
 	fitbit_all_data = {}
 	fitbit_all_data['sleep_fitbit'] = sleep_fitbit
-	fitbit_all_data['activity_fitbit'] = activity_fitbit
 	fitbit_all_data['heartrate_fitbit'] = heartrate_fitbit
 	fitbit_all_data['steps_fitbit'] = steps_fitbit
 
 	store_data(fitbit_all_data,request.user,start_date)
 
 	fitbit_data = {"sleep_fitbit":sleep_fitbit,
-					"activity_fitbit":activity_fitbit,
 					"heartrate_fitbit":heartrate_fitbit,
 					"steps_fitbit":steps_fitbit}
 	data = json.dumps(fitbit_data)
