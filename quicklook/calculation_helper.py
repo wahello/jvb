@@ -15,7 +15,8 @@ from garmin.models import UserGarminDataEpoch,\
 		  UserGarminDataManuallyUpdated,\
 		  UserGarminDataStressDetails,\
           UserGarminDataMetrics,\
-          UserGarminDataMoveIQ
+          UserGarminDataMoveIQ,\
+          UserLastSynced
 
 from user_input.models import UserDailyInput,\
 					DailyUserInputStrong,\
@@ -878,7 +879,33 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 	mc_data['exercise_hours'] = exercise_hours
 	mc_data['total_steps'] = total_steps
 
-def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleeps_today_json,
+def _get_user_current_local_time(user,tz_offset=None):
+	'''
+	Return the current local time of user.
+	If timezone offset is provided then use this offset to 
+	determine local time otherwise look for offset value.
+	If no offset value is found then return current UTC time.
+
+	Args:
+		tz_offset(int): Offset value of user's timezone. Default is None
+
+	Returns:
+		Datetime: Return a naive datetime object   
+	'''
+	utc_time_now = datetime.utcnow()
+	if not tz_offset:
+		try:
+			last_synced_obj = UserLastSynced.objects.get(user=user)
+			tz_offset = last_synced_obj.offset
+		except UserLastSynced.DoesNotExist as e:
+			tz_offset = 0
+	if tz_offset:
+		td = timedelta(seconds = tz_offset)
+		local_time = utc_time_now + td
+		return local_time
+	return utc_time_now
+
+def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,sleeps_today_json,
 					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,userinput_activities,user_input_bedtime = None,
 					user_input_awake_time = None,user_input_timezone = None,
 					user_input_strength_start_time=None,user_input_strength_end_time=None,
@@ -981,6 +1008,8 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 		last_sleeping_hour = None
 		have_steps_before_9_am  = False
 
+		user_current_local_time = _get_user_current_local_time(user)
+
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -1002,7 +1031,12 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 					movement_consistency[interval]['steps'] = 0
 
 			elif today_awake_time and hour_start >= today_awake_time:
-				if not movement_consistency[interval]['steps']:
+				if (not movement_consistency[interval]['steps'] 
+					and user_current_local_time.date() == hour_start.date()
+					and hour_start > user_current_local_time):
+					movement_consistency[interval]['status'] = 'no data yet'
+					movement_consistency[interval]['steps'] = 0
+				elif not movement_consistency[interval]['steps']:
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
 						
@@ -1022,7 +1056,12 @@ def cal_movement_consistency_summary(calendar_date,epochs_json,sleeps_json,sleep
 					if not have_steps_before_9_am:
 						have_steps_before_9_am = True
 
-				if (movement_consistency[interval]['status'] == "sleeping" and
+				if (movement_consistency[interval]['status'] == "sleeping"
+				 	and not movement_consistency[interval]['steps']
+				 	and user_current_local_time.date() == hour_start.date()
+					and hour_start > user_current_local_time):
+					movement_consistency[interval]['status'] = 'no data yet'
+				elif (movement_consistency[interval]['status'] == "sleeping" and
 					not movement_consistency[interval]['steps']):
 					movement_consistency[interval]['status'] = 'inactive'
 
@@ -2051,18 +2090,21 @@ def create_quick_look(user,from_date=None,to_date=None):
 		if tomorrows_user_input and tomorrows_user_input.strong_input:
 			todays_bedtime = tomorrows_user_input.strong_input.sleep_bedtime
 
-		movement_consistency_summary = cal_movement_consistency_summary(current_date,
-										epochs_json,sleeps_json,
-										sleeps_today_json,
-										todays_activities=todays_activities,
-										todays_manually_updated_json=todays_manually_updated_json,
-										userinput_activities=userinput_activities,
-										user_input_todays_bedtime = todays_bedtime,
-										user_input_bedtime = user_input_bedtime,
-									  	user_input_awake_time = user_input_awake_time,
-									  	user_input_timezone = user_input_timezone,
-									  	user_input_strength_start_time = user_input_strength_start_time,
-									  	user_input_strength_end_time = user_input_strength_end_time)
+		movement_consistency_summary = cal_movement_consistency_summary(
+			user,
+			current_date,
+			epochs_json,sleeps_json,
+			sleeps_today_json,
+			todays_activities=todays_activities,
+			todays_manually_updated_json=todays_manually_updated_json,
+			userinput_activities=userinput_activities,
+			user_input_todays_bedtime = todays_bedtime,
+			user_input_bedtime = user_input_bedtime,
+		  	user_input_awake_time = user_input_awake_time,
+		  	user_input_timezone = user_input_timezone,
+		  	user_input_strength_start_time = user_input_strength_start_time,
+		  	user_input_strength_end_time = user_input_strength_end_time
+		)
 		
 		if movement_consistency_summary:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency_summary)
