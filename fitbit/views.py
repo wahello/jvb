@@ -43,8 +43,12 @@ class FitbitPush(APIView):
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
 	def get(self, request, format="json"):
-		return Response(status = status.HTTP_204_NO_CONTENT)
-
+		verification_code = request.query_params
+		verify_code = verification_code.get('verify','')
+		if verify_code == '4d48c7d06f18f34bb9479af97d4dd82732885d3adbeda22c1ce79c559189900c':
+			return Response(status = status.HTTP_204_NO_CONTENT)
+		else:
+			return Response(status = status.HTTP_404_NOT_FOUND)
 
 def store_data(fitbit_all_data,user,start_date,data_type=None):
 	'''
@@ -285,26 +289,26 @@ def refresh_token_fitbit(request):
 # 		This function takes the notificatin messages which are stored in last 10 min
 # 		creates a session
 # 	'''
-	# print("Startes for checking notifications in database")
-	# time = datetime.now() - timedelta(minutes=15) 
-	# updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
-	# if updated_data:
-	# 	service = session_fitbit()
-	# 	tokens = FitbitConnectToken.objects.get(user = request.user)
-	# 	access_token = tokens.access_token
-	# 	session = service.get_session(access_token)
-	# 	for i,k in enumerate(updated_data):
-	# 		k = ast.literal_eval(k.data_notification)
-	# 		date = k[i]['date']
-	# 		user_id = k[i]['ownerId']
-	# 		data_type = k[i]['collectionType']
-	# 		try:
-	# 			user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
-	# 		except FitbitConnectToken.DoesNotExist as e:
-	# 			user = None
-	# 		call_api(date,user_id,data_type,user,session)
-	# return HttpResponse('Final return')
-	# return None
+# 	print("Startes for checking notifications in database")
+# 	time = datetime.now() - timedelta(minutes=15) 
+# 	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
+# 	if updated_data:
+# 		service = session_fitbit()
+# 		tokens = FitbitConnectToken.objects.get(user = request.user)
+# 		access_token = tokens.access_token
+# 		session = service.get_session(access_token)
+# 		for i,k in enumerate(updated_data):
+# 			k = ast.literal_eval(k.data_notification)
+# 			date = k[i]['date']
+# 			user_id = k[i]['ownerId']
+# 			data_type = k[i]['collectionType']
+# 			try:
+# 				user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
+# 			except FitbitConnectToken.DoesNotExist as e:
+# 				user = None
+# 			call_api(date,user_id,data_type,user,session)
+# 	return HttpResponse('Final return')
+# 	return None
 
 # def call_api(date,user_id,data_type,user,session):
 # 	'''
