@@ -22,3 +22,22 @@ export default function fetchHeartrateZoneData(successHeartrateZone,errorHeartra
   });
 
 }
+export function weeklyHeartRateZone(startDate,endDate,successquick, errorquick){  
+    startDate = moment(startDate);
+    endDate = moment(endDate);
+    const URL = `quicklook/users/data`;
+    const config = {
+      method: "get",
+      params:{
+        to: endDate.format('YYYY-MM-DD'),
+        from: startDate.format('YYYY-MM-DD') 
+      },
+      url: URL,
+      withCredentials: true
+    };
+     axios(config).then((response) => {
+       successquick(response,startDate,endDate);
+     }).catch(function (error){
+       errorquick(error);
+    });
+  }
