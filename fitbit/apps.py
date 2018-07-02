@@ -4,3 +4,4 @@ class FitbitConfig(AppConfig):
     name = 'fitbit'
 
 
+
