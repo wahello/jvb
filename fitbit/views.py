@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+# from .tasks import store_fitbit_data
 
 
 from rauth import OAuth2Service, OAuth2Session
@@ -40,6 +41,7 @@ class FitbitPush(APIView):
 	def post(self, request, format="json"):
 		data = request.data
 		FitbitNotifications.objects.create(data_notification=data)
+		# store_fitbit_data.delay(request.data)
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
 	def get(self, request, format="json"):
@@ -131,6 +133,14 @@ def session_fitbit():
 					 base_url='https://fitbit.com/api')
 	return service
 
+def fit_bit_user_subscriptions(request):
+	request.post("https://api.fitbit.com/1/user/-/apiSubscriptions/2112.json")
+	request.post("https://api.fitbit.com/1/user/-/activities/apiSubscriptions/2112.json")
+	request.post("https://api.fitbit.com/1/user/-/foods/apiSubscriptions/2112.json")
+	request.post("https://api.fitbit.com/1/user/-/sleep/apiSubscriptions/2112.json")
+	request.post("https://api.fitbit.com/1/user/-/body/apiSubscriptions/2112.json")
+	return None
+
 def api_fitbit(session,date_fitbit):
 	'''
 	Takes session and start date then call the fitbit api,return the fitbit api
@@ -197,6 +207,7 @@ def receive_token_fitbit(request):
 				token.save()
 		except FitbitConnectToken.DoesNotExist:
 			FitbitConnectToken.objects.create(user=request.user,refresh_token=a['refresh_token'],access_token=a['access_token'],user_id_fitbit=a['user_id'])
+			fit_bit_user_subscriptions(request)
 		return redirect('/service_connect_fitbit')
 
 def fetching_data_fitbit(request):
