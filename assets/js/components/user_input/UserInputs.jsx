@@ -14,7 +14,7 @@ import { Container, Select, option, Option, Row, Col, Button,
          ButtonGroup, Form,FormGroup, Label, Input, FormText,
          className, Modal,ModalHeader, ModalBody, ModalFooter,
          Nav, NavItem, NavLink, Collapse, Navbar, NavbarToggler, 
-         NavbarBrand,Popover,PopoverBody,PopoverHeader} from 'reactstrap';
+         NavbarBrand,Popover,PopoverBody,PopoverHeader} from 'reactstrap';    
 import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
@@ -260,6 +260,7 @@ class UserInputs extends React.Component{
     this.foodTab = this.foodTab.bind(this);
     this.stressTab = this.stressTab.bind(this);
     this.extraTab = this.extraTab.bind(this);
+    
     }
     
     _extractDateTimeInfo(dateObj){
@@ -974,7 +975,7 @@ getTotalSleep(){
         gender:data.data.gender
       });
     }
-
+   
     componentDidMount(){
       this.setState({
         fetching_data:true
@@ -982,6 +983,7 @@ getTotalSleep(){
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
       getUserProfile(this.onProfileSuccessFetch);
+      
       window.addEventListener('scroll', this.handleScroll);
     }
 

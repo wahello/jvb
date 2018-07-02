@@ -734,8 +734,7 @@ def aa_workout_calculations(request):
 					workout.append(filtered_activities_files[i])
 		for x in filtered_activities_files:
 			if (x.get("summaryId") not in act_id and 
-			   x.get("durationInSeconds",0)>=1200 and
-			   x.get("distanceInMeters",0)>200) or x.get("activityType") != "HEART_RATE_RECOVERY":
+			    x.get("activityType") != "HEART_RATE_RECOVERY"):
 				workout.append(x)
 
 	data={"date":"",
@@ -808,15 +807,19 @@ def aa_workout_calculations(request):
 		except ValueError:
 			maxi_hrr = ''
 		time_total = sum(time_duration)
-		
+		try:
+			total_prcnt_hrr_not_recorded = (sum(hrr_not_recorded_list)/sum(time_duration))*100
+			total_prcnt_hrr_not_recorded = int(Decimal(total_prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+		except ZeroDivisionError:
+			total_prcnt_hrr_not_recorded = ""
 		total = {"date":date,
 				 "workout_type":"Totals",
-				 "duration":sum(time_duration),
+				 "duration":time_total,
 				 "average_heart_rate":avg_hrr,
 				 "max_heart_rate":maxi_hrr,
 				 "steps":sum(steps),
 				 "hrr_not_recorded":sum(hrr_not_recorded_list),
-				 "prcnt_hrr_not_recorded":(sum(hrr_not_recorded_list)/sum(time_duration))*100
+				 "prcnt_hrr_not_recorded":total_prcnt_hrr_not_recorded
 				 }
 		if total:	
 			data1['Totals'] = total
@@ -870,36 +873,14 @@ def daily_aa_calculations(request):
 		user_input__created_at=(start_date),
 		user_input__user = request.user).order_by('-user_input__created_at')
 
-	activities = []
-	id_act = 0
-	if user_input_strong:
-		for tmp in user_input_strong:
-			sn = tmp.activities
-			if sn:
-				sn = json.loads(sn)
-				di = sn.values()
-				di = list(di)
-				for i,k in enumerate(di):
-					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(di[i]['summaryId'])
-						activities.append(di[i])
-
 	workout = []
 	hrr = []
+	data_summaryid = []
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 
-	if activities:
-		for tmp in a1:
-			meta = tmp.meta_data_fitfile
-			meta = ast.literal_eval(meta)
-			data_id = int(meta['activityIds'][0])
-			if id_act == data_id:
-				hrr.append(tmp)
-			else:
-				workout.append(tmp)
-	else:
+	if a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
