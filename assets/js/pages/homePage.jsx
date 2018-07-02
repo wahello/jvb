@@ -34,6 +34,7 @@ import AllRank_Data1 from '../components/leader_all_exp';
 import HeartRateCal from '../components/heart_rate_calculation';
 import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
+import Grades_Dashboard from '../components/grades_dashboard';
 
 
 
@@ -85,6 +86,7 @@ function initializeLocalState(){
 					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
+					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
 			    </Switch>
 			  </BrowserRouter>
 			</Provider> 

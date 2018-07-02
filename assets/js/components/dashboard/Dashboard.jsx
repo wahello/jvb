@@ -181,7 +181,9 @@ class Dashboard extends Component {
 							}
 							  <h3 id="link_style">Other</h3>
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
-							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>							 
+							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>
+							  <h3 id="link_style">Dashboard Summaries</h3>
+						  	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
 						  </div>
 						</div>
 					</div>
