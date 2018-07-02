@@ -133,12 +133,16 @@ def session_fitbit():
 					 base_url='https://fitbit.com/api')
 	return service
 
-def fit_bit_user_subscriptions(request):
-	request.post("https://api.fitbit.com/1/user/-/apiSubscriptions/2112.json")
-	request.post("https://api.fitbit.com/1/user/-/activities/apiSubscriptions/2112.json")
-	request.post("https://api.fitbit.com/1/user/-/foods/apiSubscriptions/2112.json")
-	request.post("https://api.fitbit.com/1/user/-/sleep/apiSubscriptions/2112.json")
-	request.post("https://api.fitbit.com/1/user/-/body/apiSubscriptions/2112.json")
+def fit_bit_user_subscriptions(user):
+	service = session_fitbit()
+	tokens = FitbitConnectToken.objects.get(user = user)
+	access_token = tokens.access_token
+	session = service.get_session(access_token)
+	session.post("https://api.fitbit.com/1/user/-/apiSubscriptions/2112.json")
+	session.post("https://api.fitbit.com/1/user/-/activities/apiSubscriptions/2112.json")
+	session.post("https://api.fitbit.com/1/user/-/foods/apiSubscriptions/2112.json")
+	session.post("https://api.fitbit.com/1/user/-/sleep/apiSubscriptions/2112.json")
+	session.post("https://api.fitbit.com/1/user/-/body/apiSubscriptions/2112.json")
 	return None
 
 def api_fitbit(session,date_fitbit):
@@ -207,7 +211,7 @@ def receive_token_fitbit(request):
 				token.save()
 		except FitbitConnectToken.DoesNotExist:
 			FitbitConnectToken.objects.create(user=request.user,refresh_token=a['refresh_token'],access_token=a['access_token'],user_id_fitbit=a['user_id'])
-			fit_bit_user_subscriptions(request)
+			fit_bit_user_subscriptions(request.user)
 		return redirect('/service_connect_fitbit')
 
 def fetching_data_fitbit(request):
