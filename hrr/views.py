@@ -560,7 +560,7 @@ def daily_aa_data(user, start_date):
 		activity_files = [pr.data for pr in activity_files_qs]
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
-
+	print(activity_files_qs,"activity files")
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -599,7 +599,7 @@ def daily_aa_data(user, start_date):
 			if activity_files_qs:
 				for i,k in enumerate(activity_files):
 					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 						hrr.append(tmp)
 					elif activity_files_dict.get("summaryId",None) == str(data_id):
 						duration = activity_files_dict.get('durationInSeconds')
@@ -782,6 +782,20 @@ def daily_aa_calculations(request):
 			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
+def store_daily_aa_calculations(user,start_date_get):
+	# start_date_get = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
+	data = daily_aa_data(user,start_date)
+	# data = json.dumps(data)
+	if data:
+		try:
+			user_aa = AaCalculations.objects.get(
+				user_aa=user, created_at=start_date)
+			update_aa_instance(user,start_date,data)
+		except AaCalculations.DoesNotExist:
+			create_aa_instance(user, data, start_date)
+	return None
+
 
 def aa_low_high_end_data(user,start_date):
 	heart_rate_zone_low_end = ""
@@ -832,7 +846,7 @@ def aa_low_high_end_data(user,start_date):
 			data_id = meta['activityIds'][0]
 			for i,k in enumerate(activity_files):
 				activity_files_dict = ast.literal_eval(activity_files[i])
-				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 					hrr.append(tmp)
 				elif activity_files_dict.get("summaryId",None) == str(data_id) :
 					workout.append(tmp)
@@ -928,6 +942,20 @@ def aa_low_high_end_calculations(request):
 		except TimeHeartZones.DoesNotExist:
 			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
+
+def store_aa_low_high_end_calculations(user,start_date_get):
+	# start_date_get = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
+	data = aa_low_high_end_data(user,start_date)
+	# data = json.dumps(data)
+	if data:
+		try:
+			user = TimeHeartZones.objects.get(
+				user=user, created_at=start_date)
+			update_heartzone_instance(user, start_date,data)
+		except TimeHeartZones.DoesNotExist:
+			create_heartzone_instance(user, data, start_date)
+	return None
 	
 
 def hrr_data(user,start_date):
