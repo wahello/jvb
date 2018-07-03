@@ -3,6 +3,3 @@ from django.apps import AppConfig
 
 class HrrConfig(AppConfig):
 	name = 'hrr'
-
-	def ready(self):
-		import hrr.signals

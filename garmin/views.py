@@ -47,7 +47,7 @@ from .models import UserGarminDataEpoch,\
 					GarminConnectToken
 
 from users.models import GarminToken
-from hrr.custom_signals import fitfile_signal
+from hrr.tasks import create_hrrdata
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -201,16 +201,11 @@ class GarminConnectPing(APIView):
 			user = None
 		if user:
 			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
-			fitfile_signal.send(
-			sender=self.__class__,
-			date=date_str,
-			user=user)
-		# mail = EmailMessage()
-		# mail.subject = "Garmin connect Push | Files"
-		# mail.body = request.data['uploadMetaData']
-		# mail.to = ['atulk@s7works.io']
-		# mail.attach(file.name, file.read(), file.content_type)
-		# mail.send()
+			create_hrrdata.delay(
+				user.id,
+				date_str
+			)
+		
 		headers={"Location":"/"}
 		return Response(status = status.HTTP_201_CREATED,headers=headers)
 

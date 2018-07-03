@@ -950,9 +950,10 @@ def store_aa_low_high_end_calculations(user,start_date_get):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user = TimeHeartZones.objects.get(
+			time_hr_zone_obj = TimeHeartZones.objects.get(
 				user=user, created_at=start_date)
-			update_heartzone_instance(user, start_date,data)
+			if time_hr_zone_obj:
+				update_heartzone_instance(user, start_date,data)
 		except TimeHeartZones.DoesNotExist:
 			create_heartzone_instance(user, data, start_date)
 	return None
