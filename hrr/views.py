@@ -62,10 +62,12 @@ def fitfile_parse(obj,offset,start_date_str):
 	obj_start_date = int(start_date_str.split('-')[2])
 	
 	x = [(FitFile(x.fit_file)).get_messages('record') for x in obj]
-	
 	for record in x:
+		# print(type(record)) # generator
 		for record_data in record:
+			# print(type(record_data)) # <class 'fitparse.records.DataMessage'>
 			for ss in record_data:
+				# print(type(ss)) # <class 'fitparse.records.FieldData'>
 				if(ss.name=='heart_rate'):
 					b = ss.value
 					heartrate_complete.extend([b])
@@ -1164,7 +1166,9 @@ def hrr_data(user,start_date):
 	start_date_timestamp = start_date_timestamp.timetuple()
 	start_date_timestamp = time.mktime(start_date_timestamp)
 	end_date_timestamp = start_date_timestamp + 86400
-
+	print(start_date_timestamp,"start_date_timestamp")
+	print(end_date_timestamp,"end_date_timestamp")
+	print(user,"user")
 	start_date_str = start_date.strftime('%Y-%m-%d')
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
@@ -1172,12 +1176,12 @@ def hrr_data(user,start_date):
 
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
-
+	print(activity_files_qs,"activity_files_qs")
 	offset = 0
 	if activity_files:
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
-
+	print(activity_files,"Activity files")
 	count = 0
 	id_act = 0
 	activities = []
@@ -1206,7 +1210,7 @@ def hrr_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-
+	print(a1,"printing the fitfiles")
 	workout = []
 	hrr = []
 	
@@ -1231,22 +1235,32 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
+				print(data_id,"fitbit summary id")
 				for i,k in enumerate(activity_files):
 					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
+					print(activity_files_dict.get("summaryId",None),"activity summary id")
+					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 						hrr.append(tmp)
+						print('hrr in side the condition check')
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
 						workout.append(tmp)
+						print('workout in side the condition check')
 	except:
 		pass
 
-
+	print(workout,"printing workout files")
+	print(hrr,"hrr files")
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+	else:
+		workout_final_heartrate = ''
+		workout_final_timestamp = ''
+		workout_timestamp = ''
+
 		
 	Did_you_measure_HRR = ""
-	if hrr:
+	if hrr and workout:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
 		hrr_difference = hrr_final_heartrate[0]-hrr_final_heartrate[-1]
@@ -1539,3 +1553,14 @@ def hrr_calculations(request):
 		except Hrr.DoesNotExist:
 			create_hrr_instance(request.user, data, start_date)
 	return JsonResponse(data)
+
+def store_hhr(start_date_get,user):
+	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
+	data = hrr_data(user,start_date)
+	if data.get('Did_you_measure_HRR'):
+		try:
+			user_hrr = Hrr.objects.get(user_hrr=user, created_at=start_date)
+			update_hrr_instance(user_hrr, data)
+		except Hrr.DoesNotExist:
+			create_hrr_instance(user, data, start_date)
+	return None
