@@ -58,7 +58,8 @@ def populate_userinput_hrr(user,from_date, to_date):
 	for user_input in user_inputs_in_duration:
 		try:
 			data = hrr_data(user,user_input.created_at)
-			if data['Did_you_measure_HRR'] == 'yes':
+			if (data['Did_you_measure_HRR'] == 'yes' 
+				and not user_input.encouraged_input.measured_hr == 'no'):
 				if data['Did_you_measure_HRR'] and not user_input.encouraged_input.measured_hr:
 					user_input.encouraged_input.measured_hr = data['Did_you_measure_HRR']
 				if data['Did_heartrate_reach_99'] and not user_input.encouraged_input.hr_down_99:

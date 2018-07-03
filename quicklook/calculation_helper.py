@@ -427,7 +427,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	recent_auto_manual = None
 	recent_auto_final = None
-	recent_auto_tentative = None
+	recent_tentative = None
 	target_sleep_data = None
 
 	user_submitted_sleep = False
@@ -467,15 +467,15 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 				# 	recent_auto_manual = obj
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
 					recent_auto_final = obj
-				elif (obj.get('validation',None) == 'AUTO_TENTATIVE' and not recent_auto_tentative):
-					recent_auto_tentative = obj
+				elif ('TENTATIVE' in obj.get('validation',None) and not recent_tentative):
+					recent_tentative = obj
 
 		if recent_auto_manual:
 			target_sleep_data = recent_auto_manual
 		elif recent_auto_final:
 			target_sleep_data = recent_auto_final
 		else:
-			target_sleep_data = recent_auto_tentative
+			target_sleep_data = recent_tentative
 
 	if not target_sleep_data:
 		max_end_time = None
@@ -503,7 +503,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 						break
 					continue
 
-				if (obj.get('validation',None) == 'AUTO_TENTATIVE' and
+				if ('TENTATIVE' in obj.get('validation',None) and
 					obj_start_time < max_end_time):
 					target_sleep_data = obj
 					max_end_time = obj_end_time
@@ -520,7 +520,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and
 					  obj_start_time < max_end_time and
-					  target_sleep_data.get('validation',None) == 'AUTO_TENTATIVE'):
+					  'TENTATIVE' in target_sleep_data.get('validation',None)):
 					target_sleep_data = obj
 					max_end_time = obj_end_time
 
@@ -656,7 +656,15 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
+			non_edited_steps = obj.get('steps',None)
 			obj = manually_edited(obj)
+			manually_edited_steps = obj.get('steps',None)
+			if (not non_edited_steps is None) and not manually_edited_steps:
+				# Manually edited summaries drop steps data, so if steps
+				# data in manually edited summary is not present but
+				# it was present in normal unedited version of summary, in
+				# that case add the previous step data to the current summary
+				obj['steps'] = non_edited_steps
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -1072,31 +1080,30 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 
 	total_steps = 0
 	exercise_steps = 0
-	activities_below_aerobic_zone = 0
-	shortest_activity = None
 	aerobic_zone = 180 - age - 30
 	if len(filtered_activities):
 		for obj in filtered_activities:
 
-			if not shortest_activity:
-				shortest_activity = obj
-			elif obj.get('durationInSeconds',0) <= shortest_activity.get('durationInSeconds',0):
-				shortest_activity = obj
+			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
+			# If avgerage heart rate in beats per minute is not submitted by user
+			# then it would be by default empty string. In that case default it to 0 
+			if not avg_hr:
+				avg_hr = 0
 
-			if ((obj.get("averageHeartRateInBeatsPerMinute",0) >= aerobic_zone 
+			steps = obj.get("steps",0)
+			if not steps:
+				# In case of user created manual activity, if user does not submit steps data
+				# then by default it would be empty string. In that case, default it to 0
+				steps = 0
+
+			if ((avg_hr >= aerobic_zone 
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
 					or obj.get("steps_type","") == "exercise"):
 				# If activity heartrate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
-				exercise_steps += obj.get('steps',0)
-			elif obj.get("averageHeartRateInBeatsPerMinute",0) < aerobic_zone:
-				activities_below_aerobic_zone += 1
+				exercise_steps += steps
 
-		if((len(filtered_activities) == activities_below_aerobic_zone) and shortest_activity):
-			# If all the activities are below aerobic zone then steps of the 
-			# shortest activity will be considered as exercise steps.
-			exercise_steps = shortest_activity.get('steps',0)
 	if dailies_json:
 		total_steps = dailies_json[0].get('steps',0)
 
@@ -1114,71 +1121,150 @@ def _get_sleep_grade_from_point(point):
 	else:
 		return 'A'
 
-def cal_average_sleep_grade(sleep_duration,sleep_aid_taken=None):
-	def _to_sec(duration):
-		hours,mins = map(int,[0 if x == '' else x 
-					for x in duration.split(':')])
-		return hours * 3600 + mins * 60
+def _to_sec(duration):
+	'''
+	Convert hour:minute string to seconds
+	
+	Args:
+		duration(string): String duration in format hh:mm eg 06:30
 
-	_sec_min = lambda x: divmod(x,60)[0]
+	Example:
+		>>> _to_sec("05:30")
+		19800
+	'''
+	hours,mins = map(int,[0 if x == '' else x 
+				for x in duration.split(':')])
+	return hours * 3600 + mins * 60
 
-	_tobj = {
-		"6:00":_to_sec("6:00"),
-		"6:29":_to_sec("6:29"),
-		"6:59":_to_sec("6:59"),
-		"6:30":_to_sec("6:30"),
-		"7:00":_to_sec("7:00"),
-		"7:29":_to_sec("7:29"),
-		"7:30":_to_sec("7:30"),
-		"10:00":_to_sec("10:00"),
-		"10:01":_to_sec("10:01"),
-		"10:30":_to_sec("10:30"),
-		"10:31":_to_sec("10:31"),
-		"11:00":_to_sec("11:00"),
-		"11:30":_to_sec("11:30"),
-		"12:00":_to_sec("12:00"),
-	}
+def sleep_point_for_kids(sleep_duration):
+	'''
+	Calculate the sleep point for kids. Person below age of 18
+	is considered as kid for this calculation.
+
+	Args:
+		sleep_duration(string): Sleep duration as a hh:mm string
+
+	Return:
+		int: sleep point between [0,4]
+	'''
+	_sec_min = lambda x: divmod(x,60)[0] #second to minute
 
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
 
-	if sleep_duration < _tobj["6:00"] or sleep_duration > _tobj["12:00"]:
-		if sleep_duration > _tobj["12:00"]:
+	if sleep_duration < _to_sec("6:30") or sleep_duration > _to_sec("14:00"):
+		if sleep_duration > _to_sec("14:00"):
 			points = 0
 		else: 
 			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
 
-	elif sleep_duration >= _tobj["7:30"] and sleep_duration <= _tobj["10:00"]:
+	elif sleep_duration >= _to_sec("8:00") and sleep_duration <= _to_sec("12:00"):
 	   points = 4
 
-	elif ((sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]) or \
-		(sleep_duration >= _tobj["10:01"] and sleep_duration <= _tobj["10:30"])) :
+	elif ((sleep_duration >= _to_sec("7:31") and sleep_duration <= _to_sec("8:00")) or \
+		(sleep_duration >= _to_sec("12:01") and sleep_duration <= _to_sec("12:30"))) :
 
-		if (sleep_duration >= _tobj["7:00"] and sleep_duration <= _tobj["7:29"]):
-			points = round(_sec_min(sleep_duration - _tobj["7:00"]) * 0.03333 + 3, 5)
-		elif(sleep_duration == _tobj["10:30"]):
-			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
+		if (sleep_duration >= _to_sec("7:31") and sleep_duration <= _to_sec("8:00")):
+			points = round(_sec_min(sleep_duration - _to_sec("7:31")) * 0.03333 + 3, 5)
+		elif(sleep_duration == _to_sec("12:30")):
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("12:30")) * 0.03333) + 2,5)
 		else:
-			points = round(0.96667 - (_sec_min(sleep_duration - _tobj["10:01"]) * 0.03333) + 3,5)
+			points = round(0.96667 - (_sec_min(sleep_duration - _to_sec("12:01")) * 0.03333) + 3,5)
 
-	elif ((sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["7:29"]) or \
-		(sleep_duration >= _tobj["10:31"] and sleep_duration <= _tobj["11:00"])) :
+	elif ((sleep_duration >= _to_sec("7:00") and sleep_duration <= _to_sec("7:29")) or \
+		(sleep_duration >= _to_sec("12:31") and sleep_duration <= _to_sec("13:00"))) :
 
-		if(sleep_duration >= _tobj["6:30"] and sleep_duration <= _tobj["6:59"]):
-			points = round(_sec_min(sleep_duration - _tobj["6:30"]) * 0.03333 + 2, 5)
-		elif(sleep_duration == _tobj["11:00"]):
-			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
+		if(sleep_duration >= _to_sec("7:00") and sleep_duration <= _to_sec("7:29")):
+			points = round(_sec_min(sleep_duration - _to_sec("7:00")) * 0.03333 + 2, 5)
+		elif(sleep_duration == _to_sec("13:00")):
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01639) + 1,5)
 		else:
-			points = round(1 - (_sec_min(sleep_duration - _tobj["10:30"]) * 0.03333) + 2,5)
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("12:30")) * 0.03333) + 2,5)
 
-	elif ((sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]) or \
-		(sleep_duration >= _tobj["11:30"] and sleep_duration <= _tobj["12:00"])) :
+	elif ((sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")) or \
+		(sleep_duration >= _to_sec("13:01") and sleep_duration <= _to_sec("14:00"))) :
 
-		if(sleep_duration >= _tobj["6:00"] and sleep_duration <= _tobj["6:29"]):
-	   		points = round(_sec_min(sleep_duration - _tobj["6:00"]) * 0.03333 + 1, 5)
+		if(sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")):
+	   		points = round(_sec_min(sleep_duration - _to_sec("6:30")) * 0.03333 + 1, 5)
 		else:
-			points = round(1 - (_sec_min(sleep_duration - _tobj["11:00"]) * 0.01639) + 1,5)
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01639) + 1,5)
 	
+	return points
+
+def sleep_point_for_adults(sleep_duration):
+	'''
+	Calculate the sleep point for adults. Person of age 18 or above
+	is considered as adult for this calculation.
+
+	Args:
+		sleep_duration(string): Sleep duration as a hh:mm string
+
+	Return:
+		int: sleep point between [0,4]
+	'''
+	_sec_min = lambda x: divmod(x,60)[0]
+
+	sleep_duration = _to_sec(sleep_duration)
+	points = 0
+
+	if sleep_duration < _to_sec("6:00") or sleep_duration > _to_sec("12:00"):
+		if sleep_duration > _to_sec("12:00"):
+			points = 0
+		else: 
+			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
+
+	elif sleep_duration >= _to_sec("7:30") and sleep_duration <= _to_sec("10:00"):
+	   points = 4
+
+	elif ((sleep_duration >= _to_sec("7:00") and sleep_duration <= _to_sec("7:29")) or \
+		(sleep_duration >= _to_sec("10:01") and sleep_duration <= _to_sec("10:30"))) :
+
+		if (sleep_duration >= _to_sec("7:00") and sleep_duration <= _to_sec("7:29")):
+			points = round(_sec_min(sleep_duration - _to_sec("7:00")) * 0.03333 + 3, 5)
+		elif(sleep_duration == _to_sec("10:30")):
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("10:30")) * 0.03333) + 2,5)
+		else:
+			points = round(0.96667 - (_sec_min(sleep_duration - _to_sec("10:01")) * 0.03333) + 3,5)
+
+	elif ((sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("7:29")) or \
+		(sleep_duration >= _to_sec("10:31") and sleep_duration <= _to_sec("11:00"))) :
+
+		if(sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")):
+			points = round(_sec_min(sleep_duration - _to_sec("6:30")) * 0.03333 + 2, 5)
+		elif(sleep_duration == _to_sec("11:00")):
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("11:00")) * 0.01639) + 1,5)
+		else:
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("10:30")) * 0.03333) + 2,5)
+
+	elif ((sleep_duration >= _to_sec("6:00") and sleep_duration <= _to_sec("6:29")) or \
+		(sleep_duration >= _to_sec("11:01") and sleep_duration <= _to_sec("12:00"))) :
+
+		if(sleep_duration >= _to_sec("6:00") and sleep_duration <= _to_sec("6:29")):
+	   		points = round(_sec_min(sleep_duration - _to_sec("6:00")) * 0.03333 + 1, 5)
+		else:
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("11:00")) * 0.01639) + 1,5)
+	
+	return points
+
+def cal_average_sleep_grade(sleep_duration,age,sleep_aid_taken=None):
+	'''
+	Calculate average sleep grade 
+
+	Args:
+		sleep_duration(string): Sleep duration as a hh:mm string
+		age(int): age of person
+		sleep_aid_taken(string, optional): Whether person have taken any sleep aid.
+			Possible answers are "yes", "no" or empty string. Default to None
+	Returns:
+		tuple(str,int): A Tuple having grade for points as first value and original points
+			as second value. Example ('A',4)
+	'''
+	points = 0
+	if age >= 18:
+		points = sleep_point_for_adults(sleep_duration)
+	else:
+		points = sleep_point_for_kids(sleep_duration)
+
 	if sleep_aid_taken == "yes":
 		if points >= 1.5:
 			points -= 1.5
@@ -1464,17 +1550,17 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 
 def get_avg_sleep_grade(sleep_calendar_date,yesterday_sleep_data,today_sleep_data,
 	user_input_bedtime, user_input_awake_time,user_input_sleep_duration,
-	user_input_timezone,sleep_aid):
+	user_input_timezone,sleep_aid,age):
 
 	sleep_stats = get_sleep_stats(sleep_calendar_date,yesterday_sleep_data,
 		today_sleep_data,user_input_bedtime,user_input_awake_time, user_input_timezone)
 	sleep_per_wearable = sleep_stats['sleep_per_wearable']
 
 	if user_input_sleep_duration and user_input_sleep_duration != ":":
-		grade_point = cal_average_sleep_grade(user_input_sleep_duration,sleep_aid)
+		grade_point = cal_average_sleep_grade(user_input_sleep_duration,age,sleep_aid)
 		return grade_point
 	elif sleep_per_wearable:
-		grade_point = cal_average_sleep_grade(sleep_per_wearable,sleep_aid)
+		grade_point = cal_average_sleep_grade(sleep_per_wearable,age,sleep_aid)
 		return grade_point
 	return (None,None)
 
@@ -1935,8 +2021,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 			user_input_awake_time = user_input_awake_time,
 			user_input_sleep_duration = user_input_sleep_duration,
 			user_input_timezone = user_input_timezone,
-			sleep_aid = user_input_sleep_aid
-			)
+			sleep_aid = user_input_sleep_aid,
+			age = user.profile.age()
+		)
 		grades_calculated_data['avg_sleep_per_night_grade'] = grade_point[0] if grade_point[0] else ''
 		grades_calculated_data['avg_sleep_per_night_gpa'] = grade_point[1] if grade_point[1] else 0
 

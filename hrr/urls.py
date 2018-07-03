@@ -11,5 +11,7 @@ urlpatterns = [
 	url(r'^daily_aa_calculations$',views.daily_aa_calculations,
 								  name="daily_aa"),
 	url(r'^aa_low_high_calculations$',views.aa_low_high_end_calculations,
-									name="aa_classification chart")
+									name="aa_classification chart"),
+	url(r'^user/hrr_data$',views.UserHrrView.as_view(),
+								  name="hrr_api"),
 	]
