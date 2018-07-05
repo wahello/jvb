@@ -30,7 +30,8 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Sleep Awake Time'},
           {name: 'Deep Sleep (hh:mm)'},
           {name: 'Light Sleep (hh:mm)'},
-          {name: 'Awake Time (hh:mm)'}                     
+          {name: 'Awake Time (hh:mm)'},
+          {name: 'REM Sleep (hh:mm)'}                     
       ],
     };
   }
@@ -92,6 +93,7 @@ renderTableColumns(dateWiseData,category,classes=""){
 						(key == 'deep_sleep' ||
 						key == 'light_sleep' ||
 						key == 'awake_time' ||
+						key == 'rem_sleep' ||
 						key == 'sleep_per_wearable')){
 						let hm = value.split(':');
 						let time_str = `${hm[0]}:${hm[1]}`;

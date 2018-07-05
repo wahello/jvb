@@ -110,6 +110,7 @@ const attrVerboseName = {
     deep_sleep: 'Deep Sleep (hh:mm)',
     light_sleep: 'Light Sleep (hh:mm)',
     awake_time: 'Awake Time (hh:mm)',
+    rem_sleep: 'REM Sleep (hh:mm)',
     resting_heart_rate: 'Resting Heart Rate (RHR)',
 
     non_exercise_steps: 'Non Exercise Steps',

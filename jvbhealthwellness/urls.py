@@ -14,6 +14,7 @@ from leaderboard import urls as leaderboardUrls
 from fitbit import views as fitbitViews
 from hrr import urls as hrrUrls
 from fitbit import urls as fitbitUrls
+from dashboards import urls as dashboardUrls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -54,6 +55,7 @@ urlpatterns = [
     url(r'^progress/',include(progressUrls)),
     url(r'^leaderboard/', include(leaderboardUrls)),
     url(r'^hrr/', include(hrrUrls)),
+    url(r'^dashboard/', include(dashboardUrls)),
     url(r'^users/',include(userInputUrls)),
     url(r'^fitbit/',include(fitbitUrls)),
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
@@ -63,7 +65,6 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^(.*)$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
-
 ]
 
 if settings.DEBUG:

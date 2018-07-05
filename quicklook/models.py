@@ -230,6 +230,7 @@ class Sleep(models.Model):
 	light_sleep = models.CharField(max_length=10,blank=True)
 	awake_time = models.CharField(max_length=10,blank=True)
 	sleep_comments = models.TextField(blank=True)
+	rem_sleep = models.CharField(max_length=10,blank=True)
 
 	# sleep_bed_time = models.TimeField()
 	# sleep_awake_time = models.TimeField()
