@@ -298,7 +298,7 @@ class Movement_Dashboard extends Component{
 		return(
 			<div>
 				<NavbarMenu title={"Movement Dashboard"} />
-				<div>
+				<div className = "cla_center">
 					<span>
 						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
 							<FontAwesome
@@ -332,19 +332,19 @@ class Movement_Dashboard extends Component{
                 	</span>
 
 		        </div>
-				<div className = "row">
-					<div className = "col-md-4 col-md-offset-1 table_margin ">
+				<div className = "row justify-content-center md_padding">
+					<div className = "col-md-6 table_margin ">
 						{this.renderHourStepsColor(this.state.steps_this_hour)}
 				    </div>
-					<div className = "col-md-4 col-md-offset-2 table_margin ">
+					<div className = "col-md-6  table_margin ">
 			      		{this.renderHourNonExerciseStepsColor(this.state.non_exercise_steps)}
 			      	</div>
 				</div>
-				<div className = "row">
-					<div className = "col-md-4 col-md-offset-1 table_margin ">
+				<div className = "row justify-content-center md_padding">
+					<div className = "col-md-6 table_margin ">
 						{this.renderMcsColors(this.state.mcs_score)}
 				    </div>
-					<div className = "col-md-4 col-md-offset-2 table_margin ">
+					<div className = "col-md-6  table_margin ">
 						<Card className = "card_style">
 					        <CardBody>
 					          	<CardTitle className = "header_style">Today's Exercise/Activity Steps</CardTitle>
@@ -354,8 +354,8 @@ class Movement_Dashboard extends Component{
 					    </Card>
 				    </div>
 				</div>
-				<div className = "row">
-					<div className = "col-md-4 col-md-offset-4 table_margin ">
+				<div className = "row justify-content-center">
+					<div className = "col-md-6  table_margin ">
 						<Card className = "card_style">
 				        	<CardBody>
 				          		<CardTitle className = "header_style">Total Steps Today</CardTitle>
