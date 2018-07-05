@@ -66,14 +66,22 @@ class MovementDashboardView(APIView):
         if user_ql:
             step_data = user_ql.steps_ql
             user_local_time = self.get_user_localtime()
-            movement_consistency = json.loads(step_data.movement_consistency)
+            if step_data.movement_consistency:
+                movement_consistency = json.loads(step_data.movement_consistency)
+            else:
+                movement_consistency = None
             movement_data["non_exercise_steps"] = step_data.non_exercise_steps
             movement_data["exercise_steps"] = step_data.exercise_steps
             movement_data["total_steps"] = step_data.total_steps
-            movement_data["mcs_score"] = movement_consistency["inactive_hours"]
 
-            this_hour_range = self.dt_to_hour_range(user_local_time)
-            step_this_hour = movement_consistency[this_hour_range]['steps']
-            movement_data["steps_this_hour"] = step_this_hour
+            if movement_consistency:
+                movement_data["mcs_score"] = movement_consistency["inactive_hours"]
+
+                this_hour_range = self.dt_to_hour_range(user_local_time)
+                step_this_hour = movement_consistency[this_hour_range]['steps']
+                movement_data["steps_this_hour"] = step_this_hour
+            else:
+                movement_data["mcs_score"] = None
+                movement_data["steps_this_hour"] = None
 
         return Response(movement_data,status=status.HTTP_200_OK)       
