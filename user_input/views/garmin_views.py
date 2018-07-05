@@ -119,9 +119,9 @@ def _get_activities(user,target_date):
 		for tmp in a1:
 			workout_activities = fitfile_parse([tmp],offset,target_date)
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
-			print(workout_final_heartrate)
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
+			print(workout_final_heartrate)
 	# print(all_activities_heartrate,"oooooooooooooooooooooooooooo")
 	sum_timestamp = []
 	for single_timestamp in all_activities_timestamp:
