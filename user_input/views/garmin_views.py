@@ -106,7 +106,7 @@ def _get_activities(user,target_date):
 	manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 	act_obj = {}
 	start = current_date
-	end = current_date + timedelta(days=3)
+	end = current_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
@@ -129,15 +129,16 @@ def _get_activities(user,target_date):
 		total_time = [sum(single_timestamp[:i+1]) for i in range(len(single_timestamp))]
 		sum_timestamp.append(total_time)
 	final_heart_rate=[]
-	# for single_heartrate,single_timestamp in zip(heart_rate,time_stamp):
-	# 	for x in enumerate(single_timestamp)
-			
-	print(final_heart_rate,'wwwwwwwwwwwwwwwwww')
+	for single_heartrate,single_timestamp in zip(heart_rate,sum_timestamp):
+		for i,value in enumerate(single_timestamp):
+			if value <= 120:
+				index = single_timestamp.index(value)
+		final_heart_rate.append(single_heartrate[:index])
 
 	for act in activity_data:
 		act_obj = manually_edited(act)
 		if a1:
-			for tmp,i,single_timestamp in zip(a1,heart_rate,time_stamp):
+			for tmp,i in zip(a1,all_activities_heartrate):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
@@ -145,12 +146,12 @@ def _get_activities(user,target_date):
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
 					(act_obj.get("distanceInMeters",0) <= 200.00)) and i):
 					hrr_difference = i[0] - i[-1]
-					if hrr_difference > 0:
+					if hrr_difference > 10:
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 				else:
 					pass
-		finall = _create_activity_stat(user,act_obj,current_date)
-		final_act_data.update(finall)
+			finall = _create_activity_stat(user,act_obj,current_date)
+			final_act_data.update(finall)
 	# print(final_act_data)
 	return final_act_data	
 		
