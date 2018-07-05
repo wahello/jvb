@@ -59,11 +59,11 @@ class Movement_Dashboard extends Component{
 			});
 		}else{
 			this.setState({
-		  		exercise_steps:"",
-				mcs_score:"",
-				non_exercise_steps:"",
-				steps_this_hour:"",
-				total_steps:"",
+		  		exercise_steps:null,
+				mcs_score:null,
+				non_exercise_steps:null,
+				steps_this_hour:null,
+				total_steps:null,
 			});
 		}
   	}
@@ -236,7 +236,7 @@ class Movement_Dashboard extends Component{
 		let background = "";
 		let color = "";
 		let hr_background = "";
-		if(score){
+		if(score || score == 0){
 		var score = parseFloat(score); 
 	            if(score <= "4.5"){
 	               	background = 'green';
