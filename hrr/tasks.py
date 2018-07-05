@@ -16,11 +16,11 @@ logger = get_task_logger(__name__)
 def create_hrrdata(user_id,date):
 	try:
 		user = User.objects.get(id = user_id)
-		print(type(user))
-		start_date = datetime(2018,7,2,0,0,0)
+		# print(type(user))
+		# start_date = datetime(2018,7,2,0,0,0)
 		start_date = start_date.strftime("%Y-%m-%d")
-		store_hhr(start_date,user)
-		store_daily_aa_calculations(user,start_date)
-		store_aa_low_high_end_calculations(user,start_date)
+		store_hhr(date,user)
+		store_daily_aa_calculations(user,date)
+		store_aa_low_high_end_calculations(user,date)
 	except Exception as e:
 		logger.error(e,exc_info=True)
