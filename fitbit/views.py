@@ -18,7 +18,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-# from .tasks import store_fitbit_data
+from .tasks import store_fitbit_data
 
 
 from rauth import OAuth2Service, OAuth2Session
@@ -29,6 +29,7 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
 					FitbitNotifications
+from .fitbit_push import store_data
 
 
 # Create your views here.
@@ -40,60 +41,22 @@ class FitbitPush(APIView):
 	'''
 	def post(self, request, format="json"):
 		data = request.data
-		FitbitNotifications.objects.create(data_notification=data)
-		# store_fitbit_data.delay(request.data)
+		store_fitbit_data.delay(data)
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_204_NO_CONTENT)
 
 
-def store_data(fitbit_all_data,user,start_date,data_type=None):
-	'''
-	this function takes json data as parameter and store in database
-	Args: fitbit_all_data should be in dict. If bulk data want to store, all data should be
-		  inside dict 
-		  user name,start data
-	Return: None
-	''' 
-	if data_type:
-		fitbit_all_data[data_type] = fitbit_all_data
-	for key,value in fitbit_all_data.items():
-		try:
-			if "sleep_fitbit" == key:
-				date_of_sleep = value['sleep'][0]['dateOfSleep']
-				UserFitbitDataSleep.objects.update_or_create(user = user,
-					date_of_sleep=date_of_sleep,sleep_data=value,
-					defaults={'created_at': start_date})
-		except (KeyError, IndexError):
-			logging.exception("message")
 
-		try:
-			if "heartrate_fitbit" == key:
-				date_of_heartrate = value['activities-heart'][0]['dateTime']
-				UserFitbitDataHeartRate.objects.update_or_create(user=user,
-					date_of_heartrate=date_of_heartrate,heartrate_data=value,
-					defaults={'created_at': start_date,})
-		except (KeyError, IndexError):
-			logging.exception("message")
-
-		try:
-			if "steps_fitbit" == key:
-				date_of_steps = value['activities-steps'][0]['dateTime']
-				instance = UserFitbitDataSteps.objects.update_or_create(user=user,
-					date_of_steps=date_of_steps,steps_data=value,
-					defaults={'created_at': start_date,})
-		except (KeyError, IndexError):
-			logging.exception("message")
-	return None
 
 def refresh_token(user):
 	'''
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -126,8 +89,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -158,14 +121,14 @@ def api_fitbit(session,date_fitbit):
 
 def request_token_fitbit(request):
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+		'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -177,8 +140,8 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -193,7 +156,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+			'redirect_uri':'http://127.0.0.1:8000/callbacks/fitbit',
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -234,7 +197,7 @@ def fetching_data_fitbit(request):
 	steps_fitbit = steps_fitbit.json()
 
 	if statuscode == 401: # if status 401 means fitbit tokens are expired below does generate tokens
-		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token':
+		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token': 
 			user = request.user
 			refresh_token(user)
 	fitbit_all_data = {}
@@ -251,8 +214,8 @@ def fetching_data_fitbit(request):
 	return HttpResponse(data,content_type='application/json')
 
 def refresh_token_fitbit(request):
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = request.user)
 	refresh_token_acc = token.refresh_token
@@ -273,7 +236,7 @@ def refresh_token_fitbit(request):
 '''
 	jvb 
 		client id 		---- 22CN2D
-		client secret   ---- e83ed7f9b5c3d49c89d6bdd0b4671b2b
+		client secret   ---- 94d717c6ec36c270ed59cc8b5564166f
 		redirect url    ---- https://app.jvbwellness.com/callbacks/fitbit
 	test
 		client id 		---- 22CN46
@@ -286,26 +249,26 @@ def refresh_token_fitbit(request):
 # 		This function takes the notificatin messages which are stored in last 10 min
 # 		creates a session
 # 	'''
-	# print("Startes for checking notifications in database")
-	# time = datetime.now() - timedelta(minutes=15) 
-	# updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
-	# if updated_data:
-	# 	service = session_fitbit()
-	# 	tokens = FitbitConnectToken.objects.get(user = request.user)
-	# 	access_token = tokens.access_token
-	# 	session = service.get_session(access_token)
-	# 	for i,k in enumerate(updated_data):
-	# 		k = ast.literal_eval(k.data_notification)
-	# 		date = k[i]['date']
-	# 		user_id = k[i]['ownerId']
-	# 		data_type = k[i]['collectionType']
-	# 		try:
-	# 			user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
-	# 		except FitbitConnectToken.DoesNotExist as e:
-	# 			user = None
-	# 		call_api(date,user_id,data_type,user,session)
-	# return HttpResponse('Final return')
-	# return None
+# 	print("Startes for checking notifications in database")
+# 	#time = datetime.now() - timedelta(minutes=15) 
+# 	updated_data = FitbitNotifications.objects.latest('created_at')
+# 	if updated_data:
+# 		service = session_fitbit()
+# 		tokens = FitbitConnectToken.objects.get(user = request.user)
+# 		access_token = tokens.access_token
+# 		session = service.get_session(access_token)
+# 		for i,k in enumerate(updated_data):
+# 			k = ast.literal_eval(k.data_notification)
+# 			date = k[i]['date']
+# 			user_id = k[i]['ownerId']
+# 			data_type = k[i]['collectionType']
+# 			try:
+# 				user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
+# 			except FitbitConnectToken.DoesNotExist as e:
+# 				user = None
+# 			call_api(date,user_id,data_type,user,session)
+# 	return HttpResponse('Final return')
+# 	return None
 
 # def call_api(date,user_id,data_type,user,session):
 # 	'''
