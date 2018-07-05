@@ -121,25 +121,29 @@ def _get_activities(user,target_date):
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
-			print(workout_final_heartrate)
-	# print(all_activities_heartrate,"oooooooooooooooooooooooooooo")
+	heart_rate = [x for x in all_activities_heartrate if x != []]
+	time_stamp = [x for x in all_activities_timestamp if x != []]
+
 	sum_timestamp = []
-	for single_timestamp in all_activities_timestamp:
+	for single_timestamp in time_stamp:
 		total_time = [sum(single_timestamp[:i+1]) for i in range(len(single_timestamp))]
-		# print(type(total_time))
 		sum_timestamp.append(total_time)
-	
+	final_heart_rate=[]
+	# for single_heartrate,single_timestamp in zip(heart_rate,time_stamp):
+	# 	for x in enumerate(single_timestamp)
+			
+	print(final_heart_rate,'wwwwwwwwwwwwwwwwww')
+
 	for act in activity_data:
 		act_obj = manually_edited(act)
 		if a1:
-			for tmp,i in zip(a1,all_activities_heartrate):
+			for tmp,i,single_timestamp in zip(a1,heart_rate,time_stamp):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
 				if (((act_obj.get("summaryId",None) == str(data_id)) and 
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
 					(act_obj.get("distanceInMeters",0) <= 200.00)) and i):
-					print(i)
 					hrr_difference = i[0] - i[-1]
 					if hrr_difference > 0:
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
