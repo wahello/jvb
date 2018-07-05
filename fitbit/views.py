@@ -29,7 +29,7 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
 					FitbitNotifications
-from .fitbit_push import store_data
+from .fitbit_push import store_data,session_fitbit
 
 
 # Create your views here.
@@ -85,17 +85,6 @@ def refresh_token(user):
 	if token_object:
 		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
-def session_fitbit():
-	'''
-	return the session 
-	'''
-	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
-					 access_token_url='https://api.fitbit.com/oauth2/token',
-					 authorize_url='https://www.fitbit.com/oauth2/authorize',
-					 base_url='https://fitbit.com/api')
-	return service
 
 def fit_bit_user_subscriptions(user):
 	service = session_fitbit()
