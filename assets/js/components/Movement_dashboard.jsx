@@ -347,7 +347,7 @@ class Movement_Dashboard extends Component{
 					<div className = "col-md-4 col-md-offset-2 table_margin ">
 						<Card className = "card_style">
 					        <CardBody>
-					          	<CardTitle className = "header_style">Today's Exercise/Activity Steps (MCS)</CardTitle>
+					          	<CardTitle className = "header_style">Today's Exercise/Activity Steps</CardTitle>
 					          	<hr className = "hr_style"/>
 					          	<CardText className = "value_style">{this.renderCommaInSteps(this.state.exercise_steps)}</CardText>
 					        </CardBody>
