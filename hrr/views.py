@@ -560,7 +560,7 @@ def daily_aa_data(user, start_date):
 		activity_files = [pr.data for pr in activity_files_qs]
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
-	print(activity_files_qs,"activity files")
+	
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -986,9 +986,7 @@ def hrr_data(user,start_date):
 	start_date_timestamp = start_date_timestamp.timetuple()
 	start_date_timestamp = time.mktime(start_date_timestamp)
 	end_date_timestamp = start_date_timestamp + 86400
-	print(start_date_timestamp,"start_date_timestamp")
-	print(end_date_timestamp,"end_date_timestamp")
-	print(user,"user")
+
 	start_date_str = start_date.strftime('%Y-%m-%d')
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
@@ -996,12 +994,12 @@ def hrr_data(user,start_date):
 
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
-	print(activity_files_qs,"activity_files_qs")
+	
 	offset = 0
 	if activity_files:
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
-	print(activity_files,"Activity files")
+	
 	count = 0
 	id_act = 0
 	activities = []
@@ -1028,7 +1026,7 @@ def hrr_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-	print(a1,"printing the fitfiles")
+	
 	workout = []
 	hrr = []
 	
@@ -1053,21 +1051,15 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
-				print(data_id,"fitbit summary id")
 				for i,k in enumerate(activity_files):
 					activity_files_dict = ast.literal_eval(activity_files[i])
-					print(activity_files_dict.get("summaryId",None),"activity summary id")
 					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
 						hrr.append(tmp)
-						print('hrr in side the condition check')
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
 						workout.append(tmp)
-						print('workout in side the condition check')
 	except:
 		pass
 
-	print(workout,"printing workout files")
-	print(hrr,"hrr files")
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
