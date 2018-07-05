@@ -4,21 +4,20 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function fetchMovemetData(successGradesData,errorGradesData,selectedDate){   
+export default function fetchMovemetData(successMovementData,errorMovementData,selectedDate){   
   selectedDate = moment(selectedDate);
-  //const URL=`/hrr/aa_low_high_calculations`;
+  const URL=`/dashboard/movement`;
   const config={
    method:"get",
    params:{
-   start_date: selectedDate.format('YYYY-MM-DD')
+   date: selectedDate.format('YYYY-MM-DD')
  },
    url:URL,
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successGradesData(response);
+   successMovementData(response);
   }).catch(function(error){
-    errorGradesData(error);
+    errorMovementData(error);
   });
-
 }
