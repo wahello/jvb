@@ -15,6 +15,10 @@
   transition: box-shadow 200ms cubic-bezier(0.4,0.0,0.2,1);
   
 }
+.md_padding{
+	padding-left: 30px;
+	padding-right: 30px;
+}
 .header_style{
 	text-align: center;
 	font-size: 17px;
@@ -28,5 +32,13 @@
 		margin-right: 15px;
 		margin-left: 15px;
 	}
+	.md_padding{
+	padding-left: 15px;
+	padding-right: 15px;
+	}
+	.cla_center{
+		text-align: center;
+	}
+	
 	
 }
