@@ -815,6 +815,9 @@ def aa_low_high_end_data(user,start_date):
 		activity_files = [pr.data for pr in activity_files_qs]
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
+	else:
+		activity_files = ''
+		offset = 0
 
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),

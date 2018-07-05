@@ -16,9 +16,8 @@ logger = get_task_logger(__name__)
 def create_hrrdata(user_id,date):
 	try:
 		user = User.objects.get(id = user_id)
-		# print(type(user))
-		# start_date = datetime(2018,7,2,0,0,0)
-		start_date = start_date.strftime("%Y-%m-%d")
+		# start_date = datetime(2018,7,3,0,0,0)
+		# date = start_date.strftime("%Y-%m-%d")
 		store_hhr(date,user)
 		store_daily_aa_calculations(user,date)
 		store_aa_low_high_end_calculations(user,date)
