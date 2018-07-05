@@ -110,15 +110,24 @@ def _get_activities(user,target_date):
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
+	all_activities_timestamp = []
 	offset = 0
 	if activity_data:
 		offset = activity_data[0].get("startTimeOffsetInSeconds")
-
+	
 	if a1:
 		for tmp in a1:
 			workout_activities = fitfile_parse([tmp],offset,target_date)
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
+			print(workout_final_heartrate)
 			all_activities_heartrate.append(workout_final_heartrate)
+			all_activities_timestamp.append(workout_final_timestamp)
+	# print(all_activities_heartrate,"oooooooooooooooooooooooooooo")
+	sum_timestamp = []
+	for single_timestamp in all_activities_timestamp:
+		total_time = [sum(single_timestamp[:i+1]) for i in range(len(single_timestamp))]
+		# print(type(total_time))
+		sum_timestamp.append(total_time)
 	
 	for act in activity_data:
 		act_obj = manually_edited(act)
