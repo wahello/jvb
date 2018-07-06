@@ -1008,7 +1008,7 @@ onLogoutSuccess(response){
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser"className={class_hrr} value="hrr"
-						    								 onClick={this.activateTab.bind(this,"hrr")}>User Inputs</DropdownItem>
+						    								 onClick={this.activateTab.bind(this,"hrr")}>Heart Rate Recovery</DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>
