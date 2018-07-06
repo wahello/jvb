@@ -123,35 +123,39 @@ def _get_activities(user,target_date):
 			all_activities_timestamp.append(workout_final_timestamp)
 	# heart_rate = [x for x in all_activities_heartrate if x != []]
 	# time_stamp = [x for x in all_activities_timestamp if x != []]
-
 	sum_timestamp = []
 	for single_timestamp in all_activities_timestamp:
-		total_time = [sum(single_timestamp[:i+1]) for i in range(len(single_timestamp))]
+		if single_timestamp:
+			total_time = [sum(single_timestamp[:i+1]) for i in range(len(single_timestamp))]
+		else:
+			total_time = []
 		sum_timestamp.append(total_time)
 	final_heart_rate=[]
 	index = ''
-	for single_heartrate,single_timestamp in zip(all_activities_heartrate,sum_timestamp):
-		for i,value in enumerate(single_timestamp):
-			if value <= 120:
-				index = single_timestamp.index(value)
-		if index:
-			final_heart_rate.append(single_heartrate[:index])
-	a1_len = len(a1)
-	final_heart_rate_len = len(final_heart_rate)
-	diff = a1_len - final_heart_rate_len
-	if diff:
-		while diff > 0:
+
+	for single_heartrate,single_time in zip(all_activities_heartrate,sum_timestamp):
+		if single_time:
+			for i,value in enumerate(single_time):
+				if value <= 120:
+					index = single_time.index(value)
+			if index:
+				final_heart_rate.append(single_heartrate[:index])
+		else:
 			final_heart_rate.append([])
-			diff = diff - 1
-	print(final_heart_rate,'bommmmmmmmmmmmmmmmmmmmm')
+	# print(final_heart_rate,"final_heart_rate")
+	# a1_len = len(a1)
+	# final_heart_rate_len = len(final_heart_rate)
+	# diff = a1_len - final_heart_rate_len
+	# if diff:
+	# 	while diff > 0:
+	# 		final_heart_rate.append([])
+	# 		diff = diff - 1
 	for act in activity_data:
 		act_obj = manually_edited(act)
 		if a1:
 			for tmp,i in zip(a1,final_heart_rate):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
-				data_id = meta['activityIds'][0]
-				print(data_id,act_obj.get("summaryId",None))
 				if (((act_obj.get("summaryId",None) == str(data_id)) and 
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
 					(act_obj.get("distanceInMeters",0) <= 200.00)) and i):

@@ -32,8 +32,7 @@ def fitfile_parse(obj,offset,start_date_str):
 	
 	start_date_obj = datetime(obj_start_year,obj_start_month,obj_start_date,0,0,0)
 	end_date_obj = start_date_obj + timedelta(days=1)
-	
-	
+
 	for heart,timeheart in zip(heartrate_complete,timestamp_complete):
 		timeheart_str = timeheart.strftime("%Y-%m-%d %H:%M:%S")
 		timeheart_utc = int(time.mktime(datetime.strptime(timeheart_str, "%Y-%m-%d %H:%M:%S").timetuple()))+offset

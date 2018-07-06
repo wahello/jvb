@@ -688,7 +688,6 @@ def aa_workout_calculations(request):
 	end_date_timestamp = start_date_timestamp + 86400
 	
 	ui_data = _get_activities(request.user,start_date_str)
-	print(ui_data,"ui_data_keys")
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	for ui_data_single in ui_data.values():
 		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
@@ -769,7 +768,6 @@ def aa_workout_calculations(request):
 	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
 	if filtered_activities_files:
 		for i,k in enumerate(filtered_activities_files):
-			print(filtered_activities_files[i].get("summaryId"))
 			if filtered_activities_files[i].get("summaryId") in ui_data_keys:
 				workout.append(filtered_activities_files[i])
 			else:
