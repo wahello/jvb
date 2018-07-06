@@ -958,10 +958,10 @@ def export_users_xls(request):
 	#Sleep
 
 	columns5 = ['sleep_per_wearable','sleep_comments','sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
-	'sleep_awake_time','deep_sleep','light_sleep','awake_time']
+	'sleep_awake_time','deep_sleep','light_sleep','awake_time','rem_sleep']
 	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 
 	'Resting Heart Rate (RHR)','Sleep per Wearable (excluding awake time)',
-	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep','Light Sleep','Awake Time']
+	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep','Light Sleep','Awake Time','REM Sleep']
 	sheet9.write(31, 0, "Sleep",bold)
 	col_num2 = 31
 	num_4 = row_num
@@ -1038,7 +1038,7 @@ def export_users_xls(request):
 				if user_input_strong_data:
 					
 					if i == 0 and grades_data['avg_sleep_per_night_grade'] == 'A':
-						sheet3.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
+						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_green)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'B':
 						sheet9.write(i1 + i + 1, row_num - num_4, user_input_strong_data['sleep_time_excluding_awake_time'], format_limegreen)
 					elif i == 0 and grades_data['avg_sleep_per_night_grade'] == 'C':
@@ -1847,7 +1847,7 @@ def export_users_xls(request):
 	sheet3.repeat_columns(0)
 	sheet3.set_row(0,30)
 	columns = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
-			   'deep_sleep','light_sleep','awake_time']
+			   'deep_sleep','light_sleep','awake_time','rem_sleep']
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
