@@ -257,6 +257,7 @@ def get_blank_model_fields(model):
 			'sleep_awake_time': '',
 			'deep_sleep': 0,
 			'light_sleep': 0,
+			'rem_sleep':0,
 			'awake_time': 0,
 			'sleep_comments':''
 		}
@@ -407,23 +408,25 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	If bed_time_today is True, that's mean we are tying to find out today's bedtime
 	"""
 
-	def _get_actual_sleep_start_time(data):
-		min_duration = None
-		sleep_level_maps = data.get('sleepLevelsMap')
-		for lvl_data in sleep_level_maps.values():
-			min_start_time = min(int(d.get('startTimeInSeconds')) for d in lvl_data)
-			if not min_duration:
-				min_duration = min_start_time
-			min_duration = min_start_time if min_start_time <= min_duration else min_duration
-		return min_duration
-
 	def _get_deep_light_awake_sleep_duration(data):
-		durations = {'deep':0,'light':0,'awake':0}
+		'''
+		Get deep sleep, light sleep and rem sleep duration
+		from sleep levels
+
+		Args:
+			data(dict): Sleep summary
+
+		Returns:
+			dict: deep, light and rem sleep duration in seconds
+		'''
+		durations = {'deep':0,'light':0,'awake':0,"rem":0}
 		sleep_level_maps = data.get('sleepLevelsMap')
 		if sleep_level_maps:
 			for lvl_type,lvl_data in sleep_level_maps.items():
-				durations[lvl_type] += sum([(datetime.utcfromtimestamp(d['endTimeInSeconds'])
-					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds for d in lvl_data])
+				durations[lvl_type] += sum(
+					[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
+					for d in lvl_data])
 		return durations
 
 	recent_auto_manual = None
@@ -439,6 +442,7 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 		"deep_sleep": '',
 		"light_sleep": '',
 		"awake_time": '',
+		"rem_sleep":'',
 		"sleep_bed_time": '',
 		"sleep_awake_time": '',
 		"sleep_per_wearable":''
@@ -456,19 +460,22 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	if yesterday_sleep_data:
 		for obj in yesterday_sleep_data:
-			start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0) +
-													   obj.get('startTimeOffsetInSeconds',0))
-			next_day_midnight = datetime.combine((start_time+timedelta(days=1)).date(),time(0))
-			end_time = start_time + timedelta(seconds=obj.get('durationInSeconds',0))
+			start_time = datetime.utcfromtimestamp(
+				obj.get('startTimeInSeconds',0) +
+				obj.get('startTimeOffsetInSeconds',0))
+			next_day_midnight = datetime.combine(
+				(start_time+timedelta(days=1)).date(),time(0))
+			end_time = start_time + timedelta(
+				seconds=obj.get('durationInSeconds',0))
 			if end_time > next_day_midnight:
 				if 'MANUAL' in obj.get('validation',None):
 					recent_auto_manual = obj
 					break;
-				# if obj.get('validation',None) == 'AUTO_MANUAL':
-				# 	recent_auto_manual = obj
-				elif (obj.get('validation',None) == 'AUTO_FINAL' and not recent_auto_final):
+				elif (obj.get('validation',None) == 'AUTO_FINAL' 
+						and not recent_auto_final):
 					recent_auto_final = obj
-				elif ('TENTATIVE' in obj.get('validation',None) and not recent_tentative):
+				elif ('TENTATIVE' in obj.get('validation',None) 
+						and not recent_tentative):
 					recent_tentative = obj
 
 		if recent_auto_manual:
@@ -481,17 +488,18 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	if not target_sleep_data:
 		max_end_time = None
 		for obj in today_sleep_data[::-1]:
-			start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds',0) +
-													   obj.get('startTimeOffsetInSeconds',0))
+			start_time = datetime.utcfromtimestamp(
+				obj.get('startTimeInSeconds',0) +
+				obj.get('startTimeOffsetInSeconds',0))
 			midnight = datetime.combine(start_time.date(),time(0))
 			if start_time >= midnight:
 
-				obj_start_time = datetime.utcfromtimestamp(obj.get('startTimeInSeconds')+
-					obj.get('startTimeOffsetInSeconds'))
-				obj_end_time = obj_start_time + timedelta(seconds=obj.get('durationInSeconds',0))
-				# obj_end_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(obj)+
-				#    obj.get('startTimeOffsetInSeconds',0)+
-				#    obj.get('durationInSeconds'))
+				obj_start_time = datetime.utcfromtimestamp(
+					obj.get('startTimeInSeconds')
+					+ obj.get('startTimeOffsetInSeconds'))
+				obj_end_time = (
+					obj_start_time 
+					+ timedelta(seconds=obj.get('durationInSeconds',0)))
 
 				if not target_sleep_data:
 					# most earliest(or recent if trying to find bedtime today) record of the day
@@ -514,11 +522,6 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 					target_sleep_data = obj
 					max_end_time = obj_end_time
 
-				# elif (obj.get('validation',None) == 'AUTO_MANUAL' and
-				# 	obj_start_time < max_end_time):
-				# 	target_sleep_data = obj
-				# 	max_end_time = obj_end_time
-
 				elif (obj.get('validation',None) == 'AUTO_FINAL' and
 					  obj_start_time < max_end_time and
 					  'TENTATIVE' in target_sleep_data.get('validation',None)):
@@ -528,22 +531,35 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	if target_sleep_data:
 		if target_sleep_data.get('validation',None) == 'MANUAL':
 			sleep_info = _get_deep_light_awake_sleep_duration(target_sleep_data)
-			sleep_stats['deep_sleep'] = sec_to_hours_min_sec(sleep_info['deep'],include_sec = False)
-			sleep_stats['light_sleep'] = sec_to_hours_min_sec(sleep_info['light'], include_sec = False)
-			sleep_stats['awake_time'] = sec_to_hours_min_sec(sleep_info['awake'],include_sec = False)
+			sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
+				sleep_info['deep'],include_sec = False
+			)
+			sleep_stats['light_sleep'] = sec_to_hours_min_sec(
+				sleep_info['light'], include_sec = False
+			)
+			sleep_stats['awake_time'] = sec_to_hours_min_sec(
+				sleep_info['awake'],include_sec = False
+			)
+			sleep_stats['rem_sleep'] = sec_to_hours_min_sec(
+				sleep_info['rem'],include_sec = False
+			)
 		else:
 			sleep_stats['deep_sleep'] = sec_to_hours_min_sec(
-										target_sleep_data.get('deepSleepDurationInSeconds',0),
-										include_sec=False)
+				target_sleep_data.get('deepSleepDurationInSeconds',0),
+				include_sec=False)
 			sleep_stats['light_sleep'] = sec_to_hours_min_sec(
-										target_sleep_data.get('lightSleepDurationInSeconds',0),
-										include_sec=False)
+				target_sleep_data.get('lightSleepDurationInSeconds',0),
+				include_sec=False)
 			sleep_stats['awake_time'] = sec_to_hours_min_sec(
-										target_sleep_data.get('awakeDurationInSeconds',0),
-									include_sec=False)
+				target_sleep_data.get('awakeDurationInSeconds',0),
+				include_sec=False)
+			sleep_stats['rem_sleep'] = sec_to_hours_min_sec(
+				target_sleep_data.get('remSleepInSeconds',0),
+				include_sec=False)
 
 		if target_sleep_data.get('validation',None) == 'MANUAL':
-			awake_duration = _get_deep_light_awake_sleep_duration(target_sleep_data).get('awake',0)
+			awake_duration = _get_deep_light_awake_sleep_duration(target_sleep_data)
+			awake_duration = awake_duration.get('awake',0)
 		else:
 			awake_duration = target_sleep_data.get('awakeDurationInSeconds',0)
 
@@ -559,54 +575,50 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 			# in same timezone as of user input submitted by user today. Thus we'll convert 
 			# bedtime and awake time in same timezone and get the naive datetime object
 			target_tz = pytz.timezone(user_input_timezone)
-			bed_time = pytz.utc.localize(datetime.utcfromtimestamp(
-						target_sleep_data.get('startTimeInSeconds'))).astimezone(target_tz).replace(tzinfo=None)
-
-			# awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-			# 			_get_actual_sleep_start_time(target_sleep_data)+
-			# 			target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+			bed_time = pytz.utc.localize(
+				datetime.utcfromtimestamp(
+					target_sleep_data.get('startTimeInSeconds'))
+				).astimezone(target_tz).replace(tzinfo=None)
 			
 			feb17 = datetime(2018,2,17,0,0,0)
 			if(sleep_calendar_date < feb17):
-				awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-							target_sleep_data.get('startTimeInSeconds')+
-							target_sleep_data.get('durationInSeconds'))).astimezone(target_tz).replace(tzinfo = None)
+				awake_time = pytz.utc.localize(
+					datetime.utcfromtimestamp(
+						target_sleep_data.get('startTimeInSeconds')
+						+ target_sleep_data.get('durationInSeconds'))
+					).astimezone(target_tz).replace(tzinfo = None)
 			else:
 				awake_time = pytz.utc.localize(datetime.utcfromtimestamp(
-							target_sleep_data.get('startTimeInSeconds')+
-							target_sleep_data.get('durationInSeconds')+
-							awake_duration)).astimezone(target_tz).replace(tzinfo = None)
+					target_sleep_data.get('startTimeInSeconds')
+					+ target_sleep_data.get('durationInSeconds')
+					+ awake_duration)).astimezone(target_tz).replace(tzinfo = None)
 		else:
-			bed_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds')+
-				target_sleep_data.get('startTimeOffsetInSeconds'))
-
-			# awake_time = datetime.utcfromtimestamp(_get_actual_sleep_start_time(target_sleep_data)+
-			# 									   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-			# 									   target_sleep_data.get('durationInSeconds'))
+			bed_time = datetime.utcfromtimestamp(
+				target_sleep_data.get('startTimeInSeconds')
+				+ target_sleep_data.get('startTimeOffsetInSeconds'))
 
 			feb17 = datetime(2018,2,17,0,0,0)
 			if(sleep_calendar_date < feb17):
-				awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
-													   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-													   target_sleep_data.get('durationInSeconds'))
+				awake_time = datetime.utcfromtimestamp(
+					target_sleep_data.get('startTimeInSeconds',0)
+					+ target_sleep_data.get('startTimeOffsetInSeconds',0)
+					+ target_sleep_data.get('durationInSeconds'))
 			else:
-				awake_time = datetime.utcfromtimestamp(target_sleep_data.get('startTimeInSeconds',0)+
-													   target_sleep_data.get('startTimeOffsetInSeconds',0)+
-													   target_sleep_data.get('durationInSeconds')+
-													   awake_duration)
+				awake_time = datetime.utcfromtimestamp(
+					target_sleep_data.get('startTimeInSeconds',0)
+					+ target_sleep_data.get('startTimeOffsetInSeconds',0)
+					+ target_sleep_data.get('durationInSeconds')
+					+ awake_duration)
 
 		sleep_per_wearable = (awake_time-bed_time).seconds - awake_duration
-
-		# sleep_per_wearable = target_sleep_data.get('durationInSeconds',0)\
-		# 					 - target_sleep_data.get('awakeDurationInSeconds',0)
-		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(sleep_per_wearable,include_sec=False)
+		sleep_stats['sleep_per_wearable'] = sec_to_hours_min_sec(
+			sleep_per_wearable,include_sec=False)
 		if str_dt:
 			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
 			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
 		else:
 			sleep_stats['sleep_bed_time'] = bed_time
 			sleep_stats['sleep_awake_time'] = awake_time
-
 		return sleep_stats
 
 	elif user_submitted_sleep:
@@ -1994,6 +2006,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 					 "prescription_or_non_prescription_sleep_aids_last_night", "")
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
 		sleeps_calculated_data['light_sleep'] = sleep_stats['light_sleep']
+		sleeps_calculated_data['rem_sleep'] = sleep_stats['rem_sleep']
 		sleeps_calculated_data['awake_time'] = sleep_stats['awake_time']
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']

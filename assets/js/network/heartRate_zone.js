@@ -22,10 +22,11 @@ export default function fetchHeartrateZoneData(successHeartrateZone,errorHeartra
   });
 
 }
-export function weeklyHeartRateZone(startDate,endDate,successquick, errorquick){  
+
+export function fetchHrrWeeklyData(startDate,endDate,successHeartrateZone, errorHeartrateZone){  
     startDate = moment(startDate);
     endDate = moment(endDate);
-    const URL = `quicklook/users/data`;
+    const URL = `/hrr/user/heartzone_data`;
     const config = {
       method: "get",
       params:{
@@ -36,8 +37,28 @@ export function weeklyHeartRateZone(startDate,endDate,successquick, errorquick){
       withCredentials: true
     };
      axios(config).then((response) => {
-       successquick(response,startDate,endDate);
+       successHeartrateZone(response,startDate,endDate);
      }).catch(function (error){
-       errorquick(error);
+       errorHeartrateZone(error);
+    });
+  }
+
+  export function fetchHrrWeeklyAaData(startDate,endDate,successHrrWeeklyAaData, errorHrrWeeklyAaData){  
+    startDate = moment(startDate);
+    endDate = moment(endDate);
+    const URL = `/hrr/user/weekly_aa_data`;
+    const config = {
+      method: "get",
+      params:{
+        to: endDate.format('YYYY-MM-DD'),
+        from: startDate.format('YYYY-MM-DD') 
+      },
+      url: URL,
+      withCredentials: true
+    };
+     axios(config).then((response) => {
+       successHrrWeeklyAaData(response,startDate,endDate);
+     }).catch(function (error){
+       errorHrrWeeklyAaData(error);
     });
   }

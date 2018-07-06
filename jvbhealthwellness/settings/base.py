@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'leaderboard',
     'fitbit',
     'hrr',
+    'dashboards',
 ]
 
 MIDDLEWARE = [
