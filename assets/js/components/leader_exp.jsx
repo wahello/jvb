@@ -131,7 +131,7 @@ class LeaderBoard1 extends Component{
 		this.toggle = this.toggle.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
-		this.successLeaderBoard = this.successLeaderBoard.bind(this);
+		this.errorLeaderBoard = this.errorLeaderBoard.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.renderTablesTd = this.renderTablesTd.bind(this);
 		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
