@@ -63,7 +63,7 @@ def _create_activity_stat(user,activity_obj,current_date):
 	aerobic_value_half = 180-user_age-15
 
 	if activity_obj:
-		tmp = {
+		activity_keys = {
 				"summaryId":"",
 				"activityType":"",
 				"comments":"",
@@ -77,19 +77,19 @@ def _create_activity_stat(user,activity_obj,current_date):
 
 			}
 		for k, v in activity_obj.items():
-			if k in tmp.keys():
-				tmp[k] = v
-				if (int(tmp.get("averageHeartRateInBeatsPerMinute",0)) < below_aerobic_value or
-					tmp.get("activityType","") == "HEART_RATE_RECOVERY"):
-					tmp["steps_type"] = "non_exercise"
+			if k in activity_keys.keys():
+				activity_keys[k] = v
+				if (int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) < below_aerobic_value or
+					activity_keys.get("activityType","") == "HEART_RATE_RECOVERY"):
+					activity_keys["steps_type"] = "non_exercise"
 				else:
-					tmp["steps_type"] = "exercise"
-				if int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
-					tmp["can_update_steps_type"] = False
-				elif int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > aerobic_value_half:
-					tmp["can_update_steps_type"] = False
+					activity_keys["steps_type"] = "exercise"
+				if int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
+					activity_keys["can_update_steps_type"] = False
+				elif int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) > aerobic_value_half:
+					activity_keys["can_update_steps_type"] = False
 
-		return {activity_obj['summaryId']:tmp}
+		return {activity_obj['summaryId']:activity_keys}
 
 def _get_activities(user,target_date):
 	current_date = str_to_datetime(target_date)
@@ -107,7 +107,7 @@ def _get_activities(user,target_date):
 	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+	fitfiles=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -115,9 +115,9 @@ def _get_activities(user,target_date):
 	if activity_data:
 		offset = activity_data[0].get("startTimeOffsetInSeconds")
 	
-	if a1:
-		for tmp in a1:
-			workout_activities = fitfile_parse([tmp],offset,target_date)
+	if fitfiles:
+		for single_fitfiles in fitfiles:
+			workout_activities = fitfile_parse([single_fitfiles],offset,target_date)
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
@@ -150,16 +150,17 @@ def _get_activities(user,target_date):
 	# 	while diff > 0:
 	# 		final_heart_rate.append([])
 	# 		diff = diff - 1
-	for act in activity_data:
-		act_obj = manually_edited(act)
-		if a1:
-			for tmp,i in zip(a1,final_heart_rate):
-				meta = tmp.meta_data_fitfile
+	for single_activity in activity_data:
+		act_obj = manually_edited(single_activity)
+		if fitfiles:
+			for single_fitfiles,single_heartrate in zip(fitfiles,final_heart_rate):
+				meta = single_fitfiles.meta_data_fitfile
 				meta = ast.literal_eval(meta)
+				data_id = meta['activityIds'][0]
 				if (((act_obj.get("summaryId",None) == str(data_id)) and 
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
 					(act_obj.get("distanceInMeters",0) <= 200.00)) and i):
-					hrr_difference = i[0] - i[-1]
+					hrr_difference = single_heartrate[0] - single_heartrate[-1]
 					if hrr_difference > 10:
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 				else:

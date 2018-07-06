@@ -13,19 +13,18 @@ def fitfile_parse(obj,offset,start_date_str):
 	obj_start_month = int(start_date_str.split('-')[1])
 	obj_start_date = int(start_date_str.split('-')[2])
 	
-	x = [(FitFile(x.fit_file)).get_messages('record') for x in obj]
+	single_obj = [(FitFile(single_obj.fit_file)).get_messages('record') for single_obj in obj]
 	
-	for record in x:
+	for record in single_obj:
 		for record_data in record:
-			for ss in record_data:
-				if(ss.name=='heart_rate'):
-					b = ss.value
-					heartrate_complete.extend([b])
+			for single_record_data in record_data:
+				if(single_record_data.name=='heart_rate'):
+					heart_rate_value = single_record_data.value
+					heartrate_complete.extend([heart_rate_value])
 
-				if(ss.name=='timestamp'):
-					c = ss.value
-					cc = c.strftime('%Y-%m-%d')
-					timestamp_complete.extend([c])
+				if(single_record_data.name=='timestamp'):
+					timestamp = single_record_data.value
+					timestamp_complete.extend([timestamp])
 
 	heartrate_selected_date = []
 	timestamp_selected_date = []
@@ -43,11 +42,11 @@ def fitfile_parse(obj,offset,start_date_str):
 
 		
 	to_timestamp = []
-	for i,k in enumerate(timestamp_selected_date):
-		dtt = k.timetuple()
-		ts = time.mktime(dtt)
-		ts = ts+offset
-		to_timestamp.extend([ts])
+	for index,value in enumerate(timestamp_selected_date):
+		value_timetuple = value.timetuple()
+		value_mktime = time.mktime(value_timetuple)
+		value_mktime = value_mktime+offset
+		to_timestamp.extend([value_mktime])
 	
 	timestamp_difference = []
 	for i,k in enumerate(to_timestamp):

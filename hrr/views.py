@@ -717,17 +717,17 @@ def aa_workout_calculations(request):
 	id_act = 0
 	activities = []
 	if user_input_strong:
-		for tmp in user_input_strong:
-			sn = tmp.activities
-			if sn:
-				sn = json.loads(sn)
-				di = sn.values()
-				di = list(di)
-				for i,k in enumerate(di):
-					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(di[i]['summaryId'])
+		for single_ui_object in user_input_strong:
+			single_activity = single_ui_object.activities
+			if single_activity:
+				single_activity_json = json.loads(single_activity)
+				single_activity_values = single_activity_json.values()
+				single_activity_values = list(single_activity_values)
+				for i,k in enumerate(single_activity_values):
+					if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
+						id_act = int(single_activity_values[i]['summaryId'])
 						count = count + 1
-						activities.append(di[i])
+						activities.append(single_activity_values[i])
 
 	try:
 		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
