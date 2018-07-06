@@ -284,6 +284,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             <span className="rd_mch_color_legend_label">Sleeping</span>
             <div className="rd_mch_color_legend color_legend_yellow"></div>
             <span className="rd_mch_color_legend_label">Exercise</span>
+            <div className="rd_mch_color_legend color_legend_grey"></div>
+            <span className="rd_mch_color_legend_label">No Data Yet</span>
 
       </div>
       </div>
