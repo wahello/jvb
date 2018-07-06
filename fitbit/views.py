@@ -53,9 +53,6 @@ class FitbitPush(APIView):
 			return Response(status = status.HTTP_404_NOT_FOUND)
 
 
-
-
-
 def refresh_token(user):
 	'''
 	This function updates the expired tokens in database
@@ -108,7 +105,9 @@ def api_fitbit(session,date_fitbit):
 	Takes session and start date then call the fitbit api,return the fitbit api
 	'''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
-	activity_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/date/{}.json".format(date_fitbit))
+	activity_fitbit = session.get(
+	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+	date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
 
@@ -188,6 +187,7 @@ def fetching_data_fitbit(request):
 	statuscode = sleep_fitbit.status_code
 	#converting str to dict
 	sleep_fitbit = sleep_fitbit.json()
+	activity_fitbit = activity_fitbit.json()
 	heartrate_fitbit = heartrate_fitbit.json()
 	steps_fitbit = steps_fitbit.json()
 
@@ -197,12 +197,14 @@ def fetching_data_fitbit(request):
 			refresh_token(user)
 	fitbit_all_data = {}
 	fitbit_all_data['sleep_fitbit'] = sleep_fitbit
+	fitbit_all_data['activity_fitbit'] = activity_fitbit
 	fitbit_all_data['heartrate_fitbit'] = heartrate_fitbit
 	fitbit_all_data['steps_fitbit'] = steps_fitbit
 
 	store_data(fitbit_all_data,request.user,start_date)
 
 	fitbit_data = {"sleep_fitbit":sleep_fitbit,
+					"activity_fitbit":activity_fitbit,
 					"heartrate_fitbit":heartrate_fitbit,
 					"steps_fitbit":steps_fitbit}
 	data = json.dumps(fitbit_data)
@@ -245,8 +247,8 @@ def refresh_token_fitbit(request):
 # 		creates a session
 # 	'''
 # 	print("Startes for checking notifications in database")
-# 	#time = datetime.now() - timedelta(minutes=15) 
-# 	updated_data = FitbitNotifications.objects.latest('created_at')
+# 	time = datetime.now() - timedelta(minutes=15) 
+# 	updated_data = FitbitNotifications.objects.filter(Q(created_at__gte=time))
 # 	if updated_data:
 # 		service = session_fitbit()
 # 		tokens = FitbitConnectToken.objects.get(user = request.user)

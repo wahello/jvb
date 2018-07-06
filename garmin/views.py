@@ -5,6 +5,7 @@ import json
 import io
 import base64
 import ast
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
@@ -46,7 +47,7 @@ from .models import UserGarminDataEpoch,\
 					GarminConnectToken
 
 from users.models import GarminToken
-
+from hrr.tasks import create_hrrdata
 
 class UserGarminDataEpochView(generics.ListCreateAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -191,20 +192,20 @@ class GarminConnectPing(APIView):
 		oauthToken_fitfile = ast.literal_eval(file_name)
 		file_oauth = oauthToken_fitfile['oauthToken']
 
+		date_now = datetime.now()
+		date_str = date_now.strftime("%Y-%m-%d")
 		try:
 			user = User.objects.get(garmin_connect_token__token = file_oauth)
-			# print(user)
+			# print(type(user))
 		except User.DoesNotExist:
 			user = None
 		if user:
 			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
-
-		# mail = EmailMessage()
-		# mail.subject = "Garmin connect Push | Files"
-		# mail.body = request.data['uploadMetaData']
-		# mail.to = ['atulk@s7works.io']
-		# mail.attach(file.name, file.read(), file.content_type)
-		# mail.send()
+			create_hrrdata.delay(
+				user.id,
+				date_str
+			)
+		
 		headers={"Location":"/"}
 		return Response(status = status.HTTP_201_CREATED,headers=headers)
 
