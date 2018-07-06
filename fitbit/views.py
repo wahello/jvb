@@ -45,8 +45,13 @@ class FitbitPush(APIView):
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
 	def get(self, request, format="json"):
-		
-		return Response(status = status.HTTP_204_NO_CONTENT)
+		verification_code = request.query_params
+		verify_code = verification_code.get('verify','')
+		if verify_code == '4d48c7d06f18f34bb9479af97d4dd82732885d3adbeda22c1ce79c559189900c':
+			return Response(status = status.HTTP_204_NO_CONTENT)
+		else:
+			return Response(status = status.HTTP_404_NOT_FOUND)
+
 
 
 
