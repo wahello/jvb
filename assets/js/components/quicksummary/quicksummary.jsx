@@ -294,8 +294,8 @@ class Quicklook extends Component{
 		        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 		        deep_sleep: data.sleep_ql.deep_sleep,
 		        light_sleep: data.sleep_ql.light_sleep,
-		        awake_time: data.sleep_ql.awake_time
-		       
+		        awake_time: data.sleep_ql.awake_time,
+		        rem_sleep: data.sleep_ql.rem_sleep
 		    },
 		    food_ql: {
 		        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
@@ -1015,7 +1015,7 @@ onLogoutSuccess(response){
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser"className={class_hrr} value="hrr"
-						    								 onClick={this.activateTab.bind(this,"hrr")}>User Inputs</DropdownItem>
+						    								 onClick={this.activateTab.bind(this,"hrr")}>Heart Rate Recovery</DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>

@@ -146,7 +146,8 @@ export function getInitialState(start_dt, end_dt){
 	           "sleep_awake_time": '-',
 	           "deep_sleep": '-',
 	           "light_sleep": '-',
-	           "awake_time": '-'
+	           "awake_time": '-',
+	           "rem_sleep": '-'
 	       
 	    },
 	    "food_ql": {
