@@ -316,7 +316,7 @@ class HeartRate extends Component{
 						}
 					   
 					}
-					else if(key == "prcnt_in_zone"){
+					else if(key == "prcnt_total_duration_in_zone"){
 						let keyvalue = this.renderpercentage(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);
 					}
