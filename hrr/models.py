@@ -42,10 +42,35 @@ class Hrr(models.Model):
 			models.Index(fields=['created_at']),
 		]
 
+class AaCalculations(models.Model):
+	user_aa = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	data = models.TextField(blank=True,null=True)
 
-# class AaCalculations(models.Model):
-# 	user_hrr = models.ForeignKey(User, on_delete=models.CASCADE)
-# 	created_at = models.DateField()
-# 	updated_at = models.DateTimeField(auto_now=True)
+	def __str__(self):
+		return str((self.user_aa))
 
-	
+	class Meta:
+		unique_together = ("user_aa", "created_at")
+		indexes = [
+			models.Index(fields=['user_aa', '-created_at']),
+			models.Index(fields=['created_at']),
+		]
+
+
+class TimeHeartZones(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	data = models.TextField(blank=True,null=True)
+
+	def __str__(self):
+		return str((self.user))
+
+	class Meta:
+		unique_together = ("user", "created_at")
+		indexes = [
+			models.Index(fields=['user', '-created_at']),
+			models.Index(fields=['created_at']),
+		]

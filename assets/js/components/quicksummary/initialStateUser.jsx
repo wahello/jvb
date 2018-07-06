@@ -18,7 +18,7 @@ export function getInitialStateUserInput(start_dt, end_dt){
  		'have_data':false,
 	    "strong_input":{    	
 	    	"workout":'-',
-	    	"workout_type":"-",
+	    	"workout_type":"-",  
 	    	"work_out_easy_or_hard":'-',
 	    	"workout_effort_level":'-',
 	    	"hard_portion_workout_effort_level":'-',
