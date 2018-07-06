@@ -41,7 +41,10 @@ mcHistoricalData(score,status){
       else if(status == "strength")
         return {background:"rgb(255,0,255)",color:'white'}
       else if(status == "exercise"){
-         return {background:"#FD9A44",color:'black'}
+        return {background:"#FD9A44",color:'black'}
+      }
+      else if(status == "no data yet"){
+        return {background:" #A5A7A5",color:'white'}
       }
       else if (score >= 300 )
         return {background:'green', color:'white'};
@@ -143,14 +146,15 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                                         style:this.mcHistoricalData(value)});
                                          }
                                       }
+                                      else if(mCdata.status == "no data yet"){
+                                         obj[time].push({value:"No Data Yet",
+                                                        style:this.mcHistoricalData(value,mCdata.status)});
+                                      }                      
                                       else{
                                           obj[time].push({value:mCdata.steps,
                                                         style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
                                       }
-            
-
-                                                                                                                           
-                                                                            
+                                                                    
                                 }
                             }else{
                               for(let [time,mCdata] of Object.entries(obj)){
