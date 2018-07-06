@@ -88,7 +88,7 @@ def refresh_token(user):
 		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
 
-def fit_bit_user_subscriptions(user):
+def fitbit_user_subscriptions(user):
 	service = session_fitbit()
 	tokens = FitbitConnectToken.objects.get(user = user)
 	access_token = tokens.access_token
@@ -168,7 +168,7 @@ def receive_token_fitbit(request):
 				token.save()
 		except FitbitConnectToken.DoesNotExist:
 			FitbitConnectToken.objects.create(user=request.user,refresh_token=a['refresh_token'],access_token=a['access_token'],user_id_fitbit=a['user_id'])
-			fit_bit_user_subscriptions(request.user)
+			fitbit_user_subscriptions(request.user)
 		return redirect('/service_connect_fitbit')
 
 def fetching_data_fitbit(request):
