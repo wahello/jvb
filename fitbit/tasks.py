@@ -20,7 +20,7 @@ def store_fitbit_data(data):
 
 	except Exception as e:
 		message = """
-Storing health data failed
+Storing fitbit data failed
 REQUEST DATA :{}
 ERROR MESSAGE:{}"""
 		logger.error(message.format(data,str(e)), exc_info=True)
