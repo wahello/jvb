@@ -30,6 +30,38 @@ from .models import FitbitConnectToken,\
 					FitbitNotifications
 
 
+def refresh_token_for_notification(user):
+	'''
+	This function updates the expired tokens in database
+	Return: refresh token and access token
+	'''
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	access_token_url='https://api.fitbit.com/oauth2/token'
+	token = FitbitConnectToken.objects.get(user = user)
+	refresh_token_acc = token.refresh_token
+	client_id_secret = '{}:{}'.format(client_id,client_secret).encode()
+	headers = {
+		'Authorization':'Basic'+' '+base64.b64encode(client_id_secret).decode('utf-8'),
+		'Content-Type':'application/x-www-form-urlencoded'
+	}
+	data = {
+		'grant_type' : 'refresh_token',
+		'refresh_token': refresh_token_acc,
+	}
+	request_data = requests.post(access_token_url,headers=headers,data=data)
+	request_data_json = request_data.json()
+	print(pprint.pprint(request_data_json))
+	token_object = ''
+	try: 
+		token_object = FitbitConnectToken.objects.filter(user=user).update(
+			refresh_token=request_data_json['refresh_token'],
+			access_token=request_data_json['access_token']
+		)
+	except:
+		logging.exception("message")
+	if token_object:
+		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
 def session_fitbit():
 	'''
@@ -42,6 +74,7 @@ def session_fitbit():
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
 	return service
+
 
 def call_push_api(data):
 	'''
@@ -66,8 +99,14 @@ def call_push_api(data):
 			access_token = tokens.access_token
 			session = service.get_session(access_token)
 			call_api(date,user_id,data_type,user,session)
-	return HttpResponse('Final return')
 	return None
+
+def get_session_and_access_token(user):
+	refresh_token,access_token = refresh_token_for_notification(user)
+	service = session_fitbit()
+	access_token = access_token
+	session = service.get_session(access_token)	
+	return session
 
 def call_api(date,user_id,data_type,user,session):
 	'''
@@ -86,7 +125,15 @@ def call_api(date,user_id,data_type,user,session):
 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
 			user_id,data_type,date))
 		sleep_fitbit = sleep_fitbit.json()
-		store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
+		statuscode = sleep_fitbit.status_code
+		if statuscode == 200:
+			store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
+		else:
+			session = get_session_and_access_token(user)
+			sleep_fitbit = session.get(
+				"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
+				user_id,data_type,date))
+			store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
 	elif data_type == 'activities':
 		activity_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
