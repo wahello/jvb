@@ -65,3 +65,18 @@ def fitfile_parse(obj,offset,start_date_str):
 			final_timestamp.extend([k]) 
 
 	return (final_heartrate,final_timestamp,to_timestamp)
+
+def week_date(start_date):
+	'''
+	Takes data object and convert to the last week from Monday to Sunday
+
+	Args: start_date(datatime.date object)
+
+	Returns:Week start date and End date
+	'''
+	week_start_date = start_date - timedelta(
+		days = start_date.weekday()+7)
+	week_end_date = start_date - timedelta(
+		days = start_date.weekday()+1)
+	return(week_start_date,week_end_date)
+

@@ -36,6 +36,7 @@ from hrr.models import Hrr,AaCalculations,TimeHeartZones
 from .serializers import HrrSerializer
 from hrr.models import Hrr
 import pprint
+from hrr.calculation_helper import week_date
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -1717,3 +1718,9 @@ class UserAaView(APIView):
 
 		return queryset
 
+def weekly_workout_summary(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	week_start_date,week_end_date = week_date(start_date)
+	print(week_start_date,week_end_date,"week datesaaaaaaaaaaaaaaaaaaaaaaaa")
+	return JsonResponse({"test":"cool"})
