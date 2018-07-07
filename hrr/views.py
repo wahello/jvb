@@ -32,9 +32,12 @@ from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
 
 from .serializers import AaSerializer,HeartzoneSerializer
-from hrr.models import Hrr,AaCalculations,TimeHeartZones
+from hrr.models import Hrr,\
+						AaCalculations,\
+						TimeHeartZones,\
+						AaWorkoutCalculations,\
+						AA
 from .serializers import HrrSerializer
-from hrr.models import Hrr
 import pprint
 
 class UserHrrView(generics.ListCreateAPIView):
@@ -165,10 +168,7 @@ def create_hrr_instance(user, data, start_date):
 	Hrr.objects.create(user_hrr = user,created_at = created_at,**data)
 
 
-def aa_calculations(request):
-	start_date = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-
+def aa_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=7)
 	start_date_str = start_date.strftime('%Y-%m-%d')
@@ -178,7 +178,7 @@ def aa_calculations(request):
 	start_date_timestamp = time.mktime(start_date_timestamp)
 	end_date_timestamp = start_date_timestamp + 86400
 
-	activity_files_qs=UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
 
 	if activity_files:
@@ -200,7 +200,7 @@ def aa_calculations(request):
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 
-	ui_data = _get_activities(request.user,start_date_str)
+	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	ui_data_hrr = []
 	for ui_data_single in ui_data.values():
@@ -225,7 +225,7 @@ def aa_calculations(request):
 
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
-		user_input__user = request.user).order_by('-user_input__created_at')
+		user_input__user = user).order_by('-user_input__created_at')
 
 	activities = []
 	id_act = 0
@@ -245,7 +245,7 @@ def aa_calculations(request):
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	if activities:
 		for tmp in a1:
@@ -295,7 +295,7 @@ def aa_calculations(request):
 	# if activities:
 	# 	offset =  activities[0]['startTimeOffsetInSeconds']
 
-	profile = Profile.objects.filter(user=request.user)
+	profile = Profile.objects.filter(user=user)
 	for tmp_profile in profile:
 		user_dob = tmp_profile.date_of_birth
 	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
@@ -352,7 +352,7 @@ def aa_calculations(request):
 			percent_hrr_not_recorded=''
 			total_percent=''
 			
-		if hrr_not_recorded_list:
+		if hrr_not_recorded_list and workout:
 			data = {"total_time":total_time,
 					"aerobic_zone":time_in_aerobic,
 					"anaerobic_zone":time_in_anaerobic,
@@ -366,7 +366,7 @@ def aa_calculations(request):
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
-		else:
+		elif workout:
 			data = {"total_time":total_time,
 					"aerobic_zone":time_in_aerobic,
 					"anaerobic_zone":time_in_anaerobic,
@@ -374,17 +374,66 @@ def aa_calculations(request):
 					"aerobic_range":aerobic_range,
 					"anaerobic_range":anaerobic_range,
 					"below_aerobic_range":below_aerobic_range,
-					"hrr_not_recorded":"",
-					"percent_hrr_not_recorded":"",
+					"hrr_not_recorded":None,
+					"percent_hrr_not_recorded":None,
 					"percent_aerobic":percent_aerobic,
 					"percent_below_aerobic":percent_below_aerobic,
 					"percent_anaerobic":percent_anaerobic,
 					"total_percent":total_percent}
-	return JsonResponse(data)
+		else:
+			data = {"total_time":None,
+					"aerobic_zone":None,
+					"anaerobic_zone":None,
+					"below_aerobic_zone":None,
+					"aerobic_range":'',
+					"anaerobic_range":'',
+					"below_aerobic_range":'',
+					"hrr_not_recorded":None,
+					"percent_hrr_not_recorded":None,
+					"percent_aerobic":None,
+					"percent_below_aerobic":None,
+					"percent_anaerobic":None,
+					"total_percent":None}
 
-def aa_workout_calculations(request):
-	start_date = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	return (data)
+
+def aa_update_helper(instance,data_dict):
+	'''
+		Helper function to update the instance
+		with provided key,value pair
+		Warning: This will not trigger any signals
+				 like post or pre save
+	'''
+	
+	for attr, value in data_dict.items():
+		setattr(instance,attr,value)
+	instance.save()
+
+# update AA table
+
+def aa_update_instance(instance, data):
+	aa_update_helper(instance, data)
+
+
+#creating AA table
+
+def aa_create_instance(user, data, start_date):
+	created_at = start_date
+	AA.objects.create(user = user,created_at = created_at,**data)
+
+def aa_calculations(request):
+	start_date_get = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
+	data = aa_data(request.user,start_date)
+	if data.get('total_time'):
+		try:
+			user_aa = AA.objects.get(user=request.user, created_at=start_date)
+			aa_update_instance(user, data)
+		except AA.DoesNotExist:
+			aa_create_instance(request.user, data, start_date)
+	return JsonResponse(data)	
+
+def aa_workout_data(user,start_date):
 	start_date_str = start_date.strftime('%Y-%m-%d')
 
 	start_date_timestamp = start_date
@@ -392,7 +441,7 @@ def aa_workout_calculations(request):
 	start_date_timestamp = time.mktime(start_date_timestamp)
 	end_date_timestamp = start_date_timestamp + 86400
 	
-	ui_data = _get_activities(request.user,start_date_str)
+	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	for ui_data_single in ui_data.values():
 		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
@@ -402,7 +451,7 @@ def aa_workout_calculations(request):
 	try:
 		user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
-		user_input__user = request.user).order_by('-user_input__created_at')
+		user_input__user = user).order_by('-user_input__created_at')
 		activities=[]
 		activities_dic={}
 		if user_input_strong:
@@ -435,7 +484,7 @@ def aa_workout_calculations(request):
 						activities.append(single_activity_values[i])
 
 	try:
-		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 		manually_edited_dic = {}
 		manually_edited_list = []
 		if manually_updated_activities:
@@ -449,7 +498,7 @@ def aa_workout_calculations(request):
 		pass
 
 	try:
-		garmin_data_activities = UserGarminDataActivity.objects.filter(user=request.user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+		garmin_data_activities = UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 		garmin_list = []
 		garmin_dic = {}
 		if garmin_data_activities:
@@ -470,7 +519,7 @@ def aa_workout_calculations(request):
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=request.user,created_at__range=[start,end])
+	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	if filtered_activities_files:
 		for i,k in enumerate(filtered_activities_files):
 			if filtered_activities_files[i].get("summaryId") in ui_data_keys:
@@ -587,9 +636,33 @@ def aa_workout_calculations(request):
 		
 	
 	if data1:
-		return JsonResponse(data1)
+		return data1
 	else:
-		return JsonResponse({})
+		return ({})
+
+def update_workout_instance(user,start_date,data):
+	AaWorkoutCalculations.objects.filter(
+			user_aa_workout=user, created_at=start_date).update(data=data)
+
+def create_workout_instance(user, data, start_date):
+	AaWorkoutCalculations.objects.create(
+		user_aa_workout = user,created_at = start_date,data=data)
+
+def aa_workout_calculations(request):
+	start_date_get = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
+	data = aa_workout_data(request.user,start_date)
+	print(type(data),"aaaaaaaaaaaaaaaaaaaaaaaaakkkkkkkkkkkkk")
+	# data = json.dumps(data)
+	if data:
+		try:
+			user_aa = AaWorkoutCalculations.objects.get(
+				user_aa_workout=request.user, created_at=start_date)
+			update_workout_instance(request.user,start_date,data)
+		except AaWorkoutCalculations.DoesNotExist:
+			create_workout_instance(request.user, data, start_date)
+	return JsonResponse(data)
+
 
 def daily_aa_data(user, start_date):
 	avg_heart_rate = 0.0
@@ -1546,7 +1619,7 @@ def hrr_calculations(request):
 			update_hrr_instance(user_hrr, data)
 		except Hrr.DoesNotExist:
 			create_hrr_instance(request.user, data, start_date)
-	return JsonResponse(data)
+	return JsonResponse(data)	
 
 
 def store_hhr(start_date_get,user):
