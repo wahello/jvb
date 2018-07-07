@@ -691,7 +691,6 @@ def daily_aa_data(user, start_date):
 					for i,k in enumerate(activity_files):
 						activity_files_dict = ast.literal_eval(activity_files[i])
 						if activity_files_dict.get("summaryId",None) == str(data_id) and str(data_id) in ui_data_keys:
-							print("fffffffffffffffffffffffffffffffff")
 							duration = activity_files_dict.get('durationInSeconds')
 							activities_duration.append(duration)
 							average_heartrate = activity_files_dict.get("averageHeartRateInBeatsPerMinute",0)
@@ -721,6 +720,29 @@ def daily_aa_data(user, start_date):
 					data_summaryid.append(data_id)
 				elif str(data_id) in ui_data_hrr:
 					hrr.append(tmp)
+				if activity_files_qs:
+					for i,k in enumerate(activity_files):
+						activity_files_dict = ast.literal_eval(activity_files[i])
+						if activity_files_dict.get("summaryId",None) == str(data_id) and str(data_id) in ui_data_keys:
+							duration = activity_files_dict.get('durationInSeconds')
+							activities_duration.append(duration)
+							average_heartrate = activity_files_dict.get("averageHeartRateInBeatsPerMinute",0)
+							avg_hrr_list.append(average_heartrate)
+							maximum_heartrate =  activity_files_dict.get('maxHeartRateInBeatsPerMinute',0)
+							max_hrr_list.append(maximum_heartrate)
+							data_summaryid.append(data_id)
+							if "averageHeartRateInBeatsPerMinute" in activity_files_dict.keys():
+								if activity_files_dict.get("averageHeartRateInBeatsPerMinute",0) == 0 or "" :
+									hrr_not_recorded = activity_files_dict.get('durationInSeconds')
+									hrr_not_recorded_list.append(hrr_not_recorded)
+								else:
+									hrr_not_recorded_list.append(0)
+							else:
+								hrr_not_recorded = activity_files_dict.get('durationInSeconds')
+								hrr_not_recorded_list.append(hrr_not_recorded)
+
+						else:
+							hrr_not_recorded_list.append(0)
 				# for i,k in enumerate(activity_files):
 					# activity_files_dict = ast.literal_eval(activity_files[i])
 					# if ((activity_files_dict.get("summaryId",None) == str(data_id)) and 
