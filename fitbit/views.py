@@ -91,13 +91,23 @@ def refresh_token(user):
 def fitbit_user_subscriptions(user):
 	service = session_fitbit()
 	tokens = FitbitConnectToken.objects.get(user = user)
+	fibtbit_user_id = tokens.user_id_fitbit
 	access_token = tokens.access_token
 	session = service.get_session(access_token)
-	session.post("https://api.fitbit.com/1/user/-/apiSubscriptions/2112.json")
-	session.post("https://api.fitbit.com/1/user/-/activities/apiSubscriptions/2112.json")
-	session.post("https://api.fitbit.com/1/user/-/foods/apiSubscriptions/2112.json")
-	session.post("https://api.fitbit.com/1/user/-/sleep/apiSubscriptions/2112.json")
-	session.post("https://api.fitbit.com/1/user/-/body/apiSubscriptions/2112.json")
+	session.post("https://api.fitbit.com/1/user/-/apiSubscriptions/{}.json".format(
+		fibtbit_user_id))
+	session.post(
+	"https://api.fitbit.com/1/user/-/activities/apiSubscriptions/{}-activities.json".format(
+		fibtbit_user_id))
+	session.post(
+	"https://api.fitbit.com/1/user/-/foods/apiSubscriptions/{}-foods.json".format(
+		fibtbit_user_id))
+	session.post(
+	"https://api.fitbit.com/1/user/-/sleep/apiSubscriptions/{}-sleep.json".format(
+		fibtbit_user_id))
+	session.post(
+	"https://api.fitbit.com/1/user/-/body/apiSubscriptions/{}-body.json".format(
+		fibtbit_user_id))
 	return None
 
 def api_fitbit(session,date_fitbit):
@@ -210,23 +220,23 @@ def fetching_data_fitbit(request):
 	data = json.dumps(fitbit_data)
 	return HttpResponse(data,content_type='application/json')
 
-def refresh_token_fitbit(request):
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
-	access_token_url='https://api.fitbit.com/oauth2/token'
-	token = FitbitConnectToken.objects.get(user = request.user)
-	refresh_token_acc = token.refresh_token
-	client_id_secret = '{}:{}'.format(client_id,client_secret).encode()
-	headers = {
-		'Authorization':'Basic'+' '+base64.b64encode(client_id_secret).decode('utf-8'),
-		'Content-Type':'application/x-www-form-urlencoded'
-	}
-	data = {
-		'grant_type' : 'refresh_token',
-		'refresh_token': refresh_token_acc,
-	}
-	r = requests.post(access_token_url,headers=headers,data=data)
-	a = r.json()
+# def refresh_token_fitbit(request):
+# 	client_id='22CN2D'
+# 	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+# 	access_token_url='https://api.fitbit.com/oauth2/token'
+# 	token = FitbitConnectToken.objects.get(user = request.user)
+# 	refresh_token_acc = token.refresh_token
+# 	client_id_secret = '{}:{}'.format(client_id,client_secret).encode()
+# 	headers = {
+# 		'Authorization':'Basic'+' '+base64.b64encode(client_id_secret).decode('utf-8'),
+# 		'Content-Type':'application/x-www-form-urlencoded'
+# 	}
+# 	data = {
+# 		'grant_type' : 'refresh_token',
+# 		'refresh_token': refresh_token_acc,
+# 	}
+# 	r = requests.post(access_token_url,headers=headers,data=data)
+# 	a = r.json()
 	#print(type(a))
 
 
