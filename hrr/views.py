@@ -428,7 +428,7 @@ def aa_calculations(request):
 	if data.get('total_time'):
 		try:
 			user_aa = AA.objects.get(user=request.user, created_at=start_date)
-			aa_update_instance(user, data)
+			aa_update_instance(user_aa, data)
 		except AA.DoesNotExist:
 			aa_create_instance(request.user, data, start_date)
 	return JsonResponse(data)	
@@ -652,7 +652,6 @@ def aa_workout_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = aa_workout_data(request.user,start_date)
-	print(type(data),"aaaaaaaaaaaaaaaaaaaaaaaaakkkkkkkkkkkkk")
 	# data = json.dumps(data)
 	if data:
 		try:
