@@ -159,7 +159,7 @@ def _get_activities(user,target_date):
 				data_id = meta['activityIds'][0]
 				if (((act_obj.get("summaryId",None) == str(data_id)) and 
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
-					(act_obj.get("distanceInMeters",0) <= 200.00)) and i):
+					(act_obj.get("distanceInMeters",0) <= 200.00)) and single_heartrate):
 					hrr_difference = single_heartrate[0] - single_heartrate[-1]
 					if hrr_difference > 10:
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
