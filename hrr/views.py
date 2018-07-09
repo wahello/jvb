@@ -522,12 +522,20 @@ def aa_workout_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-	if filtered_activities_files:
-		for i,k in enumerate(filtered_activities_files):
-			if filtered_activities_files[i].get("summaryId") in ui_hrr_keys:
-				hrr.append(filtered_activities_files[i])
-			else:
-				workout.append(filtered_activities_files[i])
+	if activities:
+		if filtered_activities_files:
+			for i,k in enumerate(filtered_activities_files):
+				if filtered_activities_files[i].get("summaryId") in ui_hrr_keys:
+					hrr.append(filtered_activities_files[i])
+				else:
+					workout.append(filtered_activities_files[i])
+	else:
+		if filtered_activities_files:
+			for i,k in enumerate(filtered_activities_files):
+				if filtered_activities_files[i].get("summaryId") in ui_data_keys:
+					workout.append(filtered_activities_files[i])
+				else:
+					hrr.append(filtered_activities_files[i])
 
 
 	# if filtered_activities_files:
