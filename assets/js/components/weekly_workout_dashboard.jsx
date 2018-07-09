@@ -28,7 +28,6 @@ class WorkoutDashboard extends Component{
 	    this.renderAddDate = this.renderAddDate.bind(this);
 		this.renderRemoveDate = this.renderRemoveDate.bind(this);
 		this.toggleCalendar = this.toggleCalendar.bind(this);
-	   
 	}
 
 	renderAddDate(){
