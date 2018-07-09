@@ -34,6 +34,8 @@ class Movement_Dashboard extends Component{
 			steps_this_hour:"",
 			total_steps:"",
 			last_synced:null,
+			selectedDate:new Date(),
+
 		}
 		this.renderHourStepsColor = this.renderHourStepsColor.bind(this);
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
