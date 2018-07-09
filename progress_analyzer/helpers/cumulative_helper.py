@@ -564,7 +564,10 @@ def _get_hrr_api_data(user,date):
 			"hrr_starting_point":0,
 			"lowest_hr_during_hrr":0,
 			"hrr_beats_lowered_first_minute":0,
-			"hrr_time_to_99":0
+			"hrr_time_to_99":0,
+			"hrr_pure_1_min_beats_lowered":0,
+			"hrr_pure_time_to_99":0
+
 		}
 		if data.get('Did_you_measure_HRR') == 'yes':
 			if(data.get('HRR_start_beat')):
@@ -587,6 +590,15 @@ def _get_hrr_api_data(user,date):
 				formated_data['hrr_beats_lowered_first_minute'] = (
 					data.get('HRR_start_beat') - data.get('lowest_hrr_1min')
 				)
+			if data.get('pure_1min_heart_beats'):
+				formated_data['hrr_pure_1_min_beats_lowered'] = data.get(
+					"pure_1min_heart_beats"
+				)
+
+			if data.get("pure_time_99"):
+				pure_time_99_in_min = round(
+					data.get("pure_time_99") / 60, 3)
+				formated_data["hrr_pure_time_to_99"] = pure_time_99_in_min
 			return formated_data
 		return None
 	except Exception as e:
@@ -616,7 +628,9 @@ def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 		"hrr_starting_point":0,
 		"lowest_hr_during_hrr":0,
 		"hrr_beats_lowered_first_minute":0,
-		"hrr_time_to_99":0
+		"hrr_time_to_99":0,
+		"hrr_pure_1_min_beats_lowered":0,
+		"hrr_pure_time_to_99":0
 	}
 
 	if hrr_api_lookup:
@@ -660,6 +674,16 @@ def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 			"hrr_beats_lowered_first_minute"
 		)
 	data['hrr_beats_lowered_first_minute'] = hrr_beats_lowered_first_minute
+
+	if hrr_api_data:
+		data["hrr_pure_1_min_beats_lowered"] = hrr_api_data.get(
+			"hrr_pure_1_min_beats_lowered"
+		)
+
+		data["hrr_pure_time_to_99"] = hrr_api_data.get(
+			"hrr_pure_time_to_99"
+		)
+
 	return data
 
 
