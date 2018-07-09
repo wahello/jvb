@@ -358,15 +358,15 @@ class HeartRate extends Component{
 					let keyvalue = value[key];
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "aerobic_zone"){
+				else if(key == "duration_in_aerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "anaerobic_zone"){
+				else if(key == "duration_in_anaerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "below_aerobic_zone"){
+				else if(key == "duration_below_aerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
