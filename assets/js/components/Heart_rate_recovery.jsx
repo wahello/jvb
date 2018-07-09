@@ -351,11 +351,11 @@ class HeartRate extends Component{
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "hrr_not_recorded"){
-					let keyvalue = value[key];
+					let keyvalue =  this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "prcnt_hrr_not_recorded"){
-					let keyvalue = value[key];
+					let keyvalue = this.renderpercentage(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "duration_in_aerobic_range"){
