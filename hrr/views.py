@@ -470,6 +470,7 @@ def aa_workout_data(user,start_date):
 	count = 0
 	id_act = 0
 	activities = []
+	ui_hrr_keys = []
 	if user_input_strong:
 		for single_ui_object in user_input_strong:
 			single_activity = single_ui_object.activities
@@ -481,6 +482,7 @@ def aa_workout_data(user,start_date):
 					if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
 						id_act = int(single_activity_values[i]['summaryId'])
 						count = count + 1
+						ui_hrr_keys.append(single_activity_values[i]['summaryId'])
 						activities.append(single_activity_values[i])
 
 	try:
@@ -522,10 +524,11 @@ def aa_workout_data(user,start_date):
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	if filtered_activities_files:
 		for i,k in enumerate(filtered_activities_files):
-			if filtered_activities_files[i].get("summaryId") in ui_data_keys:
-				workout.append(filtered_activities_files[i])
-			else:
+			if filtered_activities_files[i].get("summaryId") in ui_hrr_keys:
 				hrr.append(filtered_activities_files[i])
+			else:
+				workout.append(filtered_activities_files[i])
+
 
 	# if filtered_activities_files:
 	# 	for tmp in a1:
