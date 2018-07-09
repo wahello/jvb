@@ -183,7 +183,8 @@ class Dashboard extends Component {
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
 							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>
 							  <h3 id="link_style">Dashboards</h3>
-							  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>					 
+							  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
+							  <Link to='/weekly_workout_dashboard'>Weekly Workout Summary Report</Link><br/>					 
 						  </div>
 						</div>
 					</div>
