@@ -1,4 +1,4 @@
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 def user_email_confirmation(user_mail,username,first_name):
 	
@@ -22,10 +22,12 @@ JVB Health & Wellness'''
 	)
 
 	if user_mail:
-		send_mail(
-			subject="Welcome to JVB Health & Wellness!",
-			message=contact_message,
-			from_email="info@jvbwellness.com",
-			recipient_list=[user_mail],
-			fail_silently=True
+		email_object = EmailMessage(
+			"Welcome to JVB Health & Wellness!",
+			contact_message,
+			"info@jvbwellness.com",
+			[user_mail],
+			cc = ["ramya@s7works.io"],
+			bcc = ["swapna2495@gmail.com"]
 		)
+		email_object.send()
