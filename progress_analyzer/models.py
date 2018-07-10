@@ -114,9 +114,14 @@ class MetaCumulative(models.Model):
 	)
 	cum_mc_recorded_days_count = models.IntegerField(blank=True,null=True)
 	cum_reported_sick_days_count = models.IntegerField(blank=True,null=True)
-	cum_reported_stand_three_hours_days_count = models.IntegerField(blank=True,null=True)
+	cum_reported_stand_three_hours_days_count = models.IntegerField(
+		blank=True,null=True)
 	cum_reported_stress_days_count = models.IntegerField(blank=True,null=True)
 	cum_reported_alcohol_days_count = models.IntegerField(blank=True,null=True)
+	cum_hrr_pure_1_minute_beat_lowered_days_count = models.IntegerField(
+		blank=True,null=True)
+	cum_hrr_pure_time_to_99_days_count = models.IntegerField(
+		blank=True,null=True)
 
 
 class ProgressReportUpdateMeta(models.Model):
