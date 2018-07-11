@@ -84,4 +84,13 @@ class MovementDashboardView(APIView):
                 movement_data["mcs_score"] = None
                 movement_data["steps_this_hour"] = None
 
-        return Response(movement_data,status=status.HTTP_200_OK)       
+        return Response(movement_data,status=status.HTTP_200_OK)
+
+class GradesDashboard(APIView):
+
+    def get_data(self,request):
+        user = request.user
+        date = request.get('date') 
+        user_ql = UserQuickLook.objects.get(user=user,created_at=date)
+
+        return Response(status.HTTP_200_OK)
