@@ -1669,8 +1669,9 @@ class UserheartzoneView(APIView):
 				li_time.append(duration_in_zone)
 				percent_in_zone = hr[key].get('prcnt_total_duration_in_zone',0)
 				li_prcnt.append(percent_in_zone)
-		
+
 		for hr in hr_values:
+			print(hr,"1111111111111111111111111111111111111111111111")
 			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
@@ -1712,7 +1713,6 @@ class UserheartzoneView(APIView):
 		return queryset
 
 class UserAaView(APIView):
-
 	permission_classes = (IsAuthenticated,)
 	serializer_class = AaSerializer
 
@@ -1722,7 +1722,6 @@ class UserAaView(APIView):
 				'percent_aerobic','duration_in_anaerobic_range','percent_anaerobic','duration_below_aerobic_range',
 				'percent_below_aerobic','duration_hrr_not_recorded','percent_hrr_not_recorded']
 		lists = [[],[],[],[],[],[],[],[],[],[],[]]
-
 		for aa in data_values:
 			aa = ast.literal_eval(aa)
 			if aa:
@@ -1797,6 +1796,5 @@ class UserAaView(APIView):
 							  user_aa=user)
 		else:
 			queryset = AaCalculations.objects.all()
-
 		return queryset
 
