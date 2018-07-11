@@ -6,6 +6,7 @@ from django.db import models
 class FitbitConnectToken(models.Model):
 
 	user = models.OneToOneField('auth.User',related_name="fitbit_refresh_token")
+	updated_at = models.DateTimeField(auto_now=True)
 	refresh_token = models.CharField(max_length=250)
 	access_token = models.TextField(null=True)
 	user_id_fitbit = models.CharField(max_length=250,null=True)

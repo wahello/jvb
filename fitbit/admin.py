@@ -8,6 +8,11 @@ from .models import FitbitConnectToken,\
                     UserFitbitDataSteps,\
                     FitbitNotifications
 # Register your models here.
+
+class FitbitConnectTokenAdmin(admin.ModelAdmin):
+	list_display = ('user', 'updated_at')
+
+
 class UserFitbitSleepAdmin(admin.ModelAdmin):
 	list_display = ('user','date_of_sleep','created_at')
 
@@ -35,7 +40,7 @@ class UserFitbitDataStepsAdmin(admin.ModelAdmin):
 class FitbitNotificationsAdmin(admin.ModelAdmin):
 	list_display = ('created_at',)
 
-admin.site.register(FitbitConnectToken)
+admin.site.register(FitbitConnectToken,FitbitConnectTokenAdmin)
 admin.site.register(FitbitNotifications,FitbitNotificationsAdmin)
 admin.site.register(UserFitbitDataSleep,UserFitbitSleepAdmin)
 admin.site.register(UserFitbitDataHeartRate,UserFitbitHeartratepAdmin)
