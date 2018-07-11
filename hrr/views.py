@@ -1031,18 +1031,21 @@ def daily_aa_calculations(request):
 			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_daily_aa_calculations(user,start_date_get):
-	# start_date_get = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
-	data = daily_aa_data(user,start_date)
-	# data = json.dumps(data)
-	if data:
-		try:
-			user_aa = AaCalculations.objects.get(
-				user_aa=user, created_at=start_date)
-			update_aa_instance(user,start_date,data)
-		except AaCalculations.DoesNotExist:
-			create_aa_instance(user, data, start_date)
+def store_daily_aa_calculations(user,from_date,to_date):
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		data = daily_aa_data(user,current_date)
+		# data = json.dumps(data)
+		if data:
+			try:
+				user_aa = AaCalculations.objects.get(
+					user_aa=user, created_at=current_date)
+				update_aa_instance(user,current_date,data)
+			except AaCalculations.DoesNotExist:
+				create_aa_instance(user, data, current_date)
+		current_date -= timedelta(days=1)
 	return None
 
 
@@ -1210,19 +1213,22 @@ def aa_low_high_end_calculations(request):
 			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_aa_low_high_end_calculations(user,start_date_get):
-	# start_date_get = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
-	data = aa_low_high_end_data(user,start_date)
-	# data = json.dumps(data)
-	if data:
-		try:
-			time_hr_zone_obj = TimeHeartZones.objects.get(
-				user=user, created_at=start_date)
-			if time_hr_zone_obj:
-				update_heartzone_instance(user, start_date,data)
-		except TimeHeartZones.DoesNotExist:
-			create_heartzone_instance(user, data, start_date)
+def store_aa_low_high_end_calculations(user,from_date,to_date):
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		data = aa_low_high_end_data(user,current_date)
+		# data = json.dumps(data)
+		if data:
+			try:
+				time_hr_zone_obj = TimeHeartZones.objects.get(
+					user=user, created_at=current_date)
+				if time_hr_zone_obj:
+					update_heartzone_instance(user, current_date,data)
+			except TimeHeartZones.DoesNotExist:
+				create_heartzone_instance(user, data, current_date)
+		current_date -= timedelta(days=1)
 	return None
 	
 
@@ -1632,15 +1638,19 @@ def hrr_calculations(request):
 	return JsonResponse(data)	
 
 
-def store_hhr(start_date_get,user):
-	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
-	data = hrr_data(user,start_date)
-	if data.get('Did_you_measure_HRR'):
-		try:
-			user_hrr = Hrr.objects.get(user_hrr=user, created_at=start_date)
-			update_hrr_instance(user_hrr, data)
-		except Hrr.DoesNotExist:
-			create_hrr_instance(user, data, start_date)
+def store_hhr(user,from_date,to_date):
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		data = hrr_data(user,current_date)
+		if data.get('Did_you_measure_HRR'):
+			try:
+				user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
+				update_hrr_instance(user_hrr, data)
+			except Hrr.DoesNotExist:
+				create_hrr_instance(user, data, current_date)
+		current_date -= timedelta(days=1)
 	return None
 
 class UserheartzoneView(APIView):
