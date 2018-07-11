@@ -36,8 +36,8 @@ def refresh_token_for_notification(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN46'
-	client_secret='94d717c6ec36c270ed59cc8b5564166f'
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -69,8 +69,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -99,6 +99,12 @@ def call_push_api(data):
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
+			'''
+		The updated_at will check the time when the access_token is (created or updated)
+        As the access_token expires at every 8Hours. When celery job runs first we will check
+        the access_token is not expries. If it expries we will update the access_token first then
+        run the push notification job.
+            '''
 			token_updated_time = tokens.updated_at
 			present_time = datetime.utcnow()
 			datetime_obj_utc = present_time.replace(tzinfo=timezone('UTC'))
