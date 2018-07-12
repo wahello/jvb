@@ -160,13 +160,11 @@ class HeartrateZone extends Component{
 			start_date : start_dt.toDate(),
 			end_date : end_dt.toDate(),
 			dateRange:!this.state.dateRange,
-			fetching_ql:true
+			fetching_hrr_zone:true,
 		},()=>{
 			fetchHrrWeeklyData(this.state.start_date, this.state.end_date,
 					this.successHeartrateZone,this.errorHeartrateZone);
 			fetchHrrWeeklyAaData(this.state.start_date, this.state.end_date,this.successHrrWeeklyAaData,this.errorHrrWeeklyAaData);
-
-
 		});
   }
 	componentDidMount(){
