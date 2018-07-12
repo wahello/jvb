@@ -1032,6 +1032,16 @@ def daily_aa_calculations(request):
 	return JsonResponse(data)
 
 def store_daily_aa_calculations(user,from_date,to_date):
+		'''
+	This function takes user start date and end date, calculate the Daily A/A calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1214,6 +1224,17 @@ def aa_low_high_end_calculations(request):
 	return JsonResponse(data)
 
 def store_aa_low_high_end_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the low_high_end 
+	HR calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1639,6 +1660,16 @@ def hrr_calculations(request):
 
 
 def store_hhr(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the HRR calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
