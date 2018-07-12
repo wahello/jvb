@@ -4,10 +4,11 @@ import base64
 import requests
 import webbrowser
 import pprint
-from datetime import datetime, timedelta , date
+from datetime import datetime, timedelta , date, timezone
 import ast
 import logging
 import time
+from pytz import timezone
 
 from django.db.models import Q
 from django.shortcuts import render
@@ -54,10 +55,10 @@ def refresh_token_for_notification(user):
 	print(pprint.pprint(request_data_json))
 	token_object = ''
 	try: 
-		token_object = FitbitConnectToken.objects.filter(user=user).update(
-			refresh_token=request_data_json['refresh_token'],
-			access_token=request_data_json['access_token']
-		)
+		token_object = FitbitConnectToken.objects.get(user=user)
+		token_object.refresh_token=request_data_json['refresh_token'],
+		token_object.access_token=request_data_json['access_token']
+		token_object.save()
 	except:
 		logging.exception("message")
 	if token_object:
@@ -82,6 +83,7 @@ def call_push_api(data):
 	'''
 	print("Startes for checking notifications in database")
 	create_data = FitbitNotifications.objects.create(data_notification=data)
+	# print(FitbitNotifications._meta.get_fields(),"fields")
 	updated_data = create_data.data_notification
 	# updated_data = FitbitNotifications.objects.latest('created_at')
 	if updated_data:
@@ -97,8 +99,22 @@ def call_push_api(data):
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
+			'''
+		The updated_at will check the time when the access_token is (created or updated)
+        As the access_token expires at every 8Hours. When celery job runs first we will check
+        the access_token is not expries. If it expries we will update the access_token first then
+        run the push notification job.
+            '''
+			token_updated_time = tokens.updated_at
+			present_time = datetime.utcnow()
+			datetime_obj_utc = present_time.replace(tzinfo=timezone('UTC'))
+			check_token_expire = (datetime_obj_utc - token_updated_time).total_seconds()
 			session = service.get_session(access_token)
-			call_api(date,user_id,data_type,user,session)
+			if check_token_expire < 28800:
+				call_api(date,user_id,data_type,user,session)
+			else:
+				session = get_session_and_access_token(user)
+				call_api(date,user_id,data_type,user,session)
 	return None
 
 def get_session_and_access_token(user):
@@ -125,15 +141,7 @@ def call_api(date,user_id,data_type,user,session):
 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
 			user_id,data_type,date))
 		sleep_fitbit = sleep_fitbit.json()
-		statuscode = sleep_fitbit.status_code
-		if statuscode == 200:
-			store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
-		else:
-			session = get_session_and_access_token(user)
-			sleep_fitbit = session.get(
-				"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
-				user_id,data_type,date))
-			store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
+		store_data(sleep_fitbit,user,date,data_type='sleep_fitbit')
 	elif data_type == 'activities':
 		activity_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
@@ -146,7 +154,7 @@ def call_api(date,user_id,data_type,user,session):
 			user_id,date))
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
-			store_data(activity_fitbit,user,date,data_type)
+			store_data(activity_fitbit,user,date,data_type="activity_fitbit")
 		if heartrate_fitbit:
 			heartrate_fitbit = heartrate_fitbit.json()
 			store_data(heartrate_fitbit,user,date,data_type="heartrate_fitbit")
@@ -172,6 +180,17 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 				UserFitbitDataSleep.objects.update_or_create(user = user,
 					date_of_sleep=date_of_sleep,sleep_data=value,
 					defaults={'created_at': start_date})
+				print("sleep_fitbit fitbit data successfully")
+		except (KeyError, IndexError):
+			logging.exception("message")
+
+		try:
+			if "activity_fitbit" == key:
+				date_of_activity = value['pagination']['afterDate']
+				UserFitbitDataActivities.objects.update_or_create(user=user,
+					date_of_activities=date_of_activity,activities_data=value,
+					defaults={'created_at': start_date,})
+				print("activity_fitbit fitbit data successfully")
 		except (KeyError, IndexError):
 			logging.exception("message")
 
@@ -181,6 +200,7 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 				UserFitbitDataHeartRate.objects.update_or_create(user=user,
 					date_of_heartrate=date_of_heartrate,heartrate_data=value,
 					defaults={'created_at': start_date,})
+				print("heartrate_fitbit fitbit data successfully")
 		except (KeyError, IndexError):
 			logging.exception("message")
 
@@ -190,6 +210,7 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 				instance = UserFitbitDataSteps.objects.update_or_create(user=user,
 					date_of_steps=date_of_steps,steps_data=value,
 					defaults={'created_at': start_date,})
+				print("activities-steps fitbit data successfully")
 		except (KeyError, IndexError):
 			logging.exception("message")
 	return None
