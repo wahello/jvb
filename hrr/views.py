@@ -1032,7 +1032,7 @@ def daily_aa_calculations(request):
 	return JsonResponse(data)
 
 def store_daily_aa_calculations(user,from_date,to_date):
-		'''
+	'''
 	This function takes user start date and end date, calculate the Daily A/A calculations 
 	then stores in Data base
 
