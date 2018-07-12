@@ -1131,12 +1131,13 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 
 	total_steps = 0
 	exercise_steps = 0
+	non_exercise_activity_steps = 0
 	aerobic_zone = 180 - age - 30
 	if len(filtered_activities):
 		for obj in filtered_activities:
 
 			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
-			# If avgerage heart rate in beats per minute is not submitted by user
+			# If average heart rate in beats per minute is not submitted by user
 			# then it would be by default empty string. In that case default it to 0 
 			if not avg_hr:
 				avg_hr = 0
@@ -1151,14 +1152,37 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
 					or obj.get("steps_type","") == "exercise"):
-				# If activity heartrate is above or in aerobic zone and it's not HRR 
+				# If activity heart rate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
 				exercise_steps += steps
+			else:
+				non_exercise_activity_steps += steps
 
 	if dailies_json:
 		total_steps = dailies_json[0].get('steps',0)
 
-	return (exercise_steps, total_steps)
+	if ((not total_steps and exercise_steps) 
+		or (total_steps and total_steps < exercise_steps)):
+			# If total step s are 0 and exercise steps are available
+			# then we assume that total steps is equal to exercise steps
+			total_steps = exercise_steps
+
+	non_exercise_steps = total_steps - exercise_steps
+
+	if((not non_exercise_steps and non_exercise_activity_steps) 
+		or(non_exercise_steps 
+		and non_exercise_steps < non_exercise_activity_steps)):
+		# if non exercise steps are 0 but there exist some activities
+		# which are categorized as "non-exercise" and contribute to 
+		# non exercise steps then add the "non-exercise activities steps"
+		# in the non exercise steps and total steps 
+
+		# non_exercise_steps < non_exercise_activity_steps only when
+		# user creates manual "non exercise" activities from activity grid 
+		non_exercise_steps += non_exercise_activity_steps
+		total_steps += non_exercise_activity_steps
+
+	return (exercise_steps,non_exercise_steps,total_steps)
 
 def _get_sleep_grade_from_point(point):
 	if point < 1:
@@ -2127,18 +2151,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
-		exercise_steps, total_steps = cal_exercise_steps_total_steps(
+		exercise_steps,non_exercise_steps,total_steps = cal_exercise_steps_total_steps(
 			dailies_json,
 			todays_activities_json,
 			todays_manually_updated_json,
 			userinput_activities,
 			user.profile.age()
 		)	
-		if ((not total_steps and exercise_steps) or (total_steps and total_steps < exercise_steps)):
-			# If total step s are 0 and exercise steps are available
-			# then we assume that total steps is equal to exercise steps
-			total_steps = exercise_steps
-		non_exercise_steps = total_steps - exercise_steps
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps
