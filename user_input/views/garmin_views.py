@@ -31,7 +31,7 @@ def _get_activities_data(user,target_date):
 	activity_data = get_garmin_model_data(UserGarminDataActivity,
 		user, start_epoch,end_epoch,order_by = '-id')
 	manually_updated_activity_data = get_garmin_model_data(UserGarminDataManuallyUpdated,
-		user, start_epoch,end_epoch,order_by = '-id')
+		user, start_epoch,end_epoch,order_by = 'id')
 
 	#converting to python objects
 	activity_data = [ast.literal_eval(dic) for dic in activity_data]
