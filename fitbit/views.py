@@ -177,7 +177,9 @@ def receive_token_fitbit(request):
 				setattr(token, "user_id_fitbit", a['user_id'])
 				token.save()
 		except FitbitConnectToken.DoesNotExist:
-			FitbitConnectToken.objects.create(user=request.user,refresh_token=a['refresh_token'],access_token=a['access_token'],user_id_fitbit=a['user_id'])
+			FitbitConnectToken.objects.create(
+				user=request.user,refresh_token=a['refresh_token'],
+				access_token=a['access_token'],user_id_fitbit=a['user_id'])
 			fitbit_user_subscriptions(request.user)
 		return redirect('/service_connect_fitbit')
 
