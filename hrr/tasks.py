@@ -13,13 +13,15 @@ from hrr.views import hrr_calculations,\
 logger = get_task_logger(__name__)
 
 @task(name="hrr.save_hrr_data")
-def create_hrrdata(user_id,date):
+def create_hrrdata(user_id,from_date,to_date):
+
 	try:
 		user = User.objects.get(id = user_id)
-		# start_date = datetime(2018,7,3,0,0,0)
-		# date = start_date.strftime("%Y-%m-%d")
-		store_hhr(date,user)
-		store_daily_aa_calculations(user,date)
-		store_aa_low_high_end_calculations(user,date)
+		# start_date = datetime(2018,7,10,0,0,0)
+		# from_date = start_date.strftime("%Y-%m-%d")
+		# to_date = from_date
+		store_hhr(user,from_date,to_date)
+		store_daily_aa_calculations(user,from_date,to_date)
+		store_aa_low_high_end_calculations(user,from_date,to_date)
 	except Exception as e:
 		logger.error(e,exc_info=True)
