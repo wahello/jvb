@@ -1671,7 +1671,6 @@ class UserheartzoneView(APIView):
 				li_prcnt.append(percent_in_zone)
 
 		for hr in hr_values:
-			print(hr,"1111111111111111111111111111111111111111111111")
 			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
