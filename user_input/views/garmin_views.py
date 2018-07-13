@@ -167,6 +167,9 @@ def _get_activities(user,target_date):
 					pass
 			finall = _create_activity_stat(user,act_obj,current_date)
 			final_act_data.update(finall)
+		else:
+			finall = _create_activity_stat(user,act_obj,current_date)
+			final_act_data.update(finall)
 	# print(final_act_data)
 	return final_act_data	
 		
