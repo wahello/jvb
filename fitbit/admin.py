@@ -38,7 +38,7 @@ class UserFitbitDataStepsAdmin(admin.ModelAdmin):
 					 'user__last_name',)
 
 class FitbitNotificationsAdmin(admin.ModelAdmin):
-	list_display = ('created_at',)
+	list_display = ('user','created_at', 'collection_type','notification_date','state',)
 
 admin.site.register(FitbitConnectToken,FitbitConnectTokenAdmin)
 admin.site.register(FitbitNotifications,FitbitNotificationsAdmin)
