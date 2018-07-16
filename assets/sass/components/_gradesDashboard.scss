@@ -1,0 +1,35 @@
+.gd_table_margin{
+	margin-top: 25px;
+}
+.gd_value_style{
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+	
+}
+.gd_card_style{
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+  outline: none;
+  transition: box-shadow 200ms cubic-bezier(0.4,0.0,0.2,1);
+  
+}
+.gd_header_style{
+	text-align: center;
+	font-size: 17px;
+}
+/*.hr_style{
+	background: white;
+}*/
+@media (max-width: 1023px) {
+	.gd_table_margin{
+		margin-top: 15px;
+		margin-right: 15px;
+		margin-left: 15px;
+	}
+	.gd_card_style{
+		height: 110px;
+	}
+	
+}
