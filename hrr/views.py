@@ -1,6 +1,7 @@
 import json
 import ast
 import time
+import logging
 from datetime import datetime,timedelta,date
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -840,7 +841,7 @@ def daily_aa_data(user, start_date):
 					# 	data_summaryid.append(data_id)
 			
 	except:
-		pass
+		logging.exception("message")
 	profile = Profile.objects.filter(user=user)
 # =======
 	# a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
@@ -1354,7 +1355,7 @@ def hrr_data(user,start_date):
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
 						workout.append(tmp)
 	except:
-		pass
+		logging.exception("message")
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
