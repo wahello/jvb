@@ -1497,8 +1497,8 @@ handleBackButton(){
             <span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
           </div>
         }
-        {this.state.scheduled_date &&
-        <div className = "row justify-content-center"style = {{fontWeight:"bold"}}>Progress Analyzer reports are scheduled for an updated from {moment(this.state.scheduled_date).format('MMM DD, YYYY')}</div>
+        {(this.state.scheduled_date && this.state.active_view) &&
+        <div className = "row justify-content-center scheduled_date"style = {{fontWeight:"bold"}}>Your progress analyzer reports are currently being updated from {moment(this.state.scheduled_date).format('MMM DD, YYYY')} through today (and when this message disappears your data has been updated)</div>
         }
         {this.state.active_view &&
             <div className="row justify-content-center padding" style = {{paddingTop:"25px"}}>

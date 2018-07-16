@@ -399,7 +399,7 @@ class HeartRate extends Component{
 
 	componentDidMount(){
 		this.setState({
-			fetching_aerobic:false,
+			fetching_aerobic:true,
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
