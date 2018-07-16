@@ -1,6 +1,7 @@
 import json
 import ast
 import time
+import logging
 from datetime import datetime,timedelta,date
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -717,6 +718,7 @@ def daily_aa_data(user, start_date):
 	id_act = 0
 	activities = []
 	activities_workout = []
+	activities_hrr = []
 	if user_input_strong:
 		for tmp in user_input_strong:
 			sn = tmp.activities
@@ -729,6 +731,7 @@ def daily_aa_data(user, start_date):
 						id_act = int(di[i]['summaryId'])
 						count = count + 1
 						activities.append(di[i])
+						activities_hrr.append(di[i]['summaryId'])
 					else:
 						activities_workout.append(di[i]['summaryId'])
 
@@ -759,6 +762,7 @@ def daily_aa_data(user, start_date):
 	end = start_date + timedelta(days=7)
 
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+
 	try:
 		if activities:
 			for tmp in a1:
@@ -773,14 +777,14 @@ def daily_aa_data(user, start_date):
 				if activity_files_qs:
 					for i,k in enumerate(activity_files):
 						activity_files_dict = ast.literal_eval(activity_files[i])
-						if activity_files_dict.get("summaryId",None) == str(data_id) and str(data_id) in ui_data_keys:
+						if activity_files_dict.get("summaryId",None) == str(data_id) and str(data_id) in activities_workout:
 							duration = activity_files_dict.get('durationInSeconds')
 							activities_duration.append(duration)
 							average_heartrate = activity_files_dict.get("averageHeartRateInBeatsPerMinute",0)
 							avg_hrr_list.append(average_heartrate)
 							maximum_heartrate =  activity_files_dict.get('maxHeartRateInBeatsPerMinute',0)
 							max_hrr_list.append(maximum_heartrate)
-							data_summaryid.append(data_id)
+							# data_summaryid.append(data_id)
 							if "averageHeartRateInBeatsPerMinute" in activity_files_dict.keys():
 								if activity_files_dict.get("averageHeartRateInBeatsPerMinute",0) == 0 or "" :
 									hrr_not_recorded = activity_files_dict.get('durationInSeconds')
@@ -837,7 +841,7 @@ def daily_aa_data(user, start_date):
 					# 	data_summaryid.append(data_id)
 			
 	except:
-		pass
+		logging.exception("message")
 	profile = Profile.objects.filter(user=user)
 # =======
 	# a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
@@ -974,7 +978,6 @@ def daily_aa_data(user, start_date):
 					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
 					}
 			daily_aa_data[str(data_summaryid[i])] =data
-	
 		try:
 			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
 			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -1352,8 +1355,7 @@ def hrr_data(user,start_date):
 					elif activity_files_dict.get("summaryId",None) == str(data_id) :
 						workout.append(tmp)
 	except:
-		pass
-
+		logging.exception("message")
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
@@ -1379,7 +1381,8 @@ def hrr_data(user,start_date):
 					workout_hrr_before_hrrfile.append(i)
 					workout_time_before_hrrfile.append(k)
 					workout_timestamp_before_hrrfile.append(j)
-
+			if workout_timestamp_before_hrrfile:
+				workout_timestamp_before_hrrfile = sorted(workout_timestamp_before_hrrfile)
 			time_toreach_99 = []
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
@@ -1411,9 +1414,6 @@ def hrr_data(user,start_date):
 			else:
 				Did_heartrate_reach_99 = 'no'
 
-
-
-
 			HRR_activity_start_time = hrr_timestamp[0]-(offset)
 			HRR_start_beat = hrr_final_heartrate[0]
 			try:
@@ -1423,24 +1423,8 @@ def hrr_data(user,start_date):
 			time_99 = sum(time_toreach_99[:-1])
 			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
 			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
-			
-			# end_time_activity = workout_timestamp[-1]-(offset)
-			# end_heartrate_activity  = workout_final_heartrate[-1]
-			daily_diff = end_time_activity - daily_starttime
-			daily_activty_end = daily_diff % 15
-			if daily_activty_end != 0:
-				daily_diff = daily_diff + (15 - daily_activty_end)
-			else:
-				pass
-			if garmin_data_daily:
-				if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-					daily_diff1 = str(int(daily_diff))
-					data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
-			if data_end_activity:
-				end_heartrate_activity = data_end_activity
-			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
-
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
+			
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
 			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
 			pure_1min_beats = []
