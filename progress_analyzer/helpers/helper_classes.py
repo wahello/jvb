@@ -1178,7 +1178,10 @@ class ProgressReport():
 							todays_data.cum_hrr_time_to_99_in_mins,
 							current_data.cum_hrr_time_to_99_in_mins,
 							hrr_time_to_99_days))
-						return val
+						if hrr_time_to_99_days:
+							return val
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_beats_lowered_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -1190,7 +1193,10 @@ class ProgressReport():
 							todays_data.cum_hrr_beats_lowered_in_first_min,
 							current_data.cum_hrr_beats_lowered_in_first_min,
 							beats_lowered_in_first_min_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if beats_lowered_in_first_min_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_highest_hr_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -1202,7 +1208,10 @@ class ProgressReport():
 							todays_data.cum_highest_hr_in_first_min,
 							current_data.cum_highest_hr_in_first_min,
 							highest_hr_in_first_min_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if highest_hr_in_first_min_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_lowest_hr_point':
 					if todays_meta_data and current_meta_data:
@@ -1214,7 +1223,10 @@ class ProgressReport():
 							todays_data.cum_hrr_lowest_hr_point,
 							current_data.cum_hrr_lowest_hr_point,
 							hrr_lowest_hr_point_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if hrr_lowest_hr_point_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_pure_1_minute_beat_lowered':
 					if todays_meta_data and current_meta_data:
@@ -1226,7 +1238,10 @@ class ProgressReport():
 							todays_data.cum_hrr_pure_1_min_beats_lowered,
 							current_data.cum_hrr_pure_1_min_beats_lowered,
 							hrr_pure_1_minute_beat_lowered_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if hrr_pure_1_minute_beat_lowered_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_pure_time_to_99':
 					if todays_meta_data and current_meta_data:
@@ -1238,7 +1253,10 @@ class ProgressReport():
 							todays_data.cum_hrr_pure_time_to_99,
 							current_data.cum_hrr_pure_time_to_99,
 							hrr_pure_time_to_99_days))
-						return val
+						if hrr_pure_time_to_99_days:
+							return val
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'floors_climbed':
 					val = self._get_average_for_duration(

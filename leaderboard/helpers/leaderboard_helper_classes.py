@@ -54,8 +54,8 @@ class RankedScore(object):
 		'resting_hr':DEFAULT_MAXIMUM_SCORE,
 		'deep_sleep':DEFAULT_MINIMUM_SCORE,
 		'awake_time':DEFAULT_MAXIMUM_SCORE,
-		'time_99':DEFAULT_MINIMUM_SCORE,
-		'pure_time_99':DEFAULT_MINIMUM_SCORE,
+		'time_99':DEFAULT_MAXIMUM_SCORE,
+		'pure_time_99':DEFAULT_MAXIMUM_SCORE,
 		'beat_lowered':DEFAULT_MINIMUM_SCORE,
 		'pure_beat_lowered':DEFAULT_MINIMUM_SCORE
 	}
@@ -139,7 +139,7 @@ class RankedScore(object):
 		score = self.score
 		if score == self.DEFAULT_MAXIMUM_SCORE or score == self.DEFAULT_MINIMUM_SCORE:
 			score = "N/A"
-		elif self.category in ["awake_time","deep_sleep"]:
+		elif self.category in ["awake_time","deep_sleep","time_99","pure_time_99"]:
 			score = _hours_to_hours_min(score)
 
 		other_scores = self.other_scores
@@ -326,7 +326,8 @@ class LeaderboardOverview(object):
 	def _get_catg_score_priority(self):
 		categories = LeaderboardCategories().categories.keys()
 		catg_score_priority = {}
-		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol']
+		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol',
+			'time_99','pure_time_99']
 		for category in categories:
 			if category in lowest_first_categories:
 				catg_score_priority[category] = 'lowest_first'
@@ -406,14 +407,31 @@ class LeaderboardOverview(object):
 					elif catg == 'resting_hr':
 						score = data['other']['resting_hr'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
-					if catg == 'deep_sleep':
+					elif catg == 'deep_sleep':
 						score = data['sleep']['deep_sleep_in_hours_min'][dtype]
 						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
-					if catg == 'awake_time':
+					elif catg == 'awake_time':
 						score = data['sleep']['awake_duration_in_hours_min'][dtype]
 						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'time_99':
+						score = data['other']['hrr_time_to_99'][dtype]
+						if score and score != "Not Provided":
+							score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss")
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'pure_time_99':
+						score = data['other']['hrr_pure_time_to_99'][dtype]
+						if score and score != "Not Provided":
+							score = _str_to_hours_min_sec(score,time_format="minute", time_pattern="mm:ss")
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'beat_lowered':
+						score = data['other']['hrr_beats_lowered_in_first_min'][dtype]
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'pure_beat_lowered':
+						score = data['other']['hrr_pure_1_minute_beat_lowered'][dtype]
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+
 
 				if self.custom_ranges:
 					if not category_wise_data[catg].get('custom_range',None):
@@ -460,24 +478,48 @@ class LeaderboardOverview(object):
 							)
 						elif catg == 'alcohol':
 							score = data['alcohol']['avg_drink_per_week']['custom_range'][str_range]['data']
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
 						elif catg == 'total_steps':
 							score = data['non_exercise']['total_steps']['custom_range'][str_range]['data']
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
 						elif catg == 'floor_climbed':
 							score = data['other']['floors_climbed']['custom_range'][str_range]['data']
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
 						elif catg == 'resting_hr':
 							score = data['other']['resting_hr']['custom_range'][str_range]['data']
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
-						if catg == 'deep_sleep':
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'deep_sleep':
 							score = data['sleep']['deep_sleep_in_hours_min']['custom_range'][str_range]['data']
 							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
-						if catg == 'awake_time':
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'awake_time':
 							score = data['sleep']['awake_duration_in_hours_min']['custom_range'][str_range]['data']
 							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
-							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(self.user,user,catg,score))
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'time_99':
+							score = data['other']['hrr_time_to_99']['custom_range'][str_range]['data']
+							score = _str_to_hours_min_sec(score,time_pattern="mm:ss") if score else score
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'pure_time_99':
+							score = data['other']['hrr_pure_time_to_99']['custom_range'][str_range]['data']
+							score = _str_to_hours_min_sec(score,time_pattern="mm:ss") if score else score
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'beat_lowered':
+							score = data['other']['hrr_beats_lowered_in_first_min']['custom_range'][str_range]['data']
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'pure_beat_lowered':
+							score = data['other']['hrr_pure_1_minute_beat_lowered']['custom_range'][str_range]['data']
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):
