@@ -36,8 +36,8 @@ def refresh_token_for_notification(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -69,8 +69,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -82,13 +82,15 @@ def call_push_api(data):
 		This function take the latest created_at from FitbitNotifications and get the data 
 	'''
 	print("Startes for checking notifications in database")
-	create_data = FitbitNotifications.objects.create(data_notification=data)
+
+	# create_data = FitbitNotifications.objects.create(data_notification=data)
 	# print(FitbitNotifications._meta.get_fields(),"fields")
-	updated_data = create_data.data_notification
+	# updated_data = create_data.data_notification
 	# updated_data = FitbitNotifications.objects.latest('created_at')
-	if updated_data:
-		for i,k in enumerate(updated_data):
+	if data:
+		for i,k in enumerate(data):
 			# k = ast.literal_eval(k)
+			notification = k
 			date = k['date']
 			user_id = k['ownerId']
 			data_type = k['collectionType']
@@ -96,6 +98,9 @@ def call_push_api(data):
 				user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
 			except FitbitConnectToken.DoesNotExist as e:
 				user = None
+			if user:
+				FitbitNotifications.objects.create(user=user,collection_type=data_type,
+					notification_date=date,state="processing",notification= notification)
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
