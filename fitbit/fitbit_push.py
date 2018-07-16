@@ -82,13 +82,15 @@ def call_push_api(data):
 		This function take the latest created_at from FitbitNotifications and get the data 
 	'''
 	print("Startes for checking notifications in database")
-	create_data = FitbitNotifications.objects.create(data_notification=data)
+
+	# create_data = FitbitNotifications.objects.create(data_notification=data)
 	# print(FitbitNotifications._meta.get_fields(),"fields")
-	updated_data = create_data.data_notification
+	# updated_data = create_data.data_notification
 	# updated_data = FitbitNotifications.objects.latest('created_at')
-	if updated_data:
-		for i,k in enumerate(updated_data):
+	if data:
+		for i,k in enumerate(data):
 			# k = ast.literal_eval(k)
+			notification = k
 			date = k['date']
 			user_id = k['ownerId']
 			data_type = k['collectionType']
@@ -96,6 +98,9 @@ def call_push_api(data):
 				user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
 			except FitbitConnectToken.DoesNotExist as e:
 				user = None
+			if user:
+				FitbitNotifications.objects.create(user=user,collection_type=data_type,
+					notification_date=date,state="processing",notification= notification)
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
