@@ -11,7 +11,30 @@ from leaderboard.helpers.leaderboard_helper import (
 	_str_to_hours_min_sec,
 	_hours_to_hours_min
 )
-from leaderboard.models import Score as s
+
+class LeaderboardCategories(object):
+	"""
+	Class to represent possible categories for leaderboard
+	"""
+	def __init__(self):
+		self.categories = {
+			'oh_gpa':"Overall Health GPA",
+			'nes':"Non Exercise Steps",
+			'mc':"Movement Consistency",
+			'avg_sleep':"Average Sleep",
+			'ec':"Exercise Consistency",
+			'prcnt_uf':"Percent Unprocessed Food",
+			'alcohol':"Alcohol",
+			'total_steps':"Total Steps",
+			'floor_climbed':"Floors Climbed",
+			'resting_hr':"Resting Heart Rate",
+			'deep_sleep':"Deep Sleep",
+			'awake_time':"Awake Time",
+			'time_99':"Time To 99)",
+			"pure_time_99":"Pure Time To 99",
+			"beat_lowered":"Heart Beats Lowered In 1st Minute",
+			"pure_beat_lowered":"Pure Heart Beats Lowered In 1st Minute"
+		}
 
 class RankedScore(object):
 	DEFAULT_MAXIMUM_SCORE = 999999
@@ -30,7 +53,11 @@ class RankedScore(object):
 		'floor_climbed':DEFAULT_MINIMUM_SCORE,
 		'resting_hr':DEFAULT_MAXIMUM_SCORE,
 		'deep_sleep':DEFAULT_MINIMUM_SCORE,
-		'awake_time':DEFAULT_MAXIMUM_SCORE
+		'awake_time':DEFAULT_MAXIMUM_SCORE,
+		'time_99':DEFAULT_MINIMUM_SCORE,
+		'pure_time_99':DEFAULT_MINIMUM_SCORE,
+		'beat_lowered':DEFAULT_MINIMUM_SCORE,
+		'pure_beat_lowered':DEFAULT_MINIMUM_SCORE
 	}
 
 	CATEGORY_SCORE_VNAME = {
@@ -45,7 +72,11 @@ class RankedScore(object):
 		'floor_climbed':'Floors Climbed',
 		'resting_hr':'Resting Heart Rate (RHR)',
 		'deep_sleep':'Deep Sleep Duration (hh:mm)',
-		'awake_time':'Awake Time Duration (hh:mm)'
+		'awake_time':'Awake Time Duration (hh:mm)',
+		'time_99':'Time To Reach 99',
+		'pure_time_99':'Pure Time To Reach 99 ',
+		'beat_lowered':'Heart Beat Lowered In 1st Minute',
+		'pure_beat_lowered':'Pure Heart Beat Lowered In 1st Minute'
 	}
 
 	def __init__(self,current_user,user,category,score,
@@ -63,7 +94,7 @@ class RankedScore(object):
 
 	@category.setter
 	def category(self,category):
-		category_choices = [c[0] for c in s.CATEGORY_CHOICES]
+		category_choices = LeaderboardCategories().categories.keys()
 		if category.lower() in category_choices:
 			self.__category = category
 		else:
@@ -104,7 +135,7 @@ class RankedScore(object):
 			raise ValueError("'{}' is not a valid rank. Rank should be positive integer and non zero".format(rank))
 
 	def as_dict(self):
-		verbose_category = {c[0]:c[1] for c in s.CATEGORY_CHOICES}
+		verbose_category = LeaderboardCategories().categories
 		score = self.score
 		if score == self.DEFAULT_MAXIMUM_SCORE or score == self.DEFAULT_MINIMUM_SCORE:
 			score = "N/A"
@@ -241,7 +272,7 @@ class LeaderboardOverview(object):
 	def __init__(self,user,query_params):
 		self.user = user
 		self.current_date = self._str_to_dt(query_params.get('date',None))
-		self.categories = {x[0]:x[1] for x in s.CATEGORY_CHOICES}
+		self.categories = LeaderboardCategories().categories
 		self.duration_type = ['today','yesterday','week','month','year']
 		self.custom_ranges = self._get_custom_range_info(query_params)
 		self.catg_score_priority = self._get_catg_score_priority()
@@ -293,7 +324,7 @@ class LeaderboardOverview(object):
 		return zip_longest(*[a]*n, fillvalue=fillvalue)
 
 	def _get_catg_score_priority(self):
-		categories = [x[0] for x in s.CATEGORY_CHOICES]
+		categories = LeaderboardCategories().categories.keys()
 		catg_score_priority = {}
 		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol']
 		for category in categories:
