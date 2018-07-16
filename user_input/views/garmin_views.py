@@ -121,6 +121,7 @@ def _get_activities(user,target_date):
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
+	
 	# heart_rate = [x for x in all_activities_heartrate if x != []]
 	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []
@@ -165,6 +166,9 @@ def _get_activities(user,target_date):
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 				else:
 					pass
+			finall = _create_activity_stat(user,act_obj,current_date)
+			final_act_data.update(finall)
+		else:
 			finall = _create_activity_stat(user,act_obj,current_date)
 			final_act_data.update(finall)
 	# print(final_act_data)
