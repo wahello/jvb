@@ -167,6 +167,26 @@ def call_api(date,user_id,data_type,user,session):
 			steps_fitbit = steps_fitbit.json()
 			store_data(steps_fitbit,user,date,data_type="steps_fitbit")
 	return None
+	
+def update_fitbit_data(user,date,data,collection_type):
+	'''
+	This function updated the fitbit models 
+	'''
+
+	if collection_type == "activity_fitbit":
+		UserFitbitDataActivities.objects.update(user=user,
+					date_of_activities=date,activities_data=data)
+	elif collection_type == "sleep_fitbit":
+		UserFitbitDataSleep.objects.update(user=user,
+					date_of_sleep=date,sleep_data=data)
+	elif collection_type == "heartrate_fitbit":
+		UserFitbitDataHeartRate.objects.update(user=user,
+					date_of_heartrate=date,heartrate_data=data)
+	elif collection_type == "steps_fitbit":
+		UserFitbitDataSteps.objects.update(user=user,
+					date_of_steps=date,steps_data=data)
+
+	return None
 
 def store_data(fitbit_all_data,user,start_date,data_type=None):
 	'''
@@ -182,40 +202,67 @@ def store_data(fitbit_all_data,user,start_date,data_type=None):
 		try:
 			if "sleep_fitbit" == key:
 				date_of_sleep = value['sleep'][0]['dateOfSleep']
-				UserFitbitDataSleep.objects.update_or_create(user = user,
-					date_of_sleep=date_of_sleep,sleep_data=value,
-					defaults={'created_at': start_date})
-				print("sleep_fitbit fitbit data successfully")
+				try:
+					sleep_obj = UserFitbitDataSleep.objects.get(user=user,
+					created_at=start_date)
+					update_fitbit_data(user,date_of_sleep,value,key)
+					print("Updated sleep-Fitbit successfully")
+				except UserFitbitDataSleep.DoesNotExist:
+					UserFitbitDataSleep.objects.create(user=user,
+					date_of_sleep=date_of_sleep,
+					sleep_data=value,created_at=start_date)
+					print("Created sleep-Fitbit successfully")
+
 		except (KeyError, IndexError):
 			logging.exception("message")
 
 		try:
 			if "activity_fitbit" == key:
 				date_of_activity = value['pagination']['afterDate']
-				UserFitbitDataActivities.objects.update_or_create(user=user,
-					date_of_activities=date_of_activity,activities_data=value,
-					defaults={'created_at': start_date,})
-				print("activity_fitbit fitbit data successfully")
+				try:
+					activity_obj = UserFitbitDataActivities.objects.get(user=user,
+					created_at=start_date)
+					update_fitbit_data(user,date_of_activity,value,key)
+					print("Updated Activity-Fitbit successfully")
+				except UserFitbitDataActivities.DoesNotExist:
+					UserFitbitDataActivities.objects.create(user=user,
+					date_of_activities=date_of_activity,
+					activities_data=value,created_at=start_date)
+					print("Created Activity-Fitbit successfully")
+
 		except (KeyError, IndexError):
 			logging.exception("message")
 
 		try:
 			if "heartrate_fitbit" == key:
 				date_of_heartrate = value['activities-heart'][0]['dateTime']
-				UserFitbitDataHeartRate.objects.update_or_create(user=user,
-					date_of_heartrate=date_of_heartrate,heartrate_data=value,
-					defaults={'created_at': start_date,})
-				print("heartrate_fitbit fitbit data successfully")
+				try:
+					heartrate_obj = UserFitbitDataHeartRate.objects.get(user=user,
+					created_at=start_date)
+					update_fitbit_data(user,date_of_heartrate,value,key)
+					print("Updated Heartrate-Fitbit successfully")
+				except UserFitbitDataHeartRate.DoesNotExist:
+					UserFitbitDataHeartRate.objects.create(user=user,
+					date_of_heartrate=date_of_heartrate,
+					heartrate_data=value,created_at=start_date)
+					print("Created heartrate-Fitbit successfully")
 		except (KeyError, IndexError):
 			logging.exception("message")
+
 
 		try:
 			if "steps_fitbit" == key:
 				date_of_steps = value['activities-steps'][0]['dateTime']
-				instance = UserFitbitDataSteps.objects.update_or_create(user=user,
-					date_of_steps=date_of_steps,steps_data=value,
-					defaults={'created_at': start_date,})
-				print("activities-steps fitbit data successfully")
+				try:
+					steps_obj = UserFitbitDataSteps.objects.get(user=user,
+					created_at=start_date)
+					update_fitbit_data(user,date_of_steps,value,key)
+					print("Updated steps-Fitbit successfully")
+				except UserFitbitDataSteps.DoesNotExist:
+					UserFitbitDataSteps.objects.create(user=user,
+					date_of_steps=date_of_steps,
+					steps_data=value,created_at=start_date)
+					print("Created steps-Fitbit successfully")
 		except (KeyError, IndexError):
 			logging.exception("message")
 	return None
