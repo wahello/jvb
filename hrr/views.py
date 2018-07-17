@@ -582,7 +582,7 @@ def aa_workout_data(user,start_date):
 			workout_type = workout['activityType']
 			duration = workout['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute',0)
+			avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute')
 			heart_rate.append(avg_heart_rate)
 			max_heart_rate = workout.get('maxHeartRateInBeatsPerMinute',0)
 			max_hrr.append(max_heart_rate)
@@ -618,6 +618,7 @@ def aa_workout_data(user,start_date):
 				data['prcnt_hrr_not_recorded'] = prcnt_hrr_not_recorded
 
 		try:
+			heart_rate = [x for x in heart_rate if x != '']
 			avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
 			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
 		except ZeroDivisionError:
