@@ -133,8 +133,8 @@ class GradesDashboardView(APIView):
                 movement_consistency = None
             grades_data["overall_health_gpa"] = grade_data.overall_health_gpa
             grades_data["exercise_consistency_score"] = grade_data.exercise_consistency_score
-            grades_data["unprocessed_food_grade"] = grade_data.prcnt_unprocessed_food_consumed_grade
-            grades_data["alcoholic_drinks_per_week_grade"] = grade_data.alcoholic_drink_per_week_grade
+            grades_data["unprocessed_food_grade"] = grade_data.prcnt_unprocessed_food_consumed_gpa
+            grades_data["alcoholic_drinks_per_week_grade"] = grade_data.alcoholic_drink_per_week_gpa
             grades_data["sleep_aids_penalty"] = grade_data.sleep_aid_penalty
             grades_data["controlled_subtances_penalty"] = grade_data.ctrl_subs_penalty
             grades_data["smoking_penalty"] = grade_data.smoke_penalty
