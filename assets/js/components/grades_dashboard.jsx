@@ -15,6 +15,7 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from './navbar';
 import {fetchLastSync} from '../network/quick';
 import fetchGradesData from '../network/gradesDashboard';
+import {getUserProfile} from '../network/auth';
 axiosRetry(axios, { retries: 3});
 
 
@@ -38,6 +39,7 @@ class Grades_Dashboard extends Component{
 			"report_inputs_today": "-",
 			"controlled_subtances_penalty": "-",
 			last_synced:null,
+			"gender":"",
 			selectedDate:new Date(),
 		}
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
@@ -54,6 +56,12 @@ class Grades_Dashboard extends Component{
 		this.errorGradesData = this.errorGradesData.bind(this);
 		this.getStylesForUserinputSleep = this.getStylesForUserinputSleep.bind(this);
 	 	this.strToSecond = this.strToSecond.bind(this);
+	 	this.getStylesPrcntUnprocessedFood = this.getStylesPrcntUnprocessedFood.bind(this);
+	 	this.successProfile = this.successProfile.bind(this);
+	 	this.getStylesAlcohol = this.getStylesAlcohol.bind(this);
+	 	this.getStylesUserinput = this.getStylesUserinput.bind(this);
+	 	this.renderPanalitiesColor = this.renderPanalitiesColor.bind(this);
+	 	this.renderControlledColor = this.renderControlledColor.bind(this);
 	}
 	successGradesData(data){
 		this.setState({
@@ -70,7 +78,11 @@ class Grades_Dashboard extends Component{
 			"controlled_subtances_penalty": data.data.controlled_subtances_penalty,
 		});
   	}
-
+  	successProfile(data){
+  		this.setState({
+  			gender:data.data.gender
+  		})
+  	}
   	errorGradesData(error){
 		console.log(error.message);
     }
@@ -141,6 +153,175 @@ class Grades_Dashboard extends Component{
         let score = x1+x2;
         return score;
 	}
+	getStylesAlcohol(score){
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		var score = parseFloat(score); 
+		if(this.state.gender == "M"){
+			if(score){
+			 	if(score <= "5"){
+	               	background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(score > "5" && score < "12"){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(score >= "12" && score < "15"){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score >= "15" && score < "16"){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score >= "16"){
+	                background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+        	}
+    		else{
+	        	score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#e5e5e5';
+        	}
+		}
+		else if(this.state.gender == "F"){
+			if(score){
+			 	if(score <= "3"){
+	               	background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(score > "3" && score <= "5"){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(score > "5" && score <= "7"){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score > "7" && score <= "9"){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score >= "9"){
+	                background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+        	}
+    		else{
+	        	score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#e5e5e5';
+        	}
+		}
+
+		var model = <Card className = "card_style"
+						 id = "my-card"
+						 style = {{background:background, color:color}}>
+					        <CardBody>
+					          	<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week Grade</CardTitle>
+					          	<hr className = "hr_style"
+					          		id = "hr-style" 
+					          		style = {{background:hr_background}}/>
+					          	<CardText className = "gd_value_style">{score}</CardText>
+					        </CardBody>
+					    </Card>
+		return model;
+
+	}
+	getStylesUserinput(score){
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		if(score == "yes"){
+			score = "Yes";
+			background = 'green';
+	        color = 'white';
+	        hr_background = 'white';
+		}
+		else{
+			score = "No";
+			background = '#FF0101';
+            color = 'black';
+            hr_background = 'black';
+		}
+		var model = <Card className = "card_style"
+						 id = "my-card"
+						 style = {{background:background, color:color}}>
+					        <CardBody>
+					          	<CardTitle className = "gd_header_style">Did you Report your Inputs Today?</CardTitle>
+					          	<hr className = "hr_style"
+					          		id = "hr-style" 
+					          		style = {{background:hr_background}}/>
+					          	<CardText className = "gd_value_style">{score}</CardText>
+					        </CardBody>
+					    </Card>
+		return model;
+	}
+	renderPersentageSymbol(value){
+		if(value != "No Data Yet" ){
+			value = value + "%";
+		}
+		else{
+			value = "No Data Yet";
+		}
+		return value;
+	}
+	getStylesPrcntUnprocessedFood(score){
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		if(score){
+	      	if (score<50){
+	        	background = '#FF0101';
+	            color = 'black';
+	            hr_background = 'black';
+	      	}
+	  		else if (score>=50 && score<70){
+	    	 	background = '#FFFF01';
+	            color = 'black';
+	            hr_background = 'black';
+	  		}
+	      	else if (score >= 70){
+	        	background = 'green';
+	           	color = 'white';
+	           	hr_background = 'white';
+	      	}
+	    }
+	   	else{
+	        	score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#e5e5e5';
+        }
+		var model = <Card className = "card_style"
+						 id = "my-card"
+						 style = {{background:background, color:color}}>
+					        <CardBody>
+					          	<CardTitle className = "gd_header_style">% Unprocessed Food</CardTitle>
+					          	<hr className = "hr_style"
+					          		id = "hr-style" 
+					          		style = {{background:hr_background}}/>
+					          	<CardText className = "gd_value_style">{this.renderPersentageSymbol(score)}</CardText>
+					        </CardBody>
+					    </Card>
+		return model;
+      
+    }
 	renderHourNonExerciseStepsColor(score){
 		/* adding background color to card depends upon their Non-Exercise steps ranges*/
 		let background = "";
@@ -373,13 +554,113 @@ class Grades_Dashboard extends Component{
 			      		</Card>
 		return model;
 	}
+	renderControlledColor(value){
+		let background1 = "";
+		let color1 = "";
+		let hr_background1 = "";
+			if(value){
+				value = "Yes";
+				background1 = 'red';
+	           	color1 = 'black';
+	           	hr_background1 = 'black';
+			}
+			else if(value == "0"){
+				value = "No";
+	           	background1 = 'green';
+	           	color1 = 'white';
+	           	hr_background1 = 'white';
+			}
+			else{
+				value = "No Data Yet"
+	            background1 = 'white';
+	            color1 = '#5e5e5e';
+	            hr_background1 = '#E5E5E5';
+			}
+		let modal = <CardText className = "gd_value_style" style = {{background:background1, color:color1}}>
+					          		
+	          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{value}</span>
+					          		
+	          		</CardText>
+	    return modal;
+	}
+	renderSmokeColor(value){
+		let background1 = "";
+		let color1 = "";
+		let hr_background1 = "";
+			if(value){
+				value = "Yes";
+				background1 = 'red';
+	           	color1 = 'black';
+	           	hr_background1 = 'black';
+			}
+			else if(value == "0"){
+				value = "No";
+	           	background1 = 'green';
+	           	color1 = 'white';
+	           	hr_background1 = 'white';
+			}
+			else{
+				value = "No Data Yet"
+	            background1 = 'white';
+	            color1 = '#5e5e5e';
+	            hr_background1 = '#E5E5E5';
+			}
+		let modal = <CardText className = "gd_value_style" style = {{background:background1, color:color1}}>
+					          		
+	          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{value}</span>
+					          		
+	          		</CardText>
+	    return modal;
+	}
+	renderPanalitiesColor(sleep,controlled,smoke){
+		let background = "";
+		let color = "";
+		let hr_background = "";
+			if(sleep){
+				sleep = "Yes";
+				background = 'red';
+	           	color = 'black';
+	           	hr_background = 'black';
+			}
+			else if(sleep == "0"){
+				sleep = "No";
+	           	background = 'green';
+	           	color = 'white';
+	           	hr_background = 'white';
+			}
+			else{
+				sleep = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+			}
+		var model = <Card className = "card_style" 
+							id = "my-card-mcs"
+							 >
+				        	<CardBody>
+				          		<CardTitle className = "gd_header_style">Penalties</CardTitle>
+				          		<hr className = "hr_style" 
+				          			id = "hr-style-mcs"
+				          			style = {{background:hr_background}}/>
+				          		<CardText className = "gd_value_style" style = {{background:background, color:color}}>
+					          			<span>Sleep Aids:- </span><span className = "gd_value_style">{sleep}</span>
+					          		</CardText>
+					          		<hr className = "hr_style"/>
+					          		{this.renderControlledColor(controlled)}
+					          		<hr className = "hr_style"/>
+					          		{this.renderControlledColor(smoke)}
+				        	</CardBody>
+			      		</Card>
+		return model;
+	}
 	componentDidMount(){
 		 fetchLastSync(this.successLastSync,this.errorquick);
 		 fetchGradesData(this.successGradesData,this.errorGradesData,this.state.selectedDate);
+		 getUserProfile(this.successProfile);
 	}
 	render(){
 		return(
-			<div>
+			<div className = "container-fluid">
 				<NavbarMenu title={"Grades Dashboard"} />
 				<div>
 					<span>
@@ -415,7 +696,7 @@ class Grades_Dashboard extends Component{
                 	</span>
 
 		        </div>
-				<div className = "row">
+				<div className = "row gd_padding">
 					<div className = "col-md-4 gd_table_margin ">
 						{this.renderOverallHealthColors(this.state.overall_health_gpa)}
 				    </div>
@@ -426,7 +707,7 @@ class Grades_Dashboard extends Component{
 			      		{this.renderMcsColors(this.state.mcs_score)}
 			      	</div>
 				</div>
-				<div className = "row">
+				<div className = "row gd_padding">
 					<div className = "col-md-4 gd_table_margin ">
 						{this.getStylesForUserinputSleep(this.state.sleep_per_night)}
 				    </div>
@@ -440,54 +721,18 @@ class Grades_Dashboard extends Component{
 					    </Card>
 				    </div>
 				    <div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style">
-					        <CardBody>
-					          	<CardTitle className = "gd_header_style">% Unprocessed Food Grade</CardTitle>
-					          	<hr className = "hr_style"/>
-					          	<CardText className = "gd_value_style">{this.state.unprocessed_food_grade}</CardText>
-					        </CardBody>
-					    </Card>
+						{this.getStylesPrcntUnprocessedFood(this.state.unprocessed_food_grade)}
 				    </div>
 				</div>
-				<div className = "row">
+				<div className = "row gd_padding">
 					<div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style">
-				        	<CardBody>
-				          		<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week Grade</CardTitle>
-				          		<hr className = "hr_style"/>
-				          		<CardText className = "gd_value_style">{this.state.alcoholic_drinks_per_week_grade}</CardText>
-				        	</CardBody>
-				      	</Card>
+						{this.getStylesAlcohol(this.state.alcoholic_drinks_per_week_grade)}
 				    </div>
 				    <div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style">
-				        	<CardBody>
-				          		<CardTitle className = "gd_header_style">Did you Report your Inputs Today?</CardTitle>
-				          		<hr className = "hr_style"/>
-				          		<CardText className = "gd_value_style">{this.state.report_inputs_today}</CardText>
-				        	</CardBody>
-				      	</Card>
+						{this.getStylesUserinput(this.state.report_inputs_today)}
 				    </div>
 				    <div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style">
-				        	<CardBody>
-				          		<CardTitle className = "gd_header_style">Penalties</CardTitle>
-				          		<hr className = "hr_style"/>
-				          		<CardText >
-					          		<div>
-					          			<span>Sleep Aids:- </span><span className = "gd_value_style">{this.state.sleep_aids_penalty}</span>
-					          		</div>
-					          		<hr className = "hr_style"/>
-					          		<div>
-					          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{this.state.controlled_subtances_penalty}</span>
-					          		</div>
-					          		<hr className = "hr_style"/>
-					          		<div>
-					          			<span>Smoking:- </span><span className = "gd_value_style">{this.state.smoking_penalty}</span>
-					          		</div>
-				          		</CardText>
-				        	</CardBody>
-				      	</Card>
+						{this.renderPanalitiesColor(this.state.sleep_aids_penalty,this.state.controlled_subtances_penalty,this.state.smoking_penalty)}    		
 				    </div>
 				</div>
 			</div>
