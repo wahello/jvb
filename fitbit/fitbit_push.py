@@ -100,7 +100,7 @@ def call_push_api(data):
 				user = None
 			if user:
 				create_notification = FitbitNotifications.objects.create(user=user,collection_type=data_type,
-					notification_date=date,state="processing",notification= notification)
+					notification_date=date,state="unprocessed",notification= notification)
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
@@ -142,12 +142,16 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 	Return: returns nothing
 	'''
 	if data_type == 'sleep':
+		create_notification.state = "processing"
+		create_notification.save()
 		sleep_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
 			user_id,data_type,date))
 		sleep_fitbit = sleep_fitbit.json()
 		store_data(sleep_fitbit,user,date,create_notification,data_type='sleep_fitbit')
 	elif data_type == 'activities':
+		create_notification.state = "processing"
+		create_notification.save()
 		activity_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
 			user_id,date))
@@ -211,19 +215,22 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 					created_at=start_date)
 					update_fitbit_data(user,date_of_sleep,create_notification,value,key)
 					print("Updated sleep-Fitbit successfully")
-					create_notification.state = "processed"
-					create_notification.save()
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
 				except UserFitbitDataSleep.DoesNotExist:
 					UserFitbitDataSleep.objects.create(user=user,
 					date_of_sleep=date_of_sleep,
 					sleep_data=value,created_at=start_date)
 					print("Created sleep-Fitbit successfully")
-					create_notification.state = "processed"
-					create_notification.save()
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
 		except (KeyError, IndexError):
 			logging.exception("message")
-			create_notification.state = "failed"
-			create_notification.save()
+			if create_notification != None:
+				create_notification.state = "failed"
+				create_notification.save()
 
 		try:
 			if "activity_fitbit" == key:
@@ -232,20 +239,23 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
 					update_fitbit_data(user,date_of_activity,create_notification,value,key)
 					print("Updated Activity-Fitbit successfully")
-					create_notification.state = "processed"
-					create_notification.save()
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
 				except UserFitbitDataActivities.DoesNotExist:
 					UserFitbitDataActivities.objects.create(user=user,
 					date_of_activities=date_of_activity,
 					activities_data=value,created_at=start_date)
 					print("Created Activity-Fitbit successfully")
-					create_notification.state = "processed"
-					create_notification.save()
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
 
 		except (KeyError, IndexError):
 			logging.exception("message")
-			create_notification.state = "failed"
-			create_notification.save()
+			if create_notification != None:
+				create_notification.state = "failed"
+				create_notification.save()
 
 		try:
 			if "heartrate_fitbit" == key:
