@@ -120,7 +120,7 @@ class Dashboard extends Component {
 
 	render(){
 		return (
-			<div>
+			<div className = "container">
 				<NavbarMenu fix={true}/>
 				<div>
 					  <div className="row">

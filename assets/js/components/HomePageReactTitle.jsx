@@ -117,10 +117,6 @@ showHidePassword(e){
         </Navbar>
             <div className="inner-bg">
           	<Container>
-              <div>
-                <section id="why">
-                      <div className="container">
-
                          <div className="row">
                                   <div className="col-sm-6 col-sm-offset-3 form-box">
                                     <div className="d-flex justify-content-center">
@@ -168,11 +164,7 @@ showHidePassword(e){
                                     <a href="password_reset/">Forgot Password</a><br/>
                                     </div>
                                   </div>
-                              </div>
-
-                        </div>
-                    </section>
-                </div>
+                              </div>   
              </Container>
           </div>
           <ToastContainer 

@@ -17,7 +17,7 @@ import _ from 'lodash';
 import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
-import {getInitialStateUserInput} from './initialStateUser';
+import {getInitialStateUserInput} from './initialStateUser';  
 import {getInitialStateHrr} from './initialStateHrr';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
 import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync,hrrDate}  from '../../network/quick';
@@ -294,8 +294,8 @@ class Quicklook extends Component{
 		        sleep_awake_time: data.sleep_ql.sleep_awake_time,
 		        deep_sleep: data.sleep_ql.deep_sleep,
 		        light_sleep: data.sleep_ql.light_sleep,
-		        awake_time: data.sleep_ql.awake_time
-		       
+		        awake_time: data.sleep_ql.awake_time,
+		        rem_sleep: data.sleep_ql.rem_sleep
 		    },
 		    food_ql: {
 		        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,
@@ -566,7 +566,8 @@ class Quicklook extends Component{
 			start_date : start_dt.toDate(),
 			end_date : end_dt.toDate(),
 			dateRange:!this.state.dateRange,
-			fetching_ql:true
+			fetching_ql:true,
+			model:!this.state.model,
 		},()=>{
 			userInputDate(this.state.start_date, this.state.end_date, this.userInputFetchSuccess,
 						  this.userInputFetchFailure);
@@ -629,20 +630,26 @@ handleScroll() {
 	          <ModalHeader toggle={this.toggleModel}></ModalHeader>
 	          <ModalBody>
 	          On a mobile device, touch the button "Export Reports" below to easily view your formatted data and various tabs
-	          (on an iPhone, upgrade to OS 11.4 for the reports to be displayed); 
 	          on your desktop computer, touching this button will export your reports to Excel for easy viewing.
 	          </ModalBody>
 	          <ModalFooter>
 	            <Button color="primary" onClick={this.toggleModel}>Ok</Button>
-	             <span id="spa">
-                                          <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
-                                            <div className="btn3">
-                                            <Button id="nav-btn" className="btn" onClick={this.toggleModel}>Export Reports</Button>
-                                            </div>
-                                           </a>
-                                          </abbr>
-                                          </span> 
+             	<span className="date_range_btn">
+			        <Button
+                    className="daterange-btn btn"		                         
+		            id="daterange"
+		            onClick={this.toggleDate} >Date Range
+			        </Button>
+			    </span>
+	            <span id="spa">
+                  	<abbr  id="abbri">
+                  		<a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
+		                    <div className="btn3">
+		                    	<Button id="nav-btn" className="btn" onClick={this.toggleModel}>Export Reports</Button>
+		                    </div>
+	                   	</a>
+                  	</abbr>
+                </span>
 	          </ModalFooter>
 	        </Modal>;
     }
@@ -671,7 +678,7 @@ handleScroll() {
   }
  toggleDate(){
     this.setState({
-      dateRange:!this.state.dateRange
+      dateRange:!this.state.dateRange,
     });
    }
  toggleDropdown() {
@@ -1007,8 +1014,8 @@ onLogoutSuccess(response){
 						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser"className={class_hrr} value="hrr"
-						    								 onClick={this.activateTab.bind(this,"hrr")}>User Inputs</DropdownItem>
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="drophrr"className={class_hrr} value="hrr"
+						    								 onClick={this.activateTab.bind(this,"hrr")}>Heart Rate Recovery</DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>
                                         </span>

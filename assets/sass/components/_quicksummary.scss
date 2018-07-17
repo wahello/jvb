@@ -24,6 +24,9 @@ html,body{
 .color_legend_yellow{
 	background-color: #FD9A44;
 }
+.color_legend_grey{
+	background-color:  #A5A7A5;
+}
 .rd_mch_color_legend_label{
 	margin-left: 5px;
 	font-size: 12px;
@@ -156,6 +159,9 @@ background-color: #777777;
 	.steps{
 		display:inline;
 	}
+	.hrr{
+		display: inline;
+	}
 	#dropsteps{
 		display:none;
 	}
@@ -201,6 +207,9 @@ background-color: #777777;
 	#dropmovement{
 		display: none;
 	}
+	#drophrr{
+		display: none;
+	}
 	
 }
 @media screen and (max-width: 2560px) and (min-width: 1201px) {
@@ -211,6 +220,12 @@ background-color: #777777;
 		display: inline;
 	}
 	.allstats{
+		display: none;
+	}
+	.hrr{
+		display: inline;
+	}
+	#drophrr{
 		display: none;
 	}
 	#drop_allstats{
@@ -267,6 +282,12 @@ background-color: #777777;
 	}
     .allstats{
 		display: none;
+	}
+	.hrr{
+		display: none;
+	}
+	#drophrr{
+		display: inline;
 	}
 	#drop_allstats{
 		display: inline;

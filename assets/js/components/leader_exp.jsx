@@ -131,7 +131,7 @@ class LeaderBoard1 extends Component{
 		this.toggle = this.toggle.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
-		this.successLeaderBoard = this.successLeaderBoard.bind(this);
+		this.errorLeaderBoard = this.errorLeaderBoard.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.renderTablesTd = this.renderTablesTd.bind(this);
 		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
@@ -500,6 +500,20 @@ class LeaderBoard1 extends Component{
 	    }					
 	  	for(let score of scores){
 	  		if(category == "Total Steps"){
+	  			var value = score;
+	  		    if(value != undefined){
+	                value += '';
+	                var x = value.split('.');
+	                var x1 = x[0];
+	                var x2 = x.length > 1 ? '.' + x[1] : '';
+	                var rgx = /(\d+)(\d{3})/;
+	                while (rgx.test(x1)) {
+	            			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	          		}
+	                scoreTableData.push(<td className="lb_table_style_rows">{x1 + x2}</td>);
+    	        }
+	  		}
+	  		else if(category == "Non Exercise Steps"){
 	  			var value = score;
 	  		    if(value != undefined){
 	                value += '';

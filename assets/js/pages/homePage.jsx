@@ -39,6 +39,7 @@ import Grades_Dashboard from '../components/grades_dashboard';
 
 
 
+
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
 
@@ -87,6 +88,7 @@ function initializeLocalState(){
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
+
 			    </Switch>
 			  </BrowserRouter>
 			</Provider> 

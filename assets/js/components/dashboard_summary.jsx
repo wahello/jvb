@@ -21,7 +21,7 @@ var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
 
-const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec"];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec","resting_hr"];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 const categoryMeta = {
   "Overall Health GPA":{
@@ -416,6 +416,22 @@ constructor(props){
                 "year": "-"
             },
             "hrr_time_to_99": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+            },
+            "hrr_pure_1_minute_beat_lowered": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+            },
+             "hrr_pure_time_to_99": {
                "week": "-",
                 "yesterday": "-",
                 "month": "-",
@@ -1481,8 +1497,8 @@ handleBackButton(){
             <span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
           </div>
         }
-        {this.state.scheduled_date &&
-        <div className = "row justify-content-center"style = {{fontWeight:"bold"}}>Progress Analyzer reports are scheduled for an updated from {moment(this.state.scheduled_date).format('MMM DD, YYYY')}</div>
+        {(this.state.scheduled_date && this.state.active_view) &&
+        <div className = "row justify-content-center scheduled_date"style = {{fontWeight:"bold"}}>Your progress analyzer reports are currently being updated from {moment(this.state.scheduled_date).format('MMM DD, YYYY')} through today (and when this message disappears your data has been updated)</div>
         }
         {this.state.active_view &&
             <div className="row justify-content-center padding" style = {{paddingTop:"25px"}}>
@@ -1912,6 +1928,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.resting_hr.year}</td>
                  {this.renderCustomRangeTD(this.state.summary.other.resting_hr.custom_range)}
             </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.resting_hr)}
+            </tr>
             <tr className="progress_table">
                 <td className="progress_table">HRR (time to 99)</td>
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.today}</td>
@@ -1947,6 +1967,24 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_lowest_hr_point.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Pure 1 Minute HRR Beats Lowered </td>     
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.today}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.yesterday}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.week}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.month}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_pure_1_minute_beat_lowered.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Pure time to 99 (mm:ss)</td>     
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.today}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.yesterday}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.week}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.month}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_pure_time_to_99.custom_range)}
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">Floors Climbed</td>
