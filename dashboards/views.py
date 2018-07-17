@@ -128,6 +128,7 @@ class GradesDashboardView(APIView):
             sleep_data = user_ql.sleep_ql
             step_data = user_ql.steps_ql
             food_data = user_ql.food_ql
+            alcohol_data = user_ql.alcohol_ql
             if step_data.movement_consistency:
                 movement_consistency = json.loads(step_data.movement_consistency)
             else:
@@ -135,7 +136,7 @@ class GradesDashboardView(APIView):
             grades_data["overall_health_gpa"] = grade_data.overall_health_gpa
             grades_data["exercise_consistency_score"] = grade_data.exercise_consistency_score
             grades_data["unprocessed_food_grade"] = food_data.prcnt_non_processed_food
-            grades_data["alcoholic_drinks_per_week_grade"] = grade_data.alcoholic_drink_per_week_gpa
+            grades_data["alcoholic_drinks_per_week_grade"] = alcohol_data.alcohol_week
             grades_data["sleep_aids_penalty"] = grade_data.sleep_aid_penalty
             grades_data["controlled_subtances_penalty"] = grade_data.ctrl_subs_penalty
             grades_data["smoking_penalty"] = grade_data.smoke_penalty
