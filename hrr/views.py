@@ -992,7 +992,7 @@ def daily_aa_data(user, start_date):
 
 		total =  {"avg_heart_rate":avg_hrr,
 				  "max_heart_rate":max_hrr,
-				  "total_duration":total_time,
+				  "total_duration":sum(total_duration),
 				  "duration_in_aerobic_range":sum(aerobic_duration),
 				  "duration_in_anaerobic_range":sum(anaerobic_duration),
 				  "duration_below_aerobic_range":sum(below_aerobic_duration),
@@ -1740,7 +1740,7 @@ class UserAaView(APIView):
 	permission_classes = (IsAuthenticated,)
 	serializer_class = AaSerializer
 
-	def calculate_weekly_aa_data(self,aa_weekly_qs):
+	def calculate_weekly_aa_data(self,aa_weekly_qs,no_days):
 		data_values = [aa_data.data for aa_data in aa_weekly_qs]
 		keys = ['avg_heart_rate','max_heart_rate','total_duration','duration_in_aerobic_range',
 				'percent_aerobic','duration_in_anaerobic_range','percent_anaerobic','duration_below_aerobic_range',
@@ -1760,17 +1760,17 @@ class UserAaView(APIView):
 			avg_heart_rate = sum(lists[0])/len(lists[0])
 			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
 			
-			percent_aerobic = sum(lists[4])/len(lists[4])
-			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+			# percent_aerobic = sum(lists[4])/len(lists[4])
+			# percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
-			percent_anaerobic = sum(lists[6])/len(lists[6])
-			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+			# percent_anaerobic = sum(lists[6])/len(lists[6])
+			# percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 
-			percent_below_aerobic = sum(lists[8])/len(lists[8])
-			percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+			# percent_below_aerobic = sum(lists[8])/len(lists[8])
+			# percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
-			percent_hrr_not_recorded = sum(lists[10])/len(lists[10])
-			percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+			# percent_hrr_not_recorded = sum(lists[10])/len(lists[10])
+			# percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
 
 		except ZeroDivisionError:
 			avg_heart_rate = ""
@@ -1783,11 +1783,23 @@ class UserAaView(APIView):
 		except ValueError:
 			max_heart_rate = ""
 		
-		total_duration = sum(lists[2])
-		duration_in_aerobic_range = sum(lists[3])
-		duration_in_anaerobic_range = sum(lists[5])
-		duration_below_aerobic_range = sum(lists[7])
-		duration_hrr_not_recorded = sum(lists[9])
+		total_duration = ((sum(lists[2])/no_days)*7)
+		duration_in_aerobic_range = ((sum(lists[3])/no_days)*7)
+		duration_in_anaerobic_range = ((sum(lists[5])/no_days)*7)
+		duration_below_aerobic_range = ((sum(lists[7])/no_days)*7)
+		duration_hrr_not_recorded = ((sum(lists[9])/no_days)*7)
+
+		percent_aerobic = (duration_in_aerobic_range/total_duration)*100
+		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+
+		percent_anaerobic = (duration_in_anaerobic_range/total_duration)*100
+		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+
+		percent_below_aerobic = (duration_below_aerobic_range/total_duration)*100
+		percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+
+		percent_hrr_not_recorded = (duration_hrr_not_recorded/total_duration)*100
+		percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
 
 		total_data = {"avg_heart_rate":avg_heart_rate,
 					"max_heart_rate":max_heart_rate,
@@ -1805,7 +1817,8 @@ class UserAaView(APIView):
 		return total_data
 
 	def get(self,request,format="json"):
-		weekly_aa_data = self.calculate_weekly_aa_data(self.get_queryset())
+		weekly_queryset,no_days = self.get_queryset()
+		weekly_aa_data = self.calculate_weekly_aa_data(weekly_queryset,no_days)
 		return Response(weekly_aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
@@ -1813,12 +1826,14 @@ class UserAaView(APIView):
 
 		end_dt = self.request.query_params.get('to',None)
 		start_dt = self.request.query_params.get('from', None)
-
+		start_date_obj = datetime.strptime(start_dt, "%Y-%m-%d")
+		end_dt_obj = datetime.strptime(end_dt, "%Y-%m-%d")
+		no_days = (end_dt_obj.date() - start_date_obj.date())+timedelta(days=1)
 		if start_dt and end_dt:
 			queryset = AaCalculations.objects.filter(Q(created_at__gte=start_dt)&
 							  Q(created_at__lte=end_dt),
 							  user_aa=user)
 		else:
 			queryset = AaCalculations.objects.all()
-		return queryset
+		return (queryset,no_days.days)
 
