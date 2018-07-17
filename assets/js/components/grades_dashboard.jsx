@@ -26,24 +26,23 @@ class Grades_Dashboard extends Component{
 		super(props);
 		this.state = {
 			calendarOpen:false,
-			overall_health_gpa:"2.80",
-			non_exercise_steps:5000,
-			movement_consistency_score:"7",
-			sleep_per_night:"8:00",
-			exercise_consistency_score:"5.10",
-			prcnt_unprocessed_food_grade:20,
-			alcoholic_drinks_week_grade:"Not Reported",
-			inputs:"Yes",
-			sleep_aid:"Yes",
-			controlled_substance:"No",
-			smoking:"No",
+			"smoking_penalty": "-",
+			"non_exercise_steps": "-",
+			"unprocessed_food_grade": "-",
+			"mcs_score": "-",
+			"sleep_aids_penalty": "-",
+			"exercise_consistency_score": "-",
+			"overall_health_gpa": "-",
+			"sleep_per_night": "-",
+			"alcoholic_drinks_per_week_grade": "-",
+			"report_inputs_today": "-",
+			"controlled_subtances_penalty": "-",
 			last_synced:null,
 			selectedDate:new Date(),
 		}
-		this.renderHourStepsColor = this.renderHourStepsColor.bind(this);
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
 		this.renderMcsColors = this.renderMcsColors.bind(this);
-		this.renderMcsColors1 = this.renderMcsColors1.bind(this);
+		this.renderOverallHealthColors = this.renderOverallHealthColors.bind(this);
 		this.successLastSync = this.successLastSync.bind(this);
 		this.errorquick = this.errorquick.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
@@ -53,9 +52,23 @@ class Grades_Dashboard extends Component{
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.successGradesData = this.successGradesData.bind(this);
 		this.errorGradesData = this.errorGradesData.bind(this);
+		this.getStylesForUserinputSleep = this.getStylesForUserinputSleep.bind(this);
+	 	this.strToSecond = this.strToSecond.bind(this);
 	}
 	successGradesData(data){
-	  
+		this.setState({
+  			"smoking_penalty": data.data.smoking_penalty,
+			"non_exercise_steps":data.data.non_exercise_steps,
+			"unprocessed_food_grade": data.data.unprocessed_food_grade,
+			"mcs_score": data.data.mcs_score,
+			"sleep_aids_penalty": data.data.sleep_aids_penalty,
+			"exercise_consistency_score": data.data.exercise_consistency_score,
+			"overall_health_gpa": data.data.overall_health_gpa,
+			"sleep_per_night": data.data.sleep_per_night,
+			"alcoholic_drinks_per_week_grade": data.data.alcoholic_drinks_per_week_grade,
+			"report_inputs_today": data.data.report_inputs_today,
+			"controlled_subtances_penalty": data.data.controlled_subtances_penalty,
+		});
   	}
 
   	errorGradesData(error){
@@ -93,6 +106,8 @@ class Grades_Dashboard extends Component{
 		var tomorrow = moment(today).add(1, 'days');
 		this.setState({
 			selectedDate:tomorrow.toDate()
+		},()=>{
+			fetchGradesData(this.successGradesData,this.errorGradesData,this.state.selectedDate);
 		});
 	}
 	renderRemoveDate(){
@@ -100,6 +115,8 @@ class Grades_Dashboard extends Component{
 		var tomorrow = moment(today).subtract(1, 'days');
 		this.setState({
 			selectedDate:tomorrow.toDate()
+		},()=>{
+			fetchGradesData(this.successGradesData,this.errorGradesData,this.state.selectedDate);
 		});
 	}
 	processDate(selectedDate){
@@ -124,122 +141,241 @@ class Grades_Dashboard extends Component{
         let score = x1+x2;
         return score;
 	}
-	renderHourStepsColor(score){
-		/* adding background color to card depends upon their steps ranges*/
-		setTimeout(function () {
-            if(score >= 300){
-               	document.getElementById('my-card').style.background = 'green';
-               	document.getElementById('my-card').style.color = 'white';
-               	document.getElementById('hr-style').style.background = 'white';
-            }
-            else{
-                document.getElementById('my-card').style.background = '#FF0101';
-                document.getElementById('my-card').style.color = 'black';
-                document.getElementById('hr-style').style.background = 'black';
-            }
-        }, 100);
-		let score1 = this.renderCommaInSteps(score);
-		return score1;
-	}
 	renderHourNonExerciseStepsColor(score){
 		/* adding background color to card depends upon their Non-Exercise steps ranges*/
-		setTimeout(function () {
-            if(score >= 10000){
-           		document.getElementById('my-card-nonexercise').style.background = 'green';
-               	document.getElementById('my-card-nonexercise').style.color = 'white';
-               	document.getElementById('hr-style-nonexercise').style.background = 'white';
-            }
-            else if(score >= 7500 && score < 10000){
-                document.getElementById('my-card-nonexercise').style.background = '#32CD32';
-                document.getElementById('my-card-nonexercise').style.color = 'white';
-                document.getElementById('hr-style-nonexercise').style.background = 'white';
-            }
-            else if(score >= 5000 && score < 7500){
-                document.getElementById('my-card-nonexercise').style.background = '#FFFF01';
-                document.getElementById('my-card-nonexercise').style.color = 'black';
-                document.getElementById('hr-style-nonexercise').style.background = 'black';
-            }
-            else if(score >= 3500 && score < 5000){
-                document.getElementById('my-card-nonexercise').style.background = '#E26B0A';
-                document.getElementById('my-card-nonexercise').style.color = 'black';
-                document.getElementById('hr-style-nonexercise').style.background = 'black';
-            }
-            else if(score < 3500){
-                document.getElementById('my-card-nonexercise').style.background = '#FF0101';
-                document.getElementById('my-card-nonexercise').style.color = 'black';
-                document.getElementById('hr-style-nonexercise').style.background = 'black';
-            }
-        }, 100);
-
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		if(score){
+	            if(score >= 10000){
+	           		background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(score >= 7500 && score < 10000){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(score >= 5000 && score < 7500){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score >= 3500 && score < 5000){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score >= 0 && score < 3500){
+	                background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+        }
+       else{
+	        	score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#e5e5e5';
+        }
 		let score1 = this.renderCommaInSteps(score);
-		return score1;
+		var model = <Card className = "card_style"
+						 id = "my-card"
+						 style = {{background:background, color:color}}>
+					        <CardBody>
+					          	<CardTitle className = "gd_header_style">Today's Non Exercise Steps</CardTitle>
+					          	<hr className = "hr_style"
+					          		id = "hr-style" 
+					          		style = {{background:hr_background}}/>
+					          	<CardText className = "gd_value_style">{score1}</CardText>
+					        </CardBody>
+					    </Card>
+		return model;
 	}
+	renderOverallHealthColors(score){
+		/* adding background color to card depends upon their Movement Consistency Score ranges*/
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		if(score || score == 0){
+		var score = parseFloat(score); 
+	            if(score >= "3.4"){
+	               	background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(score >= "3" && score < "3.4"){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(score >= "2" && score < "3"){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score >= "1" && score < "2"){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score < "1"){
+	                background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+        	
+        	
+		}
+		else{
+				score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+		var model = <Card className = "card_style" 
+							id = "my-card-mcs"
+							 style = {{background:background, color:color}}>
+				        	<CardBody>
+				          		<CardTitle className = "gd_header_style">Overall Health GPA</CardTitle>
+				          		<hr className = "hr_style" 
+				          			id = "hr-style-mcs"
+				          			style = {{background:hr_background}}/>
+				          		<CardText className = "gd_value_style">{score}</CardText>
+				        	</CardBody>
+			      		</Card>
+		return model;
+	}
+	 strToSecond(value){
+    	let time = value.split(':');
+    	let hours = parseInt(time[0])*3600;
+    	let min = parseInt(time[1])*60;
+    	let s_time = hours + min;
+    	return s_time;
+	}
+	getStylesForUserinputSleep(value){
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		let score;
+		if(value){
+		 score = value;
+		}
+		else{
+			score = "No Data Yet";
+            background = 'white';
+            color = '#5e5e5e';
+            hr_background = '#E5E5E5';
+        }
+		if(value){
+			value = this.strToSecond(value);
+			if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00")){
+				 	background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	        }
+			else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00")){
+					background = 'green';
+		            color = 'white';
+		            hr_background = 'white';
+		    }
+	    	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
+	    	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30"))){
+	    		 	background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	    	}	
+	    	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("7:29"))
+	    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00"))){
+	    		 	background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	        }
+	    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
+	    	 || (this.strToSecond("11:30")<=value && value<= this.strToSecond("12:00"))){
+	    		 	background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	    	}
+    	}
+    	
+		else{
+			value = "No Data Yet";
+            background = 'white';
+            color = '#5e5e5e';
+            hr_background = '#E5E5E5';
+        }
+        var model = <Card className = "card_style" 
+							id = "my-card-mcs"
+							 style = {{background:background, color:color}}>
+				        	<CardBody>
+				          		<CardTitle className = "gd_header_style">Sleep Per Night</CardTitle>
+				          		<hr className = "hr_style" 
+				          			id = "hr-style-mcs"
+				          			style = {{background:hr_background}}/>
+				          		<CardText className = "gd_value_style">{score}</CardText>
+				        	</CardBody>
+			      		</Card>
+		return model;
+    	
+    }
 	renderMcsColors(score){
 		/* adding background color to card depends upon their Movement Consistency Score ranges*/
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		if(score || score == 0){
 		var score = parseFloat(score); 
-		setTimeout(function () {
-            if(score <= "4.5"){
-               	document.getElementById('my-card-mcs').style.background = 'green';
-               	document.getElementById('my-card-mcs').style.color = 'white';
-               	document.getElementById('hr-style-mcs').style.background = 'white';
-            }
-            else if(score > "4.5" && score <= "6"){
-                document.getElementById('my-card-mcs').style.background = '#32CD32';
-                document.getElementById('my-card-mcs').style.color = 'white';
-                document.getElementById('hr-style-mcs').style.background = 'white';
-            }
-            else if(score > "6" && score <= "7"){
-                document.getElementById('my-card-mcs').style.background = '#FFFF01';
-                document.getElementById('my-card-mcs').style.color = 'black';
-                document.getElementById('hr-style-mcs').style.background = 'black';
-            }
-            else if(score > "7" && score <= "10"){
-                document.getElementById('my-card-mcs').style.background = '#E26B0A';
-                document.getElementById('my-card-mcs').style.color = 'black';
-                document.getElementById('hr-style-mcs').style.background = 'black';
-            }
-            else if(score > "10"){
-                document.getElementById('my-card-mcs').style.background = '#FF0101';
-                document.getElementById('my-card-mcs').style.color = 'black';
-                document.getElementById('hr-style-mcs').style.background = 'black';
-            }
-          }, 100);
-		return score;
-	}
-	renderMcsColors1(score){
-		/* adding background color to card depends upon their Movement Consistency Score ranges*/
-		var score = parseFloat(score); 
-		setTimeout(function () {
-            if(score <= "4.5"){
-               	document.getElementById('my-card-mcs1').style.background = 'green';
-               	document.getElementById('my-card-mcs1').style.color = 'white';
-               	document.getElementById('hr-style-mcs1').style.background = 'white';
-            }
-            else if(score > "4.5" && score <= "6"){
-                document.getElementById('my-card-mcs1').style.background = '#32CD32';
-                document.getElementById('my-card-mcs1').style.color = 'white';
-                document.getElementById('hr-style-mcs1').style.background = 'white';
-            }
-            else if(score > "6" && score <= "7"){
-                document.getElementById('my-card-mcs1').style.background = '#FFFF01';
-                document.getElementById('my-card-mcs1').style.color = 'black';
-                document.getElementById('hr-style-mcs1').style.background = 'black';
-            }
-            else if(score > "7" && score <= "10"){
-                document.getElementById('my-card-mcs1').style.background = '#E26B0A';
-                document.getElementById('my-card-mcs1').style.color = 'black';
-                document.getElementById('hr-style-mcs1').style.background = 'black';
-            }
-            else if(score > "10"){
-                document.getElementById('my-card-mcs1').style.background = '#FF0101';
-                document.getElementById('my-card-mcs1').style.color = 'black';
-                document.getElementById('hr-style-mcs1').style.background = 'black';
-            }
-          }, 100);
-		return score;
+	            if(score <= "4.5"){
+	               	background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(score > "4.5" && score <= "6"){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(score > "6" && score <= "7"){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score > "7" && score <= "10"){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(score > "10"){
+	                background = '#FF0101';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+        	
+		}
+		else{
+				score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+		var model = <Card className = "card_style" 
+							id = "my-card-mcs"
+							 style = {{background:background, color:color}}>
+				        	<CardBody>
+				          		<CardTitle className = "gd_header_style">Today’s Movement Consistency Score (MCS)</CardTitle>
+				          		<hr className = "hr_style" 
+				          			id = "hr-style-mcs"
+				          			style = {{background:hr_background}}/>
+				          		<CardText className = "gd_value_style">{score}</CardText>
+				        	</CardBody>
+			      		</Card>
+		return model;
 	}
 	componentDidMount(){
 		 fetchLastSync(this.successLastSync,this.errorquick);
+		 fetchGradesData(this.successGradesData,this.errorGradesData,this.state.selectedDate);
 	}
 	render(){
 		return(
@@ -281,49 +417,25 @@ class Grades_Dashboard extends Component{
 		        </div>
 				<div className = "row">
 					<div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style" id = "my-card-mcs">
-					        <CardBody>
-					          	<CardTitle className = "gd_header_style">Overall Health GPA</CardTitle>
-					          	<hr className = "hr_style" id = "hr-style-mcs"/>
-					          	<CardText className = "gd_value_style">{this.renderMcsColors(this.state.overall_health_gpa)}</CardText>
-					        </CardBody>
-					    </Card>
+						{this.renderOverallHealthColors(this.state.overall_health_gpa)}
 				    </div>
 					<div className = "col-md-4 gd_table_margin ">
-			      		<Card className = "gd_card_style" id = "my-card-nonexercise">
-				        	<CardBody>
-					          	<CardTitle className = "gd_header_style">Non Exercise Steps</CardTitle>
-					          	<hr className = "hr_style" id = "hr-style-nonexercise"/>
-					          	<CardText className = "gd_value_style">{this.renderHourNonExerciseStepsColor(this.state.non_exercise_steps)}</CardText>
-				        	</CardBody>
-				      	</Card>
+			      		{this.renderHourNonExerciseStepsColor(this.state.non_exercise_steps)}
 			      	</div>
 			      	<div className = "col-md-4 gd_table_margin ">
-			      		<Card className = "gd_card_style" id = "my-card-mcs1">
-				        	<CardBody>
-					          	<CardTitle className = "gd_header_style">Movement Consistency Score</CardTitle>
-					          	<hr className = "hr_style" id = "hr-style-mcs1"/>
-					          	<CardText className = "gd_value_style">{this.renderMcsColors1(this.state.movement_consistency_score)}</CardText>
-				        	</CardBody>
-				      	</Card>
+			      		{this.renderMcsColors(this.state.mcs_score)}
 			      	</div>
 				</div>
 				<div className = "row">
 					<div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style">
-				        	<CardBody>
-				          		<CardTitle className = "gd_header_style">Sleep Per Night</CardTitle>
-				          		<hr className = "hr_style" />
-				          		<CardText className = "gd_value_style">{this.state.sleep_per_night}</CardText>
-				        	</CardBody>
-			      		</Card>
+						{this.getStylesForUserinputSleep(this.state.sleep_per_night)}
 				    </div>
 					<div className = "col-md-4 gd_table_margin ">
 						<Card className = "gd_card_style" id = "my-card-mcs">
 					        <CardBody>
 					          	<CardTitle className = "gd_header_style">Exercise Consistency Score</CardTitle>
 					          	<hr className = "hr_style" id = "hr-style-mcs"/>
-					          	<CardText className = "gd_value_style">{this.renderMcsColors(this.state.exercise_consistency_score)}</CardText>
+					          	<CardText className = "gd_value_style">{this.state.exercise_consistency_score}</CardText>
 					        </CardBody>
 					    </Card>
 				    </div>
@@ -332,7 +444,7 @@ class Grades_Dashboard extends Component{
 					        <CardBody>
 					          	<CardTitle className = "gd_header_style">% Unprocessed Food Grade</CardTitle>
 					          	<hr className = "hr_style"/>
-					          	<CardText className = "gd_value_style">{this.state.prcnt_unprocessed_food_grade}</CardText>
+					          	<CardText className = "gd_value_style">{this.state.unprocessed_food_grade}</CardText>
 					        </CardBody>
 					    </Card>
 				    </div>
@@ -343,7 +455,7 @@ class Grades_Dashboard extends Component{
 				        	<CardBody>
 				          		<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week Grade</CardTitle>
 				          		<hr className = "hr_style"/>
-				          		<CardText className = "gd_value_style">{this.state.alcoholic_drinks_week_grade}</CardText>
+				          		<CardText className = "gd_value_style">{this.state.alcoholic_drinks_per_week_grade}</CardText>
 				        	</CardBody>
 				      	</Card>
 				    </div>
@@ -352,7 +464,7 @@ class Grades_Dashboard extends Component{
 				        	<CardBody>
 				          		<CardTitle className = "gd_header_style">Did you Report your Inputs Today?</CardTitle>
 				          		<hr className = "hr_style"/>
-				          		<CardText className = "gd_value_style">{this.state.inputs}</CardText>
+				          		<CardText className = "gd_value_style">{this.state.report_inputs_today}</CardText>
 				        	</CardBody>
 				      	</Card>
 				    </div>
@@ -363,15 +475,15 @@ class Grades_Dashboard extends Component{
 				          		<hr className = "hr_style"/>
 				          		<CardText >
 					          		<div>
-					          			<span>Sleep Aids:- </span><span className = "gd_value_style">{this.state.sleep_aid}</span>
+					          			<span>Sleep Aids:- </span><span className = "gd_value_style">{this.state.sleep_aids_penalty}</span>
 					          		</div>
 					          		<hr className = "hr_style"/>
 					          		<div>
-					          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{this.state.controlled_substance}</span>
+					          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{this.state.controlled_subtances_penalty}</span>
 					          		</div>
 					          		<hr className = "hr_style"/>
 					          		<div>
-					          			<span>Smoking:- </span><span className = "gd_value_style">{this.state.smoking}</span>
+					          			<span>Smoking:- </span><span className = "gd_value_style">{this.state.smoking_penalty}</span>
 					          		</div>
 				          		</CardText>
 				        	</CardBody>
