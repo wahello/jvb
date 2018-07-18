@@ -328,10 +328,13 @@ class ProgressReport():
 
 	def _min_to_min_sec(self,mins):
 		if mins:
-			seconds = round(mins) * 60
+			seconds = mins * 60
 			mins,seconds = divmod(seconds,60)
 			mins = round(mins)
-			seconds = round(seconds)
+			if seconds < 59:
+				seconds = round(seconds)
+			else:
+				seconds = int(seconds)
 			if seconds < 10:
 				seconds = "{:02d}".format(seconds)
 			return "{}:{}".format(mins,seconds)
