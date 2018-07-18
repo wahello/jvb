@@ -1705,9 +1705,9 @@ class UserheartzoneView(APIView):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
 				classification = hr[key].get('classificaton')
-				avg_time = (sum(time)/no_days)*7
-				print(time,"eeeeeeeeeeeeeeeeeeeeeeeeeee")
-				total_duration.append(avg_time)
+				total_time = hr[key].get('total_duration',0)
+				avg_time = sum(time)
+				total_duration.append(total_time)
 				try:
 					percent_duration = sum(prcnt)/len(prcnt)
 					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
@@ -1721,7 +1721,7 @@ class UserheartzoneView(APIView):
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
-		heartzone_dic['total'] = (sum(total_duration)/no_days)*7
+		heartzone_dic['total'] = sum(total_duration)
 		print((sum(total_duration)),"total duration")
 		print((sum(total_duration)/no_days),"no of days")
 		print(((sum(total_duration)/no_days)*7),"averages total")
@@ -1761,6 +1761,7 @@ class UserAaView(APIView):
 		keys = ['avg_heart_rate','max_heart_rate','total_duration','duration_in_aerobic_range',
 				'percent_aerobic','duration_in_anaerobic_range','percent_anaerobic','duration_below_aerobic_range',
 				'percent_below_aerobic','duration_hrr_not_recorded','percent_hrr_not_recorded']
+		# Change below list, for time being I am using this
 		lists = [[],[],[],[],[],[],[],[],[],[],[]]
 		for aa in data_values:
 			aa = ast.literal_eval(aa)
@@ -1777,11 +1778,15 @@ class UserAaView(APIView):
 		except ValueError:
 			max_heart_rate = ""
 		
-		total_duration = ((sum(lists[2])/no_days)*7)
 		duration_in_aerobic_range = ((sum(lists[3])/no_days)*7)
 		duration_in_anaerobic_range = ((sum(lists[5])/no_days)*7)
 		duration_below_aerobic_range = ((sum(lists[7])/no_days)*7)
 		duration_hrr_not_recorded = ((sum(lists[9])/no_days)*7)
+		total_duration = (duration_in_aerobic_range+
+							duration_in_anaerobic_range+
+							duration_below_aerobic_range+
+							duration_hrr_not_recorded)
+		print(sum(lists[3]),"duration_in_aerobic_range")
 		try:
 			avg_heart_rate = sum(lists[0])/len(lists[0])
 			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
