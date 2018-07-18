@@ -55,12 +55,14 @@ class UserHrrView(generics.ListCreateAPIView):
 	def get_queryset(self):
 		user = self.request.user
 
-		end_dt = self.request.query_params.get('to',None)
-		start_dt = self.request.query_params.get('from', None)
+		# end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('start_date', None)
 
-		if start_dt and end_dt:
-			queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
-							  Q(created_at__lte=end_dt),
+		if start_dt:
+			# queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
+			# 				  Q(created_at__lte=end_dt),
+			# 				  user_hrr=user)
+			queryset = Hrr.objects.filter(created_at=start_dt,
 							  user_hrr=user)
 			
 		else:
@@ -1667,6 +1669,9 @@ def store_hhr(user,from_date,to_date):
 				create_hrr_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
 	return None
+
+
+
 
 class UserheartzoneView(APIView):
 
