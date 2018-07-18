@@ -1795,18 +1795,27 @@ class UserAaView(APIView):
 		duration_in_anaerobic_range = ((sum(lists[5])/no_days)*7)
 		duration_below_aerobic_range = ((sum(lists[7])/no_days)*7)
 		duration_hrr_not_recorded = ((sum(lists[9])/no_days)*7)
+		try:
+			avg_heart_rate = sum(lists[0])/len(lists[0])
+			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
 
-		percent_aerobic = (duration_in_aerobic_range/total_duration)*100
-		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+			percent_aerobic = (duration_in_aerobic_range/total_duration)*100
+			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
-		percent_anaerobic = (duration_in_anaerobic_range/total_duration)*100
-		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+			percent_anaerobic = (duration_in_anaerobic_range/total_duration)*100
+			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 
-		percent_below_aerobic = (duration_below_aerobic_range/total_duration)*100
-		percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+			percent_below_aerobic = (duration_below_aerobic_range/total_duration)*100
+			percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
-		percent_hrr_not_recorded = (duration_hrr_not_recorded/total_duration)*100
-		percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+			percent_hrr_not_recorded = (duration_hrr_not_recorded/total_duration)*100
+			percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+		except ZeroDivisionError:
+			avg_heart_rate = ""
+			percent_aerobic = ""
+			percent_anaerobic = ""
+			percent_below_aerobic = ""
+			percent_hrr_not_recorded = ""
 
 		total_data = {"avg_heart_rate":avg_heart_rate,
 					"max_heart_rate":max_heart_rate,
