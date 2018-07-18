@@ -51,6 +51,13 @@ class UserHrrView(generics.ListCreateAPIView):
 	'''
 	permission_classes = (IsAuthenticated,)
 	serializer_class = HrrSerializer
+	def calculate_aa_data(self,aa_data):
+		final_query = aa_data[0]
+		return final_query
+
+	def get(self,request,format="json"):
+		aa_data = self.calculate_aa_data(self.get_queryset())
+		return Response(aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
 		user = self.request.user
@@ -63,13 +70,12 @@ class UserHrrView(generics.ListCreateAPIView):
 			# 				  Q(created_at__lte=end_dt),
 			# 				  user_hrr=user)
 			queryset = Hrr.objects.filter(created_at=start_dt,
-							  user_hrr=user)
+							  user_hrr=user).values()
 			
 		else:
 			queryset = Hrr.objects.all()
-
 		return queryset
-
+		
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
 	heartrate_complete = []
