@@ -30,7 +30,7 @@ class LeaderboardCategories(object):
 			'resting_hr':"Resting Heart Rate",
 			'deep_sleep':"Deep Sleep",
 			'awake_time':"Awake Time",
-			'time_99':"Time To 99)",
+			'time_99':"Time To 99",
 			"pure_time_99":"Pure Time To 99",
 			"beat_lowered":"Heart Beats Lowered In 1st Minute",
 			"pure_beat_lowered":"Pure Heart Beats Lowered In 1st Minute"
@@ -86,7 +86,7 @@ class RankedScore(object):
 		'deep_sleep':'Deep Sleep Duration (hh:mm)',
 		'awake_time':'Awake Time Duration (hh:mm)',
 		'time_99':'Time To Reach 99',
-		'pure_time_99':'Pure Time To Reach 99 ',
+		'pure_time_99':'Pure Time To 99 ',
 		'beat_lowered':'Heart Beat Lowered In 1st Minute',
 		'pure_beat_lowered':'Pure Heart Beat Lowered In 1st Minute'
 	}
