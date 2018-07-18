@@ -125,6 +125,8 @@ class Dashboard extends Component {
 				<div className="social_login">
 				    <h3 id="link_style">User Inputs</h3>
 					 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
+					 <h3 id="link_style">Dashboards</h3>
+					  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>		
 					 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 					 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 					  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
@@ -178,8 +180,7 @@ class Dashboard extends Component {
 					  <h3 id="link_style">Other</h3>
 					  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
 					  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>
-					  <h3 id="link_style">Dashboards</h3>
-					  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>					 
+					  			 
 				</div>
 			</div>
 		);

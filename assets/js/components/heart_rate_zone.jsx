@@ -31,7 +31,7 @@ class HeartrateZone extends Component{
 				    dateRange:false,
 				    fetching_hrr_zone:false,
 				    selectedDate:new Date(),
-				    start_date:moment().subtract(7,'days').toDate(),
+				    start_date:moment().subtract(6,'days').toDate(),
 					end_date:moment().toDate(),
 				    hr_zone:{},
 				    weekly_aa_data:{},
@@ -134,10 +134,11 @@ class HeartrateZone extends Component{
 		}
 		return percentage;
 	}
+
   	processDate(selectedDate){
   		/*When we select a Date It will fetch the selected date value*/
   		let end_dt = moment(selectedDate);
-		let start_dt = moment(selectedDate).subtract(7,'days');
+		let start_dt = moment(selectedDate).subtract(6,'days');
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
@@ -191,6 +192,21 @@ class HeartrateZone extends Component{
 					else if(key == "prcnt_total_duration_in_zone"){
 						let keyvalue = this.renderpercentage(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "classificaton"){
+						let keyvalue = value[key];
+						if(keyvalue == "below_aerobic_zone"){
+							 td_values.push(<td>Below Aerobic Zone</td>);
+						}
+						else if(keyvalue == "aerobic_zone"){
+							td_values.push(<td>Aerobic Zone</td>);
+						}
+						else if(keyvalue == "anaerobic_zone"){
+							td_values.push(<td>Anaerobic Zone</td>);
+						}
+						else{
+							td_values.push(<td>{keyvalue}</td>);
+						}
 					}
 					else{
 						let keyvalue = value[key];
@@ -323,7 +339,7 @@ class HeartrateZone extends Component{
 	          	    	<table className = "table table-striped table-bordered ">
 		          	    	<thead>
 			          	    	<th>Heart Rate Zone Low End</th>
-			          	    	<th>Heart Rate Zone Heigh End</th>
+			          	    	<th>Heart Rate Zone High End</th>
 			          	    	<th>Classification</th>
 			          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
 			          	    	<th>% of Total Duration in Zone</th>

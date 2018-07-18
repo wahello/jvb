@@ -684,6 +684,10 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 
 	# merge user created manual activities which are not provided by garmin
 	if userinput_activities:
+		for activity in userinput_activities.values():
+			# Manually created activities will have extra key 'created_manually'
+			# which represents that it is manually created activity 
+			activity['created_manually'] = True
 		filtered_activities += userinput_activities.values()
 
 	return filtered_activities
@@ -1129,14 +1133,18 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 	)
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
-	total_steps = 0
-	exercise_steps = 0
+	garmin_total_steps = 0
+	garmin_non_activity_steps = 0
+	garmin_exec_steps = 0
+	garmin_non_exec_steps = 0
+	manual_exec_steps = 0
+	manual_non_exec_steps = 0
+
 	aerobic_zone = 180 - age - 30
 	if len(filtered_activities):
 		for obj in filtered_activities:
-
 			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
-			# If avgerage heart rate in beats per minute is not submitted by user
+			# If average heart rate in beats per minute is not submitted by user
 			# then it would be by default empty string. In that case default it to 0 
 			if not avg_hr:
 				avg_hr = 0
@@ -1151,14 +1159,35 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
 					or obj.get("steps_type","") == "exercise"):
-				# If activity heartrate is above or in aerobic zone and it's not HRR 
+				# If activity heart rate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
-				exercise_steps += steps
+				if obj.get('created_manually',False):
+					manual_exec_steps += steps
+				else:
+					garmin_exec_steps += steps
+			else:
+				if obj.get('created_manually',False):
+					manual_non_exec_steps += steps
+				else:
+					garmin_non_exec_steps += steps
 
 	if dailies_json:
-		total_steps = dailies_json[0].get('steps',0)
+		garmin_total_steps = dailies_json[0].get('steps',0)
 
-	return (exercise_steps, total_steps)
+	if (garmin_total_steps 
+		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps)):
+		garmin_non_activity_steps = (garmin_total_steps 
+			- garmin_exec_steps 
+			- garmin_non_exec_steps)
+	
+	total_exercise_steps = garmin_exec_steps + manual_exec_steps
+	total_non_exec_steps = (garmin_non_exec_steps 
+		+ manual_non_exec_steps 
+		+ garmin_non_activity_steps)
+
+	total_steps = total_exercise_steps + total_non_exec_steps
+
+	return (total_exercise_steps,total_non_exec_steps,total_steps)
 
 def _get_sleep_grade_from_point(point):
 	if point < 1:
@@ -2127,18 +2156,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
-		exercise_steps, total_steps = cal_exercise_steps_total_steps(
+		exercise_steps,non_exercise_steps,total_steps = cal_exercise_steps_total_steps(
 			dailies_json,
 			todays_activities_json,
 			todays_manually_updated_json,
 			userinput_activities,
 			user.profile.age()
 		)	
-		if ((not total_steps and exercise_steps) or (total_steps and total_steps < exercise_steps)):
-			# If total step s are 0 and exercise steps are available
-			# then we assume that total steps is equal to exercise steps
-			total_steps = exercise_steps
-		non_exercise_steps = total_steps - exercise_steps
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps

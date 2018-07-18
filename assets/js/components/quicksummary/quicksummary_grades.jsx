@@ -86,7 +86,7 @@ getStylesGpaBeforePanalities(score){
       else if (score >= 1 && score < 3)
         return {background:'yellow',color:'black'};
       else if (score >= 3)
-        return {background:'green',color:'black'};
+        return {background:'green',color:'white'};
     }
 userInputsColor(value){
   if(value == "No")

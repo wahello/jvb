@@ -31,7 +31,7 @@ def _get_activities_data(user,target_date):
 	activity_data = get_garmin_model_data(UserGarminDataActivity,
 		user, start_epoch,end_epoch,order_by = '-id')
 	manually_updated_activity_data = get_garmin_model_data(UserGarminDataManuallyUpdated,
-		user, start_epoch,end_epoch,order_by = '-id')
+		user, start_epoch,end_epoch,order_by = 'id')
 
 	#converting to python objects
 	activity_data = [ast.literal_eval(dic) for dic in activity_data]
@@ -121,6 +121,7 @@ def _get_activities(user,target_date):
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
+	
 	# heart_rate = [x for x in all_activities_heartrate if x != []]
 	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []
@@ -165,6 +166,9 @@ def _get_activities(user,target_date):
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 				else:
 					pass
+			finall = _create_activity_stat(user,act_obj,current_date)
+			final_act_data.update(finall)
+		else:
 			finall = _create_activity_stat(user,act_obj,current_date)
 			final_act_data.update(finall)
 	# print(final_act_data)
