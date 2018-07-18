@@ -1706,8 +1706,9 @@ class UserheartzoneView(APIView):
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
 				classification = hr[key].get('classificaton')
 				total_time = hr[key].get('total_duration',0)
-				avg_time = sum(time)
-				total_duration.append(total_time)
+				time_in_zone = hr[key].get('time_in_zone',0)
+				avg_time = (sum(time)/no_days)*7
+				total_duration.append(time_in_zone)
 				try:
 					percent_duration = sum(prcnt)/len(prcnt)
 					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
@@ -1721,10 +1722,7 @@ class UserheartzoneView(APIView):
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
-		heartzone_dic['total'] = sum(total_duration)
-		print((sum(total_duration)),"total duration")
-		print((sum(total_duration)/no_days),"no of days")
-		print(((sum(total_duration)/no_days)*7),"averages total")
+		heartzone_dic['total'] = (sum(total_duration)/no_days)*7	
 
 		return heartzone_dic
 
@@ -1786,7 +1784,6 @@ class UserAaView(APIView):
 							duration_in_anaerobic_range+
 							duration_below_aerobic_range+
 							duration_hrr_not_recorded)
-		print(sum(lists[3]),"duration_in_aerobic_range")
 		try:
 			avg_heart_rate = sum(lists[0])/len(lists[0])
 			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
