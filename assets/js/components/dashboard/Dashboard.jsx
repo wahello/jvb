@@ -129,6 +129,8 @@ class Dashboard extends Component {
 						    <div className="social-login-buttons">
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
+							 <h3 id="link_style">Dashboards</h3>
+				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>	
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 							  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
