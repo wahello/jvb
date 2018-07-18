@@ -16,7 +16,7 @@ import { getGarminToken,logoutUser} from '../network/auth';
 import {fetchHrrWeeklyData,fetchHrrWeeklyAaData}  from '../network/heartRate_zone';
 import {renderTimeTohrrZoneSelectedDateFetchOverlay} from './dashboard_healpers';
 
-axiosRetry(axios, { retries: 3});
+axiosRetry(axios, { retries: 3});  
 
 
 var CalendarWidget = require('react-calendar-widget');
@@ -180,9 +180,14 @@ class HeartrateZone extends Component{
 	renderTable(data){
 		/*Creating table data and columns dynamically for Heart Rate zone table*/
 		var td_rows = [];
+		let total = null;
+		if(!_.isEmpty(data)){
+			total = data.total;
+		}
 		let keys = ["heart_rate_zone_low_end","heart_rate_zone_high_end","classificaton", 
 		"time_in_zone","prcnt_total_duration_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
+			if(key1 !== "total"){
 				let td_values = [];
 				for(let key of keys){
 					if(key == "time_in_zone"){
@@ -213,7 +218,16 @@ class HeartrateZone extends Component{
 						td_values.push(<td>{keyvalue}</td>);
 					}
 				}
-				td_rows.push(<tr>{td_values}</tr>);	
+				td_rows.push(<tr>{td_values}</tr>);
+			}	
+		}
+		if(total){
+			let td_values = [
+				<td colSpan="3">{"Total"}</td>,
+				<td>{this.renderTime(total)}</td>,
+				<td>100%</td>
+			];
+			td_rows.push(<tr>{td_values}</tr>);
 		}
 		return td_rows;
 	}
