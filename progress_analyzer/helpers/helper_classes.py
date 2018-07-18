@@ -328,7 +328,7 @@ class ProgressReport():
 
 	def _min_to_min_sec(self,mins):
 		if mins:
-			seconds = mins * 60
+			seconds = round(mins) * 60
 			mins,seconds = divmod(seconds,60)
 			mins = round(mins)
 			seconds = round(seconds)
