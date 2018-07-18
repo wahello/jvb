@@ -51,6 +51,7 @@ class HeartrateZone extends Component{
 	 	this.errorHrrWeeklyAaData = this.errorHrrWeeklyAaData.bind(this);
 	 	this.renderTableWeeklyAaData = this.renderTableWeeklyAaData.bind(this);
 	 	this.renderTimeTohrrZoneSelectedDateFetchOverlay = renderTimeTohrrZoneSelectedDateFetchOverlay.bind(this);
+	 	this.numberOfDays = this.numberOfDays.bind(this);
 	}
 
 	successHeartrateZone(data){
@@ -151,7 +152,19 @@ class HeartrateZone extends Component{
 			fetchHrrWeeklyAaData(this.state.start_date, this.state.end_date,this.successHrrWeeklyAaData,this.errorHrrWeeklyAaData);
 		});
 	}
-
+	numberOfDays(st_date,ed_date){
+		var startDate = moment(ed_date);
+		var endDate = moment(st_date);
+		var no_of_days = Math.abs(startDate.diff(endDate, 'days'))+1;
+		let modal;
+		if(no_of_days > 7){
+			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>(7 day averages over {no_of_days} days period)</span>
+		}
+		else{
+			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>(7 days)</span>
+		}
+		return modal;
+	}
 	onSubmitDate(event){
 		/*It will fetch the custom date values when we gave the range of dates*/
   	event.preventDefault();
@@ -280,7 +293,7 @@ class HeartrateZone extends Component{
                 	<span  onClick={this.toggleDate} id="daterange" style={{fontWeight:"bold",marginTop:"10px",marginLeft:"10px"}}>
 				        {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 			        </span>
-			        
+			        {this.numberOfDays(this.state.start_date,this.state.end_date)}
 	            	<Popover
 			            placement="bottom"
 			            isOpen={this.state.calendarOpen}

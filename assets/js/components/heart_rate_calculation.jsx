@@ -295,7 +295,7 @@ class HeartRateCal extends Component{
 				          	    </tr>
 
 				          	    <tr className = "hr_table_style_rows">
-					          	    <td className = "hr_table_style_rows">Heart Rate End Time Activity</td>
+					          	    <td className = "hr_table_style_rows">Heart Rate at End of Activity</td>
 									<td className = "hr_table_style_rows">{this.state.end_heartrate_activity}</td>
 				          	    </tr>
 
