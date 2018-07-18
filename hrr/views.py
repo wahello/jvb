@@ -1099,6 +1099,8 @@ def aa_low_high_end_data(user,start_date):
 
 
 	activities = []
+	hrr_summary_id = []
+	workout_summary_id = []
 	id_act = 0
 	if user_input_strong:
 		for tmp in user_input_strong:
@@ -1111,30 +1113,33 @@ def aa_low_high_end_data(user,start_date):
 					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
 						id_act = int(di[i]['summaryId'])
 						activities.append(di[i])
+						hrr_summary_id.append(di[i]['summaryId'])
+					else:
+						workout_summary_id.append(di[i]['summaryId'])
 
 	workout = []
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user= user,created_at__range=[start,end])
-	if a1:
+	if activities and a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-
+			if str(data_id) in workout_summary_id:
+				workout.append(tmp)
+			elif str(data_id) in hrr_summary_id	:
+				hrr.append(tmp)
+	elif a1:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
 			if str(data_id) in ui_data_keys:
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
-				hrr.append(tmp)
-			# for i,k in enumerate(activity_files):
-			# 	activity_files_dict = ast.literal_eval(activity_files[i])
-			# 	if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-			# 		hrr.append(tmp)
-			# 	elif activity_files_dict.get("summaryId",None) == str(data_id) :
-			# 		workout.append(tmp)
-
-
+				hrr.append(tmp)				
 	profile = Profile.objects.filter(user=user)
 	if profile:
 		for tmp_profile in profile:
@@ -1694,13 +1699,14 @@ class UserheartzoneView(APIView):
 				li_time.append(duration_in_zone)
 				percent_in_zone = hr[key].get('prcnt_total_duration_in_zone',0)
 				li_prcnt.append(percent_in_zone)
-
+		total_duration = []
 		for hr in hr_values:
 			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
 				classification = hr[key].get('classificaton')
 				time = sum(time)
+				total_duration.append(time)
 				try:
 					percent_duration = sum(prcnt)/len(prcnt)
 					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
@@ -1714,6 +1720,7 @@ class UserheartzoneView(APIView):
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
+			heartzone_dic['total'] = sum(total_duration)
 		return heartzone_dic
 
 
