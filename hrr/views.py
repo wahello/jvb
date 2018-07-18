@@ -1677,7 +1677,7 @@ class UserheartzoneView(APIView):
 
 	permission_classes = (IsAuthenticated,)
 	serializer_class = HeartzoneSerializer
-	def calculate_weekly_zone_data(self,zone_weekly_qs):
+	def calculate_weekly_zone_data(self,zone_weekly_qs,no_days):
 		hr_data_values = [hr_data.data for hr_data in zone_weekly_qs]
 		hr_values = []
 		for hr in hr_data_values:
@@ -1705,8 +1705,9 @@ class UserheartzoneView(APIView):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
 				classification = hr[key].get('classificaton')
-				time = sum(time)
-				total_duration.append(time)
+				avg_time = (sum(time)/no_days)*7
+				print(time,"eeeeeeeeeeeeeeeeeeeeeeeeeee")
+				total_duration.append(avg_time)
 				try:
 					percent_duration = sum(prcnt)/len(prcnt)
 					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
@@ -1716,16 +1717,21 @@ class UserheartzoneView(APIView):
 				heartzone_data = {"heart_rate_zone_low_end":low_end,
 								  "heart_rate_zone_high_end":high_end,
 								  "classificaton":classification,
-								  "time_in_zone":time,
+								  "time_in_zone":avg_time,
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
-			heartzone_dic['total'] = sum(total_duration)
+		heartzone_dic['total'] = (sum(total_duration)/no_days)*7
+		print((sum(total_duration)),"total duration")
+		print((sum(total_duration)/no_days),"no of days")
+		print(((sum(total_duration)/no_days)*7),"averages total")
+
 		return heartzone_dic
 
 
 	def get(self,request,format="json"):
-		weekly_zone_data = self.calculate_weekly_zone_data(self.get_queryset())
+		weekly_queryset,no_days = self.get_queryset()
+		weekly_zone_data = self.calculate_weekly_zone_data(weekly_queryset,no_days)
 		return Response(weekly_zone_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
@@ -1733,6 +1739,9 @@ class UserheartzoneView(APIView):
 
 		end_dt = self.request.query_params.get('to',None)
 		start_dt = self.request.query_params.get('from', None)
+		start_date_obj = datetime.strptime(start_dt, "%Y-%m-%d")
+		end_dt_obj = datetime.strptime(end_dt, "%Y-%m-%d")
+		no_days = (end_dt_obj.date() - start_date_obj.date())+timedelta(days=1)
 
 		if start_dt and end_dt:
 			queryset = TimeHeartZones.objects.filter(Q(created_at__gte=start_dt)&
@@ -1741,7 +1750,7 @@ class UserheartzoneView(APIView):
 		else:
 			queryset = TimeHeartZones.objects.all()
 		
-		return queryset
+		return (queryset,no_days.days)
 
 class UserAaView(APIView):
 	permission_classes = (IsAuthenticated,)
@@ -1763,28 +1772,6 @@ class UserAaView(APIView):
 				for key,li in zip(keys,lists):
 					aa_values = aa_totals[key]
 					li.append(aa_values)
-		try:
-			avg_heart_rate = sum(lists[0])/len(lists[0])
-			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
-			
-			# percent_aerobic = sum(lists[4])/len(lists[4])
-			# percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
-
-			# percent_anaerobic = sum(lists[6])/len(lists[6])
-			# percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
-
-			# percent_below_aerobic = sum(lists[8])/len(lists[8])
-			# percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
-
-			# percent_hrr_not_recorded = sum(lists[10])/len(lists[10])
-			# percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
-
-		except ZeroDivisionError:
-			avg_heart_rate = ""
-			percent_aerobic = ""
-			percent_anaerobic = ""
-			percent_below_aerobic = ""
-			percent_hrr_not_recorded = ""
 		try:
 			max_heart_rate = max(lists[1])
 		except ValueError:
