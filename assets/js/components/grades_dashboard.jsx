@@ -233,7 +233,7 @@ class Grades_Dashboard extends Component{
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
 					        <CardBody>
-					          	<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week Grade</CardTitle>
+					          	<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week</CardTitle>
 					          	<hr className = "hr_style"
 					          		id = "hr-style" 
 					          		style = {{background:hr_background}}/>
