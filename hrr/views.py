@@ -1013,7 +1013,7 @@ def daily_aa_data(user, start_date):
 		return ({})
 
 def update_aa_instance(user,start_date,data):
-	AaCalculations.objects.filter(
+	user = AaCalculations.objects.filter(
 			user_aa=user, created_at=start_date).update(data=data)
 
 def create_aa_instance(user, data, start_date):
