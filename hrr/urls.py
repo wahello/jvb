@@ -2,7 +2,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-	url(r'^hrr_calculations$',views.hrr_calculations,
+	url(r'^refresh/hrr_calculations$',views.hrr_calculations,
 								  name="hrr"),
 	url(r'^aa_calculations$',views.aa_calculations,
 								  name="aa"),
@@ -14,6 +14,6 @@ urlpatterns = [
 									name="aa_classification chart"),	
 	url(r'^user/weekly_aa_data$',views.UserAaView.as_view(),name="weekly_aa_api"),
 	url(r'^user/heartzone_data$',views.UserheartzoneView.as_view(),name="hearzone_api"),
-	url(r'^user/hrr_data$',views.UserHrrView.as_view(),
+	url(r'^hrr_calculations$',views.UserHrrView.as_view(),
 								  name="hrr_api"),
 ]
