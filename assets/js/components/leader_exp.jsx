@@ -67,8 +67,25 @@ const categoryMeta = {
 		short_name:"floor_climbed",
 		url_name:"floor-climbed"
 	},
+	"Heart Beats Lowered In 1st Minute":{
+		short_name:"beat_lowered",
+		url_name:"beat-lowered"
+	},
+	"Pure Heart Beats Lowered In 1st Minute":{
+		short_name:"pure_beat_lowered",
+		url_name:"pure-beat-lowered"
+	},
+	"Pure Time To 99":{
+		short_name:"pure_time_99",
+		url_name:"pure-time-99"
+	},
+	"Time To 99":{
+		short_name:"time_99",
+		url_name:"time-99"
+	},
 };
-const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","nes","floor_climbed",];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr",
+"deep_sleep","nes","floor_climbed","beat_lowered","pure_beat_lowered","pure_time_99","time_99",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
 class LeaderBoard1 extends Component{
@@ -497,9 +514,43 @@ class LeaderBoard1 extends Component{
 	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
 	  							  className = "lb_table_style_rows">
 	  							  {"Floors Climbed"}</td>);
-	    }					
+	    }
+	    else if(category == "Heart Beats Lowered In 1st Minute"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Heart Beats Lowered In 1st Minute"}</td>);
+	    }
+	     else if(category == "Pure Heart Beats Lowered In 1st Minute"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Pure Heart Beats Lowered In 1st Minute"}</td>);
+	    }
+	     else if(category == "Pure Time To 99"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Pure Time To 99"}</td>);
+	    }
+	     else if(category == "Time To 99"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Time To 99"}</td>);
+	    }									
 	  	for(let score of scores){
 	  		if(category == "Total Steps"){
+	  			var value = score;
+	  		    if(value != undefined){
+	                value += '';
+	                var x = value.split('.');
+	                var x1 = x[0];
+	                var x2 = x.length > 1 ? '.' + x[1] : '';
+	                var rgx = /(\d+)(\d{3})/;
+	                while (rgx.test(x1)) {
+	            			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	          		}
+	                scoreTableData.push(<td className="lb_table_style_rows">{x1 + x2}</td>);
+    	        }
+	  		}
+	  		else if(category == "Non Exercise Steps"){
 	  			var value = score;
 	  		    if(value != undefined){
 	                value += '';
@@ -875,6 +926,34 @@ class LeaderBoard1 extends Component{
 		        <div className = "row justify-content-center lb_table_style">
 			        <div className = "table table-responsive">
 			        	{this.renderTablesTd(this.state.ranking_data.floor_climbed,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.beat_lowered,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.pure_beat_lowered,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		     {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.pure_time_99,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.time_99,this.state.duration_date)}
 			        </div>
 		        </div>
 		    }

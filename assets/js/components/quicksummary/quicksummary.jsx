@@ -17,7 +17,7 @@ import _ from 'lodash';
 import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {getInitialState} from './initialState';
-import {getInitialStateUserInput} from './initialStateUser';
+import {getInitialStateUserInput} from './initialStateUser';  
 import {getInitialStateHrr} from './initialStateHrr';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
 import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync,hrrDate}  from '../../network/quick';
@@ -1014,7 +1014,7 @@ onLogoutSuccess(response){
 						    						 onClick={this.activateTab.bind(this,"swim")}>Swim Stats</DropdownItem>		 		  
 						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser" className={class_user} value="user"
 						    		 				onClick={this.activateTab.bind(this,"user")}>User Inputs</DropdownItem>
-						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="dropuser"className={class_hrr} value="hrr"
+						    		 		  <DropdownItem style={{paddingLeft:"30px"}} id="drophrr"className={class_hrr} value="hrr"
 						    								 onClick={this.activateTab.bind(this,"hrr")}>Heart Rate Recovery</DropdownItem>
 									        </DropdownMenu>
 									    </Dropdown>

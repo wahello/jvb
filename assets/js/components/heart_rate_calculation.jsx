@@ -13,7 +13,8 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
-import fetchHeartData  from '../network/heart_cal';
+import fetchHeartData from '../network/heart_cal';
+import {fetchHeartRefreshData} from '../network/heart_cal';
 import {renderHrrSelectedDateFetchOverlay} from './dashboard_healpers';
 
 axiosRetry(axios, { retries: 3});
@@ -61,6 +62,7 @@ class HeartRateCal extends Component{
 			this.renderSecToMin = this.renderSecToMin.bind(this);
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
+			this.hrrRefreshData = this.hrrRefreshData.bind(this);
   	}
 
 	successHeart(data){
@@ -130,7 +132,12 @@ class HeartRateCal extends Component{
 		});
 		
 	}
-
+	hrrRefreshData(){
+		this.setState({
+			fetching_hrr:true,
+		});
+		fetchHeartRefreshData(this.successHeart,this.errorHeart,this.state.selectedDate);
+	}
 	componentDidMount(){
 		this.setState({
 			fetching_hrr:true,
@@ -206,7 +213,7 @@ class HeartRateCal extends Component{
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
-		        <div className="row" style = {{marginTop:"10px"}}>
+		        <div style = {{marginTop:"10px"}}>
 	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
 	                    <FontAwesome
 	                        name = "calendar"
@@ -214,7 +221,10 @@ class HeartRateCal extends Component{
 	                    />
 	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
-                	</span> 
+                	</span>
+                	<span className = "button_padding">
+                    	<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
+                	</span>
 	            	<Popover
 			            placement="bottom"
 			            isOpen={this.state.calendarOpen}
@@ -295,7 +305,7 @@ class HeartRateCal extends Component{
 				          	    </tr>
 
 				          	    <tr className = "hr_table_style_rows">
-					          	    <td className = "hr_table_style_rows">Heart Rate End Time Activity</td>
+					          	    <td className = "hr_table_style_rows">Heart Rate at End of Activity</td>
 									<td className = "hr_table_style_rows">{this.state.end_heartrate_activity}</td>
 				          	    </tr>
 

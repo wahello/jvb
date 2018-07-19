@@ -61,7 +61,7 @@ class FitbitNotifications(models.Model):
 		("activities","Activities"),
 		("body","Body"),
 		("foods","Foods"),
-		("sleeps","Sleeps"),
+		("sleep","Sleeps"),
 	)
 	user = models.ForeignKey('auth.user',on_delete=models.CASCADE,
 	 related_name="fitbit_notification")

@@ -7,12 +7,12 @@ axiosRetry(axios, { retries: 3});
 
 export default function fetchFitBitData(successFitBit, errorFitBit,selectedDate){
 	selectedDate = moment(selectedDate);
-	console.log(selectedDate.format('MM-DD-YYYY'));
+	console.log(selectedDate.format('YYYY-MM-DD'));
 	const URL = `/fitbit/fetching_data_fitbit`;
 	const config = {
 		method: "get",
 		params:{
-				start_date: selectedDate.format('MM-DD-YYYY'),
+				start_date: selectedDate.format('YYYY-MM-DD'),
 			},
 		url: URL,
 		withCredentials: true

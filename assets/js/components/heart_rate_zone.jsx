@@ -16,7 +16,7 @@ import { getGarminToken,logoutUser} from '../network/auth';
 import {fetchHrrWeeklyData,fetchHrrWeeklyAaData}  from '../network/heartRate_zone';
 import {renderTimeTohrrZoneSelectedDateFetchOverlay} from './dashboard_healpers';
 
-axiosRetry(axios, { retries: 3});
+axiosRetry(axios, { retries: 3});  
 
 
 var CalendarWidget = require('react-calendar-widget');
@@ -31,7 +31,7 @@ class HeartrateZone extends Component{
 				    dateRange:false,
 				    fetching_hrr_zone:false,
 				    selectedDate:new Date(),
-				    start_date:moment().subtract(7,'days').toDate(),
+				    start_date:moment().subtract(6,'days').toDate(),
 					end_date:moment().toDate(),
 				    hr_zone:{},
 				    weekly_aa_data:{},
@@ -51,6 +51,7 @@ class HeartrateZone extends Component{
 	 	this.errorHrrWeeklyAaData = this.errorHrrWeeklyAaData.bind(this);
 	 	this.renderTableWeeklyAaData = this.renderTableWeeklyAaData.bind(this);
 	 	this.renderTimeTohrrZoneSelectedDateFetchOverlay = renderTimeTohrrZoneSelectedDateFetchOverlay.bind(this);
+	 	this.numberOfDays = this.numberOfDays.bind(this);
 	}
 
 	successHeartrateZone(data){
@@ -134,10 +135,11 @@ class HeartrateZone extends Component{
 		}
 		return percentage;
 	}
+
   	processDate(selectedDate){
   		/*When we select a Date It will fetch the selected date value*/
   		let end_dt = moment(selectedDate);
-		let start_dt = moment(selectedDate).subtract(7,'days');
+		let start_dt = moment(selectedDate).subtract(6,'days');
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
@@ -150,7 +152,19 @@ class HeartrateZone extends Component{
 			fetchHrrWeeklyAaData(this.state.start_date, this.state.end_date,this.successHrrWeeklyAaData,this.errorHrrWeeklyAaData);
 		});
 	}
-
+	numberOfDays(st_date,ed_date){
+		var startDate = moment(ed_date);
+		var endDate = moment(st_date);
+		var no_of_days = Math.abs(startDate.diff(endDate, 'days'))+1;
+		let modal;
+		if(no_of_days > 7){
+			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>(7 day averages over {no_of_days} days period)</span>
+		}
+		else{
+			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>(7 days)</span>
+		}
+		return modal;
+	}
 	onSubmitDate(event){
 		/*It will fetch the custom date values when we gave the range of dates*/
   	event.preventDefault();
@@ -179,9 +193,14 @@ class HeartrateZone extends Component{
 	renderTable(data){
 		/*Creating table data and columns dynamically for Heart Rate zone table*/
 		var td_rows = [];
+		let total = null;
+		if(!_.isEmpty(data)){
+			total = data.total;
+		}
 		let keys = ["heart_rate_zone_low_end","heart_rate_zone_high_end","classificaton", 
 		"time_in_zone","prcnt_total_duration_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
+			if(key1 !== "total"){
 				let td_values = [];
 				for(let key of keys){
 					if(key == "time_in_zone"){
@@ -192,12 +211,36 @@ class HeartrateZone extends Component{
 						let keyvalue = this.renderpercentage(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);
 					}
+					else if(key == "classificaton"){
+						let keyvalue = value[key];
+						if(keyvalue == "below_aerobic_zone"){
+							 td_values.push(<td>Below Aerobic Zone</td>);
+						}
+						else if(keyvalue == "aerobic_zone"){
+							td_values.push(<td>Aerobic Zone</td>);
+						}
+						else if(keyvalue == "anaerobic_zone"){
+							td_values.push(<td>Anaerobic Zone</td>);
+						}
+						else{
+							td_values.push(<td>{keyvalue}</td>);
+						}
+					}
 					else{
 						let keyvalue = value[key];
 						td_values.push(<td>{keyvalue}</td>);
 					}
 				}
-				td_rows.push(<tr>{td_values}</tr>);	
+				td_rows.push(<tr>{td_values}</tr>);
+			}	
+		}
+		if(total){
+			let td_values = [
+				<td colSpan="3">{"Total"}</td>,
+				<td>{this.renderTime(total)}</td>,
+				<td>100%</td>
+			];
+			td_rows.push(<tr>{td_values}</tr>);
 		}
 		return td_rows;
 	}
@@ -250,7 +293,7 @@ class HeartrateZone extends Component{
                 	<span  onClick={this.toggleDate} id="daterange" style={{fontWeight:"bold",marginTop:"10px",marginLeft:"10px"}}>
 				        {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 			        </span>
-			        
+			        {this.numberOfDays(this.state.start_date,this.state.end_date)}
 	            	<Popover
 			            placement="bottom"
 			            isOpen={this.state.calendarOpen}
@@ -323,7 +366,7 @@ class HeartrateZone extends Component{
 	          	    	<table className = "table table-striped table-bordered ">
 		          	    	<thead>
 			          	    	<th>Heart Rate Zone Low End</th>
-			          	    	<th>Heart Rate Zone Heigh End</th>
+			          	    	<th>Heart Rate Zone High End</th>
 			          	    	<th>Classification</th>
 			          	    	<th>Time in Zone(hh:mm:ss) for thr Last 7 Days</th>
 			          	    	<th>% of Total Duration in Zone</th>
