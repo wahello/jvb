@@ -1348,6 +1348,14 @@ def hrr_data(user,start_date):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 	
+	ui_data = _get_activities(user,start_date_str)
+	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
+	ui_data_hrr = []
+	for ui_data_single in ui_data.values():
+		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
+			summaryId = ui_data_single['summaryId']
+			ui_data_keys.remove(summaryId)
+			ui_data_hrr.append(summaryId)
 	count = 0
 	id_act = 0
 	activities = []
@@ -1399,12 +1407,10 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
-				for i,k in enumerate(activity_files):
-					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-						hrr.append(tmp)
-					elif activity_files_dict.get("summaryId",None) == str(data_id) :
-						workout.append(tmp)
+				if str(data_id) in ui_data_keys:
+					workout.append(tmp)
+				elif str(data_id) in ui_data_hrr:
+					hrr.append(tmp)
 	except:
 		logging.exception("message")
 	if workout:
