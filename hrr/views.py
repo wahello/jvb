@@ -188,9 +188,11 @@ def aa_data(user,start_date):
 
 	hrr_not_recorded_list = []
 	hrr_recorded = []
+	activities_summary_id = []
 	if activity_files:
 		for i in range(len(activity_files)):
 			one_activity_file_dict =  ast.literal_eval(activity_files[i])
+			activities_summary_id.append(one_activity_file_dict['summaryId'])
 			if 'averageHeartRateInBeatsPerMinute' in one_activity_file_dict.keys():
 				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or ''):
 					hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
@@ -198,8 +200,6 @@ def aa_data(user,start_date):
 			else:
 				hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
 				hrr_not_recorded_list.append(hrr_not_recorded_time)
-	if hrr_not_recorded_list:
-		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
@@ -229,6 +229,8 @@ def aa_data(user,start_date):
 		user_input__user = user).order_by('-user_input__created_at')
 
 	activities = []
+	user_input_keys = []
+	created_activity_dict = {}
 	id_act = 0
 	if user_input_strong:
 		for tmp in user_input_strong:
@@ -238,10 +240,20 @@ def aa_data(user,start_date):
 				di = sn.values()
 				di = list(di)
 				for i,k in enumerate(di):
+					user_input_keys.append(di[i]['summaryId'])
+					user_input_summary_id = list(set(user_input_keys))
+					created_activity = list(set(
+						user_input_summary_id) - set(activities_summary_id))
+					if created_activity and di[i]['summaryId'] in created_activity:
+						summayid = di[i]['summaryId']
+						created_activity_dict[summayid] = k
 					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
 						id_act = int(di[i]['summaryId'])
 						activities.append(di[i])
-
+	for single_activity in created_activity_dict.values():
+		hrr_not_recorded_list.append(single_activity.get('durationInSeconds',0))
+	if hrr_not_recorded_list:
+		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 	workout = []
 	hrr = []
 	start = start_date
@@ -328,10 +340,10 @@ def aa_data(user,start_date):
 		time_in_below_aerobic = sum(below_aerobic_list)
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
-		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 		if hrr_not_recorded_list:
-			hrr_not_recorded = hrr_not_recorded_seconds
-
+			total_time =  hrr_not_recorded_seconds+time_in_aerobic+time_in_below_aerobic+time_in_anaerobic 
+		else:
+			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100
 			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -342,7 +354,7 @@ def aa_data(user,start_date):
 			percent_aerobic = (time_in_aerobic/total_time)*100
 			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 			if hrr_not_recorded_list:
-				percent_hrr_not_recorded = (hrr_not_recorded/total_time)*100
+				percent_hrr_not_recorded = (hrr_not_recorded_seconds/total_time)*100
 				percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
 			
 			total_percent = 100
@@ -361,7 +373,7 @@ def aa_data(user,start_date):
 					"aerobic_range":aerobic_range,
 					"anaerobic_range":anaerobic_range,
 					"below_aerobic_range":below_aerobic_range,
-					"hrr_not_recorded":hrr_not_recorded,
+					"hrr_not_recorded":hrr_not_recorded_seconds,
 					"percent_hrr_not_recorded":percent_hrr_not_recorded,
 					"percent_aerobic":percent_aerobic,
 					"percent_below_aerobic":percent_below_aerobic,
@@ -582,7 +594,7 @@ def aa_workout_data(user,start_date):
 			workout_type = workout['activityType']
 			duration = workout['durationInSeconds']
 			time_duration.append(duration)
-			avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute',0)
+			avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute')
 			heart_rate.append(avg_heart_rate)
 			max_heart_rate = workout.get('maxHeartRateInBeatsPerMinute',0)
 			max_hrr.append(max_heart_rate)
@@ -618,6 +630,7 @@ def aa_workout_data(user,start_date):
 				data['prcnt_hrr_not_recorded'] = prcnt_hrr_not_recorded
 
 		try:
+			heart_rate = [x for x in heart_rate if x != '']
 			avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
 			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
 		except ZeroDivisionError:
