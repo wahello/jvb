@@ -474,7 +474,7 @@ class Grades_Dashboard extends Component{
 	                hr_background = 'black';
 	        }
 	    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
-	    	 || (this.strToSecond("11:30")<=value && value<= this.strToSecond("12:00"))){
+	    	 || (this.strToSecond("11:00")<value && value<= this.strToSecond("12:00"))){
 	    		 	background = '#FF0101';
 	                color = 'black';
 	                hr_background = 'black';
