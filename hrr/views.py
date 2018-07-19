@@ -667,9 +667,10 @@ def aa_workout_calculations(request):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user_aa = AaWorkoutCalculations.objects.get(
+			user_obj = AaWorkoutCalculations.objects.get(
 				user_aa_workout=request.user, created_at=start_date)
-			update_workout_instance(request.user,start_date,data)
+			user_obj.data = data
+			user_obj.save()
 		except AaWorkoutCalculations.DoesNotExist:
 			create_workout_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -1027,9 +1028,10 @@ def daily_aa_calculations(request):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user_aa = AaCalculations.objects.get(
+			user_obj = AaCalculations.objects.get(
 				user_aa=request.user, created_at=start_date)
-			update_aa_instance(request.user,start_date,data)
+			user_obj.data = data
+			user_obj.save()
 		except AaCalculations.DoesNotExist:
 			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -1224,9 +1226,10 @@ def aa_low_high_end_calculations(request):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user = TimeHeartZones.objects.get(
+			user_obj = TimeHeartZones.objects.get(
 				user=request.user, created_at=start_date)
-			update_heartzone_instance(request.user, start_date,data)
+			user_obj.data = data
+			user_obj.save()
 		except TimeHeartZones.DoesNotExist:
 			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -1723,7 +1726,6 @@ class UserheartzoneView(APIView):
 								  }
 				heartzone_dic[low_end] = heartzone_data
 		heartzone_dic['total'] = (sum(total_duration)/no_days)*7	
-
 		return heartzone_dic
 
 
