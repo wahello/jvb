@@ -680,13 +680,13 @@ class LeaderboardOverview(object):
 						elif catg == 'time_99':
 							score = data['other']['hrr_time_to_99']['custom_range'][str_range]['data']
 							if score and score != "Not Provided":
-								score = _str_to_hours_min_sec(score,time_pattern="mm:ss") if score else score
+								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score))
 						elif catg == 'pure_time_99':
 							score = data['other']['hrr_pure_time_to_99']['custom_range'][str_range]['data']
 							if score and score != "Not Provided":
-								score = _str_to_hours_min_sec(score,time_pattern="mm:ss") if score else score
+								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score))
 						elif catg == 'beat_lowered':
