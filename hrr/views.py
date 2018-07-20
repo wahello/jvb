@@ -40,6 +40,7 @@ from hrr.models import Hrr,\
 						AA
 from .serializers import HrrSerializer
 import pprint
+# from hrr.calculation_helper import week_date
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -96,6 +97,33 @@ class UserHrrView(generics.ListCreateAPIView):
 			
 		else:
 			queryset = Hrr.objects.all()
+		return queryset
+
+class UserHrrViewRawData(generics.ListCreateAPIView):
+	'''
+		- Create the Hrr instance
+		- List all the Hrr instance
+		- If query parameters "to" and "from" are provided
+		  then filter the Hrr data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = HrrSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
+
+		if start_dt and end_dt:
+			queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
+							  Q(created_at__lte=end_dt),
+							  user_hrr=user)
+			
+		else:
+			queryset = Hrr.objects.all()
+
 		return queryset
 
 # Parse the fit files and return the heart beat and timstamp
@@ -1890,3 +1918,9 @@ class UserAaView(APIView):
 			queryset = AaCalculations.objects.all()
 		return (queryset,no_days.days)
 
+def weekly_workout_summary(request):
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	week_start_date,week_end_date = week_date(start_date)
+	print(week_start_date,week_end_date,"week datesaaaaaaaaaaaaaaaaaaaaaaaa")
+	return JsonResponse({"test":"cool"})
