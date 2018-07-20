@@ -56,7 +56,7 @@ def refresh_token_for_notification(user):
 	token_object = ''
 	try: 
 		token_object = FitbitConnectToken.objects.get(user=user)
-		token_object.refresh_token=request_data_json['refresh_token'],
+		token_object.refresh_token=request_data_json['refresh_token']
 		token_object.access_token=request_data_json['access_token']
 		token_object.save()
 	except:

@@ -16,4 +16,6 @@ urlpatterns = [
 	url(r'^user/heartzone_data$',views.UserheartzoneView.as_view(),name="hearzone_api"),
 	url(r'^hrr_calculations$',views.UserHrrView.as_view(),
 								  name="hrr_api"),
+	url(r'^raw_data/hrr_calculations$',views.UserHrrViewRawData.as_view(),
+								  name="hrr_api_raw_data"),
 ]
