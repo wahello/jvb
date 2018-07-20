@@ -2,6 +2,7 @@ import json
 import ast
 import time
 import logging
+import collections
 from datetime import datetime,timedelta,date
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -40,7 +41,11 @@ from hrr.models import Hrr,\
 						AA
 from .serializers import HrrSerializer
 import pprint
-from hrr.calculation_helper import week_date
+from hrr.calculation_helper import week_date,\
+									get_weekly_workouts,\
+									get_weekly_aa,\
+									weekly_workout_calculations,\
+									weekly_aa_calculations
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -1895,5 +1900,19 @@ def weekly_workout_summary(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	week_start_date,week_end_date = week_date(start_date)
-	print(week_start_date,week_end_date,"week datesaaaaaaaaaaaaaaaaaaaaaaaa")
+	print("start date",week_start_date,"end date",week_end_date)
+	weekly_workouts_query = get_weekly_workouts(
+		request.user,week_start_date,week_end_date)
+
+	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
+	final_workout_data = weekly_workout_calculations(weekly_workout)
+	print(final_workout_data,"final_workout_data dict")
+	
+	weekly_aa_query = get_weekly_aa(
+		request.user,week_start_date,week_end_date)
+	
+	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
+	weekly_aa_calculations(weekly_aa)
+	# print(final_aa_data,"final_workout_data dict")
+	
 	return JsonResponse({"test":"cool"})

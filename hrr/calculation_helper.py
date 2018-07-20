@@ -1,6 +1,10 @@
 from datetime import datetime,timedelta,date
 import time
+import ast
+import collections
+from django.db.models import Q
 
+from hrr.models import AaWorkoutCalculations,AaCalculations
 from fitparse import FitFile
 
 
@@ -80,3 +84,60 @@ def week_date(start_date):
 		days = start_date.weekday()+1)
 	return(week_start_date,week_end_date)
 
+def get_weekly_workouts(user,start_date,end_date):
+	'''
+		Get week workout data
+	'''
+	queryset = AaWorkoutCalculations.objects.filter(Q(created_at__gte=start_date)&
+							  Q(created_at__lte=end_date),
+							  user_aa_workout=user)
+	# print(queryset,"weekly workout data")
+	return queryset
+
+def get_weekly_aa(user,start_date,end_date):
+	'''
+		Get week Aerobic and anarobic zone data
+	'''
+	queryset = AaCalculations.objects.filter(Q(created_at__gte=start_date)&
+							  Q(created_at__lte=end_date),
+							  user_aa=user)
+	return queryset
+
+def weekly_workout_calculations(weekly_workout):
+	workout_type = []
+	workout_dict = {}
+	for single_workout in weekly_workout:
+		single_workout = ast.literal_eval(single_workout)
+		single_workout.pop('Totals',None)
+		for key,value in single_workout.items():
+			if value['workout_type'] in workout_type:
+				workout_type.append(value['workout_type'])
+				no_workouts = dict(collections.Counter(workout_type))
+				repeated_workout = no_workouts[value['workout_type']]
+				workout_dict[value['workout_type']]['repeated'] = repeated_workout
+				workout_dict[value['workout_type']]['duration'] = (
+					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
+				workout_dict[value['workout_type']]['average_heart_rate'] = (
+					(workout_dict[value['workout_type']]['average_heart_rate']) + (
+						value['average_heart_rate']))
+				workout_dict[value['workout_type']]['steps'] = (
+					(workout_dict[value['workout_type']]['steps']) + (value['steps']))
+
+			else:
+				workout_type.append(value['workout_type'])
+				workout_dict[value['workout_type']] = value
+
+	for key,value in workout_dict.items():
+		if value.get('repeated'):
+			workout_dict[key]["average_heart_rate"] = ((
+				workout_dict[key]["average_heart_rate"])/workout_dict[key]["repeated"])
+
+	return workout_dict
+
+def weekly_aa_calculations(weekly_aa):
+	actvity_type = []
+	aa_dict = {}
+	for single_aa in weekly_aa:
+		single_aa = ast.literal_eval(single_aa)
+		single_aa.pop('Totals',None)
+		print(single_aa,"snigle aa")
