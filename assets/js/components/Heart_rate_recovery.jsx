@@ -351,22 +351,22 @@ class HeartRate extends Component{
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "hrr_not_recorded"){
-					let keyvalue = value[key];
+					let keyvalue =  this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "prcnt_hrr_not_recorded"){
-					let keyvalue = value[key];
+					let keyvalue = this.renderpercentage(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "aerobic_zone"){
+				else if(key == "duration_in_aerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "anaerobic_zone"){
+				else if(key == "duration_in_anaerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "below_aerobic_zone"){
+				else if(key == "duration_below_aerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
@@ -399,7 +399,7 @@ class HeartRate extends Component{
 
 	componentDidMount(){
 		this.setState({
-			fetching_aerobic:false,
+			fetching_aerobic:true,
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);

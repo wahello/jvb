@@ -77,10 +77,18 @@ class ToStandingCumulative(object):
 class ToOtherStatsCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_resting_hr = raw_data["cum_resting_hr"]
-		self.cum_hrr_time_to_99_in_mins = raw_data["cum_hrr_time_to_99_in_mins"]
-		self.cum_hrr_beats_lowered_in_first_min = raw_data["cum_hrr_beats_lowered_in_first_min"]
-		self.cum_highest_hr_in_first_min = raw_data["cum_highest_hr_in_first_min"]
-		self.cum_hrr_lowest_hr_point = raw_data["cum_hrr_lowest_hr_point"]
+		self.cum_hrr_time_to_99_in_mins = raw_data[
+			"cum_hrr_time_to_99_in_mins"]
+		self.cum_hrr_beats_lowered_in_first_min = raw_data[
+			"cum_hrr_beats_lowered_in_first_min"]
+		self.cum_highest_hr_in_first_min = raw_data[
+			"cum_highest_hr_in_first_min"]
+		self.cum_hrr_lowest_hr_point = raw_data[
+			"cum_hrr_lowest_hr_point"]
+		self.cum_hrr_pure_1_min_beats_lowered = raw_data[
+			"cum_hrr_pure_1_min_beats_lowered"]
+		self.cum_hrr_pure_time_to_99 = raw_data[
+			"cum_hrr_pure_time_to_99"]
 		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
 
 class ToMetaCumulative(object):
@@ -114,6 +122,12 @@ class ToMetaCumulative(object):
 		]
 		self.cum_reported_stress_days_count = raw_data[
 			"cum_reported_stress_days_count"
+		]
+		self.cum_hrr_pure_1_minute_beat_lowered_days_count = raw_data[
+			"cum_hrr_pure_1_minute_beat_lowered_days_count"
+		]
+		self.cum_hrr_pure_time_to_99_days_count = raw_data[
+			"cum_hrr_pure_time_to_99_days_count"
 		]
 
 class ToCumulativeSum(object):
@@ -317,7 +331,10 @@ class ProgressReport():
 			seconds = mins * 60
 			mins,seconds = divmod(seconds,60)
 			mins = round(mins)
-			seconds = round(seconds)
+			if seconds < 59:
+				seconds = round(seconds)
+			else:
+				seconds = int(seconds)
 			if seconds < 10:
 				seconds = "{:02d}".format(seconds)
 			return "{}:{}".format(mins,seconds)
@@ -1164,7 +1181,10 @@ class ProgressReport():
 							todays_data.cum_hrr_time_to_99_in_mins,
 							current_data.cum_hrr_time_to_99_in_mins,
 							hrr_time_to_99_days))
-						return val
+						if hrr_time_to_99_days:
+							return val
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_beats_lowered_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -1176,7 +1196,10 @@ class ProgressReport():
 							todays_data.cum_hrr_beats_lowered_in_first_min,
 							current_data.cum_hrr_beats_lowered_in_first_min,
 							beats_lowered_in_first_min_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if beats_lowered_in_first_min_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_highest_hr_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -1188,7 +1211,10 @@ class ProgressReport():
 							todays_data.cum_highest_hr_in_first_min,
 							current_data.cum_highest_hr_in_first_min,
 							highest_hr_in_first_min_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if highest_hr_in_first_min_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_lowest_hr_point':
 					if todays_meta_data and current_meta_data:
@@ -1200,7 +1226,40 @@ class ProgressReport():
 							todays_data.cum_hrr_lowest_hr_point,
 							current_data.cum_hrr_lowest_hr_point,
 							hrr_lowest_hr_point_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if hrr_lowest_hr_point_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
+					return None
+				elif key == 'hrr_pure_1_minute_beat_lowered':
+					if todays_meta_data and current_meta_data:
+						hrr_pure_1_minute_beat_lowered_days = (
+							todays_meta_data.cum_hrr_pure_1_minute_beat_lowered_days_count 
+							- current_meta_data.cum_hrr_pure_1_minute_beat_lowered_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_hrr_pure_1_min_beats_lowered,
+							current_data.cum_hrr_pure_1_min_beats_lowered,
+							hrr_pure_1_minute_beat_lowered_days)
+						if hrr_pure_1_minute_beat_lowered_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
+					return None
+				elif key == 'hrr_pure_time_to_99':
+					if todays_meta_data and current_meta_data:
+						hrr_pure_time_to_99_days = (
+							todays_meta_data.cum_hrr_pure_time_to_99_days_count 
+							- current_meta_data.cum_hrr_pure_time_to_99_days_count
+						)
+						val = self._min_to_min_sec(_cal_custom_average(
+							todays_data.cum_hrr_pure_time_to_99,
+							current_data.cum_hrr_pure_time_to_99,
+							hrr_pure_time_to_99_days))
+						if hrr_pure_time_to_99_days:
+							return val
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'floors_climbed':
 					val = self._get_average_for_duration(
@@ -1215,6 +1274,8 @@ class ProgressReport():
 			'hrr_beats_lowered_in_first_min':{d:None for d in self.duration_type},
 			'hrr_highest_hr_in_first_min':{d:None for d in self.duration_type},
 			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
+			'hrr_pure_1_minute_beat_lowered':{d:None for d in self.duration_type},
+			'hrr_pure_time_to_99':{d:None for d in self.duration_type},
 			'floors_climbed':{d:None for d in self.duration_type}
 		}
 		summary_type = "other_stats_cum"

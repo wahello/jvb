@@ -203,6 +203,7 @@ class GarminConnectPing(APIView):
 			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
 			create_hrrdata.delay(
 				user.id,
+				date_str,
 				date_str
 			)
 		
