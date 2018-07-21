@@ -638,6 +638,8 @@ def aa_workout_data(user,start_date):
 			max_hrr.append(max_heart_rate)
 			exercise_steps = workout.get("steps",0)
 			steps.append(exercise_steps)
+			distance_meters = workout.get("distanceInMeters",0)
+
 			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
@@ -646,7 +648,8 @@ def aa_workout_data(user,start_date):
 				  "max_heart_rate":max_heart_rate,
 				  "steps":exercise_steps,
 				  "hrr_not_recorded":"",
-				  "prcnt_hrr_not_recorded":""
+				  "prcnt_hrr_not_recorded":"",
+				  "distance_meters":distance_meters
 					}
 			data1[summaryId] = data 
 			if "averageHeartRateInBeatsPerMinute" in workout.keys():
@@ -696,8 +699,6 @@ def aa_workout_data(user,start_date):
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
-		
-	
 	if data1:
 		return data1
 	else:
@@ -1907,17 +1908,26 @@ def weekly_workout_summary(request):
 		request.user,week_start_date,week_end_date)
 
 	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
-	final_workout_data,workout_summary_id = weekly_workout_calculations(weekly_workout)
+	if weekly_workout:
+		final_workout_data,workout_summary_id = weekly_workout_calculations(weekly_workout)
+	else:
+		final_workout_data = ''
+		workout_summary_id = ''
+
 	# print(final_workout_data,"final_workout_data dict")
 	
 	weekly_aa_query = get_weekly_aa(
 		request.user,week_start_date,week_end_date)
 	
 	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
-	final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
+	if weekly_aa:
+		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
+	else:
+		final_aa_data = ''
 	# print(final_aa_data,"final_aa_data dict")
-
-	merged_data = merge_activities(final_workout_data,final_aa_data)
-	added_totals = totals_workout(merged_data,len(weekly_aa_query))
-	print(added_totals,"hurrayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
-	return JsonResponse({"test":"cool"})
+	if final_workout_data and final_aa_data:
+		merged_data = merge_activities(final_workout_data,final_aa_data)
+		added_totals = totals_workout(merged_data,len(weekly_aa_query))
+	else:
+		added_totals = {}
+	return JsonResponse(added_totals)

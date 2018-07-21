@@ -119,6 +119,7 @@ def weekly_workout_calculations(weekly_workout):
 		single_workout = ast.literal_eval(single_workout)
 		single_workout.pop('Totals',None)
 		for key,value in single_workout.items():
+			print(value,"why distane in metres is not there")
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
 				workout_summary_id[key] = [value['workout_type']]
@@ -132,6 +133,8 @@ def weekly_workout_calculations(weekly_workout):
 						value['average_heart_rate']))
 				workout_dict[value['workout_type']]['steps'] = (
 					(workout_dict[value['workout_type']]['steps']) + (value['steps']))
+				workout_dict[value['workout_type']]['distance_meters'] = (
+					(workout_dict[value['workout_type']].get('distance_meters',0)) + (value.get('distance_meters',0)))
 
 			else:
 				workout_type.append(value['workout_type'])
@@ -250,7 +253,6 @@ def totals_workout(merged_data,no_days_activity):
 		merged_data_total['Totals']['duration_hrr_not_recorded'] = ((
 			value["duration_hrr_not_recorded"] + merged_data_total['Totals'].get(
 				'duration_hrr_not_recorded',0)))
-		
-	# print(merged_data_total,"merged data with ")
+
 	final_data = percent_total(merged_data_total)
 	return final_data
