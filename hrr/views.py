@@ -1925,6 +1925,7 @@ def weekly_workout_summary(request):
 	else:
 		final_aa_data = ''
 	# print(final_aa_data,"final_aa_data dict")
+
 	if final_workout_data and final_aa_data:
 		merged_data = merge_activities(final_workout_data,final_aa_data)
 		added_totals = totals_workout(merged_data,len(weekly_aa_query))
