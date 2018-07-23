@@ -1471,8 +1471,6 @@ def hrr_data(user,start_date):
 			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
 			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
 			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
-			# if workout_timestamp_before_hrrfile:
-			# 	workout_timestamp_before_hrrfile = sorted(workout_timestamp_before_hrrfile)
 			time_toreach_99 = []
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
@@ -1511,8 +1509,12 @@ def hrr_data(user,start_date):
 			except IndexError:
 				lowest_hrr_1min = 99
 			time_99 = sum(time_toreach_99[:-1])
-			end_time_activity = timestamp_before_hrrfile[-1]-(offset)
-			end_heartrate_activity  = heartrate_before_hrrfile[-2]
+			if workout:
+				no_workouts = len(workout)
+			else:
+				no_workouts = 1
+			end_time_activity = timestamp_before_hrrfile[-no_workouts]-(offset)
+			end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
