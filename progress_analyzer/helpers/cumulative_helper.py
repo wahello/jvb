@@ -4,7 +4,7 @@ import json
 from django.db import transaction,DatabaseError
 from django.core.exceptions import ObjectDoesNotExist
 
-from hrr.views import hrr_data
+from hrr.models import Hrr
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
 
@@ -551,7 +551,7 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 
 def _get_hrr_api_data(user,date):
 	'''
-	Get the HRR data from the HRR API. If there is no
+	Get the HRR data from the HRR table. If there is no
 	data or any exception occurs return None
 
 	Args:
@@ -563,7 +563,7 @@ def _get_hrr_api_data(user,date):
 		None: If any error occurs or no data returned from API 
 	'''
 	try:
-		data = hrr_data(user,date)
+		data = Hrr.objects.get(user_hrr = user,created_at=date)
 		formated_data = {
 			"hrr_starting_point":0,
 			"lowest_hr_during_hrr":0,
@@ -573,35 +573,36 @@ def _get_hrr_api_data(user,date):
 			"hrr_pure_time_to_99":0
 
 		}
-		if data.get('Did_you_measure_HRR') == 'yes':
-			if(data.get('HRR_start_beat')):
-				formated_data['hrr_starting_point'] = data.get(
-					'HRR_start_beat'
-				)
+		measured_hrr = _safe_get_mobj(data,'Did_you_measure_HRR','')
+		if measured_hrr == 'yes':
+			hrr_start_beat = _safe_get_mobj(data,'HRR_start_beat',0)
+			if hrr_start_beat:
+				formated_data['hrr_starting_point'] = hrr_start_beat
 
-			if(data.get('lowest_hrr_1min')):
-				formated_data['lowest_hr_during_hrr'] = data.get(
-					'lowest_hrr_1min'
-				)
+			lowest_hrr_1min = _safe_get_mobj(data,"lowest_hrr_1min",0)
+			if lowest_hrr_1min:
+				formated_data['lowest_hr_during_hrr'] = lowest_hrr_1min
 
-			if(data.get('time_99')):
-				time_in_mins = data.get('time_99') / 60
+			time_99 = _safe_get_mobj(data,"time_99",0)
+			if time_99:
+				time_in_mins = time_99 / 60
 				time_in_mins = round(time_in_mins,3)
 				formated_data['hrr_time_to_99'] = time_in_mins
 
-			if(data.get('HRR_start_beat') and data.get('lowest_hrr_1min')
-				and data.get('HRR_start_beat') >= data.get('lowest_hrr_1min')):
+			if(hrr_start_beat and lowest_hrr_1min
+				and hrr_start_beat >= lowest_hrr_1min):
 				formated_data['hrr_beats_lowered_first_minute'] = (
-					data.get('HRR_start_beat') - data.get('lowest_hrr_1min')
-				)
-			if data.get('pure_1min_heart_beats'):
-				formated_data['hrr_pure_1_min_beats_lowered'] = data.get(
-					"pure_1min_heart_beats"
+					hrr_start_beat - lowest_hrr_1min
 				)
 
-			if data.get("pure_time_99"):
+			pure_1min_heart_beats = _safe_get_mobj(data,"pure_1min_heart_beats",0)
+			if pure_1min_heart_beats:
+				formated_data['hrr_pure_1_min_beats_lowered'] = pure_1min_heart_beats
+
+			pure_time_99 = _safe_get_mobj(data,"pure_time_99",0)
+			if pure_time_99:
 				pure_time_99_in_min = round(
-					data.get("pure_time_99") / 60, 3)
+					pure_time_99 / 60, 3)
 				formated_data["hrr_pure_time_to_99"] = pure_time_99_in_min
 			return formated_data
 		return None
