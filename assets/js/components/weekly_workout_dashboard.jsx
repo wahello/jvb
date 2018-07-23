@@ -11,7 +11,7 @@ import { Collapse, Navbar, NavbarToggler,
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
-import {fetchWeeklyWorkoutData} from '../network/weekly_workout';
+import fetchWeeklyWorkoutData from '../network/weekly_workout';
 
 
 axiosRetry(axios, { retries: 3});
@@ -22,8 +22,9 @@ class WorkoutDashboard extends Component{
 	constructor(props) {
     super(props);
 	    this.state = {
-			    	calendarOpen:false,
-				   	selectedDate:new Date(),
+	    	calendarOpen:false,
+		   	selectedDate:new Date(),
+		   	weekly_data:{},
 	    }
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
 	    this.renderAddDate = this.renderAddDate.bind(this);
@@ -32,11 +33,12 @@ class WorkoutDashboard extends Component{
 		this.successWeeklyWorkoutData = this.successWeeklyWorkoutData.bind(this);
 		this.errorWeeklyWorkoutData = this.errorWeeklyWorkoutData.bind(this);
 		this.processDate = this.processDate.bind(this);
+		this.renderTable = this.renderTable.bind(this);
 	}
 	successWeeklyWorkoutData(data){
 		this.setState({
-
-		})
+			weekly_data:data.data
+		});
   	}
   	errorWeeklyWorkoutData(error){
 		console.log(error.message);
@@ -48,7 +50,7 @@ class WorkoutDashboard extends Component{
 		this.setState({
 			selectedDate:tomorrow.toDate()
 		},()=>{
-			//fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
+			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
 	}
 	renderRemoveDate(){
@@ -58,7 +60,7 @@ class WorkoutDashboard extends Component{
 		this.setState({
 			selectedDate:tomorrow.toDate()
 		},()=>{
-			//fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
+			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
 	}
 	toggleCalendar(){
@@ -74,6 +76,16 @@ class WorkoutDashboard extends Component{
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
+	}
+	componentDidMount(){
+		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
+	}
+	renderTable(weekly_data){
+		let tr_values = [];
+		for(let [key,value] of Object.entries(weekly_data)){
+			console.log("********",key);
+			console.log("+++++++++",value);
+		}
 	}
 	render(){
 		return(
@@ -135,10 +147,9 @@ class WorkoutDashboard extends Component{
 										<th>Avg Run Distance (In Miles)</th>
 										<th>Avg Bike Distance (In Miles)</th>
 										<th>Avg Swim Distance (In Yards)</th>
-										
 									</tr>
 									<tbody>
-										
+									{this.renderTable(this.state.weekly_data)}	
 									</tbody>
 								</table>
 							</div>
