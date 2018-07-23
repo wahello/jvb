@@ -66,6 +66,7 @@ class Grades_Dashboard extends Component{
 	 	this.renderAge = this.renderAge.bind(this);
 	 	this.renderEcsColors = this.renderEcsColors.bind(this);
 	 	this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
+	 	this.renderSmokeColor = this.renderSmokeColor.bind(this);
 	}
 	successGradesData(data){
 		this.setState({
@@ -699,7 +700,7 @@ class Grades_Dashboard extends Component{
 			}
 		let modal = <CardText className = "gd_value_style" style = {{background:background1, color:color1}}>
 					          		
-	          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{value}</span>
+	          			<span>Controlled Subtances: </span><span className = "gd_value_style">{value}</span>
 					          		
 	          		</CardText>
 	    return modal;
@@ -728,7 +729,7 @@ class Grades_Dashboard extends Component{
 			}
 		let modal = <CardText className = "gd_value_style" style = {{background:background1, color:color1}}>
 					          		
-	          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{value}</span>
+	          			<span>Smoking: </span><span className = "gd_value_style">{value}</span>
 					          		
 	          		</CardText>
 	    return modal;
@@ -764,12 +765,12 @@ class Grades_Dashboard extends Component{
 				          			id = "hr-style-mcs"
 				          			style = {{background:hr_background}}/>
 				          		<CardText className = "gd_value_style" style = {{background:background, color:color}}>
-					          			<span>Sleep Aids:- </span><span className = "gd_value_style">{sleep}</span>
+					          			<span>Sleep Aids: </span><span className = "gd_value_style">{sleep}</span>
 					          		</CardText>
 					          		<hr className = "hr_style"/>
 					          		{this.renderControlledColor(controlled)}
 					          		<hr className = "hr_style"/>
-					          		{this.renderControlledColor(smoke)}
+					          		{this.renderSmokeColor(smoke)}
 				        	</CardBody>
 			      		</Card>
 		return model;
