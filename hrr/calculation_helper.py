@@ -119,7 +119,6 @@ def weekly_workout_calculations(weekly_workout):
 		single_workout = ast.literal_eval(single_workout)
 		single_workout.pop('Totals',None)
 		for key,value in single_workout.items():
-			print(value,"why distane in metres is not there")
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
 				workout_summary_id[key] = [value['workout_type']]
@@ -206,6 +205,7 @@ def merge_activities(final_workout_data,final_aa_data):
 		for key1,values1 in final_aa_data.items():
 			if key == key1:
 				final_workout_data[key].update(final_aa_data[key1])
+	# print(final_workout_data)
 	return final_workout_data
 
 def percent_total(merged_data_total):
@@ -232,6 +232,7 @@ def percent_total(merged_data_total):
 def totals_workout(merged_data,no_days_activity):
 	merged_data_total = merged_data.copy()
 	for key,value in merged_data.items():
+		print(value,"finding fucking errorrrrrrrrrrrrrrrr")
 		if not merged_data_total.get('Totals'):
 			merged_data_total['Totals'] = {}
 		merged_data_total['Totals']['days_with_activity'] = no_days_activity
