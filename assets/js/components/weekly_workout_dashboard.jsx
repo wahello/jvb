@@ -82,9 +82,8 @@ class WorkoutDashboard extends Component{
 	}
 	renderTable(weekly_data){
 		let tr_values = [];
+		let td_keys = ["workout_type","repeated","percent_days","duration",];
 		for(let [key,value] of Object.entries(weekly_data)){
-			console.log("********",key);
-			console.log("+++++++++",value);
 		}
 	}
 	render(){
