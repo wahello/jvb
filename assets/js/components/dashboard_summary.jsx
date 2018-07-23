@@ -21,7 +21,8 @@ var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
 
-const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec","resting_hr"];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec","resting_hr",
+"beat_lowered","pure_beat_lowered","pure_time_99","time_99",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 const categoryMeta = {
   "Overall Health GPA":{
@@ -71,6 +72,22 @@ const categoryMeta = {
   "Floors Climbed":{
     short_name:"floor_climbed",
     url_name:"floor-climbed"
+  },
+  "Heart Beats Lowered In 1st Minute":{
+    short_name:"beat_lowered",
+    url_name:"beat-lowered"
+  },
+  "Pure Heart Beats Lowered In 1st Minute":{
+    short_name:"pure_beat_lowered",
+    url_name:"pure-beat-lowered"
+  },
+  "Pure Time To 99":{
+    short_name:"pure_time_99",
+    url_name:"pure-time-99"
+  },
+  "Time To 99":{
+    short_name:"time_99",
+    url_name:"time-99"
   },
 };
  class DashboardSummary extends Component{
@@ -1941,6 +1958,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_time_to_99.custom_range)}
             </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.time_99)}
+            </tr>
             <tr className="progress_table">
                <td className="progress_table">HRR (heart beats lowered in 1st minute)</td>               
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.today}</td>
@@ -1949,6 +1970,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.beat_lowered)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">HRR (highest heart rate in 1st minute)</td>               
@@ -1978,6 +2003,10 @@ handleBackButton(){
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_pure_1_minute_beat_lowered.custom_range)}
             </tr>
              <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.pure_beat_lowered)}
+            </tr>
+             <tr className="progress_table">
                 <td className="progress_table">Pure time to 99 (mm:ss)</td>     
                 <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.today}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.yesterday}</td>
@@ -1985,6 +2014,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_pure_time_to_99.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.pure_time_99)}
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">Floors Climbed</td>
