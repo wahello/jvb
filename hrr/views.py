@@ -658,6 +658,7 @@ def aa_workout_data(user,start_date):
 			max_hrr.append(max_heart_rate)
 			exercise_steps = workout.get("steps",0)
 			steps.append(exercise_steps)
+			distance_meters = workout.get("distanceInMeters",0)
 			
 			data = {"date":act_date,
 				  "workout_type":workout_type,
@@ -666,7 +667,8 @@ def aa_workout_data(user,start_date):
 				  "max_heart_rate":max_heart_rate,
 				  "steps":exercise_steps,
 				  "hrr_not_recorded":"",
-				  "prcnt_hrr_not_recorded":""
+				  "prcnt_hrr_not_recorded":"",
+				  "distance_meters":distance_meters
 					}
 			data1[summaryId] = data 
 			if "averageHeartRateInBeatsPerMinute" in workout.keys():
