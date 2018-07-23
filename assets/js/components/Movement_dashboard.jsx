@@ -34,6 +34,8 @@ class Movement_Dashboard extends Component{
 			steps_this_hour:"",
 			total_steps:"",
 			last_synced:null,
+			selectedDate:new Date(),
+
 		}
 		this.renderHourStepsColor = this.renderHourStepsColor.bind(this);
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
@@ -354,7 +356,7 @@ class Movement_Dashboard extends Component{
 					    </Card>
 				    </div>
 				</div>
-				<div className = "row justify-content-center">
+				<div className = "row justify-content-center md_padding">
 					<div className = "col-md-6  table_margin ">
 						<Card className = "card_style">
 				        	<CardBody>

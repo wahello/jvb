@@ -74,6 +74,8 @@ class OtherStatsCumulative(models.Model):
 	cum_highest_hr_in_first_min = models.IntegerField(blank=True,null=True)
 	cum_hrr_lowest_hr_point = models.IntegerField(blank=True, null=True)
 	cum_floors_climbed = models.IntegerField(blank=True,null=True)
+	cum_hrr_pure_1_min_beats_lowered = models.IntegerField(blank=True,null=True)
+	cum_hrr_pure_time_to_99 = models.FloatField(blank=True, null = True)
 
 class SickCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name="sick_cum")
@@ -112,9 +114,14 @@ class MetaCumulative(models.Model):
 	)
 	cum_mc_recorded_days_count = models.IntegerField(blank=True,null=True)
 	cum_reported_sick_days_count = models.IntegerField(blank=True,null=True)
-	cum_reported_stand_three_hours_days_count = models.IntegerField(blank=True,null=True)
+	cum_reported_stand_three_hours_days_count = models.IntegerField(
+		blank=True,null=True)
 	cum_reported_stress_days_count = models.IntegerField(blank=True,null=True)
 	cum_reported_alcohol_days_count = models.IntegerField(blank=True,null=True)
+	cum_hrr_pure_1_minute_beat_lowered_days_count = models.IntegerField(
+		blank=True,null=True)
+	cum_hrr_pure_time_to_99_days_count = models.IntegerField(
+		blank=True,null=True)
 
 
 class ProgressReportUpdateMeta(models.Model):

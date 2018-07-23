@@ -35,7 +35,10 @@ import HeartRateCal from '../components/heart_rate_calculation';
 import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
 import Movement_Dashboard from '../components/Movement_dashboard'
+import Grades_Dashboard from '../components/grades_dashboard';
 import WorkoutDashboard from '../components/weekly_workout_dashboard';
+
+
 
 
 
@@ -88,6 +91,7 @@ function initializeLocalState(){
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
 					<Route path='/weekly_workout_dashboard' component={RequireAuth(WorkoutDashboard)} />
+					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
 			    </Switch>
 			  </BrowserRouter>
 			</Provider> 

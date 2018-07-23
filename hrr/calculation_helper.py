@@ -1,6 +1,10 @@
 from datetime import datetime,timedelta,date
 import time
+import ast
+import collections
+from django.db.models import Q
 
+from hrr.models import AaWorkoutCalculations,AaCalculations
 from fitparse import FitFile
 
 
@@ -80,3 +84,175 @@ def week_date(start_date):
 		days = start_date.weekday()+1)
 	return(week_start_date,week_end_date)
 
+def get_weekly_workouts(user,start_date,end_date):
+	'''
+		Get week workout data
+	'''
+	queryset = AaWorkoutCalculations.objects.filter(Q(created_at__gte=start_date)&
+							  Q(created_at__lte=end_date),
+							  user_aa_workout=user)
+	# print(queryset,"weekly workout data")
+	return queryset
+
+def get_weekly_aa(user,start_date,end_date):
+	'''
+		Get week Aerobic and anarobic zone data
+	'''
+	queryset = AaCalculations.objects.filter(Q(created_at__gte=start_date)&
+							  Q(created_at__lte=end_date),
+							  user_aa=user)
+	return queryset
+
+def workout_percent(workout_dict):
+	for key,value in workout_dict.items():
+		if value.get('repeated'):
+			workout_dict[key]["average_heart_rate"] = ((
+				workout_dict[key]["average_heart_rate"])/workout_dict[key]["repeated"])
+	return workout_dict
+
+
+def weekly_workout_calculations(weekly_workout):
+	workout_type = []
+	workout_dict = {}
+	workout_summary_id = {} 
+	for single_workout in weekly_workout:
+		single_workout = ast.literal_eval(single_workout)
+		single_workout.pop('Totals',None)
+		for key,value in single_workout.items():
+			print(value,"why distane in metres is not there")
+			if value['workout_type'] in workout_type:
+				workout_type.append(value['workout_type'])
+				workout_summary_id[key] = [value['workout_type']]
+				no_workouts = dict(collections.Counter(workout_type))
+				repeated_workout = no_workouts[value['workout_type']]
+				workout_dict[value['workout_type']]['repeated'] = repeated_workout
+				workout_dict[value['workout_type']]['duration'] = (
+					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
+				workout_dict[value['workout_type']]['average_heart_rate'] = (
+					(workout_dict[value['workout_type']]['average_heart_rate']) + (
+						value['average_heart_rate']))
+				workout_dict[value['workout_type']]['steps'] = (
+					(workout_dict[value['workout_type']]['steps']) + (value['steps']))
+				workout_dict[value['workout_type']]['distance_meters'] = (
+					(workout_dict[value['workout_type']].get('distance_meters',0)) + (value.get('distance_meters',0)))
+
+			else:
+				workout_type.append(value['workout_type'])
+				workout_dict[value['workout_type']] = value
+				workout_dict[value['workout_type']]['repeated'] = 1
+				workout_summary_id[key] = [value['workout_type']]
+
+	workout_dict_percent = workout_percent(workout_dict)
+	return workout_dict_percent,workout_summary_id
+
+def add_workout_type(single_aa,workout_summary_id):
+	for key,value in single_aa.items():
+		for key1,values1 in workout_summary_id.items():
+			if key == key1:
+				value["workout_type"] = values1[0]
+	return single_aa
+
+def percent_calculations(aa_dict):
+	for key,value in aa_dict.items():
+		if value.get('repeated'):
+			aa_dict[key]["percent_aerobic"] = ((
+				aa_dict[key]["duration_in_aerobic_range"])/aa_dict[key]["total_duration"])*100
+			aa_dict[key]["percent_anaerobic"] = ((
+				aa_dict[key]["duration_in_anaerobic_range"])/aa_dict[key]["total_duration"])*100
+			aa_dict[key]["percent_below_aerobic"] = ((
+				aa_dict[key]["duration_below_aerobic_range"])/aa_dict[key]["total_duration"])*100
+			aa_dict[key]["percent_hrr_not_recorded"] = ((
+				aa_dict[key]["duration_hrr_not_recorded"])/aa_dict[key]["total_duration"])*100
+
+	return aa_dict
+
+def weekly_aa_calculations(weekly_aa,workout_summary_id):
+	activity_type = []
+	aa_dict = {}
+	for single_aa in weekly_aa:
+		single_aa = ast.literal_eval(single_aa)
+		single_aa.pop('Totals',None)
+		single_aa_modified = add_workout_type(single_aa,workout_summary_id)
+		for key,value in single_aa_modified.items():
+			if value['workout_type'] in activity_type:
+				activity_type.append(value['workout_type'])
+				no_workouts = dict(collections.Counter(activity_type))
+				repeated_workout = no_workouts[value['workout_type']]
+				aa_dict[value['workout_type']]['repeated'] = repeated_workout
+				aa_dict[value['workout_type']]['total_duration'] = (
+					(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
+				aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
+					(aa_dict[value['workout_type']]['duration_in_aerobic_range']) + (
+						value['duration_in_aerobic_range']))
+				aa_dict[value['workout_type']]['duration_in_anaerobic_range'] = (
+					(aa_dict[value['workout_type']]['duration_in_anaerobic_range']) + (
+						value['duration_in_anaerobic_range']))
+				aa_dict[value['workout_type']]['duration_below_aerobic_range'] = (
+					(aa_dict[value['workout_type']]['duration_below_aerobic_range']) + (
+						value['duration_below_aerobic_range']))
+				aa_dict[value['workout_type']]['duration_hrr_not_recorded'] = (
+					(aa_dict[value['workout_type']]['duration_hrr_not_recorded']) + (
+						value['duration_hrr_not_recorded']))
+
+
+			else:
+				activity_type.append(value['workout_type'])	
+				aa_dict[value['workout_type']] = value
+	added_percent = percent_calculations(aa_dict)
+	return added_percent
+
+def merge_activities(final_workout_data,final_aa_data):
+	for key,value in final_workout_data.items():
+		for key1,values1 in final_aa_data.items():
+			if key == key1:
+				final_workout_data[key].update(final_aa_data[key1])
+	return final_workout_data
+
+def percent_total(merged_data_total):
+	merged_data_total['Totals']['pecent_aerobic'] = (
+		(merged_data_total['Totals']['duration_in_aerobic_range'])/(
+			merged_data_total['Totals']['workout_duration']))*100
+	merged_data_total['Totals']['pecent_anarobic'] = (
+		(merged_data_total['Totals']['duration_in_anaerobic_range'])/(
+			merged_data_total['Totals']['workout_duration']))*100
+	merged_data_total['Totals']['pecent_below_aerobic'] = (
+		(merged_data_total['Totals']['duration_below_aerobic_range'])/(
+			merged_data_total['Totals']['workout_duration']))*100
+	merged_data_total['Totals']['percent_hrr_not_recorded'] = (
+		(merged_data_total['Totals']['duration_hrr_not_recorded'])/(
+			merged_data_total['Totals']['workout_duration']))*100
+	merged_data_total['Totals']['percent_avg_workout'] = (
+		(merged_data_total['Totals']['days_with_activity'])/(7))*100
+	merged_data_total['Totals']['days_no_activity'] = (
+		 (7)-(merged_data_total['Totals']['days_with_activity']))
+	merged_data_total['Totals']['percent_days_no_activity'] = (
+		(merged_data_total['Totals']['days_with_activity'])/(7))*100
+	return merged_data_total
+
+def totals_workout(merged_data,no_days_activity):
+	merged_data_total = merged_data.copy()
+	for key,value in merged_data.items():
+		if not merged_data_total.get('Totals'):
+			merged_data_total['Totals'] = {}
+		merged_data_total['Totals']['days_with_activity'] = no_days_activity
+		merged_data_total['Totals']['avg_workout_percent'] = (no_days_activity/7)*100
+		merged_data_total['Totals']['workout_duration'] = merged_data_total['Totals'].get(
+			'workout_duration',0) + value["duration"]
+		merged_data_total['Totals']['workout_duration_percent'] = 100
+		merged_data_total['Totals']['avg_heartrate'] = ((
+			value["average_heart_rate"] + merged_data_total['Totals'].get('avg_heartrate',0)))
+		merged_data_total['Totals']['duration_in_aerobic_range'] = ((
+			value["duration_in_aerobic_range"] + merged_data_total['Totals'].get(
+				'duration_in_aerobic_range',0)))
+		merged_data_total['Totals']['duration_below_aerobic_range'] = ((
+			value["duration_below_aerobic_range"] + merged_data_total['Totals'].get(
+				'duration_below_aerobic_range',0)))
+		merged_data_total['Totals']['duration_in_anaerobic_range'] = ((
+			value["duration_in_anaerobic_range"] + merged_data_total['Totals'].get(
+				'duration_in_anaerobic_range',0)))
+		merged_data_total['Totals']['duration_hrr_not_recorded'] = ((
+			value["duration_hrr_not_recorded"] + merged_data_total['Totals'].get(
+				'duration_hrr_not_recorded',0)))
+
+	final_data = percent_total(merged_data_total)
+	return final_data
