@@ -234,7 +234,6 @@ def percent_total(merged_data_total):
 def totals_workout(merged_data,no_days_activity):
 	merged_data_total = merged_data.copy()
 	for key,value in merged_data.items():
-		print(value,"finding fucking errorrrrrrrrrrrrrrrr")
 		if not merged_data_total.get('Totals'):
 			merged_data_total['Totals'] = {}
 		merged_data_total['Totals']['days_with_activity'] = no_days_activity
