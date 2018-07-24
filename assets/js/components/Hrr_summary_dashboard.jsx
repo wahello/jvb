@@ -38,10 +38,11 @@ class Hrr_Dashboard extends Component{
 			date_of_birth:"",
 			last_synced:null,
 			selectedDate:new Date(),
-			rank_data:{},
+			rank_data:"Getting Rank...",
 
 		}
-		this.renderHourStepsColor = this.renderHourStepsColor.bind(this);
+
+		this.renderOverallHrrRankColor= this.renderOverallHrrRankColor.bind(this);
 		this.renderTimeTo99Color = this.renderTimeTo99Color.bind(this);
 		this.renderHeartBeatsColors = this.renderHeartBeatsColors.bind(this);
 		this.renderPureHeartBeatsColors = this.renderPureHeartBeatsColors.bind(this);
@@ -87,9 +88,7 @@ class Hrr_Dashboard extends Component{
     }
     successLeaderboard(data){
     	this.setState({
-    		rank_data:data.data
-    	},()=>{
-    		console.log("******************",this.state.rank_data);
+    		rank_data:data.data.overall_hrr.today.user_rank.rank,
     	});
     }
     successLastSync(data){
@@ -168,31 +167,31 @@ class Hrr_Dashboard extends Component{
         }
         return value;
 	}
-	renderHourStepsColor(score){
+	renderOverallHrrRankColor(score){
 		/* adding background color to card depends upon their steps ranges*/
 		let background = "";
 		let color = "";
 		let hr_background = "";
-		if(score){
-	            if(score >= 300){
-                	 background = "green";
-                	 color = "white";
-                	 hr_background = "white" 
-	            }
-	            else if(score >= 0 && score < 300){
-	            	 background = "#FF0101";
-	            	 color = "black";
-	            	 hr_background = "#e5e5e5" 
-	            }
-		}
-        else{
-        	score = "No Data Yet"
-        	background = "white";
-        	color = "#5e5e5e";
-        	hr_background = "#e5e5e5" 
-        }
+		// if(score){
+	 //            if(score >= 300){
+  //               	 background = "green";
+  //               	 color = "white";
+  //               	 hr_background = "white" 
+	 //            }
+	 //            else if(score >= 0 && score < 300){
+	 //            	 background = "#FF0101";
+	 //            	 color = "black";
+	 //            	 hr_background = "#e5e5e5" 
+	 //            }
+		// }
+  //       else{
+  //       	score = "No Data Yet"
+  //       	background = "white";
+  //       	color = "#5e5e5e";
+  //       	hr_background = "#e5e5e5" 
+  //       }
 
-		let score1 = this.renderCommaInSteps(score);
+		// let score1 = this.renderCommaInSteps(score);
 		var model = <Card className = "card_style"
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
@@ -201,7 +200,7 @@ class Hrr_Dashboard extends Component{
 					          	<hr className = "hr_style"
 					          		id = "hr-style" 
 					          		style = {{background:hr_background}}/>
-					          	<CardText className = "value_style">{score1}</CardText>
+					          	<CardText className = "value_style">{score}</CardText>
 					        </CardBody>
 					    </Card>
 		return model;
@@ -396,7 +395,7 @@ class Hrr_Dashboard extends Component{
 	render(){
 		return(
 			<div>
-				<NavbarMenu title={"Movement Dashboard"} />
+				<NavbarMenu title={"HRR Summary Dashboard"} />
 				<div className = "cla_center">
 					<span>
 						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
@@ -433,7 +432,7 @@ class Hrr_Dashboard extends Component{
 		        </div>
 				<div className = "row justify-content-center md_padding">
 					<div className = "col-md-6 table_margin ">
-						{this.renderHourStepsColor(this.state.steps_this_hour)}
+						{this.renderOverallHrrRankColor(this.state.rank_data)}
 				    </div>
 					<div className = "col-md-6  table_margin ">
 			      		{this.renderTimeTo99Color(this.state.time_to_99)}
