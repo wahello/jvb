@@ -105,11 +105,11 @@ def get_weekly_aa(user,start_date,end_date):
 
 def workout_percent(workout_dict):
 	for key,value in workout_dict.items():
-		if value.get('repeated'):
+		if value.get('days_with_activity'):
 			workout_dict[key]["average_heart_rate"] = ((
-				workout_dict[key]["average_heart_rate"])/workout_dict[key]["repeated"])
-			workout_dict[key]["percent_days"] = ((
-				workout_dict[key]["repeated"])/7)*100
+				workout_dict[key]["average_heart_rate"])/workout_dict[key]["days_with_activity"])
+			workout_dict[key]["percent_of_days"] = ((
+				workout_dict[key]["days_with_activity"])/7)*100
 	return workout_dict
 
 
@@ -126,7 +126,7 @@ def weekly_workout_calculations(weekly_workout):
 				workout_summary_id[key] = [value['workout_type']]
 				no_workouts = dict(collections.Counter(workout_type))
 				repeated_workout = no_workouts[value['workout_type']]
-				workout_dict[value['workout_type']]['repeated'] = repeated_workout
+				workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				workout_dict[value['workout_type']]['duration'] = (
 					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
 				workout_dict[value['workout_type']]['average_heart_rate'] = (
@@ -140,7 +140,7 @@ def weekly_workout_calculations(weekly_workout):
 			else:
 				workout_type.append(value['workout_type'])
 				workout_dict[value['workout_type']] = value
-				workout_dict[value['workout_type']]['repeated'] = 1
+				workout_dict[value['workout_type']]['days_with_activity'] = 1
 				workout_summary_id[key] = [value['workout_type']]
 
 	workout_dict_percent = workout_percent(workout_dict)
@@ -155,7 +155,7 @@ def add_workout_type(single_aa,workout_summary_id):
 
 def percent_calculations(aa_dict):
 	for key,value in aa_dict.items():
-		if value.get('repeated'):
+		if value.get('days_with_activity'):
 			aa_dict[key]["percent_aerobic"] = ((
 				aa_dict[key]["duration_in_aerobic_range"])/aa_dict[key]["total_duration"])*100
 			aa_dict[key]["percent_anaerobic"] = ((
@@ -179,7 +179,7 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id):
 				activity_type.append(value['workout_type'])
 				no_workouts = dict(collections.Counter(activity_type))
 				repeated_workout = no_workouts[value['workout_type']]
-				aa_dict[value['workout_type']]['repeated'] = repeated_workout
+				aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				aa_dict[value['workout_type']]['total_duration'] = (
 					(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
 				aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
@@ -211,19 +211,19 @@ def merge_activities(final_workout_data,final_aa_data):
 	return final_workout_data
 
 def percent_total(merged_data_total):
-	merged_data_total['Totals']['pecent_aerobic'] = (
+	merged_data_total['Totals']['percent_aerobic'] = (
 		(merged_data_total['Totals']['duration_in_aerobic_range'])/(
-			merged_data_total['Totals']['workout_duration']))*100
-	merged_data_total['Totals']['pecent_anarobic'] = (
+			merged_data_total['Totals']['duration']))*100
+	merged_data_total['Totals']['percent_anaerobic'] = (
 		(merged_data_total['Totals']['duration_in_anaerobic_range'])/(
-			merged_data_total['Totals']['workout_duration']))*100
-	merged_data_total['Totals']['pecent_below_aerobic'] = (
+			merged_data_total['Totals']['duration']))*100
+	merged_data_total['Totals']['percent_below_aerobic'] = (
 		(merged_data_total['Totals']['duration_below_aerobic_range'])/(
-			merged_data_total['Totals']['workout_duration']))*100
+			merged_data_total['Totals']['duration']))*100
 	merged_data_total['Totals']['percent_hrr_not_recorded'] = (
 		(merged_data_total['Totals']['duration_hrr_not_recorded'])/(
-			merged_data_total['Totals']['workout_duration']))*100
-	merged_data_total['Totals']['percent_avg_workout'] = (
+			merged_data_total['Totals']['duration']))*100
+	merged_data_total['Totals']['percent_of_days'] = (
 		(merged_data_total['Totals']['days_with_activity'])/(7))*100
 	merged_data_total['Totals']['days_no_activity'] = (
 		 (7)-(merged_data_total['Totals']['days_with_activity']))
@@ -237,12 +237,12 @@ def totals_workout(merged_data,no_days_activity):
 		if not merged_data_total.get('Totals'):
 			merged_data_total['Totals'] = {}
 		merged_data_total['Totals']['days_with_activity'] = no_days_activity
-		merged_data_total['Totals']['avg_workout_percent'] = (no_days_activity/7)*100
-		merged_data_total['Totals']['workout_duration'] = merged_data_total['Totals'].get(
-			'workout_duration',0) + value["duration"]
+		merged_data_total['Totals']['percent_of_days'] = (no_days_activity/7)*100
+		merged_data_total['Totals']['duration'] = merged_data_total['Totals'].get(
+			'duration',0) + value["duration"]
 		merged_data_total['Totals']['workout_duration_percent'] = 100
-		merged_data_total['Totals']['avg_heartrate'] = ((
-			value["average_heart_rate"] + merged_data_total['Totals'].get('avg_heartrate',0)))
+		merged_data_total['Totals']['average_heart_rate'] = ((
+			value["average_heart_rate"] + merged_data_total['Totals'].get('average_heart_rate',0)))
 		merged_data_total['Totals']['duration_in_aerobic_range'] = ((
 			value["duration_in_aerobic_range"] + merged_data_total['Totals'].get(
 				'duration_in_aerobic_range',0)))
@@ -258,3 +258,32 @@ def totals_workout(merged_data,no_days_activity):
 
 	final_data = percent_total(merged_data_total)
 	return final_data
+
+def add_duration_percent(final_data):
+	final_data_total = final_data.copy()
+	for key,value in final_data.items():
+		if key != 'Totals':
+			final_data_total[key]['workout_duration_percent'] = ((
+				value['duration'])/final_data_total['Totals']['duration'])*100
+			value.pop('avg_heart_rate', None)
+			value.pop('max_heart_rate', None)
+			value.pop('total_duration', None)
+			value.pop('hrr_not_recorded', None)
+			value.pop('prcnt_hrr_not_recorded', None)
+			value.pop('prcnt_hrr_not_recorded', None)
+			value.pop('steps', None)
+			value.pop('date', None)
+		else:
+			value['workout_type'] = ''
+			value["distance_meters"] = ''
+			if not final_data_total.get('extra'):
+				final_data_total['extra'] = {}
+				final_data_total['extra']['days_no_activity'] = final_data_total['Totals']['days_no_activity']
+				final_data_total['extra']['percent_days_no_activity'] = ((
+					final_data_total['Totals']['percent_days_no_activity']))
+			final_data_total['Totals'].pop('days_no_activity', None)
+			final_data_total['Totals'].pop('percent_days_no_activity', None)
+
+	return final_data_total
+ 
+ 

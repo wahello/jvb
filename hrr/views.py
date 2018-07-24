@@ -47,7 +47,8 @@ from hrr.calculation_helper import week_date,\
 									weekly_workout_calculations,\
 									weekly_aa_calculations,\
 									merge_activities,\
-									totals_workout
+									totals_workout,\
+									add_duration_percent
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -1931,4 +1932,9 @@ def weekly_workout_summary(request):
 		added_totals = totals_workout(merged_data,len(weekly_aa_query))
 	else:
 		added_totals = {}
-	return JsonResponse(added_totals)
+	if added_totals:
+		final_data = add_duration_percent(added_totals)
+	else:
+		final_data = {}
+		
+	return JsonResponse(final_data)
