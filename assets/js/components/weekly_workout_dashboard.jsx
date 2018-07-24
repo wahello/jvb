@@ -34,6 +34,8 @@ class WorkoutDashboard extends Component{
 		this.errorWeeklyWorkoutData = this.errorWeeklyWorkoutData.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.renderTable = this.renderTable.bind(this);
+		this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
+		this.renderTime = this.renderTime.bind(this);
 	}
 	successWeeklyWorkoutData(data){
 		this.setState({
@@ -80,11 +82,79 @@ class WorkoutDashboard extends Component{
 	componentDidMount(){
 		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 	}
+	gpascoreDecimal(gpa){
+		let value;
+		let x = gpa;
+		if( x !=  null && x != undefined){
+		    value =parseFloat(x).toFixed(2) + " %";
+		 }
+		 else{
+		  value = "";
+		 }
+		return value;
+	}
+	renderTime(value){
+		// This function will devide the seconds to hh:mm:ss format.
+		var time;
+		if(value){
+			if(value>0){
+				var sec_num = parseInt(value); 
+			    var hours   = Math.floor(sec_num / 3600);
+			    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+			    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+			    if (hours   < 10) {hours   = "0"+hours;}
+			    if (minutes < 10) {minutes = "0"+minutes;}
+			    if (seconds < 10) {seconds = "0"+seconds;}
+			    time = hours+':'+minutes;
+			}
+		}
+		else if(value == 0 || value == null){
+			time = "00:00";
+		}
+		return time;
+	}
 	renderTable(weekly_data){
 		let tr_values = [];
-		let td_keys = ["workout_type","repeated","percent_days","duration",];
+		let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
+		"percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
+		"duration_hrr_not_recorded","percent_hrr_not_recorded","distance_meters"];
+		let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity","","","","","","","","","","","","",];
 		for(let [key,value] of Object.entries(weekly_data)){
+			let td_values = [];
+			if(key != "extra"){
+				for(let key1 of td_keys){
+					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
+					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
+					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
+						td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>)
+					}
+					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
+					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
+					  key1 == "duration_hrr_not_recorded"){
+						td_values.push(<td>{this.renderTime(value[key1])}</td>)
+					}
+					else{
+						td_values.push(<td>{value[key1]}</td>)
+					}
+				}
+			}
+			else{
+				for(let key2 of td_keys1){
+					if(key2 == "percent_days_no_activity"){
+						td_values.push(<td>{this.gpascoreDecimal(value[key2])}</td>)
+					}
+					else if(key2 == "no_activity"){
+						td_values.push(<td>No Activity</td>)
+					}
+					else{
+						td_values.push(<td>{value[key2]}</td>)
+					}
+				}
+			}
+			tr_values.push(<tr>{td_values}</tr>)
 		}
+		return tr_values;
 	}
 	render(){
 		return(
@@ -143,9 +213,7 @@ class WorkoutDashboard extends Component{
 										<th>Avg % Below Aerobic</th>
 										<th>Avg HR Not Recorded Duration (hh:mm)</th>
 										<th>Avg % HR Not Recorded</th>
-										<th>Avg Run Distance (In Miles)</th>
-										<th>Avg Bike Distance (In Miles)</th>
-										<th>Avg Swim Distance (In Yards)</th>
+										<th>Avg Distance (In Miles)</th>
 									</tr>
 									<tbody>
 									{this.renderTable(this.state.weekly_data)}	
