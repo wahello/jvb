@@ -130,8 +130,9 @@ class Dashboard extends Component {
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
 							 <h3 id="link_style">Dashboards</h3>
-				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
-				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
+				  		 	 <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
+				  		 	 <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
+				  		 	 <Link to='/hrr_summary_dashboard'>Hrr Summary Dashboard</Link><br/>
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 							  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
