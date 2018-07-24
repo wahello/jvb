@@ -274,8 +274,8 @@ def add_duration_percent(final_data):
 			value.pop('steps', None)
 			value.pop('date', None)
 		else:
-			value['workout_type'] = ''
-			value["distance_meters"] = ''
+			value['workout_type'] = 'Total'
+			value["distance_meters"] = None
 			if not final_data_total.get('extra'):
 				final_data_total['extra'] = {}
 				final_data_total['extra']['days_no_activity'] = final_data_total['Totals']['days_no_activity']
