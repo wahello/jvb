@@ -505,7 +505,7 @@ def aa_calculations(request):
 	return JsonResponse(data)	
 
 def aa_workout_data(user,start_date):
-	data_aa_check = aa_data(request.user,start_date)
+	data_aa_check = aa_data(user,start_date)
 	if data_aa_check.get('total_time'):
 		start_date_str = start_date.strftime('%Y-%m-%d')
 
