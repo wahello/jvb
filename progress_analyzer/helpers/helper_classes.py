@@ -89,6 +89,8 @@ class ToOtherStatsCumulative(object):
 			"cum_hrr_pure_1_min_beats_lowered"]
 		self.cum_hrr_pure_time_to_99 = raw_data[
 			"cum_hrr_pure_time_to_99"]
+		self.cum_hrr_activity_end_hr = raw_data[
+			"cum_hrr_activity_end_hr"]
 		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
 
 class ToMetaCumulative(object):
@@ -128,6 +130,9 @@ class ToMetaCumulative(object):
 		]
 		self.cum_hrr_pure_time_to_99_days_count = raw_data[
 			"cum_hrr_pure_time_to_99_days_count"
+		]
+		self.cum_hrr_activity_end_hr_days_count = raw_data[
+			"cum_hrr_activity_end_hr_days_count"
 		]
 
 class ToCumulativeSum(object):
@@ -1261,6 +1266,21 @@ class ProgressReport():
 						else:
 							return "Not Provided"
 					return None
+				elif key == 'hrr_activity_end_hr':
+					if todays_meta_data and current_meta_data:
+						hrr_activity_end_hr = (
+							todays_meta_data.cum_hrr_activity_end_hr_days_count 
+							- current_meta_data.cum_hrr_activity_end_hr_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_hrr_activity_end_hr,
+							current_data.cum_hrr_activity_end_hr,
+							hrr_activity_end_hr)
+						if hrr_activity_end_hr:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
+					return None
 				elif key == 'floors_climbed':
 					val = self._get_average_for_duration(
 						todays_data.cum_floors_climbed,
@@ -1276,6 +1296,7 @@ class ProgressReport():
 			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
 			'hrr_pure_1_minute_beat_lowered':{d:None for d in self.duration_type},
 			'hrr_pure_time_to_99':{d:None for d in self.duration_type},
+			'hrr_activity_end_hr':{d:None for d in self.duration_type},
 			'floors_climbed':{d:None for d in self.duration_type}
 		}
 		summary_type = "other_stats_cum"

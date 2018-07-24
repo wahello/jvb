@@ -632,6 +632,12 @@ class LeaderboardOverview(object):
 
 		for user in user_model.objects.all():
 			data = ProgressReport(user,query_params).get_progress_report()
+
+			if hasattr(user,'profile'):
+				user_aerobic_hr_zone = 180 - user.profile.age() + 5
+			else:
+				user_aerobic_hr_zone = 0
+
 			if not self.duration_date:
 				self.duration_date = data.get("duration_date")
 			data = data['summary']
@@ -695,12 +701,34 @@ class LeaderboardOverview(object):
 						score = data['other']['hrr_time_to_99'][dtype]
 						if score and score != "Not Provided":
 							score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss")
-						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+						other_scores = {
+							"activity_end_hr":{
+								"value":data['other']['hrr_activity_end_hr'][dtype],
+								"verbose_name":"Activity Heart Rate at End"
+							},
+							"aerobic_hr_zone":{
+								"value":user_aerobic_hr_zone,
+								"verbose_name":"Aerobic Heart Rate Zone"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores))
 					elif catg == 'pure_time_99':
 						score = data['other']['hrr_pure_time_to_99'][dtype]
 						if score and score != "Not Provided":
 							score = _str_to_hours_min_sec(score,time_format="minute", time_pattern="mm:ss")
-						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+						other_scores = {
+							"activity_end_hr":{
+								"value":data['other']['hrr_activity_end_hr'][dtype],
+								"verbose_name":"Activity Heart Rate at End"
+							},
+							"aerobic_hr_zone":{
+								"value":user_aerobic_hr_zone,
+								"verbose_name":"Aerobic Heart Rate Zone"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores))
 					elif catg == 'beat_lowered':
 						score = data['other']['hrr_beats_lowered_in_first_min'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
@@ -782,14 +810,34 @@ class LeaderboardOverview(object):
 							score = data['other']['hrr_time_to_99']['custom_range'][str_range]['data']
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
+							other_scores = {
+								"activity_end_hr":{
+									"value":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data'],
+									"verbose_name":"Activity Heart Rate at End"
+								},
+								"aerobic_hr_zone":{
+									"value":user_aerobic_hr_zone,
+									"verbose_name":"Aerobic Heart Rate Zone"
+								}
+							}
 							category_wise_data[catg]['custom_range'][str_range].append(
-								RankedScore(self.user,user,catg,score))
+								RankedScore(self.user,user,catg,score,other_scores=other_scores))
 						elif catg == 'pure_time_99':
 							score = data['other']['hrr_pure_time_to_99']['custom_range'][str_range]['data']
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
+							other_scores = {
+								"activity_end_hr":{
+									"value":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data'],
+									"verbose_name":"Activity Heart Rate at End"
+								},
+								"aerobic_hr_zone":{
+									"value":user_aerobic_hr_zone,
+									"verbose_name":"Aerobic Heart Rate Zone"
+								}
+							}
 							category_wise_data[catg]['custom_range'][str_range].append(
-								RankedScore(self.user,user,catg,score))
+								RankedScore(self.user,user,catg,score,other_scores=other_scores))
 						elif catg == 'beat_lowered':
 							score = data['other']['hrr_beats_lowered_in_first_min']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(
