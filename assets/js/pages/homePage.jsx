@@ -35,7 +35,7 @@ import HeartRateCal from '../components/heart_rate_calculation';
 import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
 import Movement_Dashboard from '../components/Movement_dashboard'
-
+import MCS_Dashboard from '../components/mcs_dashboard'
 
 
 
@@ -87,6 +87,7 @@ function initializeLocalState(){
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
+				    <Route path='/mcs_dashboard' component={MCS_Dashboard}/>
 			    </Switch>
 			  </BrowserRouter>
 			</Provider> 

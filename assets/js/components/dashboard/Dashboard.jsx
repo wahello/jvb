@@ -126,7 +126,8 @@ class Dashboard extends Component {
 				    <h3 id="link_style">User Inputs</h3>
 					 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
 					 <h3 id="link_style">Dashboards</h3>
-					  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>		
+					  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
+					  <Link to='/mcs_dashboard'>Movement Consistency Score (MCS) Dashboard</Link><br /> 		
 					 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 					 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 					  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
