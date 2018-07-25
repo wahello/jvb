@@ -36,7 +36,7 @@ import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
 import Movement_Dashboard from '../components/Movement_dashboard';
 import Grades_Dashboard from '../components/grades_dashboard';
-import HrrLeaderboard from '../components/Hrr_leaderboard';
+import Hrr_Dashboard from '../components/Hrr_summary_dashboard';
 
 
 
@@ -71,7 +71,6 @@ function initializeLocalState(){
 			        <Route path='/hrr_recovery' component={RequireAuth(HeartRateCal)} />
 			        <Route path='/workout_stats' component={RequireAuth(Workout)} />
 			        <Route path='/heartrate_zone' component={RequireAuth(HeartrateZone)} />
-			        <Route path='/overall_hrr_leaderboard' component={RequireAuth(HrrLeaderboard)} />
 					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
 					{/*<Route path='/nes' component={RequireAuth(Nes)} /> */}
 					{/*<Route path='/OverAllGrade' component={RequireAuth(Overallgrade)} /> */}
@@ -91,6 +90,7 @@ function initializeLocalState(){
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
 					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
+					<Route path='/hrr_summary_dashboard' component={RequireAuth(Hrr_Dashboard)} />
 			    </Switch>
 			  </BrowserRouter>
 			</Provider> 
