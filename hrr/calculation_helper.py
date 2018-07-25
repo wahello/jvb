@@ -326,17 +326,19 @@ def add_duration_percent(final_data):
 def dynamic_activities(final_data,workout_type):
 	workout_type_unique = list(set(workout_type))
 	for key,value in final_data.items():
-		for i,k in enumerate(workout_type_unique):
-			if k == key:
-				k_str = k.lower()+"_distance"
-				if not value.get(k_str):
-					final_data['Totals'][k_str] = {}
-				final_data['Totals'][k_str]['value'] = value["distance_meters"]
-				final_data['Totals'][k_str]['units'] = "meters"
-			else:
-				k_str = k.lower()+"_distance"
-				if not value.get(k_str):
-					final_data['Totals'][k_str] = {}
-				final_data['Totals'][k_str]['value'] = final_data[k]["distance_meters"]
-				final_data['Totals'][k_str]['units'] = "meters"
+		if key == 'Totals':
+			for i,k in enumerate(workout_type_unique):
+				if k == key:
+					k_str = k.lower()+"_distance"
+					print(value,"ffffffff")
+					if not value.get(k_str):
+						final_data['Totals'][k_str] = {}
+					final_data['Totals'][k_str]['value'] = value["distance_meters"]
+					final_data['Totals'][k_str]['units'] = "meters"
+				else:
+					k_str = k.lower()+"_distance"
+					if not value.get(k_str):
+						final_data['Totals'][k_str] = {}
+					final_data['Totals'][k_str]['value'] = final_data[k]["distance_meters"]
+					final_data['Totals'][k_str]['units'] = "meters"
 	return final_data
