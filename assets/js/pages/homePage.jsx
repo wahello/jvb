@@ -90,7 +90,7 @@ function initializeLocalState(){
 					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
-					<Route path='/weekly_workout_dashboard' component={RequireAuth(WorkoutDashboard)} />
+					<Route path='/weekly_workout_summary' component={RequireAuth(WorkoutDashboard)} />
 					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
 			    </Switch>
 			  </BrowserRouter>
