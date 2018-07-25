@@ -12,7 +12,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import fetchWeeklyWorkoutData from '../network/weekly_workout';
-
+import {renderWeeklySummaryOverlay} from './dashboard_healpers';
 
 axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
@@ -23,6 +23,7 @@ class WorkoutDashboard extends Component{
     super(props);
 	    this.state = {
 	    	calendarOpen:false,
+	    	fetching_weekly:false,
 		   	selectedDate:new Date(),
 		   	weekly_data:{},
 	    }
@@ -37,21 +38,28 @@ class WorkoutDashboard extends Component{
 		this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
 		this.renderTime = this.renderTime.bind(this);
 		this.renderLastSunday = this.renderLastSunday.bind(this);
+		this.renderWeeklySummaryOverlay = renderWeeklySummaryOverlay.bind(this);
 	}
 	successWeeklyWorkoutData(data){
 		this.setState({
-			weekly_data:data.data
+			weekly_data:data.data,
+			fetching_weekly:false,
 		});
   	}
   	errorWeeklyWorkoutData(error){
 		console.log(error.message);
+		this.setState({
+			fetching_weekly:false,
+		});
+		
   	}
 	renderAddDate(){
 		/*It is forward arrow button for the calender getting the next day date*/
 		var today = this.state.selectedDate;
 		var tomorrow = moment(today).add(7, 'days');
 		this.setState({
-			selectedDate:tomorrow.toDate()
+			selectedDate:tomorrow.toDate(),
+			fetching_weekly:true,
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
@@ -61,7 +69,8 @@ class WorkoutDashboard extends Component{
 		var today = this.state.selectedDate;
 		var tomorrow = moment(today).subtract(7, 'days');
 		this.setState({
-			selectedDate:tomorrow.toDate()
+			selectedDate:tomorrow.toDate(),
+			fetching_weekly:true,
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
@@ -90,11 +99,15 @@ class WorkoutDashboard extends Component{
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
+			fetching_weekly:true,
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
 	}
 	componentDidMount(){
+		this.setState({
+			fetching_weekly:true,
+		});
 		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 	}
 	gpascoreDecimal(gpa){
@@ -131,28 +144,29 @@ class WorkoutDashboard extends Component{
 	}
 	renderTable(weekly_data){
 		let tr_values = [];
+		let td_values = [];
+		let td_totals = [];
+		let td_extra = [];
 		let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
 		"percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
 		"duration_hrr_not_recorded","percent_hrr_not_recorded","distance_meters"];
 		let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity","","","","","","","","","","","","",];
 		for(let [key,value] of Object.entries(weekly_data)){
-			let td_values = [];
-			let td_totals = [];
-			let td_extra = [];
+			
 			if(key != "extra" && key != "Totals"){
 				for(let key1 of td_keys){
 					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
 					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
 					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
-						td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>)
+						td_values.push(this.gpascoreDecimal(value[key1]));
 					}
 					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
 					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
 					  key1 == "duration_hrr_not_recorded"){
-						td_values.push(<td>{this.renderTime(value[key1])}</td>)
+						td_values.push(this.renderTime(value[key1]));
 					}
 					else{
-						td_values.push(<td>{value[key1]}</td>)
+						td_values.push(value[key1]);
 					}
 				}
 			}
@@ -161,37 +175,50 @@ class WorkoutDashboard extends Component{
 					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
 					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
 					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
-						td_totals.push(<td>{this.gpascoreDecimal(value[key1])}</td>)
+						td_totals.push(this.gpascoreDecimal(value[key1]))
 					}
 					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
 					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
 					  key1 == "duration_hrr_not_recorded"){
-						td_totals.push(<td>{this.renderTime(value[key1])}</td>)
+						td_totals.push(this.renderTime(value[key1]))
 					}
 					else{
-						td_totals.push(<td>{value[key1]}</td>)
+						td_totals.push(value[key1])
 					}
 				}
 			}
 			else{
 				for(let key2 of td_keys1){
 					if(key2 == "percent_days_no_activity"){
-						td_extra.push(<td>{this.gpascoreDecimal(value[key2])}</td>)
+						td_extra.push(this.gpascoreDecimal(value[key2]))
 					}
 					else if(key2 == "no_activity"){
-						td_extra.push(<td>No Activity</td>)
+						td_extra.push("No Activity")
 					}
 					else{
-						td_extra.push(<td>{value[key2]}</td>)
+						td_extra.push(value[key2])
 					}
 				}
 			}
-			tr_values.push(<tbody>
-							<tr>{td_values}</tr>
-							<tr>{td_totals}</tr>
-							<tr>{td_extra}</tr>
-						   </tbody>)
 		}
+		let td_values1 = [];
+		for(let value6 of td_values){
+			td_values1.push(<td>{value6}</td>)
+		}
+		tr_values.push(<tr>{td_values1}</tr>);
+
+		let td_valuesTotal = [];
+		for(let total of td_totals){
+			td_valuesTotal.push(<td>{total}</td>)
+		}
+		tr_values.push(<tr>{td_valuesTotal}</tr>);
+
+		let td_valuesExtra = [];
+		for(let extra of td_extra){
+			td_valuesExtra.push(<td>{extra}</td>)
+		}
+		tr_values.push(<tr>{td_valuesExtra}</tr>);
+
 		return tr_values;
 	}
 	render(){
@@ -255,13 +282,13 @@ class WorkoutDashboard extends Component{
 										<th>Avg % HR Not Recorded</th>
 										<th>Avg Distance (In Miles)</th>
 									</tr>
-									
+									<tbody>
 									{this.renderTable(this.state.weekly_data)}	
-									
+									</tbody>
 								</table>
 							</div>
 						</div>
-					
+						{this.renderWeeklySummaryOverlay()}
 				</div>
 			);
 	}
