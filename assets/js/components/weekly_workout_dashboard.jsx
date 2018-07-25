@@ -144,7 +144,7 @@ class WorkoutDashboard extends Component{
 	}
 	renderTable(weekly_data){
 		let tr_values = [];
-		let td_values = [];
+		
 		let td_totals = [];
 		let td_extra = [];
 		let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
@@ -152,21 +152,21 @@ class WorkoutDashboard extends Component{
 		"duration_hrr_not_recorded","percent_hrr_not_recorded","distance_meters"];
 		let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity","","","","","","","","","","","","",];
 		for(let [key,value] of Object.entries(weekly_data)){
-			
+			let td_values = [];
 			if(key != "extra" && key != "Totals"){
 				for(let key1 of td_keys){
 					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
 					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
 					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
-						td_values.push(this.gpascoreDecimal(value[key1]));
+						td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
 					}
 					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
 					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
 					  key1 == "duration_hrr_not_recorded"){
-						td_values.push(this.renderTime(value[key1]));
+						td_values.push(<td>{this.renderTime(value[key1])}</td>);
 					}
 					else{
-						td_values.push(value[key1]);
+						td_values.push(<td>{value[key1]}</td>);
 					}
 				}
 			}
@@ -200,13 +200,9 @@ class WorkoutDashboard extends Component{
 					}
 				}
 			}
+			tr_values.push(<tr>{td_values}</tr>);
 		}
-		let td_values1 = [];
-		for(let value6 of td_values){
-			td_values1.push(<td>{value6}</td>)
-		}
-		tr_values.push(<tr>{td_values1}</tr>);
-
+		
 		let td_valuesTotal = [];
 		for(let total of td_totals){
 			td_valuesTotal.push(<td>{total}</td>)
