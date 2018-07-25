@@ -228,7 +228,7 @@ def percent_total(merged_data_total):
 	merged_data_total['Totals']['days_no_activity'] = (
 		 (7)-(merged_data_total['Totals']['days_with_activity']))
 	merged_data_total['Totals']['percent_days_no_activity'] = (
-		(merged_data_total['Totals']['days_with_activity'])/(7))*100
+		(merged_data_total['Totals']['days_no_activity'])/(7))*100
 	return merged_data_total
 
 def totals_workout(merged_data,no_days_activity):
@@ -265,6 +265,15 @@ def add_duration_percent(final_data):
 		if key != 'Totals':
 			final_data_total[key]['workout_duration_percent'] = ((
 				value['duration'])/final_data_total['Totals']['duration'])*100
+			if 'distance_meters' in value.keys():
+				if 'SWIMMING' in key:
+					final_data_total[key]['distance_meters'] = (str(
+						int(final_data_total[key]['distance_meters']*1.09361))+" yards")
+				else:
+					final_data_total[key]['distance_meters'] = (str(
+						int(final_data_total[key]['distance_meters']*0.000621371))+" Miles ")
+
+
 			value.pop('avg_heart_rate', None)
 			value.pop('max_heart_rate', None)
 			value.pop('total_duration', None)
