@@ -125,13 +125,13 @@ def add_activity_type(workout_dict,workout_type):
 				if not value.get(k_str):
 					workout_dict[key][k_str] = {}
 				workout_dict[key][k_str]['value'] = value["distance_meters"]
-				workout_dict[key][k_str]['units'] = "meters"
+				workout_dict[key][k_str]['unit'] = "meters"
 			else:
 				k_str = k.lower()+"_distance"
 				if not value.get(k_str):
 					workout_dict[key][k_str] = {}
 				workout_dict[key][k_str]['value'] = workout_dict[k]["distance_meters"]
-				workout_dict[key][k_str]['units'] = "meters"
+				workout_dict[key][k_str]['unit'] = "meters"
 	return workout_dict
 
 def weekly_workout_calculations(weekly_workout):
@@ -334,11 +334,16 @@ def dynamic_activities(final_data,workout_type):
 					if not value.get(k_str):
 						final_data['Totals'][k_str] = {}
 					final_data['Totals'][k_str]['value'] = value["distance_meters"]
-					final_data['Totals'][k_str]['units'] = "meters"
+					final_data['Totals'][k_str]['unit'] = "meters"
 				else:
 					k_str = k.lower()+"_distance"
 					if not value.get(k_str):
 						final_data['Totals'][k_str] = {}
 					final_data['Totals'][k_str]['value'] = final_data[k]["distance_meters"]
-					final_data['Totals'][k_str]['units'] = "meters"
+					final_data['Totals'][k_str]['unit'] = "meters"
 	return final_data
+
+def remove_distance_meters(data):
+	for key,value in data.items():
+		value.pop("distance_meters",None)
+	return data
