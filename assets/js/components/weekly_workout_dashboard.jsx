@@ -39,6 +39,9 @@ class WorkoutDashboard extends Component{
 		this.renderTime = this.renderTime.bind(this);
 		this.renderLastSunday = this.renderLastSunday.bind(this);
 		this.renderWeeklySummaryOverlay = renderWeeklySummaryOverlay.bind(this);
+		this.renderTableActivityHeader = this.renderTableActivityHeader.bind(this);
+		this.renderMetersToYards = this.renderMetersToYards.bind(this);
+		this.renderMetersToMiles = this.renderMetersToMiles.bind(this);
 	}
 	successWeeklyWorkoutData(data){
 		this.setState({
@@ -52,6 +55,12 @@ class WorkoutDashboard extends Component{
 			fetching_weekly:false,
 		});
 		
+  	}
+  	renderMetersToYards(value){
+  		return parseFloat(value * 1.09361).toFixed(2);
+  	}
+  	renderMetersToMiles(value){
+  		return parseFloat(value*0.000621371).toFixed(2);
   	}
 	renderAddDate(){
 		/*It is forward arrow button for the calender getting the next day date*/
@@ -142,82 +151,131 @@ class WorkoutDashboard extends Component{
 		}
 		return time;
 	}
+
 	renderTable(weekly_data){
-		let tr_values = [];
-		
-		let td_totals = [];
-		let td_extra = [];
-		let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
-		"percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
-		"duration_hrr_not_recorded","percent_hrr_not_recorded","distance_meters"];
-		let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity","","","","","","","","","","","","",];
-		for(let [key,value] of Object.entries(weekly_data)){
-			let td_values = [];
-			if(key != "extra" && key != "Totals"){
-				for(let key1 of td_keys){
-					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
-					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
-					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
-						td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
-					}
-					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
-					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
-					  key1 == "duration_hrr_not_recorded"){
-						td_values.push(<td>{this.renderTime(value[key1])}</td>);
-					}
-					else{
-						td_values.push(<td>{value[key1]}</td>);
-					}
-				}
-			}
-			else if(key == "Totals"){
-				for(let key1 of td_keys){
-					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
-					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
-					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
-						td_totals.push(this.gpascoreDecimal(value[key1]))
-					}
-					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
-					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
-					  key1 == "duration_hrr_not_recorded"){
-						td_totals.push(this.renderTime(value[key1]))
-					}
-					else{
-						td_totals.push(value[key1])
+		if (!_.isEmpty(weekly_data)){
+			let tr_values = [];
+			let td_totals = [];
+			let td_extra = [];
+			let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
+			"percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
+			"duration_hrr_not_recorded","percent_hrr_not_recorded"];
+			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => !td_keys.includes(x));
+			td_keys = td_keys.concat(activity_distance_keys);
+			let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity"];
+			for(let [key,value] of Object.entries(weekly_data)){
+				let td_values = [];
+				if(key != "extra" && key != "Totals"){
+					for(let key1 of td_keys){
+						if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
+						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
+						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
+							td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
+						}
+						else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
+						 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
+						  key1 == "duration_hrr_not_recorded"){
+							td_values.push(<td>{this.renderTime(value[key1])}</td>);
+						}
+						else if(activity_distance_keys.includes(key1)){
+							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
+								td_values.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
+							}
+							else{
+								td_values.push(<td>{this.renderMetersToMiles(value[key1].value)}</td>);
+							}
+						}
+						else{
+							td_values.push(<td>{value[key1]}</td>);
+						}
 					}
 				}
-			}
-			else{
-				for(let key2 of td_keys1){
-					if(key2 == "percent_days_no_activity"){
-						td_extra.push(this.gpascoreDecimal(value[key2]))
-					}
-					else if(key2 == "no_activity"){
-						td_extra.push("No Activity")
-					}
-					else{
-						td_extra.push(value[key2])
+				else if(key == "Totals"){
+					for(let key1 of td_keys){
+						if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
+						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
+						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
+							td_totals.push(this.gpascoreDecimal(value[key1]))
+						}
+						else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
+						 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
+						  key1 == "duration_hrr_not_recorded"){
+							td_totals.push(this.renderTime(value[key1]))
+						}
+						else if(activity_distance_keys.includes(key1)){
+							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
+								td_totals.push(this.renderMetersToYards(value[key1].value));
+							}
+							else{
+								td_totals.push(this.renderMetersToMiles(value[key1].value));
+							}
+						}
+						else{
+							td_totals.push(value[key1])
+						}
 					}
 				}
+				else{
+					for(let key2 of td_keys1){
+						if(key2 == "percent_days_no_activity"){
+							td_extra.push(this.gpascoreDecimal(value[key2]))
+						}
+						else if(key2 == "no_activity"){
+							td_extra.push("No Activity")
+						}
+						else{
+							td_extra.push(value[key2])
+						}
+					}
+				}
+				tr_values.push(<tr>{td_values}</tr>);
 			}
-			tr_values.push(<tr>{td_values}</tr>);
-		}
-		
-		let td_valuesTotal = [];
-		for(let total of td_totals){
-			td_valuesTotal.push(<td>{total}</td>)
-		}
-		tr_values.push(<tr>{td_valuesTotal}</tr>);
 
-		let td_valuesExtra = [];
-		for(let extra of td_extra){
-			td_valuesExtra.push(<td>{extra}</td>)
-		}
-		tr_values.push(<tr>{td_valuesExtra}</tr>);
+			let td_valuesTotal = [];
+			for(let total of td_totals){
+				td_valuesTotal.push(<td>{total}</td>)
+			}
+			tr_values.push(<tr>{td_valuesTotal}</tr>);
 
-		return tr_values;
+			let td_valuesExtra = [];
+			for(let extra of td_extra){
+				td_valuesExtra.push(<td>{extra}</td>)
+			}
+			tr_values.push(<tr>{td_valuesExtra}</tr>);
+
+			return [activity_distance_keys,tr_values];
+		}
+		return [null,null];
+	}
+	renderTableActivityHeader(header_data){
+		let td_header = [];
+		let th_row = [];
+		if(header_data){
+			for(let key of header_data){
+				let patt = /_distance/i;
+				let pattern = new RegExp(patt);
+				let res = pattern.exec(key);
+				let sliceIndex = res.index;
+				let activity_name = key.slice(0,sliceIndex).split("_");
+				activity_name.forEach((x,i,arr) => {
+					arr[i] = x[0].toUpperCase()+x.slice(1);
+				})
+				activity_name = activity_name.join(" ")
+				if(activity_name.toLowerCase().search("swimming") >= 0){
+					key = "Avg" + " " + activity_name + " Distance (In Yards)";
+				}else{
+					key = "Avg" + " " + activity_name + " Distance (In Miles)";
+				}
+ 				td_header.push(key);
+			}
+			th_row.push(<th>{td_header}</th>);
+		}
+		return th_row;
 	}
 	render(){
+		let rendered_data = this.renderTable(this.state.weekly_data)
+		let activities_keys = rendered_data[0];
+		let rendered_rows = rendered_data[1];
 		return(
 				<div className = "container-fluid">
 					<NavbarMenu title = {<span style = {{fontSize:"22px"}}>
@@ -276,10 +334,10 @@ class WorkoutDashboard extends Component{
 										<th>Avg % Below Aerobic</th>
 										<th>Avg HR Not Recorded Duration (hh:mm)</th>
 										<th>Avg % HR Not Recorded</th>
-										<th>Avg Distance (In Miles)</th>
+										{this.renderTableActivityHeader(activities_keys)}
 									</tr>
 									<tbody>
-									{this.renderTable(this.state.weekly_data)}	
+									{rendered_rows}	
 									</tbody>
 								</table>
 							</div>
