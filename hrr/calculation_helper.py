@@ -108,6 +108,8 @@ def workout_percent(workout_dict):
 		if value.get('days_with_activity') and value.get("average_heart_rate"):
 			workout_dict[key]["average_heart_rate"] = ((
 				workout_dict[key]["average_heart_rate"])/workout_dict[key]["days_with_activity"])
+			workout_dict[key]["percent_of_days"] = ((
+				workout_dict[key]["days_with_activity"])/7)*100
 		elif value.get('days_with_activity'):	
 			workout_dict[key]["percent_of_days"] = ((
 				workout_dict[key]["days_with_activity"])/7)*100
