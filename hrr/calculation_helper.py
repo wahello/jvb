@@ -105,9 +105,10 @@ def get_weekly_aa(user,start_date,end_date):
 
 def workout_percent(workout_dict):
 	for key,value in workout_dict.items():
-		if value.get('days_with_activity'):
+		if value.get('days_with_activity') and value.get("average_heart_rate"):
 			workout_dict[key]["average_heart_rate"] = ((
 				workout_dict[key]["average_heart_rate"])/workout_dict[key]["days_with_activity"])
+		elif value.get('days_with_activity'):	
 			workout_dict[key]["percent_of_days"] = ((
 				workout_dict[key]["days_with_activity"])/7)*100
 	return workout_dict
@@ -241,8 +242,9 @@ def totals_workout(merged_data,no_days_activity):
 		merged_data_total['Totals']['duration'] = merged_data_total['Totals'].get(
 			'duration',0) + value["duration"]
 		merged_data_total['Totals']['workout_duration_percent'] = 100
-		merged_data_total['Totals']['average_heart_rate'] = ((
-			value["average_heart_rate"] + merged_data_total['Totals'].get('average_heart_rate',0)))
+		if value["average_heart_rate"]:
+			merged_data_total['Totals']['average_heart_rate'] = ((
+				value["average_heart_rate"] + merged_data_total['Totals'].get('average_heart_rate',0)))
 		merged_data_total['Totals']['duration_in_aerobic_range'] = ((
 			value["duration_in_aerobic_range"] + merged_data_total['Totals'].get(
 				'duration_in_aerobic_range',0)))
@@ -261,6 +263,7 @@ def totals_workout(merged_data,no_days_activity):
 
 def add_duration_percent(final_data):
 	final_data_total = final_data.copy()
+	heart_rate = []
 	for key,value in final_data.items():
 		if key != 'Totals':
 			final_data_total[key]['workout_duration_percent'] = ((
@@ -272,6 +275,8 @@ def add_duration_percent(final_data):
 				else:
 					final_data_total[key]['distance_meters'] = (str(
 						int(final_data_total[key]['distance_meters']*0.000621371))+" Miles ")
+			if value['average_heart_rate']:
+				heart_rate.append(value['average_heart_rate'])
 
 
 			value.pop('avg_heart_rate', None)
@@ -292,6 +297,9 @@ def add_duration_percent(final_data):
 					final_data_total['Totals']['percent_days_no_activity']))
 			final_data_total['Totals'].pop('days_no_activity', None)
 			final_data_total['Totals'].pop('percent_days_no_activity', None)
+	if heart_rate:
+		final_data_total['Totals']['average_heart_rate'] = ((
+			final_data_total['Totals']['average_heart_rate']/len(heart_rate)))
 
 	return final_data_total
  

@@ -661,7 +661,7 @@ def aa_workout_data(user,start_date):
 						hrr_not_recorded_list.append(hrr_not_recorded)
 						data['hrr_not_recorded'] = hrr_not_recorded
 				else:
-					hrr_not_recorded = workout['durationInSeconds']
+					hrr_not_recorded = workout.get('durationInSeconds',0)
 					hrr_not_recorded_list.append(hrr_not_recorded)
 					data['hrr_not_recorded'] = hrr_not_recorded
 			for tm in hrr_not_recorded_list:
