@@ -136,7 +136,7 @@ def add_activity_type(workout_dict,workout_type):
 				k_str = k.lower()+"_distance"
 				if not value.get(k_str):
 					workout_dict[key][k_str] = {}
-				workout_dict[key][k_str]['value'] = workout_dict[k]["distance_meters"]
+				workout_dict[key][k_str]['value'] = 0
 				workout_dict[key][k_str]['unit'] = "meters"
 	return workout_dict
 
@@ -149,7 +149,7 @@ def weekly_workout_calculations(weekly_workout):
 	workout_summary_id = {} 
 	for single_workout in weekly_workout:
 		single_workout = ast.literal_eval(single_workout)
-		single_workout.pop('Totals',None)
+		single_workout.pop('Totals',None)	
 		for key,value in single_workout.items():
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
