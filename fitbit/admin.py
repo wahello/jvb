@@ -6,7 +6,9 @@ from .models import FitbitConnectToken,\
                     UserFitbitDataHeartRate,\
                     UserFitbitDataActivities,\
                     UserFitbitDataSteps,\
-                    FitbitNotifications
+                    FitbitNotifications,\
+                    UserFitbitDatabody,\
+                    UserFitbitDatafoods
 # Register your models here.
 
 class FitbitConnectTokenAdmin(admin.ModelAdmin):
@@ -40,9 +42,23 @@ class UserFitbitDataStepsAdmin(admin.ModelAdmin):
 class FitbitNotificationsAdmin(admin.ModelAdmin):
 	list_display = ('user','created_at', 'collection_type','notification_date','state',)
 
+class UserFitbitDatabodyAdmin(admin.ModelAdmin):
+	list_display = ('user','date_of_body','created_at')
+
+	search_fields = ('user__username','user__email','user__first_name',
+					 'user__last_name',)
+
+class UserFitbitDatafoodsAdmin(admin.ModelAdmin):
+	list_display = ('user','date_of_foods','created_at')
+
+	search_fields = ('user__username','user__email','user__first_name',
+					 'user__last_name',)
+
 admin.site.register(FitbitConnectToken,FitbitConnectTokenAdmin)
 admin.site.register(FitbitNotifications,FitbitNotificationsAdmin)
 admin.site.register(UserFitbitDataSleep,UserFitbitSleepAdmin)
 admin.site.register(UserFitbitDataHeartRate,UserFitbitHeartratepAdmin)
 admin.site.register(UserFitbitDataActivities,UserFitbitActivitiesAdmin)
 admin.site.register(UserFitbitDataSteps,UserFitbitDataStepsAdmin)
+admin.site.register(UserFitbitDatabody,UserFitbitDatabodyAdmin)
+admin.site.register(UserFitbitDatafoods,UserFitbitDatafoodsAdmin)
