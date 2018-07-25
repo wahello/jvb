@@ -36,6 +36,7 @@ class WorkoutDashboard extends Component{
 		this.renderTable = this.renderTable.bind(this);
 		this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
 		this.renderTime = this.renderTime.bind(this);
+		this.renderLastSunday = this.renderLastSunday.bind(this);
 	}
 	successWeeklyWorkoutData(data){
 		this.setState({
@@ -48,7 +49,7 @@ class WorkoutDashboard extends Component{
 	renderAddDate(){
 		/*It is forward arrow button for the calender getting the next day date*/
 		var today = this.state.selectedDate;
-		var tomorrow = moment(today).add(1, 'days');
+		var tomorrow = moment(today).add(7, 'days');
 		this.setState({
 			selectedDate:tomorrow.toDate()
 		},()=>{
@@ -58,12 +59,26 @@ class WorkoutDashboard extends Component{
 	renderRemoveDate(){
 		/*It is backward arrow button for the calender getting the last day date*/
 		var today = this.state.selectedDate;
-		var tomorrow = moment(today).subtract(1, 'days');
+		var tomorrow = moment(today).subtract(7, 'days');
 		this.setState({
 			selectedDate:tomorrow.toDate()
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
+	}
+	renderLastSunday(d){
+		let date;
+		let diff;
+  		var day = d.getDay();
+  		if(day == 0){
+  			diff = d.getDate() - day + (day == 0 ? -7:0);
+  			date = moment(new Date(d.setDate(diff))).format('MMM DD, YYYY');
+  		}
+  		else{
+	      	diff = d.getDate() - day + (day == 0 ? -6:0); // adjust when day is sunday
+	      	date = moment(new Date(d.setDate(diff))).format('MMM DD, YYYY');
+      	}
+  		return date;
 	}
 	toggleCalendar(){
 		//Toggle of calander icon.
@@ -122,7 +137,9 @@ class WorkoutDashboard extends Component{
 		let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity","","","","","","","","","","","","",];
 		for(let [key,value] of Object.entries(weekly_data)){
 			let td_values = [];
-			if(key != "extra"){
+			let td_totals = [];
+			let td_extra = [];
+			if(key != "extra" && key != "Totals"){
 				for(let key1 of td_keys){
 					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
 					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
@@ -139,20 +156,41 @@ class WorkoutDashboard extends Component{
 					}
 				}
 			}
-			else{
-				for(let key2 of td_keys1){
-					if(key2 == "percent_days_no_activity"){
-						td_values.push(<td>{this.gpascoreDecimal(value[key2])}</td>)
+			else if(key == "Totals"){
+				for(let key1 of td_keys){
+					if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
+					 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
+					  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
+						td_totals.push(<td>{this.gpascoreDecimal(value[key1])}</td>)
 					}
-					else if(key2 == "no_activity"){
-						td_values.push(<td>No Activity</td>)
+					else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
+					 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
+					  key1 == "duration_hrr_not_recorded"){
+						td_totals.push(<td>{this.renderTime(value[key1])}</td>)
 					}
 					else{
-						td_values.push(<td>{value[key2]}</td>)
+						td_totals.push(<td>{value[key1]}</td>)
 					}
 				}
 			}
-			tr_values.push(<tr>{td_values}</tr>)
+			else{
+				for(let key2 of td_keys1){
+					if(key2 == "percent_days_no_activity"){
+						td_extra.push(<td>{this.gpascoreDecimal(value[key2])}</td>)
+					}
+					else if(key2 == "no_activity"){
+						td_extra.push(<td>No Activity</td>)
+					}
+					else{
+						td_extra.push(<td>{value[key2]}</td>)
+					}
+				}
+			}
+			tr_values.push(<tbody>
+							<tr>{td_values}</tr>
+							<tr>{td_totals}</tr>
+							<tr>{td_extra}</tr>
+						   </tbody>)
 		}
 		return tr_values;
 	}
@@ -176,7 +214,8 @@ class WorkoutDashboard extends Component{
 			                        name = "calendar"
 			                        size = "2x"
 			                    />
-			                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+			                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>
+			                   
 		                	</span>
 		                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
 								<FontAwesome
@@ -194,6 +233,7 @@ class WorkoutDashboard extends Component{
 				                </PopoverBody>
 			                </Popover>
 	                	</span>
+	                	 <div style = {{textAlign:"center",fontWeight:"bold"}}>Weekly Workout Summary Report For The Week Ended: <span style = {{textDecoration:"underline"}}>{this.renderLastSunday(new Date(this.state.selectedDate))}</span></div> 
 		        	</div>
 					 <div className = "row justify-content-center hr_table_padd">
 							<div className = "table table-responsive">
@@ -215,9 +255,9 @@ class WorkoutDashboard extends Component{
 										<th>Avg % HR Not Recorded</th>
 										<th>Avg Distance (In Miles)</th>
 									</tr>
-									<tbody>
+									
 									{this.renderTable(this.state.weekly_data)}	
-									</tbody>
+									
 								</table>
 							</div>
 						</div>
