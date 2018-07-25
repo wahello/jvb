@@ -1,6 +1,7 @@
 from datetime import datetime,timedelta,date
 import time
 import ast
+import json
 import collections
 from django.db.models import Q
 
@@ -115,6 +116,23 @@ def workout_percent(workout_dict):
 				workout_dict[key]["days_with_activity"])/7)*100
 	return workout_dict
 
+def add_activity_type(workout_dict,workout_type):
+	workout_type_unique = list(set(workout_type))
+	for key,value in workout_dict.items():
+		for i,k in enumerate(workout_type_unique):
+			if k == key:
+				k_str = k.lower()+"_distance"
+				if not value.get(k_str):
+					workout_dict[key][k_str] = {}
+				workout_dict[key][k_str]['value'] = value["distance_meters"]
+				workout_dict[key][k_str]['units'] = "meters"
+			else:
+				k_str = k.lower()+"_distance"
+				if not value.get(k_str):
+					workout_dict[key][k_str] = {}
+				workout_dict[key][k_str]['value'] = workout_dict[k]["distance_meters"]
+				workout_dict[key][k_str]['units'] = "meters"
+	return workout_dict
 
 def weekly_workout_calculations(weekly_workout):
 	workout_type = []
@@ -146,8 +164,9 @@ def weekly_workout_calculations(weekly_workout):
 				workout_dict[value['workout_type']]['days_with_activity'] = 1
 				workout_summary_id[key] = [value['workout_type']]
 
-	workout_dict_percent = workout_percent(workout_dict)
-	return workout_dict_percent,workout_summary_id
+	added_all_actiivtes = add_activity_type(workout_dict,workout_type)
+	workout_dict_percent = workout_percent(added_all_actiivtes)
+	return workout_dict_percent,workout_summary_id,workout_type
 
 def add_workout_type(single_aa,workout_summary_id):
 	for key,value in single_aa.items():
@@ -270,16 +289,15 @@ def add_duration_percent(final_data):
 		if key != 'Totals':
 			final_data_total[key]['workout_duration_percent'] = ((
 				value['duration'])/final_data_total['Totals']['duration'])*100
-			if 'distance_meters' in value.keys():
-				if 'SWIMMING' in key:
-					final_data_total[key]['distance_meters'] = (str(
-						int(final_data_total[key]['distance_meters']*1.09361))+" yards")
-				else:
-					final_data_total[key]['distance_meters'] = (str(
-						int(final_data_total[key]['distance_meters']*0.000621371))+" Miles ")
+			# if 'distance_meters' in value.keys():
+			# 	if 'SWIMMING' in key:
+			# 		final_data_total[key]['distance_meters'] = (str(
+			# 			int(final_data_total[key]['distance_meters']*1.09361))+" yards")
+			# 	else:
+			# 		final_data_total[key]['distance_meters'] = (str(
+			# 			int(final_data_total[key]['distance_meters']*0.000621371))+" Miles ")
 			if value['average_heart_rate']:
 				heart_rate.append(value['average_heart_rate'])
-
 
 			value.pop('avg_heart_rate', None)
 			value.pop('max_heart_rate', None)
@@ -305,4 +323,20 @@ def add_duration_percent(final_data):
 
 	return final_data_total
  
- 
+def dynamic_activities(final_data,workout_type):
+	workout_type_unique = list(set(workout_type))
+	for key,value in final_data.items():
+		for i,k in enumerate(workout_type_unique):
+			if k == key:
+				k_str = k.lower()+"_distance"
+				if not value.get(k_str):
+					final_data['Totals'][k_str] = {}
+				final_data['Totals'][k_str]['value'] = value["distance_meters"]
+				final_data['Totals'][k_str]['units'] = "meters"
+			else:
+				k_str = k.lower()+"_distance"
+				if not value.get(k_str):
+					final_data['Totals'][k_str] = {}
+				final_data['Totals'][k_str]['value'] = final_data[k]["distance_meters"]
+				final_data['Totals'][k_str]['units'] = "meters"
+	return final_data
