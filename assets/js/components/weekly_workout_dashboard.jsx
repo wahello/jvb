@@ -207,7 +207,6 @@ class WorkoutDashboard extends Component{
 								td_totals.push(this.renderMetersToYards(value[key1].value));
 							}
 							else{
-								console.log("*******************",value[key1].value);
 								td_totals.push(this.renderMetersToMiles(value[key1].value));
 							}
 						}
