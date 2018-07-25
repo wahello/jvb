@@ -82,11 +82,11 @@ class HrrLeaderboard extends Component{
 								<tr>
 									<th>Overall HRR Rank</th>
 									<th>User</th>
-									<th>Time to 99</th>
+									<th>Time to 99 (hh:mm)</th>
 									<th>Time to 99 Rank</th>
 									<th>Heart beats lowered in 1st minute</th>
 									<th>Lowered Beats Rank</th>
-									<th>Pure Time to 99</th>
+									<th>Pure Time to 99 (hh:mm)</th>
 									<th>Pure Time to 99 Rank</th>
 									<th>Pure Heart beats lowered in 1st minute</th>
 									<th>Pure Heart beats lowered in 1st minute Rank</th>
