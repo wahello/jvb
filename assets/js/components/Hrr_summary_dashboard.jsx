@@ -446,7 +446,7 @@ class Hrr_Dashboard extends Component{
 						{this.renderPureTimeTo99Colors(this.state.pure_time_to_99)}
 				    </div>
 				</div>
-				<div className = "row justify-content-center md_padding">
+				<div className = "row justify-content-center md_padding hrr_padd">
 					<div className = "col-md-6 table_margin ">
 						{this.renderPureHeartBeatsColors(this.state.pure_heart_beats_lowered_in_1st_min)}
 				    </div>
