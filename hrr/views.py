@@ -49,7 +49,8 @@ from hrr.calculation_helper import week_date,\
 									merge_activities,\
 									totals_workout,\
 									add_duration_percent,\
-									dynamic_activities
+									dynamic_activities,\
+									remove_distance_meters
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -1941,6 +1942,9 @@ def weekly_workout_summary(request):
 		data = dynamic_activities(final_data,workout_type)
 	else:
 		data = {}
+	if data:
+		data_v2 = remove_distance_meters(data)
+	else:
+		data_v2 = {}
 
-
-	return JsonResponse(data)
+	return JsonResponse(data_v2)

@@ -342,3 +342,8 @@ def dynamic_activities(final_data,workout_type):
 					final_data['Totals'][k_str]['value'] = final_data[k]["distance_meters"]
 					final_data['Totals'][k_str]['unit'] = "meters"
 	return final_data
+
+def remove_distance_meters(data):
+	for key,value in data.items():
+		value.pop("distance_meters",None)
+	return data
