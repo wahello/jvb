@@ -160,3 +160,25 @@ export function renderTimeTohrrZoneSelectedDateFetchOverlay(){
 		);
 	}
 }
+export function renderHrrSummaryDashboardDataFetchOverlay(){
+	if(this.state.fetching_hrr_dashboard){
+		let selectedDate = moment(this.state.selectedDate);
+
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Time to Hrr Summary Dashboard Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
