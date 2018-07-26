@@ -89,7 +89,7 @@ class HrrLeaderboard extends Component{
           }, 100);
       }
   }
-	renderTable(Hrr_data){
+	renderTable(Hrr_data,Hrr_username){
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","time_99","beat_lowered","pure_time_99","pure_beat_lowered","total_hrr_rank_point"];
@@ -102,8 +102,15 @@ class HrrLeaderboard extends Component{
 					td_values.push(<td className ="progress_table">{value[key1]}</td>);
 				}
 				else if(key1 == "username"){
-					currentUser = value[key1];
-					td_values.push(<td className ="progress_table">{currentUser}</td>);
+					let user = value[key1];
+					if(user == Hrr_username){
+						td_values.push(<td className ="progress_table">{user}</td>);
+						currentUser = user;
+					}
+					else{
+						td_values.push(<td className ="progress_table">{user}</td>);
+						currentUser = '';
+					}
 				}
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
 					for(let [key3,value4] of Object.entries(value[key1])){
@@ -152,7 +159,7 @@ class HrrLeaderboard extends Component{
 									<th>Total HRR Rank Points</th>
 								</tr>
 								<tbody>
-								{this.renderTable(this.props.Hrr_data)}	
+								{this.renderTable(this.props.Hrr_data,this.props.Hrr_username)}	
 								</tbody>
 							</table>
 						</div>

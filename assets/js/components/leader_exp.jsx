@@ -13,7 +13,7 @@ import {renderLeaderBoardFetchOverlay,renderLeaderBoard2FetchOverlay,renderLeade
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
 import AllRank_Data1 from "./leader_all_exp";
-import HrrLeaderboard from "./Hrr_leaderboard";
+import HrrLeaderboard from "./Hrr_leaderboard"; 
 
 
 
@@ -157,6 +157,7 @@ class LeaderBoard1 extends Component{
 			active_category_name:"",
 			all_verbose_name:"",
 			all_hrr_rank_data:"",
+			Hrr_username:"",
 			duration_date:{
 				"week":"",
 				"today":"",
@@ -342,6 +343,7 @@ class LeaderBoard1 extends Component{
 		let category = "";
 	  	let durations = [];
 	  	let scores = [];
+	  	let userName;
 	  	let ranks = [];
 	  	let tableRows = [];
 	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
@@ -352,6 +354,7 @@ class LeaderBoard1 extends Component{
 	  				durations.push(this.headerDates(range));
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "user_rank"){
+		  					userName = c_rankData.username;
 			  		 		scores.push(c_rankData.total_hrr_rank_point);
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
@@ -363,6 +366,7 @@ class LeaderBoard1 extends Component{
 			  		durations.push(duration);
 			  		for (let [key,rankData] of Object.entries(val)){
 			  		 	if(key == "user_rank"){
+			  		 		userName = rankData.username;
 			  		 		scores.push(rankData.total_hrr_rank_point);
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
@@ -411,7 +415,7 @@ class LeaderBoard1 extends Component{
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  		<a  onClick = {this.reanderAllHrr.bind(this,all_cat_rank)}>
+			  		<a  onClick = {this.reanderAllHrr.bind(this,all_cat_rank,userName)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -439,9 +443,10 @@ class LeaderBoard1 extends Component{
 	  	{tableRows}
 	  	</table>;
 	}
-	reanderAllHrr(all_data){
+	reanderAllHrr(all_data,value1){
 		this.setState({
 			all_hrr_rank_data:all_data,
+			Hrr_username:value1,
 			Hrr_view:!this.state.Hrr_view,
 			active_view:!this.state.active_view,
 			btnView2:!this.state.btnView2,
@@ -1099,7 +1104,8 @@ class LeaderBoard1 extends Component{
 		        all_verbose_name = {this.state.all_verbose_name}/>
 		  	}
 			{this.state.btnView2 &&
-		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}/>
+		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
+	  							Hrr_username = {this.state.Hrr_username}/>
 			}
 	        </div>
 	        {this.renderLeaderBoardFetchOverlay()}
