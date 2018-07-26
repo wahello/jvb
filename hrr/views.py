@@ -1905,10 +1905,13 @@ class UserAaView(APIView):
 		return (queryset,no_days.days)
 
 def weekly_workout_summary(request):
+	'''
+		Create the weekly workout summary cart api
+	'''
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	week_start_date,week_end_date = week_date(start_date)
-	# print("start date",week_start_date,"end date",week_end_date)
+	print("start date",week_start_date,"end date",week_end_date)
 	weekly_workouts_query = get_weekly_workouts(
 		request.user,week_start_date,week_end_date)
 
@@ -1919,19 +1922,13 @@ def weekly_workout_summary(request):
 	else:
 		final_workout_data = ''
 		workout_summary_id = ''
-
-	# print(final_workout_data,"final_workout_data dict")
-	
 	weekly_aa_query = get_weekly_aa(
 		request.user,week_start_date,week_end_date)
-	
 	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
 	if weekly_aa:
 		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
 	else:
 		final_aa_data = ''
-	# print(final_aa_data,"final_aa_data dict")
-
 	if final_workout_data and final_aa_data:
 		merged_data = merge_activities(final_workout_data,final_aa_data)
 		added_totals = totals_workout(merged_data,len(weekly_aa_query))

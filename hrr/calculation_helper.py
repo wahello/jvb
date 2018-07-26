@@ -105,6 +105,9 @@ def get_weekly_aa(user,start_date,end_date):
 	return queryset
 
 def workout_percent(workout_dict):
+	'''
+		calculating the average heart rate and percent of days having activities 
+	'''
 	for key,value in workout_dict.items():
 		if value.get('days_with_activity') and value.get("average_heart_rate"):
 			workout_dict[key]["average_heart_rate"] = ((
@@ -117,6 +120,9 @@ def workout_percent(workout_dict):
 	return workout_dict
 
 def add_activity_type(workout_dict,workout_type):
+	'''
+		Add new dictonary(activity duration) for every activty
+	''' 
 	workout_type_unique = list(set(workout_type))
 	for key,value in workout_dict.items():
 		for i,k in enumerate(workout_type_unique):
@@ -130,17 +136,20 @@ def add_activity_type(workout_dict,workout_type):
 				k_str = k.lower()+"_distance"
 				if not value.get(k_str):
 					workout_dict[key][k_str] = {}
-				workout_dict[key][k_str]['value'] = workout_dict[k]["distance_meters"]
+				workout_dict[key][k_str]['value'] = 0
 				workout_dict[key][k_str]['unit'] = "meters"
 	return workout_dict
 
 def weekly_workout_calculations(weekly_workout):
+	'''
+		Make Similar activities into single activity
+	'''
 	workout_type = []
 	workout_dict = {}
 	workout_summary_id = {} 
 	for single_workout in weekly_workout:
 		single_workout = ast.literal_eval(single_workout)
-		single_workout.pop('Totals',None)
+		single_workout.pop('Totals',None)	
 		for key,value in single_workout.items():
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
@@ -169,6 +178,9 @@ def weekly_workout_calculations(weekly_workout):
 	return workout_dict_percent,workout_summary_id,workout_type
 
 def add_workout_type(single_aa,workout_summary_id):
+	'''
+		Make activity type as key
+	'''
 	for key,value in single_aa.items():
 		for key1,values1 in workout_summary_id.items():
 			if key == key1:
@@ -176,6 +188,9 @@ def add_workout_type(single_aa,workout_summary_id):
 	return single_aa
 
 def percent_calculations(aa_dict):
+	'''
+		Add percentages to Aerobic and Anarobic ranges for activity
+	'''
 	for key,value in aa_dict.items():
 		if value.get('days_with_activity'):
 			aa_dict[key]["percent_aerobic"] = ((
@@ -190,6 +205,9 @@ def percent_calculations(aa_dict):
 	return aa_dict
 
 def weekly_aa_calculations(weekly_aa,workout_summary_id):
+	'''
+		Add Aerobic and Anarobic ranhe values to activity
+	'''
 	activity_type = []
 	aa_dict = {}
 	for single_aa in weekly_aa:
@@ -197,34 +215,38 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id):
 		single_aa.pop('Totals',None)
 		single_aa_modified = add_workout_type(single_aa,workout_summary_id)
 		for key,value in single_aa_modified.items():
-			if value['workout_type'] in activity_type:
-				activity_type.append(value['workout_type'])
-				no_workouts = dict(collections.Counter(activity_type))
-				repeated_workout = no_workouts[value['workout_type']]
-				aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
-				aa_dict[value['workout_type']]['total_duration'] = (
-					(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
-				aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
-					(aa_dict[value['workout_type']]['duration_in_aerobic_range']) + (
-						value['duration_in_aerobic_range']))
-				aa_dict[value['workout_type']]['duration_in_anaerobic_range'] = (
-					(aa_dict[value['workout_type']]['duration_in_anaerobic_range']) + (
-						value['duration_in_anaerobic_range']))
-				aa_dict[value['workout_type']]['duration_below_aerobic_range'] = (
-					(aa_dict[value['workout_type']]['duration_below_aerobic_range']) + (
-						value['duration_below_aerobic_range']))
-				aa_dict[value['workout_type']]['duration_hrr_not_recorded'] = (
-					(aa_dict[value['workout_type']]['duration_hrr_not_recorded']) + (
-						value['duration_hrr_not_recorded']))
+			if value.get('workout_type',None):
+				if value['workout_type'] in activity_type:
+					activity_type.append(value['workout_type'])
+					no_workouts = dict(collections.Counter(activity_type))
+					repeated_workout = no_workouts[value['workout_type']]
+					aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+					aa_dict[value['workout_type']]['total_duration'] = (
+						(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
+					aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
+						(aa_dict[value['workout_type']]['duration_in_aerobic_range']) + (
+							value['duration_in_aerobic_range']))
+					aa_dict[value['workout_type']]['duration_in_anaerobic_range'] = (
+						(aa_dict[value['workout_type']]['duration_in_anaerobic_range']) + (
+							value['duration_in_anaerobic_range']))
+					aa_dict[value['workout_type']]['duration_below_aerobic_range'] = (
+						(aa_dict[value['workout_type']]['duration_below_aerobic_range']) + (
+							value['duration_below_aerobic_range']))
+					aa_dict[value['workout_type']]['duration_hrr_not_recorded'] = (
+						(aa_dict[value['workout_type']]['duration_hrr_not_recorded']) + (
+							value['duration_hrr_not_recorded']))
 
 
-			else:
-				activity_type.append(value['workout_type'])	
-				aa_dict[value['workout_type']] = value
+				else:
+					activity_type.append(value['workout_type'])	
+					aa_dict[value['workout_type']] = value
 	added_percent = percent_calculations(aa_dict)
 	return added_percent
 
 def merge_activities(final_workout_data,final_aa_data):
+	'''
+		Merge Totals dict and activity dicts
+	'''
 	for key,value in final_workout_data.items():
 		for key1,values1 in final_aa_data.items():
 			if key == key1:
@@ -233,6 +255,9 @@ def merge_activities(final_workout_data,final_aa_data):
 	return final_workout_data
 
 def percent_total(merged_data_total):
+	'''
+		Add percentages to Aerobic and Anarobic ranges for Totals
+	'''
 	merged_data_total['Totals']['percent_aerobic'] = (
 		(merged_data_total['Totals']['duration_in_aerobic_range'])/(
 			merged_data_total['Totals']['duration']))*100
@@ -254,6 +279,9 @@ def percent_total(merged_data_total):
 	return merged_data_total
 
 def totals_workout(merged_data,no_days_activity):
+	'''
+		Create Totals dictionary and update with relavant data
+	'''
 	merged_data_total = merged_data.copy()
 	for key,value in merged_data.items():
 		if not merged_data_total.get('Totals'):
@@ -283,19 +311,16 @@ def totals_workout(merged_data,no_days_activity):
 	return final_data
 
 def add_duration_percent(final_data):
+	'''
+		Remove unwanted keys from activity
+	'''
 	final_data_total = final_data.copy()
 	heart_rate = []
 	for key,value in final_data.items():
 		if key != 'Totals':
 			final_data_total[key]['workout_duration_percent'] = ((
 				value['duration'])/final_data_total['Totals']['duration'])*100
-			# if 'distance_meters' in value.keys():
-			# 	if 'SWIMMING' in key:
-			# 		final_data_total[key]['distance_meters'] = (str(
-			# 			int(final_data_total[key]['distance_meters']*1.09361))+" yards")
-			# 	else:
-			# 		final_data_total[key]['distance_meters'] = (str(
-			# 			int(final_data_total[key]['distance_meters']*0.000621371))+" Miles ")
+
 			if value['average_heart_rate']:
 				heart_rate.append(value['average_heart_rate'])
 
@@ -324,13 +349,15 @@ def add_duration_percent(final_data):
 	return final_data_total
  
 def dynamic_activities(final_data,workout_type):
+	'''
+		Add value and unit for activity distance in Totals dictionary
+	'''
 	workout_type_unique = list(set(workout_type))
 	for key,value in final_data.items():
 		if key == 'Totals':
 			for i,k in enumerate(workout_type_unique):
 				if k == key:
 					k_str = k.lower()+"_distance"
-					print(value,"ffffffff")
 					if not value.get(k_str):
 						final_data['Totals'][k_str] = {}
 					final_data['Totals'][k_str]['value'] = value["distance_meters"]
@@ -344,6 +371,9 @@ def dynamic_activities(final_data,workout_type):
 	return final_data
 
 def remove_distance_meters(data):
+	'''
+		Remove distace in meters key from all the dictionaries
+	'''
 	for key,value in data.items():
 		value.pop("distance_meters",None)
 	return data

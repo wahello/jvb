@@ -272,11 +272,10 @@ class WorkoutDashboard extends Component{
 				}else{
 					key = "Avg" + " " + activity_name + " Distance (In Miles)";
 				}
- 				td_header.push(key);
+ 				td_header.push(<th>{key}</th>);
 			}
-			th_row.push(<th>{td_header}</th>);
 		}
-		return th_row;
+		return td_header;
 	}
 	render(){
 		let rendered_data = this.renderTable(this.state.weekly_data)
