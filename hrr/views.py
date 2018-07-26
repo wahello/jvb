@@ -2,6 +2,7 @@ import json
 import ast
 import time
 import logging
+import collections
 from datetime import datetime,timedelta,date
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -40,7 +41,16 @@ from hrr.models import Hrr,\
 						AA
 from .serializers import HrrSerializer
 import pprint
-# from hrr.calculation_helper import week_date
+from hrr.calculation_helper import week_date,\
+									get_weekly_workouts,\
+									get_weekly_aa,\
+									weekly_workout_calculations,\
+									weekly_aa_calculations,\
+									merge_activities,\
+									totals_workout,\
+									add_duration_percent,\
+									dynamic_activities,\
+									remove_distance_meters
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -660,8 +670,7 @@ def aa_workout_data(user,start_date):
 				max_hrr.append(max_heart_rate)
 				exercise_steps = workout.get("steps",0)
 				steps.append(exercise_steps)
-				distance_meters = workout.get("distanceInMeters",0)
-				
+				distance_meters = workout.get("distanceInMeters",0)			
 				data = {"date":act_date,
 					  "workout_type":workout_type,
 					  "duration":duration,
@@ -679,7 +688,7 @@ def aa_workout_data(user,start_date):
 						hrr_not_recorded_list.append(hrr_not_recorded)
 						data['hrr_not_recorded'] = hrr_not_recorded
 				else:
-					hrr_not_recorded = workout['durationInSeconds']
+					hrr_not_recorded = workout.get('durationInSeconds',0)
 					hrr_not_recorded_list.append(hrr_not_recorded)
 					data['hrr_not_recorded'] = hrr_not_recorded
 			for tm in hrr_not_recorded_list:
@@ -720,8 +729,6 @@ def aa_workout_data(user,start_date):
 				data1['Totals'] = total
 			else:
 				data1['Totals'] = {}
-			
-		
 		if data1:
 			return data1
 		else:
@@ -1938,8 +1945,43 @@ class UserAaView(APIView):
 		return (queryset,no_days.days)
 
 def weekly_workout_summary(request):
+	'''
+		Create the weekly workout summary cart api
+	'''
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	week_start_date,week_end_date = week_date(start_date)
-	print(week_start_date,week_end_date,"week datesaaaaaaaaaaaaaaaaaaaaaaaa")
-	return JsonResponse({"test":"cool"})
+	print("start date",week_start_date,"end date",week_end_date)
+	weekly_workouts_query = get_weekly_workouts(
+		request.user,week_start_date,week_end_date)
+
+	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
+	if weekly_workout:
+		final_workout_data,workout_summary_id,workout_type = weekly_workout_calculations(
+			weekly_workout)
+	else:
+		final_workout_data = ''
+		workout_summary_id = ''
+	weekly_aa_query = get_weekly_aa(
+		request.user,week_start_date,week_end_date)
+	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
+	if weekly_aa:
+		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
+	else:
+		final_aa_data = ''
+	if final_workout_data and final_aa_data:
+		merged_data = merge_activities(final_workout_data,final_aa_data)
+		added_totals = totals_workout(merged_data,len(weekly_aa_query))
+	else:
+		added_totals = {}
+	if added_totals:
+		final_data = add_duration_percent(added_totals)
+		data = dynamic_activities(final_data,workout_type)
+	else:
+		data = {}
+	if data:
+		data_v2 = remove_distance_meters(data)
+	else:
+		data_v2 = {}
+
+	return JsonResponse(data_v2)
