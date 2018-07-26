@@ -172,6 +172,9 @@ class WorkoutDashboard extends Component{
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
 							td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
 						}
+						else if(key1 == "average_heart_rate"){
+							td_values.push(<td>{Math.round(value[key1])}</td>);
+						}
 						else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
 						 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
 						  key1 == "duration_hrr_not_recorded"){
@@ -196,6 +199,9 @@ class WorkoutDashboard extends Component{
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded"){
 							td_totals.push(this.gpascoreDecimal(value[key1]))
+						}
+						else if(key1 == "average_heart_rate"){
+							td_totals.push(Math.round(value[key1]));
 						}
 						else if(key1 == "duration" || key1 == "duration_in_aerobic_range" ||
 						 key1 == "duration_in_anaerobic_range" || key1 == "duration_below_aerobic_range" ||
