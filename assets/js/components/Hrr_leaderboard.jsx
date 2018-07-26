@@ -11,6 +11,8 @@ import { Collapse, Navbar, NavbarToggler,
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 
+let objectLength = 0;
+
 class HrrLeaderboard extends Component{
 	constructor(props) {
     super(props);
@@ -18,6 +20,7 @@ class HrrLeaderboard extends Component{
 	    }
 		this.renderTable = this.renderTable.bind(this);
 		this.heartBeatsColors = this.heartBeatsColors.bind(this);
+		this.scrollCallback = this.scrollCallback.bind(this);
 	}
 	heartBeatsColors(value){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
@@ -37,21 +40,75 @@ class HrrLeaderboard extends Component{
 	  			color = "black";
 	  		}
   		}
-  		return <td style ={{background:background,color:color}}>{value}</td>
+  		return <td style ={{background:background,color:color}} className ="progress_table">{value}</td>
   	}
+  	scrollCallback(operationCount) {
+      if (objectLength === operationCount) {
+          setTimeout(function () {
+            var x = window.matchMedia("(max-width: 900px)");
+            if(x.matches){
+               document.getElementById('my-row').style.background = 'lightyellow';
+                var index = -1;
+                var rows = document.getElementById("my-table").offsetHeight;
+                var rows1 = document.getElementById("my-row").offsetTop;
+                // for (var i=0;i<rows.length; i++){
+                //     if ( rows[i] == document.getElementById("my-row")){
+                //         index = i;
+                //         break;
+                //     }
+                // }
+                var rows2 = rows1 + 180;
+                var rows3 = rows2 - 712;
+                if(rows1 >= 520){
+                  window.scrollTo(0,  rows3);
+                }
+                else{
+                  window.scrollTo(0, 155);
+                }
+            }
+            else{
+                document.getElementById('my-row').style.background = 'lightyellow';
+                var index = -1;
+                var rows = document.getElementById("my-table").offsetHeight;
+                var rows1 = document.getElementById("my-row").offsetTop;
+                // for (var i=0;i<rows.length; i++){
+                //     if ( rows[i] == document.getElementById("my-row")){
+                //         index = i;
+                //         break;
+                //     }
+                // }
+                var rows2 = rows1 + 180;
+                var rows3 = rows2 - 662;
+                if(rows1 >= 520){
+                  window.scrollTo(0,  rows3);
+                }
+                else{
+                  window.scrollTo(0, 130);
+                }
+            }
+          }, 100);
+      }
+  }
 	renderTable(Hrr_data){
+		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","time_99","beat_lowered","pure_time_99","pure_beat_lowered","total_hrr_rank_point"];
+		objectLength = Object.keys(Hrr_data).length;
 		for(let[key,value] of Object.entries(Hrr_data)){
 			let td_values = [];
+			 let currentUser = '';
 			for(let key1 of keys){
-				if(key1 == "rank" || key1 == "username" || key1 == "total_hrr_rank_point"){
-					td_values.push(<td>{value[key1]}</td>);
+				if(key1 == "rank"|| key1 == "total_hrr_rank_point"){
+					td_values.push(<td className ="progress_table">{value[key1]}</td>);
+				}
+				else if(key1 == "username"){
+					currentUser = value[key1];
+					td_values.push(<td className ="progress_table">{currentUser}</td>);
 				}
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
 					for(let [key3,value4] of Object.entries(value[key1])){
 						if(key3 == "rank"){
-							td_values.push(<td>{value4}</td>);
+							td_values.push(<td className ="progress_table">{value4}</td>);
 						}
 						else if(key3 == "score"){
 							td_values.push(this.heartBeatsColors(value4.value));
@@ -61,15 +118,17 @@ class HrrLeaderboard extends Component{
 				else{
 					for(let [key3,value4] of Object.entries(value[key1])){
 						if(key3 == "rank"){
-							td_values.push(<td>{value4}</td>);
+							td_values.push(<td className ="progress_table">{value4}</td>);
 						}
 						else if(key3 == "score"){
-							td_values.push(<td>{value4.value}</td>);
+							td_values.push(<td className ="progress_table">{value4.value}</td>);
 						}
 					}
 				}
 			}
-			td_rows.push(<tr>{td_values}</tr>);	
+			++operationCount;
+                this.scrollCallback(operationCount);
+			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''} className ="progress_table">{td_values}</tr>);	
 		}
 		return td_rows;
 	}
@@ -78,15 +137,15 @@ class HrrLeaderboard extends Component{
 				<div className = "container-fluid">
 					<div className = "row justify-content-center hr_table_padd">
 						<div className = "table table-responsive">
-			          	    <table className = "table table-striped table-bordered ">
-								<tr>
+			          	    <table id="my-table" className = "table table-striped table-bordered ">
+								<tr className ="progress_table">
 									<th>Overall HRR Rank</th>
 									<th>User</th>
-									<th>Time to 99</th>
+									<th>Time to 99 (hh:mm)</th>
 									<th>Time to 99 Rank</th>
 									<th>Heart beats lowered in 1st minute</th>
 									<th>Lowered Beats Rank</th>
-									<th>Pure Time to 99</th>
+									<th>Pure Time to 99 (hh:mm)</th>
 									<th>Pure Time to 99 Rank</th>
 									<th>Pure Heart beats lowered in 1st minute</th>
 									<th>Pure Heart beats lowered in 1st minute Rank</th>
