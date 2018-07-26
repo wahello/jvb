@@ -330,7 +330,7 @@ class MCS_Dashboard extends Component{
 			        </div>
 			           
 			       <div className = "row justify-content-center mcs_dashboard">
-			          <div className="col-sm-9">
+			          <div className="col-sm-9 table_process">
 			           
 	          	    	  <table className = "table table-striped table-bordered tableContent ">
 		          	    	<tr className="table_content">
@@ -385,8 +385,8 @@ class MCS_Dashboard extends Component{
 		  </div>
 
 		          <div className = "row justify-content-center mcs_dashboard">
-		          	<div className="col-sm-9">
-		          	    <table className="table table-striped table-bordered">
+		          	<div className="col-sm-9 table_pro">
+		          	    <table className="table table-striped table-bordered tableContent">
 		          	    	<tr className="table_content">
 		          	    		<th className="mcs-dashboard" style={{background:'rgb(0,176,240)',color:'black'}}>Sleeping Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'green',color:'white'}}>Active Hours</th>

@@ -159,9 +159,12 @@ def weekly_workout_calculations(weekly_workout):
 				workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				workout_dict[value['workout_type']]['duration'] = (
 					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
-				workout_dict[value['workout_type']]['average_heart_rate'] = (
-					(workout_dict[value['workout_type']]['average_heart_rate']) + (
-						value['average_heart_rate']))
+				if value['average_heart_rate'] and workout_dict[value['workout_type']]['average_heart_rate']:
+					workout_dict[value['workout_type']]['average_heart_rate'] = (
+						(workout_dict[value['workout_type']]['average_heart_rate']) + (
+							value['average_heart_rate']))
+				else:
+					workout_dict[value['workout_type']]['average_heart_rate'] = None
 				workout_dict[value['workout_type']]['steps'] = (
 					(workout_dict[value['workout_type']]['steps']) + (value['steps']))
 				workout_dict[value['workout_type']]['distance_meters'] = (
@@ -295,16 +298,16 @@ def totals_workout(merged_data,no_days_activity):
 			merged_data_total['Totals']['average_heart_rate'] = ((
 				value["average_heart_rate"] + merged_data_total['Totals'].get('average_heart_rate',0)))
 		merged_data_total['Totals']['duration_in_aerobic_range'] = ((
-			value["duration_in_aerobic_range"] + merged_data_total['Totals'].get(
+			value.get("duration_in_aerobic_range",0) + merged_data_total['Totals'].get(
 				'duration_in_aerobic_range',0)))
 		merged_data_total['Totals']['duration_below_aerobic_range'] = ((
-			value["duration_below_aerobic_range"] + merged_data_total['Totals'].get(
+			value.get("duration_below_aerobic_range",0) + merged_data_total['Totals'].get(
 				'duration_below_aerobic_range',0)))
 		merged_data_total['Totals']['duration_in_anaerobic_range'] = ((
-			value["duration_in_anaerobic_range"] + merged_data_total['Totals'].get(
+			value.get("duration_in_anaerobic_range",0) + merged_data_total['Totals'].get(
 				'duration_in_anaerobic_range',0)))
 		merged_data_total['Totals']['duration_hrr_not_recorded'] = ((
-			value["duration_hrr_not_recorded"] + merged_data_total['Totals'].get(
+			value.get("duration_hrr_not_recorded",0) + merged_data_total['Totals'].get(
 				'duration_hrr_not_recorded',0)))
 
 	final_data = percent_total(merged_data_total)
