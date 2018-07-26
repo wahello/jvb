@@ -28,7 +28,9 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataHeartRate,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
-					FitbitNotifications
+					FitbitNotifications,\
+					UserFitbitDatabody,\
+					UserFitbitDatafoods
 
 
 def refresh_token_for_notification(user):
@@ -106,10 +108,10 @@ def call_push_api(data):
 			access_token = tokens.access_token
 			'''
 		The updated_at will check the time when the access_token is (created or updated)
-        As the access_token expires at every 8Hours. When celery job runs first we will check
-        the access_token is not expries. If it expries we will update the access_token first then
-        run the push notification job.
-            '''
+		As the access_token expires at every 8Hours. When celery job runs first we will check
+		the access_token is not expries. If it expries we will update the access_token first then
+		run the push notification job.
+			'''
 			token_updated_time = tokens.updated_at
 			present_time = datetime.utcnow()
 			datetime_obj_utc = present_time.replace(tzinfo=timezone('UTC'))
@@ -142,18 +144,38 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 	Return: returns nothing
 	'''
 	
-	# if data_type == 'body':
-	# 	body_fat_fitbit = session.get(
-	# 		"https://api.fitbit.com/1.2/user/{}/{}/log/fat/date/{}.json".format(
-	# 		user_id,data_type,date))
-	# 	body_fat_fitbit = body_fat_fitbit.json()
-	# 	print(body_fat_fitbit, "testttttttttttt1")
-	# 	body_weight_fitbit = session.get(
-	# 		"https://api.fitbit.com/1/user/{}/body/log/weight/date/{}.json ".format(
-	# 		user_id,date))
-	# 	print(body_weight_fitbit, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-	# 	body_weight_fitbit = body_weight_fitbit.json()
-	# 	print(body_weight_fitbit, "testttttttttttt")
+	if data_type == 'body':
+		body_fat_fitbit = session.get(
+			"https://api.fitbit.com/1.2/user/{}/{}/log/fat/date/{}.json".format(
+			user_id,data_type,date))
+		body_fat_fitbit = body_fat_fitbit.json()
+		store_data(body_fat_fitbit,user,date,create_notification,data_type='body_fat_fitbit')
+			# body_fat_fitbit = body_fat_fitbit.json()
+			# print(body_fat_fitbit, "testttttttttttt1")
+		# body_weight_fitbit = session.get(
+		# 	"https://api.fitbit.com/1/user/{}/body/log/weight/date/{}.json ".format(
+		# 	user_id,date))
+		# print(body_weight_fitbit, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+		# body_weight_fitbit = body_weight_fitbit.json()
+		# print(body_weight_fitbit, "testttttttttttt")
+
+	if data_type == 'foods':
+		foods_goal_logs = session.get(
+			"https://api.fitbit.com/1/user/{}/{}/log/date/{}.json".format(
+			user_id,data_type,date))
+		foods_water_logs = session.get(
+			"https://api.fitbit.com/1/user/{}/{}/log/water/date/{}.json ".format(
+			user_id,data_type,date))
+		foods_goal_logs = foods_goal_logs.json()
+		store_data(foods_goal_logs,user,date,create_notification,data_type='foods_goal_logs')
+		# foods_goal_logs = foods_goal_logs.json()
+		# print(foods_goal_logs, "foodssssssssssssss")
+		# foods_water_logs = session.get(
+		# 	"https://api.fitbit.com/1/user/{}/{}/log/water/date/{}.json ".format(
+		# 	user_id,data_type,date))
+		# print(foods_water_logs, "waterrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+		# foods_water_logs = foods_water_logs.json()
+		# print(foods_water_logs, "water11111111111111111111")
 
 	if data_type == 'sleep':
 		create_notification.state = "processing"
@@ -185,8 +207,8 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 			steps_fitbit = steps_fitbit.json()
 			store_data(steps_fitbit,user,date,create_notification,data_type="steps_fitbit")
 			# FitbitNotifications.objects.filter(user=user,
-			# 	collection_type='Activities').update(state="processed")
-
+			# 	collection_type='Activities').update(state="processed") 
+		
 	return None
 
 def update_fitbit_data(user,date,create_notification,data,collection_type):
@@ -205,7 +227,12 @@ def update_fitbit_data(user,date,create_notification,data,collection_type):
 	elif collection_type == "steps_fitbit":
 		UserFitbitDataSteps.objects.filter(user=user,
 			date_of_steps=date).update(steps_data=data)
-    
+	elif collection_type == "body_fat_fitbit":
+		UserFitbitDatabody.objects.filter(user=user,
+			date_of_body=date).update(body_data=data,date_of_body=date.today())
+	elif collection_type == "foods_goal_logs":
+		UserFitbitDatafoods.objects.filter(user=user,
+			date_of_foods=date).update(foods_data=data,date_of_foods=date.today())
 	return None
 
 def store_data(fitbit_all_data,user,start_date,create_notification,data_type=None):
@@ -302,4 +329,55 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 					print("Created steps-Fitbit successfully")
 		except (KeyError, IndexError):
 			logging.exception("message")
+
+		try:
+			if "body_fat_fitbit" == key:
+				#date_of_body = value['activities-steps'][0]['dateTime']
+				try:
+					body_obj = UserFitbitDatabody.objects.get(user=user,
+					created_at=datetime.now())
+					update_fitbit_data(user,date.today(),create_notification,value,key)
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
+					print("Updated body_fat_fitbit successfully")
+				except UserFitbitDatabody.DoesNotExist:
+					UserFitbitDatabody.objects.create(user=user,
+					date_of_body=date.today(),
+					body_data=value,created_at=datetime.now())
+					print("Created steps-body_fat_fitbit successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
+		except (KeyError, IndexError):
+			logging.exception("message")
+			if create_notification != None:
+				create_notification.state = "failed"
+				create_notification.save()	
+
+		try:
+			if "foods_goal_logs" == key:
+				# date_of_foods = value['activities-steps'][0]['dateTime']
+				try:
+					foods_obj = UserFitbitDatafoods.objects.get(user=user,
+					created_at=datetime.now())
+					update_fitbit_data(user,date.today(),create_notification,value,key)
+					print("Updated foods_goal_logs successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
+				except UserFitbitDatafoods.DoesNotExist:
+					UserFitbitDatafoods.objects.create(user=user,
+					date_of_foods=date.today(),
+					foods_data=value,created_at=datetime.now())
+					print("Created  foods_goal_logs successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
+		except (KeyError, IndexError):
+			logging.exception("message")
+			if create_notification != None:
+				create_notification.state = "failed"
+				create_notification.save()	
+
 	return None

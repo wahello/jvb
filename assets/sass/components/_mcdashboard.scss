@@ -1,0 +1,41 @@
+@media screen and (max-width: 480px) and (min-width: 320px) {
+	.arrow{
+		font-size: 28px;
+	}
+	.mc-calendar{
+		margin-top: 3px;
+       padding-bottom: 0px;
+	}
+   .mcs_dashboard  {
+    font-size: 11px;
+    min-width: 63px;
+    text-align: center;
+}
+.table .table_size {
+    min-width: 57px;
+    text-align: center;
+    font-size: 10px;
+}
+.table .mcs-dashboard {
+    min-width: 57px;
+    text-align: center;
+    font-size: 10px;
+    padding:6px;
+}
+
+.tableContent{
+  margin-left: 5px;
+}
+}
+@media screen and (max-width: 320px) {
+ .table .table_size {
+    min-width: 54px;
+    font-size: 9px;
+}
+.table .mcs-dashboard {
+    min-width: 55px;
+    font-size: 10px;
+    padding: 4px;
+}
+
+}
