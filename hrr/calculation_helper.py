@@ -159,7 +159,7 @@ def weekly_workout_calculations(weekly_workout):
 				workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				workout_dict[value['workout_type']]['duration'] = (
 					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
-				if value['average_heart_rate']:
+				if value['average_heart_rate'] and workout_dict[value['workout_type']]['average_heart_rate']:
 					workout_dict[value['workout_type']]['average_heart_rate'] = (
 						(workout_dict[value['workout_type']]['average_heart_rate']) + (
 							value['average_heart_rate']))
