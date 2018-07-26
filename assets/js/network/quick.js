@@ -49,7 +49,7 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
   export function hrrDate(startDate,endDate,hrrFetchSuccess, hrrFetchFailure){
     startDate = moment(startDate);
     endDate = moment(endDate);
-    const URL = `/hrr/user/hrr_data`;
+    const URL = `hrr/raw_data/hrr_calculations`;
     const config = {
       method: "get",
       params:{

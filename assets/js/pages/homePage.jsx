@@ -36,11 +36,9 @@ import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
 import Movement_Dashboard from '../components/Movement_dashboard'
 import Grades_Dashboard from '../components/grades_dashboard';
+import Hrr_Dashboard from '../components/Hrr_summary_dashboard';
+import MCS_Dashboard from '../components/mcs_dashboard'
 import WorkoutDashboard from '../components/weekly_workout_dashboard';
-
-
-
-
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -92,7 +90,9 @@ function initializeLocalState(){
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
 					<Route path='/weekly_workout_summary' component={RequireAuth(WorkoutDashboard)} />
 					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
-			    </Switch>
+					<Route path='/hrr_summary_dashboard' component={RequireAuth(Hrr_Dashboard)} />
+					<Route path='/mcs_dashboard' component={MCS_Dashboard}/>
+				</Switch>
 			  </BrowserRouter>
 			</Provider> 
 		), document.getElementById('react-app'));	

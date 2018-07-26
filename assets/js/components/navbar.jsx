@@ -89,10 +89,10 @@ class NavbarMenu extends React.Component {
                 </span><span>{this.state.username}</span></Link>
               </NavItem>
               <NavItem className="float-sm-right">                
-                   <NavLink  
+                   <Link to="#" 
                    className="nav-link"                    
                    onClick={this.handleLogout}>Log Out
-                    </NavLink>               
+                    </Link>               
               </NavItem>  
             </Nav>
           </Collapse>
