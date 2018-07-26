@@ -109,6 +109,33 @@ class UserHrrView(generics.ListCreateAPIView):
 			queryset = Hrr.objects.all()
 		return queryset
 
+class UserHrrViewRawData(generics.ListCreateAPIView):
+	'''
+		- Create the Hrr instance
+		- List all the Hrr instance
+		- If query parameters "to" and "from" are provided
+		  then filter the Hrr data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = HrrSerializer
+
+	def get_queryset(self):
+		user = self.request.user
+
+		end_dt = self.request.query_params.get('to',None)
+		start_dt = self.request.query_params.get('from', None)
+
+		if start_dt and end_dt:
+			queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
+							  Q(created_at__lte=end_dt),
+							  user_hrr=user)
+			
+		else:
+			queryset = Hrr.objects.all()
+
+		return queryset
+
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
 	heartrate_complete = []
@@ -488,8 +515,8 @@ def aa_calculations(request):
 	return JsonResponse(data)	
 
 def aa_workout_data(user,start_date):
-	check_data = aa_data(user,start_date)
-	if check_data.get("total_time"):
+	data_aa_check = aa_data(user,start_date)
+	if data_aa_check.get('total_time'):
 		start_date_str = start_date.strftime('%Y-%m-%d')
 
 		start_date_timestamp = start_date
@@ -643,9 +670,7 @@ def aa_workout_data(user,start_date):
 				max_hrr.append(max_heart_rate)
 				exercise_steps = workout.get("steps",0)
 				steps.append(exercise_steps)
-				distance_meters = workout.get("distanceInMeters",0)
-
-				
+				distance_meters = workout.get("distanceInMeters",0)			
 				data = {"date":act_date,
 					  "workout_type":workout_type,
 					  "duration":duration,
@@ -708,6 +733,8 @@ def aa_workout_data(user,start_date):
 			return data1
 		else:
 			return ({})
+	else:
+		return ({})
 
 def update_workout_instance(user,start_date,data):
 	AaWorkoutCalculations.objects.filter(
@@ -1362,6 +1389,14 @@ def hrr_data(user,start_date):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 	
+	ui_data = _get_activities(user,start_date_str)
+	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
+	ui_data_hrr = []
+	for ui_data_single in ui_data.values():
+		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
+			summaryId = ui_data_single['summaryId']
+			ui_data_keys.remove(summaryId)
+			ui_data_hrr.append(summaryId)
 	count = 0
 	id_act = 0
 	activities = []
@@ -1413,12 +1448,10 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
-				for i,k in enumerate(activity_files):
-					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-						hrr.append(tmp)
-					elif activity_files_dict.get("summaryId",None) == str(data_id) :
-						workout.append(tmp)
+				if str(data_id) in ui_data_keys:
+					workout.append(tmp)
+				elif str(data_id) in ui_data_hrr:
+					hrr.append(tmp)
 	except:
 		logging.exception("message")
 	if workout:
@@ -1446,8 +1479,11 @@ def hrr_data(user,start_date):
 					workout_hrr_before_hrrfile.append(i)
 					workout_time_before_hrrfile.append(k)
 					workout_timestamp_before_hrrfile.append(j)
-			if workout_timestamp_before_hrrfile:
-				workout_timestamp_before_hrrfile = sorted(workout_timestamp_before_hrrfile)
+			dict_timestamp_heart = dict(zip(
+				workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
+			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
+			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
+			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
 			time_toreach_99 = []
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
@@ -1486,8 +1522,12 @@ def hrr_data(user,start_date):
 			except IndexError:
 				lowest_hrr_1min = 99
 			time_99 = sum(time_toreach_99[:-1])
-			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
-			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+			if workout:
+				no_workouts = len(workout)
+			else:
+				no_workouts = 1
+			end_time_activity = timestamp_before_hrrfile[-no_workouts]-(offset)
+			end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
