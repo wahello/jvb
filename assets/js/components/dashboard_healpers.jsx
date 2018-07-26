@@ -160,10 +160,10 @@ export function renderTimeTohrrZoneSelectedDateFetchOverlay(){
 		);
 	}
 }
+
 export function renderWeeklySummaryOverlay(){
 	if(this.state.fetching_weekly){
 		let selectedDate = moment(this.renderLastSunday(new Date(this.state.selectedDate)));
-
 		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">
@@ -177,6 +177,29 @@ export function renderWeeklySummaryOverlay(){
 					</div>
 					<br/>
 					<p>Weekly Workout Summary Report For The Week Ended Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderHrrSummaryDashboardDataFetchOverlay(){
+	if(this.state.fetching_hrr_dashboard){
+		let selectedDate = moment(this.state.selectedDate);
+
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Time to Hrr Summary Dashboard Data For {selectedDate.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
