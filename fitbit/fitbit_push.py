@@ -56,7 +56,7 @@ def refresh_token_for_notification(user):
 	token_object = ''
 	try: 
 		token_object = FitbitConnectToken.objects.get(user=user)
-		token_object.refresh_token=request_data_json['refresh_token'],
+		token_object.refresh_token=request_data_json['refresh_token']
 		token_object.access_token=request_data_json['access_token']
 		token_object.save()
 	except:
@@ -141,6 +141,20 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		  session(created sesssion)
 	Return: returns nothing
 	'''
+	
+	# if data_type == 'body':
+	# 	body_fat_fitbit = session.get(
+	# 		"https://api.fitbit.com/1.2/user/{}/{}/log/fat/date/{}.json".format(
+	# 		user_id,data_type,date))
+	# 	body_fat_fitbit = body_fat_fitbit.json()
+	# 	print(body_fat_fitbit, "testttttttttttt1")
+	# 	body_weight_fitbit = session.get(
+	# 		"https://api.fitbit.com/1/user/{}/body/log/weight/date/{}.json ".format(
+	# 		user_id,date))
+	# 	print(body_weight_fitbit, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+	# 	body_weight_fitbit = body_weight_fitbit.json()
+	# 	print(body_weight_fitbit, "testttttttttttt")
+
 	if data_type == 'sleep':
 		create_notification.state = "processing"
 		create_notification.save()
@@ -175,24 +189,23 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 
 	return None
 
-def update_fitbit_data(user,date,data,collection_type,create_notification):
+def update_fitbit_data(user,date,create_notification,data,collection_type):
 	'''
 	This function updated the fitbit models 
 	'''
-
 	if collection_type == "activity_fitbit":
-		UserFitbitDataActivities.objects.update(user=user,
-					date_of_activities=date,activities_data=data)
+		UserFitbitDataActivities.objects.filter(user=user,
+			date_of_activities=date).update(activities_data=data)
 	elif collection_type == "sleep_fitbit":
-		UserFitbitDataSleep.objects.update(user=user,
-					date_of_sleep=date,sleep_data=data)
+		UserFitbitDataSleep.objects.filter(user=user,
+			date_of_sleep=date).update(sleep_data=data)
 	elif collection_type == "heartrate_fitbit":
-		UserFitbitDataHeartRate.objects.update(user=user,
-					date_of_heartrate=date,heartrate_data=data)
+		UserFitbitDataHeartRate.objects.filter(user=user,
+			date_of_heartrate=date).update(heartrate_data=data)
 	elif collection_type == "steps_fitbit":
-		UserFitbitDataSteps.objects.update(user=user,
-					date_of_steps=date,steps_data=data)
-
+		UserFitbitDataSteps.objects.filter(user=user,
+			date_of_steps=date).update(steps_data=data)
+    
 	return None
 
 def store_data(fitbit_all_data,user,start_date,create_notification,data_type=None):
