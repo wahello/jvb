@@ -78,29 +78,21 @@ class UserHrrView(generics.ListCreateAPIView):
 		return final_query
 
 	def get(self,request,format="json"):
-		querset,user_get,start_dt = self.get_queryset()
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
 		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
 		return Response(aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
 		user = self.request.user
-
-		# end_dt = self.request.query_params.get('to',None)
 		start_dt = self.request.query_params.get('start_date', None)
-
 		if start_dt:
-			# queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
-			# 				  Q(created_at__lte=end_dt),
-			# 				  user_hrr=user)
 			queryset = Hrr.objects.filter(created_at=start_dt,
 							  user_hrr=user).values()
-			# if not queryset:
-			# 	start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			# 	hrr_data(user,start_date)
-
 		else:
 			queryset = Hrr.objects.all()
-		return queryset,user,start_dt
+		return queryset
 
 class UserHrrViewRawData(generics.ListCreateAPIView):
 	'''
