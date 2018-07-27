@@ -62,34 +62,24 @@ class UserHrrView(generics.ListCreateAPIView):
 	'''
 	permission_classes = (IsAuthenticated,)
 	serializer_class = HrrSerializer
-	def calculate_aa_data(self,aa_data):
+	def calculate_aa_data(self,aa_data,user_get,start_dt):
 		if aa_data:
 			final_query = aa_data[0]
 		else:
-			final_query = {"Did_you_measure_HRR":'',
-			"Did_heartrate_reach_99":'',
-			"time_99":None,
-			"HRR_start_beat":None,
-			"lowest_hrr_1min":None,
-			"No_beats_recovered":None,
-			"end_time_activity":None,
-			"diff_actity_hrr":None,
-			"HRR_activity_start_time":None,
-			"end_heartrate_activity":None,
-			"heart_rate_down_up":None,
-			"pure_1min_heart_beats":None,
-			"pure_time_99":None,
-			"no_fitfile_hrr_reach_99":'',
-			"no_fitfile_hrr_time_reach_99":None,
-			"time_heart_rate_reached_99":None,
-			"lowest_hrr_no_fitfile":None,
-			"no_file_beats_recovered":None,
-			"offset":None,
-			}
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = hrr_data(user_get,start_date)
+			if final_query.get('Did_you_measure_HRR'):
+				try:
+					user_hrr = Hrr.objects.get(
+						user_hrr=user_get, created_at=start_date)
+					update_hrr_instance(user_hrr, final_query)
+				except Hrr.DoesNotExist:
+					create_hrr_instance(user_get, final_query, start_date)
 		return final_query
 
 	def get(self,request,format="json"):
-		aa_data = self.calculate_aa_data(self.get_queryset())
+		querset,user_get,start_dt = self.get_queryset()
+		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
 		return Response(aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
@@ -104,10 +94,13 @@ class UserHrrView(generics.ListCreateAPIView):
 			# 				  user_hrr=user)
 			queryset = Hrr.objects.filter(created_at=start_dt,
 							  user_hrr=user).values()
-			
+			# if not queryset:
+			# 	start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			# 	hrr_data(user,start_date)
+
 		else:
 			queryset = Hrr.objects.all()
-		return queryset
+		return queryset,user,start_dt
 
 class UserHrrViewRawData(generics.ListCreateAPIView):
 	'''
@@ -1131,6 +1124,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 
 	Return:None
 	'''
+	print("HRR A/A low high got started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1138,6 +1132,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
 		if data:
+			print("HRR A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
 					user_aa=user, created_at=current_date)
@@ -1145,6 +1140,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 			except AaCalculations.DoesNotExist:
 				create_aa_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
+	print("HRR A/A low high finished")
 	return None
 
 
@@ -1642,7 +1638,7 @@ def hrr_data(user,start_date):
 			time_heart_rate_reached_99 = None
 
 	if (hrr and (Did_you_measure_HRR == 'yes' or
-		Did_you_measure_HRR == 'no') and garmin_data_daily):
+		Did_you_measure_HRR == 'no')):
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
 				"Did_heartrate_reach_99":Did_heartrate_reach_99,
 				"time_99":time_99,
@@ -1759,18 +1755,23 @@ def store_hhr(user,from_date,to_date):
 
 	Return:None
 	'''
+	print("HRR calculations got started",user.username)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
 	while (current_date >= from_date_obj):
 		data = hrr_data(user,current_date)
 		if data.get('Did_you_measure_HRR'):
+			print("HRR calculations creating")
 			try:
 				user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
 				update_hrr_instance(user_hrr, data)
 			except Hrr.DoesNotExist:
 				create_hrr_instance(user, data, current_date)
+		else:
+			print("NO HRR")
 		current_date -= timedelta(days=1)
+	print("HRR calculations got finished")
 	return None
 
 
