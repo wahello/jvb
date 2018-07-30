@@ -106,7 +106,7 @@ def _get_activities(user,target_date):
 	manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 	act_obj = {}
 	start = current_date
-	end = current_date + timedelta(days=7)
+	end = current_date + timedelta(days=3)
 	fitfiles=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
@@ -121,7 +121,9 @@ def _get_activities(user,target_date):
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
-	
+			# print(workout_timestamp,"workout_timestamp")
+	# print(all_activities_heartrate,"all_activities_heartrate")
+	# print(all_activities_timestamp,"all_activities_timestamp")
 	# heart_rate = [x for x in all_activities_heartrate if x != []]
 	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []

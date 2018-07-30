@@ -161,7 +161,6 @@ def fitfile_parse(obj,offset,start_date_str):
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
 
-		
 	to_timestamp = []
 	for i,k in enumerate(timestamp_selected_date):
 		dtt = k.timetuple()
@@ -184,7 +183,8 @@ def fitfile_parse(obj,offset,start_date_str):
 		if (k <= 200) and (k >= 0):
 			final_heartrate.extend([i])
 			final_timestamp.extend([k]) 
-
+	# final_parsed_data = dict(zip(to_timestamp,final_heartrate))
+	# print(final_parsed_data,"dicttttttttttttttttttttttttttttttttttttttt")
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def update_helper(instance,data_dict):
@@ -1376,6 +1376,9 @@ def hrr_data(user,start_date):
 	if activity_files:
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
+		# start_times_seconds = one_activity_file_dict['startTimeInSeconds']
+		# duration_seconds = one_activity_file_dict['durationInSeconds']
+		# end_times_seconds = start_times_seconds+offset+duration_seconds
 	
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
@@ -1442,9 +1445,16 @@ def hrr_data(user,start_date):
 					hrr.append(tmp)
 	except:
 		logging.exception("message")
+	all_activities_heartrate = []
+	all_activities_timestamp = []
+	all_activities_timestamp_raw = []
 	if workout:
-		workout_data = fitfile_parse(workout,offset,start_date_str)
-		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+		for single_fitfiles in a1:
+			workout_activities = fitfile_parse([single_fitfiles],offset,start_date_str)
+			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
+			all_activities_heartrate.extend(workout_final_heartrate)
+			all_activities_timestamp.extend(workout_final_timestamp)
+			all_activities_timestamp_raw.extend(workout_timestamp)
 	else:
 		workout_final_heartrate = ''
 		workout_final_timestamp = ''
@@ -1455,6 +1465,8 @@ def hrr_data(user,start_date):
 	if hrr and workout:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
+		# print(hrr_final_heartrate,"hrr final data")
+		# print(hrr_timestamp,"timestampppp")
 		hrr_difference = hrr_final_heartrate[0]-hrr_final_heartrate[-1]
 		if (hrr_difference > 10) or activities:
 			Did_you_measure_HRR = 'yes'
@@ -1462,14 +1474,18 @@ def hrr_data(user,start_date):
 			workout_time_before_hrrfile = []
 			workout_timestamp_before_hrrfile = []
 
-			for i,k,j in zip(workout_final_heartrate,workout_final_timestamp,workout_timestamp):
+			for i,k,j in zip(all_activities_heartrate,all_activities_timestamp,all_activities_timestamp_raw):
 				if j < hrr_timestamp[1]:
 					workout_hrr_before_hrrfile.append(i)
 					workout_time_before_hrrfile.append(k)
 					workout_timestamp_before_hrrfile.append(j)
+			# print(workout_hrr_before_hrrfile,"workout_hrr_before_hrrfile")
+			# print(workout_timestamp_before_hrrfile,"workout_timestamp_before_hrrfile")
 			dict_timestamp_heart = dict(zip(
 				workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
+			# print(dict_timestamp_heart,"fffffffffffffffffffff")
 			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
+			# print(sort_dict_timestamp_heart,"sort_dict_timestamp_heart1111111111111111111111111111111")
 			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
 			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
 			time_toreach_99 = []
