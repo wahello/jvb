@@ -40,6 +40,7 @@ class Grades_Dashboard extends Component{
 			"controlled_subtances_penalty": "-",
 			last_synced:null,
 			"gender":"",
+			"date_of_birth":"",
 			selectedDate:new Date(),
 		}
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
@@ -62,6 +63,10 @@ class Grades_Dashboard extends Component{
 	 	this.getStylesUserinput = this.getStylesUserinput.bind(this);
 	 	this.renderPanalitiesColor = this.renderPanalitiesColor.bind(this);
 	 	this.renderControlledColor = this.renderControlledColor.bind(this);
+	 	this.renderAge = this.renderAge.bind(this);
+	 	this.renderEcsColors = this.renderEcsColors.bind(this);
+	 	this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
+	 	this.renderSmokeColor = this.renderSmokeColor.bind(this);
 	}
 	successGradesData(data){
 		this.setState({
@@ -80,7 +85,8 @@ class Grades_Dashboard extends Component{
   	}
   	successProfile(data){
   		this.setState({
-  			gender:data.data.gender
+  			gender:data.data.gender,
+  			date_of_birth:data.data.date_of_birth,
   		})
   	}
   	errorGradesData(error){
@@ -137,6 +143,7 @@ class Grades_Dashboard extends Component{
 			calendarOpen:!this.state.calendarOpen,
 		},()=>{
 			fetchGradesData(this.successGradesData,this.errorGradesData,this.state.selectedDate);
+			getUserProfile(this.successProfile);
 		});
 	}
 	renderCommaInSteps(value){
@@ -153,14 +160,25 @@ class Grades_Dashboard extends Component{
         let score = x1+x2;
         return score;
 	}
+	gpascoreDecimal(gpa){
+		let value;
+		let x = gpa;
+		if( x !=  null && x != undefined && x != "No Data Yet"){
+		    value =parseFloat(x).toFixed(2);
+		}
+		else{
+			value = "No Data Yet";
+		} 
+		return value;
+	}
 	getStylesAlcohol(score){
 		let background = "";
 		let color = "";
 		let hr_background = "";
 		var score = parseFloat(score); 
 		if(this.state.gender == "M"){
-			if(score){
-			 	if(score <= "5"){
+			if(score || score == "0"){
+			 	if(score <= "5" && score >= "0"){
 	               	background = 'green';
 	               	color = 'white';
 	               	hr_background = 'white';
@@ -180,7 +198,7 @@ class Grades_Dashboard extends Component{
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(score >= "16"){
+	            else if(score >= "16" && score <= "21"){
 	                background = '#FF0101';
 	                color = 'black';
 	                hr_background = 'black';
@@ -194,8 +212,8 @@ class Grades_Dashboard extends Component{
         	}
 		}
 		else if(this.state.gender == "F"){
-			if(score){
-			 	if(score <= "3"){
+			if(score || score == "0"){
+			 	if(score <= "3" && score >= "0"){
 	               	background = 'green';
 	               	color = 'white';
 	               	hr_background = 'white';
@@ -215,7 +233,7 @@ class Grades_Dashboard extends Component{
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(score >= "9"){
+	            else if(score >= "9" && score <= "14"){
 	                background = '#FF0101';
 	                color = 'black';
 	                hr_background = 'black';
@@ -233,11 +251,11 @@ class Grades_Dashboard extends Component{
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
 					        <CardBody>
-					          	<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week Grade</CardTitle>
+					          	<CardTitle className = "gd_header_style">Alcoholic Drinks Per Week</CardTitle>
 					          	<hr className = "hr_style"
 					          		id = "hr-style" 
 					          		style = {{background:hr_background}}/>
-					          	<CardText className = "gd_value_style">{score}</CardText>
+					          	<CardText className = "gd_value_style">{this.gpascoreDecimal(score)}</CardText>
 					        </CardBody>
 					    </Card>
 		return model;
@@ -286,21 +304,31 @@ class Grades_Dashboard extends Component{
 		let color = "";
 		let hr_background = "";
 		if(score){
-	      	if (score<50){
-	        	background = '#FF0101';
-	            color = 'black';
-	            hr_background = 'black';
-	      	}
-	  		else if (score>=50 && score<70){
-	    	 	background = '#FFFF01';
-	            color = 'black';
-	            hr_background = 'black';
-	  		}
-	      	else if (score >= 70){
+			if (score >= 80 && score <= 100){
 	        	background = 'green';
 	           	color = 'white';
 	           	hr_background = 'white';
 	      	}
+	      	 else if(score >= 70 && score < 80){
+                background = '#32CD32';
+                color = 'white';
+                hr_background = 'white';
+            }
+	      	else if (score >= 60 && score < 70){
+	    	 	background = '#FFFF01';
+	            color = 'black';
+	            hr_background = 'black';
+	  		}
+	  		else if(score >= 50 && score < 60){
+                background = '#E26B0A';
+                color = 'black';
+                hr_background = 'black';
+            }
+	      	else if (score<50){
+	        	background = '#FF0101';
+	            color = 'black';
+	            hr_background = 'black';
+	      	}  	
 	    }
 	   	else{
 	        	score = "No Data Yet"
@@ -327,7 +355,7 @@ class Grades_Dashboard extends Component{
 		let background = "";
 		let color = "";
 		let hr_background = "";
-		if(score){
+		if(score || score == 0){
 	            if(score >= 10000){
 	           		background = 'green';
 	               	color = 'white';
@@ -423,7 +451,59 @@ class Grades_Dashboard extends Component{
 				          		<hr className = "hr_style" 
 				          			id = "hr-style-mcs"
 				          			style = {{background:hr_background}}/>
-				          		<CardText className = "gd_value_style">{score}</CardText>
+				          		<CardText className = "gd_value_style">{this.gpascoreDecimal(score)}</CardText>
+				        	</CardBody>
+			      		</Card>
+		return model;
+	}
+	renderEcsColors(score){
+		/* adding background color to card depends upon their Movement Consistency Score ranges*/
+		let background = "";
+		let color = "";
+		let hr_background = "";
+		if(score || score == 0){
+		var score = parseFloat(score); 
+            if(score >= 5){
+               	background = 'green';
+               	color = 'white';
+               	hr_background = 'white';
+            }
+            else if(score == 4){
+                background = '#32CD32';
+                color = 'white';
+                hr_background = 'white';
+            }
+            else if(score == 3){
+                background = '#FFFF01';
+                color = 'black';
+                hr_background = 'black';
+            }
+            else if(score == 2){
+                background = '#E26B0A';
+                color = 'black';
+                hr_background = 'black';
+            }
+            else if(score <= 1){
+                background = '#FF0101';
+                color = 'black';
+                hr_background = 'black';
+            }	
+		}
+		else{
+				score = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+		var model = <Card className = "card_style" 
+							id = "my-card-mcs"
+							 style = {{background:background, color:color}}>
+				        	<CardBody>
+				          		<CardTitle className = "gd_header_style">Exercise Consistency Score</CardTitle>
+				          		<hr className = "hr_style" 
+				          			id = "hr-style-mcs"
+				          			style = {{background:hr_background}}/>
+				          		<CardText className = "gd_value_style">{this.gpascoreDecimal(score)}</CardText>
 				        	</CardBody>
 			      		</Card>
 		return model;
@@ -435,11 +515,19 @@ class Grades_Dashboard extends Component{
     	let s_time = hours + min;
     	return s_time;
 	}
+	renderAge(){
+		let today_date = new Date();
+		let date_of_birth = moment(this.state.date_of_birth);
+		let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
+		let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
+		return age;
+	}
 	getStylesForUserinputSleep(value){
 		let background = "";
 		let color = "";
 		let hr_background = "";
 		let score;
+		let age = this.renderAge();
 		if(value){
 		 score = value;
 		}
@@ -449,37 +537,71 @@ class Grades_Dashboard extends Component{
             color = '#5e5e5e';
             hr_background = '#E5E5E5';
         }
-		if(value){
-			value = this.strToSecond(value);
-			if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00")){
-				 	background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	        }
-			else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00")){
-					background = 'green';
-		            color = 'white';
-		            hr_background = 'white';
-		    }
-	    	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
-	    	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30"))){
-	    		 	background = '#32CD32';
-	                color = 'white';
-	                hr_background = 'white';
-	    	}	
-	    	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("7:29"))
-	    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00"))){
-	    		 	background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	        }
-	    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
-	    	 || (this.strToSecond("11:30")<=value && value<= this.strToSecond("12:00"))){
-	    		 	background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
+			if(value){
+				value = this.strToSecond(value);
+				if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00")){
+					 	background = '#FF0101';
+		                color = 'black';
+		                hr_background = 'black';
+		        }
+				else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00")){
+						background = 'green';
+			            color = 'white';
+			            hr_background = 'white';
+			    }
+		    	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
+		    	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30"))){
+		    		 	background = '#32CD32';
+		                color = 'white';
+		                hr_background = 'white';
+		    	}	
+		    	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("6:59"))
+		    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00"))){
+		    		 	background = '#FFFF01';
+		                color = 'black';
+		                hr_background = 'black';
+		        }
+		    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
+		    	 || (this.strToSecond("11:00")<=value && value<= this.strToSecond("12:00"))){
+		    		 	background = '#E26B0A';
+		                color = 'black';
+		                hr_background = 'black';
+		    	}
 	    	}
-    	}
+ 
+   //  	else if(age >= 6 && age <= 17){
+			// if(value){
+			// 	value = this.strToSecond(value);
+			// 	if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00")){
+			// 		 	background = '#FF0101';
+		 //                color = 'black';
+		 //                hr_background = 'black';
+		 //        }
+			// 	else if(this.strToSecond("8:00") <= value && value <= this.strToSecond("12:00")){
+			// 			background = 'green';
+			//             color = 'white';
+			//             hr_background = 'white';
+			//     }
+		 //    	else if((this.strToSecond("7:31")<=value && value<= this.strToSecond("8:00"))
+		 //    	 || (this.strToSecond("12:01")<=value && value<=this.strToSecond("12:30"))){
+		 //    		 	background = '#32CD32';
+		 //                color = 'white';
+		 //                hr_background = 'white';
+		 //    	}	
+		 //    	else if((this.strToSecond("7:00")<=value && value<=this.strToSecond("7:29"))
+		 //    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00"))){
+		 //    		 	background = '#FFFF01';
+		 //                color = 'black';
+		 //                hr_background = 'black';
+		 //        }
+		 //    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
+		 //    	 || (this.strToSecond("11:00")<=value && value<= this.strToSecond("12:00"))){
+		 //    		 	background = '#E26B0A';
+		 //                color = 'black';
+		 //                hr_background = 'black';
+		 //    	}
+	  //   	}
+   //  	}
     	
 		else{
 			value = "No Data Yet";
@@ -578,7 +700,7 @@ class Grades_Dashboard extends Component{
 			}
 		let modal = <CardText className = "gd_value_style" style = {{background:background1, color:color1}}>
 					          		
-	          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{value}</span>
+	          			<span>Controlled Subtances: </span><span className = "gd_value_style">{value}</span>
 					          		
 	          		</CardText>
 	    return modal;
@@ -607,7 +729,7 @@ class Grades_Dashboard extends Component{
 			}
 		let modal = <CardText className = "gd_value_style" style = {{background:background1, color:color1}}>
 					          		
-	          			<span>Controlled Subtances:- </span><span className = "gd_value_style">{value}</span>
+	          			<span>Smoking: </span><span className = "gd_value_style">{value}</span>
 					          		
 	          		</CardText>
 	    return modal;
@@ -643,12 +765,12 @@ class Grades_Dashboard extends Component{
 				          			id = "hr-style-mcs"
 				          			style = {{background:hr_background}}/>
 				          		<CardText className = "gd_value_style" style = {{background:background, color:color}}>
-					          			<span>Sleep Aids:- </span><span className = "gd_value_style">{sleep}</span>
+					          			<span>Sleep Aids: </span><span className = "gd_value_style">{sleep}</span>
 					          		</CardText>
 					          		<hr className = "hr_style"/>
 					          		{this.renderControlledColor(controlled)}
 					          		<hr className = "hr_style"/>
-					          		{this.renderControlledColor(smoke)}
+					          		{this.renderSmokeColor(smoke)}
 				        	</CardBody>
 			      		</Card>
 		return model;
@@ -712,13 +834,7 @@ class Grades_Dashboard extends Component{
 						{this.getStylesForUserinputSleep(this.state.sleep_per_night)}
 				    </div>
 					<div className = "col-md-4 gd_table_margin ">
-						<Card className = "gd_card_style" id = "my-card-mcs">
-					        <CardBody>
-					          	<CardTitle className = "gd_header_style">Exercise Consistency Score</CardTitle>
-					          	<hr className = "hr_style" id = "hr-style-mcs"/>
-					          	<CardText className = "gd_value_style">{this.state.exercise_consistency_score}</CardText>
-					        </CardBody>
-					    </Card>
+						{this.renderEcsColors(this.state.exercise_consistency_score)}
 				    </div>
 				    <div className = "col-md-4 gd_table_margin ">
 						{this.getStylesPrcntUnprocessedFood(this.state.unprocessed_food_grade)}
@@ -735,6 +851,13 @@ class Grades_Dashboard extends Component{
 						{this.renderPanalitiesColor(this.state.sleep_aids_penalty,this.state.controlled_subtances_penalty,this.state.smoking_penalty)}    		
 				    </div>
 				</div>
+				<div className = "row justify-content-center" style = {{marginTop:"25px",marginBottom:"25px"}}>
+					<div className="gd_mch_color_legend color_legend_A">A</div>	            
+		            <div className="gd_mch_color_legend color_legend_B">B</div>	             
+		            <div className="gd_mch_color_legend color_legend_C">C</div>	            
+		            <div className="gd_mch_color_legend color_legend_D">D</div>	       
+		            <div className="gd_mch_color_legend color_legend_F">F</div>
+	            </div>	      
 			</div>
 		);
 	}
