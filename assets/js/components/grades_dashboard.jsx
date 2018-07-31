@@ -291,11 +291,11 @@ class Grades_Dashboard extends Component{
 		return model;
 	}
 	renderPersentageSymbol(value){
-		if(value != "No Data Yet" ){
+		if(value != "Not Reported" ){
 			value = value + "%";
 		}
 		else{
-			value = "No Data Yet";
+			value = "Not Reported";
 		}
 		return value;
 	}
@@ -331,7 +331,7 @@ class Grades_Dashboard extends Component{
 	      	}  	
 	    }
 	   	else{
-	        	score = "No Data Yet"
+	        	score = "Not Reported"
 	            background = 'white';
 	            color = '#5e5e5e';
 	            hr_background = '#e5e5e5';
@@ -693,7 +693,7 @@ class Grades_Dashboard extends Component{
 	           	hr_background1 = 'white';
 			}
 			else{
-				value = "No Data Yet"
+				value = "Not Reported"
 	            background1 = 'white';
 	            color1 = '#5e5e5e';
 	            hr_background1 = '#E5E5E5';
@@ -722,7 +722,7 @@ class Grades_Dashboard extends Component{
 	           	hr_background1 = 'white';
 			}
 			else{
-				value = "No Data Yet"
+				value = "Not Reported"
 	            background1 = 'white';
 	            color1 = '#5e5e5e';
 	            hr_background1 = '#E5E5E5';
@@ -751,7 +751,7 @@ class Grades_Dashboard extends Component{
 	           	hr_background = 'white';
 			}
 			else{
-				sleep = "No Data Yet"
+				sleep = "Not Reported"
 	            background = 'white';
 	            color = '#5e5e5e';
 	            hr_background = '#E5E5E5';
