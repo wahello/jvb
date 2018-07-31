@@ -38,6 +38,8 @@ class Grades_Dashboard extends Component{
 			"alcoholic_drinks_per_week_grade": "-",
 			"report_inputs_today": "-",
 			"controlled_subtances_penalty": "-",
+			"did_you_workout":"",
+			"alcohol_drinks_yesterday":"",
 			last_synced:null,
 			"gender":"",
 			"date_of_birth":"",
@@ -67,6 +69,8 @@ class Grades_Dashboard extends Component{
 	 	this.renderEcsColors = this.renderEcsColors.bind(this);
 	 	this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
 	 	this.renderSmokeColor = this.renderSmokeColor.bind(this);
+	 	this.renderWorkoutCard = this.renderWorkoutCard.bind(this);
+	 	this.renderAlocoholYesterdayCard = this.renderAlocoholYesterdayCard.bind(this);
 	}
 	successGradesData(data){
 		this.setState({
@@ -81,6 +85,8 @@ class Grades_Dashboard extends Component{
 			"alcoholic_drinks_per_week_grade": data.data.alcoholic_drinks_per_week_grade,
 			"report_inputs_today": data.data.report_inputs_today,
 			"controlled_subtances_penalty": data.data.controlled_subtances_penalty,
+			"did_you_workout":data.data.did_you_workout,
+			"alcohol_drinks_yesterday":data.data.alcohol_drinks_yesterday,
 		});
   	}
   	successProfile(data){
@@ -285,6 +291,46 @@ class Grades_Dashboard extends Component{
 					          	<hr className = "hr_style"
 					          		id = "hr-style" 
 					          		style = {{background:hr_background}}/>
+					          	<CardText className = "gd_value_style">{score}</CardText>
+					        </CardBody>
+					    </Card>
+		return model;
+	}
+	renderWorkoutCard(score){
+		if(score == "yes"){
+			score = "Yes";
+		}
+		else if(score == "no"){
+			score = "No";
+		}
+		else{
+			score = "No";
+		}
+		var model = <Card className = "card_style"
+						 id = "my-card"
+						>
+					        <CardBody>
+					          	<CardTitle className = "gd_header_style">Did I Workout Today?</CardTitle>
+					          	<hr className = "hr_style"
+					          		id = "hr-style" 
+					          	/>
+					          	<CardText className = "gd_value_style">{score}</CardText>
+					        </CardBody>
+					    </Card>
+		return model;
+	}
+	renderAlocoholYesterdayCard(score){
+		if(!score){
+			score = "No Data Yet";
+		}
+		var model = <Card className = "card_style"
+						 id = "my-card"
+						>
+					        <CardBody>
+					          	<CardTitle className = "gd_header_style"># of Alcholic Drinks Consumed Yesterday?</CardTitle>
+					          	<hr className = "hr_style"
+					          		id = "hr-style" 
+					          	/>
 					          	<CardText className = "gd_value_style">{score}</CardText>
 					        </CardBody>
 					    </Card>
@@ -833,18 +879,27 @@ class Grades_Dashboard extends Component{
 					<div className = "col-md-4 gd_table_margin ">
 						{this.getStylesForUserinputSleep(this.state.sleep_per_night)}
 				    </div>
+				    <div className = "col-md-4 gd_table_margin ">
+						{this.renderWorkoutCard(this.state.did_you_workout)}
+				    </div>
 					<div className = "col-md-4 gd_table_margin ">
 						{this.renderEcsColors(this.state.exercise_consistency_score)}
 				    </div>
-				    <div className = "col-md-4 gd_table_margin ">
-						{this.getStylesPrcntUnprocessedFood(this.state.unprocessed_food_grade)}
-				    </div>
+				    
 				</div>
 				<div className = "row gd_padding">
 					<div className = "col-md-4 gd_table_margin ">
-						{this.getStylesAlcohol(this.state.alcoholic_drinks_per_week_grade)}
+						{this.getStylesPrcntUnprocessedFood(this.state.unprocessed_food_grade)}
 				    </div>
 				    <div className = "col-md-4 gd_table_margin ">
+						{this.renderAlocoholYesterdayCard(this.state.alcohol_drinks_yesterday)}
+				    </div>
+					<div className = "col-md-4 gd_table_margin ">
+						{this.getStylesAlcohol(this.state.alcoholic_drinks_per_week_grade)}
+				    </div>   
+				</div>
+				<div className = "row gd_padding">
+					<div className = "col-md-4 gd_table_margin ">
 						{this.getStylesUserinput(this.state.report_inputs_today)}
 				    </div>
 				    <div className = "col-md-4 gd_table_margin ">
