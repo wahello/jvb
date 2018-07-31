@@ -24,7 +24,8 @@ from rest_framework import status
 from django.db.models import Q
 
 from registration.models import Profile
-from user_input.models import DailyUserInputStrong
+from user_input.models import DailyUserInputStrong,\
+							  DailyUserInputEncouraged
 from garmin.models import GarminFitFiles,\
 						UserGarminDataDaily,\
 						UserGarminDataActivity,\
@@ -1368,7 +1369,6 @@ def hrr_data(user,start_date):
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
 		user_input__user = user).order_by('-user_input__created_at')
-
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
 	
@@ -1391,6 +1391,7 @@ def hrr_data(user,start_date):
 	count = 0
 	id_act = 0
 	activities = []
+	workout_id = []
 	if user_input_strong:
 		for tmp in user_input_strong:
 			sn = tmp.activities
@@ -1403,6 +1404,9 @@ def hrr_data(user,start_date):
 						id_act = int(di[i]['summaryId'])
 						count = count + 1
 						activities.append(di[i])
+					else:
+						workout_id.append(int(di[i]['summaryId']))
+
 	
 	start_date_timestamp = start_date_timestamp
 	garmin_data_daily = UserGarminDataDaily.objects.filter(user=user,start_time_in_seconds=start_date_timestamp).last()
@@ -1430,9 +1434,10 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = int(meta['activityIds'][0])
+				# print(type())
 				if id_act == data_id:
 					hrr.append(tmp)
-				else:
+				elif data_id in workout_id:
 					workout.append(tmp)
 		else:
 			for tmp in a1:
@@ -1488,6 +1493,8 @@ def hrr_data(user,start_date):
 			# print(sort_dict_timestamp_heart,"sort_dict_timestamp_heart1111111111111111111111111111111")
 			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
 			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
+			# print(timestamp_before_hrrfile[-2],"timestamp_before_hrrfile")
+			# print(heartrate_before_hrrfile[-2],"heartrate_before_hrrfile")
 			time_toreach_99 = []
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
@@ -1530,7 +1537,8 @@ def hrr_data(user,start_date):
 				no_workouts = len(workout)
 			else:
 				no_workouts = 1
-			end_time_activity = timestamp_before_hrrfile[-no_workouts]-(offset)
+			end_time_activity = timestamp_before_hrrfile[-no_workouts]
+			end_time_activity =  end_time_activity - (offset) -1 
 			end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			
@@ -1751,6 +1759,26 @@ def hrr_calculations(request):
 			create_hrr_instance(request.user, data, start_date)
 	return JsonResponse(data)	
 
+def update_data_as_per_userinput_form(user,data,current_date):
+	userinput_obj = DailyUserInputEncouraged.objects.filter(
+		user_input__user=user,user_input__created_at=current_date)
+	for single_obj in userinput_obj:
+		time_99 = single_obj.time_to_99
+		hr_down_99 = single_obj.hr_down_99
+		hr_level = single_obj.hr_level
+		lowest_hr_first_minute = single_obj.lowest_hr_first_minute
+		if time_99:
+			min,sec = time_99.split(':')
+			time_99_convert = (float(sec))+(float(min)*60)
+			data["time_99"] = time_99_convert
+		if hr_down_99:
+			data["Did_heartrate_reach_99"] = hr_down_99
+		if hr_level:
+			data['HRR_start_beat'] =  float(hr_level)
+		if lowest_hr_first_minute:
+			data['lowest_hrr_1min'] =  float(lowest_hr_first_minute)
+
+	return data
 
 def store_hhr(user,from_date,to_date):
 	'''
@@ -1770,6 +1798,7 @@ def store_hhr(user,from_date,to_date):
 	while (current_date >= from_date_obj):
 		data = hrr_data(user,current_date)
 		if data.get('Did_you_measure_HRR'):
+			data = update_data_as_per_userinput_form(user,data,current_date)
 			print("HRR calculations creating")
 			try:
 				user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
