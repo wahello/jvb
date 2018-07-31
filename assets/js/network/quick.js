@@ -46,7 +46,25 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
        userInputFetchfailure(error);
     });
   }
-
+  export function hrrDate(startDate,endDate,hrrFetchSuccess, hrrFetchFailure){
+    startDate = moment(startDate);
+    endDate = moment(endDate);
+    const URL = `hrr/raw_data/hrr_calculations`;
+    const config = {
+      method: "get",
+      params:{
+        to: endDate.format('YYYY-MM-DD'),
+        from: startDate.format('YYYY-MM-DD') 
+      },
+      url: URL,
+      withCredentials: true
+    };
+     axios(config).then((response) => {
+       hrrFetchSuccess(response,startDate,endDate);
+     }).catch(function (error){
+       hrrFetchFailure(error);
+    });
+  }
   export function createQuicklook(startDate, endDate,
                                   successCallback=undefined,
                                   errorCallback=undefined){

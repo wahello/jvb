@@ -214,13 +214,9 @@ class HeartRate extends Component{
 			    time = hours+':'+minutes+':'+seconds;
 			}
 		}
-		else if(value == 0){
+		else if(value == 0 || value == null){
 			time = "00:00:00";
 		}
-		else{
-			time = "-";
-		}
-		
 		return time;
 	}
 
@@ -297,8 +293,8 @@ class HeartRate extends Component{
 		if(!_.isEmpty(data)){
 			total = data.total;
 		}
-		let keys = ["low_end","high_end","classificaton",
-		"time_in_zone","prcnt_in_zone"];
+		let keys = ["heart_rate_zone_low_end","heart_rate_zone_high_end","classificaton", 
+		"time_in_zone","prcnt_total_duration_in_zone"];
 		for(let[key1,value] of Object.entries(data)){
 			if(key1 !== "total"){
 				let td_values = [];
@@ -320,7 +316,7 @@ class HeartRate extends Component{
 						}
 					   
 					}
-					else if(key == "prcnt_in_zone"){
+					else if(key == "prcnt_total_duration_in_zone"){
 						let keyvalue = this.renderpercentage(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);
 					}
@@ -346,7 +342,7 @@ class HeartRate extends Component{
 	renderTable(data){
 		let td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
-		"aerobic_zone","percent_aerobic","anaerobic_zone","percent_anaerobic","below_aerobic_zone","percent_below_aerobic","hrr_not_recorded","prcnt_hrr_not_recorded"];
+		"duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic","hrr_not_recorded","prcnt_hrr_not_recorded"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
@@ -355,22 +351,22 @@ class HeartRate extends Component{
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "hrr_not_recorded"){
-					let keyvalue = value[key];
+					let keyvalue =  this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
 				else if(key == "prcnt_hrr_not_recorded"){
-					let keyvalue = value[key];
+					let keyvalue = this.renderpercentage(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "aerobic_zone"){
+				else if(key == "duration_in_aerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "anaerobic_zone"){
+				else if(key == "duration_in_anaerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "below_aerobic_zone"){
+				else if(key == "duration_below_aerobic_range"){
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
@@ -403,7 +399,7 @@ class HeartRate extends Component{
 
 	componentDidMount(){
 		this.setState({
-			fetching_aerobic:false,
+			fetching_aerobic:true,
 		});
 		fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
 		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);

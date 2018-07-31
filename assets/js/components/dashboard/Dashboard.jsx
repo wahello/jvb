@@ -3,14 +3,15 @@ import { connect } from 'react-redux';
 import { Link,withRouter } from 'react-router-dom';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import NavbarMenu from '../navbar';
-import haveGarminToken from "../../network/dashboard";
+import {haveGarminToken,haveFitBitToken} from "../../network/dashboard";
 class Dashboard extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
 			 modal: false,
 			"have_garmin_connect_token":"",
-    		"have_garmin_health_token":""
+    		"have_garmin_health_token":"",
+    		"have_fitbit_tokens":"",
 		};
 		this.noGarminTokenModel = this.noGarminTokenModel.bind(this);
 		this.successToken = this.successToken.bind(this);
@@ -18,6 +19,10 @@ class Dashboard extends Component {
 		this.garminHealthModel = this.garminHealthModel.bind(this);
 		this.garminConnectModel = this.garminConnectModel.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.successFitBitToken = this.successFitBitToken.bind(this);
+		this.errorFitBitToken = this.errorFitBitToken.bind(this);
+		//this.fitBitTokenModel = this.fitBitTokenModel.bind(this);
+
 	}
 
 	successToken(data){
@@ -27,7 +32,13 @@ class Dashboard extends Component {
 			have_garmin_health_token:data.data.have_garmin_health_token,
 		});
 	}
-
+	successFitBitToken(data){
+		
+		this.setState({
+			modal:true,
+			have_fitbit_tokens:data.data.have_fitbit_tokens
+		});
+	}
 	toggle() {
 	    this.setState({
 	      modal: !this.state.modal
@@ -81,17 +92,35 @@ class Dashboard extends Component {
         return modal;
 	}
 
+	/*fitBitTokenModel(){
+		let modal =  <Modal isOpen={this.state.modal} toggle = {this.toggle} className={this.props.className}>
+				          <ModalHeader>Fitbit Connect</ModalHeader>
+				          <ModalBody>
+				            	We noticed that you have not linked your FitBit account to us yet.
+				            	Click the link below to link your account so we can provide you with lots of cool reporting and grades from your data!
+				          </ModalBody>
+				          <ModalFooter>
+				          		<a href='/fitbit/request_token_fitbit' className = "garminlink"><Button color="primary"style = {{fontSize:"13px"}} >Connect to Fitbit<br/></Button></a>
+				            	<Button color="primary" onClick={this.toggle} style = {{fontSize:"13px"}}>Ok</Button>
+				          </ModalFooter>
+			        </Modal>
+        return modal;
+	}*/
+
 	errorToken(error){
 		console.log(error.message);
 	}
-
+	errorFitBitToken(error){
+		console.log(error.message);
+	}
 	componentDidMount(){
 		haveGarminToken(this.successToken,this.errorToken);
+		haveFitBitToken(this.successFitBitToken,this.errorFitBitToken);
 	}
 
 	render(){
 		return (
-			<div>
+			<div className = "container">
 				<NavbarMenu fix={true}/>
 				<div>
 					  <div className="row">
@@ -100,19 +129,27 @@ class Dashboard extends Component {
 						    <div className="social-login-buttons">
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
+							 <h3 id="link_style">Dashboards</h3>
+				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
+				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
+				  		 	  <Link to='/hrr_summary_dashboard'>Hrr Summary Dashboard</Link><br/>
+				  		 	  <Link to='/mcs_dashboard'>Movement Consistency Score (MCS) Dashboard</Link><br />
+				  		 	  <Link to='/weekly_workout_summary'>Weekly Workout Summary Report</Link><br/>
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 							  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
 							  {/*<Link to='/overallgrade'>Over All Grade</Link><br/>*/}
 							  {/*<Link to='/weeklygrade'>Weekly Grade</Link><br/>*/}
 							  {/*<Link to='/breakdown'>Break Down Grade</Link><br/>*/}
-							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}
+							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}				 
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							  <Link to='/leaderboard'>My Rankings</Link><br/>
 							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
 							   <Link to='/hrr_recovery'>Heartrate Recovery</Link><br/>
-							   {/*<Link to='/heartrate_zone'>Time in Heart -Rate Zones Chart</Link><br/>*/}
+							   <Link to='/heartrate_zone'>Time in Heart -Rate Zones Chart</Link><br/>
+							   
+
 							   {/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
 							   
 							  <h3 id="link_style">Raw Data</h3>		  
@@ -143,13 +180,17 @@ class Dashboard extends Component {
 								  {this.garminConnectModel()}
 							  </div>
 							}
+							{this.state.have_fitbit_tokens == false &&
+							  <div>
 							  <h3 id="link_style">Set up Link to Fitbit</h3>
 							  <a href='/fitbit/request_token_fitbit'>Connect to Fitbit</a><br/>
+							  {/*{this.fitBitTokenModel()}*/}
+							  </div>
+							}
 							  <h3 id="link_style">Other</h3>
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
-							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>							 
+							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>
 						  </div>
-
 						</div>
 					</div>
 				</div>

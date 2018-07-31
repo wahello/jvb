@@ -11,7 +11,7 @@ import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
-import fetchProgress,{fetchUserRank} from '../network/progress';
+import fetchProgress,{fetchUserRank,progressAnalyzerUpdateTime} from '../network/progress';
 import AllRank_Data1 from "./leader_all_exp";
 import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay    } from './dashboard_healpers';
 
@@ -21,7 +21,8 @@ var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
 
-const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec"];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec","resting_hr",
+"beat_lowered","pure_beat_lowered","pure_time_99","time_99",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 const categoryMeta = {
   "Overall Health GPA":{
@@ -71,6 +72,22 @@ const categoryMeta = {
   "Floors Climbed":{
     short_name:"floor_climbed",
     url_name:"floor-climbed"
+  },
+  "Heart Beats Lowered In 1st Minute":{
+    short_name:"beat_lowered",
+    url_name:"beat-lowered"
+  },
+  "Pure Heart Beats Lowered In 1st Minute":{
+    short_name:"pure_beat_lowered",
+    url_name:"pure-beat-lowered"
+  },
+  "Pure Time To 99":{
+    short_name:"pure_time_99",
+    url_name:"pure-time-99"
+  },
+  "Time To 99":{
+    short_name:"time_99",
+    url_name:"time-99"
   },
 };
  class DashboardSummary extends Component{
@@ -422,6 +439,22 @@ constructor(props){
                "custom_range":"-",
                 "today": "-",
                 "year": "-"
+            },
+            "hrr_pure_1_minute_beat_lowered": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
+            },
+             "hrr_pure_time_to_99": {
+               "week": "-",
+                "yesterday": "-",
+                "month": "-",
+               "custom_range":"-",
+                "today": "-",
+                "year": "-"
             }
         },
         "sick":{
@@ -576,7 +609,8 @@ constructor(props){
            "week": "-",
            "today": "-",
            "yesterday": "-"
-       }
+       },
+       scheduled_date:''
 
     };
     this.successProgress = this.successProgress.bind(this);
@@ -616,6 +650,8 @@ constructor(props){
    this.handleBackButton = this.handleBackButton.bind(this);
    this.renderTableHeader = this.renderTableHeader.bind(this);
    this.toggleDropdown = this.toggleDropdown.bind(this);
+   this.successUpdateTime = this.successUpdateTime.bind(this);
+   this.errorUpdateTime =this.errorUpdateTime.bind(this);
 
   }
     
@@ -946,7 +982,14 @@ headerDates(value){
             let date = date1 + ' to ' + date2;
             return date;
 }
-
+   successUpdateTime(data){
+      this.setState({
+        scheduled_date:data.data.scheduled_date
+      });
+    }
+    errorUpdateTime(error){
+      console.log(error.message);
+    }
     componentDidMount(){
       this.setState({
          fetching_ql4 :true,     
@@ -954,6 +997,7 @@ headerDates(value){
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
       fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,true);
       window.addEventListener('scroll', this.handleScroll);
+      progressAnalyzerUpdateTime(this.successUpdateTime,this.errorUpdateTime);
 
     }
     componentWillUnmount() {
@@ -1470,6 +1514,9 @@ handleBackButton(){
             <span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
           </div>
         }
+        {(this.state.scheduled_date && this.state.active_view) &&
+        <div className = "row justify-content-center scheduled_date"style = {{fontWeight:"bold"}}>Your progress analyzer reports are currently being updated from {moment(this.state.scheduled_date).format('MMM DD, YYYY')} through today (and when this message disappears your data has been updated)</div>
+        }
         {this.state.active_view &&
             <div className="row justify-content-center padding" style = {{paddingTop:"25px"}}>
           <span className = "table table-responsive">
@@ -1898,6 +1945,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.resting_hr.year}</td>
                  {this.renderCustomRangeTD(this.state.summary.other.resting_hr.custom_range)}
             </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.resting_hr)}
+            </tr>
             <tr className="progress_table">
                 <td className="progress_table">HRR (time to 99)</td>
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.today}</td>
@@ -1907,6 +1958,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_time_to_99.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_time_to_99.custom_range)}
             </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.time_99)}
+            </tr>
             <tr className="progress_table">
                <td className="progress_table">HRR (heart beats lowered in 1st minute)</td>               
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.today}</td>
@@ -1915,6 +1970,10 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_beats_lowered_in_first_min.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_beats_lowered_in_first_min.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.beat_lowered)}
             </tr>
             <tr className="progress_table">
                 <td className="progress_table">HRR (highest heart rate in 1st minute)</td>               
@@ -1933,6 +1992,32 @@ handleBackButton(){
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.month}</td>
                 <td className="progress_table">{this.state.summary.other.hrr_lowest_hr_point.year}</td>
                 {this.renderCustomRangeTD(this.state.summary.other.hrr_lowest_hr_point.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Pure 1 Minute HRR Beats Lowered </td>     
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.today}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.yesterday}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.week}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.month}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_1_minute_beat_lowered.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_pure_1_minute_beat_lowered.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.pure_beat_lowered)}
+            </tr>
+             <tr className="progress_table">
+                <td className="progress_table">Pure time to 99 (mm:ss)</td>     
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.today}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.yesterday}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.week}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.month}</td>
+                <td className="progress_table">{this.state.summary.other.hrr_pure_time_to_99.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.other.hrr_pure_time_to_99.custom_range)}
+            </tr>
+             <tr className="progress_table">
+                 <td className="progress_table">Rank against other users</td>
+                 {this.renderTablesTd(this.state.rankData.pure_time_99)}
             </tr>
              <tr className="progress_table">
                 <td className="progress_table">Floors Climbed</td>

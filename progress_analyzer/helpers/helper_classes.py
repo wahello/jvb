@@ -77,10 +77,18 @@ class ToStandingCumulative(object):
 class ToOtherStatsCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_resting_hr = raw_data["cum_resting_hr"]
-		self.cum_hrr_time_to_99_in_mins = raw_data["cum_hrr_time_to_99_in_mins"]
-		self.cum_hrr_beats_lowered_in_first_min = raw_data["cum_hrr_beats_lowered_in_first_min"]
-		self.cum_highest_hr_in_first_min = raw_data["cum_highest_hr_in_first_min"]
-		self.cum_hrr_lowest_hr_point = raw_data["cum_hrr_lowest_hr_point"]
+		self.cum_hrr_time_to_99_in_mins = raw_data[
+			"cum_hrr_time_to_99_in_mins"]
+		self.cum_hrr_beats_lowered_in_first_min = raw_data[
+			"cum_hrr_beats_lowered_in_first_min"]
+		self.cum_highest_hr_in_first_min = raw_data[
+			"cum_highest_hr_in_first_min"]
+		self.cum_hrr_lowest_hr_point = raw_data[
+			"cum_hrr_lowest_hr_point"]
+		self.cum_hrr_pure_1_min_beats_lowered = raw_data[
+			"cum_hrr_pure_1_min_beats_lowered"]
+		self.cum_hrr_pure_time_to_99 = raw_data[
+			"cum_hrr_pure_time_to_99"]
 		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
 
 class ToMetaCumulative(object):
@@ -115,14 +123,20 @@ class ToMetaCumulative(object):
 		self.cum_reported_stress_days_count = raw_data[
 			"cum_reported_stress_days_count"
 		]
+		self.cum_hrr_pure_1_minute_beat_lowered_days_count = raw_data[
+			"cum_hrr_pure_1_minute_beat_lowered_days_count"
+		]
+		self.cum_hrr_pure_time_to_99_days_count = raw_data[
+			"cum_hrr_pure_time_to_99_days_count"
+		]
 
 class ToCumulativeSum(object):
 	'''
 	Convert a quicklook object to cumulative sum object
 	'''
-	def __init__(self,ql_obj,ui_obj,cum_obj=None):
+	def __init__(self,user,ql_obj,ui_obj,cum_obj=None):
 
-		cum_raw_data = create_cum_raw_data(ql_obj,ui_obj,cum_obj)
+		cum_raw_data = create_cum_raw_data(user,ql_obj,ui_obj,cum_obj)
 		
 		self.overall_health_grade_cum = ToOverallHealthGradeCumulative(
 			cum_raw_data["overall_health_grade_cum"]
@@ -260,6 +274,41 @@ class ProgressReport():
 			for d in existing-allowed:
 				self.duration_type.pop(self.duration_type.index(d))
 
+		self.todays_cum_data = self._get_todays_cum_data()
+
+	@property
+	def todays_cum_data(self):
+		return self.__todays_cum_data
+
+	@todays_cum_data.setter
+	def todays_cum_data(self,data):
+		self.__todays_cum_data = data
+
+	def _get_todays_cum_data(self):
+		'''
+		Create todays cumulative data by merging todays raw report 
+		and yesterday cumulative sum (if available)
+		'''
+		todays_ql_data = self.ql_datewise_data.get(
+				self.current_date.strftime("%Y-%m-%d"),None)
+		todays_ui_data = self.ui_datewise_data.get(
+			self.current_date.strftime("%Y-%m-%d"),None)
+		yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
+
+		todays_cum = None
+		if todays_ql_data:
+			if yesterday_data:
+				todays_cum = ToCumulativeSum(
+					self.user,todays_ql_data,todays_ui_data,yesterday_data
+				)
+			else:
+				todays_cum = ToCumulativeSum(
+					self.user,todays_ql_data,todays_ui_data
+				)
+		return todays_cum
+			
+
 	def _str_to_dt(self,dt_str):
 		if dt_str:
 			return datetime.strptime(dt_str, "%Y-%m-%d")
@@ -282,7 +331,10 @@ class ProgressReport():
 			seconds = mins * 60
 			mins,seconds = divmod(seconds,60)
 			mins = round(mins)
-			seconds = round(seconds)
+			if seconds < 59:
+				seconds = round(seconds)
+			else:
+				seconds = int(seconds)
 			if seconds < 10:
 				seconds = "{:02d}".format(seconds)
 			return "{}:{}".format(mins,seconds)
@@ -397,6 +449,56 @@ class ProgressReport():
 		}
 		return duration
 
+	def _get_last_three_days_data(self,summary_type):
+		'''
+		Return the Cumulative data for specifed summary type and 
+		cumulative 'meta' data for today, yesterday and day before
+		yesterday (calculated from current date)
+
+		Args:
+			summary_type(string): Summary type for which cumulative data is
+			required. Possible summary types are defined in self.summary_type
+
+		Returns:
+			dict: Return a dictionary whose value is a tuple. Tuple have
+			following values in same order- 
+				1) Cumulative data of particular summary type
+				2) cumulative data for meta summary
+		'''
+		todays_data = None
+		todays_meta_data = None
+		yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
+		yesterday_meta_data = None
+		day_before_yesterday_data = self.cumulative_datewise_data.get(
+			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
+		day_before_yesterday_meta_data = None
+
+		if self.todays_cum_data:
+			todays_meta_data = self.todays_cum_data.__dict__.get("meta_cum")
+			todays_data = self.todays_cum_data.__dict__.get(summary_type)
+
+		if yesterday_data:
+			# Because of select related, attribute names become "_attrname_cache"
+			cached_summary_type = "_{}_cache".format(summary_type)
+			yesterday_meta_data = yesterday_data.__dict__.get("_meta_cum_cache")
+			yesterday_data = yesterday_data.__dict__.get(cached_summary_type)
+
+		if day_before_yesterday_data:
+			cached_summary_type = "_{}_cache".format(summary_type)
+			day_before_yesterday_meta_data = day_before_yesterday_data.__dict__.get("_meta_cum_cache")
+			day_before_yesterday_data = day_before_yesterday_data.__dict__.get(cached_summary_type)
+
+		data = {
+			"today":(todays_data,todays_meta_data),
+			"yesterday":(yesterday_data,yesterday_meta_data),
+			"day_before_yesterday":(
+				day_before_yesterday_data,
+				day_before_yesterday_meta_data
+			)
+		}
+		return data
+
 	def _generic_custom_range_calculator(self,key,alias,summary_type,custom_avg_calculator):
 		custom_average_data = {}
 
@@ -424,7 +526,9 @@ class ProgressReport():
 					r[1].strftime("%Y-%m-%d"),None
 				)
 				if range_end_data and yesterday_cum_data:
-					range_end_data = ToCumulativeSum(range_end_data,todays_ui_data,yesterday_cum_data)
+					range_end_data = ToCumulativeSum(
+						self.user,range_end_data,todays_ui_data,yesterday_cum_data
+					)
 					format_summary_name = False
 
 			str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
@@ -458,35 +562,32 @@ class ProgressReport():
 		return custom_average_data
 
 	def _generic_summary_calculator(self,calculated_data_dict,avg_calculator,summary_type):
-		todays_data = self.ql_datewise_data.get(
-				self.current_date.strftime("%Y-%m-%d"),None)
-		todays_ui_data = self.ui_datewise_data.get(
-			self.current_date.strftime("%Y-%m-%d"),None)
-		todays_meta_data = None
-		yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=1)).strftime("%Y-%m-%d"),None)
-		yesterday_meta_data = None
-		day_before_yesterday_data = self.cumulative_datewise_data.get(
-			(self.current_date-timedelta(days=2)).strftime("%Y-%m-%d"),None)
-		day_before_yesterday_meta_data = None
+		'''
+		Generates averages for provided summary type all ranges
+		(today, yesterday etc) except custom range
 
-		if todays_data:
-			if yesterday_data:
-				todays_meta_data = ToCumulativeSum(todays_data,todays_ui_data,yesterday_data).__dict__.get("meta_cum")
-				todays_data = ToCumulativeSum(todays_data,todays_ui_data,yesterday_data).__dict__.get(summary_type)
-			else:
-				todays_meta_data = ToCumulativeSum(todays_data,todays_ui_data).__dict__.get(summary_type)
-				todays_data = ToCumulativeSum(todays_data,todays_ui_data).__dict__.get(summary_type)
-		if yesterday_data:
-			# Because of select related, attribute names become "_attrname_cache"
-			cached_summary_type = "_{}_cache".format(summary_type)
-			yesterday_meta_data = yesterday_data.__dict__.get("_meta_cum_cache")
-			yesterday_data = yesterday_data.__dict__.get(cached_summary_type)
+		Args:
+			calculated_data_dict (dict):  Dictionary where average for
+				any field (eg overall_health_gpa) in given summary type
+				(eg overall_health_grade_cum) is calculated and stored
+				by mutating this dictionary
 
-		if day_before_yesterday_data:
-			cached_summary_type = "_{}_cache".format(summary_type)
-			day_before_yesterday_meta_data = day_before_yesterday_data.__dict__.get("_meta_cum_cache")
-			day_before_yesterday_data = day_before_yesterday_data.__dict__.get(cached_summary_type)
+			avg_calculator (function): A function which have average logic
+				for every field in given summary type.
+
+			summary_type(string): Summary type for which averages to be 
+				calculated. This summary type is the relative name of the
+				model which stores the cumulative data of any summary type
+				mentioned in self.summary_type. For example, model of
+				summary type "overall_health" have relative name
+				"overall_health_grade_cum" 
+		'''
+		last_three_days_data = self._get_last_three_days_data(summary_type)
+		todays_data,todays_meta_data = last_three_days_data["today"]
+		yesterday_data,yesterday_meta_data = last_three_days_data["yesterday"]
+		day_before_yesterday_data,day_before_yesterday_meta_data = last_three_days_data[
+			"day_before_yesterday"
+		]
 
 		for key in calculated_data_dict.keys():
 			for alias, dtobj in self._get_duration_datetime(self.current_date).items():
@@ -1080,7 +1181,10 @@ class ProgressReport():
 							todays_data.cum_hrr_time_to_99_in_mins,
 							current_data.cum_hrr_time_to_99_in_mins,
 							hrr_time_to_99_days))
-						return val
+						if hrr_time_to_99_days:
+							return val
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_beats_lowered_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -1092,7 +1196,10 @@ class ProgressReport():
 							todays_data.cum_hrr_beats_lowered_in_first_min,
 							current_data.cum_hrr_beats_lowered_in_first_min,
 							beats_lowered_in_first_min_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if beats_lowered_in_first_min_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_highest_hr_in_first_min':
 					if todays_meta_data and current_meta_data:
@@ -1104,7 +1211,10 @@ class ProgressReport():
 							todays_data.cum_highest_hr_in_first_min,
 							current_data.cum_highest_hr_in_first_min,
 							highest_hr_in_first_min_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if highest_hr_in_first_min_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'hrr_lowest_hr_point':
 					if todays_meta_data and current_meta_data:
@@ -1116,7 +1226,40 @@ class ProgressReport():
 							todays_data.cum_hrr_lowest_hr_point,
 							current_data.cum_hrr_lowest_hr_point,
 							hrr_lowest_hr_point_days)
-						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						if hrr_lowest_hr_point_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
+					return None
+				elif key == 'hrr_pure_1_minute_beat_lowered':
+					if todays_meta_data and current_meta_data:
+						hrr_pure_1_minute_beat_lowered_days = (
+							todays_meta_data.cum_hrr_pure_1_minute_beat_lowered_days_count 
+							- current_meta_data.cum_hrr_pure_1_minute_beat_lowered_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_hrr_pure_1_min_beats_lowered,
+							current_data.cum_hrr_pure_1_min_beats_lowered,
+							hrr_pure_1_minute_beat_lowered_days)
+						if hrr_pure_1_minute_beat_lowered_days:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
+					return None
+				elif key == 'hrr_pure_time_to_99':
+					if todays_meta_data and current_meta_data:
+						hrr_pure_time_to_99_days = (
+							todays_meta_data.cum_hrr_pure_time_to_99_days_count 
+							- current_meta_data.cum_hrr_pure_time_to_99_days_count
+						)
+						val = self._min_to_min_sec(_cal_custom_average(
+							todays_data.cum_hrr_pure_time_to_99,
+							current_data.cum_hrr_pure_time_to_99,
+							hrr_pure_time_to_99_days))
+						if hrr_pure_time_to_99_days:
+							return val
+						else:
+							return "Not Provided"
 					return None
 				elif key == 'floors_climbed':
 					val = self._get_average_for_duration(
@@ -1131,6 +1274,8 @@ class ProgressReport():
 			'hrr_beats_lowered_in_first_min':{d:None for d in self.duration_type},
 			'hrr_highest_hr_in_first_min':{d:None for d in self.duration_type},
 			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
+			'hrr_pure_1_minute_beat_lowered':{d:None for d in self.duration_type},
+			'hrr_pure_time_to_99':{d:None for d in self.duration_type},
 			'floors_climbed':{d:None for d in self.duration_type}
 		}
 		summary_type = "other_stats_cum"

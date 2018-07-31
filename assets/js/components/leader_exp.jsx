@@ -13,6 +13,7 @@ import {renderLeaderBoardFetchOverlay,renderLeaderBoard2FetchOverlay,renderLeade
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
 import AllRank_Data1 from "./leader_all_exp";
+import HrrLeaderboard from "./Hrr_leaderboard"; 
 
 
 
@@ -67,8 +68,26 @@ const categoryMeta = {
 		short_name:"floor_climbed",
 		url_name:"floor-climbed"
 	},
+	"Heart Beats Lowered In 1st Minute":{
+		short_name:"beat_lowered",
+		url_name:"beat-lowered"
+	},
+	"Pure Heart Beats Lowered In 1st Minute":{
+		short_name:"pure_beat_lowered",
+		url_name:"pure-beat-lowered"
+	},
+	"Pure Time To 99":{
+		short_name:"pure_time_99",
+		url_name:"pure-time-99"
+	},
+	"Time To 99":{
+		short_name:"time_99",
+		url_name:"time-99"
+	},
 };
-const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr","deep_sleep","nes","floor_climbed",];
+const overallHrrcategory = ["overall_hrr"];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr",
+"deep_sleep","nes","floor_climbed","beat_lowered","pure_beat_lowered","pure_time_99","time_99",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
 class LeaderBoard1 extends Component{
@@ -78,7 +97,7 @@ class LeaderBoard1 extends Component{
     for (let catg of catagory){
         let catInitialState = {}
         for(let dur of duration){
-	          let userRank = {
+          	let userRank = {
 	            'user_rank':{
 	              category:'',
 	              rank:'',
@@ -91,6 +110,22 @@ class LeaderBoard1 extends Component{
          catInitialState[dur] = userRank;
         }
         rankInitialState[catg] = catInitialState;
+    };
+
+	let overallHrrrankInitialState = {}
+    for (let catg of overallHrrcategory){
+        let hrrInitialState = {}
+        for(let dur of duration){
+	          let userRank = {
+	            'user_rank':{
+
+	            },
+	            "all_rank":[
+	            ]
+	        };
+         hrrInitialState[dur] = userRank;
+        }
+        overallHrrrankInitialState[catg] = hrrInitialState;
     };
 		this.state = {
 			selectedDate:new Date(),
@@ -111,13 +146,18 @@ class LeaderBoard1 extends Component{
 			isOpen:false,
 			isOpen1:false,
 			ranking_data:rankInitialState,
+			Hrr_ranking_data:overallHrrrankInitialState,
 			active_view:true,
 			btnView:false,
+			btnView2:false,
+			Hrr_view:false,
 			scrollingLock:false,
 			active_category:"",
 			active_username:"",
 			active_category_name:"",
 			all_verbose_name:"",
+			all_hrr_rank_data:"",
+			Hrr_username:"",
 			duration_date:{
 				"week":"",
 				"today":"",
@@ -131,7 +171,7 @@ class LeaderBoard1 extends Component{
 		this.toggle = this.toggle.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.successLeaderBoard = this.successLeaderBoard.bind(this);
-		this.successLeaderBoard = this.successLeaderBoard.bind(this);
+		this.errorLeaderBoard = this.errorLeaderBoard.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.renderTablesTd = this.renderTablesTd.bind(this);
 		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
@@ -148,16 +188,19 @@ class LeaderBoard1 extends Component{
 		this.renderLeaderBoardSelectedDateFetchOverlay = renderLeaderBoardSelectedDateFetchOverlay.bind(this);
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.renderTableHeader = this.renderTableHeader.bind(this);
-		this.handleScroll = this.handleScroll.bind(this);
+		this.renderOverallHrrTable = this.renderOverallHrrTable.bind(this);
 	}
 	successLeaderBoard(data){
 		this.setState({
+			Hrr_ranking_data:data.data.overall_hrr,
 			ranking_data:data.data,
 			duration_date:data.data.duration_date,
 			fetching_lb1:false,
 	        fetching_lb2:false,
 	        fetching_lb3:false,
 	        fetching_lb4:false,
+		},()=>{
+			// console.log("****************************",this.state.Hrr_ranking_data);
 		});
 	}
 
@@ -247,10 +290,6 @@ class LeaderBoard1 extends Component{
 			fetching_lb4:true,
 		});
 		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,true);
-		window.addEventListener('scroll', this.handleScroll);
-	}
-	componentWillUnmount() {
-    	window.removeEventListener('scroll', this.handleScroll);
 	}
 	toggle() {
 	    this.setState({
@@ -299,6 +338,119 @@ class LeaderBoard1 extends Component{
             let date2 =moment(d2).format('MMM DD, YYYY');
             let date = date1 + ' to ' + date2;
             return date;
+	}
+	renderOverallHrrTable(value,value5){
+		let category = "";
+	  	let durations = [];
+	  	let scores = [];
+	  	let userName;
+	  	let ranks = [];
+	  	let tableRows = [];
+	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
+	  	for(let duration of durations_type){
+	  		let val = value[duration];
+	  		if(duration == "custom_range" && val){
+	  			for(let [range,value1] of Object.entries(val)){
+	  				durations.push(this.headerDates(range));
+	  				for(let [c_key,c_rankData] of Object.entries(value1)){
+		  				if(c_key == "user_rank"){
+		  					userName = c_rankData.username;
+			  		 		scores.push(c_rankData.total_hrr_rank_point);
+			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
+		  		 		}
+	  				}
+	  			}
+	  		}
+	  		else{
+	  			if (val){ 
+			  		durations.push(duration);
+			  		for (let [key,rankData] of Object.entries(val)){
+			  		 	if(key == "user_rank"){
+			  		 		userName = rankData.username;
+			  		 		scores.push(rankData.total_hrr_rank_point);
+			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
+			  		 	}
+			  		 	
+			  		}
+			  	}
+		  	}
+		}
+
+		let date;
+	  	let tableHeaders = [<th className = "lb_table_style_rows">Overall HRR</th>]
+	  	for(let dur of durations){
+	  		let capt = dur[0].toUpperCase() + dur.slice(1)
+	  		if(dur == "today"){
+	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
+	  		}
+	  		else if(dur == "yesterday"){
+	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
+	  		}
+	  		else if(dur == "week"){
+		  		date = this.headerDates(value5[dur]);
+	  		}
+	  		else if(dur == "month"){
+		  		date = this.headerDates(value5[dur]);
+	  		}
+	  		else if(dur == "year"){
+		  		date = this.headerDates(value5[dur]);
+	  		}
+	  		else{
+	  			date = value5[dur];
+	  		}	
+	  		tableHeaders.push(<th className = "lb_table_style_rows">{capt}<br/>{date}</th>);
+	  	}
+	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
+	  	
+	  	let rankTableData = [<td style={{fontWeight:"bold"}}
+	  							 className = "lb_table_style_rows">
+	  							 {"Ranks"}</td>]
+
+		  	for(let rank of ranks){
+		  		if(rank.isCustomRange){
+		  			var all_cat_rank = this.state.Hrr_ranking_data['custom_range'][rank['duration']].all_rank;
+			  	}
+			  	else{
+			  		var all_cat_rank = this.state.Hrr_ranking_data[rank['duration']].all_rank;
+			  	}
+		  		rankTableData.push(
+			  		<td className = "lb_table_style_rows">
+			  		<a  onClick = {this.reanderAllHrr.bind(this,all_cat_rank,userName)}>
+			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
+			  				 <span id="lbfontawesome">
+			                    <FontAwesome
+			                    	className = "fantawesome_style"
+			                        name = "external-link"
+			                        size = "1x"
+			                    />
+			                 </span>  
+			                 </a> 
+			  		</td>
+		  		);
+		  	}
+	  	tableRows.push(<tbody><tr className = "lb_table_style_rows">{rankTableData}</tr></tbody>);
+
+	  	let scoreTableData = [<td style={{fontWeight:"bold"}}
+	  							 className = "lb_table_style_rows">
+	  							 {"Total Hrr Rank Point"}</td>]
+	  	for(let score of scores){
+	  		scoreTableData.push(<td className = "lb_table_style_rows">
+			  				{score}</td>)
+	  	}
+	  	tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>);
+
+	  	return  <table className = "table table-striped table-bordered">
+	  	{tableRows}
+	  	</table>;
+	}
+	reanderAllHrr(all_data,value1){
+		this.setState({
+			all_hrr_rank_data:all_data,
+			Hrr_username:value1,
+			Hrr_view:!this.state.Hrr_view,
+			active_view:!this.state.active_view,
+			btnView2:!this.state.btnView2,
+		});
 	}
   	renderTablesTd(value,value5){
   		let category = "";
@@ -497,9 +649,43 @@ class LeaderBoard1 extends Component{
 	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
 	  							  className = "lb_table_style_rows">
 	  							  {"Floors Climbed"}</td>);
-	    }					
+	    }
+	    else if(category == "Heart Beats Lowered In 1st Minute"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Heart Beats Lowered In 1st Minute"}</td>);
+	    }
+	     else if(category == "Pure Heart Beats Lowered In 1st Minute"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Pure Heart Beats Lowered In 1st Minute"}</td>);
+	    }
+	     else if(category == "Pure Time To 99"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Pure Time To 99"}</td>);
+	    }
+	     else if(category == "Time To 99"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Time To 99"}</td>);
+	    }									
 	  	for(let score of scores){
 	  		if(category == "Total Steps"){
+	  			var value = score;
+	  		    if(value != undefined){
+	                value += '';
+	                var x = value.split('.');
+	                var x1 = x[0];
+	                var x2 = x.length > 1 ? '.' + x[1] : '';
+	                var rgx = /(\d+)(\d{3})/;
+	                while (rgx.test(x1)) {
+	            			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	          		}
+	                scoreTableData.push(<td className="lb_table_style_rows">{x1 + x2}</td>);
+    	        }
+	  		}
+	  		else if(category == "Non Exercise Steps"){
 	  			var value = score;
 	  		    if(value != undefined){
 	                value += '';
@@ -570,7 +756,8 @@ class LeaderBoard1 extends Component{
   	handleBackButton(){
   		this.setState({
   			active_view:!this.state.active_view,
-  			btnView:false
+  			btnView:false,
+  			btnView2:false,
   		})
   	}
   	renderTableHeader(data){
@@ -583,23 +770,14 @@ class LeaderBoard1 extends Component{
 					for (let cat of category){
 						if(cat == "category"){
 							values.push(<span style = {{fontWeight:"bold"}}>{value1[cat]}</span>);
+							console.log("&&&&&&&&&&&&&&",value1[cat]);
 						}
 					}
 				}
 		  
 		return values;
 	}
-	handleScroll() {
-		  if (window.scrollY >= 150 && !this.state.scrollingLock) {
-		    this.setState({
-		      scrollingLock: true
-		    });
-		  } else if(window.scrollY < 100 && this.state.scrollingLock) {                                               
-		    this.setState({
-		      scrollingLock: false
-		    });
-		  }
-	}
+
 	render(){
 		 const {fix} = this.props;
 		return(
@@ -785,6 +963,11 @@ class LeaderBoard1 extends Component{
 	            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
 	            </div>
             }
+            {this.state.btnView2 &&
+	           	<div>
+	            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
+	            </div>
+            }
             {this.state.btnView &&
 	        	<div className = "row justify-content-center">
   					<span style={{float:"center",fontSize:"17px"}}>{this.renderTableHeader(this.state.active_category)}</span>
@@ -878,12 +1061,52 @@ class LeaderBoard1 extends Component{
 			        </div>
 		        </div>
 		    }
-		      {this.state.btnView && 
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.beat_lowered,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.pure_beat_lowered,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		     {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.pure_time_99,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.time_99,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderOverallHrrTable(this.state.Hrr_ranking_data,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+	      	{this.state.btnView && 
 		        <AllRank_Data1 data={this.state.active_category} 
 		        active_username = {this.state.active_username} 
 		        active_category_name = {this.state.active_category_name}
 		        all_verbose_name = {this.state.all_verbose_name}/>
-			  }
+		  	}
+			{this.state.btnView2 &&
+		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
+	  							Hrr_username = {this.state.Hrr_username}/>
+			}
 	        </div>
 	        {this.renderLeaderBoardFetchOverlay()}
 			{this.renderLeaderBoard2FetchOverlay()}

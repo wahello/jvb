@@ -6,6 +6,7 @@ from django.db import models
 class FitbitConnectToken(models.Model):
 
 	user = models.OneToOneField('auth.User',related_name="fitbit_refresh_token")
+	updated_at = models.DateTimeField(auto_now=True)
 	refresh_token = models.CharField(max_length=250)
 	access_token = models.TextField(null=True)
 	user_id_fitbit = models.CharField(max_length=250,null=True)
@@ -39,3 +40,60 @@ class UserFitbitDataActivities(models.Model):
 
 	def __str__(self):
 		return "%s"%(self.user.username)
+
+class UserFitbitDataSteps(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="fitbit_steps_data")
+	created_at = models.DateField(default=datetime.now, blank=True)
+	date_of_steps = models.TextField()
+	steps_data = models.TextField(null=True)
+
+	def __str__(self):
+		return "%s"%(self.user.username)
+
+class FitbitNotifications(models.Model):
+	PING_STATE_CHOICES = (
+		("unprocessed","Unprocessed"),
+		("processing","Processing"),
+		("processed","Processed"),
+		("failed","Failed"),
+	)
+	COLLECTION_TYPE_CHOICES = (
+		("activities","Activities"),
+		("body","Body"),
+		("foods","Foods"),
+		("sleep","Sleeps"),
+	)
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE,
+	 related_name="fitbit_notification")
+	created_at = models.DateTimeField(auto_now_add=True)
+	notification_date = models.DateField()
+	collection_type = models.CharField(
+		choices = COLLECTION_TYPE_CHOICES,
+		max_length=100)
+	state = models.CharField(
+		choices = PING_STATE_CHOICES,
+		max_length = 100
+	)
+	notification = models.TextField()
+
+	def __str__(self):
+		return "%s"%(self.user.username)
+class UserFitbitDatabody(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE,
+	 related_name="fitbit_body_data")
+	created_at = models.DateField(default=datetime.now, blank=True)
+	date_of_body = models.TextField()
+	body_data = models.TextField(null=True)
+	def __str__(self):
+		return "%s"%(self.user.username)
+
+class UserFitbitDatafoods(models.Model):
+	user = models.ForeignKey('auth.user',on_delete=models.CASCADE, 
+		related_name="fitbit_food_data")
+	created_at = models.DateField(default=datetime.now, blank=True)
+	date_of_foods = models.TextField()
+	foods_data = models.TextField(null=True)
+	def __str__(self):
+		return "%s"%(self.user.username)
+
+
