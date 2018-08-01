@@ -54,7 +54,7 @@ def fitfile_parse(obj,offset,start_date_str):
 		to_timestamp.extend([value_mktime])
 	
 	timestamp_difference = []
-	for i,k in enumerate(to_timestamp):
+	for i,single_timestamp in enumerate(to_timestamp):
 		try:
 			dif_tim = to_timestamp[i+1] - to_timestamp[i]
 			timestamp_difference.extend([dif_tim])
@@ -64,10 +64,10 @@ def fitfile_parse(obj,offset,start_date_str):
 	final_heartrate = []
 	final_timestamp = []
 
-	for i,k in zip(heartrate_selected_date,timestamp_difference):
-		if (k <= 200) and (k >= 0):
-			final_heartrate.extend([i])
-			final_timestamp.extend([k]) 
+	for heart_rate,time_stamp in zip(heartrate_selected_date,timestamp_difference):
+		if (time_stamp <= 200) and (time_stamp >= 0):
+			final_heartrate.extend([heart_rate])
+			final_timestamp.extend([time_stamp]) 
 
 	return (final_heartrate,final_timestamp,to_timestamp)
 
