@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import {Field, reduxForm } from 'redux-form';
 import _ from 'lodash';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import queryString from 'query-string';
 import moment from 'moment';
 import FontAwesome from "react-fontawesome";
  import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
+import {fetchLastSync} from '../network/quick';
 import {fetchMovementConsistency} from '../network/quick';
 
 
@@ -19,12 +22,13 @@ var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
 class MCS_Dashboard extends Component{
-	constructor(prop){
-		super(prop);
+	constructor(props){
+		super(props);
 		this.state = {
 		    selectedDate:new Date(),
 			calendarOpen:false,
 			isOpen:false,
+			last_synced:null,
 			mc_data:{},
 		};
 
@@ -34,6 +38,8 @@ class MCS_Dashboard extends Component{
 	    this.errorMCFetch = this.errorMCFetch.bind(this);
 		this.successMCFetch = this.successMCFetch.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
+		this.successLastSync = this.successLastSync.bind(this);
+		this.errorquick = this.errorquick.bind(this);
 		this.stepsValueComma = this.stepsValueComma.bind(this);
 		this.renderTable = this.renderTable.bind(this);
 		this.renderTablecolumn = this.renderTablecolumn.bind(this);
@@ -43,16 +49,36 @@ class MCS_Dashboard extends Component{
 		this.mcHistoricalData = this.mcHistoricalData.bind(this);
 		this.renderAddDate = this.renderAddDate.bind(this);
 		this.renderRemoveDate = this.renderRemoveDate.bind(this);
+		
 	}
+
 	errorMCFetch(error){
    		console.log(error.message);
     }
+    successLastSync(data){
+    	/* Getting Wearable Device Last Sync date and time*/
+    	let last_synced;
+    	if(_.isEmpty(data.data))
+    		last_synced = null
+    	else
+    		 last_synced = data.data.last_synced;
+    	this.setState({
+    		last_synced:last_synced,
+    	})
+    }
+    errorquick(error){
+		console.log(error.message);
+	}
+
     renderLastSync(value){
           let time;
+          let sync="";
         if(value != null){
           time = moment(value).format("MMM DD, YYYY @ hh:mm a")
+          sync = <div style = {{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
        }
-         return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
+        return sync;
+       
    }
     renderAddDate(){
     	/*added the angle-right to the calender to getting the next day data */
@@ -87,16 +113,31 @@ class MCS_Dashboard extends Component{
    }
     processDate(selectedDate){
 	    this.setState({
-	        selectedDate: selectedDate,
+	        selectedDate:selectedDate,
 	        calendarOpen:!this.state.calendarOpen,
        },()=>{
         fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
+        
      });
     }
 
     componentDidMount(){
-       	fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);  
-  	} 
+    	const values = queryString.parse(this.props.location.search);
+    	let value = values.date;
+    	window.history.pushState("selectedDate","mcs_dashboard","/mcs_dashboard")	
+       	if(value){
+               this.setState({
+	    		selectedDate:new Date(values.date)
+	    	},()=>{
+	    		fetchMovementConsistency(values.date,this.successMCFetch,this.errorMCFetch);  
+	    	});
+    	}
+    	else{
+      	   fetchMovementConsistency(this.state.selectedDate,this.successMCFetch,this.errorMCFetch);
+        }
+      
+            fetchLastSync(this.successLastSync,this.errorquick);
+    }
 
     toggle() {
 	    this.setState({
@@ -147,7 +188,7 @@ class MCS_Dashboard extends Component{
 	        color = 'black'
 	      }
 	      else if(status == "no data yet"){
-	      	score = "No Data Yet";
+	      	score = "NDY";
 	        background = "#A5A7A5";
 	        color = 'black'
 	      }
@@ -295,7 +336,7 @@ class MCS_Dashboard extends Component{
 			   <NavbarMenu title = {<span style = {{fontSize:"18px"}}>Movement Consistency Score (MCS) Dashboard
                     </span>} />
                
-                    <div className="row justify-content-center mc-calendar"  style = {{marginTop:"10px",paddingBottom:"25px"}}>
+                    <div className="cla_center">
 						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
 							<FontAwesome
 							className="arrow"
@@ -310,6 +351,7 @@ class MCS_Dashboard extends Component{
 			                  size = "2x"
 			                />
 			                <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+
 		                </span>
 		                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
 						    <FontAwesome
@@ -317,7 +359,9 @@ class MCS_Dashboard extends Component{
 		                        name = "angle-right"
 		                        size = "2x"
 			                />
-						</span> 
+						</span>
+
+						 <span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -325,9 +369,10 @@ class MCS_Dashboard extends Component{
 					            toggle={this.toggleCalendar}>
 				                <PopoverBody className="calendar2">
 				                   <CalendarWidget  onDaySelect={this.processDate}/>
+				         
 				                </PopoverBody>
 			                </Popover>
-			        </div>
+			         </div>
 			           
 			       <div className = "row justify-content-center mcs_dashboard">
 			          <div className="col-sm-9 table_process">
@@ -400,12 +445,12 @@ class MCS_Dashboard extends Component{
 		          	    	</tbody>
 		            </table>
 	          	
+				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Active Hours = Any hour with more than 300 steps when user was not sleeping</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Inactive Hours (MCS Score) = # of hours a day with 300 steps or less when a user is not sleeping</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Strength Hours = Hours user recorded strength exercises</p>
-				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
-			                <p className="mcs_content" style={{marginLeft:"15px"}}>No Data Yet = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
+			                <p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
 		       </div>
 		   
 	     </div>
