@@ -150,8 +150,7 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 			user_id,data_type,date))
 		body_fat_fitbit = body_fat_fitbit.json()
 		store_data(body_fat_fitbit,user,date,create_notification,data_type='body_fat_fitbit')
-			# body_fat_fitbit = body_fat_fitbit.json()
-			# print(body_fat_fitbit, "testttttttttttt1")
+		#print(body_fat_fitbit, "testttttttttttt1")
 		# body_weight_fitbit = session.get(
 		# 	"https://api.fitbit.com/1/user/{}/body/log/weight/date/{}.json ".format(
 		# 	user_id,date))
@@ -229,7 +228,7 @@ def update_fitbit_data(user,date,create_notification,data,collection_type):
 			date_of_steps=date).update(steps_data=data)
 	elif collection_type == "body_fat_fitbit":
 		UserFitbitDatabody.objects.filter(user=user,
-			date_of_body=date).update(body_data=data,date_of_body=date.today())
+			date_of_body=date).update(body_data=data,date_of_body=date)
 	elif collection_type == "foods_goal_logs":
 		UserFitbitDatafoods.objects.filter(user=user,
 			date_of_foods=date).update(foods_data=data,date_of_foods=date.today())
@@ -332,19 +331,19 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 
 		try:
 			if "body_fat_fitbit" == key:
-				#date_of_body = value['activities-steps'][0]['dateTime']
+				date_of_body = value['fat'][0]['date']
 				try:
 					body_obj = UserFitbitDatabody.objects.get(user=user,
-					created_at=datetime.now())
-					update_fitbit_data(user,date.today(),create_notification,value,key)
+					created_at=date_of_body)
+					update_fitbit_data(user,date_of_body,create_notification,value,key)
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
 					print("Updated body_fat_fitbit successfully")
 				except UserFitbitDatabody.DoesNotExist:
 					UserFitbitDatabody.objects.create(user=user,
-					date_of_body=date.today(),
-					body_data=value,created_at=datetime.now())
+					date_of_body=date_of_body,
+					body_data=value,created_at=date_of_body)
 					print("Created steps-body_fat_fitbit successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
