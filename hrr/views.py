@@ -2,6 +2,7 @@ import json
 import ast
 import time
 import logging
+import collections
 from datetime import datetime,timedelta,date
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -40,8 +41,60 @@ from hrr.models import Hrr,\
 						AA
 from .serializers import HrrSerializer
 import pprint
+from hrr.calculation_helper import week_date,\
+									get_weekly_workouts,\
+									get_weekly_aa,\
+									weekly_workout_calculations,\
+									weekly_aa_calculations,\
+									merge_activities,\
+									totals_workout,\
+									add_duration_percent,\
+									dynamic_activities,\
+									remove_distance_meters
 
 class UserHrrView(generics.ListCreateAPIView):
+	'''
+		- Create the Hrr instance
+		- List all the Hrr instance
+		- If query parameters "to" and "from" are provided
+		  then filter the Hrr data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+	serializer_class = HrrSerializer
+	def calculate_aa_data(self,aa_data,user_get,start_dt):
+		if aa_data:
+			final_query = aa_data[0]
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = hrr_data(user_get,start_date)
+			if final_query.get('Did_you_measure_HRR'):
+				try:
+					user_hrr = Hrr.objects.get(
+						user_hrr=user_get, created_at=start_date)
+					update_hrr_instance(user_hrr, final_query)
+				except Hrr.DoesNotExist:
+					create_hrr_instance(user_get, final_query, start_date)
+		return final_query
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
+		return Response(aa_data, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		if start_dt:
+			queryset = Hrr.objects.filter(created_at=start_dt,
+							  user_hrr=user).values()
+		else:
+			queryset = Hrr.objects.all()
+		return queryset
+
+class UserHrrViewRawData(generics.ListCreateAPIView):
 	'''
 		- Create the Hrr instance
 		- List all the Hrr instance
@@ -188,9 +241,11 @@ def aa_data(user,start_date):
 
 	hrr_not_recorded_list = []
 	hrr_recorded = []
+	activities_summary_id = []
 	if activity_files:
 		for i in range(len(activity_files)):
 			one_activity_file_dict =  ast.literal_eval(activity_files[i])
+			activities_summary_id.append(one_activity_file_dict['summaryId'])
 			if 'averageHeartRateInBeatsPerMinute' in one_activity_file_dict.keys():
 				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or ''):
 					hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
@@ -198,8 +253,6 @@ def aa_data(user,start_date):
 			else:
 				hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
 				hrr_not_recorded_list.append(hrr_not_recorded_time)
-	if hrr_not_recorded_list:
-		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
@@ -229,6 +282,8 @@ def aa_data(user,start_date):
 		user_input__user = user).order_by('-user_input__created_at')
 
 	activities = []
+	user_input_keys = []
+	created_activity_dict = {}
 	id_act = 0
 	if user_input_strong:
 		for tmp in user_input_strong:
@@ -238,10 +293,20 @@ def aa_data(user,start_date):
 				di = sn.values()
 				di = list(di)
 				for i,k in enumerate(di):
+					user_input_keys.append(di[i]['summaryId'])
+					user_input_summary_id = list(set(user_input_keys))
+					created_activity = list(set(
+						user_input_summary_id) - set(activities_summary_id))
+					if created_activity and di[i]['summaryId'] in created_activity:
+						summayid = di[i]['summaryId']
+						created_activity_dict[summayid] = k
 					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
 						id_act = int(di[i]['summaryId'])
 						activities.append(di[i])
-
+	for single_activity in created_activity_dict.values():
+		hrr_not_recorded_list.append(single_activity.get('durationInSeconds',0))
+	if hrr_not_recorded_list:
+		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 	workout = []
 	hrr = []
 	start = start_date
@@ -328,10 +393,10 @@ def aa_data(user,start_date):
 		time_in_below_aerobic = sum(below_aerobic_list)
 		time_in_anaerobic = sum(anaerobic_range_list)
 		
-		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 		if hrr_not_recorded_list:
-			hrr_not_recorded = hrr_not_recorded_seconds
-
+			total_time =  hrr_not_recorded_seconds+time_in_aerobic+time_in_below_aerobic+time_in_anaerobic 
+		else:
+			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 		try:
 			percent_anaerobic = (time_in_anaerobic/total_time)*100
 			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -342,7 +407,7 @@ def aa_data(user,start_date):
 			percent_aerobic = (time_in_aerobic/total_time)*100
 			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 			if hrr_not_recorded_list:
-				percent_hrr_not_recorded = (hrr_not_recorded/total_time)*100
+				percent_hrr_not_recorded = (hrr_not_recorded_seconds/total_time)*100
 				percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
 			
 			total_percent = 100
@@ -361,7 +426,7 @@ def aa_data(user,start_date):
 					"aerobic_range":aerobic_range,
 					"anaerobic_range":anaerobic_range,
 					"below_aerobic_range":below_aerobic_range,
-					"hrr_not_recorded":hrr_not_recorded,
+					"hrr_not_recorded":hrr_not_recorded_seconds,
 					"percent_hrr_not_recorded":percent_hrr_not_recorded,
 					"percent_aerobic":percent_aerobic,
 					"percent_below_aerobic":percent_below_aerobic,
@@ -435,220 +500,224 @@ def aa_calculations(request):
 	return JsonResponse(data)	
 
 def aa_workout_data(user,start_date):
-	start_date_str = start_date.strftime('%Y-%m-%d')
+	data_aa_check = aa_data(user,start_date)
+	if data_aa_check.get('total_time'):
+		start_date_str = start_date.strftime('%Y-%m-%d')
 
-	start_date_timestamp = start_date
-	start_date_timestamp = start_date_timestamp.timetuple()
-	start_date_timestamp = time.mktime(start_date_timestamp)
-	end_date_timestamp = start_date_timestamp + 86400
-	
-	ui_data = _get_activities(user,start_date_str)
-	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
-	for ui_data_single in ui_data.values():
-		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
-			summaryId = ui_data_single['summaryId']
-			ui_data_keys.remove(summaryId)
-	
-	try:
-		user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
-		activities=[]
-		activities_dic={}
+		start_date_timestamp = start_date
+		start_date_timestamp = start_date_timestamp.timetuple()
+		start_date_timestamp = time.mktime(start_date_timestamp)
+		end_date_timestamp = start_date_timestamp + 86400
+		
+		ui_data = _get_activities(user,start_date_str)
+		ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
+		for ui_data_single in ui_data.values():
+			if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
+				summaryId = ui_data_single['summaryId']
+				ui_data_keys.remove(summaryId)
+		
+		try:
+			user_input_strong = DailyUserInputStrong.objects.filter(
+			user_input__created_at=(start_date),
+			user_input__user = user).order_by('-user_input__created_at')
+			activities=[]
+			activities_dic={}
+			if user_input_strong:
+				user_input_activities =[act.activities for act in user_input_strong]
+				for i,k in enumerate(user_input_activities):
+					input_files=json.loads(user_input_activities[i])
+					summaryId = []
+					for keys in input_files.keys():
+						summaryId.append(keys)
+					for i in range(len(summaryId)):
+						activities.append(input_files[summaryId[i]])
+						activities_dic[summaryId[i]]=input_files[summaryId[i]]
+		except (ValueError, SyntaxError):
+			pass
+
+		count = 0
+		id_act = 0
+		activities = []
+		ui_hrr_keys = []
 		if user_input_strong:
-			user_input_activities =[act.activities for act in user_input_strong]
-			for i,k in enumerate(user_input_activities):
-				input_files=json.loads(user_input_activities[i])
-				summaryId = []
-				for keys in input_files.keys():
-					summaryId.append(keys)
-				for i in range(len(summaryId)):
-					activities.append(input_files[summaryId[i]])
-					activities_dic[summaryId[i]]=input_files[summaryId[i]]
-	except (ValueError, SyntaxError):
-		pass
+			for single_ui_object in user_input_strong:
+				single_activity = single_ui_object.activities
+				if single_activity:
+					single_activity_json = json.loads(single_activity)
+					single_activity_values = single_activity_json.values()
+					single_activity_values = list(single_activity_values)
+					for i,k in enumerate(single_activity_values):
+						if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
+							id_act = int(single_activity_values[i]['summaryId'])
+							count = count + 1
+							ui_hrr_keys.append(single_activity_values[i]['summaryId'])
+							activities.append(single_activity_values[i])
 
-	count = 0
-	id_act = 0
-	activities = []
-	ui_hrr_keys = []
-	if user_input_strong:
-		for single_ui_object in user_input_strong:
-			single_activity = single_ui_object.activities
-			if single_activity:
-				single_activity_json = json.loads(single_activity)
-				single_activity_values = single_activity_json.values()
-				single_activity_values = list(single_activity_values)
-				for i,k in enumerate(single_activity_values):
-					if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(single_activity_values[i]['summaryId'])
-						count = count + 1
-						ui_hrr_keys.append(single_activity_values[i]['summaryId'])
-						activities.append(single_activity_values[i])
+		try:
+			manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+			manually_edited_dic = {}
+			manually_edited_list = []
+			if manually_updated_activities:
+				manual_activity_files = [activity.data for activity in manually_updated_activities]
+				for i,k in enumerate(manual_activity_files):
+					manual_files=ast.literal_eval(manual_activity_files[i])
+					manual_act_id=manual_files['summaryId']
+					manually_edited_dic[manual_act_id]=manual_files
+					manually_edited_list.append(manual_files)
+		except (ValueError, SyntaxError):
+			pass
 
-	try:
-		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
-		manually_edited_dic = {}
-		manually_edited_list = []
-		if manually_updated_activities:
-			manual_activity_files = [activity.data for activity in manually_updated_activities]
-			for i,k in enumerate(manual_activity_files):
-				manual_files=ast.literal_eval(manual_activity_files[i])
-				manual_act_id=manual_files['summaryId']
-				manually_edited_dic[manual_act_id]=manual_files
-				manually_edited_list.append(manual_files)
-	except (ValueError, SyntaxError):
-		pass
+		try:
+			garmin_data_activities = UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+			garmin_list = []
+			garmin_dic = {}
+			if garmin_data_activities:
+				garmin_activity_files = [pr.data for pr in garmin_data_activities]
+				for i,k in enumerate(garmin_activity_files):
+					act_files=ast.literal_eval(garmin_activity_files[i])
+					act_id=act_files['summaryId']
+					garmin_dic[act_id]=act_files
+					garmin_list.append(act_files)
+		except (ValueError, SyntaxError):
+			pass
 
-	try:
-		garmin_data_activities = UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
-		garmin_list = []
-		garmin_dic = {}
-		if garmin_data_activities:
-			garmin_activity_files = [pr.data for pr in garmin_data_activities]
-			for i,k in enumerate(garmin_activity_files):
-				act_files=ast.literal_eval(garmin_activity_files[i])
-				act_id=act_files['summaryId']
-				garmin_dic[act_id]=act_files
-				garmin_list.append(act_files)
-	except (ValueError, SyntaxError):
-		pass
+		filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+														manually_updated_json=manually_edited_dic,
+														userinput_activities=activities_dic)
+		act_id = []
+		workout = []
+		hrr = []
+		start = start_date
+		end = start_date + timedelta(days=7)
+		a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+		if activities:
+			if filtered_activities_files:
+				for i,k in enumerate(filtered_activities_files):
+					if filtered_activities_files[i].get("summaryId") in ui_hrr_keys:
+						hrr.append(filtered_activities_files[i])
+					else:
+						workout.append(filtered_activities_files[i])
+		else:
+			if filtered_activities_files:
+				for i,k in enumerate(filtered_activities_files):
+					if filtered_activities_files[i].get("summaryId") in ui_data_keys:
+						workout.append(filtered_activities_files[i])
+					else:
+						hrr.append(filtered_activities_files[i])
 
-	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
-													manually_updated_json=manually_edited_dic,
-													userinput_activities=activities_dic)
-	act_id = []
-	workout = []
-	hrr = []
-	start = start_date
-	end = start_date + timedelta(days=7)
-	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-	if activities:
-		if filtered_activities_files:
-			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in ui_hrr_keys:
-					hrr.append(filtered_activities_files[i])
+
+		# if filtered_activities_files:
+		# 	for tmp in a1:
+		# 		meta = tmp.meta_data_fitfile
+		# 		meta = ast.literal_eval(meta)
+		# 		data_id = meta['activityIds'][0]
+		# 		act_id.append(str(data_id))
+		# 		for i,k in enumerate(filtered_activities_files):
+		# 			if (filtered_activities_files[i].get("summaryId") == str(data_id) and 
+		# 				filtered_activities_files[i].get("durationInSeconds",0) <= 1200 and 
+		# 				filtered_activities_files[i].get("distanceInMeters",0) <200) or (filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY"):
+		# 				hrr.append(filtered_activities_files[i])
+		# 			elif filtered_activities_files[i].get("summaryId") == str(data_id):
+		# 				workout.append(filtered_activities_files[i])
+		# 	for x in filtered_activities_files:
+		# 		if (x.get("summaryId") not in act_id and 
+		# 		    x.get("activityType") != "HEART_RATE_RECOVERY"):
+		# 			workout.append(x)
+		# print(workout,"workout")
+		data={"date":"",
+			  "workout_type":"",
+			  "duration":"",
+			  "average_heart_rate":"",
+			  "max_heart_rate":"",
+			  "steps":"",
+			  "hrr_not_recorded":"",
+			  "prcnt_hrr_not_recorded":""
+				}
+		time_duration = []
+		heart_rate = []
+		max_hrr = []
+		data1={}
+		steps = []
+		hrr_not_recorded_list = []
+		if workout:
+			start_date_timestamp = workout[0]['startTimeInSeconds']
+			start_date = datetime.utcfromtimestamp(start_date_timestamp)
+			date = start_date.strftime('%d-%b-%y')
+			for workout in workout:
+				act_date = date
+				summaryId = workout['summaryId']
+				workout_type = workout['activityType']
+				duration = workout['durationInSeconds']
+				time_duration.append(duration)
+				avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute')
+				heart_rate.append(avg_heart_rate)
+				max_heart_rate = workout.get('maxHeartRateInBeatsPerMinute',0)
+				max_hrr.append(max_heart_rate)
+				exercise_steps = workout.get("steps",0)
+				steps.append(exercise_steps)
+				distance_meters = workout.get("distanceInMeters",0)			
+				data = {"date":act_date,
+					  "workout_type":workout_type,
+					  "duration":duration,
+					  "average_heart_rate":avg_heart_rate,
+					  "max_heart_rate":max_heart_rate,
+					  "steps":exercise_steps,
+					  "hrr_not_recorded":"",
+					  "prcnt_hrr_not_recorded":"",
+					  "distance_meters":distance_meters
+						}
+				data1[summaryId] = data 
+				if "averageHeartRateInBeatsPerMinute" in workout.keys():
+					if workout['averageHeartRateInBeatsPerMinute'] == 0 or "":
+						hrr_not_recorded = workout['durationInSeconds']
+						hrr_not_recorded_list.append(hrr_not_recorded)
+						data['hrr_not_recorded'] = hrr_not_recorded
 				else:
-					workout.append(filtered_activities_files[i])
-	else:
-		if filtered_activities_files:
-			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in ui_data_keys:
-					workout.append(filtered_activities_files[i])
-				else:
-					hrr.append(filtered_activities_files[i])
-
-
-	# if filtered_activities_files:
-	# 	for tmp in a1:
-	# 		meta = tmp.meta_data_fitfile
-	# 		meta = ast.literal_eval(meta)
-	# 		data_id = meta['activityIds'][0]
-	# 		act_id.append(str(data_id))
-	# 		for i,k in enumerate(filtered_activities_files):
-	# 			if (filtered_activities_files[i].get("summaryId") == str(data_id) and 
-	# 				filtered_activities_files[i].get("durationInSeconds",0) <= 1200 and 
-	# 				filtered_activities_files[i].get("distanceInMeters",0) <200) or (filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY"):
-	# 				hrr.append(filtered_activities_files[i])
-	# 			elif filtered_activities_files[i].get("summaryId") == str(data_id):
-	# 				workout.append(filtered_activities_files[i])
-	# 	for x in filtered_activities_files:
-	# 		if (x.get("summaryId") not in act_id and 
-	# 		    x.get("activityType") != "HEART_RATE_RECOVERY"):
-	# 			workout.append(x)
-	# print(workout,"workout")
-	data={"date":"",
-		  "workout_type":"",
-		  "duration":"",
-		  "average_heart_rate":"",
-		  "max_heart_rate":"",
-		  "steps":"",
-		  "hrr_not_recorded":"",
-		  "prcnt_hrr_not_recorded":""
-			}
-	time_duration = []
-	heart_rate = []
-	max_hrr = []
-	data1={}
-	steps = []
-	hrr_not_recorded_list = []
-	if workout:
-		start_date_timestamp = workout[0]['startTimeInSeconds']
-		start_date = datetime.utcfromtimestamp(start_date_timestamp)
-		date = start_date.strftime('%d-%b-%y')
-		for workout in workout:
-			act_date = date
-			summaryId = workout['summaryId']
-			workout_type = workout['activityType']
-			duration = workout['durationInSeconds']
-			time_duration.append(duration)
-			avg_heart_rate = workout.get('averageHeartRateInBeatsPerMinute',0)
-			heart_rate.append(avg_heart_rate)
-			max_heart_rate = workout.get('maxHeartRateInBeatsPerMinute',0)
-			max_hrr.append(max_heart_rate)
-			exercise_steps = workout.get("steps",0)
-			steps.append(exercise_steps)
-			
-			data = {"date":act_date,
-				  "workout_type":workout_type,
-				  "duration":duration,
-				  "average_heart_rate":avg_heart_rate,
-				  "max_heart_rate":max_heart_rate,
-				  "steps":exercise_steps,
-				  "hrr_not_recorded":"",
-				  "prcnt_hrr_not_recorded":""
-					}
-			data1[summaryId] = data 
-			if "averageHeartRateInBeatsPerMinute" in workout.keys():
-				if workout['averageHeartRateInBeatsPerMinute'] == 0 or "":
-					hrr_not_recorded = workout['durationInSeconds']
+					hrr_not_recorded = workout.get('durationInSeconds',0)
 					hrr_not_recorded_list.append(hrr_not_recorded)
 					data['hrr_not_recorded'] = hrr_not_recorded
-			else:
-				hrr_not_recorded = workout['durationInSeconds']
-				hrr_not_recorded_list.append(hrr_not_recorded)
-				data['hrr_not_recorded'] = hrr_not_recorded
-		for tm in hrr_not_recorded_list:
-			try:
-				prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
-				prcnt_hrr_not_recorded = int(Decimal(prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
-				data['prcnt_hrr_not_recorded']=prcnt_hrr_not_recorded
-			except ZeroDivisionError:
-				prcnt_hrr_not_recorded = ""
-				data['prcnt_hrr_not_recorded'] = prcnt_hrr_not_recorded
+			for tm in hrr_not_recorded_list:
+				try:
+					prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
+					prcnt_hrr_not_recorded = int(Decimal(prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+					data['prcnt_hrr_not_recorded']=prcnt_hrr_not_recorded
+				except ZeroDivisionError:
+					prcnt_hrr_not_recorded = ""
+					data['prcnt_hrr_not_recorded'] = prcnt_hrr_not_recorded
 
-		try:
-			avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
-			avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
-		except ZeroDivisionError:
-			avg_hrr = ""
-		try:
-			maxi_hrr = max(max_hrr)
-		except ValueError:
-			maxi_hrr = ''
-		time_total = sum(time_duration)
-		try:
-			total_prcnt_hrr_not_recorded = (sum(hrr_not_recorded_list)/sum(time_duration))*100
-			total_prcnt_hrr_not_recorded = int(Decimal(total_prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
-		except ZeroDivisionError:
-			total_prcnt_hrr_not_recorded = ""
-		total = {"date":date,
-				 "workout_type":"Totals",
-				 "duration":time_total,
-				 "average_heart_rate":avg_hrr,
-				 "max_heart_rate":maxi_hrr,
-				 "steps":sum(steps),
-				 "hrr_not_recorded":sum(hrr_not_recorded_list),
-				 "prcnt_hrr_not_recorded":total_prcnt_hrr_not_recorded
-				 }
-		if total:	
-			data1['Totals'] = total
+			try:
+				heart_rate = [x for x in heart_rate if x != '']
+				avg_hrr = sum(filter(lambda i: isinstance(i, int),heart_rate))/len(heart_rate)
+				avg_hrr = int(Decimal(avg_hrr).quantize(0,ROUND_HALF_UP))
+			except ZeroDivisionError:
+				avg_hrr = ""
+			try:
+				maxi_hrr = max(max_hrr)
+			except ValueError:
+				maxi_hrr = ''
+			time_total = sum(time_duration)
+			try:
+				total_prcnt_hrr_not_recorded = (sum(hrr_not_recorded_list)/sum(time_duration))*100
+				total_prcnt_hrr_not_recorded = int(Decimal(total_prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+			except ZeroDivisionError:
+				total_prcnt_hrr_not_recorded = ""
+			total = {"date":date,
+					 "workout_type":"Totals",
+					 "duration":time_total,
+					 "average_heart_rate":avg_hrr,
+					 "max_heart_rate":maxi_hrr,
+					 "steps":sum(steps),
+					 "hrr_not_recorded":sum(hrr_not_recorded_list),
+					 "prcnt_hrr_not_recorded":total_prcnt_hrr_not_recorded
+					 }
+			if total:	
+				data1['Totals'] = total
+			else:
+				data1['Totals'] = {}
+		if data1:
+			return data1
 		else:
-			data1['Totals'] = {}
-		
-	
-	if data1:
-		return data1
+			return ({})
 	else:
 		return ({})
 
@@ -667,9 +736,10 @@ def aa_workout_calculations(request):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user_aa = AaWorkoutCalculations.objects.get(
+			user_obj = AaWorkoutCalculations.objects.get(
 				user_aa_workout=request.user, created_at=start_date)
-			update_workout_instance(request.user,start_date,data)
+			user_obj.data = data
+			user_obj.save()
 		except AaWorkoutCalculations.DoesNotExist:
 			create_workout_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -992,7 +1062,7 @@ def daily_aa_data(user, start_date):
 
 		total =  {"avg_heart_rate":avg_hrr,
 				  "max_heart_rate":max_hrr,
-				  "total_duration":total_time,
+				  "total_duration":sum(total_duration),
 				  "duration_in_aerobic_range":sum(aerobic_duration),
 				  "duration_in_anaerobic_range":sum(anaerobic_duration),
 				  "duration_below_aerobic_range":sum(below_aerobic_duration),
@@ -1013,7 +1083,7 @@ def daily_aa_data(user, start_date):
 		return ({})
 
 def update_aa_instance(user,start_date,data):
-	AaCalculations.objects.filter(
+	user = AaCalculations.objects.filter(
 			user_aa=user, created_at=start_date).update(data=data)
 
 def create_aa_instance(user, data, start_date):
@@ -1027,9 +1097,10 @@ def daily_aa_calculations(request):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user_aa = AaCalculations.objects.get(
+			user_obj = AaCalculations.objects.get(
 				user_aa=request.user, created_at=start_date)
-			update_aa_instance(request.user,start_date,data)
+			user_obj.data = data
+			user_obj.save()
 		except AaCalculations.DoesNotExist:
 			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -1045,6 +1116,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 
 	Return:None
 	'''
+	print("HRR A/A low high got started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1052,6 +1124,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
 		if data:
+			print("HRR A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
 					user_aa=user, created_at=current_date)
@@ -1059,6 +1132,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 			except AaCalculations.DoesNotExist:
 				create_aa_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
+	print("HRR A/A low high finished")
 	return None
 
 
@@ -1099,6 +1173,8 @@ def aa_low_high_end_data(user,start_date):
 
 
 	activities = []
+	hrr_summary_id = []
+	workout_summary_id = []
 	id_act = 0
 	if user_input_strong:
 		for tmp in user_input_strong:
@@ -1111,30 +1187,33 @@ def aa_low_high_end_data(user,start_date):
 					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
 						id_act = int(di[i]['summaryId'])
 						activities.append(di[i])
+						hrr_summary_id.append(di[i]['summaryId'])
+					else:
+						workout_summary_id.append(di[i]['summaryId'])
 
 	workout = []
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user= user,created_at__range=[start,end])
-	if a1:
+	if activities and a1:
 		for tmp in a1:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-
+			if str(data_id) in workout_summary_id:
+				workout.append(tmp)
+			elif str(data_id) in hrr_summary_id	:
+				hrr.append(tmp)
+	elif a1:
+		for tmp in a1:
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
 			if str(data_id) in ui_data_keys:
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
-				hrr.append(tmp)
-			# for i,k in enumerate(activity_files):
-			# 	activity_files_dict = ast.literal_eval(activity_files[i])
-			# 	if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-			# 		hrr.append(tmp)
-			# 	elif activity_files_dict.get("summaryId",None) == str(data_id) :
-			# 		workout.append(tmp)
-
-
+				hrr.append(tmp)				
 	profile = Profile.objects.filter(user=user)
 	if profile:
 		for tmp_profile in profile:
@@ -1219,9 +1298,10 @@ def aa_low_high_end_calculations(request):
 	# data = json.dumps(data)
 	if data:
 		try:
-			user = TimeHeartZones.objects.get(
+			user_obj = TimeHeartZones.objects.get(
 				user=request.user, created_at=start_date)
-			update_heartzone_instance(request.user, start_date,data)
+			user_obj.data = data
+			user_obj.save()
 		except TimeHeartZones.DoesNotExist:
 			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
@@ -1297,6 +1377,14 @@ def hrr_data(user,start_date):
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 	
+	ui_data = _get_activities(user,start_date_str)
+	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
+	ui_data_hrr = []
+	for ui_data_single in ui_data.values():
+		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
+			summaryId = ui_data_single['summaryId']
+			ui_data_keys.remove(summaryId)
+			ui_data_hrr.append(summaryId)
 	count = 0
 	id_act = 0
 	activities = []
@@ -1348,12 +1436,10 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
-				for i,k in enumerate(activity_files):
-					activity_files_dict = ast.literal_eval(activity_files[i])
-					if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-						hrr.append(tmp)
-					elif activity_files_dict.get("summaryId",None) == str(data_id) :
-						workout.append(tmp)
+				if str(data_id) in ui_data_keys:
+					workout.append(tmp)
+				elif str(data_id) in ui_data_hrr:
+					hrr.append(tmp)
 	except:
 		logging.exception("message")
 	if workout:
@@ -1381,8 +1467,11 @@ def hrr_data(user,start_date):
 					workout_hrr_before_hrrfile.append(i)
 					workout_time_before_hrrfile.append(k)
 					workout_timestamp_before_hrrfile.append(j)
-			if workout_timestamp_before_hrrfile:
-				workout_timestamp_before_hrrfile = sorted(workout_timestamp_before_hrrfile)
+			dict_timestamp_heart = dict(zip(
+				workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
+			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
+			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
+			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
 			time_toreach_99 = []
 			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if i >= 99:
@@ -1421,8 +1510,12 @@ def hrr_data(user,start_date):
 			except IndexError:
 				lowest_hrr_1min = 99
 			time_99 = sum(time_toreach_99[:-1])
-			end_time_activity = workout_timestamp_before_hrrfile[-1]-(offset)
-			end_heartrate_activity  = workout_hrr_before_hrrfile[-2]
+			if workout:
+				no_workouts = len(workout)
+			else:
+				no_workouts = 1
+			end_time_activity = timestamp_before_hrrfile[-no_workouts]-(offset)
+			end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			
 			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
@@ -1537,7 +1630,7 @@ def hrr_data(user,start_date):
 			time_heart_rate_reached_99 = None
 
 	if (hrr and (Did_you_measure_HRR == 'yes' or
-		Did_you_measure_HRR == 'no') and garmin_data_daily):
+		Did_you_measure_HRR == 'no')):
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
 				"Did_heartrate_reach_99":Did_heartrate_reach_99,
 				"time_99":time_99,
@@ -1654,25 +1747,33 @@ def store_hhr(user,from_date,to_date):
 
 	Return:None
 	'''
+	print("HRR calculations got started",user.username)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
 	while (current_date >= from_date_obj):
 		data = hrr_data(user,current_date)
 		if data.get('Did_you_measure_HRR'):
+			print("HRR calculations creating")
 			try:
 				user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
 				update_hrr_instance(user_hrr, data)
 			except Hrr.DoesNotExist:
 				create_hrr_instance(user, data, current_date)
+		else:
+			print("NO HRR")
 		current_date -= timedelta(days=1)
+	print("HRR calculations got finished")
 	return None
+
+
+
 
 class UserheartzoneView(APIView):
 
 	permission_classes = (IsAuthenticated,)
 	serializer_class = HeartzoneSerializer
-	def calculate_weekly_zone_data(self,zone_weekly_qs):
+	def calculate_weekly_zone_data(self,zone_weekly_qs,no_days):
 		hr_data_values = [hr_data.data for hr_data in zone_weekly_qs]
 		hr_values = []
 		for hr in hr_data_values:
@@ -1694,13 +1795,16 @@ class UserheartzoneView(APIView):
 				li_time.append(duration_in_zone)
 				percent_in_zone = hr[key].get('prcnt_total_duration_in_zone',0)
 				li_prcnt.append(percent_in_zone)
-
+		total_duration = []
 		for hr in hr_values:
 			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
 				classification = hr[key].get('classificaton')
-				time = sum(time)
+				total_time = hr[key].get('total_duration',0)
+				time_in_zone = hr[key].get('time_in_zone',0)
+				avg_time = (sum(time)/no_days)*7
+				total_duration.append(time_in_zone)
 				try:
 					percent_duration = sum(prcnt)/len(prcnt)
 					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
@@ -1710,15 +1814,17 @@ class UserheartzoneView(APIView):
 				heartzone_data = {"heart_rate_zone_low_end":low_end,
 								  "heart_rate_zone_high_end":high_end,
 								  "classificaton":classification,
-								  "time_in_zone":time,
+								  "time_in_zone":avg_time,
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
+		heartzone_dic['total'] = (sum(total_duration)/no_days)*7	
 		return heartzone_dic
 
 
 	def get(self,request,format="json"):
-		weekly_zone_data = self.calculate_weekly_zone_data(self.get_queryset())
+		weekly_queryset,no_days = self.get_queryset()
+		weekly_zone_data = self.calculate_weekly_zone_data(weekly_queryset,no_days)
 		return Response(weekly_zone_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
@@ -1726,6 +1832,9 @@ class UserheartzoneView(APIView):
 
 		end_dt = self.request.query_params.get('to',None)
 		start_dt = self.request.query_params.get('from', None)
+		start_date_obj = datetime.strptime(start_dt, "%Y-%m-%d")
+		end_dt_obj = datetime.strptime(end_dt, "%Y-%m-%d")
+		no_days = (end_dt_obj.date() - start_date_obj.date())+timedelta(days=1)
 
 		if start_dt and end_dt:
 			queryset = TimeHeartZones.objects.filter(Q(created_at__gte=start_dt)&
@@ -1734,17 +1843,18 @@ class UserheartzoneView(APIView):
 		else:
 			queryset = TimeHeartZones.objects.all()
 		
-		return queryset
+		return (queryset,no_days.days)
 
 class UserAaView(APIView):
 	permission_classes = (IsAuthenticated,)
 	serializer_class = AaSerializer
 
-	def calculate_weekly_aa_data(self,aa_weekly_qs):
+	def calculate_weekly_aa_data(self,aa_weekly_qs,no_days):
 		data_values = [aa_data.data for aa_data in aa_weekly_qs]
 		keys = ['avg_heart_rate','max_heart_rate','total_duration','duration_in_aerobic_range',
 				'percent_aerobic','duration_in_anaerobic_range','percent_anaerobic','duration_below_aerobic_range',
 				'percent_below_aerobic','duration_hrr_not_recorded','percent_hrr_not_recorded']
+		# Change below list, for time being I am using this
 		lists = [[],[],[],[],[],[],[],[],[],[],[]]
 		for aa in data_values:
 			aa = ast.literal_eval(aa)
@@ -1757,37 +1867,39 @@ class UserAaView(APIView):
 					aa_values = aa_totals[key]
 					li.append(aa_values)
 		try:
+			max_heart_rate = max(lists[1])
+		except ValueError:
+			max_heart_rate = ""
+		
+		duration_in_aerobic_range = ((sum(lists[3])/no_days)*7)
+		duration_in_anaerobic_range = ((sum(lists[5])/no_days)*7)
+		duration_below_aerobic_range = ((sum(lists[7])/no_days)*7)
+		duration_hrr_not_recorded = ((sum(lists[9])/no_days)*7)
+		total_duration = (duration_in_aerobic_range+
+							duration_in_anaerobic_range+
+							duration_below_aerobic_range+
+							duration_hrr_not_recorded)
+		try:
 			avg_heart_rate = sum(lists[0])/len(lists[0])
 			avg_heart_rate = int(Decimal(avg_heart_rate).quantize(0,ROUND_HALF_UP))
-			
-			percent_aerobic = sum(lists[4])/len(lists[4])
+
+			percent_aerobic = (duration_in_aerobic_range/total_duration)*100
 			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
-			percent_anaerobic = sum(lists[6])/len(lists[6])
+			percent_anaerobic = (duration_in_anaerobic_range/total_duration)*100
 			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 
-			percent_below_aerobic = sum(lists[8])/len(lists[8])
+			percent_below_aerobic = (duration_below_aerobic_range/total_duration)*100
 			percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
-			percent_hrr_not_recorded = sum(lists[10])/len(lists[10])
+			percent_hrr_not_recorded = (duration_hrr_not_recorded/total_duration)*100
 			percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
-
 		except ZeroDivisionError:
 			avg_heart_rate = ""
 			percent_aerobic = ""
 			percent_anaerobic = ""
 			percent_below_aerobic = ""
 			percent_hrr_not_recorded = ""
-		try:
-			max_heart_rate = max(lists[1])
-		except ValueError:
-			max_heart_rate = ""
-		
-		total_duration = sum(lists[2])
-		duration_in_aerobic_range = sum(lists[3])
-		duration_in_anaerobic_range = sum(lists[5])
-		duration_below_aerobic_range = sum(lists[7])
-		duration_hrr_not_recorded = sum(lists[9])
 
 		total_data = {"avg_heart_rate":avg_heart_rate,
 					"max_heart_rate":max_heart_rate,
@@ -1805,7 +1917,8 @@ class UserAaView(APIView):
 		return total_data
 
 	def get(self,request,format="json"):
-		weekly_aa_data = self.calculate_weekly_aa_data(self.get_queryset())
+		weekly_queryset,no_days = self.get_queryset()
+		weekly_aa_data = self.calculate_weekly_aa_data(weekly_queryset,no_days)
 		return Response(weekly_aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
@@ -1813,12 +1926,55 @@ class UserAaView(APIView):
 
 		end_dt = self.request.query_params.get('to',None)
 		start_dt = self.request.query_params.get('from', None)
-
+		start_date_obj = datetime.strptime(start_dt, "%Y-%m-%d")
+		end_dt_obj = datetime.strptime(end_dt, "%Y-%m-%d")
+		no_days = (end_dt_obj.date() - start_date_obj.date())+timedelta(days=1)
 		if start_dt and end_dt:
 			queryset = AaCalculations.objects.filter(Q(created_at__gte=start_dt)&
 							  Q(created_at__lte=end_dt),
 							  user_aa=user)
 		else:
 			queryset = AaCalculations.objects.all()
-		return queryset
+		return (queryset,no_days.days)
 
+def weekly_workout_summary(request):
+	'''
+		Create the weekly workout summary cart api
+	'''
+	start_date = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	week_start_date,week_end_date = week_date(start_date)
+	print("start date",week_start_date,"end date",week_end_date)
+	weekly_workouts_query = get_weekly_workouts(
+		request.user,week_start_date,week_end_date)
+
+	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
+	if weekly_workout:
+		final_workout_data,workout_summary_id,workout_type = weekly_workout_calculations(
+			weekly_workout)
+	else:
+		final_workout_data = ''
+		workout_summary_id = ''
+	weekly_aa_query = get_weekly_aa(
+		request.user,week_start_date,week_end_date)
+	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
+	if weekly_aa:
+		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
+	else:
+		final_aa_data = ''
+	if final_workout_data and final_aa_data:
+		merged_data = merge_activities(final_workout_data,final_aa_data)
+		added_totals = totals_workout(merged_data,len(weekly_aa_query))
+	else:
+		added_totals = {}
+	if added_totals:
+		final_data = add_duration_percent(added_totals)
+		data = dynamic_activities(final_data,workout_type)
+	else:
+		data = {}
+	if data:
+		data_v2 = remove_distance_meters(data)
+	else:
+		data_v2 = {}
+
+	return JsonResponse(data_v2)

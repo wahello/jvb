@@ -78,7 +78,7 @@ def refresh_token(user):
 	token_object = ''
 	try:
 		token_object = FitbitConnectToken.objects.get(user=user)
-		token_object.refresh_token=request_data_json['refresh_token'],
+		token_object.refresh_token=request_data_json['refresh_token']
 		token_object.access_token=request_data_json['access_token']
 		token_object.save()
 		fetching_data_fitbit(request)
@@ -184,8 +184,8 @@ def receive_token_fitbit(request):
 		return redirect('/service_connect_fitbit')
 
 def fetching_data_fitbit(request):
-	start_date = request.GET.get('start_date',None)
-	start_date = datetime.strptime(start_date, "%m-%d-%Y").date()
+	start_date_str = request.GET.get('start_date',None)
+	start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
 	
 	service = session_fitbit()
 	tokens = FitbitConnectToken.objects.get(user = request.user)
@@ -213,7 +213,7 @@ def fetching_data_fitbit(request):
 	fitbit_all_data['heartrate_fitbit'] = heartrate_fitbit
 	fitbit_all_data['steps_fitbit'] = steps_fitbit
 
-	store_data(fitbit_all_data,request.user,start_date)
+	store_data(fitbit_all_data,request.user,start_date_str,create_notification=None)
 
 	fitbit_data = {"sleep_fitbit":sleep_fitbit,
 					"activity_fitbit":activity_fitbit,

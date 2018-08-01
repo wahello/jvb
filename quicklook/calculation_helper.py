@@ -857,6 +857,8 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 	sleeping_hours = 0
 	strength_hours = 0
 	exercise_hours = 0
+	no_data_hours = 0
+	timezone_change_hours = 0
 
 	for interval,values in list(mc_data.items()):
 		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
@@ -886,6 +888,10 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 				strength_hours += 1
 			elif mc_data[interval]['status'] == 'exercise':
 				exercise_hours += 1
+			elif mc_data[interval]['status'] == 'no data yet':
+				no_data_hours += 1
+			elif mc_data[interval]['status'] == 'time zone change':
+				timezone_change_hours += 1
 			total_steps += values['steps']
 
 	mc_data['active_hours'] = active_hours
@@ -893,6 +899,8 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 	mc_data['sleeping_hours'] = sleeping_hours
 	mc_data['strength_hours'] = strength_hours
 	mc_data['exercise_hours'] = exercise_hours
+	mc_data['no_data_hours'] = no_data_hours
+	mc_data['timezone_change_hours'] = timezone_change_hours
 	mc_data['total_steps'] = total_steps
 
 def _get_user_current_local_time(user,tz_offset=None):
@@ -921,11 +929,141 @@ def _get_user_current_local_time(user,tz_offset=None):
 		return local_time
 	return utc_time_now
 
+def check_timezone_change(today_epoch_data,
+ 		yesterday_epoch_data=None, tomorrow_epoch_data=None):
+	"""
+	Check timezone changes and return the list of time interval 
+	which have to be marked as "Timezone Change"
+	"""
+	timezone_change_interval = []
+	Interval = namedtuple('Interval',['start','end'])
+	if yesterday_epoch_data:
+		# sort record so that oldest record first and newest record last
+		yesterday_epoch_data = sorted(
+			yesterday_epoch_data,
+			key=lambda x: int(x.get('startTimeInSeconds')))
+
+	if tomorrow_epoch_data:
+		tomorrow_epoch_data = sorted(
+			tomorrow_epoch_data,
+			key=lambda x: int(x.get('startTimeInSeconds')))
+
+	if today_epoch_data:
+		today_epoch_data = sorted(
+			today_epoch_data,
+			key=lambda x: int(x.get('startTimeInSeconds')))
+		epoch_data_date = datetime.utcfromtimestamp(
+			today_epoch_data[0].get("startTimeInSeconds")
+			+ today_epoch_data[0].get("startTimeOffsetInSeconds"))
+		today_midnight_dt = datetime.combine(epoch_data_date.date(),time(0))
+		today_last_min_dt = datetime.combine(epoch_data_date.date(),time(23,59))
+
+		last_start_time = None
+		last_offset = None
+		for i,epoch in enumerate(today_epoch_data):
+			current_start_time = (epoch.get('startTimeInSeconds')
+				+ epoch.get('startTimeOffsetInSeconds'))
+			current_start_time = datetime.utcfromtimestamp(current_start_time)
+			current_offset = epoch.get('startTimeOffsetInSeconds',0)
+
+			if i == 0 and yesterday_epoch_data:
+				# if it is first record of the day and user
+				# moved in tz ahead of previous tz eg. if user switched
+				# timezone at 11:00 PM July 30 California to NY then
+				# the next summary would be recorded at 2:00 AM NY timezone.
+				# So we have to mark interval 12:00 - 12:59 AM and
+				# 1:00 to 1:59 AM on July 31 as timezone change 
+				yday_last_record = yesterday_epoch_data[-1]
+				yday_last_record_offset = yday_last_record.get(
+					'startTimeOffsetInSeconds')
+				if not current_offset == yday_last_record_offset:
+					if current_offset > yday_last_record_offset:
+						timezone_change_interval.append(
+							Interval(today_midnight_dt,current_start_time))
+
+			elif i == len(today_epoch_data)-1 and tomorrow_epoch_data:
+				# if it is last record of the day and user
+				# moved in tz ahead of current tz eg. if user switched
+				# timezone at 10:30 PM July 30 California to NY then
+				# the next summary would be recorded at 1:30 AM NY timezone.
+				# So we have to mark interval 10:00 - 10:59 AM and
+				# 11:00 to 11:59 AM on July 30 as timezone change
+				tomorrow_first_record = tomorrow_epoch_data[0]
+				tomorrow_first_record_offset = tomorrow_first_record.get(
+					'startTimeOffsetInSeconds')
+				if not current_offset == tomorrow_first_record_offset:
+					if current_offset < tomorrow_first_record_offset:
+						timezone_change_interval.append(
+							Interval(current_start_time,today_last_min_dt))
+
+			elif last_offset and last_start_time:
+				# check for timezone changes
+				if not current_offset == last_offset:
+					#offset are different, timezone got changed 
+					if current_offset > last_offset:
+						# user moved to time zone which is ahead of 
+						# last timezone eg. California to NY
+						timezone_change_interval.append(
+							Interval(last_start_time,current_start_time))
+					else:
+						# user moved to time zone which is behind 
+						# last timezone eg. NY to California
+						timezone_change_interval.append(
+							Interval(current_start_time,last_start_time))
+
+			last_start_time = current_start_time
+			last_offset = current_offset
+
+	return timezone_change_interval
+
+def _update_status_to_timezone_change(mc_data,timezone_change_interval,calendar_date):
+	'''
+	Update status of hourly intervals to "timezone change" according to 
+	the interval list
+
+	Args:
+		mc_data(dict): Dictionary containing hourly interval MC data
+		timezone_change_interval(list): A list containing named tuple,
+			representing time interval to be marked as "timezone change"
+		calendar_date(datetime): A datetime object representing date for which
+			this MC data is
+	'''
+	def in_tz_interval(hour_start):
+		for interval in timezone_change_interval:
+			interval_start = datetime.combine(
+				interval.start.date(),
+				time(interval.start.hour))
+			interval_end = datetime.combine(
+				interval.end.date(),
+				time(interval.end.hour,59))
+			if hour_start >= interval_start and hour_start <= interval_end:
+				return True
+		return False
+
+	for interval,values in list(mc_data.items()):
+		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
+			'strength_hours','exercise_hours','total_steps']
+		if interval not in non_interval_keys:
+			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
+			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
+			if am_or_pm == 'PM' and int(hour) != 12:
+				hour = int(hour) + 12
+			elif am_or_pm == 'AM' and int(hour) == 12:
+				hour = 0
+			else:
+				hour = int(hour)
+				
+			hour_start = datetime.combine(calendar_date.date(),time(hour))
+			if in_tz_interval(hour_start):
+				mc_data[interval]['status'] = 'time zone change'
+	return mc_data
+
+
 def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,sleeps_today_json,
-					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,userinput_activities,user_input_bedtime = None,
-					user_input_awake_time = None,user_input_timezone = None,
-					user_input_strength_start_time=None,user_input_strength_end_time=None,
-					):
+		user_input_todays_bedtime,todays_activities,todays_manually_updated_json,userinput_activities,user_input_bedtime = None,
+		user_input_awake_time = None,user_input_timezone = None,
+		user_input_strength_start_time=None,user_input_strength_end_time=None,
+		yesterday_epoch_data = None, tomorrow_epoch_data=None):
 	
 	'''
 		Calculate the movement consistency summary
@@ -967,6 +1105,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		today_bedtime = None
 		
 	if epochs_json:
+		timezone_change_interval = check_timezone_change(
+			epochs_json,yesterday_epoch_data,tomorrow_epoch_data)
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
 											  epochs_json[0].get("startTimeOffsetInSeconds"))
@@ -1020,11 +1160,18 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		sleeping_hours = 0
 		strength_hours = 0
 		exercise_hours = 0
+		no_data_hours = 0
+		timezone_change_hours = 0
 		previous_hour_steps = None
 		last_sleeping_hour = None
 		have_steps_before_9_am  = False
 
 		user_current_local_time = _get_user_current_local_time(user)
+
+		# update interval status if there any timezone change
+		# Note: 'sleeping' can overide 'time zone change' status
+		_update_status_to_timezone_change(
+			movement_consistency,timezone_change_interval,calendar_date)
 
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
@@ -1052,7 +1199,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 					and hour_start > user_current_local_time):
 					movement_consistency[interval]['status'] = 'no data yet'
 					movement_consistency[interval]['steps'] = 0
-				elif not movement_consistency[interval]['steps']:
+				elif (not movement_consistency[interval]['steps'] 
+						and not movement_consistency[interval]['status'] == 'time zone change'):
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
 						
@@ -1103,6 +1251,10 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				strength_hours += 1
 			elif movement_consistency[interval]['status'] == 'exercise':
 				exercise_hours += 1
+			elif movement_consistency[interval]['status'] == 'no data yet':
+				no_data_hours += 1
+			elif movement_consistency[interval]['status'] == 'time zone change':
+				timezone_change_hours += 1
 			total_steps += values['steps']
 
 		movement_consistency['active_hours'] = active_hours
@@ -1110,8 +1262,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		movement_consistency['sleeping_hours'] = sleeping_hours
 		movement_consistency['strength_hours'] = strength_hours
 		movement_consistency['exercise_hours'] = exercise_hours
+		movement_consistency['no_data_hours'] = no_data_hours
+		movement_consistency['timezone_change_hours'] = timezone_change_hours
 		movement_consistency['total_steps'] = total_steps
-
 		if(not yesterday_bedtime and not today_awake_time and have_steps_before_9_am):
 			_update_status_to_sleep_hours(
 				movement_consistency,
@@ -1844,8 +1997,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
 
-		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch,
-										order_by ='-id',filter_dup = True)
+		# epoch data for yesterday, today and tomorrow
+		epochs = get_garmin_model_data(
+			UserGarminDataEpoch,user,
+			start_epoch-86400,end_epoch+86400,
+			order_by ='-id',filter_dup = True)
+
+		epochs = get_weekly_data(
+			epochs,current_date+timedelta(days=1),current_date-timedelta(days=1))
+
 		# Get sleep data for yesterday
 		sleeps = get_garmin_model_data(UserGarminDataSleep,
 									   user,start_epoch-86400,end_epoch-86400,
@@ -1929,7 +2089,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# todays_manually_updated_json.update(userinput_activities)
 		
-		epochs_json = [ast.literal_eval(dic) for dic in epochs]
+		epochs_json = epochs[current_date.strftime("%Y-%m-%d")]
+		yesterday_epoch = epochs[(current_date-timedelta(days=1)).strftime("%Y-%m-%d")]
+		tomorrow_epoch = epochs[(current_date+timedelta(days=1)).strftime("%Y-%m-%d")]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
 		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
@@ -2145,7 +2307,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 		  	user_input_awake_time = user_input_awake_time,
 		  	user_input_timezone = user_input_timezone,
 		  	user_input_strength_start_time = user_input_strength_start_time,
-		  	user_input_strength_end_time = user_input_strength_end_time
+		  	user_input_strength_end_time = user_input_strength_end_time,
+		  	yesterday_epoch_data = yesterday_epoch,
+		  	tomorrow_epoch_data = tomorrow_epoch
 		)
 		
 		if movement_consistency_summary:

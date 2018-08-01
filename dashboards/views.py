@@ -11,9 +11,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from quicklook.models import UserQuickLook
 from garmin.models import UserLastSynced
+from hrr.models import Hrr
 from user_input.models import UserDailyInput
 
-class MovementDashboardView(APIView):
+
+class MovementDashboardView(APIView):       
     '''
     API for Movement Dashboard 
     '''
@@ -84,8 +86,27 @@ class MovementDashboardView(APIView):
             else:
                 movement_data["mcs_score"] = None
                 movement_data["steps_this_hour"] = None
+        return Response(movement_data,status=status.HTTP_200_OK) 
 
-        return Response(movement_data,status=status.HTTP_200_OK)
+class HrrSummaryDashboardview(APIView):
+
+    def get(self,request,format=None):
+        user = request.user
+        date = request.query_params.get('date')
+        try:
+            userhrr = Hrr.objects.get(user_hrr = user, created_at = date)
+        except Hrr.DoesNotExist as e:
+            userhrr = None
+        hrr_data = {}
+        if userhrr:
+            hrr_data["time_to_99"] = userhrr.time_99
+            hrr_data["pure_time_to_99"] = userhrr.pure_time_99
+            hrr_data["pure_heart_beats_lowered_in_1st_min"] = userhrr.pure_1min_heart_beats
+            hrr_data["heart_beats_lowest_1st_minute"] = userhrr.No_beats_recovered
+             
+
+        return Response(hrr_data,status=status.HTTP_200_OK)
+
 
 class GradesDashboardView(APIView):
 
