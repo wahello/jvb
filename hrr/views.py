@@ -1479,27 +1479,25 @@ def hrr_data(user,start_date):
 			workout_time_before_hrrfile = []
 			workout_timestamp_before_hrrfile = []
 
-			for i,k,j in zip(all_activities_heartrate,all_activities_timestamp,all_activities_timestamp_raw):
-				if j < hrr_timestamp[1]:
-					workout_hrr_before_hrrfile.append(i)
-					workout_time_before_hrrfile.append(k)
-					workout_timestamp_before_hrrfile.append(j)
-			# print(workout_hrr_before_hrrfile,"workout_hrr_before_hrrfile")
-			# print(workout_timestamp_before_hrrfile,"workout_timestamp_before_hrrfile")
+			for heart_rate,timestamp_diff,time_stamp in zip(
+			all_activities_heartrate,all_activities_timestamp,all_activities_timestamp_raw):
+				if time_stamp < hrr_timestamp[1]:
+					workout_hrr_before_hrrfile.append(heart_rate)
+					workout_time_before_hrrfile.append(timestamp_diff)
+					workout_timestamp_before_hrrfile.append(time_stamp)
+
 			dict_timestamp_heart = dict(zip(
 				workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
-			# print(dict_timestamp_heart,"fffffffffffffffffffff")
 			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
-			# print(sort_dict_timestamp_heart,"sort_dict_timestamp_heart1111111111111111111111111111111")
 			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
 			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
 			# print(timestamp_before_hrrfile[-2],"timestamp_before_hrrfile")
 			# print(heartrate_before_hrrfile[-2],"heartrate_before_hrrfile")
 			time_toreach_99 = []
-			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
-				if i >= 99:
-					time_toreach_99.append(k)
-				if(i == 99) or (i < 99):
+			for i,timestamp_hrr in zip(hrr_final_heartrate,hrr_final_timestamp):
+				if heartrate_hrr >= 99:
+					time_toreach_99.append(timestamp_hrr)
+				if(heartrate_hrr == 99) or (heartrate_hrr < 99):
 					break
 						
 			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
@@ -1575,20 +1573,6 @@ def hrr_data(user,start_date):
 			
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
-
-			# end_time_activity = workout_timestamp[-1]-(offset)
-			# end_heartrate_activity  = workout_final_heartrate[-1]
-			# daily_diff = end_time_activity - daily_starttime
-			# daily_activty_end = daily_diff % 15
-			# if daily_activty_end != 0:
-			# 	daily_diff = daily_diff + (15 - daily_activty_end)
-			# else:
-			# 	pass
-			# if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-			# 	daily_diff1 = str(int(daily_diff))
-			# 	data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
-			# if data_end_activity:
-			# 	end_heartrate_activity = data_end_activity
 
 	else:
 		Did_you_measure_HRR = 'no'
@@ -1760,6 +1744,9 @@ def hrr_calculations(request):
 	return JsonResponse(data)	
 
 def update_data_as_per_userinput_form(user,data,current_date):
+	'''
+		Take user input form data and update to calculated values
+	'''
 	userinput_obj = DailyUserInputEncouraged.objects.filter(
 		user_input__user=user,user_input__created_at=current_date)
 	for single_obj in userinput_obj:

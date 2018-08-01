@@ -44,17 +44,16 @@ def fitfile_parse(obj,offset,start_date_str):
 		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj:
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
-
-	# print(timestamp_selected_date,"collllllllllllllllllllllllllllllllllllllll")	
+	
 	to_timestamp = []
 	for index,value in enumerate(timestamp_selected_date):
 		value_timetuple = value.timetuple()
 		value_mktime = time.mktime(value_timetuple)
 		value_mktime = value_mktime+offset
 		to_timestamp.extend([value_mktime])
-	# print(to_timestamp,"to_timestampto_timestampto_timestamp")
+	
 	timestamp_difference = []
-	for i,k in enumerate(to_timestamp):
+	for i,single_timstamp in enumerate(to_timestamp):
 		try:
 			dif_tim = to_timestamp[i+1] - to_timestamp[i]
 			timestamp_difference.extend([dif_tim])
@@ -64,11 +63,10 @@ def fitfile_parse(obj,offset,start_date_str):
 	final_heartrate = []
 	final_timestamp = []
 
-	for i,k in zip(heartrate_selected_date,timestamp_difference):
-		if (k <= 200) and (k >= 0):
-			final_heartrate.extend([i])
-			final_timestamp.extend([k]) 
-	# print(to_timestamp,"cooooooooooooooooooooooooooooooooooooooooooool")
+	for heart_rate,heart_rate in zip(heartrate_selected_date,timestamp_difference):
+		if (heart_rate <= 200) and (heart_rate >= 0):
+			final_heartrate.extend([heart_rate])
+			final_timestamp.extend([heart_rate]) 
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def week_date(start_date):

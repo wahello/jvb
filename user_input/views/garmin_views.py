@@ -164,6 +164,8 @@ def _get_activities(user,target_date):
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
 					(act_obj.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
 					hrr_difference = single_heartrate[0] - single_heartrate[-1]
+					print(hrr_difference,"ccccccccccccc")
+					print(single_heartrate,"ccccccccccccccccccccccc")
 					if hrr_difference > 10:
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 				else:
