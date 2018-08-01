@@ -28,6 +28,7 @@ class HeartRateCal extends Component{
 					    	calendarOpen:false,
 						    isOpen:false,
 						    fetching_hrr:false,
+						    editable : false,
 						    selectedDate:new Date(),
 				   			"Did_you_measure_HRR":"",
 							"Did_heartrate_reach_99":"",
@@ -51,6 +52,7 @@ class HeartRateCal extends Component{
 							"no_file_beats_recovered":"",
 
 							"offset":"",
+							edit_did_you_measure_HRR:"",
 		   				}
 		    this.toggleCalendar = this.toggleCalendar.bind(this);
 			this.toggle = this.toggle.bind(this);
@@ -63,9 +65,15 @@ class HeartRateCal extends Component{
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
 			this.hrrRefreshData = this.hrrRefreshData.bind(this);
+			this.editToggleDidyouWorkout = this.editToggleDidyouWorkout.bind(this);
+			this.handleChange =this.handleChange.bind(this);
 			//this.sampleSum = this.sampleSum.bind(this);
   	}
-
+  	editToggleDidyouWorkout(){
+  		this.setState({
+  			editable:!this.state.editable
+  		})
+  	}
 	successHeart(data){
 	  	this.setState({
 	  	    		fetching_hrr:false,
@@ -107,7 +115,7 @@ class HeartRateCal extends Component{
 		// 	if(key == "sleep"){
 		// 		for(let [key1,value1] of Object.entries(value)){
 		// 			for(let [key2,value2] of Object.entries(value1)){
-		// 				console.log("********************",value2);
+		// 				//console.log("********************",key2);
 		// 				if(key2 == "dateOfSleep"){
 		// 					obj["calendar_date"] = value2;
 		// 				}
@@ -115,17 +123,17 @@ class HeartRateCal extends Component{
 		// 					let f_value = value2 * 0.001;
 		// 					obj["duration_inseconds"] =f_value;
 		// 				}
-		// 				else if(key2 == "endTime"){
+		// 				else if(key2 == "startTime"){
 		// 					obj["start_time"] =value2;
 		// 				}
-		// 				else if(key2 == "startTime"){
+		// 				else if(key2 == "endTime"){
 		// 					obj["end_time"] =value2;
 		// 				}
 		// 			}
 		// 		}
 		// 	}
 		// }
-		 //console.log("***********************",obj);
+		//  console.log("***********************",obj);
   //   }
     processDate(selectedDate){
 		this.setState({
@@ -157,6 +165,15 @@ class HeartRateCal extends Component{
 		},()=>{
 			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 		});
+		
+	}
+	handleChange(event){
+	  	const target = event.target;
+	  	const value = target.value;
+	  	const name = target.name;
+		  	this.setState({
+				[name]: value
+		  	});
 		
 	}
 	hrrRefreshData(){
@@ -274,7 +291,25 @@ class HeartRateCal extends Component{
 			          	    <tbody>  
 			          	    <tr className = "hr_table_style_rows">   
 				          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>    
-				          	    <td className = "hr_table_style_rows">{this.captilizeYes(this.state.Did_you_measure_HRR)}</td>
+				          	    <td className = "hr_table_style_rows">{this.state.editable ? 
+				          	    	<Input
+				          	    		style = {{maxWidth:"100px"}}
+                                        type="select"
+                                        className="custom-select form-control edit_sel" 
+                                        name="edit_did_you_measure_HRR"
+                                        value={this.state.edit_did_you_measure_HRR}                                       
+                                        onChange={this.handleChange}
+                                        onBlur={this.editToggleDidyouWorkout}>
+                                        <option value="">select</option>                                 
+                                    	<option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </Input> 
+				          	    	:this.captilizeYes(this.state.Did_you_measure_HRR)}
+				          	    	<span  onClick={this.editToggleDidyouWorkout}
+                            			className="fa fa-pencil fa-1x progressActivity1"
+                            			id = "add_button">
+                        			</span>
+			          	    	</td>
 			          	    </tr>
 
 			          	    <tr className = "hr_table_style_rows">
