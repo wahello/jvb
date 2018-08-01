@@ -671,7 +671,7 @@ class Grades_Dashboard extends Component{
 				          			id = "hr-style-mcs"
 				          			style = {{background:hr_background}}/>
 				          		<CardText className = "gd_value_style">{score}
-                                   <a href={`/mcs_dashboard?date=${moment(this.state.selectedDate).format('MM-DD-YYYY')}`}>
+                                   <Link to={`/mcs_dashboard?date=${moment(this.state.selectedDate).format('MM-DD-YYYY')}`}>
                                         <span id="lbfontawesome">
 			                                 <FontAwesome
 			                    	           className = "fantawesome_style"
@@ -679,7 +679,7 @@ class Grades_Dashboard extends Component{
 			                                    size = "1x"
 			                                />
 			                            </span> 
-			                        </a> 
+			                        </Link> 
 				          		</CardText>
 				        	</CardBody>
 			      		</Card>

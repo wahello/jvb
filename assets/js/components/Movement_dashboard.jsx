@@ -282,7 +282,7 @@ class Movement_Dashboard extends Component{
 				          			id = "hr-style-mcs"
 				          			style = {{background:hr_background}}/>
 				          		<CardText className = "value_style">{score}
-				          	    <a href={`/mcs_dashboard?date=${moment(this.state.selectedDate).format('YYYY-MM-DD')}`}>
+				          	    <Link to={`/mcs_dashboard?date=${moment(this.state.selectedDate).format('YYYY-MM-DD')}`}>
                                    <span id="lbfontawesome">
 			                           <FontAwesome
 			                    	     className = "fantawesome_style"
@@ -290,7 +290,7 @@ class Movement_Dashboard extends Component{
 			                             size = "1x"
 			                           />
 			                        </span> 
-			                    </a> 
+			                    </Link> 
 				          		</CardText>
 				        	</CardBody>
 			      		</Card>

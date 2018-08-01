@@ -124,7 +124,7 @@ class MCS_Dashboard extends Component{
     componentDidMount(){
     	const values = queryString.parse(this.props.location.search);
     	let value = values.date;
-    	window.history.pushState("selectedDate","mcs_dashboard","/mcs_dashboard")	
+    	window.history.pushState(null,"mcs_dashboard","/mcs_dashboard")	
        	if(value){
                this.setState({
 	    		selectedDate:new Date(values.date)
