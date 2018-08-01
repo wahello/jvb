@@ -204,9 +204,14 @@ class RankedScore(object):
 		else:
 			raise ValueError("'{}' is not a valid rank. Rank should be positive integer and non zero".format(rank))
 
-	def as_dict(self):
+	def as_dict(self,privacy="private"):
 		'''
 		convert score data in dict object
+		Args:
+			privacy: Toggle between whether to show username or not.
+				If it is "private", then show 'Anonymous'. If it's 
+				"public" diaplay username of score's user. Default to 
+				"private"
 
 		Return:
 			dict: A dictionary having data related to score. Example - 
@@ -235,7 +240,9 @@ class RankedScore(object):
 			if other_scores['sleep_duration']['value'] == self.DEFAULT_SLEEP_DURATION:
 				other_scores['sleep_duration']['value'] = 'N/A'
 
-		if self.user == self.current_user or self.current_user.is_staff:
+		if (self.user == self.current_user 
+			or self.current_user.is_staff
+			or privacy == "public"):
 			#if user is staff user, show username
 			username = self.user.username
 		else:
@@ -256,7 +263,8 @@ class RankedScore(object):
 class Leaderboard(object):
 	''' Class representing leader board for particular category'''
 
-	def __init__(self,user,scores,category,score_priority='lowest_last'):
+	def __init__(self,user,scores,category,
+			score_priority='lowest_last',privacy="private"):
 		'''
 		Initialize a Leader board object
 
@@ -270,7 +278,10 @@ class Leaderboard(object):
 				consistency score then that user should be ranked higher 
 				than other user. Default to 'lowest_last'.Possible value -
 					lowest_last: Lowest score should be ranked last
-					lowest_first: Lowset score should be ranked first    
+					lowest_first: Lowset score should be ranked first 
+			privacy: Display username of users if public else show
+				"Anonymous", default to "private". Possible values are
+				- "public", "private"   
 		'''
 		self.user = user
 		# possible score priorities
@@ -280,6 +291,7 @@ class Leaderboard(object):
 		self._score_priority = score_priority
 		# list of scores which are ranked
 		self.ranked_scores = self.rank_scores()
+		self.privacy = privacy
 
 	@property
 	def score_priority(self):
@@ -332,7 +344,7 @@ class Leaderboard(object):
 			for score in self.ranked_scores:
 				if score.user == self.user:
 					user_rank = score.as_dict()
-				dict_scores.append(score.as_dict())
+				dict_scores.append(score.as_dict(privacy=self.privacy))
 			# Ranked score of currently logged user
 			lb['user_rank'] = user_rank 
 			# Ranked score of all user
@@ -410,7 +422,8 @@ class HrrOverallLeaderboard(Leaderboard):
 	'''
 	Class for preparing Overall HRR Leaderboard
 	'''
-	def __init__(self,user,category_wise_hrr_data,score_priority="lowest_first"):
+	def __init__(self,user,category_wise_hrr_data,
+			score_priority="lowest_first",privacy="private"):
 		self.category_meta = LeaderboardCategories()
 		self.user = user
 		self.priorities = ["lowest_last","lowest_first"]
@@ -418,6 +431,7 @@ class HrrOverallLeaderboard(Leaderboard):
 		self.scores = self.__prepare_scores()
 		self._score_priority = score_priority
 		self.ranked_scores = self.rank_scores()
+		self.privacy = privacy
 
 	def __prepare_scores(self):
 		'''
@@ -429,7 +443,7 @@ class HrrOverallLeaderboard(Leaderboard):
 		catg_score_priority = self.category_meta.category_score_priority
 		for catg,data in self.category_wise_hrr_data.items():
 			catg_lb[catg] = Leaderboard(
-				self.user,data,catg,catg_score_priority[catg]
+				self.user,data,catg,catg_score_priority[catg],privacy="public"
 			).get_leaderboard()
 
 		for catg,lb in catg_lb.items():
@@ -489,7 +503,12 @@ class HrrOverallLeaderboard(Leaderboard):
 			for score in self.ranked_scores:
 				if score["username"] == self.user.username:
 					user_rank = score
-				dict_scores.append(score)
+					dict_scores.append(score)
+				elif self.privacy == "public" or self.user.is_staff:
+					dict_scores.append(score)
+				else:
+					score['username'] = 'Anonymous'
+					dict_scores.append(score)
 			# Ranked score of currently logged user
 			lb['user_rank'] = user_rank 
 			# Ranked score of all user

@@ -18,6 +18,7 @@ import {fetchLastSync} from '../network/quick';
 import fetchHrrSummaryData from '../network/Hrr_dashboard';
 import {getUserProfile} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
+import {renderHrrSummaryDashboardDataFetchOverlay} from './dashboard_healpers';
 
 
 axiosRetry(axios, { retries: 3});
@@ -31,6 +32,7 @@ class Hrr_Dashboard extends Component{
 		super(props);
 		this.state = {
 			calendarOpen:false,
+			fetching_hrr_dashboard:false,
 			heart_beats_lowest_1st_minute:"",
 			pure_heart_beats_lowered_in_1st_min:"",
 			pure_time_to_99:"",
@@ -59,6 +61,7 @@ class Hrr_Dashboard extends Component{
 		this.successProfile = this.successProfile.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
 		this.successLeaderboard = this.successLeaderboard.bind(this);
+		this.renderHrrSummaryDashboardDataFetchOverlay = renderHrrSummaryDashboardDataFetchOverlay.bind(this);
 	}
 	successHrrSummaryData(data){
 		if(!_.isEmpty(data.data)){
@@ -67,6 +70,7 @@ class Hrr_Dashboard extends Component{
 				pure_heart_beats_lowered_in_1st_min:data.data.pure_heart_beats_lowered_in_1st_min,
 				pure_time_to_99:data.data.pure_time_to_99,
 				time_to_99:data.data.time_to_99,
+				fetching_hrr_dashboard:false,
 			});
 		}else{
 			this.setState({
@@ -74,11 +78,15 @@ class Hrr_Dashboard extends Component{
 				pure_heart_beats_lowered_in_1st_min:null,
 				pure_time_to_99:null,
 				time_to_99:null,
+				fetching_hrr_dashboard:false,
 			});
 		}
   	}
 
   	errorHrrSummaryData(error){
+  		this.setState({
+  			fetching_hrr_dashboard:false,
+  		});
 		console.log(error.message);
     }
     successProfile(data){
@@ -119,7 +127,10 @@ class Hrr_Dashboard extends Component{
 		var today = this.state.selectedDate;
 		var tomorrow = moment(today).add(1, 'days');
 		this.setState({
-			selectedDate:tomorrow.toDate()
+			selectedDate:tomorrow.toDate(),
+			rank_data:"Getting Rank...",
+			fetching_hrr_dashboard:true,
+
 		},()=>{
 			getUserProfile(this.successProfile);
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
@@ -131,7 +142,9 @@ class Hrr_Dashboard extends Component{
 		var today = this.state.selectedDate;
 		var tomorrow = moment(today).subtract(1, 'days');
 		this.setState({
-			selectedDate:tomorrow.toDate()
+			selectedDate:tomorrow.toDate(),
+			rank_data:"Getting Rank...",
+			fetching_hrr_dashboard:true,
 		},()=>{
 			getUserProfile(this.successProfile);
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
@@ -142,6 +155,8 @@ class Hrr_Dashboard extends Component{
 		this.setState({
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
+			rank_data:"Getting Rank...",
+			fetching_hrr_dashboard:true,
 		},()=>{
 			getUserProfile(this.successProfile);
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
@@ -387,6 +402,9 @@ class Hrr_Dashboard extends Component{
 	    });
     }
     componentDidMount(){
+    	this.setState({
+    		fetching_hrr_dashboard:true,
+    	})
 		 fetchLastSync(this.successLastSync,this.errorquick);
 		 getUserProfile(this.successProfile);
 		 fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
@@ -446,11 +464,12 @@ class Hrr_Dashboard extends Component{
 						{this.renderPureTimeTo99Colors(this.state.pure_time_to_99)}
 				    </div>
 				</div>
-				<div className = "row justify-content-center md_padding">
+				<div className = "row justify-content-center md_padding hrr_padd">
 					<div className = "col-md-6 table_margin ">
 						{this.renderPureHeartBeatsColors(this.state.pure_heart_beats_lowered_in_1st_min)}
 				    </div>
 				</div>
+				{this.renderHrrSummaryDashboardDataFetchOverlay()}
 			</div>
 		);
 	}

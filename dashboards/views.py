@@ -102,7 +102,7 @@ class HrrSummaryDashboardview(APIView):
             hrr_data["time_to_99"] = userhrr.time_99
             hrr_data["pure_time_to_99"] = userhrr.pure_time_99
             hrr_data["pure_heart_beats_lowered_in_1st_min"] = userhrr.pure_1min_heart_beats
-            hrr_data["heart_beats_lowest_1st_minute"] = userhrr.lowest_hrr_1min
+            hrr_data["heart_beats_lowest_1st_minute"] = userhrr.No_beats_recovered
              
 
         return Response(hrr_data,status=status.HTTP_200_OK)
