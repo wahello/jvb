@@ -106,7 +106,7 @@ def _get_activities(user,target_date):
 	manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 	act_obj = {}
 	start = current_date
-	end = current_date + timedelta(days=3)
+	end = current_date + timedelta(days=7)
 	fitfiles=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
@@ -121,9 +121,7 @@ def _get_activities(user,target_date):
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
-			# print(workout_timestamp,"workout_timestamp")
-	# print(all_activities_heartrate,"all_activities_heartrate")
-	# print(all_activities_timestamp,"all_activities_timestamp")
+	
 	# heart_rate = [x for x in all_activities_heartrate if x != []]
 	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []
@@ -145,14 +143,7 @@ def _get_activities(user,target_date):
 				final_heart_rate.append(single_heartrate[:index])
 		else:
 			final_heart_rate.append([])
-	# print(final_heart_rate,"final_heart_rate")
-	# a1_len = len(a1)
-	# final_heart_rate_len = len(final_heart_rate)
-	# diff = a1_len - final_heart_rate_len
-	# if diff:
-	# 	while diff > 0:
-	# 		final_heart_rate.append([])
-	# 		diff = diff - 1
+
 	for single_activity in activity_data:
 		act_obj = manually_edited(single_activity)
 		if fitfiles:
@@ -164,8 +155,6 @@ def _get_activities(user,target_date):
 					(act_obj.get("durationInSeconds",0) <= 1200) and 
 					(act_obj.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
 					hrr_difference = single_heartrate[0] - single_heartrate[-1]
-					print(hrr_difference,"ccccccccccccc")
-					print(single_heartrate,"ccccccccccccccccccccccc")
 					if hrr_difference > 10:
 						act_obj["activityType"] = "HEART_RATE_RECOVERY"
 				else:
@@ -226,122 +215,6 @@ class GarminData(APIView):
 			self.request.user, start_epoch,end_epoch,order_by = '-id')
 
 		return True if activity_records else False
-
-
-	# def _get_activities_data(self,target_date):
-	# 	current_date = str_to_datetime(target_date)
-	# 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
-
-	# 	start_epoch = current_date_epoch
-	# 	end_epoch = current_date_epoch + 86400
-
-	# 	activity_data = get_garmin_model_data(UserGarminDataActivity,
-	# 		self.request.user, start_epoch,end_epoch,order_by = '-id')
-	# 	manually_updated_activity_data = get_garmin_model_data(UserGarminDataManuallyUpdated,
-	# 		self.request.user, start_epoch,end_epoch,order_by = '-id')
-
-	# 	#converting to python objects
-	# 	activity_data = [ast.literal_eval(dic) for dic in activity_data]
-	# 	manually_updated_activity_data = [ast.literal_eval(dic) for dic
-	# 		in manually_updated_activity_data]
-
-	# 	return (activity_data,manually_updated_activity_data)    
-
-	# def _create_activity_stat(self,activity_obj,current_date):
-	# 	'''
-	# 		this funtion accepts the single activity object at a time
-	# 		and returns only very few key and values which are to be shown in activity grid
-
-	# 	Args:
-	# 		param1: single activity object
-	# 		param1: current data
-	# 	Returms:
-	# 		keys as summary id and value as a dictonary, in the dictonary modified key and values
-	# 		which are to be shown in activity grid
-	# 	'''
-	# 	profile = Profile.objects.filter(user=self.request.user)
-		
-	# 	for tmp_profile in profile:
-	# 		user_dob = tmp_profile.date_of_birth
-	# 	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
-		
-	# 	below_aerobic_value = 180-user_age-30
-	# 	anaerobic_value = 180-user_age+5
-	# 	aerobic_value_half = 180-user_age-15
-
-	# 	if activity_obj:
-	# 		tmp = {
-	# 				"summaryId":"",
-	# 				"activityType":"",
-	# 				"comments":"",
-	# 				"startTimeInSeconds":"",
-	# 				"durationInSeconds":"",
-	# 				"startTimeOffsetInSeconds":"",
-	# 				"averageHeartRateInBeatsPerMinute":0,
-	# 				"steps_type":"",
-	# 				"can_update_steps_type":True,
-	# 				"steps":0,
-
-	# 			}
-	# 		for k, v in activity_obj.items():
-	# 			if k in tmp.keys():
-	# 				tmp[k] = v
-	# 				if (int(tmp.get("averageHeartRateInBeatsPerMinute",0)) < below_aerobic_value or
-	# 					tmp.get("activityType","") == "HEART_RATE_RECOVERY"):
-	# 					tmp["steps_type"] = "non_exercise"
-	# 				else:
-	# 					tmp["steps_type"] = "exercise"
-	# 				if int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
-	# 					tmp["can_update_steps_type"] = False
-	# 				elif int(tmp.get("averageHeartRateInBeatsPerMinute",0)) > aerobic_value_half:
-	# 					tmp["can_update_steps_type"] = False
-
-	# 		return {activity_obj['summaryId']:tmp}
-		
-		
-	# def _get_activities(self,target_date):
-	# 	current_date = str_to_datetime(target_date)
-	# 	# hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
-	# 	# if hrr_data:
-	# 	# 	measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
-	# 	act_data = self._get_activities_data(target_date)
-	# 	activity_data = act_data[0]
-	# 	manually_updated_act_data = act_data[1]
-
-	# 	final_act_data = {}
-	# 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
-	# 	manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
-	# 	act_obj = {}
-	# 	start = current_date
-	# 	end = current_date + timedelta(days=3)
-	# 	a1=GarminFitFiles.objects.filter(user=self.request.user,created_at__range=[start,end])
-
-	# 	for act in activity_data:
-	# 		non_edited_steps = act.get('steps',None)
-	# 		act_obj = manually_edited(act)
-	# 		manually_edited_steps = act_obj.get('steps',None)
-	# 		if (not non_edited_steps is None) and not manually_edited_steps:
-	# 			# Manually edited summaries drop steps data, so if steps
-	# 			# data in manually edited summary is not present but
-	# 			# it was present in normal unedited version of summary, in
-	# 			# that case add the previous step data to the current summary
-	# 			act_obj['steps'] = non_edited_steps
-	# 		if a1:
-	# 			for tmp in a1:
-	# 				meta = tmp.meta_data_fitfile
-	# 				meta = ast.literal_eval(meta)
-	# 				data_id = meta['activityIds'][0]
-	# 				if (((act_obj.get("summaryId",None) == str(data_id)) and 
-	# 					(act_obj.get("durationInSeconds",0) <= 1200) and 
-	# 					(act_obj.get("distanceInMeters",0) <= 200.00))):
-	# 					act_obj["activityType"] = "HEART_RATE_RECOVERY"
-	# 				else:
-	# 					pass
-	# 		finall = self._create_activity_stat(act_obj,current_date)
-	# 		final_act_data.update(finall)
-	# 	# print(final_act_data)
-	# 	return final_act_data
-		
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)

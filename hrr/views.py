@@ -1494,7 +1494,7 @@ def hrr_data(user,start_date):
 			# print(timestamp_before_hrrfile[-2],"timestamp_before_hrrfile")
 			# print(heartrate_before_hrrfile[-2],"heartrate_before_hrrfile")
 			time_toreach_99 = []
-			for i,timestamp_hrr in zip(hrr_final_heartrate,hrr_final_timestamp):
+			for heartrate_hrr,timestamp_hrr in zip(hrr_final_heartrate,hrr_final_timestamp):
 				if heartrate_hrr >= 99:
 					time_toreach_99.append(timestamp_hrr)
 				if(heartrate_hrr == 99) or (heartrate_hrr < 99):
