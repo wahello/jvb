@@ -101,7 +101,7 @@ class UserInputs extends React.Component{
         calories:'',
         calories_item:'',
 
-        measured_hr:'',
+        gd_value_style:'',
         hr_down_99:'',
         time_to_99_min:'',
         time_to_99_sec:'',
@@ -782,7 +782,7 @@ transformActivity(activity){
     let min = "";
     let sec = "";
     let measured_hr = this.state.measured_hr;
-    let measure_hrr = data.data.Did_you_measure_HRR;
+    let hrr_measure_hrr = data.data.Did_you_measure_HRR;
     let hr_down_99 = this.state.hr_down_99;
     let hrr_reach_99 = data.data.Did_heartrate_reach_99;
     let time_to_99_min = this.state.time_to_99_min;
@@ -807,7 +807,7 @@ transformActivity(activity){
         sec = "0" + sec;
        }
     }
-    let final_measured_hrr = measured_hr?measured_hr:measure_hrr;
+    let final_measured_hrr = measured_hr?measured_hr:hrr_measure_hrr;
     if(final_measured_hrr == "yes"){
       this.setState({
         measured_hr:final_measured_hrr,
@@ -818,7 +818,7 @@ transformActivity(activity){
         lowest_hr_first_minute:lowest_hr_first_minute?lowest_hr_first_minute:lowest_hrr_1min,
       });
     }
-    else if(final_measured_hrr == "no"){
+    else{
       this.setState({
         measured_hr:final_measured_hrr,
         hr_down_99:"",
