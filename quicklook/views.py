@@ -56,7 +56,7 @@ from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
 from hrr.models import Hrr
 # from .calculation_helper import *
-
+from hrr.views import weekly_workout_helper
 
 class UserQuickLookView(generics.ListCreateAPIView):
 	'''
@@ -437,6 +437,7 @@ def export_users_xls(request):
 	sheet4 = book.add_worksheet('Food')
 	sheet5 = book.add_worksheet('Alcohol')
 	sheet6 = book.add_worksheet('Exercise Reporting')
+	weekly_workout_sheet = book.add_worksheet('Weekly Workout Summary')
 	hrr_sheet = book.add_worksheet('HRR')
 	sheet7 = book.add_worksheet('Swim Stats')
 	sheet8 = book.add_worksheet('Bike Stats')
@@ -453,6 +454,7 @@ def export_users_xls(request):
 	sheet9.set_column(1,1000,11)
 	sheet10.set_column(2,1000,11)
 	hrr_sheet.set_column(1,1000,11)
+	weekly_workout_sheet.set_column(1,1000,11)
 	sheet1.freeze_panes(1, 1)
 	sheet1.set_column('A:A',40)
 	sheet2.freeze_panes(1, 1)
@@ -1398,14 +1400,15 @@ def export_users_xls(request):
 			current_date -= timedelta(days=1)
 	
 	last_sycn_obj = UserLastSynced.objects.filter(user = request.user)
-	last_sycn = [tmp.last_synced for tmp in last_sycn_obj]
-	last_sycn_offset = [tmp.offset for tmp in last_sycn_obj]
-	import time
-	unixtime = time.mktime(last_sycn[0].timetuple())
-	local_time = unixtime + last_sycn_offset[0]
-	value_last_sycn = datetime.fromtimestamp(local_time).strftime('%b %d,%Y @ %I:%M %p')
-	matter = 'Wearable Device Last Synced on'
-	sheet1.write_rich_string(0,0,matter,'\n',value_last_sycn)
+	if last_sycn_obj:
+		last_sycn = [tmp.last_synced for tmp in last_sycn_obj]
+		last_sycn_offset = [tmp.offset for tmp in last_sycn_obj]
+		import time
+		unixtime = time.mktime(last_sycn[0].timetuple())
+		local_time = unixtime + last_sycn_offset[0]
+		value_last_sycn = datetime.fromtimestamp(local_time).strftime('%b %d,%Y @ %I:%M %p')
+		matter = 'Wearable Device Last Synced on'
+		sheet1.write_rich_string(0,0,matter,'\n',value_last_sycn)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
 	col_num1 = 2
@@ -2787,10 +2790,119 @@ def export_users_xls(request):
 				row_num += 1
 				hrr_sheet.write(i + 2, row_num, '')
 			current_date -= timedelta(days=1)
+	
+	def show_values(value,col_num1,row_num,workout_type,total_activities=None):
+		workout_copy = workout_type
+		workout_keys = ["days_with_activity","percent_of_days","duration",
+		"workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
+		"percent_aerobic","duration_in_anaerobic_range","percent_anaerobic",
+		"duration_below_aerobic_range","percent_below_aerobic",
+		"duration_hrr_not_recorded","percent_hrr_not_recorded"]
+		for key,values in enumerate(workout_keys):
+			if values == 'days_with_activity':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'percent_of_days':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'duration':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'workout_duration_percent':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'average_heart_rate':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'duration_in_aerobic_range':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'percent_aerobic':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'duration_in_anaerobic_range':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'percent_anaerobic':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'duration_below_aerobic_range':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'percent_below_aerobic':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'duration_hrr_not_recorded':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+			elif values == 'percent_hrr_not_recorded':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values])
+		wokout_distance = workout_type.lower()
+		wokout_distance = wokout_distance+'_distance'
+		
+		for i,k in value.items():
+			if i == wokout_distance:
+				length_workout = len(total_activities)
+				col_num_miles = col_num1 + length_workout
+				weekly_workout_sheet.write(row_num,col_num_miles,k['value'])
+
+	def workout_totals_miles(value,col_num1,row_num,total_activities):
+		col_num1 = 14
+		for i,k in enumerate(total_activities):
+			k_distance = k.lower()+"_distance"
+			weekly_workout_sheet.write(row_num,col_num1,value[k_distance]['value'])
+			col_num1 = col_num1 + 1
 
 
+	# Weekly Workout Summary
+	weekly_workout_sheet.set_row(2,80)
+	cell_format = book.add_format({'bold': True})
 
-
+	headers = ["Workout Type","Avg # Of Days With Activity","% of Days","Avg. Workout Duration (hh:mm)",
+	"% of Total Duration","Avg Heart Rate","Avg Aerobic Duration (hh:mm)","Avg % Aerobic","Avg Anaerobic Duration (hh:mm)",
+	"Avg % Anaerobic","Avg Below Aerobic Duration (hh:mm)","Avg % Below Aerobic","Avg HR Not Recorded Duration (hh:mm)",
+	"Avg % HR Not Recorded"]
+	cell_format.set_text_wrap()
+	col_num = 0
+	row_num1 = 2
+	for col_num in range(len(headers)):
+		weekly_workout_sheet.write(row_num1,col_num,headers[col_num],cell_format)
+		col_num = col_num + 1
+	data = weekly_workout_helper(request.user,to_date)
+	col_num1 = 0
+	row_num = 3
+	total_activities = []
+	for key,value in data.items():
+		if key != 'Totals' and key != 'extra':
+			total_activities.append(key)
+			if 'SWIMMING' in key:
+				weekly_workout_sheet.write(
+				row_num1,col_num,"Avg {} Distance (In Yards)".format(key),cell_format)
+				col_num = col_num + 1
+			else:
+				weekly_workout_sheet.write(
+				row_num1,col_num,"Avg {} Distance (In Miles)".format(key),cell_format)
+				col_num = col_num + 1
+			weekly_workout_sheet.write(row_num,col_num1,key,)
+			show_values(value,col_num1,row_num,key,total_activities)
+			row_num = row_num + 1
+	print(total_activities,"googleeeeeeeeeeeeee")
+	for key,value in data.items():
+		if key == 'Totals':
+			col_num1 = 0
+			weekly_workout_sheet.write(row_num,col_num1,key)
+			show_values(value,col_num1,row_num,key)
+			workout_totals_miles(value,col_num1,row_num,total_activities)
+			row_num = row_num + 1
+		elif key == 'extra':
+			weekly_workout_sheet.write(row_num,col_num1,"No Activity")
+			col_num1 = col_num1 + 1
+			weekly_workout_sheet.write(row_num,col_num1,value['days_no_activity'])
+			col_num1 = col_num1 + 1
+			weekly_workout_sheet.write(row_num,col_num1,value['percent_days_no_activity'])
+			row_num = row_num + 1
+	
 
 	#movement consistenct
 	sheet11 = book.add_worksheet('Movement Consistency')
