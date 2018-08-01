@@ -1943,10 +1943,16 @@ def weekly_workout_summary(request):
 	'''
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	complete_data = weekly_workout_helper(request.user,start_date)
+
+	return JsonResponse(complete_data)
+
+def weekly_workout_helper(user,start_date):
+
 	week_start_date,week_end_date = week_date(start_date)
 	print("start date",week_start_date,"end date",week_end_date)
 	weekly_workouts_query = get_weekly_workouts(
-		request.user,week_start_date,week_end_date)
+		user,week_start_date,week_end_date)
 
 	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
 	if weekly_workout:
@@ -1956,7 +1962,7 @@ def weekly_workout_summary(request):
 		final_workout_data = ''
 		workout_summary_id = ''
 	weekly_aa_query = get_weekly_aa(
-		request.user,week_start_date,week_end_date)
+		user,week_start_date,week_end_date)
 	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
 	if weekly_aa:
 		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
@@ -1977,4 +1983,4 @@ def weekly_workout_summary(request):
 	else:
 		data_v2 = {}
 
-	return JsonResponse(data_v2)
+	return data_v2
