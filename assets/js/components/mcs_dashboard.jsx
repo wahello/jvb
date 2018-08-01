@@ -173,24 +173,28 @@ class MCS_Dashboard extends Component{
 		  let color = "";
 	      if(status == "sleeping"){
 	        background= 'rgb(0,176,240)';
-	        color = 'black'
+	        color = 'black';
 	      }
 	      else if(status == "inactive"){
 	        background = 'red';
-	    	color = 'white'
+	    	color = 'white';
 	      }
 	      else if(status == "strength"){
 	      	background = "rgb(255,0,255)";
-	      	color = 'white'
+	      	color = 'white';
 	      }
 	      else if(status == "exercise"){
 	        background = "#FD9A44";
-	        color = 'black'
+	        color = 'black';
 	      }
 	      else if(status == "no data yet"){
 	      	score = "NDY";
 	        background = "#A5A7A5";
-	        color = 'black'
+	        color = 'black';
+	      }
+	      else if(status == "time zone change"){
+	      	background = "#fdeab7";
+	      	color = 'black';
 	      }
 	      else if (score >= 300){
 	        background = 'green';
@@ -287,41 +291,17 @@ class MCS_Dashboard extends Component{
     }
     renderTablestatus(mc_data){
     	var td_rows = [];
-    	let sleep_hours;
-    	let active_hours;
-    	let inactive_hours;
-    	let strength_hours;
-    	let exercise_hours;
-
-    	let keys = ["sleeping_hours","active_hours","inactive_hours","strength_hours","exercise_hours",];
+        let keys = ["sleeping_hours","active_hours","inactive_hours","strength_hours",
+        	"exercise_hours","no_data_hours","timezone_change_hours"];
         if(!_.isEmpty(mc_data)){
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
          	     	if(key2 == "movement_consistency"){
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
-	                     	for(let key3 of keys){  
-			              		if(key3 == "sleeping_hours"){
-			              			sleep_hours = values2[key3];
-			              		}
-			              		else if(key3 == "active_hours"){
-			              			active_hours = values2[key3];
-			              		}
-			              		else if(key3 == "inactive_hours"){
-			              			inactive_hours = values2[key3];
-			              		}
-			              		else if(key3 == "strength_hours"){
-			              			strength_hours = values2[key3];
-			              		}
-			              		else if(key3 == "exercise_hours"){
-			              			exercise_hours = values2[key3];
-			              		}
+	                     	for(let key3 of keys) 
 			         		 	td_values.push(<td>{values2[key3]}</td>);
-			         		    }
-							let no_data_yet = 24 - (sleep_hours + active_hours + inactive_hours + strength_hours + exercise_hours);
-		         			td_rows.push(<tr>{td_values}
-		         							  <td>{no_data_yet}</td>
-         							     </tr>);
+		          			td_rows.push(<tr>{td_values}</tr>);
 		         		}
 		         	}
 		        }
@@ -439,6 +419,7 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="mcs-dashboard" style={{background:'rgb(255,0,255)',color:'white'}}>Strength Hours</th>
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
 								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet</th>
+								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone</th>
 		          	    	</tr>
 		          	    	<tbody>
 		          	    		{this.renderTablestatus(this.state.mc_data)}
