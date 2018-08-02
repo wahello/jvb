@@ -862,7 +862,8 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 
 	for interval,values in list(mc_data.items()):
 		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
-			'strength_hours','exercise_hours','total_steps']
+			'strength_hours','exercise_hours','total_steps','timezone_change_hours',
+			'no_data_hours']
 		if interval not in non_interval_keys:
 			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
