@@ -19,6 +19,7 @@ import fetchHrrSummaryData from '../network/Hrr_dashboard';
 import {getUserProfile} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
 import {renderHrrSummaryDashboardDataFetchOverlay} from './dashboard_healpers';
+import HrrLeaderboard from './Hrr_leaderboard';
 
 
 axiosRetry(axios, { retries: 3});
@@ -32,6 +33,8 @@ class Hrr_Dashboard extends Component{
 		super(props);
 		this.state = {
 			calendarOpen:false,
+			gridview:false,
+			dashView:true,
 			fetching_hrr_dashboard:false,
 			heart_beats_lowest_1st_minute:"",
 			pure_heart_beats_lowered_in_1st_min:"",
@@ -39,6 +42,8 @@ class Hrr_Dashboard extends Component{
 			time_to_99:"",
 			date_of_birth:"",
 			last_synced:null,
+			all_hrr_rank_data:"",
+			Hrr_username:"",
 			selectedDate:new Date(),
 			rank_data:"Getting Rank...",
 
@@ -61,6 +66,7 @@ class Hrr_Dashboard extends Component{
 		this.successProfile = this.successProfile.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
 		this.successLeaderboard = this.successLeaderboard.bind(this);
+		this.handleBackButton = this.handleBackButton.bind(this);
 		this.renderHrrSummaryDashboardDataFetchOverlay = renderHrrSummaryDashboardDataFetchOverlay.bind(this);
 	}
 	successHrrSummaryData(data){
@@ -96,7 +102,7 @@ class Hrr_Dashboard extends Component{
     }
     successLeaderboard(data){
     	this.setState({
-    		rank_data:data.data.overall_hrr.today.user_rank.rank,
+    		rank_data:data.data.overall_hrr.today,
     	});
     }
     successLastSync(data){
@@ -110,6 +116,12 @@ class Hrr_Dashboard extends Component{
     		last_synced:last_synced,
     	})
     }
+    handleBackButton(){
+  		this.setState({
+  			dashView:true,
+  			gridview:false
+  		})
+  	}
     errorquick(error){
 		console.log(error.message);
 	}
@@ -182,7 +194,8 @@ class Hrr_Dashboard extends Component{
         }
         return value;
 	}
-	renderOverallHrrRankColor(score){
+	renderOverallHrrRankColor(val){
+		// console.log("**********************",score);
 		/* adding background color to card depends upon their steps ranges*/
 		let background = "";
 		let color = "";
@@ -207,18 +220,50 @@ class Hrr_Dashboard extends Component{
   //       }
 
 		// let score1 = this.renderCommaInSteps(score);
-		var model = <Card className = "card_style"
-						 id = "my-card"
-						 style = {{background:background, color:color}}>
+
+		let category = "";
+	  	let userName;
+	  	let ranks = [];
+  			if (val){ 
+  				var all_cat_rank = this.state.rank_data.all_rank;
+		  		for (let [key,rankData] of Object.entries(val)){
+		  		 	if(key == "user_rank"){
+		  		 		userName = rankData.username;
+		  		 		ranks.push(rankData.rank);
+		  		 	}
+		  		 	
+		  		}
+		  	}
+			var model = <Card className = "card_style"
+					 		id = "my-card"
+							style = {{background:background, color:color}}>
 					        <CardBody>
 					          	<CardTitle className = "header_style">Overall HRR Rank</CardTitle>
 					          	<hr className = "hr_style"
-					          		id = "hr-style" 
-					          		style = {{background:hr_background}}/>
-					          	<CardText className = "value_style">{score}</CardText>
+				          		id = "hr-style" 
+				          		style = {{background:hr_background}}/>
+					          	<a onClick = {this.reanderAllHrr.bind(this,all_cat_rank,userName)}>
+					          		<CardText className = "value_style">{ranks ? ranks : "Getting Rank..."}
+						          		<span id="lbfontawesome">
+						                    <FontAwesome
+						                    	className = "fantawesome_style"
+						                        name = "external-link"
+						                        size = "1x"
+						                    />
+					                 	</span>
+			                 		</CardText>
+					          	</a> 
 					        </CardBody>
-					    </Card>
+				        </Card>
 		return model;
+	}
+	reanderAllHrr(all_data,value1){
+		this.setState({
+			all_hrr_rank_data:all_data,
+			Hrr_username:value1,
+			gridview:true,
+			dashView:false,
+		});
 	}
 	renderTimeTo99Color(score){
 		/* adding background color to card depends upon their Non-Exercise steps ranges*/
@@ -414,62 +459,78 @@ class Hrr_Dashboard extends Component{
 		return(
 			<div>
 				<NavbarMenu title={"HRR Summary Dashboard"} />
-				<div className = "cla_center">
-					<span>
-						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
-							<FontAwesome
-		                        name = "angle-left"
-		                        size = "2x"
-			                />
-						</span> 
-		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
-		                    <FontAwesome
-		                        name = "calendar"
-		                        size = "2x"
-		                    />
-		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+				{this.state.dashView &&
+					<div className = "cla_center">
+						<span>
+							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+								<FontAwesome
+			                        name = "angle-left"
+			                        size = "2x"
+				                />
+							</span> 
+			            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
+			                    <FontAwesome
+			                        name = "calendar"
+			                        size = "2x"
+			                    />
+			                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+		                	</span>
+		                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+								<FontAwesome
+			                        name = "angle-right"
+			                        size = "2x"
+				                />
+							</span> 
+							<span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span>
+			            	<Popover
+					            placement="bottom"
+					            isOpen={this.state.calendarOpen}
+					            target="gd_progress"
+					            toggle={this.toggleCalendar}>
+				                <PopoverBody className="calendar2">
+				                <CalendarWidget  onDaySelect={this.processDate}/>
+				                </PopoverBody>
+			                </Popover>
 	                	</span>
-	                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
-							<FontAwesome
-		                        name = "angle-right"
-		                        size = "2x"
-			                />
-						</span> 
-						<span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span>
-		            	<Popover
-				            placement="bottom"
-				            isOpen={this.state.calendarOpen}
-				            target="gd_progress"
-				            toggle={this.toggleCalendar}>
-			                <PopoverBody className="calendar2">
-			                <CalendarWidget  onDaySelect={this.processDate}/>
-			                </PopoverBody>
-		                </Popover>
-                	</span>
-
-		        </div>
-				<div className = "row justify-content-center md_padding">
-					<div className = "col-md-6 table_margin ">
-						{this.renderOverallHrrRankColor(this.state.rank_data)}
-				    </div>
-					<div className = "col-md-6  table_margin ">
-			      		{this.renderTimeTo99Color(this.state.time_to_99)}
-			      	</div>
-				</div>
-				<div className = "row justify-content-center md_padding">
-					<div className = "col-md-6 table_margin ">
-						{this.renderHeartBeatsColors(this.state.heart_beats_lowest_1st_minute)}
-				    </div>
-					<div className = "col-md-6 table_margin ">
-						{this.renderPureTimeTo99Colors(this.state.pure_time_to_99)}
-				    </div>
-				</div>
-				<div className = "row justify-content-center md_padding hrr_padd">
-					<div className = "col-md-6 table_margin ">
-						{this.renderPureHeartBeatsColors(this.state.pure_heart_beats_lowered_in_1st_min)}
-				    </div>
-				</div>
+			        </div>
+		    	}
+		    	{this.state.gridview &&
+	           	<div>
+	            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
+	            </div>
+            	}
+		        {this.state.dashView &&
+					<div className = "row justify-content-center md_padding">
+						<div className = "col-md-6 table_margin ">
+							{this.renderOverallHrrRankColor(this.state.rank_data)}
+					    </div>
+						<div className = "col-md-6  table_margin ">
+				      		{this.renderTimeTo99Color(this.state.time_to_99)}
+				      	</div>
+					</div>
+				}
+				{this.state.dashView &&
+					<div className = "row justify-content-center md_padding">
+						<div className = "col-md-6 table_margin ">
+							{this.renderHeartBeatsColors(this.state.heart_beats_lowest_1st_minute)}
+					    </div>
+						<div className = "col-md-6 table_margin ">
+							{this.renderPureTimeTo99Colors(this.state.pure_time_to_99)}
+					    </div>
+					</div>
+				}
+				{this.state.dashView &&
+					<div className = "row justify-content-center md_padding hrr_padd">
+						<div className = "col-md-6 table_margin ">
+							{this.renderPureHeartBeatsColors(this.state.pure_heart_beats_lowered_in_1st_min)}
+					    </div>
+					</div>
+				}
 				{this.renderHrrSummaryDashboardDataFetchOverlay()}
+				{this.state.gridview &&
+					<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
+	  							Hrr_username = {this.state.Hrr_username}/>
+				}
 			</div>
 		);
 	}

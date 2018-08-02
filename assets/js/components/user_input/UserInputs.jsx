@@ -782,7 +782,7 @@ transformActivity(activity){
     let min = "";
     let sec = "";
     let measured_hr = this.state.measured_hr;
-    let measure_hrr = data.data.Did_you_measure_HRR;
+    let hrr_measure_hrr = data.data.Did_you_measure_HRR;
     let hr_down_99 = this.state.hr_down_99;
     let hrr_reach_99 = data.data.Did_heartrate_reach_99;
     let time_to_99_min = this.state.time_to_99_min;
@@ -807,16 +807,27 @@ transformActivity(activity){
         sec = "0" + sec;
        }
     }
-    
-    this.setState({
-      measured_hr:measured_hr?measured_hr:measure_hrr,
-      hr_down_99:hr_down_99?hr_down_99:hrr_reach_99,
-      time_to_99_min:time_to_99_min?time_to_99_min:min,
-      time_to_99_sec:time_to_99_sec?time_to_99_sec:sec,
-      hr_level:hr_level?hr_level:HRR_start_beat,
-      lowest_hr_first_minute:lowest_hr_first_minute?lowest_hr_first_minute:lowest_hrr_1min,
-
-    });
+    let final_measured_hrr = measured_hr?measured_hr:hrr_measure_hrr;
+    if(final_measured_hrr == "yes"){
+      this.setState({
+        measured_hr:final_measured_hrr,
+        hr_down_99:hr_down_99?hr_down_99:hrr_reach_99,
+        time_to_99_min:time_to_99_min?time_to_99_min:min,
+        time_to_99_sec:time_to_99_sec?time_to_99_sec:sec,
+        hr_level:hr_level?hr_level:HRR_start_beat,
+        lowest_hr_first_minute:lowest_hr_first_minute?lowest_hr_first_minute:lowest_hrr_1min,
+      });
+    }
+    else{
+      this.setState({
+        measured_hr:final_measured_hrr,
+        hr_down_99:"",
+        time_to_99_min:"",
+        time_to_99_sec:"",
+        hr_level:"",
+        lowest_hr_first_minute:"",
+      });
+    }
   }
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
