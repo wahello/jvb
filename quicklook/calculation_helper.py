@@ -1089,9 +1089,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		todays_manually_updated_json=todays_manually_updated_json,userinput_activities=userinput_activities)
 
 	today_bedtime = None
-	if user_input_todays_bedtime and user_input_timezone:
-		target_tz = pytz.timezone(user_input_timezone)
-		today_bedtime = user_input_todays_bedtime.astimezone(target_tz).replace(tzinfo=None)
+	if user_input_todays_bedtime:
+		target_tz = pytz.timezone(user_input_todays_bedtime[1])
+		today_bedtime = user_input_todays_bedtime[0].astimezone(target_tz).replace(tzinfo=None)
 	else:
 		sleeps_today_stats = get_sleep_stats(calendar_date,None,sleeps_today_json[::-1],
 			user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
@@ -2292,8 +2292,10 @@ def create_quick_look(user,from_date=None,to_date=None):
 			user_input_strength_end_time = _str_duration_to_dt(current_date,user_input_strength_end_time)
 
 		todays_bedtime = None
+		tomorrows_user_input_tz = None
 		if tomorrows_user_input and tomorrows_user_input.strong_input:
 			todays_bedtime = tomorrows_user_input.strong_input.sleep_bedtime
+			tomorrows_user_input_tz = tomorrows_user_input.timezone
 
 		movement_consistency_summary = cal_movement_consistency_summary(
 			user,
@@ -2303,7 +2305,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 			todays_activities=todays_activities,
 			todays_manually_updated_json=todays_manually_updated_json,
 			userinput_activities=userinput_activities,
-			user_input_todays_bedtime = todays_bedtime,
+			user_input_todays_bedtime = (todays_bedtime,tomorrows_user_input_tz),
 			user_input_bedtime = user_input_bedtime,
 		  	user_input_awake_time = user_input_awake_time,
 		  	user_input_timezone = user_input_timezone,
