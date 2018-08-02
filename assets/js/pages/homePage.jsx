@@ -31,7 +31,7 @@ import FitBit from '../components/fitbitData';
 import HeartRate from '../components/Heart_rate_recovery';
 import LeaderBoard1 from '../components/leader_exp';
 import AllRank_Data1 from '../components/leader_all_exp';
-import HeartRateCal from '../components/heart_rate_calculation';
+import HeartRateCal from '../components/HRR/heart_rate_calculation';
 import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
 import Movement_Dashboard from '../components/Movement_dashboard'

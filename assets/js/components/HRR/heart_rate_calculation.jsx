@@ -3,7 +3,7 @@ import { withRouter, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import fetchHeartRateData  from '../network/heratrateOperations';
+import fetchHeartRateData  from '../../network/heratrateOperations';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
@@ -11,11 +11,12 @@ import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
-import NavbarMenu from './navbar';
-import { getGarminToken,logoutUser} from '../network/auth';
-import fetchHeartData from '../network/heart_cal';
-import {fetchHeartRefreshData} from '../network/heart_cal';
-import {renderHrrSelectedDateFetchOverlay} from './dashboard_healpers';
+import NavbarMenu from '../navbar';
+import { getGarminToken,logoutUser} from '../../network/auth';
+import fetchHeartData from '../../network/heart_cal';
+import {fetchHeartRefreshData} from '../../network/heart_cal';
+import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
+import Heartrate_Data from './heartrate_data_file';  
 
 axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
@@ -65,15 +66,8 @@ class HeartRateCal extends Component{
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
 			this.hrrRefreshData = this.hrrRefreshData.bind(this);
-			this.editToggleDidyouWorkout = this.editToggleDidyouWorkout.bind(this);
-			this.handleChange =this.handleChange.bind(this);
-			//this.sampleSum = this.sampleSum.bind(this);
   	}
-  	editToggleDidyouWorkout(){
-  		this.setState({
-  			editable:!this.state.editable
-  		})
-  	}
+  	
 	successHeart(data){
 	  	this.setState({
 	  	    		fetching_hrr:false,
@@ -108,33 +102,6 @@ class HeartRateCal extends Component{
 			fetching_hrr:false,
 		})
     }
-  //   sampleSum(){
-		// let fitbit = {'sleep': [{'dateOfSleep': '2018-07-30', 'duration': 22680000, 'efficiency': 95, 'endTime': '2018-07-30T06:07:00.000', 'infoCode': 0, 'isMainSleep': true, 'levels': {'data': [{'dateTime': '2018-07-29T23:49:00.000', 'level': 'light', 'seconds': 9750}, {'dateTime': '2018-07-30T02:31:30.000', 'level': 'rem', 'seconds': 930}, {'dateTime': '2018-07-30T02:47:00.000', 'level': 'light', 'seconds': 1440}, {'dateTime': '2018-07-30T03:11:00.000', 'level': 'wake', 'seconds': 420}, {'dateTime': '2018-07-30T03:18:00.000', 'level': 'light', 'seconds': 780}, {'dateTime': '2018-07-30T03:31:00.000', 'level': 'deep', 'seconds': 330}, {'dateTime': '2018-07-30T03:36:30.000', 'level': 'light', 'seconds': 660}, {'dateTime': '2018-07-30T03:47:30.000', 'level': 'rem', 'seconds': 1590}, {'dateTime': '2018-07-30T04:14:00.000', 'level': 'light', 'seconds': 1170}, {'dateTime': '2018-07-30T04:33:30.000', 'level': 'deep', 'seconds': 930}, {'dateTime': '2018-07-30T04:49:00.000', 'level': 'light', 'seconds': 510}, {'dateTime': '2018-07-30T04:57:30.000', 'level': 'deep', 'seconds': 270}, {'dateTime': '2018-07-30T05:02:00.000', 'level': 'light', 'seconds': 630}, {'dateTime': '2018-07-30T05:12:30.000', 'level': 'wake', 'seconds': 1920}, {'dateTime': '2018-07-30T05:44:30.000', 'level': 'light', 'seconds': 150}, {'dateTime': '2018-07-30T05:47:00.000', 'level': 'wake', 'seconds': 1200}], 'shortData': [{'dateTime': '2018-07-29T23:57:30.000', 'level': 'wake', 'seconds': 120}, {'dateTime': '2018-07-30T00:01:00.000', 'level': 'wake', 'seconds': 60}, {'dateTime': '2018-07-30T00:27:00.000', 'level': 'wake', 'seconds': 90}, {'dateTime': '2018-07-30T00:31:00.000', 'level': 'wake', 'seconds': 60}, {'dateTime': '2018-07-30T00:52:00.000', 'level': 'wake', 'seconds': 30}, {'dateTime': '2018-07-30T00:54:00.000', 'level': 'wake', 'seconds': 30}, {'dateTime': '2018-07-30T01:42:30.000', 'level': 'wake', 'seconds': 120}, {'dateTime': '2018-07-30T01:47:00.000', 'level': 'wake', 'seconds': 60}, {'dateTime': '2018-07-30T02:45:00.000', 'level': 'wake', 'seconds': 120}, {'dateTime': '2018-07-30T02:49:30.000', 'level': 'wake', 'seconds': 30}], 'summary': {'deep': {'count': 3, 'minutes': 26, 'thirtyDayAvgMinutes': 30}, 'light': {'count': 17, 'minutes': 241, 'thirtyDayAvgMinutes': 256}, 'rem': {'count': 2, 'minutes': 40, 'thirtyDayAvgMinutes': 89}, 'wake': {'count': 13, 'minutes': 71, 'thirtyDayAvgMinutes': 64}}}, 'logId': 19022894840, 'minutesAfterWakeup': 0, 'minutesAsleep': 307, 'minutesAwake': 71, 'minutesToFallAsleep': 0, 'startTime': '2018-07-29T23:49:00.000', 'timeInBed': 378, 'type': 'stages'}], 'summary': {'stages': {'deep': 0, 'light': 0, 'rem': 0, 'wake': 0}, 'totalMinutesAsleep': 307, 'totalSleepRecords': 1, 'totalTimeInBed': 378}};
-		// let obj ={};
-		// for(let [key,value] of Object.entries(fitbit)){
-		// 	if(key == "sleep"){
-		// 		for(let [key1,value1] of Object.entries(value)){
-		// 			for(let [key2,value2] of Object.entries(value1)){
-		// 				//console.log("********************",key2);
-		// 				if(key2 == "dateOfSleep"){
-		// 					obj["calendar_date"] = value2;
-		// 				}
-		// 				else if(key2 == "duration"){
-		// 					let f_value = value2 * 0.001;
-		// 					obj["duration_inseconds"] =f_value;
-		// 				}
-		// 				else if(key2 == "startTime"){
-		// 					obj["start_time"] =value2;
-		// 				}
-		// 				else if(key2 == "endTime"){
-		// 					obj["end_time"] =value2;
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
-		//  console.log("***********************",obj);
-  //   }
     processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
@@ -167,15 +134,7 @@ class HeartRateCal extends Component{
 		});
 		
 	}
-	handleChange(event){
-	  	const target = event.target;
-	  	const value = target.value;
-	  	const name = target.name;
-		  	this.setState({
-				[name]: value
-		  	});
-		
-	}
+	
 	hrrRefreshData(){
 		this.setState({
 			fetching_hrr:true,
@@ -281,67 +240,14 @@ class HeartRateCal extends Component{
 	            </div>
 
 	            {this.state.Did_you_measure_HRR == "yes"  &&
-	            <div className = "row justify-content-center hr_table_padd">
-	          	    <div className = "table table-responsive">
-		          	    <table className = "table table-striped table-bordered ">
-			          	    <thead className = "hr_table_style_rows">
-				          	    <th className = "hr_table_style_rows">HRR Stats</th>
-				          	    <th className = "hr_table_style_rows">{moment(this.state.selectedDate).format("MMM DD, YYYY")}</th>
-			          	    </thead>  
-			          	    <tbody>  
-			          	    <tr className = "hr_table_style_rows">   
-				          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>    
-				          	    <td className = "hr_table_style_rows">{this.state.editable ? 
-				          	    	<Input
-				          	    		style = {{maxWidth:"100px"}}
-                                        type="select"
-                                        className="custom-select form-control edit_sel" 
-                                        name="edit_did_you_measure_HRR"
-                                        value={this.state.edit_did_you_measure_HRR}                                       
-                                        onChange={this.handleChange}
-                                        onBlur={this.editToggleDidyouWorkout}>
-                                        <option value="">select</option>                                 
-                                    	<option value="yes">Yes</option>
-                                        <option value="no">No</option>
-                                    </Input> 
-				          	    	:this.captilizeYes(this.state.Did_you_measure_HRR)}
-				          	    	<span  onClick={this.editToggleDidyouWorkout}
-                            			className="fa fa-pencil fa-1x progressActivity1"
-                            			id = "add_button">
-                        			</span>
-			          	    	</td>
-			          	    </tr>
-
-			          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">Did your heart rate go down to 99 beats per minute or lower?</td>
-				          	    <td className = "hr_table_style_rows">{this.captilizeYes(this.state.Did_heartrate_reach_99)}</td>
-			          	    </tr>
-
-			          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
-				          	    <td className = "hr_table_style_rows">{this.renderSecToMin(this.state.time_99)}</td>
-			          	    </tr>
-
-			          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">HRR File Starting Heart Rate</td>
-								<td className = "hr_table_style_rows">{this.state.HRR_start_beat}</td>
-			          	    </tr>
-
-			          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">Lowest Heart Rate Level in the 1st Minute</td>
-				          	    <td className = "hr_table_style_rows">{this.state.lowest_hrr_1min}</td>
-			          	    </tr>
-
-			          	    <tr className = "hr_table_style_rows">
-				          	    <td className = "hr_table_style_rows">Number of heart beats recovered in the first minute</td>
-								<td className = "hr_table_style_rows">{this.state.No_beats_recovered}</td>
-			          	    </tr>
-			          	    </tbody>
-		          	    </table> 
-		          	   
-	          	   </div>
-          	  </div>
-          	}
+	            	<Heartrate_Data  hrr={{"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
+								"Did_heartrate_reach_99":this.state.Did_heartrate_reach_99,
+								"time_99":this.state.time_99,
+								"HRR_start_beat":this.state.HRR_start_beat,
+								"lowest_hrr_1min":this.state.lowest_hrr_1min,
+								"No_beats_recovered":this.state.No_beats_recovered}}
+								selectedDate = {this.state.selectedDate}/>
+          		}
 
           	{this.state.Did_you_measure_HRR == "yes" &&
           	  <div className = "row justify-content-center hr_table_padd">
@@ -447,7 +353,6 @@ class HeartRateCal extends Component{
           	}
           	
           	{this.renderHrrSelectedDateFetchOverlay()}
-          	 {/*<div>{this.sampleSum()}</div>*/} 
   		</div>
   		);
     }
