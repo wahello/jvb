@@ -341,7 +341,6 @@ transformActivity(activity){
     onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
         userDailyInputRecentFetch(this.state.selected_date,this.onFetchRecentSuccess,this.onFetchFailure);
-        fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
       }
       else {
 
@@ -658,11 +657,13 @@ transformActivity(activity){
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
           fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+          fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
-        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         this.onFetchFailure(data)
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+        fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
       }
     }
 
