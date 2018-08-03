@@ -132,7 +132,7 @@ class Dashboard extends Component {
 							 <h3 id="link_style">Dashboards</h3>
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
-				  		 	  <Link to='/hrr_summary_dashboard'>Hrr Summary Dashboard</Link><br/>
+				  		 	  
 				  		 	  <Link to='/mcs_dashboard'>Movement Consistency Score (MCS) Dashboard</Link><br />
 				  		 	  <Link to='/weekly_workout_summary'>Weekly Workout Summary Report</Link><br/>
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
@@ -141,12 +141,16 @@ class Dashboard extends Component {
 							  {/*<Link to='/overallgrade'>Over All Grade</Link><br/>*/}
 							  {/*<Link to='/weeklygrade'>Weekly Grade</Link><br/>*/}
 							  {/*<Link to='/breakdown'>Break Down Grade</Link><br/>*/}
-							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}				 
+							  {/*<Link to='/weeklysummary'>Weekly Summary</Link><br/>*/}
+							  <h3 id="link_style">Heart Rate Recovery (HRR)</h3>
+							  <Link to='/hrr_summary_dashboard'>HRR Dashboard</Link><br/>
+							  <Link to='/hrr_recovery'>HRR Daily Summary Details</Link><br/>
+							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							  <Link to='/leaderboard'>My Rankings</Link><br/>
 							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
-							   <Link to='/hrr_recovery'>Heartrate Recovery</Link><br/>
+							   
 							   <Link to='/heartrate_zone'>Time in Heart -Rate Zones Chart</Link><br/>
 							   
 

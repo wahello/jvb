@@ -199,8 +199,6 @@ class LeaderBoard1 extends Component{
 	        fetching_lb2:false,
 	        fetching_lb3:false,
 	        fetching_lb4:false,
-		},()=>{
-			// console.log("****************************",this.state.Hrr_ranking_data);
 		});
 	}
 
@@ -770,7 +768,6 @@ class LeaderBoard1 extends Component{
 					for (let cat of category){
 						if(cat == "category"){
 							values.push(<span style = {{fontWeight:"bold"}}>{value1[cat]}</span>);
-							console.log("&&&&&&&&&&&&&&",value1[cat]);
 						}
 					}
 				}

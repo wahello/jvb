@@ -24,7 +24,8 @@ from rest_framework import status
 from django.db.models import Q
 
 from registration.models import Profile
-from user_input.models import DailyUserInputStrong
+from user_input.models import DailyUserInputStrong,\
+							  DailyUserInputEncouraged
 from garmin.models import GarminFitFiles,\
 						UserGarminDataDaily,\
 						UserGarminDataActivity,\
@@ -62,49 +63,34 @@ class UserHrrView(generics.ListCreateAPIView):
 	'''
 	permission_classes = (IsAuthenticated,)
 	serializer_class = HrrSerializer
-	def calculate_aa_data(self,aa_data):
+	def calculate_aa_data(self,aa_data,user_get,start_dt):
 		if aa_data:
 			final_query = aa_data[0]
 		else:
-			final_query = {"Did_you_measure_HRR":'',
-			"Did_heartrate_reach_99":'',
-			"time_99":None,
-			"HRR_start_beat":None,
-			"lowest_hrr_1min":None,
-			"No_beats_recovered":None,
-			"end_time_activity":None,
-			"diff_actity_hrr":None,
-			"HRR_activity_start_time":None,
-			"end_heartrate_activity":None,
-			"heart_rate_down_up":None,
-			"pure_1min_heart_beats":None,
-			"pure_time_99":None,
-			"no_fitfile_hrr_reach_99":'',
-			"no_fitfile_hrr_time_reach_99":None,
-			"time_heart_rate_reached_99":None,
-			"lowest_hrr_no_fitfile":None,
-			"no_file_beats_recovered":None,
-			"offset":None,
-			}
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = hrr_data(user_get,start_date)
+			if final_query.get('Did_you_measure_HRR'):
+				try:
+					user_hrr = Hrr.objects.get(
+						user_hrr=user_get, created_at=start_date)
+					update_hrr_instance(user_hrr, final_query)
+				except Hrr.DoesNotExist:
+					create_hrr_instance(user_get, final_query, start_date)
 		return final_query
 
 	def get(self,request,format="json"):
-		aa_data = self.calculate_aa_data(self.get_queryset())
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
 		return Response(aa_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
 		user = self.request.user
-
-		# end_dt = self.request.query_params.get('to',None)
 		start_dt = self.request.query_params.get('start_date', None)
-
 		if start_dt:
-			# queryset = Hrr.objects.filter(Q(created_at__gte=start_dt)&
-			# 				  Q(created_at__lte=end_dt),
-			# 				  user_hrr=user)
 			queryset = Hrr.objects.filter(created_at=start_dt,
 							  user_hrr=user).values()
-			
 		else:
 			queryset = Hrr.objects.all()
 		return queryset
@@ -176,7 +162,6 @@ def fitfile_parse(obj,offset,start_date_str):
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
 
-		
 	to_timestamp = []
 	for i,k in enumerate(timestamp_selected_date):
 		dtt = k.timetuple()
@@ -199,7 +184,8 @@ def fitfile_parse(obj,offset,start_date_str):
 		if (k <= 200) and (k >= 0):
 			final_heartrate.extend([i])
 			final_timestamp.extend([k]) 
-
+	# final_parsed_data = dict(zip(to_timestamp,final_heartrate))
+	# print(final_parsed_data,"dicttttttttttttttttttttttttttttttttttttttt")
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def update_helper(instance,data_dict):
@@ -1131,6 +1117,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 
 	Return:None
 	'''
+	print("HRR A/A low high got started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1138,6 +1125,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
 		if data:
+			print("HRR A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
 					user_aa=user, created_at=current_date)
@@ -1145,6 +1133,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 			except AaCalculations.DoesNotExist:
 				create_aa_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
+	print("HRR A/A low high finished")
 	return None
 
 
@@ -1380,7 +1369,6 @@ def hrr_data(user,start_date):
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
 		user_input__user = user).order_by('-user_input__created_at')
-
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
 	
@@ -1388,6 +1376,9 @@ def hrr_data(user,start_date):
 	if activity_files:
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
+		# start_times_seconds = one_activity_file_dict['startTimeInSeconds']
+		# duration_seconds = one_activity_file_dict['durationInSeconds']
+		# end_times_seconds = start_times_seconds+offset+duration_seconds
 	
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
@@ -1400,6 +1391,7 @@ def hrr_data(user,start_date):
 	count = 0
 	id_act = 0
 	activities = []
+	workout_id = []
 	if user_input_strong:
 		for tmp in user_input_strong:
 			sn = tmp.activities
@@ -1412,6 +1404,9 @@ def hrr_data(user,start_date):
 						id_act = int(di[i]['summaryId'])
 						count = count + 1
 						activities.append(di[i])
+					else:
+						workout_id.append(int(di[i]['summaryId']))
+
 	
 	start_date_timestamp = start_date_timestamp
 	garmin_data_daily = UserGarminDataDaily.objects.filter(user=user,start_time_in_seconds=start_date_timestamp).last()
@@ -1439,9 +1434,10 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = int(meta['activityIds'][0])
+				# print(type())
 				if id_act == data_id:
 					hrr.append(tmp)
-				else:
+				elif data_id in workout_id:
 					workout.append(tmp)
 		else:
 			for tmp in a1:
@@ -1454,9 +1450,16 @@ def hrr_data(user,start_date):
 					hrr.append(tmp)
 	except:
 		logging.exception("message")
+	all_activities_heartrate = []
+	all_activities_timestamp = []
+	all_activities_timestamp_raw = []
 	if workout:
-		workout_data = fitfile_parse(workout,offset,start_date_str)
-		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+		for single_fitfiles in a1:
+			workout_activities = fitfile_parse([single_fitfiles],offset,start_date_str)
+			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
+			all_activities_heartrate.extend(workout_final_heartrate)
+			all_activities_timestamp.extend(workout_final_timestamp)
+			all_activities_timestamp_raw.extend(workout_timestamp)
 	else:
 		workout_final_heartrate = ''
 		workout_final_timestamp = ''
@@ -1467,6 +1470,8 @@ def hrr_data(user,start_date):
 	if hrr and workout:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
+		# print(hrr_final_heartrate,"hrr final data")
+		# print(hrr_timestamp,"timestampppp")
 		hrr_difference = hrr_final_heartrate[0]-hrr_final_heartrate[-1]
 		if (hrr_difference > 10) or activities:
 			Did_you_measure_HRR = 'yes'
@@ -1474,21 +1479,25 @@ def hrr_data(user,start_date):
 			workout_time_before_hrrfile = []
 			workout_timestamp_before_hrrfile = []
 
-			for i,k,j in zip(workout_final_heartrate,workout_final_timestamp,workout_timestamp):
-				if j < hrr_timestamp[1]:
-					workout_hrr_before_hrrfile.append(i)
-					workout_time_before_hrrfile.append(k)
-					workout_timestamp_before_hrrfile.append(j)
+			for heart_rate,timestamp_diff,time_stamp in zip(
+			all_activities_heartrate,all_activities_timestamp,all_activities_timestamp_raw):
+				if time_stamp < hrr_timestamp[1]:
+					workout_hrr_before_hrrfile.append(heart_rate)
+					workout_time_before_hrrfile.append(timestamp_diff)
+					workout_timestamp_before_hrrfile.append(time_stamp)
+
 			dict_timestamp_heart = dict(zip(
 				workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
 			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
 			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
 			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
+			# print(timestamp_before_hrrfile[-2],"timestamp_before_hrrfile")
+			# print(heartrate_before_hrrfile[-2],"heartrate_before_hrrfile")
 			time_toreach_99 = []
-			for i,k in zip(hrr_final_heartrate,hrr_final_timestamp):
-				if i >= 99:
-					time_toreach_99.append(k)
-				if(i == 99) or (i < 99):
+			for heartrate_hrr,timestamp_hrr in zip(hrr_final_heartrate,hrr_final_timestamp):
+				if heartrate_hrr >= 99:
+					time_toreach_99.append(timestamp_hrr)
+				if(heartrate_hrr == 99) or (heartrate_hrr < 99):
 					break
 						
 			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
@@ -1526,7 +1535,8 @@ def hrr_data(user,start_date):
 				no_workouts = len(workout)
 			else:
 				no_workouts = 1
-			end_time_activity = timestamp_before_hrrfile[-no_workouts]-(offset)
+			end_time_activity = timestamp_before_hrrfile[-no_workouts]
+			end_time_activity =  end_time_activity - (offset) -1 
 			end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
 			diff_actity_hrr= HRR_activity_start_time - end_time_activity
 			
@@ -1563,20 +1573,6 @@ def hrr_data(user,start_date):
 			
 			if Did_heartrate_reach_99 == 'no':
 				pure_time_99 = None
-
-			# end_time_activity = workout_timestamp[-1]-(offset)
-			# end_heartrate_activity  = workout_final_heartrate[-1]
-			# daily_diff = end_time_activity - daily_starttime
-			# daily_activty_end = daily_diff % 15
-			# if daily_activty_end != 0:
-			# 	daily_diff = daily_diff + (15 - daily_activty_end)
-			# else:
-			# 	pass
-			# if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-			# 	daily_diff1 = str(int(daily_diff))
-			# 	data_end_activity = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff1,None)
-			# if data_end_activity:
-			# 	end_heartrate_activity = data_end_activity
 
 	else:
 		Did_you_measure_HRR = 'no'
@@ -1642,7 +1638,7 @@ def hrr_data(user,start_date):
 			time_heart_rate_reached_99 = None
 
 	if (hrr and (Did_you_measure_HRR == 'yes' or
-		Did_you_measure_HRR == 'no') and garmin_data_daily):
+		Did_you_measure_HRR == 'no')):
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
 				"Did_heartrate_reach_99":Did_heartrate_reach_99,
 				"time_99":time_99,
@@ -1747,6 +1743,29 @@ def hrr_calculations(request):
 			create_hrr_instance(request.user, data, start_date)
 	return JsonResponse(data)	
 
+def update_data_as_per_userinput_form(user,data,current_date):
+	'''
+		Take user input form data and update to calculated values
+	'''
+	userinput_obj = DailyUserInputEncouraged.objects.filter(
+		user_input__user=user,user_input__created_at=current_date)
+	for single_obj in userinput_obj:
+		time_99 = single_obj.time_to_99
+		hr_down_99 = single_obj.hr_down_99
+		hr_level = single_obj.hr_level
+		lowest_hr_first_minute = single_obj.lowest_hr_first_minute
+		if time_99:
+			min,sec = time_99.split(':')
+			time_99_convert = (float(sec))+(float(min)*60)
+			data["time_99"] = time_99_convert
+		if hr_down_99:
+			data["Did_heartrate_reach_99"] = hr_down_99
+		if hr_level:
+			data['HRR_start_beat'] =  float(hr_level)
+		if lowest_hr_first_minute:
+			data['lowest_hrr_1min'] =  float(lowest_hr_first_minute)
+
+	return data
 
 def store_hhr(user,from_date,to_date):
 	'''
@@ -1759,18 +1778,24 @@ def store_hhr(user,from_date,to_date):
 
 	Return:None
 	'''
+	print("HRR calculations got started",user.username)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
 	while (current_date >= from_date_obj):
 		data = hrr_data(user,current_date)
 		if data.get('Did_you_measure_HRR'):
+			data = update_data_as_per_userinput_form(user,data,current_date)
+			print("HRR calculations creating")
 			try:
 				user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
 				update_hrr_instance(user_hrr, data)
 			except Hrr.DoesNotExist:
 				create_hrr_instance(user, data, current_date)
+		else:
+			print("NO HRR")
 		current_date -= timedelta(days=1)
+	print("HRR calculations got finished")
 	return None
 
 
@@ -1950,10 +1975,16 @@ def weekly_workout_summary(request):
 	'''
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	complete_data = weekly_workout_helper(request.user,start_date)
+
+	return JsonResponse(complete_data)
+
+def weekly_workout_helper(user,start_date):
+
 	week_start_date,week_end_date = week_date(start_date)
 	print("start date",week_start_date,"end date",week_end_date)
 	weekly_workouts_query = get_weekly_workouts(
-		request.user,week_start_date,week_end_date)
+		user,week_start_date,week_end_date)
 
 	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
 	if weekly_workout:
@@ -1963,7 +1994,7 @@ def weekly_workout_summary(request):
 		final_workout_data = ''
 		workout_summary_id = ''
 	weekly_aa_query = get_weekly_aa(
-		request.user,week_start_date,week_end_date)
+		user,week_start_date,week_end_date)
 	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
 	if weekly_aa:
 		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
@@ -1984,4 +2015,4 @@ def weekly_workout_summary(request):
 	else:
 		data_v2 = {}
 
-	return JsonResponse(data_v2)
+	return data_v2
