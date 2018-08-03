@@ -122,6 +122,101 @@ class UserHrrViewRawData(generics.ListCreateAPIView):
 
 		return queryset
 
+
+class UserAA(generics.ListCreateAPIView):
+	'''
+		- Create the AA instance
+		- List all the AA instance
+		- If query parameters "from" is provided
+		  then filter the AA data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = aa_data(user_get,start_date)
+			if final_query.get('total_time'):
+				try:
+					user_aa = AA.objects.get(
+					user=user_get, created_at=start_date)
+					aa_update_instance(user_aa, final_query)
+				except AA.DoesNotExist:
+					aa_create_instance(user_get, final_query, start_date)
+		return final_query
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
+		return Response(aa_data, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+
+		start_dt = self.request.query_params.get('start_date', None)
+
+		if start_dt:
+			queryset = AA.objects.filter(created_at=start_dt,
+							  user=user).values()
+		else:
+			queryset = AA.objects.all()
+		return queryset
+
+class UserAA_workout(generics.ListCreateAPIView):
+	'''
+		- Create the AA_workout instance
+		- List all the AA_workout instance
+		- If query parameters "from" is provided
+		  then filter the AA_workout data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = aa_workout_data(user_get,start_date)
+			if final_query:
+				try:
+					user_obj = AaWorkoutCalculations.objects.get(
+					user_aa_workout=user_get, created_at=start_date)
+					user_obj.data = final_query
+					user_obj.save()
+				except AaWorkoutCalculations.DoesNotExist:
+					create_workout_instance(user_get, final_query, start_date)
+			else:
+				final_query = {}
+		return final_query
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_workout_data = self.calculate_aa_data(querset,user_get,start_dt)
+
+		if aa_workout_data.get('data'):
+			aa_workout_data_json = ast.literal_eval(aa_workout_data.get('data'))
+			return Response(aa_workout_data_json, status=status.HTTP_200_OK)
+		else:
+			return Response(aa_workout_data, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		if start_dt:
+			queryset = AaWorkoutCalculations.objects.filter(created_at=start_dt,
+							  user_aa_workout=user).values()
+		else:
+			queryset = AaWorkoutCalculations.objects.all()
+		return queryset
+
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
 	heartrate_complete = []
@@ -184,8 +279,6 @@ def fitfile_parse(obj,offset,start_date_str):
 		if (k <= 200) and (k >= 0):
 			final_heartrate.extend([i])
 			final_timestamp.extend([k]) 
-	# final_parsed_data = dict(zip(to_timestamp,final_heartrate))
-	# print(final_parsed_data,"dicttttttttttttttttttttttttttttttttttttttt")
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def update_helper(instance,data_dict):
@@ -332,35 +425,6 @@ def aa_data(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)
-			# for i,k in enumerate(activity_files):
-			# 	activity_files_dict = ast.literal_eval(activity_files[i])
-			# 	if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",None) <= 1200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-			# 		if activity_files_dict.get("summaryId") in ui_data_keys:
-			# 			workout.append(tmp)
-			# 		else:
-			# 			hrr.append(tmp)
-			# 	elif activity_files_dict.get("summaryId") in ui_data_keys:
-			# 		workout.append(tmp)
-			# for i,k in enumerate(activity_files):
-			# 	activity_files_dict = ast.literal_eval(activity_files[i])
-			# 	if activity_files_dict.get("summaryId") in ui_data_keys:
-			# 		print(activity_files_dict.get("summaryId"),'qqqqqqqqq')
-			# 		workout.append(tmp)
-			# 	else:
-			# 		hrr.append(tmp)
-
-	# if a1:
-	# 	for tmp in a1:
-	# 		meta = tmp.meta_data_fitfile
-	# 		meta = ast.literal_eval(meta)
-	# 		data_id = int(meta['activityIds'][0])
-	# 		if data_id == id_act:
-	# 			hrr.append(tmp) # getting only hrr files
-	# 		else:
-	# 			workout.append(tmp)
-
-	# if activities:
-	# 	offset =  activities[0]['startTimeOffsetInSeconds']
 
 	profile = Profile.objects.filter(user=user)
 	for tmp_profile in profile:
@@ -488,6 +552,7 @@ def aa_create_instance(user, data, start_date):
 	created_at = start_date
 	AA.objects.create(user = user,created_at = created_at,**data)
 
+
 def aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
@@ -606,25 +671,6 @@ def aa_workout_data(user,start_date):
 					else:
 						hrr.append(filtered_activities_files[i])
 
-
-		# if filtered_activities_files:
-		# 	for tmp in a1:
-		# 		meta = tmp.meta_data_fitfile
-		# 		meta = ast.literal_eval(meta)
-		# 		data_id = meta['activityIds'][0]
-		# 		act_id.append(str(data_id))
-		# 		for i,k in enumerate(filtered_activities_files):
-		# 			if (filtered_activities_files[i].get("summaryId") == str(data_id) and 
-		# 				filtered_activities_files[i].get("durationInSeconds",0) <= 1200 and 
-		# 				filtered_activities_files[i].get("distanceInMeters",0) <200) or (filtered_activities_files[i].get("activityType") =="HEART_RATE_RECOVERY"):
-		# 				hrr.append(filtered_activities_files[i])
-		# 			elif filtered_activities_files[i].get("summaryId") == str(data_id):
-		# 				workout.append(filtered_activities_files[i])
-		# 	for x in filtered_activities_files:
-		# 		if (x.get("summaryId") not in act_id and 
-		# 		    x.get("activityType") != "HEART_RATE_RECOVERY"):
-		# 			workout.append(x)
-		# print(workout,"workout")
 		data={"date":"",
 			  "workout_type":"",
 			  "duration":"",
