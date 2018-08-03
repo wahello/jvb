@@ -60,7 +60,7 @@ class MCS_Dashboard extends Component{
     	let last_synced;
     	if(_.isEmpty(data.data))
     		last_synced = null
-    	else
+    	else                        
     		 last_synced = data.data.last_synced;
     	this.setState({
     		last_synced:last_synced,
@@ -418,8 +418,8 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="mcs-dashboard" style={{background:'red',color:'white'}}>Inactive Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'rgb(255,0,255)',color:'white'}}>Strength Hours</th>
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
-								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet</th>
-								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone</th>
+								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet Hours</th>
+								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Hours</th>
 		          	    	</tr>
 		          	    	<tbody>
 		          	    		{this.renderTablestatus(this.state.mc_data)}
