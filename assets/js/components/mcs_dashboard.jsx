@@ -432,6 +432,7 @@ class MCS_Dashboard extends Component{
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Inactive Hours (MCS Score) = # of hours a day with 300 steps or less when a user is not sleeping</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Strength Hours = Hours user recorded strength exercises</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
+			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Hours = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
 		       </div>
 		   
 	     </div>
