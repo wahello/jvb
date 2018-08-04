@@ -56,6 +56,56 @@ def _str_duration_to_dt(dobj,str_duration):
 		return datetime.combine(dobj.date(),time(hour,minute))
 	return None
 
+def _get_lst(lst,i,default = None):
+	""" get method for list similar to dictionary's get method """
+	try:
+		return lst[i];
+	except IndexError:
+		return default
+	except TypeError:
+		return default
+
+def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss"):
+	'''
+		Expect duration in this format - "hh:mm:ss"
+		convert in into hours, min or sec
+		
+		Arguments
+		- str_duration : type String, time in format 'hh:mm:ss'
+
+		- time_format: type String, possible values are [hour, minute, seconds]
+		  specified in what format time to be converted
+		  
+		- time_pattern: type String, possible values are substring of "hh:mm:ss"
+		  specify the position of hour, minute and second in the str_duration
+
+	'''
+	if str_duration:
+		hms = str_duration.split(":")
+		pattern_lst = time_pattern.split(":")
+		pattern_indexed = {
+			"hour":pattern_lst.index("hh") if "hh" in pattern_lst else None,
+			"minute":pattern_lst.index("mm") if "mm" in pattern_lst else None,
+			"second":pattern_lst.index("ss") if "ss" in pattern_lst else None
+		}
+
+		h = int(_get_lst(hms,pattern_indexed["hour"],0))\
+			if _get_lst(hms,pattern_indexed["hour"],0) else 0
+		m = int(_get_lst(hms,pattern_indexed["minute"],0))\
+			if _get_lst(hms,pattern_indexed["minute"],0) else 0
+		s = int(_get_lst(hms,pattern_indexed["second"],0))\
+			if _get_lst(hms,pattern_indexed["second"],0) else 0
+
+		t = 0
+		if time_format == 'hour':
+			t = h + (m/60) + (s/3600)
+		elif time_format == 'minute':
+			t = (h*60) + m + (s/60)
+		else:
+			t = (h * 3600) + (m * 60) + s
+		return round(t,3)
+	return 0
+
 def sec_to_hours_min_sec(seconds,include_sec = True):
 	seconds = int(seconds)
 	m,s = divmod(seconds,60)
@@ -1998,6 +2048,25 @@ def did_workout_today(have_activities,user_did_workout):
 	else:
 		return ""
 
+def get_user_input_total_sleep(todays_daily_strong,daily_optional):
+	'''
+	Calculate total sleep duration as per user input. This includes
+	duration of Sleep last night and any nap user took.
+	'''
+	sleep_duration = safe_get(
+		todays_daily_strong,"sleep_time_excluding_awake_time","00:00")
+	sleep_duration = _str_to_hours_min_sec(
+		sleep_duration,time_format='seconds',time_pattern="hh:mm")
+	nap_duration = safe_get(
+		daily_optional,"nap_duration","00:00")
+	nap_duration = _str_to_hours_min_sec(
+		nap_duration,time_format='seconds',time_pattern="hh:mm")
+	total_duration_in_seconds = sleep_duration + nap_duration
+	
+	if total_duration_in_seconds:
+		return sec_to_hours_min_sec(total_duration_in_seconds,include_sec = False)
+	return None
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -2207,7 +2276,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Sleeps
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)
 		user_input_awake_time = safe_get(todays_daily_strong,"sleep_awake_time",None)
-		user_input_sleep_duration = safe_get(todays_daily_strong,"sleep_time_excluding_awake_time",None)
+		user_input_sleep_duration = get_user_input_total_sleep(
+			todays_daily_strong,daily_optional)
 		user_input_timezone = todays_user_input.timezone if todays_user_input else None
 		
 		sleep_stats = get_sleep_stats(current_date,sleeps_json,sleeps_today_json,
@@ -2224,8 +2294,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
-		sleeps_calculated_data['sleep_per_user_input'] = safe_get(todays_daily_strong,
-														'sleep_time_excluding_awake_time','')
+		sleeps_calculated_data['sleep_per_user_input'] = (user_input_sleep_duration 
+			if user_input_sleep_duration else "")
 		comment = safe_get(todays_daily_strong,"sleep_comment",'')
 		sleeps_calculated_data['sleep_comments'] = comment if comment else ''
 
