@@ -34,6 +34,7 @@ from quicklook.models import UserQuickLook,\
 					Alcohol
 
 from quicklook.serializers import UserQuickLookSerializer
+# from user_input.views.garmin_views import _get_activities
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -637,6 +638,44 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 			sleep_stats['sleep_awake_time'] = None
 
 	return sleep_stats
+
+def is_potential_hrr_activity(activity):
+	'''
+	Check if activity is potential HRR file or not. 
+	Any activity is potential HRR if it's not actually "HRR"
+	file but is meeting following conditions - 
+
+	1) Duration in seconds is greator than or equal to 1200 seconds
+	2) Distance in meters is greator than or equal to 1287.48 (0.8 miles) 
+	'''
+	if(activity 
+		and activity.get('activityType') != "HEART_RATE_RECOVERY"
+		and activity.get("durationInSeconds",0) <= 1200
+		and activity.get("distanceInMeters",0) <= 1287.48):
+		return True
+	return False
+
+def rename_activities_to_hrr(activities,user,calendar_date):
+	any_potential_hrr = False
+	for activity in activities:
+		if not any_potential_hrr and is_potential_hrr_activity(activity):
+			any_potential_hrr = True
+			break
+	# if any_potential_hrr:
+	# 	try:
+	# 		# call the FIT parser function and get the renamed activities
+	# 		renamed_activities = _get_activities(user,calendar_date)
+	# 	except Exception as e:
+	# 		renamed_activities = None
+
+	# 	if renamed_activities:	
+	# 		for activity in activities:
+	# 			renamed_act = renamed_activities.get(activity.get('summaryId'),None)
+	# 			if(renamed_act 
+	# 				and renamed_act.get('activityType') == 'HEART_RATE_RECOVERY'):
+	# 				activity['activityType'] = 'HEART_RATE_RECOVERY'
+
+	return activities
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
 
