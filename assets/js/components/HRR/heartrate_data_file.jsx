@@ -9,24 +9,36 @@ import moment from 'moment';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
+        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
 
 class Heartrate_Data extends Component{
 	constructor(props){
 		    super(props);
 		    let Did_you_measure_HRR = this.props.hrr.Did_you_measure_HRR;
 		    let Did_heartrate_reach_99 = this.props.hrr.Did_heartrate_reach_99;
-		    let time_99 = this.props.hrr.time_99;
+		    let time_99 = this.renderSecToMin(this.props.hrr.time_99);
 		    let time_99_time = time_99.split(":");
 		    let time_99_min = time_99_time[0];
 		    let time_99_sec = time_99_time[1];
+		    let HRR_start_beat1= this.props.hrr.HRR_start_beat;
+		    let lowest_hrr_1min1 = this.props.hrr.lowest_hrr_1min;
+		    let No_beats_recovered = this.props.hrr.No_beats_recovered;
 		    this.state = {
 		    	editable:false,
 		    	editable_hrr_99_beats:false,
+		    	editable_time_99:false,
+		    	editable_HRR_start_beat:false,
+		    	editable_lowest_hrr_1min:false,
+		    	editable_no_beats:false,
 		    	Did_you_measure_HRR:Did_you_measure_HRR,
 		    	Did_heartrate_reach_99:Did_heartrate_reach_99,
+		    	time_99:"",
+		    	HRR_start_beat:HRR_start_beat1,
+		    	lowest_hrr_1min:lowest_hrr_1min1,
+		    	No_beats_recovered:No_beats_recovered,
 		    	time_99_min:time_99_min,
 		    	time_99_sec:time_99_sec,
+
 		    };
 		    this.captilizeYes = this.captilizeYes.bind(this);
 		    this.editToggleDidyouWorkout = this.editToggleDidyouWorkout.bind(this);
@@ -34,6 +46,12 @@ class Heartrate_Data extends Component{
 		    this.renderSecToMin = this.renderSecToMin.bind(this);
 		    this.editToggleHrr99Beats = this.editToggleHrr99Beats.bind(this);
 		    this.createSleepDropdown = this.createSleepDropdown.bind(this);
+		    this.editToggletime99 = this.editToggletime99.bind(this);
+		    this.renderTime99 = this.renderTime99.bind(this);
+		    this.editToggleHrrStartBeat = this.editToggleHrrStartBeat.bind(this);
+		    this.editToggleLowestHrr1min = this.editToggleLowestHrr1min.bind(this);
+		    this.editToggleNoBeats = this.editToggleNoBeats.bind(this);
+		    this.updateData = this.updateData.bind(this);
 		}
 		editToggleDidyouWorkout(){
 	  		this.setState({
@@ -54,6 +72,43 @@ class Heartrate_Data extends Component{
 	  		this.setState({
 	  			editable_hrr_99_beats:!this.state.editable_hrr_99_beats
 	  		});
+  		}
+  		editToggletime99(){
+	  		this.setState({
+	  			editable_time_99:!this.state.editable_time_99
+	  		});
+  		}
+  		editToggleHrrStartBeat(){
+  			let beats = parseInt(this.state.HRR_start_beat);
+  			let beats1 = parseInt(this.state.lowest_hrr_1min);
+ 			let diff = beats - beats1;
+	  		this.setState({
+	  			editable_HRR_start_beat:!this.state.editable_HRR_start_beat,
+	  			No_beats_recovered:diff
+	  		});
+  		}
+  		editToggleLowestHrr1min(){
+  			let beats = parseInt(this.state.HRR_start_beat);
+  			let beats1 = parseInt(this.state.lowest_hrr_1min);
+ 			let diff = beats - beats1;
+	  		this.setState({
+	  			editable_lowest_hrr_1min:!this.state.editable_lowest_hrr_1min,
+	  			No_beats_recovered:diff
+	  		});
+  		}
+  		editToggleNoBeats(){
+	  		this.setState({
+	  			editable_no_beats:!this.state.editable_no_beats,
+	  		});
+  		}
+  		renderTime99(){
+  			let mins = parseInt(this.state.time_99_min) * 60;
+  			let sec = parseInt(this.state.time_99_sec);
+  			let time = mins + sec;
+  			this.setState({
+  				time_99:time,
+  				editable_time_99:!this.state.editable_time_99
+  			});	
   		}
 		captilizeYes(value){
 			let cpatilize;
@@ -87,8 +142,23 @@ class Heartrate_Data extends Component{
 		  	}
 	  		return time;
   		}
+  		updateData(){
+  			let mins = parseInt(this.state.time_99_min) * 60;
+  			let sec = parseInt(this.state.time_99_sec);
+  			let time = mins + sec;
+  			let data = {
+  				Did_you_measure_HRR:this.state.Did_you_measure_HRR,
+		    	Did_heartrate_reach_99:this.state.Did_heartrate_reach_99,
+		    	time_99:time,
+		    	HRR_start_beat:this.state.HRR_start_beat,
+		    	lowest_hrr_1min:this.state.lowest_hrr_1min,
+		    	No_beats_recovered:this.state.No_beats_recovered,
+		    };
+		    this.props.renderHrrData(data);
+  			
+  		}
 	render(){
-		return(
+		return(<div>
 				<div className = "row justify-content-center hr_table_padd">
 	          	    <div className = "table table-responsive">
 		          	    <table className = "table table-striped table-bordered ">
@@ -147,54 +217,123 @@ class Heartrate_Data extends Component{
 			          	    <tr className = "hr_table_style_rows">
 				          	    <td className = "hr_table_style_rows">Duration (mm:ss) for Heart Rate Time to Reach 99</td>
 				          	    <td className = "hr_table_style_rows">
-				          	    {this.state.editable_hrr_99_beats ?
-				          	    	<span>
-					          	    	<Input
-					          	    		style = {{maxWidth:"100px"}}
-	                                        type="select"
-	                                        className="custom-select form-control" 
-	                                        name="Did_heartrate_reach_99"
-	                                        value={this.state.Did_heartrate_reach_99}                                       
-	                                        onChange={this.handleChange}
-	                                        onBlur={this.editToggleHrr99Beats}>
-	                                        {this.createSleepDropdown()}
-	                                    </Input>
-                                    </span>
-                                    <span>
-                                    	<Input
-				          	    		style = {{maxWidth:"100px"}}
-                                        type="select"
-                                        className="custom-select form-control" 
-                                        name="Did_heartrate_reach_99"
-                                        value={this.state.Did_heartrate_reach_99}                                       
-                                        onChange={this.handleChange}
-                                        onBlur={this.editToggleHrr99Beats}>
-                                        {this.createSleepDropdown()}
-                                    </Input>
-                                    </span> 
-				          	    	: this.captilizeYes(this.state.Did_heartrate_reach_99)}
-				          	    	
-				          	    {this.renderSecToMin(this.props.hrr.time_99)}</td>
+				          	    {this.state.editable_time_99 ?
+	  						<Modal isOpen={this.state.editable_time_99}  className={this.props.className}>
+	      					<ModalHeader toggle={this.editToggletime99}>Tme to 99</ModalHeader>
+	          				<ModalBody>
+	            				<div className = "row justify-content-center">
+	            				<span>
+				          	    	<Input
+				          	    	style = {{minWidth:"130px"}}
+	                                    type="select"
+	                                    className="custom-select form-control" 
+	                                    name="time_99_min"
+	                                    value={this.state.time_99_min}                                       
+	                                    onChange={this.handleChange}
+	                                    >
+	                                    {this.createSleepDropdown(0,59)}
+	                            	</Input>
+	                            </span>
+	                            <span style = {{marginLeft:"30px"}}>
+	                            	<Input
+				          	    		style = {{minWidth:"130px"}}
+			                            type="select"
+			                            className="custom-select form-control" 
+			                            name="time_99_sec"
+			                            value={this.state.time_99_sec}                                       
+			                            onChange={this.handleChange}
+			                            >
+			                            {this.createSleepDropdown(0,59,true)}
+	                            	</Input>
+	                            </span>
+	                            </div>
+	      					</ModalBody>
+	      					<ModalFooter>
+	        				<Button color="primary" onClick={this.renderTime99}>Save</Button>
+	            			<Button color="secondary" onClick={this.editToggletime99}>Cancel</Button>
+	          				</ModalFooter>
+	        				</Modal>              
+				          	    	: (this.state.time_99_min + ":" +this.state.time_99_sec)}
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggletime99}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+				          	    	</td>
 			          	    </tr>
 
 			          	    <tr className = "hr_table_style_rows">
 				          	    <td className = "hr_table_style_rows">HRR File Starting Heart Rate</td>
-								<td className = "hr_table_style_rows">{this.props.hrr.HRR_start_beat}</td>
+								<td className = "hr_table_style_rows">
+								{this.state.editable_HRR_start_beat ? 
+				          	    	<Input
+				          	    		style = {{maxWidth:"100px"}}
+                                        type="select"
+                                        className="custom-select form-control" 
+                                        name="HRR_start_beat"
+                                        value={this.state.HRR_start_beat}                                       
+                                        onChange={this.handleChange}
+                                        onBlur={this.editToggleHrrStartBeat}>
+                                        {this.createSleepDropdown(70,220)}
+                                    </Input> 
+				          	    	: this.state.HRR_start_beat}
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleHrrStartBeat}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+
+								</td>
 			          	    </tr>
 
 			          	    <tr className = "hr_table_style_rows">
 				          	    <td className = "hr_table_style_rows">Lowest Heart Rate Level in the 1st Minute</td>
-				          	    <td className = "hr_table_style_rows">{this.props.hrr.lowest_hrr_1min}</td>
+				          	    <td className = "hr_table_style_rows">
+				          	    	{this.state.editable_lowest_hrr_1min ? 
+					          	    	<Input
+					          	    		style = {{maxWidth:"100px"}}
+	                                        type="select"
+	                                        className="custom-select form-control" 
+	                                        name="lowest_hrr_1min"
+	                                        value={this.state.lowest_hrr_1min}                                       
+	                                        onChange={this.handleChange}
+	                                        onBlur={this.editToggleLowestHrr1min}>
+	                                        {this.createSleepDropdown(70,220)}
+	                                    </Input> 
+				          	    	: this.state.lowest_hrr_1min}
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleLowestHrr1min}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+								</td>
 			          	    </tr>
 
 			          	    <tr className = "hr_table_style_rows">
 				          	    <td className = "hr_table_style_rows">Number of heart beats recovered in the first minute</td>
-								<td className = "hr_table_style_rows">{this.props.hrr.No_beats_recovered}</td>
+								<td className = "hr_table_style_rows">
+								{this.state.editable_no_beats ? 
+					          	    	<Input
+					          	    		style = {{maxWidth:"100px"}}
+	                                        type="select"
+	                                        className="custom-select form-control" 
+	                                        name="No_beats_recovered"
+	                                        value={this.state.No_beats_recovered}                                       
+	                                        onChange={this.handleChange}
+	                                        onBlur={this.editToggleNoBeats}>
+	                                        {this.createSleepDropdown(0,220)}
+	                                    </Input> 
+				          	    	: this.state.No_beats_recovered}
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleNoBeats}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+                        			</td>
 			          	    </tr>
 			          	    </tbody>
-		          	    </table> 
-		          	   
+		          	    </table>		          	   		        
 	          	   </div>
+          	  </div>
+          	  	<div className = "row justify-content-center">
+          	    	<Button onClick = {this.updateData}>Update</Button>
+          	    </div>
           	  </div>
 			);
 	}
