@@ -171,7 +171,7 @@ class UserAA_workout(generics.ListCreateAPIView):
 	'''
 		- Create the AA_workout instance
 		- List all the AA_workout instance
-		- If query parameters "from" is provided
+		- If query parameters "start_date" is provided
 		  then filter the AA_workout data for provided date interval
 		  and return the list
 	'''
@@ -215,6 +215,106 @@ class UserAA_workout(generics.ListCreateAPIView):
 							  user_aa_workout=user).values()
 		else:
 			queryset = AaWorkoutCalculations.objects.all()
+		return queryset
+
+class UserAA_daily(generics.ListCreateAPIView):
+	'''
+		- Create the AA_daily instance
+		- List all the AA_daily instance
+		- If query parameters "start_date" is provided
+		  then filter the AA_daily data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = daily_aa_data(user_get,start_date)
+			if final_query:
+				try:
+					user_obj = AaCalculations.objects.get(
+					user_aa=user_get, created_at=start_date)
+					user_obj.data = final_query
+					user_obj.save()
+				except AaCalculations.DoesNotExist:
+					create_aa_instance(user_get, final_query, start_date)
+			else:
+				final_query = {}
+		return final_query
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_daily = self.calculate_aa_data(querset,user_get,start_dt)
+
+		if aa_daily.get('data'):
+			aa_daily_json = ast.literal_eval(aa_daily.get('data'))
+			return Response(aa_daily_json, status=status.HTTP_200_OK)
+		else:
+			return Response(aa_daily, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		if start_dt:
+			queryset = AaCalculations.objects.filter(created_at=start_dt,
+							  user_aa=user).values()
+		else:
+			queryset = AaCalculations.objects.all()
+		return queryset
+
+class UserAA_low_high_values(generics.ListCreateAPIView):
+	'''
+		- Create the AA_daily instance
+		- List all the AA_daily instance
+		- If query parameters "start_date" is provided
+		  then filter the AA_daily data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			final_query = aa_low_high_end_data(user_get,start_date)
+			if final_query:
+				try:
+					user_obj = TimeHeartZones.objects.get(
+					user=user_get, created_at=start_date)
+					user_obj.data = final_query
+					user_obj.save()
+				except TimeHeartZones.DoesNotExist:
+					create_heartzone_instance(user_get, final_query, start_date)
+			else:
+				final_query = {}
+		return final_query
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_low_high_values = self.calculate_aa_data(querset,user_get,start_dt)
+
+		if aa_low_high_values.get('data'):
+			aa_low_high_values_json = ast.literal_eval(aa_low_high_values.get('data'))
+			return Response(aa_low_high_values_json, status=status.HTTP_200_OK)
+		else:
+			return Response(aa_low_high_values, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		if start_dt:
+			queryset = TimeHeartZones.objects.filter(created_at=start_dt,
+							  user=user).values()
+		else:
+			queryset = TimeHeartZones.objects.all()
 		return queryset
 
 # Parse the fit files and return the heart beat and timstamp
@@ -563,7 +663,37 @@ def aa_calculations(request):
 			aa_update_instance(user_aa, data)
 		except AA.DoesNotExist:
 			aa_create_instance(request.user, data, start_date)
-	return JsonResponse(data)	
+	return JsonResponse(data)
+
+def store_aa_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the AA calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	print("AA calculations got started",user.username)
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		data = aa_data(user,current_date)
+		if data.get('total_time'):
+			print("AA calculations creating")
+			try:
+				user_aa = AA.objects.get(user=user, created_at=current_date)
+				aa_update_instance(user_aa, data)
+			except AA.DoesNotExist:
+				aa_create_instance(user, data, current_date)
+		else:
+			print("NO AA")
+		current_date -= timedelta(days=1)
+	print("HRR calculations got finished")
+	return None
 
 def aa_workout_data(user,start_date):
 	data_aa_check = aa_data(user,start_date)
@@ -791,6 +921,37 @@ def aa_workout_calculations(request):
 			create_workout_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
+def store_aa_workout_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the Daily A/A
+	workout calculations then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	print("HRR A/A Workout started")
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		data = aa_workout_data(user,current_date)
+		# data = json.dumps(data)
+		if data:
+			print("HRR A/A workout")
+			try:
+				user_obj = AaWorkoutCalculations.objects.get(
+					user_aa_workout=user, created_at=current_date)
+				user_obj.data = data
+				user_obj.save()
+			except AaWorkoutCalculations.DoesNotExist:
+				create_workout_instance(user, data, current_date)
+		current_date -= timedelta(days=1)
+	print("HRR A/A workout finished")
+	return None
+
 
 def daily_aa_data(user, start_date):
 	avg_heart_rate = 0.0
@@ -960,36 +1121,6 @@ def daily_aa_data(user, start_date):
 	except:
 		logging.exception("message")
 	profile = Profile.objects.filter(user=user)
-# =======
-	# a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-	# if a1:
-	# 	for tmp in a1:
-	# 		meta = tmp.meta_data_fitfile
-	# 		meta = ast.literal_eval(meta)
-	# 		data_id = meta['activityIds'][0]
-	# 		if activity_files_qs:
-	# 			for i,k in enumerate(activity_files):
-	# 				activity_files_dict = ast.literal_eval(activity_files[i])
-	# 				if ((activity_files_dict.get("summaryId",None) == str(data_id)) and (activity_files_dict.get("durationInSeconds",0) <= 200) and (activity_files_dict.get("distanceInMeters",0) <= 200.00)):
-	# 					hrr.append(tmp)
-	# 				elif activity_files_dict.get("summaryId",None) == str(data_id):
-	# 					duration = activity_files_dict.get('durationInSeconds')
-	# 					activities_duration.append(duration)
-	# 					workout.append(tmp)
-	# 					average_heartrate = activity_files_dict.get("averageHeartRateInBeatsPerMinute",0)
-	# 					avg_hrr_list.append(average_heartrate)
-	# 					maximum_heartrate =  activity_files_dict.get('maxHeartRateInBeatsPerMinute',0)
-	# 					max_hrr_list.append(maximum_heartrate)
-	# 					data_summaryid.append(data_id)
-	# 					if "averageHeartRateInBeatsPerMinute" in activity_files_dict.keys():
-	# 						if activity_files_dict.get("averageHeartRateInBeatsPerMinute",0) == 0 or "" :
-	# 							hrr_not_recorded = activity_files_dict.get('durationInSeconds')
-	# 							hrr_not_recorded_list.append(hrr_not_recorded)
-	# 						else:
-	# 							hrr_not_recorded_list.append(0)
-	# 					else:
-	# 						hrr_not_recorded = activity_files_dict.get('durationInSeconds')
-	# 						hrr_not_recorded_list.append(hrr_not_recorded)
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
 			try:
@@ -1163,7 +1294,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 
 	Return:None
 	'''
-	print("HRR A/A low high got started")
+	print("A/A dailies got started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1171,7 +1302,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
 		if data:
-			print("HRR A/A low high creating")
+			print("A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
 					user_aa=user, created_at=current_date)
@@ -1179,7 +1310,7 @@ def store_daily_aa_calculations(user,from_date,to_date):
 			except AaCalculations.DoesNotExist:
 				create_aa_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
-	print("HRR A/A low high finished")
+	print("A/A dailes finished")
 	return None
 
 
@@ -1843,9 +1974,6 @@ def store_hhr(user,from_date,to_date):
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
 	return None
-
-
-
 
 class UserheartzoneView(APIView):
 

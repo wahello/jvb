@@ -8,10 +8,10 @@ urlpatterns = [
 	#							  name="aa"),
 	#url(r'^aa_workout_calculations$',views.aa_workout_calculations,
 	#							  name="aa_workout"),
-	url(r'^daily_aa_calculations$',views.daily_aa_calculations,
-								  name="daily_aa"),
-	url(r'^aa_low_high_calculations$',views.aa_low_high_end_calculations,
-									name="aa_classification chart"),	
+	#url(r'^daily_aa_calculations$',views.daily_aa_calculations,
+	#							  name="daily_aa"),
+	#url(r'^aa_low_high_calculations$',views.aa_low_high_end_calculations,
+	#								name="aa_classification chart"),	
 	url(r'^user/weekly_aa_data$',views.UserAaView.as_view(),name="weekly_aa_api"),
 	url(r'^user/heartzone_data$',views.UserheartzoneView.as_view(),name="hearzone_api"),
 
@@ -25,5 +25,9 @@ urlpatterns = [
 	url(r'^aa_calculations$',views.UserAA.as_view(),
 								  name="aa_database"),
 	url(r'^aa_workout_calculations$',views.UserAA_workout.as_view(),
-								  name="aa_workout_databse")
+								  name="aa_workout_databse"),
+	url(r'^daily_aa_calculations$',views.UserAA_daily.as_view(),
+								  name="daily_aa"),
+	url(r'^aa_low_high_calculations$',views.UserAA_low_high_values.as_view(),
+									name="aa_classification chart"),
 ]
