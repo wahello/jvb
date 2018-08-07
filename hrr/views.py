@@ -52,7 +52,7 @@ from hrr.calculation_helper import week_date,\
 									dynamic_activities,\
 									remove_distance_meters
 
-class UserHrrView(generics.ListCreateAPIView):
+class UserHrrView(generics.ListCreateAPIView,generics.RetrieveUpdateAPIView):
 	'''
 		- Create the Hrr instance
 		- List all the Hrr instance
@@ -118,7 +118,6 @@ class UserHrrViewRawData(generics.ListCreateAPIView):
 		  and return the list
 	'''
 	permission_classes = (IsAuthenticated,)
-	serializer_class = HrrSerializer
 
 	def get_queryset(self):
 		user = self.request.user
