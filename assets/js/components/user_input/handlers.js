@@ -129,7 +129,7 @@ export function handleChangeNapStartTime(date){
   this.setState({
     nap_start_time_date:date
     },()=>{
-    let duration = this.getTotalSleep();
+    let duration = this.getTotalNapSleep();
      if(duration)
     {  
       let hours = duration.split(":")[0];
@@ -150,7 +150,7 @@ export function handleChangeNapHoursMin(event){
   this.setState({
   [name]: value
   },()=>{
-    let duration = this.getTotalSleep();
+    let duration = this.getTotalNapSleep();
      if(duration)
     {  
       let hours = duration.split(":")[0];
@@ -168,13 +168,13 @@ export function handleChangeNapEndTime(date){
   this.setState({
       nap_end_time_date: date,
     },()=>{
-    let duration = this.getTotalSleep();
+    let duration = this.getTotalNapSleep();
     if(duration)
     {  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
       this.setState({
-         nap_duration_hour:hours,
+        nap_duration_hour:hours,
         nap_duration_min:mins
       })
     } 

@@ -161,16 +161,14 @@ class UserInputs extends React.Component{
         report_type:'quick',
 
         took_nap:'no',
-        nap_start_time_date:null,
+        //nap_start_time_date:null,
         nap_start_time_hour:"",
         nap_start_time_min:"",
         nap_start_time_am_pm:"",
-        nap_start_time:"",
-        nap_end_time_date:null,
+        //nap_end_time_date:null,
         nap_end_time_hour:"",
         nap_end_time_min:"",
         nap_end_time_am_pm:"",
-        nap_end_time:"",
         nap_duration_hour:"",
         nap_duration_min:"",
         nap_comment:"",
@@ -266,10 +264,12 @@ class UserInputs extends React.Component{
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
+      this.getTotalNapSleep = this.getTotalNapSleep.bind(this);
       this.createWindDropdown = this.createWindDropdown.bind(this)
       this.onFetchGarminSuccessActivities = this.onFetchGarminSuccessActivities.bind(this);
       this.onFetchRecentSuccessFullReport = this.onFetchRecentSuccessFullReport.bind(this);
       this.userDailyInputRecentFetch = userDailyInputRecentFetch.bind(this);
+      this.getDTMomentObj1 = this.getDTMomentObj1.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
@@ -407,6 +407,14 @@ transformActivity(activity){
         if(have_strong_input && data.data.strong_input.sleep_awake_time && canUpdateForm)
           sleep_awake_time_info = this._extractDateTimeInfo(data.data.strong_input.sleep_awake_time);
 
+        let nap_start_time_info = this._extractDurationInfo(null);
+        if(have_optional_input && data.data.optional_input.nap_start_time && canUpdateForm)
+          nap_start_time_info = this._extractDurationInfo(data.data.optional_input.nap_start_time);
+
+        let nap_end_time_info = this._extractDurationInfo(null);
+        if(have_optional_input && data.data.optional_input.nap_end_time && canUpdateForm)
+          nap_end_time_info = this._extractDurationInfo(data.data.optional_input.nap_end_time);
+
         let strength_start_info = this._extractDurationInfo(null);
         if(have_strong_input && data.data.strong_input.strength_workout_start) 
           strength_start_info = this._extractDurationInfo(data.data.strong_input.strength_workout_start);
@@ -524,7 +532,19 @@ transformActivity(activity){
           travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
           general_comment:have_optional_input?data.data.optional_input.general_comment:'',
-          took_nap:have_optional_input?data.data.optional_input.took_nap:''
+          
+          took_nap:have_optional_input?data.data.optional_input.took_nap:'',
+          //nap_start_time_date:nap_start_time_info.calendarDate,
+          nap_start_time_hour:nap_start_time_info.hour,
+          nap_start_time_min:nap_start_time_info.min,
+          nap_start_time_am_pm:nap_start_time_info.meridiem,
+          //nap_end_time_date:nap_end_time_info.calendarDate,
+          nap_end_time_hour:nap_end_time_info.hour,
+          nap_end_time_min:nap_end_time_info.min,
+          nap_end_time_am_pm:nap_end_time_info.meridiem,
+          nap_duration_hour:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[0]:'',
+          nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
+          nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
@@ -880,6 +900,23 @@ getDTMomentObj(dt,hour,min,am_pm){
   });
   return sleep_bedtime_dt;
 }
+getDTMomentObj1(hour,min,am_pm){
+  hour = hour ? parseInt(hour) : 0;
+  min = min ? parseInt(min) : 0;
+
+  if(am_pm == 'am' && hour && hour == 12){
+    hour = 0
+  }
+  if (am_pm == 'pm' && hour && hour != 12){
+    hour = hour + 12;
+  }
+  
+  let sleep_bedtime_dt = moment({ 
+    hour :hour,
+    minute :min
+  });
+  return sleep_bedtime_dt;
+}
 
 getTotalSleep(){
      let sleep_bedtime_date = this.state.sleep_bedtime_date;
@@ -910,6 +947,40 @@ getTotalSleep(){
      
      if(sleep_bedtime_dt && sleep_awake_time_dt){
        let diff = sleep_awake_time_dt.diff(sleep_bedtime_dt,'minutes')-awake_time_in_mins;
+       let hours = Math.floor(diff/60);
+       let mins = diff % 60;
+       if(mins < 10)
+         mins = `0${mins}`;
+       return hours+":"+mins;
+     }else
+       return '';
+   }
+   
+   getTotalNapSleep(){
+     //let nap_start_time_date = this.state.nap_start_time_date;
+     let nap_start_time_hour=this.state.nap_start_time_hour;
+     let nap_start_time_min=this.state.nap_start_time_min;
+     let nap_start_time_am_pm = this.state.nap_start_time_am_pm;
+     let nap_start_time_dt = null;
+     if (nap_start_time_hour
+         && nap_start_time_min && nap_start_time_am_pm){
+        nap_start_time_dt = this.getDTMomentObj1(nap_start_time_hour,
+          nap_start_time_min,nap_start_time_am_pm)
+     }
+     
+     //let nap_end_time_date = this.state.nap_end_time_date;
+     let nap_end_time_hour=this.state.nap_end_time_hour;
+     let nap_end_time_min=this.state.nap_end_time_min;
+     let nap_end_time_am_pm = this.state.nap_end_time_am_pm;
+     let nap_end_time_dt = null;
+     if (nap_end_time_hour
+         && nap_end_time_min && nap_end_time_am_pm){
+        nap_end_time_dt = this.getDTMomentObj1(nap_end_time_hour,
+          nap_end_time_min,nap_end_time_am_pm)
+     }
+   
+     if(nap_start_time_dt && nap_end_time_dt){
+       let diff = nap_end_time_dt.diff(nap_start_time_dt,'minutes');
        let hours = Math.floor(diff/60);
        let mins = diff % 60;
        if(mins < 10)
@@ -3246,7 +3317,7 @@ handleScroll() {
                             <Label className="padding">2.4.1 Nap Start Time?</Label>
                             {this.state.editable &&
                               <div className=" display_flex" >
-                              <div className="align_width align_width1">
+                              {/*<div className="align_width align_width1">
                               <div className="input ">
                                 <DatePicker
                                     id="datepicker"
@@ -3258,7 +3329,7 @@ handleScroll() {
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
-                              </div>
+                              </div>*/}
                                <div className="align_width_time align_width1 margin_tp">
                                   <div className="input "> 
                                 <Input type="select" name="nap_start_time_hour"
@@ -3303,8 +3374,8 @@ handleScroll() {
                            {
                               !this.state.editable &&
                               <div className="input">
-                              {(this.state.nap_start_time_date && this.state.nap_start_time_hour && this.state.nap_start_time_min && this.state.nap_start_time_am_pm) &&
-                                <p>{this.state.nap_start_time_date.format('MMMM Do YYYY')}, {this.state.nap_start_time_hour}:{this.state.nap_start_time_min}  {this.state.nap_start_time_am_pm}</p>
+                              {(/*this.state.nap_start_time_date &&*/ this.state.nap_start_time_hour && this.state.nap_start_time_min && this.state.nap_start_time_am_pm) &&
+                                <p>{this.state.nap_start_time_hour}:{this.state.nap_start_time_min}  {this.state.nap_start_time_am_pm}</p>
                               }
                               </div>
                             }                          
@@ -3315,7 +3386,7 @@ handleScroll() {
                             <Label className="padding">2.4.2 Nap End Time?</Label>
                             {this.state.editable &&
                               <div className=" display_flex" >
-                              <div className="align_width align_width1">
+                              {/*<div className="align_width align_width1">
                               <div className="input ">
                                 <DatePicker
                                     id="datepicker"
@@ -3327,7 +3398,7 @@ handleScroll() {
                                     shouldCloseOnSelect={false}
                                 />
                               </div>
-                              </div>
+                              </div>*/}
                                <div className="align_width_time align_width1 margin_tp">
                                   <div className="input "> 
                                 <Input type="select" name="nap_end_time_hour"
@@ -3372,8 +3443,8 @@ handleScroll() {
                            {
                               !this.state.editable &&
                               <div className="input">
-                              {(this.state.nap_end_time_date && this.state.nap_end_time_hour && this.state.nap_end_time_min && this.state.nap_end_time_am_pm) &&
-                                <p>{this.state.nap_end_time_date.format('MMMM Do YYYY')}, {this.state.nap_end_time_hour}:{this.state.nap_end_time_min}  {this.state.nap_end_time_am_pm}</p>
+                              {(this.state.nap_end_time_hour && this.state.nap_end_time_min && this.state.nap_end_time_am_pm) &&
+                                <p>{this.state.nap_end_time_hour}:{this.state.nap_end_time_min}  {this.state.nap_end_time_am_pm}</p>
                               }
                               </div>
                             }                          

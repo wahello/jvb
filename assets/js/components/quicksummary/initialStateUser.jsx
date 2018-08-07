@@ -74,7 +74,12 @@ export function getInitialStateUserInput(start_dt, end_dt){
               "sickness":'-',
               "stand_for_three_hours":'-',
               "type_of_diet_eaten":'-',
-       		  "general_comment":'-'
+       		  "general_comment":'-',
+       		  "nap_duration":"-",
+       		  "nap_start_time":"-",
+       		  "nap_end_time":"-",
+       		  "nap_comment":"-"
+
 	    }
 
 	};

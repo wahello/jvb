@@ -196,6 +196,10 @@ class MCS_Dashboard extends Component{
 	      	background = "#fdeab7";
 	      	color = 'black';
 	      }
+	       else if(status == "nap"){
+	      	background = " #107dac";
+	      	color = 'white';
+	      }
 	      else if (score >= 300){
 	        background = 'green';
 	        color = 'white';
@@ -292,7 +296,7 @@ class MCS_Dashboard extends Component{
     renderTablestatus(mc_data){
     	var td_rows = [];
         let keys = ["sleeping_hours","active_hours","inactive_hours","strength_hours",
-        	"exercise_hours","no_data_hours","timezone_change_hours"];
+        	"exercise_hours","no_data_hours","timezone_change_hours","nap_hours"];
         if(!_.isEmpty(mc_data)){
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
@@ -420,6 +424,7 @@ class MCS_Dashboard extends Component{
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
 								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet Hours</th>
 								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Hours</th>
+								<th className="mcs-dashboard" style={{background:' #107dac',color:'white'}}>Nap Hours</th>
 		          	    	</tr>
 		          	    	<tbody>
 		          	    		{this.renderTablestatus(this.state.mc_data)}
