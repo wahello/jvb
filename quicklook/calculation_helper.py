@@ -34,7 +34,7 @@ from quicklook.models import UserQuickLook,\
 					Alcohol
 
 from quicklook.serializers import UserQuickLookSerializer
-# from user_input.views.garmin_views import _get_activities
+import user_input.views.garmin_views
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -655,29 +655,31 @@ def is_potential_hrr_activity(activity):
 		return True
 	return False
 
-def rename_activities_to_hrr(activities,user,calendar_date):
+def rename_activities_to_hrr(user,calendar_date,activities):
 	any_potential_hrr = False
 	for activity in activities:
 		if not any_potential_hrr and is_potential_hrr_activity(activity):
 			any_potential_hrr = True
 			break
-	# if any_potential_hrr:
-	# 	try:
-	# 		# call the FIT parser function and get the renamed activities
-	# 		renamed_activities = _get_activities(user,calendar_date)
-	# 	except Exception as e:
-	# 		renamed_activities = None
+	if any_potential_hrr:
+		try:
+			# call the FIT parser function and get the renamed activities
+			renamed_activities = user_input.views.garmin_views._get_activities(
+				user,calendar_date)
+		except Exception as e:
+			renamed_activities = None
 
-	# 	if renamed_activities:	
-	# 		for activity in activities:
-	# 			renamed_act = renamed_activities.get(activity.get('summaryId'),None)
-	# 			if(renamed_act 
-	# 				and renamed_act.get('activityType') == 'HEART_RATE_RECOVERY'):
-	# 				activity['activityType'] = 'HEART_RATE_RECOVERY'
+		if renamed_activities:	
+			for activity in activities:
+				renamed_act = renamed_activities.get(activity.get('summaryId'),None)
+				if(renamed_act 
+					and renamed_act.get('activityType') == 'HEART_RATE_RECOVERY'):
+					activity['activityType'] = 'HEART_RATE_RECOVERY'
 
 	return activities
 
-def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+def get_filtered_activity_stats(activities_json,manually_updated_json,
+		userinput_activities=None,**kwargs):
 
 	# If same id exist in user submited activities, give it more preference
 	# than manually edited activities 
@@ -731,7 +733,8 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 
 	return filtered_activities
 
-def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+def get_activity_stats(activities_json,manually_updated_json,
+		userinput_activities=None,**kwargs):
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 
@@ -755,7 +758,7 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 	max_duration = 0
 
 	filtered_activities = get_filtered_activity_stats(activities_json,
-		manually_updated_json,userinput_activities
+		manually_updated_json,userinput_activities,**kwargs
 	)
 
 	if len(filtered_activities):
@@ -854,14 +857,16 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 		return None
 	return point_range
 
-def _get_activities_start_end_time(todays_activities,todays_manually_updated_json,userinput_activities):
+def _get_activities_start_end_time(todays_activities,todays_manually_updated_json,
+		userinput_activities,**kwargs):
 	'''
 		Return list of named tuples containing start and end datetime
 		object of each activities
 	'''
 	final_filtered_activities= get_filtered_activity_stats(activities_json=todays_activities,
 									manually_updated_json=todays_manually_updated_json,
-									userinput_activities=userinput_activities)
+									userinput_activities=userinput_activities,
+									**kwargs)
 
 	Time = namedtuple("Time",["start","end"])
 	activities_start_end_time = []
@@ -1317,14 +1322,15 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		return movement_consistency
 
 def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
-		todays_manually_updated_json, userinput_activities, age):
+		todays_manually_updated_json, userinput_activities, age,**kwargs):
 	'''
 		Calculate exercise steps and total steps
 	'''	
 	filtered_activities = get_filtered_activity_stats(
 		todays_activities_json,
 		todays_manually_updated_json,
-		userinput_activities
+		userinput_activities,
+		**kwargs
 	)
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
@@ -1894,10 +1900,11 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
-										 todays_daily_strong,age,userinput_activities=None):
+		todays_daily_strong,age,userinput_activities=None,**kwargs):
 	
 	filtered_activities = get_filtered_activity_stats(
-		todays_activities,todays_manually_updated,userinput_activities
+		todays_activities,todays_manually_updated,
+		userinput_activities,**kwargs
 	)
 	total_duration = 0
 	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']

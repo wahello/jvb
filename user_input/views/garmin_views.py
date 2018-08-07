@@ -5,10 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from quicklook.calculation_helper import get_sleep_stats,\
-										 str_to_datetime,\
-										 get_garmin_model_data,\
-										 get_weekly_data
+import quicklook.calculation_helper
 
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
@@ -22,16 +19,17 @@ from registration.models import Profile
 from hrr.calculation_helper import fitfile_parse
 
 def _get_activities_data(user,target_date):
-	current_date = str_to_datetime(target_date)
+	current_date = quicklook.calculation_helper.str_to_datetime(target_date)
 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 
 	start_epoch = current_date_epoch
 	end_epoch = current_date_epoch + 86400
 
-	activity_data = get_garmin_model_data(UserGarminDataActivity,
+	activity_data = quicklook.calculation_helper.get_garmin_model_data(UserGarminDataActivity,
 		user, start_epoch,end_epoch,order_by = '-id')
-	manually_updated_activity_data = get_garmin_model_data(UserGarminDataManuallyUpdated,
-		user, start_epoch,end_epoch,order_by = 'id')
+	manually_updated_activity_data = quicklook.calculation_helper.get_garmin_model_data(
+		UserGarminDataManuallyUpdated,user,
+		start_epoch,end_epoch,order_by = 'id')
 
 	#converting to python objects
 	activity_data = [ast.literal_eval(dic) for dic in activity_data]
@@ -92,7 +90,7 @@ def _create_activity_stat(user,activity_obj,current_date):
 		return {activity_obj['summaryId']:activity_keys}
 
 def _get_activities(user,target_date):
-	current_date = str_to_datetime(target_date)
+	current_date = quicklook.calculation_helper.str_to_datetime(target_date)
 	# hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
 	# if hrr_data:
 	# 	measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
@@ -171,31 +169,35 @@ class GarminData(APIView):
 	permission_classes = (IsAuthenticated,)
 
 	def _get_sleep_stats(self,target_date):
-		current_date = str_to_datetime(target_date)
+		current_date = quicklook.calculation_helper.str_to_datetime(target_date)
 		yesterday_date = current_date - timedelta(days=1)
 		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 
 		start_epoch = current_date_epoch - 86400
 		end_epoch = current_date_epoch + 86400
-		sleep_data = get_garmin_model_data(UserGarminDataSleep,
-			self.request.user, start_epoch,end_epoch,order_by = '-id')
-		sleep_data_parsed = get_weekly_data(sleep_data,current_date,yesterday_date)
+		sleep_data = quicklook.calculation_helper.get_garmin_model_data(
+			UserGarminDataSleep,self.request.user,
+			start_epoch,end_epoch,order_by = '-id')
+		sleep_data_parsed = quicklook.calculation_helper.get_weekly_data(
+			sleep_data,current_date,yesterday_date)
 		todays_sleep_data = sleep_data_parsed[current_date.strftime('%Y-%m-%d')]
 		yesterday_sleep_data = sleep_data_parsed[yesterday_date.strftime('%Y-%m-%d')]
-		return get_sleep_stats(current_date,yesterday_sleep_data, todays_sleep_data,str_dt=False)
+		return quicklook.calculation_helper.get_sleep_stats(
+			current_date,yesterday_sleep_data, todays_sleep_data,str_dt=False)
 
 	def _get_weight(self, target_date):
 		weight = {
 			"value":None,
 			"unit":None
 		}
-		current_date = str_to_datetime(target_date)
+		current_date = quicklook.calculation_helper.str_to_datetime(target_date)
 		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 
 		start_epoch = current_date_epoch
 		end_epoch = current_date_epoch + 86400
-		todays_weight_data = get_garmin_model_data(UserGarminDataBodyComposition,
-			self.request.user, start_epoch,end_epoch,order_by = '-id')
+		todays_weight_data = quicklook.calculation_helper.get_garmin_model_data(
+			UserGarminDataBodyComposition,self.request.user,
+			start_epoch,end_epoch,order_by = '-id')
 
 		if todays_weight_data:
 			todays_weight_data = [ast.literal_eval(dic) for dic in todays_weight_data]
@@ -207,12 +209,13 @@ class GarminData(APIView):
 			return weight
 
 	def _have_activity_record(self, target_date):
-		current_date = str_to_datetime(target_date)
+		current_date = quicklook.calculation_helper.str_to_datetime(target_date)
 		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		start_epoch = current_date_epoch
 		end_epoch = current_date_epoch + 86400
-		activity_records = get_garmin_model_data(UserGarminDataActivity,
-			self.request.user, start_epoch,end_epoch,order_by = '-id')
+		activity_records = quicklook.calculation_helper.get_garmin_model_data(
+			UserGarminDataActivity,self.request.user,
+			start_epoch,end_epoch,order_by = '-id')
 
 		return True if activity_records else False
 
