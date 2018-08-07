@@ -642,20 +642,27 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 def is_potential_hrr_activity(activity):
 	'''
 	Check if activity is potential HRR file or not. 
-	Any activity is potential HRR if it's not actually "HRR"
-	file but is meeting following conditions - 
-
-	1) Duration in seconds is greator than or equal to 1200 seconds
-	2) Distance in meters is greator than or equal to 1287.48 (0.8 miles) 
+	Any activity is potential HRR if meets following criteria - 
+		1)it's not actually "HEART RATE RECOVERY" file
+		2) Not created manually by user from activity grid
+		3) Not yet submitted from the user input. How to check?
+			Any activity file submitted from user input activity grid 
+			will have "comments" key.  
+		4) Duration in seconds is greator than or equal to 1200 seconds
+		5) Distance in meters is greator than or equal to 1287.48 (0.8 miles) 
 	'''
 	if(activity 
 		and activity.get('activityType') != "HEART_RATE_RECOVERY"
+		and not activity.get('created_manually',False) # not manually created by user 
+		and not "comments" in activity # not edited by user yet 
 		and activity.get("durationInSeconds",0) <= 1200
 		and activity.get("distanceInMeters",0) <= 1287.48):
 		return True
 	return False
 
-def rename_activities_to_hrr(user,calendar_date,activities):
+def get_renamed_to_hrr_activities(user,calendar_date,activities):
+	calendar_date = calendar_date.strftime("%Y-%m-%d")
+	renamed_summaries = []
 	any_potential_hrr = False
 	for activity in activities:
 		if not any_potential_hrr and is_potential_hrr_activity(activity):
@@ -668,15 +675,15 @@ def rename_activities_to_hrr(user,calendar_date,activities):
 				user,calendar_date)
 		except Exception as e:
 			renamed_activities = None
-
 		if renamed_activities:	
 			for activity in activities:
 				renamed_act = renamed_activities.get(activity.get('summaryId'),None)
 				if(renamed_act 
 					and renamed_act.get('activityType') == 'HEART_RATE_RECOVERY'):
-					activity['activityType'] = 'HEART_RATE_RECOVERY'
+					renamed_summaries.append(activity['summaryId'])
 
-	return activities
+	print("Renamed Summaries:",renamed_summaries)
+	return renamed_summaries
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,
 		userinput_activities=None,**kwargs):
@@ -719,6 +726,7 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 				# it was present in normal unedited version of summary, in
 				# that case add the previous step data to the current summary
 				obj['steps'] = non_edited_steps
+
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -730,6 +738,17 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 			# which represents that it is manually created activity 
 			activity['created_manually'] = True
 		filtered_activities += userinput_activities.values()
+
+	# act_renamed_to_hrr = []
+	# if kwargs.get('user') and kwargs.get('calendar_date') and filtered_activities:
+	# 	act_renamed_to_hrr = get_renamed_to_hrr_activities(
+	# 		user = kwargs.get('user'),
+	# 		calendar_date = kwargs.get('calendar_date'),
+	# 		activities = filtered_activities
+	# 	)
+	# for act in filtered_activities:
+	# 	if act['summaryId'] in act_renamed_to_hrr:
+	# 		act['activityType'] = 'HEART_RATE_RECOVERY'
 
 	return filtered_activities
 
@@ -1129,8 +1148,11 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		user_input_awake_time = user_input_awake_time,
 		user_input_timezone = user_input_timezone ,str_dt=False)
 	
-	activities_start_end_time =_get_activities_start_end_time(todays_activities=todays_activities,
-		todays_manually_updated_json=todays_manually_updated_json,userinput_activities=userinput_activities)
+	activities_start_end_time =_get_activities_start_end_time(
+		todays_activities=todays_activities,
+		todays_manually_updated_json=todays_manually_updated_json,
+		userinput_activities=userinput_activities,
+		user=user,calendar_date=calendar_date)
 
 	today_bedtime = None
 	if (user_input_todays_bedtime 
@@ -2159,7 +2181,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
 		# Exercise
-		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json,userinput_activities)
+		activity_stats = get_activity_stats(
+			todays_activities_json,todays_manually_updated_json,
+			userinput_activities,user=user,calendar_date=current_date)
 		exercise_calculated_data['did_workout'] = did_workout_today(
 				activity_stats['have_activity'],
 				safe_get(todays_daily_strong,"workout","")
@@ -2282,9 +2306,11 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['workout_effortlvl_gpa'] = workout_effortlvl_grade_pts[1]
 
 		# Average exercise heartrate grade calculation
-		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
-									todays_manually_updated_json,todays_daily_strong,
-									user.profile.age(),userinput_activities)
+		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(
+			todays_activities_json,
+			todays_manually_updated_json,todays_daily_strong,
+			user.profile.age(),userinput_activities,
+			user=user, calendar_date=current_date)
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
@@ -2376,7 +2402,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 			todays_activities_json,
 			todays_manually_updated_json,
 			userinput_activities,
-			user.profile.age()
+			user.profile.age(),
+			user=user,
+			calendar_date=current_date
 		)	
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps
