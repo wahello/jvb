@@ -385,7 +385,7 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 					# Update the HRR and A/A reports if activity file is arrived
 					# TODO: Once start picking stored HRR data, have to chain the
 					# HRR update task before PA update. 
-					if dtype == 'activities':
+					if dtype == 'activities' or dtype == 'dailies':
 						create_hrrdata.delay(user.id,start_date,end_date)
 
 		elif dtype == "deregistrations":
