@@ -29,7 +29,8 @@ from progress_analyzer.tasks import (
 	generate_cumulative_instances_custom_range,
 	set_pa_report_update_date
 )
-from hrr.tasks import create_hrrdata
+from hrr.tasks import create_hrrdata,\
+						create_only_hrrdata
 
 def _get_model_types():
 	MODEL_TYPES = {
@@ -387,6 +388,8 @@ def store_garmin_health_push(notifications,ping_notif_obj=None):
 					# HRR update task before PA update. 
 					if dtype == 'activities':
 						create_hrrdata.delay(user.id,start_date,end_date)
+					if dtype == 'dailies':
+						create_only_hrrdata.delay(user.id,start_date,end_date)
 
 		elif dtype == "deregistrations":
 			for obj in notifications.get(dtype):
