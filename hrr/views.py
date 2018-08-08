@@ -1647,106 +1647,102 @@ def hrr_data(user,start_date):
 	if hrr and workout:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
-		#print(hrr_final_heartrate,"hrr final data")
-		# print(hrr_timestamp,"timestampppp")
-		hrr_difference = hrr_final_heartrate[0]-hrr_final_heartrate[-1]
-		if (hrr_difference > 10) or activities:
-			Did_you_measure_HRR = 'yes'
-			workout_hrr_before_hrrfile = []
-			workout_time_before_hrrfile = []
-			workout_timestamp_before_hrrfile = []
+		Did_you_measure_HRR = 'yes'
+		workout_hrr_before_hrrfile = []
+		workout_time_before_hrrfile = []
+		workout_timestamp_before_hrrfile = []
 
-			for heart_rate,timestamp_diff,time_stamp in zip(
-			all_activities_heartrate,all_activities_timestamp,all_activities_timestamp_raw):
-				if time_stamp < hrr_timestamp[1]:
-					workout_hrr_before_hrrfile.append(heart_rate)
-					workout_time_before_hrrfile.append(timestamp_diff)
-					workout_timestamp_before_hrrfile.append(time_stamp)
-			dict_timestamp_heart = dict(zip(
-				workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
-			sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
-			timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
-			heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
-			time_toreach_99 = []
-			for heartrate_hrr,timestamp_hrr in zip(hrr_final_heartrate,hrr_final_timestamp):
-				if heartrate_hrr >= 99:
-					time_toreach_99.append(timestamp_hrr)
-				if(heartrate_hrr == 99) or (heartrate_hrr < 99):
-					break
-						
-			new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
-			min_heartrate = []
-			for i,k in zip(hrr_final_heartrate,new_L):
-				if k <= 60:
-					min_heartrate.append(i)
+		for heart_rate,timestamp_diff,time_stamp in zip(
+		all_activities_heartrate,all_activities_timestamp,all_activities_timestamp_raw):
+			if time_stamp < hrr_timestamp[1]:
+				workout_hrr_before_hrrfile.append(heart_rate)
+				workout_time_before_hrrfile.append(timestamp_diff)
+				workout_timestamp_before_hrrfile.append(time_stamp)
+		dict_timestamp_heart = dict(zip(
+			workout_timestamp_before_hrrfile, workout_hrr_before_hrrfile))
+		sort_dict_timestamp_heart = sorted(dict_timestamp_heart.items())
+		timestamp_before_hrrfile = [i[0] for i in sort_dict_timestamp_heart]
+		heartrate_before_hrrfile = [i[1] for i in sort_dict_timestamp_heart]
+		time_toreach_99 = []
+		for heartrate_hrr,timestamp_hrr in zip(hrr_final_heartrate,hrr_final_timestamp):
+			if heartrate_hrr >= 99:
+				time_toreach_99.append(timestamp_hrr)
+			if(heartrate_hrr == 99) or (heartrate_hrr < 99):
+				break
+					
+		new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
+		min_heartrate = []
+		for i,k in zip(hrr_final_heartrate,new_L):
+			if k <= 60:
+				min_heartrate.append(i)
 
-			b = []
-			a = len(hrr_final_heartrate)-len(min_heartrate)
-			if a > 0:
-				b =  hrr_final_heartrate[-a:]
-			elif a == 0:
+		b = []
+		a = len(hrr_final_heartrate)-len(min_heartrate)
+		if a > 0:
+			b =  hrr_final_heartrate[-a:]
+		elif a == 0:
+			b = [min(min_heartrate)]
+		else:
+			min_heartrate.reverse()
+			b = min_heartrate
+		if min_heartrate:
+			if b and min(min_heartrate) < b[0]:
 				b = [min(min_heartrate)]
-			else:
-				min_heartrate.reverse()
-				b = min_heartrate
-			if min_heartrate:
-				if b and min(min_heartrate) < b[0]:
-					b = [min(min_heartrate)]
 
-			if min(hrr_final_heartrate) <= 99:
-				Did_heartrate_reach_99 = 'yes'
-			else:
-				Did_heartrate_reach_99 = 'no'
+		if min(hrr_final_heartrate) <= 99:
+			Did_heartrate_reach_99 = 'yes'
+		else:
+			Did_heartrate_reach_99 = 'no'
 
-			HRR_activity_start_time = hrr_timestamp[0]-(offset)
-			HRR_start_beat = hrr_final_heartrate[0]
-			try:
-				lowest_hrr_1min = b[0]
-			except IndexError:
-				lowest_hrr_1min = 99
-			time_99 = sum(time_toreach_99[:-1])
-			if workout:
-				no_workouts = len(workout)
-				#print(no_workouts,"ffffffffffff")
+		HRR_activity_start_time = hrr_timestamp[0]-(offset)
+		HRR_start_beat = hrr_final_heartrate[0]
+		try:
+			lowest_hrr_1min = b[0]
+		except IndexError:
+			lowest_hrr_1min = 99
+		time_99 = sum(time_toreach_99[:-1])
+		if workout:
+			no_workouts = len(workout)
+			#print(no_workouts,"ffffffffffff")
+		else:
+			no_workouts = 1
+		end_time_activity = timestamp_before_hrrfile[-no_workouts]
+		end_time_activity =  end_time_activity - (offset) 
+		end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
+		diff_actity_hrr= HRR_activity_start_time - end_time_activity
+		No_beats_recovered = HRR_start_beat - lowest_hrr_1min
+		heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
+		pure_1min_beats = []
+		pure1min = 60-diff_actity_hrr
+		hrr_no_fitfile = None
+		if pure1min >= 0:
+			for i,k in zip(hrr_final_heartrate,new_L):
+				if k <= pure1min:
+					pure_1min_beats.append(i)
+		else:
+			daily_diff_hrr = end_time_activity - daily_starttime
+			daily_activty_end = daily_diff_hrr % 15
+			if daily_activty_end != 0:
+				daily_diff_hrr = daily_diff_hrr + (15 - daily_activty_end)
 			else:
-				no_workouts = 1
-			end_time_activity = timestamp_before_hrrfile[-no_workouts]
-			end_time_activity =  end_time_activity - (offset) 
-			end_heartrate_activity  = heartrate_before_hrrfile[-no_workouts]
-			diff_actity_hrr= HRR_activity_start_time - end_time_activity
-			No_beats_recovered = HRR_start_beat - lowest_hrr_1min
-			heart_rate_down_up = abs(end_heartrate_activity-HRR_start_beat)
-			pure_1min_beats = []
-			pure1min = 60-diff_actity_hrr
-			hrr_no_fitfile = None
-			if pure1min >= 0:
-				for i,k in zip(hrr_final_heartrate,new_L):
-					if k <= pure1min:
-						pure_1min_beats.append(i)
+				pass
+			if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
+				daily_diff_60 = str(int(daily_diff_hrr + 60))
+				daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
+			if daily_diff_data_60:
+				hrr_no_fitfile = daily_diff_data_60
 			else:
-				daily_diff_hrr = end_time_activity - daily_starttime
-				daily_activty_end = daily_diff_hrr % 15
-				if daily_activty_end != 0:
-					daily_diff_hrr = daily_diff_hrr + (15 - daily_activty_end)
-				else:
-					pass
-				if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
-					daily_diff_60 = str(int(daily_diff_hrr + 60))
-					daily_diff_data_60 = garmin_data_daily['timeOffsetHeartRateSamples'].get(daily_diff_60,None)
-				if daily_diff_data_60:
-					hrr_no_fitfile = daily_diff_data_60
-				else:
-					hrr_no_fitfile = None
-			if pure1min >= 0 and pure_1min_beats:
-				pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
-			elif hrr_no_fitfile:
-				pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
-			else:
-				pure_1min_heart_beats = 0
-			pure_time_99 = time_99 + diff_actity_hrr
-			
-			if Did_heartrate_reach_99 == 'no':
-				pure_time_99 = None
+				hrr_no_fitfile = None
+		if pure1min >= 0 and pure_1min_beats:
+			pure_1min_heart_beats = abs(end_heartrate_activity - pure_1min_beats[-1])
+		elif hrr_no_fitfile:
+			pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
+		else:
+			pure_1min_heart_beats = 0
+		pure_time_99 = time_99 + diff_actity_hrr
+		
+		if Did_heartrate_reach_99 == 'no':
+			pure_time_99 = None
 
 	else:
 		Did_you_measure_HRR = 'no'
