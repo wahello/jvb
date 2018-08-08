@@ -3288,17 +3288,19 @@ handleScroll() {
 
                             <FormGroup>  
                               {this.state.editable &&
-                                <div className="input1">
-                                <Input
-                                type="checkbox"
-                                name = "took_nap"
-                                value = {this.state.took_nap}
-                                checked = {this.state.took_nap == "yes"}                                            
-                                onClick={this.handleChangeNap}
-                                >
-                                </Input>
-                                <Label className="LAbel" style={{paddingLeft:"25px"}}>2.4 I took a nap today
-                                </Label>
+                                <div className="input">
+                                  <Label className="padding" >2.4 I took a nap today
+                                  <span  style={{marginLeft:"15px",paddingTop:"20px"}}>
+                                    <Input
+                                    type="checkbox"
+                                    name = "took_nap"
+                                    value = {this.state.took_nap}
+                                    checked = {this.state.took_nap == "yes"}                                            
+                                    onClick={this.handleChangeNap}
+                                    >
+                                    </Input>
+                                    </span>
+                                  </Label>
                                 </div>
                               }
                                
@@ -3307,7 +3309,7 @@ handleScroll() {
                                 <div>
                                 <Label className="LAbel">2.4 I took a nap today</Label>
                                 <div className="input">                             
-                                  <p>{this.state.took_nap?"Yes":"No"}</p>
+                                  <p>{this.state.took_nap}</p>
                                 </div>
                                 </div>
                               }
@@ -3330,7 +3332,7 @@ handleScroll() {
                                 />
                               </div>
                               </div>*/}
-                               <div className="align_width_time align_width1 margin_tp">
+                               <div className="align_width_time align_width1">
                                   <div className="input "> 
                                 <Input type="select" name="nap_start_time_hour"
                                 id="bed_hr"
@@ -3495,7 +3497,7 @@ handleScroll() {
 
                          {(this.state.report_type === "full") && (this.state.took_nap === 'yes') && 
                           <FormGroup>      
-                            <Label className="padding">2.4.4 Sleep Comments</Label>
+                            <Label className="padding">2.4.4 Nap Comments</Label>
                               {this.state.editable &&
                                 <div className="input1">
                                      <Textarea name="nap_comment" 
