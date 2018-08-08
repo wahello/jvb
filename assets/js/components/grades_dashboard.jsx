@@ -848,7 +848,7 @@ class Grades_Dashboard extends Component{
 		                        size = "2x"
 			                />
 						</span> 
-		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
+		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress"> 
 		                    <FontAwesome
 		                        name = "calendar"
 		                        size = "2x"
