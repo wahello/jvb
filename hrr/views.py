@@ -57,7 +57,7 @@ class UserHrrView(generics.ListCreateAPIView):
 	'''
 		- Create the Hrr instance
 		- List all the Hrr instance
-		- If query parameters "to" and "from" are provided
+		- If query parameters "start_date" is provided
 		  then filter the Hrr data for provided date interval
 		  and return the list
 	'''
@@ -269,10 +269,10 @@ class UserAA_daily(generics.ListCreateAPIView):
 
 class UserAA_low_high_values(generics.ListCreateAPIView):
 	'''
-		- Create the AA_daily instance
-		- List all the AA_daily instance
+		- Create the AA_low_high_values instance
+		- List all the AA_low_high_values instance
 		- If query parameters "start_date" is provided
-		  then filter the AA_daily data for provided date interval
+		  then filter the AA_low_high_values data for provided date interval
 		  and return the list
 	'''
 	permission_classes = (IsAuthenticated,)
