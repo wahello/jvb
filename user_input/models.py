@@ -433,6 +433,12 @@ class DailyUserInputOptional(models.Model):
 
     travel_destination = models.TextField(blank=True)
     travel_purpose = models.TextField(blank=True)
+    took_nap = models.CharField(
+        max_length = 10,choices = YN_CHOICE,blank=True)
+    nap_start_time = models.CharField(max_length = 10, blank=True)
+    nap_end_time = models.CharField(max_length = 10, blank=True)
+    nap_duration = models.CharField(max_length = 10, blank = True)
+    nap_comment = models.TextField(blank=True)
 
 
 class InputsChangesFromThirdSources(models.Model):
