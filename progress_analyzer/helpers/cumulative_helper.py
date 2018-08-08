@@ -429,7 +429,9 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		mc = _safe_get_mobj(ql_data.steps_ql,"movement_consistency",None)
 		if mc:
 			mc = json.loads(mc)
-			return int(mc['inactive_hours'])
+			inactive_hours = int(mc.get('inactive_hours',0))
+			inactive_hours += int(mc.get('no_data_hours',0))
+			return inactive_hours
 		return 0
 
 	if today_ql_data and yday_cum_data:
