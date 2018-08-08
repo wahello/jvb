@@ -507,7 +507,16 @@ export function handleChangeNap(event){
    const name = target.name;
    if(value == 'yes'){
     this.setState({
-      took_nap:"no"
+      took_nap:"no",
+      nap_start_time_hour:"",
+      nap_start_time_min:"",
+      nap_start_time_am_pm:"",
+      nap_end_time_hour:"",
+      nap_end_time_min:"",
+      nap_end_time_am_pm:"",
+      nap_duration_hour:"",
+      nap_duration_min:"",
+      nap_comment:"",
     });
    }
    else{
