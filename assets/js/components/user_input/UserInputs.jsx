@@ -1274,19 +1274,20 @@ handleScroll() {
         return(
             <div>            
         <div id="hambergar" className="container-fluid">
-      <NavbarMenu title = {<span> User Inputs
-              <span id="infobutton"
-              onClick={this.toggleInfo}                   
-              >
-              <a  className="infoBtn"> 
-                 <FontAwesome 
-                              name = "info-circle"
-                              size = "1x"                                      
-                            
-                  />
-              </a>
-              </span> </span>} />
-        </div>                                                                                    
+      <NavbarMenu title = {
+              <span> User Inputs
+                <span id="infobutton"
+                onClick={this.toggleInfo}                   
+                >
+                  <a  className="infoBtn"> 
+                     <FontAwesome 
+                        name = "info-circle"
+                        size = "1x"                                      
+                      />
+                  </a>
+                </span> 
+              </span>} />
+              </div>                                                                                    
                             <Modal
                             id="popover"                          
                             placement="bottom" 
@@ -1345,8 +1346,9 @@ handleScroll() {
                                           
                                         />
                                     </div>
-                               </NavbarToggler> 
-                                  <span onClick = {this.renderRemoveDate} style = {{marginRight:"2px",color:"white",fontWeight:"bold"}}>
+                               </NavbarToggler>
+                               <div className = "arrows">
+                                  <span onClick = {this.renderRemoveDate} style = {{marginRight:"10px",color:"white",fontWeight:"bold"}}>
                                     <FontAwesome
                                                   name = "angle-left"
                                                   size = "1x"
@@ -1368,12 +1370,13 @@ handleScroll() {
                                   </span>                                  
                                                                   
                                   </span>
-                                  <span onClick = {this.renderAddDate} style = {{marginLeft:"2px",color:"white",fontWeight:"bold"}}>
+                                  <span onClick = {this.renderAddDate} style = {{color:"white",fontWeight:"bold"}}>
                                     <FontAwesome
                                                   name = "angle-right"
                                                   size = "1x"
                                             />
                                   </span>
+                                  </div>
 
                                   <span onClick={this.toggleInfo2} id="info2">
                                    <span id="spa">

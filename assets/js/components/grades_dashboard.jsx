@@ -52,7 +52,7 @@ class Grades_Dashboard extends Component{
 		this.errorquick = this.errorquick.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
 		this.renderAddDate = this.renderAddDate.bind(this);
-		this.renderRemoveDate = this.renderRemoveDate.bind(this);
+		this.renderRemoveDate = this.renderRemoveDate.bind(this); 
 		this.processDate = this.processDate.bind(this);
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.successGradesData = this.successGradesData.bind(this);
@@ -327,7 +327,7 @@ class Grades_Dashboard extends Component{
 						 id = "my-card"
 						>
 					        <CardBody>
-					          	<CardTitle className = "gd_header_style"># of Alcholic Drinks Consumed Yesterday?</CardTitle>
+					          	<CardTitle className = "gd_header_style"># of Alcoholic Drinks Consumed Yesterday?</CardTitle>
 					          	<hr className = "hr_style"
 					          		id = "hr-style" 
 					          	/>
