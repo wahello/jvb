@@ -3329,7 +3329,7 @@ handleScroll() {
                               {this.state.editable &&
                                 <div className="input">
                                   <Label className="padding" >2.4 I took a nap today
-                                  <span  style={{marginLeft:"15px",paddingTop:"20px"}}>
+                                  <span  style={{marginLeft:"35px",paddingTop:"20px"}}>
                                     <Input
                                     type="checkbox"
                                     name = "took_nap"
