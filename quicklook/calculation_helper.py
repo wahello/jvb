@@ -1274,11 +1274,13 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
 					
-				elif(user_input_strength_end_time and user_input_strength_start_time):
-					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
+				elif(user_input_strength_end_time and user_input_strength_start_time
+					and hour_start >= user_input_strength_start_time 
+					and hour_start <= user_input_strength_end_time):
 						movement_consistency[interval]['status'] = 'strength'
-				elif(nap_start_time and nap_start_time):
-					if hour_start >= nap_start_time and hour_start <= nap_end_time:
+				elif(nap_start_time and nap_start_time
+					and hour_start >= nap_start_time 
+					and hour_start <= nap_end_time):
 						movement_consistency[interval]['status'] = 'nap'
 				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
 					movement_consistency[interval]['status'] = 'exercise'
