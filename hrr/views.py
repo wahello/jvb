@@ -991,15 +991,17 @@ def daily_aa_data(user, start_date):
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
 	
-
+	
 	count = 0
 	id_act = 0
 	activities = []
 	activities_workout = []
 	activities_hrr = []
+	user_input_activities = []
 	if user_input_strong:
 		for tmp in user_input_strong:
 			sn = tmp.activities
+			user_input_activities.append(sn)
 			if sn:
 				sn = json.loads(sn)
 				di = sn.values()
@@ -1013,6 +1015,20 @@ def daily_aa_data(user, start_date):
 					else:
 						activities_workout.append(di[i]['summaryId'])
 
+	user_input_activities_dict = json.loads(user_input_activities[0])
+	user_input_activities_keys = list(user_input_activities_dict.keys())
+	for i,single_activity in enumerate(activity_files):
+		print(single_activity[i],"single_activity[i]")
+		print(type(single_activity[i]),"typessss")
+		single_activity_dict = ast.literal_eval(single_activity)
+		if single_activity_dict.get('summaryId',None) in user_input_activities_keys:
+			user_input_activities_keys.remove(
+			single_activity_dict.get('summaryId',None))
+	for i,summaryid in enumerate(user_input_activities_keys):
+		value_ui_activity = user_input_activities_dict.get(summaryid,None)
+		value_ui_activity.pop('can_update_steps_type',None)
+		convt_str = str(value_ui_activity)
+		activity_files.append(convt_str)
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1256,6 +1272,7 @@ def daily_aa_data(user, start_date):
 			daily_aa_data['Totals'] = {}
 	
 	if daily_aa_data:
+		print(daily_aa_data,"daily_aa_data")
 		return daily_aa_data
 	else:
 		return ({})
