@@ -178,6 +178,7 @@ def weekly_workout_calculations(weekly_workout):
 
 	added_all_actiivtes = add_activity_type(workout_dict,workout_type)
 	workout_dict_percent = workout_percent(added_all_actiivtes)
+	print(workout_dict_percent,"workout_dict_percent")
 	return workout_dict_percent,workout_summary_id,workout_type
 
 def add_workout_type(single_aa,workout_summary_id):
@@ -244,6 +245,7 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id):
 					activity_type.append(value['workout_type'])	
 					aa_dict[value['workout_type']] = value
 	added_percent = percent_calculations(aa_dict)
+	print(added_percent,"added_percent")
 	return added_percent
 
 def merge_activities(final_workout_data,final_aa_data):
