@@ -10,7 +10,7 @@ import { StyleSheet, css } from 'aphrodite';
 
 const attrVerboseName = {
     workout_easy_hard: 'Workout Easy Hard',
-    workout_type: 'Workout Type',
+    workout_type: 'Workout Type', 
     workout_time: 'Workout Time',
     workout_location: 'Workout Location',
     workout_duration: 'Workout Duration (hh:mm:ss)',
@@ -107,6 +107,10 @@ const attrVerboseName = {
     sleep_aid: 'Sleep Aid taken?',
     sleep_bed_time: 'Sleep Bed Time',
     sleep_awake_time: 'Sleep Awake Time',
+    nap_comment:'Nap Comment',
+    nap_duration:'Nap Duration (hh:mm)',
+    nap_end_time:'Nap End Time (hh:mm)',
+    nap_start_time:'Nap Start Time (hh:mm)',
     deep_sleep: 'Deep Sleep (hh:mm)',
     light_sleep: 'Light Sleep (hh:mm)',
     awake_time: 'Awake Time (hh:mm)',

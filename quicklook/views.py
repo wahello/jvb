@@ -2845,56 +2845,67 @@ def export_users_xls(request):
 				row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
 			elif values == 'average_heart_rate':
 				col_num1 = col_num1 + 1
-				weekly_workout_sheet.write(row_num,col_num1,value[values],innercell_format)
+				if value[values]:
+					avg_heart = round_percentage(value[values])
+					weekly_workout_sheet.write(row_num,col_num1,avg_heart,innercell_format)
 			elif values == 'duration_in_aerobic_range':
 				col_num1 = col_num1 + 1
-				seconds = value[values]
-				hours,minutes = convert_sec_to_hhmm(seconds)
-				weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(
+					row_num,col_num1,"{}:{}".format(hours,minutes))
 			elif values == 'percent_aerobic':
 				col_num1 = col_num1 + 1
-				if value[values] and value[values] != 0:
-					workout_percent = round_percentage(value[values])
-					weekly_workout_sheet.write(
-					row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
-				else:
-					weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
+				if value.get(values):
+					if value[values] and value[values] != 0:
+						workout_percent = round_percentage(value[values])
+						weekly_workout_sheet.write(
+						row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+					else:
+						weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
 			elif values == 'duration_in_anaerobic_range':
 				col_num1 = col_num1 + 1
-				seconds = value[values]
-				hours,minutes = convert_sec_to_hhmm(seconds)
-				weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
 			elif values == 'percent_anaerobic':
 				col_num1 = col_num1 + 1
-				if value[values] and value[values] != 0:
-					workout_percent = round_percentage(value[values])
-					weekly_workout_sheet.write(
-					row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
-				else:
-					weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
+				if value.get(values):
+					if value[values] and value[values] != 0:
+						workout_percent = round_percentage(value[values])
+						weekly_workout_sheet.write(
+						row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+					else:
+						weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
 			elif values == 'duration_below_aerobic_range':
 				col_num1 = col_num1 + 1
-				seconds = value[values]
-				hours,minutes = convert_sec_to_hhmm(seconds)
-				weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
 			elif values == 'percent_below_aerobic':
 				col_num1 = col_num1 + 1
-				if value[values] and value[values] != 0:
-					workout_percent = round_percentage(value[values])
-					weekly_workout_sheet.write(
-					row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
-				else:
-					weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
+				if value.get(values):
+					if value[values] and value[values] != 0:
+						workout_percent = round_percentage(value[values])
+						weekly_workout_sheet.write(
+						row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+					else:
+						weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
 			elif values == 'duration_hrr_not_recorded':
 				col_num1 = col_num1 + 1
-				seconds = value[values]
-				hours,minutes = convert_sec_to_hhmm(seconds)
-				weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
 			elif values == 'percent_hrr_not_recorded':
 				col_num1 = col_num1 + 1
-				workout_percent = round_percentage(value[values])
-				weekly_workout_sheet.write(
-				row_num,col_num1,"{}{}".format(workout_percent,"%"),innercell_format)
+				if value.get(values):
+					workout_percent = round_percentage(value[values])
+					weekly_workout_sheet.write(
+					row_num,col_num1,"{}{}".format(workout_percent,"%"),innercell_format)
 		wokout_distance = workout_type.lower()
 		wokout_distance = wokout_distance+'_distance'
 		

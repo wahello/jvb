@@ -160,6 +160,18 @@ class UserInputs extends React.Component{
         activities:{},
         report_type:'quick',
 
+        took_nap:'no',
+        //nap_start_time_date:null,
+        nap_start_time_hour:"",
+        nap_start_time_min:"",
+        nap_start_time_am_pm:"",
+        //nap_end_time_date:null,
+        nap_end_time_hour:"",
+        nap_end_time_min:"",
+        nap_end_time_am_pm:"",
+        nap_duration_hour:"",
+        nap_duration_min:"",
+        nap_comment:"",
       };
       return initialState;
     }
@@ -192,6 +204,10 @@ class UserInputs extends React.Component{
       this.handleChangeTravelPurpose = handlers.handleChangeTravelPurpose.bind(this);
       this.handleQuickReportPreSubmit = handlers.handleQuickReportPreSubmit.bind(this);
       this.handleChangeReportType = handlers.handleChangeReportType.bind(this);
+      this.handleChangeNap = handlers.handleChangeNap.bind(this);
+      this.handleChangeNapStartTime = handlers.handleChangeNapStartTime.bind(this);
+      this.handleChangeNapHoursMin = handlers.handleChangeNapHoursMin.bind(this);
+      this.handleChangeNapEndTime = handlers.handleChangeNapEndTime.bind(this);
 
       this.renderWorkoutEffortModal = renderers.renderWorkoutEffortModal.bind(this);
       this.renderPainModal = renderers.renderPainModal.bind(this);
@@ -248,10 +264,12 @@ class UserInputs extends React.Component{
       this.onFetchGarminFailure = this.onFetchGarminFailure.bind(this);
       this.infoPrint = this.infoPrint.bind(this);
       this.getTotalSleep = this.getTotalSleep.bind(this);
+      this.getTotalNapSleep = this.getTotalNapSleep.bind(this);
       this.createWindDropdown = this.createWindDropdown.bind(this)
       this.onFetchGarminSuccessActivities = this.onFetchGarminSuccessActivities.bind(this);
       this.onFetchRecentSuccessFullReport = this.onFetchRecentSuccessFullReport.bind(this);
       this.userDailyInputRecentFetch = userDailyInputRecentFetch.bind(this);
+      this.getDTMomentObj1 = this.getDTMomentObj1.bind(this);
 
     this.toggle1 = this.toggle1.bind(this);
     this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
@@ -343,7 +361,6 @@ transformActivity(activity){
     onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
         userDailyInputRecentFetch(this.state.selected_date,this.onFetchRecentSuccess,this.onFetchFailure);
-        fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
       }
       else {
 
@@ -391,6 +408,14 @@ transformActivity(activity){
         let sleep_awake_time_info = this._extractDateTimeInfo(null);
         if(have_strong_input && data.data.strong_input.sleep_awake_time && canUpdateForm)
           sleep_awake_time_info = this._extractDateTimeInfo(data.data.strong_input.sleep_awake_time);
+
+        let nap_start_time_info = this._extractDurationInfo(null);
+        if(have_optional_input && data.data.optional_input.nap_start_time && canUpdateForm)
+          nap_start_time_info = this._extractDurationInfo(data.data.optional_input.nap_start_time);
+
+        let nap_end_time_info = this._extractDurationInfo(null);
+        if(have_optional_input && data.data.optional_input.nap_end_time && canUpdateForm)
+          nap_end_time_info = this._extractDurationInfo(data.data.optional_input.nap_end_time);
 
         let strength_start_info = this._extractDurationInfo(null);
         if(have_strong_input && data.data.strong_input.strength_workout_start) 
@@ -508,7 +533,20 @@ transformActivity(activity){
           travel:have_optional_input?data.data.optional_input.travel:'',
           travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:''
+          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
+          
+          took_nap:have_optional_input?data.data.optional_input.took_nap:'',
+          //nap_start_time_date:nap_start_time_info.calendarDate,
+          nap_start_time_hour:nap_start_time_info.hour,
+          nap_start_time_min:nap_start_time_info.min,
+          nap_start_time_am_pm:nap_start_time_info.meridiem,
+          //nap_end_time_date:nap_end_time_info.calendarDate,
+          nap_end_time_hour:nap_end_time_info.hour,
+          nap_end_time_min:nap_end_time_info.min,
+          nap_end_time_am_pm:nap_end_time_info.meridiem,
+          nap_duration_hour:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[0]:'',
+          nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
+          nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
@@ -660,11 +698,13 @@ transformActivity(activity){
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
           fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+          fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
-        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         this.onFetchFailure(data)
+        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+        fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
       }
     }
 
@@ -862,6 +902,23 @@ getDTMomentObj(dt,hour,min,am_pm){
   });
   return sleep_bedtime_dt;
 }
+getDTMomentObj1(hour,min,am_pm){
+  hour = hour ? parseInt(hour) : 0;
+  min = min ? parseInt(min) : 0;
+
+  if(am_pm == 'am' && hour && hour == 12){
+    hour = 0
+  }
+  if (am_pm == 'pm' && hour && hour != 12){
+    hour = hour + 12;
+  }
+  
+  let sleep_bedtime_dt = moment({ 
+    hour :hour,
+    minute :min
+  });
+  return sleep_bedtime_dt;
+}
 
 getTotalSleep(){
      let sleep_bedtime_date = this.state.sleep_bedtime_date;
@@ -892,6 +949,40 @@ getTotalSleep(){
      
      if(sleep_bedtime_dt && sleep_awake_time_dt){
        let diff = sleep_awake_time_dt.diff(sleep_bedtime_dt,'minutes')-awake_time_in_mins;
+       let hours = Math.floor(diff/60);
+       let mins = diff % 60;
+       if(mins < 10)
+         mins = `0${mins}`;
+       return hours+":"+mins;
+     }else
+       return '';
+   }
+   
+   getTotalNapSleep(){
+     //let nap_start_time_date = this.state.nap_start_time_date;
+     let nap_start_time_hour=this.state.nap_start_time_hour;
+     let nap_start_time_min=this.state.nap_start_time_min;
+     let nap_start_time_am_pm = this.state.nap_start_time_am_pm;
+     let nap_start_time_dt = null;
+     if (nap_start_time_hour
+         && nap_start_time_min && nap_start_time_am_pm){
+        nap_start_time_dt = this.getDTMomentObj1(nap_start_time_hour,
+          nap_start_time_min,nap_start_time_am_pm)
+     }
+     
+     //let nap_end_time_date = this.state.nap_end_time_date;
+     let nap_end_time_hour=this.state.nap_end_time_hour;
+     let nap_end_time_min=this.state.nap_end_time_min;
+     let nap_end_time_am_pm = this.state.nap_end_time_am_pm;
+     let nap_end_time_dt = null;
+     if (nap_end_time_hour
+         && nap_end_time_min && nap_end_time_am_pm){
+        nap_end_time_dt = this.getDTMomentObj1(nap_end_time_hour,
+          nap_end_time_min,nap_end_time_am_pm)
+     }
+   
+     if(nap_start_time_dt && nap_end_time_dt){
+       let diff = nap_end_time_dt.diff(nap_start_time_dt,'minutes');
        let hours = Math.floor(diff/60);
        let mins = diff % 60;
        if(mins < 10)
@@ -3233,7 +3324,238 @@ handleScroll() {
                               </div>
                             }                          
                           </FormGroup>
-                         
+
+                            <FormGroup>  
+                              {this.state.editable &&
+                                <div className="input">
+                                  <Label className="padding" >2.4 I took a nap today
+                                  <span  style={{marginLeft:"15px",paddingTop:"20px"}}>
+                                    <Input
+                                    type="checkbox"
+                                    name = "took_nap"
+                                    value = {this.state.took_nap}
+                                    checked = {this.state.took_nap == "yes"}                                            
+                                    onClick={this.handleChangeNap}
+                                    >
+                                    </Input>
+                                    </span>
+                                  </Label>
+                                </div>
+                              }
+                               
+                              {
+                                !this.state.editable &&
+                                <div>
+                                <Label className="LAbel">2.4 I took a nap today</Label>
+                                <div className="input">                             
+                                  <p>{this.state.took_nap}</p>
+                                </div>
+                                </div>
+                              }
+                            </FormGroup>
+                            {this.state.took_nap == "yes" &&
+                           <FormGroup>
+                            <Label className="padding">2.4.1 Nap Start Time?</Label>
+                            {this.state.editable &&
+                              <div className=" display_flex" >
+                              {/*<div className="align_width align_width1">
+                              <div className="input ">
+                                <DatePicker
+                                    id="datepicker"
+                                    name = "nap_start_time_date"
+                                    selected={this.state.nap_start_time_date}
+                                    onChange={this.handleChangeNapStartTime}
+                                    dateFormat="LL"
+                                    isClearable={true}
+                                    shouldCloseOnSelect={false}
+                                />
+                              </div>
+                              </div>*/}
+                               <div className="align_width_time align_width1">
+                                  <div className="input "> 
+                                <Input type="select" name="nap_start_time_hour"
+                                id="bed_hr"
+                                className="form-control custom-select"
+                                value={this.state.nap_start_time_hour}
+                                onChange={this.handleChangeNapHoursMin}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="nap_start_time_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.nap_start_time_min}
+                                onChange={this.handleChangeNapHoursMin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="nap_start_time_am_pm"                                  
+                                     value={this.state.nap_start_time_am_pm}
+                                     onChange={this.handleChangeNapHoursMin} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+                              </div>
+                              </div>
+                            }
+
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(/*this.state.nap_start_time_date &&*/ this.state.nap_start_time_hour && this.state.nap_start_time_min && this.state.nap_start_time_am_pm) &&
+                                <p>{this.state.nap_start_time_hour}:{this.state.nap_start_time_min}  {this.state.nap_start_time_am_pm}</p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+                        }
+                         {this.state.took_nap == "yes" &&
+                           <FormGroup>
+                            <Label className="padding">2.4.2 Nap End Time?</Label>
+                            {this.state.editable &&
+                              <div className=" display_flex" >
+                              {/*<div className="align_width align_width1">
+                              <div className="input ">
+                                <DatePicker
+                                    id="datepicker"
+                                    name = "nap_end_time_date"
+                                    selected={this.state.nap_end_time_date}
+                                    onChange={this.handleChangeNapEndTime}
+                                    dateFormat="LL"
+                                    isClearable={true}
+                                    shouldCloseOnSelect={false}
+                                />
+                              </div>
+                              </div>*/}
+                               <div className="align_width_time align_width1 margin_tp">
+                                  <div className="input "> 
+                                <Input type="select" name="nap_end_time_hour"
+                                id="bed_hr"
+                                className="form-control custom-select"
+                                value={this.state.nap_end_time_hour}
+                                onChange={this.handleChangeNapHoursMin}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(1,12)}                        
+                                </Input>
+                                </div>
+                                </div>
+                                <div className="align_width_time align_width1 margin_tp">
+                               <div className="input ">
+                                <Input type="select" name="nap_end_time_min"
+                                 id="bed_min"
+                                className="form-control custom-select "
+                                value={this.state.nap_end_time_min}
+                                onChange={this.handleChangeNapHoursMin}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                                <div className="align_width_time align_width1 margin_tp">
+                                 <div className="input1 ">
+                                  <Input type="select" 
+                                     className="custom-select form-control "
+                                     name="nap_end_time_am_pm"                                  
+                                     value={this.state.nap_end_time_am_pm}
+                                     onChange={this.handleChangeNapHoursMin} >
+                                       <option value="">AM/PM</option>
+                                       <option value="am">AM</option>
+                                       <option value="pm">PM</option> 
+                                    
+                                     </Input>
+                                      </div> 
+                              </div>
+                              </div>
+                            }
+
+                           {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.nap_end_time_hour && this.state.nap_end_time_min && this.state.nap_end_time_am_pm) &&
+                                <p>{this.state.nap_end_time_hour}:{this.state.nap_end_time_min}  {this.state.nap_end_time_am_pm}</p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+                        }
+                        {this.state.took_nap == "yes" &&
+                         <FormGroup>
+                            <Label className="padding">2.4.3 How Long Was Your Nap?</Label>
+                            {this.state.editable &&
+                              <div>
+                                <div className="col-xs-6">
+                                  <div className="input"> 
+                                <Input type="select" name="nap_duration_hour"
+                                id="hours"
+                                className="form-control custom-select"
+                                value={this.state.nap_duration_hour}
+                                onChange={this.handleChange}>
+                                 <option key="hours" value="">Hours</option>
+                                {this.createSleepDropdown(0,24)}                        
+                                </Input>
+                                </div>
+                                </div>
+                              
+                                <div className="col-xs-6 justify-content-right">
+                               <div className="input">
+                                <Input type="select" name="nap_duration_min"
+                                 id="minutes"
+                                className="form-control custom-select "
+                                value={this.state.nap_duration_min}
+                                onChange={this.handleChange}>
+                                 <option key="mins" value="">Minutes</option>
+                                {this.createSleepDropdown(0,59,true)}                        
+                                </Input>                        
+                                </div>
+                                </div>
+                              </div>
+                            }
+                            {
+                              !this.state.editable &&
+                              <div className="input">
+                              {(this.state.nap_duration_hour && this.state.nap_duration_min) &&
+                                <p>{this.state.nap_duration_hour} hours {this.state.nap_duration_min} minutes</p>
+                              }
+                              </div>
+                            }                          
+                          </FormGroup>
+                        }
+
+                         {(this.state.report_type === "full") && (this.state.took_nap === 'yes') && 
+                          <FormGroup>      
+                            <Label className="padding">2.4.4 Nap Comments</Label>
+                              {this.state.editable &&
+                                <div className="input1">
+                                     <Textarea name="nap_comment" 
+                                     placeholder="please leave a comment" 
+                                     className="form-control"
+                                     rows="5" cols="5" 
+                                     value={this.state.nap_comment}
+                                     onChange={this.handleChange}></Textarea>
+                                </div>
+                              }
+                              {
+                                !this.state.editable &&
+                                <div className="input">
+                                  <p>{this.state.nap_comment}</p>
+                                </div>
+                              }
+                          </FormGroup>
+                           }
+
                           {(this.state.report_type === "full") && 
                           <FormGroup>      
                             <Label className="padding">3 Sleep Comments</Label>
