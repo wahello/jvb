@@ -9,7 +9,7 @@ from quicklook.tasks import generate_quicklook
 from .custom_signals import user_input_post_save,user_input_notify
 from .tasks import notify_admins_task
 from progress_analyzer.tasks import set_pa_report_update_date
-from hrr.tasks import create_only_hrrdata
+from hrr.tasks import create_hrrdata
 from .models import DailyUserInputStrong
 
 @receiver(user_input_post_save, sender=UserDailyInputSerializer)
@@ -64,5 +64,5 @@ def create_or_update_hrr(sender, **kwargs):
 	to_date_str = kwargs.get('to_date').strftime("%Y-%m-%d")
 	# print(from_date_str,"from date")
 	# print(to_date_str,"to date str")
-	create_only_hrrdata.delay(request.user.id,to_date_str,to_date_str)
+	create_hrrdata.delay(request.user.id,to_date_str,to_date_str)
 	
