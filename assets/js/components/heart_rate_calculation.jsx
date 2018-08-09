@@ -300,6 +300,9 @@ class HeartRateCal extends Component{
 			                />
 						</span> 
 						
+						<span className = "button_padding">
+                    		<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
+                		</span>
 		            	<Popover
 				            placement="bottom"
 				            isOpen={this.state.calendarOpen}
