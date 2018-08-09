@@ -19,7 +19,7 @@ import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
-
+  
 import * as handlers from './handlers';
 import * as renderers from './renderers';
 
@@ -278,6 +278,8 @@ class UserInputs extends React.Component{
     this.foodTab = this.foodTab.bind(this);
     this.stressTab = this.stressTab.bind(this);
     this.extraTab = this.extraTab.bind(this);
+    this.renderAddDate = this.renderAddDate.bind(this);
+    this.renderRemoveDate = this.renderRemoveDate.bind(this);
     
     }
     
@@ -1005,6 +1007,29 @@ getTotalSleep(){
         });
     }
 
+  renderAddDate(){
+    var today = this.state.selected_date;
+    var tomorrow = moment(today).add(1, 'days');
+    this.setState({
+      selected_date:tomorrow.toDate(), 
+      fetching_data:true,
+    },function(){
+        const clone = true;
+        userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+      }.bind(this));
+  }
+  renderRemoveDate(){
+    var today = this.state.selected_date;
+    var tomorrow = moment(today).subtract(1, 'days');
+    this.setState({
+      selected_date:tomorrow.toDate(),
+       fetching_data:true,
+    },function(){
+        const clone = true;
+        userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+      }.bind(this));
+  }
+
     processDate(date){
       this.setState({
         selected_date:date,
@@ -1340,19 +1365,20 @@ handleScroll() {
         return(
             <div>            
         <div id="hambergar" className="container-fluid">
-      <NavbarMenu title = {<span> User Inputs
-              <span id="infobutton"
-              onClick={this.toggleInfo}                   
-              >
-              <a  className="infoBtn"> 
-                 <FontAwesome 
-                              name = "info-circle"
-                              size = "1x"                                      
-                            
-                  />
-              </a>
-              </span> </span>} />
-        </div>                                                                                    
+      <NavbarMenu title = {
+              <span> User Inputs
+                <span id="infobutton"
+                onClick={this.toggleInfo}                   
+                >
+                  <a  className="infoBtn"> 
+                     <FontAwesome 
+                        name = "info-circle"
+                        size = "1x"                                      
+                      />
+                  </a>
+                </span> 
+              </span>} />
+              </div>                                                                                    
                             <Modal
                             id="popover"                          
                             placement="bottom" 
@@ -1411,8 +1437,14 @@ handleScroll() {
                                           
                                         />
                                     </div>
-                               </NavbarToggler> 
-                                  
+                               </NavbarToggler>
+                               <div className = "arrows">
+                                  <span onClick = {this.renderRemoveDate} style = {{marginRight:"10px",color:"white",fontWeight:"bold"}}>
+                                    <FontAwesome
+                                                  name = "angle-left"
+                                                  size = "1x"
+                                            />
+                                  </span> 
                                   <span id="calendar" 
                                   onClick={this.toggleCalendar}>
                                   <span id="spa" >
@@ -1429,6 +1461,13 @@ handleScroll() {
                                   </span>                                  
                                                                   
                                   </span>
+                                  <span onClick = {this.renderAddDate} style = {{color:"white",fontWeight:"bold"}}>
+                                    <FontAwesome
+                                                  name = "angle-right"
+                                                  size = "1x"
+                                            />
+                                  </span>
+                                  </div>
 
                                   <span onClick={this.toggleInfo2} id="info2">
                                    <span id="spa">
