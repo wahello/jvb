@@ -122,7 +122,62 @@ export function handleChangeSleepAwakeTime(date){
         sleep_hours_last_night:hours, 
         sleep_mins_last_night:mins
       })
+    } 
+  });
+}
+export function handleChangeNapStartTime(date){
+  this.setState({
+    nap_start_time_date:date
+    },()=>{
+    let duration = this.getTotalNapSleep();
+     if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+
+      this.setState({
+        nap_duration_hour:hours,
+        nap_duration_min:mins
+      })
     }
+  });
+
+}
+
+export function handleChangeNapHoursMin(event){
+  const value = event.target.value;
+  const name = event.target.name;
+  this.setState({
+  [name]: value
+  },()=>{
+    let duration = this.getTotalNapSleep();
+     if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+      this.setState({
+        nap_duration_hour:hours,
+        nap_duration_min:mins
+      })
+    }
+  });
+}
+
+export function handleChangeNapEndTime(date){
+  const name = event.target.name;
+  this.setState({
+      nap_end_time_date: date,
+    },()=>{
+    let duration = this.getTotalNapSleep();
+    if(duration)
+    {  
+      let hours = duration.split(":")[0];
+      let mins = duration.split(":")[1];
+      this.setState({
+        nap_duration_hour:hours,
+        nap_duration_min:mins
+      })
+    } 
   });
 }
 
@@ -446,7 +501,30 @@ else{
   });
 }
 }
-
+export function handleChangeNap(event){
+   const target = event.target;
+   const value = target.value;
+   const name = target.name;
+   if(value == 'yes'){
+    this.setState({
+      took_nap:"no",
+      nap_start_time_hour:"",
+      nap_start_time_min:"",
+      nap_start_time_am_pm:"",
+      nap_end_time_hour:"",
+      nap_end_time_min:"",
+      nap_end_time_am_pm:"",
+      nap_duration_hour:"",
+      nap_duration_min:"",
+      nap_comment:"",
+    });
+   }
+   else{
+    this.setState({
+      took_nap:"yes"
+    });
+   }
+}
 export function handleQuickReportPreSubmit(){
   if(this.state.report_type == 'quick'){
     this.setState({

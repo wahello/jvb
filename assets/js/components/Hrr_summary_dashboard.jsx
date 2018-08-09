@@ -229,7 +229,7 @@ class Hrr_Dashboard extends Component{
 		  		for (let [key,rankData] of Object.entries(val)){
 		  		 	if(key == "user_rank"){
 		  		 		userName = rankData.username;
-		  		 		ranks.push(rankData.rank);
+		  		 		ranks.push(rankData.rank ? rankData.rank : "Getting Rank...");
 		  		 	}
 		  		 	
 		  		}
@@ -243,7 +243,7 @@ class Hrr_Dashboard extends Component{
 				          		id = "hr-style" 
 				          		style = {{background:hr_background}}/>
 					          	<a onClick = {this.reanderAllHrr.bind(this,all_cat_rank,userName)}>
-					          		<CardText className = "value_style">{ranks ? ranks : "Getting Rank..."}
+					          		<CardText className = "value_style">{ranks}
 						          		<span id="lbfontawesome">
 						                    <FontAwesome
 						                    	className = "fantawesome_style"

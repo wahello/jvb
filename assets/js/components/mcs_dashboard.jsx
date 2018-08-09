@@ -196,6 +196,10 @@ class MCS_Dashboard extends Component{
 	      	background = "#fdeab7";
 	      	color = 'black';
 	      }
+	       else if(status == "nap"){
+	      	background = " #107dac";
+	      	color = 'white';
+	      }
 	      else if (score >= 300){
 	        background = 'green';
 	        color = 'white';
@@ -292,7 +296,7 @@ class MCS_Dashboard extends Component{
     renderTablestatus(mc_data){
     	var td_rows = [];
         let keys = ["sleeping_hours","active_hours","inactive_hours","strength_hours",
-        	"exercise_hours","no_data_hours","timezone_change_hours"];
+        	"exercise_hours","no_data_hours","timezone_change_hours","nap_hours"];
         if(!_.isEmpty(mc_data)){
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
@@ -409,10 +413,12 @@ class MCS_Dashboard extends Component{
 		     </div>
 		  </div>
 
-		          <div className = "row justify-content-center mcs_dashboard">
-		          	<div className="col-sm-9 table_pro">
-		          	    <table className="table table-striped table-bordered tableContent">
-		          	    	<tr className="table_content">
+		          <div className = "row justify-content-center table_size1">
+		          	<div className = "col-sm-9">
+		          	<div className="table_pro">
+		          
+		          	    <table className="table table-striped table-bordered">
+		          	    	<tr>
 		          	    		<th className="mcs-dashboard" style={{background:'rgb(0,176,240)',color:'black'}}>Sleeping Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'green',color:'white'}}>Active Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'red',color:'white'}}>Inactive Hours</th>
@@ -420,12 +426,18 @@ class MCS_Dashboard extends Component{
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
 								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet Hours</th>
 								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Hours</th>
+								<th className="mcs-dashboard" style={{background:' #107dac',color:'white'}}>Nap Hours</th>
 		          	    	</tr>
 		          	    	<tbody>
 		          	    		{this.renderTablestatus(this.state.mc_data)}
 		          	    	</tbody>
 		            </table>
-	          	
+		            </div>
+		            </div>
+					</div>
+					<div className = "row justify-content-center mcs-dashboard">
+		          	<div className = "col-sm-9">
+	         
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Active Hours = Any hour with more than 300 steps when user was not sleeping</p>
@@ -433,10 +445,12 @@ class MCS_Dashboard extends Component{
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Strength Hours = Hours user recorded strength exercises</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Hours = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
-		       </div>
-		   
-	     </div>
+		       				<p className="mcs_content" style={{marginLeft:"15px"}}>Nap Hours = Any portion of an hour user taking nap</p>
+		       		</div>
+		       		</div>
+     							
      </div>
+
       	  
       
       );

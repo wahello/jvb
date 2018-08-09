@@ -104,7 +104,7 @@ def _get_activities(user,target_date):
 	manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 	act_obj = {}
 	start = current_date
-	end = current_date + timedelta(days=7)
+	end = current_date + timedelta(days=3)
 	fitfiles=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
