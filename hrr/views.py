@@ -418,7 +418,7 @@ def create_hrr_instance(user, data, start_date):
 
 def aa_data(user,start_date):
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=3)
 	start_date_str = start_date.strftime('%Y-%m-%d')
 
 	start_date_timestamp = start_date
@@ -504,7 +504,7 @@ def aa_data(user,start_date):
 	workout = []
 	hrr = []
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	if activities:
@@ -784,7 +784,7 @@ def aa_workout_data(user,start_date):
 		workout = []
 		hrr = []
 		start = start_date
-		end = start_date + timedelta(days=7)
+		end = start_date + timedelta(days=3)
 		a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 		if activities:
 			if filtered_activities_files:
@@ -1037,7 +1037,7 @@ def daily_aa_data(user, start_date):
 	activities_duration = []
 	data_summaryid = []
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=3)
 
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
@@ -1372,7 +1372,7 @@ def aa_low_high_end_data(user,start_date):
 	workout = []
 	hrr = []
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user= user,created_at__range=[start,end])
 	if activities and a1:
 		for tmp in a1:
@@ -1593,7 +1593,7 @@ def hrr_data(user,start_date):
 		daily_starttime = garmin_data_daily['startTimeInSeconds']
 
 	start = start_date
-	end = start_date + timedelta(days=7)
+	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	
 	workout = []
