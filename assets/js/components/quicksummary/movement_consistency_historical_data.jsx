@@ -49,6 +49,9 @@ mcHistoricalData(score,status){
       else if(status == 'time zone change'){
         return {background:'#fdeab7',color:'black'}
       }
+      else if(status == 'nap'){
+        return {background:'#107dac',color:'white'}
+      }
       else if (score >= 300 )
         return {background:'green', color:'white'};
 }
@@ -99,6 +102,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             "active_hours" : [],
             "inactive_hours" : [],
             "sleeping_hours" : [],
+            "nap_hours":[],
             "strength_hours" : [],
             "exercise_hours" : [],
             "no_data_hours": [],
@@ -144,6 +148,9 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                       else if (time == "timezone_change_hours")
                                         obj[time].push({value:mc.timezone_change_hours?mc.timezone_change_hours:0,
                                                         style:{}});
+                                      else if (time == "nap_hours")
+                                        obj[time].push({value:mc.nap_hours?mc.nap_hours:0,
+                                                        style:{}});
                                       else if (time == "total_steps"){
                                         let totalSteps = mc.total_steps;
                                          if(totalSteps != undefined){
@@ -168,7 +175,12 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                          obj[time].push(
                                             {value:mCdata.steps,
                                              style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
-                                      }                        
+                                      }
+                                      else if(mCdata.status == "nap"){
+                                         obj[time].push(
+                                            {value:mCdata.steps,
+                                             style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
+                                      }                          
                                       else{
                                           obj[time].push({value:mCdata.steps,
                                                         style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
@@ -215,6 +227,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         "active_hours" : "Active Hours",
         "inactive_hours" : "Inactive Hours",
         "sleeping_hours" : "Sleeping Hours",
+        "nap_hours" : "Nap Hours",
         "strength_hours" : "Strength Hours",
         "exercise_hours" : "Exercise Hours",
         "no_data_hours": "No Data Yet Hours",
@@ -227,7 +240,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
     for(let [key,col] of Object.entries(obj)){
       let prcnt_active_steps = '';
       if(key != "active_hours" && key != "inactive_hours" &&
-         key != "sleeping_hours" && key != "strength_hours" &&
+         key != "sleeping_hours" && key != "nap_hours" && key != "strength_hours" &&
          key != "exercise_hours" && key != "total_steps" && key != "dmc"
          && key !== 'no_data_hours' && key !== "timezone_change_hours"){
         let active_days = 0;
@@ -312,6 +325,8 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             <span className="rd_mch_color_legend_label">No Data Yet</span>
             <div className="rd_mch_color_legend color_legend_tz_change"></div>
             <span className="rd_mch_color_legend_label">Time Zone Change</span>
+            <div className="rd_mch_color_legend color_legend_nap_change"></div>
+            <span className="rd_mch_color_legend_label">Nap</span>
 
       </div>
       </div>
