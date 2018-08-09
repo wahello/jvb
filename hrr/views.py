@@ -1593,7 +1593,7 @@ def hrr_data(user,start_date):
 		daily_starttime = garmin_data_daily['startTimeInSeconds']
 
 	start = start_date
-	end = start_date + timedelta(days=3)
+	end = start_date + timedelta(days=7)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	
 	workout = []
