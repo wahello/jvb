@@ -698,8 +698,8 @@ def is_potential_hrr_activity(activity):
 		3) Not yet submitted from the user input. How to check?
 			Any activity file submitted from user input activity grid 
 			will have "comments" key.  
-		4) Duration in seconds is greator than or equal to 1200 seconds
-		5) Distance in meters is greator than or equal to 1287.48 (0.8 miles) 
+		4) Duration in seconds is greater than or equal to 1200 seconds
+		5) Distance in meters is greater than or equal to 1287.48 (0.8 miles) 
 	'''
 	if(activity 
 		and activity.get('activityType') != "HEART_RATE_RECOVERY"
@@ -711,6 +711,19 @@ def is_potential_hrr_activity(activity):
 	return False
 
 def get_renamed_to_hrr_activities(user,calendar_date,activities):
+	'''
+	Return the list of summary ids which has to be renamed as
+	"HEART_RATE_RECOVERY"
+
+	Args:
+		user(:obj:`User`): Currently logged user
+		calendar_date(datetime): Date for which calculation has to be done
+		activities(list): List of activities
+
+	Return:
+		list: List of summary id. Empty list if there is no activity which
+			need to be renamed 
+	'''
 	calendar_date = calendar_date.strftime("%Y-%m-%d")
 	renamed_summaries = []
 	any_potential_hrr = False
@@ -731,8 +744,6 @@ def get_renamed_to_hrr_activities(user,calendar_date,activities):
 				if(renamed_act 
 					and renamed_act.get('activityType') == 'HEART_RATE_RECOVERY'):
 					renamed_summaries.append(activity['summaryId'])
-
-	print("Renamed Summaries:",renamed_summaries)
 	return renamed_summaries
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,
