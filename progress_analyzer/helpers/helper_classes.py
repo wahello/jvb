@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from itertools import zip_longest
 from decimal import Decimal, ROUND_HALF_UP
+import copy
+import json
 
 from django.db.models import Q
 
@@ -134,7 +136,27 @@ class ToCumulativeSum(object):
 	'''
 	Convert a quicklook object to cumulative sum object
 	'''
+
+	def __exclude_no_data_yet_hours(self, ql_obj):
+		'''
+		If there is any "No Data Yet" hour in the MCs the,
+		make it 0 because this should not be taken into consideration
+		while calculating "inactive hours" for current day
+		'''
+		mcs = ql_obj.steps_ql.movement_consistency
+		if mcs:
+			mcs = json.loads(mcs)
+			if mcs.get('no_data_hours'):
+				mcs['no_data_hours'] = 0
+				ql_obj.steps_ql.movement_consistency = json.dumps(mcs)
+		return ql_obj
+
+
 	def __init__(self,user,ql_obj,ui_obj,cum_obj=None):
+
+		if ql_obj:
+			ql_obj = copy.deepcopy(ql_obj)
+			ql_obj = self.__exclude_no_data_yet_hours(ql_obj)
 
 		cum_raw_data = create_cum_raw_data(user,ql_obj,ui_obj,cum_obj)
 		
