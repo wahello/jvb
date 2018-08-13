@@ -748,14 +748,26 @@ def get_renamed_to_hrr_activities(user,calendar_date,activities):
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,
 		userinput_activities=None,**kwargs):
+	
+	'''
+	Combine activities, manually edited activities and user input activities
+	and provide final list of activities.
 
-	# If same id exist in user submited activities, give it more preference
-	# than manually edited activities 
+	During combining activities, information from activites are preferrend in
+	following order - user edited/modifies > Manually edited > normal activities 
+
+	Args:
+		activities_json (list): List of  activities
+		manually_updated_json (list): List of manually edited activities
+		userinput_activities (list): List of user created/modified activities
+	'''
 
 	activities_json = copy.deepcopy(activities_json)
 	userinput_activities = copy.deepcopy(userinput_activities)
 	manually_updated_json = copy.deepcopy(manually_updated_json)
 
+	# If same id exist in user submited activities, give it more preference
+	# than manually edited activities
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
 		if obj_in_user_activities:
@@ -835,10 +847,6 @@ def get_activity_stats(combined_user_activities):
 	activities_hr = {}
 	activities_duration = {}
 	max_duration = 0
-
-	# filtered_activities = get_filtered_activity_stats(activities_json,
-	# 	manually_updated_json,userinput_activities,**kwargs
-	# )
 
 	if len(combined_user_activities):
 		runs_count = 0
@@ -941,10 +949,6 @@ def _get_activities_start_end_time(combined_user_activities):
 		Return list of named tuples containing start and end datetime
 		object of each activities
 	'''
-	# final_filtered_activities= get_filtered_activity_stats(activities_json=todays_activities,
-	# 								manually_updated_json=todays_manually_updated_json,
-	# 								userinput_activities=userinput_activities,
-	# 								**kwargs)
 
 	Time = namedtuple("Time",["start","end"])
 	activities_start_end_time = []
@@ -1423,12 +1427,7 @@ def cal_exercise_steps_total_steps(dailies_json,combined_user_activities,age):
 	'''
 		Calculate exercise steps and total steps
 	'''	
-	# filtered_activities = get_filtered_activity_stats(
-	# 	todays_activities_json,
-	# 	todays_manually_updated_json,
-	# 	userinput_activities,
-	# 	**kwargs
-	# )
+
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
 	garmin_total_steps = 0
@@ -1999,10 +1998,6 @@ def get_workout_effort_grade(todays_daily_strong):
 def get_average_exercise_heartrate_grade(combined_user_activities,
 		todays_daily_strong, age):
 	
-	# filtered_activities = get_filtered_activity_stats(
-	# 	todays_activities,todays_manually_updated,
-	# 	userinput_activities,**kwargs
-	# )
 	total_duration = 0
 	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
 	final_activities = []
