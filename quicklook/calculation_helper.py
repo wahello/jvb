@@ -1468,11 +1468,11 @@ def sleep_point_for_kids(sleep_duration):
 	elif sleep_duration >= _to_sec("8:00") and sleep_duration <= _to_sec("12:00"):
 	   points = 4
 
-	elif ((sleep_duration >= _to_sec("7:31") and sleep_duration <= _to_sec("8:00")) or \
+	elif ((sleep_duration >= _to_sec("7:30") and sleep_duration <= _to_sec("7:59")) or \
 		(sleep_duration >= _to_sec("12:01") and sleep_duration <= _to_sec("12:30"))) :
 
-		if (sleep_duration >= _to_sec("7:31") and sleep_duration <= _to_sec("8:00")):
-			points = round(_sec_min(sleep_duration - _to_sec("7:31")) * 0.03333 + 3, 5)
+		if (sleep_duration >= _to_sec("7:30") and sleep_duration <= _to_sec("7:59")):
+			points = round(_sec_min(sleep_duration - _to_sec("7:30")) * 0.03333 + 3, 5)
 		elif(sleep_duration == _to_sec("12:30")):
 			points = round(1 - (_sec_min(sleep_duration - _to_sec("12:30")) * 0.03333) + 2,5)
 		else:
@@ -1514,8 +1514,8 @@ def sleep_point_for_adults(sleep_duration):
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
 
-	if sleep_duration < _to_sec("6:00") or sleep_duration > _to_sec("12:00"):
-		if sleep_duration > _to_sec("12:00"):
+	if sleep_duration < _to_sec("6:00") or sleep_duration > _to_sec("13:00"):
+		if sleep_duration > _to_sec("13:00"):
 			points = 0
 		else: 
 			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
@@ -1533,7 +1533,7 @@ def sleep_point_for_adults(sleep_duration):
 		else:
 			points = round(0.96667 - (_sec_min(sleep_duration - _to_sec("10:01")) * 0.03333) + 3,5)
 
-	elif ((sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("7:29")) or \
+	elif ((sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")) or \
 		(sleep_duration >= _to_sec("10:31") and sleep_duration <= _to_sec("11:00"))) :
 
 		if(sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")):
@@ -1550,6 +1550,9 @@ def sleep_point_for_adults(sleep_duration):
 	   		points = round(_sec_min(sleep_duration - _to_sec("6:00")) * 0.03333 + 1, 5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _to_sec("11:00")) * 0.01639) + 1,5)
+
+	elif sleep_duration >= _to_sec("12:01") and sleep_duration <= _to_sec("13:00"):
+		points = round(1 - (_sec_min(sleep_duration - _to_sec("12:00")) * 0.01639),5)
 	
 	return points
 
