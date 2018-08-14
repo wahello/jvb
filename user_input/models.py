@@ -311,15 +311,15 @@ class DailyUserInputEncouraged(models.Model):
     time_to_99 = models.CharField(max_length=10, blank = True)
     hr_level = models.CharField(
         max_length=10,
-        validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
+        validators=[CharMinValueValidator(45),CharMaxValueValidator(220)],
         blank = True)
     lowest_hr_first_minute = models.CharField(
         max_length=10,
-        validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
+        validators=[CharMinValueValidator(45),CharMaxValueValidator(220)],
         blank = True)
     lowest_hr_during_hrr = models.CharField(
         max_length=10,
-        validators=[CharMinValueValidator(70),CharMaxValueValidator(220)],
+        validators=[CharMinValueValidator(45),CharMaxValueValidator(220)],
         blank = True)
     time_to_lowest_point = models.CharField(max_length=10, blank = True)
 
@@ -433,6 +433,12 @@ class DailyUserInputOptional(models.Model):
 
     travel_destination = models.TextField(blank=True)
     travel_purpose = models.TextField(blank=True)
+    took_nap = models.CharField(
+        max_length = 10,choices = YN_CHOICE,blank=True)
+    nap_start_time = models.CharField(max_length = 10, blank=True)
+    nap_end_time = models.CharField(max_length = 10, blank=True)
+    nap_duration = models.CharField(max_length = 10, blank = True)
+    nap_comment = models.TextField(blank=True)
 
 
 class InputsChangesFromThirdSources(models.Model):

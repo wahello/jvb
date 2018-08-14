@@ -17,7 +17,7 @@ import { StyleSheet, css } from 'aphrodite';
 	 this.getDayWithDate = this.getDayWithDate.bind(this);
 	 this.getStylesForUserinputSleep = this.getStylesForUserinputSleep.bind(this);
 	 this.strToSecond = this.strToSecond.bind(this);
-     this.renderLastSync = this.renderLastSync.bind(this);
+     this.renderLastSync = this.renderLastSync.bind(this);   
 
 	 this.state = {
       myTableData: [
@@ -28,6 +28,10 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Sleep per Wearable (excluding awake time) (hh:mm)'},
           {name: 'Sleep Bed Time'}, 
           {name: 'Sleep Awake Time'},
+          {name: 'Nap Duration (hh:mm)'},
+          {name: 'Nap Start Time (hh:mm)'},
+          {name: 'Nap End Time (hh:mm)'},
+          {name: 'Nap Comments'},
           {name: 'Deep Sleep (hh:mm)'},
           {name: 'Light Sleep (hh:mm)'},
           {name: 'Awake Time (hh:mm)'},

@@ -2,49 +2,51 @@
 	.arrow{
 		font-size: 28px;
 	}
-	.mc-calendar{
-		margin-top: 3px;
-       padding-bottom: 0px;
+	.row .mc_calendar{
+		margin-top: 10px;
+   padding-bottom: 8px;
 	}
    .mcs_dashboard  {
     font-size: 11px;
-    min-width: 63px;
-    
+    min-width: 63px;   
 }
 .table .table_size {
     min-width: 57px;
     text-align: center;
-    font-size: 11px;
+    font-size: 11px; 
+    padding:3px;
 }
 .table .mcs-dashboard {
 
-    min-width: 57px;
+    min-width: 46px;
     text-align: center;
     font-size: 11px;
-    padding:6px;
+    padding:0px;
 }
-
 .tableContent{
   margin-left: 5px;
-}
+}                 
 .table_process{
   margin-left:8px;
   margin-right:18px;
 }
-.table_pro{
-  margin-left:14px;
-  margin-right:15px;
+.table_size1{
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.table_pro{  
+  overflow-x: scroll;
 }
 }
 @media screen and (max-width: 320px) {
  .table .table_size {
-    min-width: 54px;
+    min-width: 51px;
     font-size: 9px;
 }
 .table .mcs-dashboard {
-    min-width: 55px;
-    font-size: 10px;
-    padding: 4px;
+    min-width: 43px;
+    font-size: 9px;
+    padding: 0px;
+ }
 }
 
-}

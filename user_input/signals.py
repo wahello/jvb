@@ -9,6 +9,8 @@ from quicklook.tasks import generate_quicklook
 from .custom_signals import user_input_post_save,user_input_notify
 from .tasks import notify_admins_task
 from progress_analyzer.tasks import set_pa_report_update_date
+from hrr.tasks import create_hrrdata
+from .models import DailyUserInputStrong
 
 @receiver(user_input_post_save, sender=UserDailyInputSerializer)
 def create_or_update_quicklook(sender, **kwargs):
@@ -50,3 +52,17 @@ def notify_admins(sender,instance=None, created=False,**kwargs):
 		}
 
 		notify_admins_task.delay(admin_users_email,instance_meta)
+
+@receiver(user_input_post_save, sender=UserDailyInputSerializer)
+def create_or_update_hrr(sender, **kwargs):
+	request = kwargs.get('request')
+	# obj = DailyUserInputStrong.objects.filter(
+	# 	user_input__user=request.user,user_input__created_at=kwargs.get('to_date'))
+	# print(obj,"user input object created or not")
+	# from_date = kwargs.get('from_date')
+	# from_date_str = kwargs.get('from_date').strftime("%Y-%m-%d")
+	to_date_str = kwargs.get('to_date').strftime("%Y-%m-%d")
+	# print(from_date_str,"from date")
+	# print(to_date_str,"to date str")
+	create_hrrdata.delay(request.user.id,to_date_str,to_date_str)
+	
