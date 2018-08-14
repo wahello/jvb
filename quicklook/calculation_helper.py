@@ -1258,7 +1258,12 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			time_interval = data_date_midnight.strftime("%I:%M %p")+" to "+end_hour.strftime("%I:%M %p")
 			movement_consistency[time_interval] = {
 				"steps":0,
-				"status":"sleeping"
+				"status":"sleeping",
+				"active_duration":{
+					'duration':0,
+					'unit':'minute'
+				},
+				"active_prcnt":0
 			}
 			data_date_midnight += td_hour
 
@@ -1291,6 +1296,12 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				else:
 					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
+				active_duration_min = data.get('activeTimeInSeconds',0)/60
+				interval_active_duration = movement_consistency[time_interval]['active_duration']
+				interval_active_duration['duration'] = round(
+					interval_active_duration['duration'] + active_duration_min,2)
+				active_prcnt = round((interval_active_duration['duration']/60)*100,2)
+				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
 
