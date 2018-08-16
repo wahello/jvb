@@ -149,7 +149,7 @@ class UpdateHrr(generics.RetrieveUpdateDestroyAPIView):
 		except Hrr.DoesNotExist:
 			return None
 
-	def put(self, request,id, format="json"):
+	def put(self, request,format="json"):
 		latest_hrr = self.get_object()
 		if latest_hrr:
 			serializer = HrrSerializer(latest_hrr,data = request.data)
