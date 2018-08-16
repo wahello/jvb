@@ -35,7 +35,7 @@ class UserInputs extends React.Component{
 
     getInitialState(){
       const initialState = {
-        garminRequestCancleSource:[],
+        garminRequestCancelSource:[],
         selected_date:new Date(),
         fetched_user_input_created_at:'',
         update_form:false,
@@ -178,7 +178,7 @@ class UserInputs extends React.Component{
     }
 
     constructor(props){
-      super(props);
+       super(props);
       this.state = this.getInitialState();
       this.handleChange = handlers.handleChange.bind(this);
       this.handleChangeSleepBedTime = handlers.handleChangeSleepBedTime.bind(this);
@@ -271,30 +271,19 @@ class UserInputs extends React.Component{
       this.onFetchRecentSuccessFullReport = this.onFetchRecentSuccessFullReport.bind(this);
       this.userDailyInputRecentFetch = userDailyInputRecentFetch.bind(this);
       this.getDTMomentObj1 = this.getDTMomentObj1.bind(this);
-      this.GarminDataRequestCreator = this.GarminDataRequestCreator.bind(this);
+      this.fetchGarminData = fetchGarminData.bind(this);
+      this.cancelPendingGarminRequests = this.cancelPendingGarminRequests.bind(this);
 
-      this.toggle1 = this.toggle1.bind(this);
-      this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
-      this.workoutTab = this.workoutTab.bind(this);
-      this.sleepTab = this.sleepTab.bind(this);
-      this.foodTab = this.foodTab.bind(this);
-      this.stressTab = this.stressTab.bind(this);
-      this.extraTab = this.extraTab.bind(this);
-      this.renderAddDate = this.renderAddDate.bind(this);
-      this.renderRemoveDate = this.renderRemoveDate.bind(this);
-    
+    this.toggle1 = this.toggle1.bind(this);
+    this.onLogoutSuccess = this.onLogoutSuccess.bind(this);
+    this.workoutTab = this.workoutTab.bind(this);
+    this.sleepTab = this.sleepTab.bind(this);
+    this.foodTab = this.foodTab.bind(this);
+    this.stressTab = this.stressTab.bind(this);
+    this.extraTab = this.extraTab.bind(this);
+    this.renderAddDate = this.renderAddDate.bind(this);
+    this.renderRemoveDate = this.renderRemoveDate.bind(this);
     }
-
-  GarminDataRequestCreator(){
-    let source = axios.CancelToken.source();
-    let token = source.token;
-    let tokenList = this.state.garminRequestCancleSource;
-    tokenList.append(source);
-    this.setState({
-      garminRequestCancleSource:tokenList
-    });
-    return fetchGarminData
-  }
     
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
@@ -564,22 +553,18 @@ transformActivity(activity){
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today")){
-
-            let getGarminData = this.GarminDataRequestCreator();
-            
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
-              getGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
             else if(!this.state.workout ||this.state.workout == 'no' || this.state.workout == 'not yet'){
-              getGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
+              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWorkout, this.onFetchGarminFailure);
             }
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
-             getGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
+             this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
           }
-          let getGarminData = this.GarminDataRequestCreator();
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
-          getGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
+          this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }
@@ -714,13 +699,13 @@ transformActivity(activity){
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
           selected_date:this.state.selected_date,
           gender:this.state.gender},()=>{
-          fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+          this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }else{
         this.onFetchFailure(data)
-        fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
+        this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
         fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
       }
     }
@@ -1024,10 +1009,20 @@ getTotalSleep(){
         });
     }
 
+  cancelPendingGarminRequests(){
+    // Cancle pending ajax call to get garmin data
+    for(let req of  this.state.garminRequestCancelSource)
+      req.cancel();
+  }
+
   renderAddDate(){
     var today = this.state.selected_date;
     var tomorrow = moment(today).add(1, 'days');
+    // Cancle pending ajax call for fetching Garmin data
+    // when date is changed
+    this.cancelPendingGarminRequests()
     this.setState({
+      garminRequestCancelSource:[],
       selected_date:tomorrow.toDate(), 
       fetching_data:true,
     },function(){
@@ -1038,7 +1033,11 @@ getTotalSleep(){
   renderRemoveDate(){
     var today = this.state.selected_date;
     var tomorrow = moment(today).subtract(1, 'days');
+    // Cancle pending ajax call for fetching Garmin data
+    // when date is changed
+    this.cancelPendingGarminRequests();
     this.setState({
+      garminRequestCancelSource:[],
       selected_date:tomorrow.toDate(),
        fetching_data:true,
     },function(){
@@ -1048,7 +1047,13 @@ getTotalSleep(){
   }
 
     processDate(date){
+      /*Handle selection of new date from calendar*/
+
+      // Cancle pending ajax call for fetching Garmin data
+      // when date is changed
+      this.cancelPendingGarminRequests();
       this.setState({
+        garminRequestCancelSource:[],
         selected_date:date,
         fetching_data:true,
         calendarOpen:!this.state.calendarOpen
