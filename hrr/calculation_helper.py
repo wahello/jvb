@@ -158,6 +158,7 @@ def weekly_workout_calculations(weekly_workout):
 	'''
 		Make Similar activities into single activity
 	'''
+	print(weekly_workout,"raw weekly workout")
 	workout_type = []
 	workout_dict = {}
 	workout_summary_id = {} 
@@ -193,6 +194,7 @@ def weekly_workout_calculations(weekly_workout):
 	added_all_actiivtes = add_activity_type(workout_dict,workout_type)
 	workout_dict_percent = workout_percent(added_all_actiivtes)
 	final_workout_data = change_hrr_key(workout_dict_percent)
+	print(final_workout_data,"final weekly workout")
 	return final_workout_data,workout_summary_id,workout_type
 
 def add_workout_type(single_aa,workout_summary_id):

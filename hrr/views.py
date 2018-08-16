@@ -1120,6 +1120,8 @@ def daily_aa_data(user, start_date):
 			
 	except:
 		logging.exception("message")
+	print(workout,"daily workout")
+	print(hrr,"hrr")
 	profile = Profile.objects.filter(user=user)
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
