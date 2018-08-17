@@ -22,7 +22,6 @@ import Sleepgraph from '../components/sleep';
 import GarminDataPage from '../components/GarminData';
 import { Switch, BrowserRouter, Route, hashHistory } from 'react-router-dom';
 import Quicklook from '../components/quicksummary/quicksummary';
-import Movement from '../components/movement_consistency';
 import DashboardSummary from '../components/dashboard_summary';
 import TermsConditions from '../components/terms_and_conditions';
 import ServiceConnect_fitBit from '../components/serviceConnect_fitbit';
@@ -86,7 +85,6 @@ function initializeLocalState(){
 					<Route path='/leaderboard' component={RequireAuth(LeaderBoard)} />*/}
 					<Route path='/leaderboard' component={RequireAuth(LeaderBoard1)} />
 					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
-					{/*<Route path='/movement_consistency' component={RequireAuth(Movement)}/>*/}
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
 					<Route path='/weekly_workout_summary' component={RequireAuth(WorkoutDashboard)} />

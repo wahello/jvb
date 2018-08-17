@@ -138,7 +138,10 @@ class Movement_Dashboard extends Component{
 	        }
 	        value = x1+x2;
     	}
-    	else{
+    	else if(value == 0){
+        	value = "0";
+        }
+        else{
         	value = "No Data Yet"
         }
         return value;
