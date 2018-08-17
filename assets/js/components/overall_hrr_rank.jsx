@@ -69,6 +69,7 @@ class OverallRank extends Component{
 			
 			},
 			date:"",
+			capt:"",
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallHrrTable = this.renderOverallHrrTable.bind(this);
@@ -318,7 +319,7 @@ class OverallRank extends Component{
 
   			tableHeaders.push(
   			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,rank,userName,date)}
+	  			onClick = {this.reanderAllHrr.bind(this,rank,userName,capt,date)}
 	  			style = {{fontSize:"13px"}}>
 	  			{capt}<br/>{date}
   			</a>);
@@ -326,11 +327,12 @@ class OverallRank extends Component{
 	  return tableHeaders;	
 	  	
 	}
-	reanderAllHrr(all_data,value1,date){
+	reanderAllHrr(all_data,value1,capt,date){
 		this.setState({
 			all_hrr_rank_data:all_data,
 			Hrr_username:value1,
 			date:date,
+			capt:capt,
 			Hrr_view:!this.state.Hrr_view,
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
@@ -528,7 +530,7 @@ class OverallRank extends Component{
 					        	{this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
 					      	</div>
 				      	</div>
-				      	<span className = "weekdate">{this.state.date}</span>
+				      	<span className = "weekdate"><span>{this.state.capt ? this.state.capt : "Week"}</span><span>{" (" + this.state.date + ")"}</span></span>
 			        </div>
 		    	
 		    	
