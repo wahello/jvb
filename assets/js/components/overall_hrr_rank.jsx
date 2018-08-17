@@ -58,7 +58,7 @@ class OverallRank extends Component{
 	        Hrr_view:false,
 	        active_view:true,
 			btnView:false,
-	        all_hrr_rank_data:"",
+	        all_hrr_rank_data:'',
 	        Hrr_username:"",
 	        duration_date:{
 				"week":"",
@@ -68,6 +68,7 @@ class OverallRank extends Component{
 				"month":"",
 			
 			},
+			date:"",
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallHrrTable = this.renderOverallHrrTable.bind(this);
@@ -88,12 +89,16 @@ class OverallRank extends Component{
 		this.renderOverallHrr2FetchOverlay = renderOverallHrr2FetchOverlay.bind(this);
 		this.renderOverallHrr3FetchOverlay = renderOverallHrr3FetchOverlay.bind(this);
 		this.renderOverallHrrSelectedDateFetchOverlay = renderOverallHrrSelectedDateFetchOverlay.bind(this);
+		this.renderDate = this.renderDate.bind(this);
 
 	}
 	successOverallHrrRank(data){
+		let date = this.renderDate(data.data.overall_hrr,data.data.duration_date);
 		this.setState({
 			Hrr_data:data.data.overall_hrr,
 			duration_date:data.data.duration_date,
+			all_hrr_rank_data:data.data.overall_hrr.week.all_rank,
+			date:this.headerDates(date),
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
@@ -221,20 +226,29 @@ class OverallRank extends Component{
 	    });
    	}
    	headerDates(value){
-    let str = value;
-            let d = str.split(" ");
-            let d1 = d[0];
-            let date1 =moment(d1).format('MMM DD, YYYY');
-            let d2 = d[2];
-            let date2 =moment(d2).format('MMM DD, YYYY');
-            let date = date1 + ' to ' + date2;
-            return date;
+   	   let str = value;
+       let d = str.split(" ");
+       let d1 = d[0];
+       let date1 =moment(d1).format('MMM DD, YYYY');
+       let d2 = d[2];
+       let date2 =moment(d2).format('MMM DD, YYYY');
+       let date = date1 + ' to ' + date2;
+       return date;
 	}
 	handleBackButton(){
   		this.setState({
   			active_view:!this.state.active_view,
   			btnView:false,
   		})
+  	}
+  	renderDate(value,value5){
+  		let date;
+  		for(let [key,val] of Object.entries(value)){
+  			if(key == "week"){
+  				date = value5[key];
+  			}
+  		}
+  		return date;
   	}
    	renderOverallHrrTable(value,value5){
 		let category = "";
@@ -248,12 +262,11 @@ class OverallRank extends Component{
 	  		let val = value[duration];
 	  		if(duration == "custom_range" && val){
 	  			for(let [range,value1] of Object.entries(val)){
-	  				durations.push(this.headerDates(range));
+	  				durations.push(range);
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
-		  				if(c_key == "user_rank"){
-		  					userName = c_rankData.username;
-			  		 		scores.push(c_rankData.total_hrr_rank_point);
-			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
+		  				if(c_key == "all_rank"){
+		  					//userName = c_rankData.username;
+			  		 		ranks.push(c_rankData);
 		  		 		}
 	  				}
 	  			}
@@ -262,88 +275,62 @@ class OverallRank extends Component{
 	  			if (val){ 
 			  		durations.push(duration);
 			  		for (let [key,rankData] of Object.entries(val)){
-			  		 	if(key == "user_rank"){
-			  		 		userName = rankData.username;
-			  		 		scores.push(rankData.total_hrr_rank_point);
-			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
-			  		 	}
-			  		 	
+			  		 	if(key == "all_rank"){
+			  		 		// userName = rankData.username;
+			  		 		ranks.push(rankData);
+			  		 	}	
 			  		}
 			  	}
 		  	}
 		}
 
 		let date;
-	  	let tableHeaders = [<th className = "lb_table_style_rows">Overall HRR</th>]
+	  	let tableHeaders = [];
 	  	for(let dur of durations){
+	  		let rank;
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
 	  		if(dur == "today"){
-	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
+	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+	  			rank = value[dur].all_rank;	
 	  		}
 	  		else if(dur == "yesterday"){
-	  			date = moment(value5[dur]).format('MMM DD, YYYY');	
+	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+	  			rank = value[dur].all_rank;	
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
+		  		rank = value[dur].all_rank;
 	  		}
 	  		else if(dur == "month"){
 		  		date = this.headerDates(value5[dur]);
+		  		rank = value[dur].all_rank;
 	  		}
 	  		else if(dur == "year"){
 		  		date = this.headerDates(value5[dur]);
+		  		rank = value[dur].all_rank;
 	  		}
 	  		else{
-	  			date = value5[dur];
-	  		}	
-	  		tableHeaders.push(<th className = "lb_table_style_rows">{capt}<br/>{date}</th>);
+	  			date = this.headerDates(dur);
+	  			capt = "";
+	  			rank = value['custom_range'][dur].all_rank;
+
+	  		}
+
+  			tableHeaders.push(
+  			 <a className="dropdown-item" 
+	  			onClick = {this.reanderAllHrr.bind(this,rank,userName,date)}
+	  			style = {{fontSize:"13px"}}>
+	  			{capt}<br/>{date}
+  			</a>);
 	  	}
-	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
+	  return tableHeaders;	
 	  	
-	  	let rankTableData = [<td style={{fontWeight:"bold"}}
-	  							 className = "lb_table_style_rows">
-	  							 {"Ranks"}</td>]
-
-		  	for(let rank of ranks){
-		  		if(rank.isCustomRange){
-		  			var all_cat_rank = this.state.Hrr_data['custom_range'][rank['duration']].all_rank;
-			  	}
-			  	else{
-			  		var all_cat_rank = this.state.Hrr_data[rank['duration']].all_rank;
-			  	}
-		  		rankTableData.push(
-			  		<td className = "lb_table_style_rows">
-			  		<a  onClick = {this.reanderAllHrr.bind(this,all_cat_rank,userName)}>
-			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
-			  				 <span id="lbfontawesome">
-			                    <FontAwesome
-			                    	className = "fantawesome_style"
-			                        name = "external-link"
-			                        size = "1x"
-			                    />
-			                 </span>  
-			                 </a> 
-			  		</td>
-		  		);
-		  	}
-	  	tableRows.push(<tbody><tr className = "lb_table_style_rows">{rankTableData}</tr></tbody>);
-
-	  	let scoreTableData = [<td style={{fontWeight:"bold"}}
-	  							 className = "lb_table_style_rows">
-	  							 {"Total Hrr Rank Point"}</td>]
-	  	for(let score of scores){
-	  		scoreTableData.push(<td className = "lb_table_style_rows">
-			  				{score}</td>)
-	  	}
-	  	tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>);
-
-	  	return  <table className = "table table-striped table-bordered">
-	  	{tableRows}
-	  	</table>;
 	}
-	reanderAllHrr(all_data,value1){
+	reanderAllHrr(all_data,value1,date){
 		this.setState({
 			all_hrr_rank_data:all_data,
 			Hrr_username:value1,
+			date:date,
 			Hrr_view:!this.state.Hrr_view,
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
@@ -357,7 +344,7 @@ class OverallRank extends Component{
 			<div id = "hambergar">
 		        <NavbarMenu title = {"HRR Leaderboard"} />
 		    </div>
-		    {this.state.active_view &&
+		   
 		      	<div className="nav3" id='bottom-nav'>
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1 user_nav">
@@ -416,7 +403,7 @@ class OverallRank extends Component{
                            </Navbar> 
                            </div>
                            </div>                                
-		    }
+		  
 
             <Popover
             placement="bottom"
@@ -532,22 +519,22 @@ class OverallRank extends Component{
                 </Popover>
 
                 <div className = "col-md-12 col-sm-12 col-lg-12" >
-             	{this.state.btnView &&
-		           	<div>
-		            	<Button className = "btn btn-info" onClick = {this.handleBackButton} style = {{marginLeft:"50px",marginTop:"10px",fontSize:"13px"}}>Back</Button>
-		            </div>
-            	}
-             	{this.state.active_view &&
-			        <div className = "row justify-content-center lb_table_style" style = {{paddingTop:"25px"}}>
-				        <div className = "table table-responsive">
-				        	{this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
-				        </div>
+			        <div className = "row dropStyles">
+				       <div className="dropdown">
+	    					<button type="button" className="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+	      					Select Range
+	    					</button>
+	    					 <div className="dropdown-menu">
+					        	{this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
+					      	</div>
+				      	</div>
+				      	<span className = "weekdate">{this.state.date}</span>
 			        </div>
-		    	}
-		    	{this.state.btnView &&
+		    	
+		    	
 		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
 	  							Hrr_username = {this.state.Hrr_username}/>
-				}
+				
                 </div>
                 {this.renderOverallHrrSelectedDateFetchOverlay()}
                 {this.renderOverallHrr1FetchOverlay()}
