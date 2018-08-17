@@ -100,6 +100,7 @@ class OverallRank extends Component{
 			duration_date:data.data.duration_date,
 			all_hrr_rank_data:data.data.overall_hrr.week.all_rank,
 			date:this.headerDates(date),
+			capt:"Week",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
@@ -530,7 +531,7 @@ class OverallRank extends Component{
 					        	{this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
 					      	</div>
 				      	</div>
-				      	<span className = "weekdate"><span>{this.state.capt ? this.state.capt : "Week"}</span><span>{" (" + this.state.date + ")"}</span></span>
+				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 			        </div>
 		    	
 		    	
