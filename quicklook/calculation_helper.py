@@ -1463,7 +1463,7 @@ def sleep_point_for_kids(sleep_duration):
 		if sleep_duration > _to_sec("14:00"):
 			points = 0
 		else: 
-			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
+			points = round(_sec_min((sleep_duration - 0)) * 0.00256 + 0, 5)
 
 	elif sleep_duration >= _to_sec("8:00") and sleep_duration <= _to_sec("12:00"):
 	   points = 4
@@ -1484,7 +1484,7 @@ def sleep_point_for_kids(sleep_duration):
 		if(sleep_duration >= _to_sec("7:00") and sleep_duration <= _to_sec("7:29")):
 			points = round(_sec_min(sleep_duration - _to_sec("7:00")) * 0.03333 + 2, 5)
 		elif(sleep_duration == _to_sec("13:00")):
-			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01639) + 1,5)
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01667) + 1,5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _to_sec("12:30")) * 0.03333) + 2,5)
 
@@ -1494,7 +1494,7 @@ def sleep_point_for_kids(sleep_duration):
 		if(sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")):
 	   		points = round(_sec_min(sleep_duration - _to_sec("6:30")) * 0.03333 + 1, 5)
 		else:
-			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01639) + 1,5)
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01667) + 1,5)
 	
 	return points
 
