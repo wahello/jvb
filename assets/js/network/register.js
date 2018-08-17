@@ -22,7 +22,7 @@ class RegisterNetwork {
 		delete post_data['dob_day'];
 		delete post_data['dob_month'];
 		delete post_data['dob_year'];
-		console.log(post_data);
+		// console.log(post_data);
 		const URL = "/api/users/";
 		var config = {
 			method: 'post',
