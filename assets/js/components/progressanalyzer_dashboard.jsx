@@ -39,6 +39,7 @@ class ProgressDashboard extends Component{
 			 dateRange3:false,
 			 fetching_ql4:false,
 			 scrollingLock:false,
+			 dropdownOpen1:false,
 			 summary:{
             "overall_health":{
                "overall_health_gpa":{
@@ -510,8 +511,10 @@ class ProgressDashboard extends Component{
 	           "today": "-",
 	           "yesterday": "-"
 	       	},
+	       	selected_range:"",
 		};
 		this.successProgress = this.successProgress.bind(this);
+		this.headerDates = this.headerDates.bind(this);
     	this.errorProgress = this.errorProgress.bind(this);
     	this.toggleCalendar=this.toggleCalendar.bind(this);
     	this.toggleDate1 = this.toggleDate1.bind(this);
@@ -527,6 +530,17 @@ class ProgressDashboard extends Component{
    		this.handleScroll = this.handleScroll.bind(this);
    		this.renderOverallHealth = this.renderOverallHealth.bind(this);
    		this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
+   		this.toggle = this.toggle.bind(this);
+	}
+	headerDates(value){
+   	   let str = value;
+       let d = str.split(" ");
+       let d1 = d[0];
+       let date1 =moment(d1).format('MMM DD, YYYY');
+       let d2 = d[2];
+       let date2 =moment(d2).format('MMM DD, YYYY');
+       let date = date1 + ' to ' + date2;
+       return date;
 	}
 	successProgress(data){
 	    this.setState({
@@ -550,6 +564,11 @@ class ProgressDashboard extends Component{
         	[name]: value
       	});
     }
+    toggle(){
+		this.setState({
+			dropdownOpen1:!this.state.dropdownOpen1
+		})
+	}
 	toggleCalendar(){
 	    this.setState({
       		calendarOpen:!this.state.calendarOpen
@@ -711,66 +730,72 @@ class ProgressDashboard extends Component{
     });
   }
   	renderOverallHealth(value,value5){
-  		let duration_type = ["today","yesterday","week","year","custom_range"];
+  		let duration_type = ["today","yesterday","week","month","year","custom_range"];
+  		let duration_type1 = ["today","yesterday","week","month","year",];
   		let durations = [];
   		for(let [key,value1] of Object.entries(value)){
-  			for(let [key1,value2] of Object.entries(value1)){
-  				for(let duration of duration_type){
-  					let val = value2[duration];
-  					if(dur == "custom_range"){
-  						for(let [range,value3] of Object.entries(val)){
-  							durations.push(range);
-  						}
-  					}
-  					else{
-  						durations.push(duration);
-  					}
-  				}
-  			}
+  			if(key == "overall_health"){
+	  			for(let [key1,value2] of Object.entries(value1)){
+	  				if(key1 == "overall_health_gpa"){
+		  				for(let duration of duration_type){
+		  					let val = value2[duration];
+		  					if(duration == "custom_range" && val){
+		  						for(let [range,value3] of Object.entries(val)){
+		  							duration_type1.push(range);
+		  						}
+		  					}
+		  				}
+		  			}
+	  			}
+	  		}
   		}
-
+  
   		let date;
 	  	let tableHeaders = [];
-	  	for(let dur of durations){
+	  	for(let dur of duration_type1){
 	  		let rank;
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
 	  		if(dur == "today"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
-	  			rank = value[dur].all_rank;	
+	  			
 	  		}
 	  		else if(dur == "yesterday"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
-	  			rank = value[dur].all_rank;	
+	  			
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
-		  		rank = value[dur].all_rank;
+		  		
 	  		}
 	  		else if(dur == "month"){
 		  		date = this.headerDates(value5[dur]);
-		  		rank = value[dur].all_rank;
+		  		
 	  		}
 	  		else if(dur == "year"){
 		  		date = this.headerDates(value5[dur]);
-		  		rank = value[dur].all_rank;
+		  		
 	  		}
 	  		else{
 	  			date = this.headerDates(dur);
 	  			capt = "";
-	  			rank = value['custom_range'][dur].all_rank;
+	  			
 
 	  		}
 
   			tableHeaders.push(
+  			 <DropdownItem>
   			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,rank,userName,capt,date)}
+	  			onClick = {this.reanderAllHrr.bind(this,dur)}
 	  			style = {{fontSize:"13px"}}>
 	  			{capt}<br/>{date}
-  			</a>);
+  			</a></DropdownItem>);
 	  	}
 	  return tableHeaders;	
-	  	
-  	
+  	}
+  	reanderAllHrr(period){
+  		this.setState({
+  			selected_range:period,
+  		});
   	}
 	render(){
 		return(
@@ -1006,9 +1031,18 @@ class ProgressDashboard extends Component{
                     </Popover>
 
                     <div className = "row gd_padding">
-						<div className = "col-md-4 gd_table_margin ">
-							{this.renderOverallHealth(this.state.summary,this.state.duration_date)}
-					    </div>
+
+					     <div className = "row dropStyles">
+
+				        <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
+					        <DropdownToggle caret>
+					          Select Range
+					        </DropdownToggle>
+					        <DropdownMenu>
+					         {this.renderOverallHealth(this.state.summary,this.state.duration_date)}
+					        </DropdownMenu>
+					      </Dropdown>
+			        </div>
 					</div>
 					{this.renderProgressSelectedDateFetchOverlay()}
 			</div>
