@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
-import { StyleSheet, css } from 'aphrodite';
+import { StyleSheet, css } from 'aphrodite';  
 import html2canvas from 'html2canvas';
 import fetchProgress,{fetchUserRank,progressAnalyzerUpdateTime} from '../network/progress';
 import AllRank_Data1 from "./leader_all_exp";
@@ -1229,48 +1229,7 @@ handleBackButton(){
         return(
             <div className="dashboard">
         <div className="container-fluid">
-        
 
-         {/*<Navbar toggleable
-         fixed={fix ? 'top' : ''}
-          className="navbar navbar-expand-sm navbar-inverse nav6">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
-           <FontAwesome
-                 name = "bars"
-                 size = "1x"
-
-             />
-
-          </NavbarToggler>
-
-          <Link to='/' >
-            <NavbarBrand
-              className="navbar-brand float-sm-left"
-              id="navbarTogglerDemo" style={{fontSize:"16px",marginLeft:"-4px"}}>
-              <img className="img-fluid"
-               style={{maxWidth:"200px"}}
-               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-            </NavbarBrand>
-          </Link>
-            <span id="header">
-            <h2 className="head" id="head">Progress Analyzer
-            </h2>
-            </span>
-          <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
-            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
-              <NavItem className="float-sm-right">
-                <Link id="logout"className="nav-link" to='/'>Home</Link>
-              </NavItem>
-               <NavItem className="float-sm-right">
-                   <NavLink
-                   className="nav-link"
-                   id="logout"
-                   onClick={this.handleLogout}>Log Out
-                    </NavLink>
-              </NavItem>
-            </Nav>
-          </Collapse>
-        </Navbar>*/}
         <NavbarMenu title = {"Progress Analyzer"} />
       </div> 
       {this.state.active_view &&
