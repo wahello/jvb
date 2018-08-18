@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
+        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input,
+    	Dropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import NavbarMenu from './navbar';
@@ -70,6 +71,7 @@ class OverallRank extends Component{
 			},
 			date:"",
 			capt:"",
+			dropdownOpen: false,
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallHrrTable = this.renderOverallHrrTable.bind(this);
@@ -91,6 +93,7 @@ class OverallRank extends Component{
 		this.renderOverallHrr3FetchOverlay = renderOverallHrr3FetchOverlay.bind(this);
 		this.renderOverallHrrSelectedDateFetchOverlay = renderOverallHrrSelectedDateFetchOverlay.bind(this);
 		this.renderDate = this.renderDate.bind(this);
+		this.toggle = this.toggle.bind(this);
 
 	}
 	successOverallHrrRank(data){
@@ -129,6 +132,11 @@ class OverallRank extends Component{
 			fetching_hrr4:true,
 		});
 		fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,true);
+	}
+	toggle(){
+		this.setState({
+			dropdownOpen:!this.state.dropdownOpen
+		})
 	}
 	onSubmitDate1(event){
     event.preventDefault();
@@ -319,11 +327,12 @@ class OverallRank extends Component{
 	  		}
 
   			tableHeaders.push(
+          	<DropdownItem>
   			 <a className="dropdown-item" 
 	  			onClick = {this.reanderAllHrr.bind(this,rank,userName,capt,date)}
 	  			style = {{fontSize:"13px"}}>
 	  			{capt}<br/>{date}
-  			</a>);
+  			</a></DropdownItem>);
 	  	}
 	  return tableHeaders;	
 	  	
@@ -523,18 +532,18 @@ class OverallRank extends Component{
 
                 <div className = "col-md-12 col-sm-12 col-lg-12" >
 			        <div className = "row dropStyles">
-				       <div className="dropdown">
-	    					<button type="button" className="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-	      					Select Range
-	    					</button>
-	    					 <div className="dropdown-menu">
-					        	{this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
-					      	</div>
-				      	</div>
+
+				        <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+					        <DropdownToggle caret>
+					          Select Range
+					        </DropdownToggle>
+					        <DropdownMenu>
+					          {this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
+					        </DropdownMenu>
+					      </Dropdown>
+					      
 				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 			        </div>
-		    	
-		    	
 		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
 	  							Hrr_username = {this.state.Hrr_username}/>
 				
