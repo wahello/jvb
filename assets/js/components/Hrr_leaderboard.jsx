@@ -86,7 +86,7 @@ class HrrLeaderboard extends Component{
                   window.scrollTo(0, 130);
                 }
             }
-          }, 100);
+          },100);
       }
   }
 	renderTable(Hrr_data,Hrr_username){

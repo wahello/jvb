@@ -1,0 +1,22 @@
+.dropStyles{
+	padding-top: 20px;
+	margin-left: 35px;
+}
+.weekdate{
+	margin-left: 400px;
+	padding-top: 10px;
+	font-weight: bold;
+	color:gray;
+}
+@media (max-width: 1023px){
+	.dropStyles{
+	padding-top: 10px;
+	margin-left: 15px;
+	}
+	.weekdate{
+	margin-left: 10px;
+	color:gray;
+	padding-top: 5px;
+	font-size: 13px;
+}
+}
