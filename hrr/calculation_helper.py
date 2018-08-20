@@ -158,7 +158,6 @@ def weekly_workout_calculations(weekly_workout):
 	'''
 		Make Similar activities into single activity
 	'''
-	print(weekly_workout,"raw weekly workout")
 	workout_type = []
 	workout_dict = {}
 	workout_summary_id = {} 
@@ -194,7 +193,6 @@ def weekly_workout_calculations(weekly_workout):
 	added_all_actiivtes = add_activity_type(workout_dict,workout_type)
 	workout_dict_percent = workout_percent(added_all_actiivtes)
 	final_workout_data = change_hrr_key(workout_dict_percent)
-	print(final_workout_data,"final weekly workout")
 	return final_workout_data,workout_summary_id,workout_type
 
 def add_workout_type(single_aa,workout_summary_id):
@@ -237,7 +235,7 @@ def percent_calculations(aa_dict):
 
 def weekly_aa_calculations(weekly_aa,workout_summary_id):
 	'''
-		Add Aerobic and Anarobic ranhe values to activity
+		Add Aerobic and Anarobic range values to activity
 	'''
 	activity_type = []
 	aa_dict = {}
@@ -278,12 +276,13 @@ def merge_activities(final_workout_data,final_aa_data):
 	'''
 		Merge Totals dict and activity dicts
 	'''
-	#print(final_workout_data,"final_workout_data")
+	print(final_workout_data,"final_workout_data")
+	print(final_aa_data,"final_aa_data")
 	for key,value in final_workout_data.items():
 		for key1,values1 in final_aa_data.items():
 			if key == key1:
 				final_workout_data[key].update(final_aa_data[key1])
-	#print(final_workout_data,"after modification")
+	print(final_workout_data,"after modification")
 	return final_workout_data
 
 def percent_total(merged_data_total):
