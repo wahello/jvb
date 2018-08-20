@@ -977,6 +977,7 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	return False 
 
 def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
+	total_active_minutes = 0
 	active_hours = 0
 	inactive_hours = 0
 	total_steps = 0
@@ -990,7 +991,7 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 	for interval,values in list(mc_data.items()):
 		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
 			'strength_hours','exercise_hours','total_steps','timezone_change_hours',
-			'no_data_hours','nap_hours']
+			'no_data_hours','nap_hours','total_active_minutes']
 		if interval not in non_interval_keys:
 			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -1023,7 +1024,11 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 			elif mc_data[interval]['status'] == 'time zone change':
 				timezone_change_hours += 1
 			total_steps += values['steps']
+			total_active_minutes += values['active_duration']['duration']
 
+	mc_data['total_active_minutes'] = total_active_minutes
+	mc_data['total_active_prcnt'] = round(
+			(total_active_minutes / 1440)*100)
 	mc_data['active_hours'] = active_hours
 	mc_data['inactive_hours'] = inactive_hours
 	mc_data['sleeping_hours'] = sleeping_hours
@@ -1299,12 +1304,13 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				active_duration_min = data.get('activeTimeInSeconds',0)/60
 				interval_active_duration = movement_consistency[time_interval]['active_duration']
 				interval_active_duration['duration'] = round(
-					interval_active_duration['duration'] + active_duration_min,2)
-				active_prcnt = round((interval_active_duration['duration']/60)*100,2)
+					interval_active_duration['duration'] + active_duration_min)
+				active_prcnt = round((interval_active_duration['duration']/60)*100)
 				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
 
+		total_active_minutes = 0
 		active_hours = 0
 		inactive_hours = 0
 		total_steps = 0
@@ -1415,7 +1421,11 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			elif movement_consistency[interval]['status'] == 'nap':
 				nap_hours += 1
 			total_steps += values['steps']
+			total_active_minutes += values['active_duration']['duration']
 
+		movement_consistency['total_active_minutes'] = total_active_minutes
+		movement_consistency['total_active_prcnt'] = round(
+			(total_active_minutes / 1440)*100)
 		movement_consistency['active_hours'] = active_hours
 		movement_consistency['inactive_hours'] = inactive_hours
 		movement_consistency['sleeping_hours'] = sleeping_hours

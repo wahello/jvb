@@ -60,6 +60,8 @@ class Movementquick extends Component{
         {name: 'Exercise Hours'},
         {name: 'No Data Yet Hours'},
         {name: 'Time Zone Change Hours'},
+        {name: 'Total Active Minutes'},
+        {name: 'Total % Active'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
         popoverOpen: false,
@@ -225,6 +227,8 @@ class Movementquick extends Component{
            exercise_hours:'-',
            no_data_hours: '-',
            timezone_change_hours:'-',
+           total_active_minutes: '-',
+           total_active_prcnt:'-',
            total_steps:'-'
          }
       }
@@ -318,6 +322,8 @@ class Movementquick extends Component{
       steps_data.push(data['movement_consistency'].exercise_hours);
       steps_data.push(data['movement_consistency'].no_data_hours);
       steps_data.push(data['movement_consistency'].timezone_change_hours);
+      steps_data.push(data['movement_consistency'].total_active_minutes);
+      steps_data.push(data['movement_consistency'].total_active_prcnt);
      let totalSteps =data['movement_consistency'].total_steps;
        if(totalSteps != undefined){
           totalSteps += '';
