@@ -65,6 +65,7 @@ class HeartRateCal extends Component{
 			this.hrrRefreshData = this.hrrRefreshData.bind(this);
 			this.renderAddDate = this.renderAddDate.bind(this);
 			this.renderRemoveDate = this.renderRemoveDate.bind(this);
+			this.getHeartRateDownUpFormatted = this.getHeartRateDownUpFormatted.bind(this);
   	}
 
 	successHeart(data){
@@ -273,6 +274,21 @@ class HeartRateCal extends Component{
 	    	calendarOpen:!this.state.calendarOpen
 	    });
     }
+
+  getHeartRateDownUpFormatted(){
+  	// Add parentheses "()" around the heartRateBeatDifference
+  	// if HR at start of HRR activity file is greator than 
+  	// HR at the end of workout activity
+  	let heartRateAtEndOfActivity = this.state.end_heartrate_activity;
+  	let heartRateAtStartOfHRR = this.state.HRR_start_beat;
+  	let heartRateBeatDifference = this.state.heart_rate_down_up;
+  	if(heartRateAtStartOfHRR && heartRateBeatDifference &&
+  		heartRateAtEndOfActivity < heartRateAtStartOfHRR){
+  		return "( "+heartRateBeatDifference+" )";
+  	}
+  	return heartRateBeatDifference;
+  }
+
   render(){
   	const {fix} = this.props;
   	return(
@@ -391,7 +407,7 @@ class HeartRateCal extends Component{
 
 				          	     <tr className = "hr_table_style_rows">
 					          	    <td className = "hr_table_style_rows">Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file</td>
-					          	    <td className = "hr_table_style_rows">{"( " + this.state.heart_rate_down_up + " )"}</td>
+					          	    <td className = "hr_table_style_rows">{this.getHeartRateDownUpFormatted()}</td>
 				          	    </tr>
 
 				          	    <tr className = "hr_table_style_rows">

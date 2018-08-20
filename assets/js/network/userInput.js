@@ -365,8 +365,12 @@ export function userDailyInputRecentFetch(date,successCallback=undefined, errorC
 	});
 }
 
-export function fetchGarminData(date, successCallback=undefined, errorCallback=undefined){
-	date = moment(date)
+export function fetchGarminData(date,successCallback=undefined, errorCallback=undefined){
+	let source = axios.CancelToken.source();
+	let token = source.token;
+	let tokenList = this.state.garminRequestCancelSource;
+	tokenList.push(source);
+	date = moment(date);
 	const URL = 'users/daily_input/garmin_data/';
 	const config = {
 		url : URL,
@@ -374,16 +378,26 @@ export function fetchGarminData(date, successCallback=undefined, errorCallback=u
 		params:{
 			"date":date.format('YYYY-MM-DD')
 		},
+		cancelToken:token,
 		withCredentials: true
 	};
-	axios(config).then(function(response){
+	// Add cancel token source for this ajax call to the state
+	// Later used to cancle this call is required.
+	// Read more here - https://github.com/axios/axios#cancellation
+	this.setState({
+		garminRequestCancelSource:tokenList
+	},()=>{
+		axios(config).then(function(response){
 		if(successCallback != undefined){
 			successCallback(response);
 		}
-	}).catch((error) => {
-		if(errorCallback != undefined){
-			errorCallback(error);
-		}
+		}).catch((error) => {
+			if (axios.isCancel(error)) {
+			    console.log('Request canceled', error);
+			}else if(errorCallback != undefined){
+				errorCallback(error);
+			}
+		});
 	});
 }
 

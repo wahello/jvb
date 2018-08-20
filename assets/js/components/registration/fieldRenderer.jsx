@@ -62,7 +62,7 @@ export function renderSelectInches(field){
 				required 
 				{...field.input}>
 				<option value="Inches">Inches</option> 
-				{createDropdown(1,12)}
+				{createDropdown(0,12)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
 	);
