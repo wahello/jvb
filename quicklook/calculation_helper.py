@@ -1455,9 +1455,12 @@ def cal_exercise_steps_total_steps(dailies_json,combined_user_activities,age):
 			if ((avg_hr >= aerobic_zone 
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
-					or obj.get("steps_type","") == "exercise"):
+					or obj.get("steps_type","") == "exercise"
+					or(not avg_hr and obj.get("steps_type","") != "non_exercise")):
 				# If activity heart rate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
+				# If no avg heartrate information, simply treat activity steps as 
+				# exercise steps 
 				if obj.get('created_manually',False):
 					manual_exec_steps += steps
 				else:
