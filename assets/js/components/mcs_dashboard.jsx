@@ -295,8 +295,8 @@ class MCS_Dashboard extends Component{
     }
     renderTablestatus(mc_data){
     	var td_rows = [];
-        let keys = ["sleeping_hours","active_hours","inactive_hours","strength_hours",
-        	"exercise_hours","no_data_hours","timezone_change_hours","nap_hours"];
+        let keys = ["sleeping_hours","nap_hours","active_hours","inactive_hours","strength_hours",
+        	"exercise_hours","no_data_hours","timezone_change_hours",];
         if(!_.isEmpty(mc_data)){
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
@@ -304,8 +304,8 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 	                     	for(let key3 of keys) 
-			         		 	td_values.push(<td>{values2[key3]}</td>);
-		          			td_rows.push(<tr>{td_values}</tr>);
+			         		 	td_values.push(<td className="mcs-dashboard">{values2[key3]}</td>);
+		          			td_rows.push(<tr className="mcs-dashboard">{td_values}</tr>);
 		         		}
 		         	}
 		        }
@@ -416,17 +416,17 @@ class MCS_Dashboard extends Component{
 		          <div className = "row justify-content-center table_size1">
 		          	<div className = "col-sm-9">
 		          	<div className="table_pro">
-		          
 		          	    <table className="table table-striped table-bordered">
 		          	    	<tr>
 		          	    		<th className="mcs-dashboard" style={{background:'rgb(0,176,240)',color:'black'}}>Sleeping Hours</th>
+			          	    	<th className="mcs-dashboard" style={{background:' #107dac',color:'white'}}>Nap Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'green',color:'white'}}>Active Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'red',color:'white'}}>Inactive Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'rgb(255,0,255)',color:'white'}}>Strength Hours</th>
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
 								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet Hours</th>
 								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Hours</th>
-								<th className="mcs-dashboard" style={{background:' #107dac',color:'white'}}>Nap Hours</th>
+								
 		          	    	</tr>
 		          	    	<tbody>
 		          	    		{this.renderTablestatus(this.state.mc_data)}

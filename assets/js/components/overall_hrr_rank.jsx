@@ -532,6 +532,7 @@ class OverallRank extends Component{
 
                 <div className = "col-md-12 col-sm-12 col-lg-12" >
 			        <div className = "row dropStyles">
+
 				        <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
 					        <DropdownToggle caret>
 					          Select Range
@@ -540,6 +541,7 @@ class OverallRank extends Component{
 					          {this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
 					        </DropdownMenu>
 					      </Dropdown>
+					      
 				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 			        </div>
 		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
