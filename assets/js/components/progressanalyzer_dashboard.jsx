@@ -68,475 +68,89 @@ class ProgressDashboard extends Component{
 			 rankData:rankInitialState,
 			 summary:{
             "overall_health":{
-               "overall_health_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "overall_health_gpa_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-
-                     },
-                 "total_gpa_point":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+               "overall_health_gpa":this.getInitialDur(),
+                 "overall_health_gpa_grade":this.getInitialDur(),
+                 "total_gpa_point":this.getInitialDur()
                 },
 
             "ec":{
-                 "avg_no_of_days_exercises_per_week":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                  "exercise_consistency_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                   "exercise_consistency_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+                 "avg_no_of_days_exercises_per_week":this.getInitialDur(),
+                  "exercise_consistency_grade":this.getInitialDur(),
+                   "exercise_consistency_gpa":this.getInitialDur()
                  },
                 "nutrition":{
-                   "prcnt_unprocessed_food_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "prcnt_unprocessed_food_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                  "prcnt_unprocessed_volume_of_food":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+                   "prcnt_unprocessed_food_gpa":this.getInitialDur(),
+                 "prcnt_unprocessed_food_grade":this.getInitialDur(),
+                  "prcnt_unprocessed_volume_of_food":this.getInitialDur()
 
                   },
             "mc":{
-                "movement_consistency_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                     "movement_consistency_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                     "movement_consistency_score":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+                "movement_consistency_gpa":this.getInitialDur(),
+                     "movement_consistency_grade":this.getInitialDur(),
+                     "movement_consistency_score":this.getInitialDur()
                   },
             "non_exercise":{
-                 "non_exericse_steps_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "movement_non_exercise_step_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "non_exercise_steps":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                "total_steps":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },     
+                 "non_exericse_steps_gpa":this.getInitialDur(),
+                 "movement_non_exercise_step_grade":this.getInitialDur(),
+                 "non_exercise_steps":this.getInitialDur(),
+                 "total_steps":this.getInitialDur(),     
             },
         "exercise":{                
-            "workout_duration_hours_min":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }, 
-                "avg_exercise_heart_rate":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },                                      
-                "workout_effort_level":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                      "vo2_max":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }               
+            "workout_duration_hours_min":this.getInitialDur(), 
+                "avg_exercise_heart_rate":this.getInitialDur(),                                      
+                "workout_effort_level":this.getInitialDur(),
+                      "vo2_max":this.getInitialDur()              
                 },
          "sleep": {
-             "prcnt_days_sleep_aid_taken_in_period": {
-                "custom_range": "-",
-                "year": "-",
-                "yesterday": "-",
-                "month": "-",
-                "today":"-" ,
-                "week":"-" 
-            },
-            "average_sleep_grade": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "total_sleep_in_hours_min": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "overall_sleep_gpa": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-             "num_days_sleep_aid_taken_in_period": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            }
+             "prcnt_days_sleep_aid_taken_in_period": this.getInitialDur(),
+            "average_sleep_grade": this.getInitialDur(),
+            "total_sleep_in_hours_min": this.getInitialDur(),
+            "overall_sleep_gpa": this.getInitialDur(),
+             "num_days_sleep_aid_taken_in_period": this.getInitialDur()
         },
          "alcohol": {
-            "alcoholic_drinks_per_week_grade": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "avg_drink_per_week": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range": "-",
-                "today": "-",
-                "year": "-"
-            },
-            "alcoholic_drinks_per_week_gpa": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "prcnt_alcohol_consumption_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            }
+            "alcoholic_drinks_per_week_grade": this.getInitialDur(),
+            "avg_drink_per_week": this.getInitialDur(),
+            "alcoholic_drinks_per_week_gpa": this.getInitialDur(),
+            "prcnt_alcohol_consumption_reported":this.getInitialDur()
         },
          "other": {
-            "hrr_beats_lowered_in_first_min": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_highest_hr_in_first_min": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_lowest_hr_point": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "floors_climbed": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "resting_hr": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range": "-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_time_to_99": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_pure_1_minute_beat_lowered": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-             "hrr_pure_time_to_99": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            }
+            "hrr_beats_lowered_in_first_min":this.getInitialDur(),
+            "hrr_highest_hr_in_first_min":this.getInitialDur(),
+            "hrr_lowest_hr_point": this.getInitialDur(),
+            "floors_climbed": this.getInitialDur(),
+            "resting_hr": this.getInitialDur(),
+            "hrr_time_to_99":this.getInitialDur(),
+            "hrr_pure_1_minute_beat_lowered":this.getInitialDur(),
+             "hrr_pure_time_to_99": this.getInitialDur()
         },
         "sick":{
-          "days_sick_not_sick_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_not_sick":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_sick":{
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_not_sick":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_sick":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-",
-        }
+          "days_sick_not_sick_reported":this.getInitialDur(),
+          "number_of_days_not_sick":this.getInitialDur(),
+          "number_of_days_sick":this.getInitialDur(),
+          "prcnt_of_days_not_sick":this.getInitialDur(),
+          "prcnt_of_days_sick":this.getInitialDur()
       },
         "stress":{
-          "days_stress_level_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_high_stress_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_low_stress_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_medium_stress_reported":{
-              "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_high_stress":{
-              "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_low_stress":{
-              "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_medium_stress":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                 "custom_range":"-",
-                  "today": "-",
-                  "year": "-"
-          }
+          "days_stress_level_reported":this.getInitialDur(),
+          "number_of_days_high_stress_reported":this.getInitialDur(),
+          "number_of_days_low_stress_reported":this.getInitialDur(),
+          "number_of_days_medium_stress_reported":this.getInitialDur(),
+          "prcnt_of_days_high_stress":this.getInitialDur(),
+          "prcnt_of_days_low_stress":this.getInitialDur(),
+          "prcnt_of_days_medium_stress":this.getInitialDur()
         },
         "standing":{
-          "number_days_reported_stood_not_stood_three_hours":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_days_stood_three_hours":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_days_stood_three_hours":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-",
-          }
-
+          "number_days_reported_stood_not_stood_three_hours":this.getInitialDur(),
+          "number_days_stood_three_hours":this.getInitialDur(),
+          "prcnt_days_stood_three_hours":this.getInitialDur()
         },
         "travel":{
-          "number_days_travel_away_from_home":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_days_travel_away_from_home":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-",
-          	}
+          "number_days_travel_away_from_home":this.getInitialDur(),
+          "prcnt_days_travel_away_from_home":this.getInitialDur()
         },
  	 	},
-			"duration_date": {
-	           "month": "-",
-	           "year": "-",
-	           "week": "-",
-	           "today": "-",
-	           "yesterday": "-"
-	       	},
+			"duration_date": this.getInitialDur(),
 	       	selected_range:"today",
 	       	date:"",
 			capt:"",
@@ -592,7 +206,20 @@ class ProgressDashboard extends Component{
    		this.getStylesForBeats = this.getStylesForBeats.bind(this);
    		this.getStylesForRhr = this.getStylesForRhr.bind(this);
    		this.getStylesForFood = this.getStylesForFood.bind(this);
+   		this.getInitialDur = this.getInitialDur.bind(this);
+   		this.renderValue = this.renderValue.bind(this);
 
+	}
+	getInitialDur(){
+		 let paDurationInitialState = {
+ 			"week":"-",
+            "yesterday":"-",
+            "month":"-",
+           "custom_range":"-",
+            "today":"-",
+            "year":"-"
+       };
+       return paDurationInitialState;
 	}
 	headerDates(value){
    	   let str = value;
@@ -1164,24 +791,18 @@ class ProgressDashboard extends Component{
 		return model;
       
     }
-  	renderOverallHealth(value,dur,rank){
-  		let overall_health_gpa = '';
-  		let overall_health_gpa_grade = '';
-  		let overall_health_rank = '';
-  		let total_gpa_point = '';
-  		if(dur && dur != "today" && dur != "month" &&
+    renderValue(value,dur){
+    	let score = "";
+    	if(dur && dur != "today" && dur != "month" &&
   			dur != "yesterday" && dur != "week" && dur != "year"){
-  			overall_health_gpa = value.overall_health_gpa['custom_range'][dur].data;
-  			overall_health_gpa_grade = value.overall_health_gpa_grade['custom_range'][dur].data;
-  			overall_health_rank  = rank['custom_range'][dur].user_rank.rank;
-  			total_gpa_point = value.total_gpa_point['custom_range'][dur].data;	
-  		}
-  		else{
-  			overall_health_gpa = value.overall_health_gpa[dur];
-  			overall_health_gpa_grade = value.overall_health_gpa_grade[dur];
-  			overall_health_rank = rank[dur].user_rank.rank;
-  			total_gpa_point = value.total_gpa_point[dur];	
-  		}
+    		score = value['custom_range'][dur].data;
+    	}
+    	else{
+    		score = value[dur];
+    	}
+    	return score;
+    }
+  	renderOverallHealth(value,dur,rank){ 		
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1197,7 +818,7 @@ class ProgressDashboard extends Component{
 						          		Total GPA Points
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ total_gpa_point }
+						          		{this.renderValue(value.total_gpa_point,dur)}
 		          					</div>
 		          				</div>
 		          				<hr 
@@ -1208,7 +829,7 @@ class ProgressDashboard extends Component{
 						         		Overall Health GPA
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGpa(overall_health_gpa) }
+						         		{ this.getStylesForGpa(this.renderValue(value.overall_health_gpa,dur)) }
 						         	</div>
 						        </div>
 				          		<hr 
@@ -1228,7 +849,7 @@ class ProgressDashboard extends Component{
 					          			Overall Health GPA Grade
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGrades(overall_health_gpa_grade) }
+					          			{this.getStylesForGrades(this.renderValue(value.overall_health_gpa_grade,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1254,20 +875,6 @@ class ProgressDashboard extends Component{
       })
     }
   	renderMcs(value,dur,rank){
-  		let movement_consistency_score = '';
-  		let movement_consistency_grade = '';
-  		let movement_consistency_gpa = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			movement_consistency_score = value.movement_consistency_score['custom_range'][dur].data;
-  			movement_consistency_grade = value.movement_consistency_grade['custom_range'][dur].data;
-  			movement_consistency_gpa = value.movement_consistency_gpa['custom_range'][dur].data;
-  		}
-  		else{
-  			movement_consistency_score = value.movement_consistency_score[dur];
-  			movement_consistency_grade = value.movement_consistency_grade[dur];
-  			movement_consistency_gpa = value.movement_consistency_gpa[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1286,7 +893,7 @@ class ProgressDashboard extends Component{
 						          		Movement Consistency Score
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ movement_consistency_score }
+						          		{ this.renderValue(value.movement_consistency_score,dur)}
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1297,7 +904,7 @@ class ProgressDashboard extends Component{
 						         		Movement Consistency Grade
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.getStylesForGrades(movement_consistency_grade) }
+						         		{this.getStylesForGrades(this.renderValue(value.movement_consistency_grade,dur)) }
 						         	</div>
 						        </div>
 						        <hr  
@@ -1319,7 +926,7 @@ class ProgressDashboard extends Component{
 					          			Movement Consistency GPA
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGpa(movement_consistency_gpa) }
+					          			{this.getStylesForGpa(this.renderValue(value.movement_consistency_gpa,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1328,24 +935,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderNonExerciseSteps(value,dur,rank){
-  		let non_exercise_steps = '';
-  		let movement_non_exercise_step_grade = '';
-  		let non_exericse_steps_gpa = '';
-  		let total_steps = '';
-  		
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			non_exercise_steps = value.non_exercise_steps['custom_range'][dur].data;
-  			movement_non_exercise_step_grade = value.movement_non_exercise_step_grade['custom_range'][dur].data;
-  			non_exericse_steps_gpa = value.non_exericse_steps_gpa['custom_range'][dur].data;
-  			total_steps = value.total_steps['custom_range'][dur].data;
-  		}
-  		else{
-  			non_exercise_steps = value.non_exercise_steps[dur];
-  			movement_non_exercise_step_grade = value.movement_non_exercise_step_grade[dur];
-  			non_exericse_steps_gpa = value.non_exericse_steps_gpa[dur];
-  			total_steps = value.total_steps[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1361,7 +950,7 @@ class ProgressDashboard extends Component{
 						          		Non Exercise Steps
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.getStylesForsteps(non_exercise_steps) }
+						          		{ this.getStylesForsteps(this.renderValue(value.non_exercise_steps,dur)) }
 		          					</div>
 		          				</div>
 		          				 <hr  
@@ -1383,7 +972,7 @@ class ProgressDashboard extends Component{
 						         		Movement-Non Exercise Steps Grade
 						         	</div>
 						         	<div className = "col-md-3 col-sm-3 col-lg-3 text_center">
-						         		{this.getStylesForGrades(movement_non_exercise_step_grade) }
+						         		{this.getStylesForGrades(this.renderValue(value.movement_non_exercise_step_grade,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -1394,7 +983,7 @@ class ProgressDashboard extends Component{
 					          			Non Exercise Steps GPA
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGpa(non_exericse_steps_gpa) }
+					          			{this.getStylesForGpa(this.renderValue(value.non_exericse_steps_gpa,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1405,7 +994,7 @@ class ProgressDashboard extends Component{
 					          			Total Steps
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.renderComma(total_steps)}
+					          			{this.renderComma(this.renderValue(value.total_steps,dur))}
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1441,20 +1030,6 @@ class ProgressDashboard extends Component{
 		return model;
   	}
   	renderNutrition(value,dur,rank){
-  		let prcnt_unprocessed_volume_of_food = '';
-  		let prcnt_unprocessed_food_grade = '';
-  		let prcnt_unprocessed_food_gpa = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			prcnt_unprocessed_volume_of_food = value.prcnt_unprocessed_volume_of_food['custom_range'][dur].data;
-  			prcnt_unprocessed_food_grade = value.prcnt_unprocessed_food_grade['custom_range'][dur].data;
-  			prcnt_unprocessed_food_gpa = value.prcnt_unprocessed_food_gpa['custom_range'][dur].data;
-  		}
-  		else{
-  			prcnt_unprocessed_volume_of_food = value.prcnt_unprocessed_volume_of_food[dur];
-  			prcnt_unprocessed_food_grade = value.prcnt_unprocessed_food_grade[dur];
-  			prcnt_unprocessed_food_gpa = value.prcnt_unprocessed_food_gpa[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1470,7 +1045,7 @@ class ProgressDashboard extends Component{
 						          		% of Unprocessed Food Consumed
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.getStylesForFood(prcnt_unprocessed_volume_of_food) }
+						          		{ this.getStylesForFood(this.renderValue(value.prcnt_unprocessed_volume_of_food,dur)) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1492,7 +1067,7 @@ class ProgressDashboard extends Component{
 						         		% Non Processed Food Consumed Grade
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.getStylesForGrades(prcnt_unprocessed_food_grade) }
+						         		{this.getStylesForGrades(this.renderValue(value.prcnt_unprocessed_food_grade,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -1503,7 +1078,7 @@ class ProgressDashboard extends Component{
 					          			% Non Processed Food Consumed GPA
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGpa(prcnt_unprocessed_food_gpa) }
+					          			{this.getStylesForGpa(this.renderValue(value.prcnt_unprocessed_food_gpa,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1512,23 +1087,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderAlcohol(value,dur,rank){
-  		let avg_drink_per_week = '';
-  		let alcoholic_drinks_per_week_grade = '';
-  		let alcoholic_drinks_per_week_gpa = '';
-  		let prcnt_alcohol_consumption_reported = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			avg_drink_per_week = value.avg_drink_per_week['custom_range'][dur].data;
-  			alcoholic_drinks_per_week_grade = value.alcoholic_drinks_per_week_grade['custom_range'][dur].data;
-  			alcoholic_drinks_per_week_gpa = value.alcoholic_drinks_per_week_gpa['custom_range'][dur].data;
-  			prcnt_alcohol_consumption_reported = value.prcnt_alcohol_consumption_reported['custom_range'][dur].data;
-  		}
-  		else{
-  			avg_drink_per_week = value.avg_drink_per_week[dur];
-  			alcoholic_drinks_per_week_grade = value.alcoholic_drinks_per_week_grade[dur];
-  			alcoholic_drinks_per_week_gpa = value.alcoholic_drinks_per_week_gpa[dur];
-  			prcnt_alcohol_consumption_reported = value.prcnt_alcohol_consumption_reported[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1544,7 +1102,7 @@ class ProgressDashboard extends Component{
 						          		Average Drinks Per Week (7 Days)
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ avg_drink_per_week }
+						          		{ this.renderValue(value.avg_drink_per_week,dur) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1566,7 +1124,7 @@ class ProgressDashboard extends Component{
 						         		Alcoholic drinks per week Grade
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGrades(alcoholic_drinks_per_week_grade) }
+						         		{ this.getStylesForGrades(this.renderValue(value.alcoholic_drinks_per_week_grade,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -1577,7 +1135,7 @@ class ProgressDashboard extends Component{
 					          			Alcoholic drinks per week GPA
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.getStylesForGpa(alcoholic_drinks_per_week_gpa) }
+					          			{ this.getStylesForGpa(this.renderValue(value.alcoholic_drinks_per_week_gpa,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1588,7 +1146,7 @@ class ProgressDashboard extends Component{
 					          			% of Days Alcohol Consumption Reported
 					          		</div>
 					          		<div className = "col-md-3 col-sm-3 col-lg-3 text_center">
-					          			{this.renderPercent(prcnt_alcohol_consumption_reported) }
+					          			{this.renderPercent(this.renderValue(value.prcnt_alcohol_consumption_reported,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1597,20 +1155,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderEc(value,dur,rank){
-  		let avg_no_of_days_exercises_per_week = '';
-  		let exercise_consistency_grade = '';
-  		let exercise_consistency_gpa = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			avg_no_of_days_exercises_per_week = value.avg_no_of_days_exercises_per_week['custom_range'][dur].data;
-  			exercise_consistency_grade = value.exercise_consistency_grade['custom_range'][dur].data;
-  			exercise_consistency_gpa = value.exercise_consistency_gpa['custom_range'][dur].data;
-  		}
-  		else{
-  			avg_no_of_days_exercises_per_week = value.avg_no_of_days_exercises_per_week[dur];
-  			exercise_consistency_grade = value.exercise_consistency_grade[dur];
-  			exercise_consistency_gpa = value.exercise_consistency_gpa[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1626,7 +1170,7 @@ class ProgressDashboard extends Component{
 						          		Avg # of Days Exercised/Week
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{avg_no_of_days_exercises_per_week }
+						          		{this.renderValue(value.avg_no_of_days_exercises_per_week,dur) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1648,7 +1192,7 @@ class ProgressDashboard extends Component{
 						         		Exercise Consistency Grade
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGrades(exercise_consistency_grade) }
+						         		{ this.getStylesForGrades(this.renderValue(value.exercise_consistency_grade,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -1659,7 +1203,7 @@ class ProgressDashboard extends Component{
 					          			Exercise Consistency GPA
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.getStylesForGpa(exercise_consistency_gpa) }
+					          			{ this.getStylesForGpa(this.renderValue(value.exercise_consistency_gpa,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1668,23 +1212,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderExerciseStats(value,dur){
-  		let workout_duration_hours_min = '';
-  		let workout_effort_level = '';
-  		let avg_exercise_heart_rate = '';
-  		let vo2_max = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			workout_duration_hours_min = value.workout_duration_hours_min['custom_range'][dur].data;
-  			workout_effort_level = value.workout_effort_level['custom_range'][dur].data;
-  			avg_exercise_heart_rate = value.avg_exercise_heart_rate['custom_range'][dur].data;
-  			vo2_max = value.vo2_max['custom_range'][dur].data;
-  		}
-  		else{
-  			workout_duration_hours_min = value.workout_duration_hours_min[dur];
-  			workout_effort_level = value.workout_effort_level[dur];
-  			avg_exercise_heart_rate = value.avg_exercise_heart_rate[dur];
-  			vo2_max = value.vo2_max[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1700,7 +1227,7 @@ class ProgressDashboard extends Component{
 						          		Workout Duration (hours:minutes)
 		          					</div>
 		          					<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-						          		{ this.exerciseStatsNoWorkOut(workout_duration_hours_min) }
+						          		{ this.exerciseStatsNoWorkOut(this.renderValue(value.workout_duration_hours_min,dur)) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1711,7 +1238,7 @@ class ProgressDashboard extends Component{
 						         		Workout Effort Level
 						         	</div>
 						         	<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-						         		{ this.exerciseStatsNoWorkOut(workout_effort_level) }
+						         		{ this.exerciseStatsNoWorkOut(this.renderValue(value.workout_effort_level,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -1722,7 +1249,7 @@ class ProgressDashboard extends Component{
 					          			Average Exercise Heart Rate
 					          		</div>
 					          		<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-					          			{ this.exerciseStatsNoWorkOut(avg_exercise_heart_rate) }
+					          			{ this.exerciseStatsNoWorkOut(this.renderValue(value.avg_exercise_heart_rate,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1733,7 +1260,7 @@ class ProgressDashboard extends Component{
 					          			VO2 Max
 					          		</div>
 					          		<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-					          			{ this.vo2MaxNotReported(vo2_max) }
+					          			{ this.vo2MaxNotReported(this.renderValue(value.vo2_max,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1811,35 +1338,6 @@ class ProgressDashboard extends Component{
 		return model;
   	}
   	renderOther(value,dur,rank){
-  		let resting_hr = '';
-  		let hrr_time_to_99 = '';
-  		let hrr_beats_lowered_in_first_min = '';
-  		let hrr_highest_hr_in_first_min = '';
-  		let hrr_lowest_hr_point = '';
-  		let hrr_pure_1_minute_beat_lowered = '';
-  		let hrr_pure_time_to_99 = '';
-  		let floors_climbed = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			resting_hr = value.resting_hr['custom_range'][dur].data;
-  			hrr_time_to_99 = value.hrr_time_to_99['custom_range'][dur].data;
-  			hrr_beats_lowered_in_first_min = value.hrr_beats_lowered_in_first_min['custom_range'][dur].data;
-  			hrr_highest_hr_in_first_min = value.hrr_highest_hr_in_first_min['custom_range'][dur].data;
-  			hrr_lowest_hr_point = value.hrr_lowest_hr_point['custom_range'][dur].data;
-  			hrr_pure_1_minute_beat_lowered = value.hrr_pure_1_minute_beat_lowered['custom_range'][dur].data;
-  			hrr_pure_time_to_99 = value.hrr_pure_time_to_99['custom_range'][dur].data;
-  			floors_climbed = value.floors_climbed['custom_range'][dur].data;
-  		}
-  		else{
-  			resting_hr = value.resting_hr[dur];
-  			hrr_time_to_99 = value.hrr_time_to_99[dur];
-  			hrr_beats_lowered_in_first_min = value.hrr_beats_lowered_in_first_min[dur];
-  			hrr_highest_hr_in_first_min = value.hrr_highest_hr_in_first_min[dur];
-  			hrr_lowest_hr_point = value.hrr_lowest_hr_point[dur];
-  			hrr_pure_1_minute_beat_lowered = value.hrr_pure_1_minute_beat_lowered[dur];
-  			hrr_pure_time_to_99 = value.hrr_pure_time_to_99[dur];
-  			floors_climbed = value.floors_climbed[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -1855,7 +1353,7 @@ class ProgressDashboard extends Component{
 						          		Resting Heart Rate (RHR)
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{this.getStylesForRhr(resting_hr) }
+						          		{this.getStylesForRhr(this.renderValue(value.resting_hr,dur)) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1877,7 +1375,7 @@ class ProgressDashboard extends Component{
 						         		HRR (time to 99)
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ hrr_time_to_99 }
+						         		{ this.renderValue(value.hrr_time_to_99,dur)}
 						         	</div>
 						        </div>
 						        <hr  
@@ -1899,7 +1397,7 @@ class ProgressDashboard extends Component{
 					          			HRR (heart beats lowered in 1st minute)
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForBeats(hrr_beats_lowered_in_first_min) }
+					          			{this.getStylesForBeats(this.renderValue(value.hrr_beats_lowered_in_first_min,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1921,7 +1419,7 @@ class ProgressDashboard extends Component{
 					          			HRR (highest heart rate in 1st minute)
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{hrr_highest_hr_in_first_min }
+					          			{this.renderValue(value.hrr_highest_hr_in_first_min,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1932,7 +1430,7 @@ class ProgressDashboard extends Component{
 					          			HRR (lowest heart rate point in 1st Minute)
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{hrr_lowest_hr_point }
+					          			{this.renderValue(value.hrr_lowest_hr_point,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1943,7 +1441,7 @@ class ProgressDashboard extends Component{
 					          			Pure 1 Minute HRR Beats Lowered
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.getStylesForBeats(hrr_pure_1_minute_beat_lowered) }
+					          			{ this.getStylesForBeats(this.renderValue(value.hrr_pure_1_minute_beat_lowered,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1965,7 +1463,7 @@ class ProgressDashboard extends Component{
 					          			Pure time to 99 (mm:ss)
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ hrr_pure_time_to_99 }
+					          			{ this.renderValue(value.hrr_pure_time_to_99,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -1987,7 +1485,7 @@ class ProgressDashboard extends Component{
 					          			Floors Climbed
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ floors_climbed }
+					          			{ this.renderValue(value.floors_climbed,dur) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -1996,23 +1494,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderSleep(value,dur,rank){
-  		let total_sleep_in_hours_min = '';
-  		let average_sleep_grade = '';
-  		let num_days_sleep_aid_taken_in_period = '';
-  		let prcnt_days_sleep_aid_taken_in_period = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			total_sleep_in_hours_min = value.total_sleep_in_hours_min['custom_range'][dur].data;
-  			average_sleep_grade = value.average_sleep_grade['custom_range'][dur].data;
-  			num_days_sleep_aid_taken_in_period = value.num_days_sleep_aid_taken_in_period['custom_range'][dur].data;
-  			prcnt_days_sleep_aid_taken_in_period = value.prcnt_days_sleep_aid_taken_in_period['custom_range'][dur].data;
-  		}
-  		else{
-  			total_sleep_in_hours_min = value.total_sleep_in_hours_min[dur];
-  			average_sleep_grade = value.average_sleep_grade[dur];
-  			num_days_sleep_aid_taken_in_period = value.num_days_sleep_aid_taken_in_period[dur];
-  			prcnt_days_sleep_aid_taken_in_period = value.prcnt_days_sleep_aid_taken_in_period[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -2028,7 +1509,7 @@ class ProgressDashboard extends Component{
 						          		Total Sleep in hours:minutes
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.getStylesForSleep(total_sleep_in_hours_min) }
+						          		{ this.getStylesForSleep(this.renderValue(value.total_sleep_in_hours_min,dur)) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -2050,7 +1531,7 @@ class ProgressDashboard extends Component{
 						         		Average Sleep Grade
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGrades(average_sleep_grade) }
+						         		{ this.getStylesForGrades(this.renderValue(value.average_sleep_grade,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -2061,7 +1542,7 @@ class ProgressDashboard extends Component{
 					          			# of Days Sleep Aid Taken in Period
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{num_days_sleep_aid_taken_in_period }
+					          			{this.renderValue(value.num_days_sleep_aid_taken_in_period,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2072,7 +1553,7 @@ class ProgressDashboard extends Component{
 					          			% of Days Sleep Aid Taken in Period
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(prcnt_days_sleep_aid_taken_in_period) }
+					          			{ this.renderPercent(this.renderValue(value.prcnt_days_sleep_aid_taken_in_period,dur)) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -2081,26 +1562,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderSick(value,dur){
-  		let number_of_days_not_sick = '';
-  		let prcnt_of_days_not_sick = '';
-  		let number_of_days_sick = '';
-  		let prcnt_of_days_sick = '';
-  		let days_sick_not_sick_reported = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			number_of_days_not_sick = value.number_of_days_not_sick['custom_range'][dur].data;
-  			prcnt_of_days_not_sick = value.prcnt_of_days_not_sick['custom_range'][dur].data;
-  			number_of_days_sick = value.number_of_days_sick['custom_range'][dur].data;
-  			prcnt_of_days_sick = value.prcnt_of_days_sick['custom_range'][dur].data;
-  			days_sick_not_sick_reported = value.days_sick_not_sick_reported['custom_range'][dur].data;
-  		}
-  		else{
-  			number_of_days_not_sick = value.number_of_days_not_sick[dur];
-  			prcnt_of_days_not_sick = value.prcnt_of_days_not_sick[dur];
-  			number_of_days_sick = value.number_of_days_sick[dur];
-  			prcnt_of_days_sick = value.prcnt_of_days_sick[dur];
-  			days_sick_not_sick_reported = value.days_sick_not_sick_reported[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -2116,7 +1577,7 @@ class ProgressDashboard extends Component{
 						          		Number of Days Not Sick
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ number_of_days_not_sick }
+						          		{ this.renderValue(value.number_of_days_not_sick,dur) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -2127,7 +1588,7 @@ class ProgressDashboard extends Component{
 						         		% of Days Not Sick
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(prcnt_of_days_not_sick) }
+						         		{ this.renderPercent(this.renderValue(value.prcnt_of_days_not_sick,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -2138,7 +1599,7 @@ class ProgressDashboard extends Component{
 					          			Number of Days Sick
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ number_of_days_sick }
+					          			{ this.renderValue(value.number_of_days_sick,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2149,7 +1610,7 @@ class ProgressDashboard extends Component{
 					          			% of Days Sick
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(prcnt_of_days_sick) }
+					          			{ this.renderPercent(this.renderValue(value.prcnt_of_days_sick,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2160,7 +1621,7 @@ class ProgressDashboard extends Component{
 					          			Days Sick/Not Sick Reported
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ days_sick_not_sick_reported }
+					          			{ this.renderValue(value.days_sick_not_sick_reported,dur) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -2169,32 +1630,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderStress(value,dur){
-  		let number_of_days_low_stress_reported = '';
-  		let prcnt_of_days_low_stress = '';
-  		let number_of_days_medium_stress_reported = '';
-  		let prcnt_of_days_medium_stress = '';
-  		let number_of_days_high_stress_reported = '';
-  		let prcnt_of_days_high_stress = '';
-  		let days_stress_level_reported = '';
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			number_of_days_low_stress_reported = value.number_of_days_low_stress_reported['custom_range'][dur].data;
-  			prcnt_of_days_low_stress = value.prcnt_of_days_low_stress['custom_range'][dur].data;
-  			number_of_days_medium_stress_reported = value.number_of_days_medium_stress_reported['custom_range'][dur].data;
-  			prcnt_of_days_medium_stress = value.prcnt_of_days_medium_stress['custom_range'][dur].data;
-  			number_of_days_high_stress_reported = value.number_of_days_high_stress_reported['custom_range'][dur].data;
-  			prcnt_of_days_high_stress = value.prcnt_of_days_high_stress['custom_range'][dur].data;
-  			days_stress_level_reported = value.days_stress_level_reported['custom_range'][dur].data;
-  		}
-  		else{
-  			number_of_days_low_stress_reported = value.number_of_days_low_stress_reported[dur];
-  			prcnt_of_days_low_stress = value.prcnt_of_days_low_stress[dur];
-  			number_of_days_medium_stress_reported = value.number_of_days_medium_stress_reported[dur];
-  			prcnt_of_days_medium_stress = value.prcnt_of_days_medium_stress[dur];
-  			number_of_days_high_stress_reported = value.number_of_days_high_stress_reported[dur];
-  			prcnt_of_days_high_stress = value.prcnt_of_days_high_stress[dur];
-  			days_stress_level_reported = value.days_stress_level_reported[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -2210,7 +1645,7 @@ class ProgressDashboard extends Component{
 						          		Number of Days Low Stress Reported
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ number_of_days_low_stress_reported }
+						          		{ this.renderValue(value.number_of_days_low_stress_reported,dur) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -2221,7 +1656,7 @@ class ProgressDashboard extends Component{
 						         		% of Days Low Stress
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(prcnt_of_days_low_stress) }
+						         		{ this.renderPercent(this.renderValue(value.prcnt_of_days_low_stress,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -2232,7 +1667,7 @@ class ProgressDashboard extends Component{
 					          			Number of Days Medium Stress Reported
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ number_of_days_medium_stress_reported }
+					          			{ this.renderValue(value.number_of_days_medium_stress_reported,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2243,7 +1678,7 @@ class ProgressDashboard extends Component{
 					          			% of Days Medium Stress
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(prcnt_of_days_medium_stress) }
+					          			{ this.renderPercent(this.renderValue(value.prcnt_of_days_medium_stress,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2254,7 +1689,7 @@ class ProgressDashboard extends Component{
 					          			Number of Days High Stress Reported
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ number_of_days_high_stress_reported }
+					          			{ this.renderValue(value.number_of_days_high_stress_reported,dur) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2265,7 +1700,7 @@ class ProgressDashboard extends Component{
 					          			% of Days High Stress
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(prcnt_of_days_high_stress) }
+					          			{ this.renderPercent(this.renderValue(value.prcnt_of_days_high_stress,dur)) }
 					          		</div>
 					          	</div>
 					          	<hr  
@@ -2276,7 +1711,7 @@ class ProgressDashboard extends Component{
 					          			Number of Days Stress Level Reported
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ days_stress_level_reported }
+					          			{ this.renderValue(value.days_stress_level_reported,dur) }
 					          		</div>
 					          	</div>
 			          		</CardText>
@@ -2285,22 +1720,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderStanding(value,dur){
-  		let number_days_stood_three_hours = '';
-  		let prcnt_days_stood_three_hours = '';
-  		let number_days_reported_stood_not_stood_three_hours = '';
-  		
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			number_days_stood_three_hours = value.number_days_stood_three_hours['custom_range'][dur].data;
-  			prcnt_days_stood_three_hours = value.prcnt_days_stood_three_hours['custom_range'][dur].data;
-  			number_days_reported_stood_not_stood_three_hours = value.number_days_reported_stood_not_stood_three_hours['custom_range'][dur].data;
-  			
-  		}
-  		else{
-  			number_days_stood_three_hours = value.number_days_stood_three_hours[dur];
-  			prcnt_days_stood_three_hours = value.prcnt_days_stood_three_hours[dur];
-  			number_days_reported_stood_not_stood_three_hours = value.number_days_reported_stood_not_stood_three_hours[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -2316,7 +1735,7 @@ class ProgressDashboard extends Component{
 						          		Number of Days Stood more than 3 hours
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ number_days_stood_three_hours }
+						          		{ this.renderValue(value.number_days_stood_three_hours,dur) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -2327,7 +1746,7 @@ class ProgressDashboard extends Component{
 						         		% of Days Stood More Than 3 Hours
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(prcnt_days_stood_three_hours) }
+						         		{ this.renderPercent(this.renderValue(value.prcnt_days_stood_three_hours,dur)) }
 						         	</div>
 						        </div>
 				          		<hr  
@@ -2338,7 +1757,7 @@ class ProgressDashboard extends Component{
 					          			Number of Days Reported Standing/Not Standing more than 3 hours
 					          		</div>
 					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ number_days_reported_stood_not_stood_three_hours }
+					          			{ this.renderValue(value.number_days_reported_stood_not_stood_three_hours,dur) }
 					          		</div>
 					          	</div>					       
 			          		</CardText>
@@ -2347,19 +1766,6 @@ class ProgressDashboard extends Component{
   		return card;
   	}
   	renderTravel(value,dur){
-  		let number_days_travel_away_from_home = '';
-  		let prcnt_days_travel_away_from_home = '';
-  		
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-  			number_days_travel_away_from_home = value.number_days_travel_away_from_home['custom_range'][dur].data;
-  			prcnt_days_travel_away_from_home = value.prcnt_days_travel_away_from_home['custom_range'][dur].data;
-  			
-  		}
-  		else{
-  			number_days_travel_away_from_home = value.number_days_travel_away_from_home[dur];
-  			prcnt_days_travel_away_from_home = value.prcnt_days_travel_away_from_home[dur];
-  		}
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -2375,7 +1781,7 @@ class ProgressDashboard extends Component{
 						          		Number of Days you Traveled/Stayed Away From Home?
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ number_days_travel_away_from_home }
+						          		{ this.renderValue(value.number_days_travel_away_from_home,dur) }
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -2386,7 +1792,7 @@ class ProgressDashboard extends Component{
 						         		% of Days you Traveled/Stayed Away From Home?
 						         	</div>
 						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(prcnt_days_travel_away_from_home) }
+						         		{ this.renderPercent(this.renderValue(value.prcnt_days_travel_away_from_home,dur)) }
 						         	</div>
 						        </div>				       
 			          		</CardText>

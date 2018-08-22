@@ -139,477 +139,91 @@ constructor(props){
         active_category_name:"",
         all_verbose_name:"",
         "rankData":rankInitialState,
-        "summary":{
+         summary:{
             "overall_health":{
-               "overall_health_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "overall_health_gpa_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-
-                     },
-                 "total_gpa_point":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+               "overall_health_gpa":this.getInitialDur(),
+                 "overall_health_gpa_grade":this.getInitialDur(),
+                 "total_gpa_point":this.getInitialDur()
                 },
 
             "ec":{
-                 "avg_no_of_days_exercises_per_week":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                  "exercise_consistency_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                   "exercise_consistency_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+                 "avg_no_of_days_exercises_per_week":this.getInitialDur(),
+                  "exercise_consistency_grade":this.getInitialDur(),
+                   "exercise_consistency_gpa":this.getInitialDur()
                  },
                 "nutrition":{
-                   "prcnt_unprocessed_food_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "prcnt_unprocessed_food_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                  "prcnt_unprocessed_volume_of_food":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+                   "prcnt_unprocessed_food_gpa":this.getInitialDur(),
+                 "prcnt_unprocessed_food_grade":this.getInitialDur(),
+                  "prcnt_unprocessed_volume_of_food":this.getInitialDur()
 
                   },
             "mc":{
-                "movement_consistency_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                     "movement_consistency_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                     "movement_consistency_score":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }
+                "movement_consistency_gpa":this.getInitialDur(),
+                     "movement_consistency_grade":this.getInitialDur(),
+                     "movement_consistency_score":this.getInitialDur()
                   },
             "non_exercise":{
-                 "non_exericse_steps_gpa":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "movement_non_exercise_step_grade":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                 "non_exercise_steps":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                "total_steps":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },     
+                 "non_exericse_steps_gpa":this.getInitialDur(),
+                 "movement_non_exercise_step_grade":this.getInitialDur(),
+                 "non_exercise_steps":this.getInitialDur(),
+                 "total_steps":this.getInitialDur(),     
             },
         "exercise":{                
-            "workout_duration_hours_min":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }, 
-                "avg_exercise_heart_rate":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },                                      
-                "workout_effort_level":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     },
-                      "vo2_max":{
-                        "week":"-",
-                        "yesterday":"-",
-                        "month":"-",
-                       "custom_range":"-",
-                        "today":"-",
-                        "year":"-"
-                     }               
+            "workout_duration_hours_min":this.getInitialDur(), 
+                "avg_exercise_heart_rate":this.getInitialDur(),                                      
+                "workout_effort_level":this.getInitialDur(),
+                      "vo2_max":this.getInitialDur()              
                 },
          "sleep": {
-             "prcnt_days_sleep_aid_taken_in_period": {
-                "custom_range": "-",
-                "year": "-",
-                "yesterday": "-",
-                "month": "-",
-                "today":"-" ,
-                "week":"-" 
-            },
-            "average_sleep_grade": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "total_sleep_in_hours_min": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "overall_sleep_gpa": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-             "num_days_sleep_aid_taken_in_period": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            }
+             "prcnt_days_sleep_aid_taken_in_period": this.getInitialDur(),
+            "average_sleep_grade": this.getInitialDur(),
+            "total_sleep_in_hours_min": this.getInitialDur(),
+            "overall_sleep_gpa": this.getInitialDur(),
+             "num_days_sleep_aid_taken_in_period": this.getInitialDur()
         },
          "alcohol": {
-            "alcoholic_drinks_per_week_grade": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "avg_drink_per_week": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range": "-",
-                "today": "-",
-                "year": "-"
-            },
-            "alcoholic_drinks_per_week_gpa": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "prcnt_alcohol_consumption_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            }
+            "alcoholic_drinks_per_week_grade": this.getInitialDur(),
+            "avg_drink_per_week": this.getInitialDur(),
+            "alcoholic_drinks_per_week_gpa": this.getInitialDur(),
+            "prcnt_alcohol_consumption_reported":this.getInitialDur()
         },
          "other": {
-            "hrr_beats_lowered_in_first_min": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_highest_hr_in_first_min": {
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_lowest_hr_point": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "floors_climbed": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "resting_hr": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range": "-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_time_to_99": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-            "hrr_pure_1_minute_beat_lowered": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            },
-             "hrr_pure_time_to_99": {
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-            }
+            "hrr_beats_lowered_in_first_min":this.getInitialDur(),
+            "hrr_highest_hr_in_first_min":this.getInitialDur(),
+            "hrr_lowest_hr_point": this.getInitialDur(),
+            "floors_climbed": this.getInitialDur(),
+            "resting_hr": this.getInitialDur(),
+            "hrr_time_to_99":this.getInitialDur(),
+            "hrr_pure_1_minute_beat_lowered":this.getInitialDur(),
+             "hrr_pure_time_to_99": this.getInitialDur()
         },
         "sick":{
-          "days_sick_not_sick_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_not_sick":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_sick":{
-               "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_not_sick":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_sick":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-",
-        }
+          "days_sick_not_sick_reported":this.getInitialDur(),
+          "number_of_days_not_sick":this.getInitialDur(),
+          "number_of_days_sick":this.getInitialDur(),
+          "prcnt_of_days_not_sick":this.getInitialDur(),
+          "prcnt_of_days_sick":this.getInitialDur()
       },
         "stress":{
-          "days_stress_level_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_high_stress_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_low_stress_reported":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_of_days_medium_stress_reported":{
-              "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_high_stress":{
-              "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_low_stress":{
-              "week": "-",
-                "yesterday": "-",
-                "month": "-",
-               "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_of_days_medium_stress":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                 "custom_range":"-",
-                  "today": "-",
-                  "year": "-"
-          }
+          "days_stress_level_reported":this.getInitialDur(),
+          "number_of_days_high_stress_reported":this.getInitialDur(),
+          "number_of_days_low_stress_reported":this.getInitialDur(),
+          "number_of_days_medium_stress_reported":this.getInitialDur(),
+          "prcnt_of_days_high_stress":this.getInitialDur(),
+          "prcnt_of_days_low_stress":this.getInitialDur(),
+          "prcnt_of_days_medium_stress":this.getInitialDur()
         },
         "standing":{
-          "number_days_reported_stood_not_stood_three_hours":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "number_days_stood_three_hours":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_days_stood_three_hours":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-",
-          }
-
+          "number_days_reported_stood_not_stood_three_hours":this.getInitialDur(),
+          "number_days_stood_three_hours":this.getInitialDur(),
+          "prcnt_days_stood_three_hours":this.getInitialDur()
         },
         "travel":{
-          "number_days_travel_away_from_home":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-"
-          },
-          "prcnt_days_travel_away_from_home":{
-                "week": "-",
-                "yesterday": "-",
-                "month": "-",
-                "custom_range":"-",
-                "today": "-",
-                "year": "-",
-          }
+          "number_days_travel_away_from_home":this.getInitialDur(),
+          "prcnt_days_travel_away_from_home":this.getInitialDur()
         },
-      },
-        "duration_date": {
-           "month": "-",
-           "year": "-",
-           "week": "-",
-           "today": "-",
-           "yesterday": "-"
-       },
+    },
+      "duration_date": this.getInitialDur(),
        scheduled_date:''
 
     };
@@ -652,6 +266,7 @@ constructor(props){
    this.toggleDropdown = this.toggleDropdown.bind(this);
    this.successUpdateTime = this.successUpdateTime.bind(this);
    this.errorUpdateTime =this.errorUpdateTime.bind(this);
+   this.getInitialDur = this.getInitialDur.bind(this);
 
   }
     
@@ -679,7 +294,17 @@ constructor(props){
       //  duration_date:data.data.duration_date,
     });
   }
-
+getInitialDur(){
+     let paDurationInitialState = {
+      "week":"-",
+            "yesterday":"-",
+            "month":"-",
+           "custom_range":"-",
+            "today":"-",
+            "year":"-"
+       };
+       return paDurationInitialState;
+  }
 gpascoreDecimal(gpa){
 let value;
 let x = gpa;
