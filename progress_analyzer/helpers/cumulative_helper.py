@@ -576,16 +576,25 @@ def _get_hrr_api_data(user,date):
 
 		}
 		measured_hrr = _safe_get_mobj(data,'Did_you_measure_HRR','')
-		if measured_hrr == 'yes':
-			hrr_start_beat = _safe_get_mobj(data,'HRR_start_beat',0)
+		if measured_hrr == 'yes' or measured_hrr == 'no':
+			if measured_hrr == 'yes':
+				hrr_start_beat = _safe_get_mobj(data,'HRR_start_beat',0)
+			else:
+				hrr_start_beat = _safe_get_mobj(data,'end_heartrate_activity',0)
 			if hrr_start_beat:
 				formated_data['hrr_starting_point'] = hrr_start_beat
 
-			lowest_hrr_1min = _safe_get_mobj(data,"lowest_hrr_1min",0)
+			if measured_hrr == 'yes':
+				lowest_hrr_1min = _safe_get_mobj(data,"lowest_hrr_1min",0)
+			else:
+				lowest_hrr_1min = _safe_get_mobj(data,"lowest_hrr_no_fitfile",0)
 			if lowest_hrr_1min:
 				formated_data['lowest_hr_during_hrr'] = lowest_hrr_1min
 
-			time_99 = _safe_get_mobj(data,"time_99",0)
+			if measured_hrr == 'yes':
+				time_99 = _safe_get_mobj(data,"time_99",0)
+			else:
+				time_99 = _safe_get_mobj(data,"no_fitfile_hrr_time_reach_99",0)
 			if time_99:
 				time_in_mins = time_99 / 60
 				time_in_mins = round(time_in_mins,3)
@@ -607,7 +616,7 @@ def _get_hrr_api_data(user,date):
 					pure_time_99 / 60, 3)
 				formated_data["hrr_pure_time_to_99"] = pure_time_99_in_min
 			return formated_data
-		return None
+		return None	
 	except Exception as e:
 		return None
 
@@ -940,7 +949,7 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 
 		hrr_lowest_hr_point = user_hrr_data['lowest_hr_during_hrr']
 		hrr_lowest_hr_point = 1 if hrr_lowest_hr_point else 0
-		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = hrr_beats_lowered_in_first_min \
+		meta_cum_data['cum_hrr_lowest_hr_point_days_count'] = hrr_lowest_hr_point \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_hrr_lowest_hr_point_days_count",0)
 
 		have_mc = _safe_get_mobj(
