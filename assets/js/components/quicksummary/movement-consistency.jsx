@@ -453,7 +453,7 @@ export default Dimensions({
     return window.innerHeight - 192;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :950;
+    var widthOffset = window.innerWidth < 1024 ? 0 :730;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);
