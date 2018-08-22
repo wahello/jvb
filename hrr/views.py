@@ -950,6 +950,9 @@ def store_aa_workout_calculations(user,from_date,to_date):
 	print("HRR A/A workout finished")
 	return None
 def total_percent(modified_data_total):
+	'''
+		Add percent to all the fields in Totals
+	'''
 	modified_data_total['Totals']['percent_aerobic'] = (
 	(modified_data_total["Totals"].get("duration_in_aerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
 	modified_data_total['Totals']['percent_below_aerobic'] = (
@@ -961,6 +964,9 @@ def total_percent(modified_data_total):
 	return(modified_data_total)
 
 def add_totals(modified_data):
+	'''
+		Add totals field to user created activity
+	'''
 	modified_data_total = modified_data.copy()
 	for key,value in modified_data.items():
 		if not modified_data_total.get('Totals'):
@@ -983,6 +989,9 @@ def add_totals(modified_data):
 	return(percent_added)
 
 def add_created_activity(di,data,below_aerobic,anaerobic):
+	'''
+		This function will add user created activty in user input form to AA calculation
+	'''
 	modified_data = {}
 	for i,single_activity in enumerate(di):
 		data_copy = data.copy()
