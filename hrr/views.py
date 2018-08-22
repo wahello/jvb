@@ -1743,6 +1743,25 @@ def hrr_data(user,start_date):
 		
 		if Did_heartrate_reach_99 == 'no':
 			pure_time_99 = None
+			if daily_starttime:
+				daily_start_time = end_time_activity - daily_starttime
+				make_to_daily_key = (daily_start_time) % 15
+				if make_to_daily_key > 7:
+					daily_key = str(int(daily_start_time + make_to_daily_key))
+				else:
+					daily_key = str(int(daily_start_time - make_to_daily_key))
+				daily_diff_data_99 = 100
+				daily_key_copy = daily_key
+				while daily_diff_data_99 >= 99:
+					daily_diff_data_99 = garmin_data_daily['timeOffsetHeartRateSamples'].get(
+						daily_key_copy,None)
+					daily_key_copy = int(daily_key_copy) + 15
+					daily_key_copy = str(daily_key_copy)
+					if daily_diff_data_99 == None or daily_diff_data_99 == 99:
+						break
+				time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
+			else:
+				time_99 = None
 
 	else:
 		Did_you_measure_HRR = 'no'
