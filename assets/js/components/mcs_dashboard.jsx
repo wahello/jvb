@@ -167,7 +167,7 @@ class MCS_Dashboard extends Component{
 	    }
 	}
 
-  	mcHistoricalData(score,status){
+  	mcHistoricalData(score,status,active_prcnt){
   		/* adding background color to card depends upon their steps ranges*/
 	  	  let background = "";
 		  let color = "";
@@ -204,7 +204,7 @@ class MCS_Dashboard extends Component{
 	        background = 'green';
 	        color = 'white';
 	      }
-	    return <td style = {{background:background,color:color}}>{this.stepsValueComma(score)}</td>
+	    return <td style = {{background:background,color:color}}>{this.stepsValueComma(score)+active_prcnt}</td>
 	}
 	
   	renderTable(mc_data){
@@ -218,8 +218,14 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
-			         		}
+			         		 	let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
+			         		}	
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
 		         	}
@@ -239,7 +245,13 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
+			         		 	let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
 			         		}
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
@@ -260,7 +272,13 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
+			              		let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
 			         		}
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
@@ -282,7 +300,13 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
+			         		 	let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
 			         		}
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
@@ -437,7 +461,7 @@ class MCS_Dashboard extends Component{
 					</div>
 					<div className = "row justify-content-center mcs-dashboard">
 		          	<div className = "col-sm-9">
-	         
+	         				<p className="mcs_content" style={{marginLeft:"15px"}}>Data in each cell = Steps in that particular hour ( percentage of active minutes in that hour )</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Active Hours = Any hour with more than 300 steps when user was not sleeping</p>
