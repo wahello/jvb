@@ -208,6 +208,7 @@ class ProgressDashboard extends Component{
    		this.getStylesForFood = this.getStylesForFood.bind(this);
    		this.getInitialDur = this.getInitialDur.bind(this);
    		this.renderValue = this.renderValue.bind(this);
+      this.toggle1 = this.toggle1.bind(this);
 
 	}
 	getInitialDur(){
