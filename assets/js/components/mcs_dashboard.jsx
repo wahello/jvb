@@ -75,7 +75,7 @@ class MCS_Dashboard extends Component{
           let sync="";
         if(value != null){
           time = moment(value).format("MMM DD, YYYY @ hh:mm a")
-          sync = <div style = {{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
+          sync = <div className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
        }
         return sync;
        
@@ -206,7 +206,10 @@ class MCS_Dashboard extends Component{
 	      }
 	    return (
 	    	<td style = {{background:background,color:color}}>
-		    	{this.stepsValueComma(score) + active_prcnt}
+	    	<div>
+		    	{this.stepsValueComma(score)}
+		    </div> 
+		    	<div>{active_prcnt}</div>
 	    	</td>
 	    )
 	}
@@ -345,7 +348,7 @@ class MCS_Dashboard extends Component{
     render(){
         return(
 			<div className="container-fluid">
-			   <NavbarMenu title = {<span style = {{fontSize:"18px"}}>Movement Consistency Score (MCS) Dashboard
+			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard
                     </span>} />
                
                     <div className="cla_center">
@@ -359,10 +362,11 @@ class MCS_Dashboard extends Component{
                 
 			            <span id="navlink"  onClick={this.toggleCalendar} id="gd_progress">
                             <FontAwesome
+                            className="arrow"
 			                  name = "calendar"
 			                  size = "2x"
 			                />
-			                <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+			                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
 		                </span>
 		                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
@@ -373,7 +377,7 @@ class MCS_Dashboard extends Component{
 			                />
 						</span>
 
-						 <span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
+						 <span  className="last_sync" style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
