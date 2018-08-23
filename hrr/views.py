@@ -1005,7 +1005,7 @@ def add_created_activity(di,data,below_aerobic,anaerobic):
 			data_copy["duration_in_aerobic_range"] = single_activity.get("durationInSeconds",0.0)
 			data_copy["percent_aerobic"] = 100
 		elif avg_hr != '' and int(avg_hr) > 0.0 and int(avg_hr) <= below_aerobic:
-			data_copy["duration_below_aerobic_range"] = single_activity[i].get("durationInSeconds",0.0)
+			data_copy["duration_below_aerobic_range"] = single_activity.get("durationInSeconds",0.0)
 			data_copy["percent_below_aerobic"] = 100
 		elif avg_hr == '' or avg_hr == 0:
 			data_copy["duration_hrr_not_recorded"] = single_activity.get("durationInSeconds",0.0)
