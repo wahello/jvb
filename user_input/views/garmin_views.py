@@ -77,7 +77,10 @@ def _create_activity_stat(user,activity_obj,current_date):
 		for k, v in activity_obj.items():
 			if k in activity_keys.keys():
 				activity_keys[k] = v
-				if (int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) < below_aerobic_value or
+				avg_hr = int(activity_keys.get("averageHeartRateInBeatsPerMinute",0))
+				# If there is no average HR information, then consider
+				# steps as "exercise steps"
+				if ((avg_hr and avg_hr < below_aerobic_value) or
 					activity_keys.get("activityType","") == "HEART_RATE_RECOVERY"):
 					activity_keys["steps_type"] = "non_exercise"
 				else:
