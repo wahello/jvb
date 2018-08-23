@@ -204,7 +204,11 @@ class MCS_Dashboard extends Component{
 	        background = 'green';
 	        color = 'white';
 	      }
-	    return <td style = {{background:background,color:color}}>{this.stepsValueComma(score)+active_prcnt}</td>
+	    return (
+	    	<td style = {{background:background,color:color}}>
+		    	{this.stepsValueComma(score) + active_prcnt}
+	    	</td>
+	    )
 	}
 	
   	renderTable(mc_data){
@@ -448,8 +452,8 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="mcs-dashboard" style={{background:'red',color:'white'}}>Inactive Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'rgb(255,0,255)',color:'white'}}>Strength Hours</th>
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
-								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet Hours</th>
-								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Hours</th>
+								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet</th>
+								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Change</th>
 								
 		          	    	</tr>
 		          	    	<tbody>
@@ -468,7 +472,7 @@ class MCS_Dashboard extends Component{
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Inactive Hours (MCS Score) = # of hours a day with 300 steps or less when a user is not sleeping</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Strength Hours = Hours user recorded strength exercises</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
-			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Hours = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
+			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Change = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
 		       				<p className="mcs_content" style={{marginLeft:"15px"}}>Nap Hours = Any portion of an hour user taking nap</p>
 		       		</div>
 		       		</div>
