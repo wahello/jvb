@@ -235,7 +235,7 @@ def percent_calculations(aa_dict):
 
 def weekly_aa_calculations(weekly_aa,workout_summary_id):
 	'''
-		Add Aerobic and Anarobic ranhe values to activity
+		Add Aerobic and Anarobic range values to activity
 	'''
 	activity_type = []
 	aa_dict = {}
@@ -276,12 +276,10 @@ def merge_activities(final_workout_data,final_aa_data):
 	'''
 		Merge Totals dict and activity dicts
 	'''
-	#print(final_workout_data,"final_workout_data")
 	for key,value in final_workout_data.items():
 		for key1,values1 in final_aa_data.items():
 			if key == key1:
 				final_workout_data[key].update(final_aa_data[key1])
-	#print(final_workout_data,"after modification")
 	return final_workout_data
 
 def percent_total(merged_data_total):

@@ -101,9 +101,9 @@ class OverallRank extends Component{
 		this.setState({
 			Hrr_data:data.data.overall_hrr,
 			duration_date:data.data.duration_date,
-			all_hrr_rank_data:data.data.overall_hrr.week.all_rank,
-			date:this.headerDates(date),
-			capt:"Week",
+			all_hrr_rank_data:data.data.overall_hrr.today.all_rank,
+			date:date,
+			capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
@@ -254,7 +254,7 @@ class OverallRank extends Component{
   	renderDate(value,value5){
   		let date;
   		for(let [key,val] of Object.entries(value)){
-  			if(key == "week"){
+  			if(key == "today"){
   				date = value5[key];
   			}
   		}
