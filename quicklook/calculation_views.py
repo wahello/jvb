@@ -8,7 +8,7 @@ from rest_framework import status,generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from . import calculation_helper as hlpr
+from .calculations.calculation_driver import create_quick_look
 from .models import Steps
 
 class QuicklookCalculationView(APIView):
@@ -21,7 +21,7 @@ class QuicklookCalculationView(APIView):
 		from_dt = self.request.data.get('from_date',None)
 		to_dt = self.request.data.get('to_date',None)
 
-		SERIALIZED_DATA = hlpr.create_quick_look(user,from_dt,to_dt)
+		SERIALIZED_DATA = create_quick_look(user,from_dt,to_dt)
 
 		return Response(SERIALIZED_DATA,status = status.HTTP_201_CREATED)
 

@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 
 from celery.decorators import task
 from celery.utils.log import get_task_logger
-from .calculation_helper import create_quick_look
+from .calculations.calculation_driver import create_quick_look
 from django.contrib.auth.models import User
 
 logger = get_task_logger(__name__)

@@ -2139,7 +2139,7 @@ def get_user_input_total_sleep(todays_daily_strong,daily_optional):
 		return sec_to_hours_min_sec(total_duration_in_seconds,include_sec = False)
 	return None
 
-def create_quick_look(user,from_date=None,to_date=None):
+def create_garmin_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
 

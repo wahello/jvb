@@ -30,7 +30,7 @@ from garmin.models import GarminFitFiles,\
 						UserGarminDataDaily,\
 						UserGarminDataActivity,\
 						UserGarminDataManuallyUpdated
-from quicklook.calculation_helper import get_filtered_activity_stats
+from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
 from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
 
