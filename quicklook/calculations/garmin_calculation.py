@@ -190,7 +190,7 @@ def get_blank_model_fields(model):
 			'overall_health_grade':'',
 			'overall_health_gpa':0,
 			'movement_non_exercise_steps_grade':'',
-			'movement_non_exercise_steps_gpa':'',
+			'movement_non_exercise_steps_gpa':0,
 			'movement_consistency_grade': '',
 			'avg_sleep_per_night_grade':'',
 			'avg_sleep_per_night_gpa':0,
@@ -267,8 +267,8 @@ def get_blank_model_fields(model):
 			'workout_elapsed_time': '',
 			'timewatch_paused_workout': '',
 			'exercise_consistency':0,
-			'heartrate_variability_stress': '',
-			'fitness_age':'',
+			'heartrate_variability_stress': 0,
+			'fitness_age':0,
 			'workout_comment':''
 		}
 		return fields
