@@ -1,5 +1,6 @@
 from datetime import datetime,timedelta
 import ast
+import pdb
 
 from quicklook.serializers import UserQuickLookSerializer
 from .garmin_calculation import (
@@ -134,7 +135,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 	to_dt = str_to_datetime(to_date)
 	current_date = from_dt
 	SERIALIZED_DATA = []
-
 	while current_date <= to_dt:
 		
 		grades_calculated_data = get_blank_model_fields('grade')

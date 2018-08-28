@@ -3,6 +3,7 @@ from .fitbit_calculation import create_fitbit_quick_look
 
 def which_device(user):
 	if hasattr(user,"garmin_token"):
+		print("******************",hasattr(user,"garmin_token")) 
 		return "garmin"
 	elif hasattr(user,"fitbit_refresh_token"):
 		return "fitbit"

@@ -2140,6 +2140,7 @@ def get_user_input_total_sleep(todays_daily_strong,daily_optional):
 	return None
 
 def create_garmin_quick_look(user,from_date=None,to_date=None):
+
 	'''
 		calculate and create quicklook instance for given date range
 
