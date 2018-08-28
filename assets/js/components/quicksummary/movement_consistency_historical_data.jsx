@@ -46,6 +46,12 @@ mcHistoricalData(score,status){
       else if(status == "no data yet"){
         return {background:" #A5A7A5",color:'white'}
       }
+      else if(status == 'time zone change'){
+        return {background:'#fdeab7',color:'black'}
+      }
+      else if(status == 'nap'){
+        return {background:'#107dac',color:'white'}
+      }
       else if (score >= 300 )
         return {background:'green', color:'white'};
 }
@@ -96,8 +102,13 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             "active_hours" : [],
             "inactive_hours" : [],
             "sleeping_hours" : [],
+            "nap_hours":[],
             "strength_hours" : [],
             "exercise_hours" : [],
+            "no_data_hours": [],
+            "timezone_change_hours": [],
+            "total_active_minutes": [],
+            "total_active_prcnt": [],
             "total_steps" : []
           };
         
@@ -112,25 +123,57 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                             let mc = value;
                             if( mc != undefined && mc != "" && mc != "-"){
                                 mc = JSON.parse(mc);                       
-                                for(let [time,mCdata] of Object.entries(mc)){
+                                for(let time of Object.keys(obj)){
+                                  if(time !== 'dmc'){
+                                      let mCdata = mc[time];
                                       if(time == "inactive_hours"){
-                                        obj[time].push({value:mc.inactive_hours,
-                                                        style:this.dailyMC(value)});
+                                        obj[time].push({value:mc.inactive_hours?mc.inactive_hours:0,
+                                                        extra:"",
+                                                        style:{}});
                                         obj["dmc"].push({value:mc.inactive_hours,
+                                                          extra:"",
                                                           style:this.dailyMC(mc.inactive_hours)});
                                       }
                                       else if (time == "active_hours")
-                                        obj[time].push({value:mc.active_hours,
-                                                        style:this.mcHistoricalData(value)});
+                                        obj[time].push({value:mc.active_hours?mc.active_hours:0,
+                                                        extra:"",
+                                                        style:{}});
                                       else if (time == "strength_hours")
-                                        obj[time].push({value:mc.strength_hours,
-                                                        style:this.mcHistoricalData(value)});
+                                        obj[time].push({value:mc.strength_hours?mc.strength_hours:0,
+                                                        extra:"",
+                                                        style:{}});
                                       else if (time == "exercise_hours")
-                                        obj[time].push({value:mc.exercise_hours,
-                                                        style:this.mcHistoricalData(value)});
+                                        obj[time].push({value:mc.exercise_hours?mc.exercise_hours:0,
+                                                        extra:"",
+                                                        style:{}});
                                       else if (time == "sleeping_hours")
-                                        obj[time].push({value:mc.sleeping_hours,
-                                                        style:this.mcHistoricalData(value)});
+                                        obj[time].push({value:mc.sleeping_hours?mc.sleeping_hours:0,
+                                                        extra:"",
+                                                        style:{}});
+                                      else if (time == "no_data_hours")
+                                        obj[time].push({value:mc.no_data_hours?mc.no_data_hours:0,
+                                                        extra:"",
+                                                        style:{}});
+                                      else if (time == "timezone_change_hours")
+                                        obj[time].push({value:mc.timezone_change_hours?mc.timezone_change_hours:0,
+                                                        extra:"",
+                                                        style:{}});
+                                      else if (time == "nap_hours")
+                                        obj[time].push({value:mc.nap_hours?mc.nap_hours:0,
+                                                        extra:"",
+                                                        style:{}});
+                                      else if (time == "total_active_minutes")
+                                        obj[time].push({
+                                          value:mc.total_active_minutes?mc.total_active_minutes:0,
+                                          extra:"",
+                                          style:{}
+                                        });
+                                      else if (time == "total_active_prcnt")
+                                        obj[time].push({
+                                          value:mc.total_active_prcnt?mc.total_active_prcnt:0,
+                                          extra:"",
+                                          style:{}
+                                        }); 
                                       else if (time == "total_steps"){
                                         let totalSteps = mc.total_steps;
                                          if(totalSteps != undefined){
@@ -143,22 +186,44 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
                                                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
                                               }
                                               obj[time].push({value:x1 + x2,
-                                                        style:this.mcHistoricalData(value)});
+                                                        extra:"",
+                                                        style:{}});
                                          }
                                       }
                                       else if(mCdata.status == "no data yet"){
-                                         obj[time].push({value:"No Data Yet",
-                                                        style:this.mcHistoricalData(value,mCdata.status)});
-                                      }                      
+                                         obj[time].push(
+                                            {value:"No Data Yet",
+                                             extra:(mCdata.active_prcnt != null || mCdata.active_prcnt != undefined
+                                                    ?" ( " + mCdata.active_prcnt + "% )":""),
+                                             style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
+                                      }
+                                      // else if(mCdata.status == "time zone change"){
+                                      //    obj[time].push(
+                                      //       {value:mCdata.steps,
+                                      //        extra:mCdata.active_prcnt?"( " + mCdata.active_prcnt + " )":"",
+                                      //        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
+                                      // }
+                                      // else if(mCdata.status == "nap"){
+                                      //    obj[time].push(
+                                      //       {value:mCdata.steps,
+                                      //        extra:mCdata.active_prcnt?"( " + mCdata.active_prcnt + " )":"",
+                                      //        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
+                                      // }                         
                                       else{
-                                          obj[time].push({value:mCdata.steps,
-                                                        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
+                                          obj[time].push(
+                                            {value:mCdata.steps,
+                                             extra:(mCdata.active_prcnt != null || mCdata.active_prcnt != undefined 
+                                                    ?" ( " + mCdata.active_prcnt + "% )":""),
+                                             style:this.mcHistoricalData(mCdata.steps,mCdata.status)}
+                                          );
                                       }
                                                                     
                                 }
+                              }
                             }else{
                               for(let [time,mCdata] of Object.entries(obj)){
                                 obj[time].push({value:'-',
+                                                extra:"",
                                                 style:""});
                               }
                             }
@@ -195,8 +260,13 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         "active_hours" : "Active Hours",
         "inactive_hours" : "Inactive Hours",
         "sleeping_hours" : "Sleeping Hours",
+        "nap_hours" : "Nap Hours",
         "strength_hours" : "Strength Hours",
         "exercise_hours" : "Exercise Hours",
+        "no_data_hours": "No Data Yet Hours",
+        "timezone_change_hours":"Time Zone Change Hours",
+        "total_active_minutes": "Total Active Minutes",
+        "total_active_prcnt": "Total % Active",
         "total_steps" : "Total Steps",
         "dmc":"Daily Movement consistency"
       }
@@ -204,8 +274,10 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
     for(let [key,col] of Object.entries(obj)){
       let prcnt_active_steps = '';
       if(key != "active_hours" && key != "inactive_hours" &&
-         key != "sleeping_hours" && key != "strength_hours" &&
-         key != "exercise_hours" && key != "total_steps" && key != "dmc"){
+         key != "sleeping_hours" && key != "nap_hours" && key != "strength_hours" &&
+         key != "exercise_hours" && key != "total_steps" && key != "dmc"
+         && key !== 'no_data_hours' && key !== "timezone_change_hours"
+         && key !== 'total_active_prcnt' && key !== 'total_active_minutes'){
         let active_days = 0;
         for(let step of col){
           if(step.value >= 300){
@@ -226,13 +298,18 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
       }
     }
       col.splice(0, 0,{value:prcnt_active_steps,
+                       extra:"",
                        style:""});
        columns.push(
         <Column 
           header={<Cell className={css(styles.newTableHeader)}>{verbose_name[key]}</Cell>}
            cell={props => (
-                    <Cell style={col[props.rowIndex].style} {...{'title':col[props.rowIndex].value}} {...props} className={css(styles.newTableBody)}>
-                      {col[props.rowIndex].value}
+                    <Cell 
+                    style={col[props.rowIndex].style}
+                    className={css(styles.newTableBody)} 
+                    {...{'title':col[props.rowIndex].value + col[props.rowIndex].extra}}
+                    {...props} >
+                        {col[props.rowIndex].value + col[props.rowIndex].extra}
                     </Cell>
                   )}
           width ={100}
@@ -286,6 +363,10 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
             <span className="rd_mch_color_legend_label">Exercise</span>
             <div className="rd_mch_color_legend color_legend_grey"></div>
             <span className="rd_mch_color_legend_label">No Data Yet</span>
+            <div className="rd_mch_color_legend color_legend_tz_change"></div>
+            <span className="rd_mch_color_legend_label">Time Zone Change</span>
+            <div className="rd_mch_color_legend color_legend_nap_change"></div>
+            <span className="rd_mch_color_legend_label">Nap</span>
 
       </div>
       </div>
@@ -306,7 +387,7 @@ const styles = StyleSheet.create({
   },
   newTableBody:{
   	textAlign:'center',
-    fontSize: '16px', 
+    fontSize: '14px', 
     border: 'none',
     fontFamily:'Proxima-Nova',
     fontStyle:'normal'

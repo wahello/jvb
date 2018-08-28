@@ -56,7 +56,12 @@ class Movementquick extends Component{
         {name: 'Inactive Hours'},
         {name: 'Strength Hours'},
         {name: 'Sleeping Hours'},
+        {name:'Nap Hours'},
         {name: 'Exercise Hours'},
+        {name: 'No Data Yet Hours'},
+        {name: 'Time Zone Change Hours'},
+        {name: 'Total Active Minutes'},
+        {name: 'Total % Active'},
         {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
        ],
         popoverOpen: false,
@@ -72,105 +77,158 @@ class Movementquick extends Component{
          movement_consistency: {
           "12:00 AM to 12:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            },
            "01:00 AM to 01:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "02:00 AM to 02:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "03:00 AM to 03:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "04:00 AM to 04:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "05:00 AM to 05:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "06:00 AM to 06:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "07:00 AM to 07:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "08:00 AM to 08:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "09:00 AM to 09:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "10:00 AM to 10:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "11:00 AM to 11:59 AM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "12:00 PM to 12:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "01:00 PM to 01:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "02:00 PM to 02:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            },
            "03:00 PM to 03:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "04:00 PM to 04:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            },
            "05:00 PM to 05:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            },
            "06:00 PM to 06:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "07:00 PM to 07:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "08:00 PM to 08:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            },
            "09:00 PM to 09:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            "10:00 PM to 10:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            },
            "11:00 PM to 11:59 PM":{
             steps:'-',
-            status:'-'
+            status:'-',
+            active_prcnt:'-',
+            active_duration:{unit: "minute", duration: '-'}
            }, 
            active_hours:'-',
            inactive_hours:'-',
            strength_hours:'-',
            sleeping_hours:'-',
+           nap_hours:'-',
            exercise_hours:'-',
+           no_data_hours: '-',
+           timezone_change_hours:'-',
+           total_active_minutes: '-',
+           total_active_prcnt:'-',
            total_steps:'-'
          }
       }
@@ -230,6 +288,8 @@ class Movementquick extends Component{
     for(let data of dateWiseData) {
       let steps_data = [];
       let status_data = [];
+      let activeDurationData = [];
+      let activePercentData = [];
       for(let slot of this.getSortKeysAccordingTime()){
          let value = data['movement_consistency'][slot].steps;
          
@@ -244,14 +304,26 @@ class Movementquick extends Component{
               }
                steps_data.push(x1 + x2);
          }
-         
+          let activeDuration = 0;
+          let activePercent = 0;
+          if(data['movement_consistency'][slot].active_duration)
+            activeDuration = data['movement_consistency'][slot].active_duration.duration;
+          if(data['movement_consistency'][slot].active_prcnt)
+            activePercent = data['movement_consistency'][slot].active_prcnt;
+          activeDurationData.push(activeDuration);
+          activePercentData.push(activePercent);
           status_data.push(data['movement_consistency'][slot].status);
         }
       steps_data.push(data['movement_consistency'].active_hours);
       steps_data.push(data['movement_consistency'].inactive_hours);
       steps_data.push(data['movement_consistency'].strength_hours);
       steps_data.push(data['movement_consistency'].sleeping_hours);
+      steps_data.push(data['movement_consistency'].nap_hours);
       steps_data.push(data['movement_consistency'].exercise_hours);
+      steps_data.push(data['movement_consistency'].no_data_hours);
+      steps_data.push(data['movement_consistency'].timezone_change_hours);
+      steps_data.push(data['movement_consistency'].total_active_minutes);
+      steps_data.push(data['movement_consistency'].total_active_prcnt);
      let totalSteps =data['movement_consistency'].total_steps;
        if(totalSteps != undefined){
           totalSteps += '';
@@ -281,6 +353,28 @@ class Movementquick extends Component{
               cell={props => (
                     <Cell {...{'title':status_data[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
                       {status_data[props.rowIndex]}
+                    </Cell>
+                  )}
+              width={110}
+        />
+      );
+      columns.push(
+        <Column 
+          header={<Cell className={css(styles.newTableHeader)}>Active Minutes</Cell>}
+              cell={props => (
+                    <Cell {...{'title':activeDurationData[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
+                      {activeDurationData[props.rowIndex]}
+                    </Cell>
+                  )}
+              width={110}
+        />
+      );
+      columns.push(
+        <Column 
+          header={<Cell className={css(styles.newTableHeader)}>% Active</Cell>}
+              cell={props => (
+                    <Cell {...{'title':activePercentData[props.rowIndex]}} {...props} className={css(styles.newTableBody)}>
+                      {activePercentData[props.rowIndex]}
                     </Cell>
                   )}
               width={110}
@@ -359,7 +453,7 @@ export default Dimensions({
     return window.innerHeight - 192;
   },
   getWidth: function(element) {
-    var widthOffset = window.innerWidth < 1024 ? 0 :950;
+    var widthOffset = window.innerWidth < 1024 ? 0 :680;
     return window.innerWidth - widthOffset;
   }
 })(Movementquick);

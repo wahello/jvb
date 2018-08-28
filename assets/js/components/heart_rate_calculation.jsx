@@ -63,6 +63,9 @@ class HeartRateCal extends Component{
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
 			this.hrrRefreshData = this.hrrRefreshData.bind(this);
+			this.renderAddDate = this.renderAddDate.bind(this);
+			this.renderRemoveDate = this.renderRemoveDate.bind(this);
+			this.getHeartRateDownUpFormatted = this.getHeartRateDownUpFormatted.bind(this);
   	}
 
 	successHeart(data){
@@ -99,7 +102,70 @@ class HeartRateCal extends Component{
 			fetching_hrr:false,
 		})
     }
+    renderAddDate(){
+		var today = this.state.selectedDate;
+		var tomorrow = moment(today).add(1, 'days');
+		this.setState({
+			selectedDate:tomorrow.toDate(),
+			fetching_hrr:true,
+			"Did_you_measure_HRR":"",
+			"Did_heartrate_reach_99":"",
+			"time_99":"",
+			"HRR_start_beat":"",
+			"lowest_hrr_1min":"",
+			"No_beats_recovered":"",
 
+			"end_time_activity":"",
+			"diff_actity_hrr":"",
+			"HRR_activity_start_time":"",
+			"end_heartrate_activity":"",
+			"heart_rate_down_up":"",
+			"pure_1min_heart_beats":"",
+			"pure_time_99":"",
+
+			"no_fitfile_hrr_reach_99":"",
+			"no_fitfile_hrr_time_reach_99":"",
+			"time_heart_rate_reached_99":"",
+			"lowest_hrr_no_fitfile":"",
+			"no_file_beats_recovered":"",
+
+			"offset":"",
+		},()=>{
+			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+		});
+	}
+	renderRemoveDate(){
+		var today = this.state.selectedDate;
+		var tomorrow = moment(today).subtract(1, 'days');
+		this.setState({
+			selectedDate:tomorrow.toDate(),
+			fetching_hrr:true,
+			"Did_you_measure_HRR":"",
+			"Did_heartrate_reach_99":"",
+			"time_99":"",
+			"HRR_start_beat":"",
+			"lowest_hrr_1min":"",
+			"No_beats_recovered":"",
+
+			"end_time_activity":"",
+			"diff_actity_hrr":"",
+			"HRR_activity_start_time":"",
+			"end_heartrate_activity":"",
+			"heart_rate_down_up":"",
+			"pure_1min_heart_beats":"",
+			"pure_time_99":"",
+
+			"no_fitfile_hrr_reach_99":"",
+			"no_fitfile_hrr_time_reach_99":"",
+			"time_heart_rate_reached_99":"",
+			"lowest_hrr_no_fitfile":"",
+			"no_file_beats_recovered":"",
+
+			"offset":"",
+		},()=>{
+			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+		});
+	}
     processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
@@ -208,33 +274,63 @@ class HeartRateCal extends Component{
 	    	calendarOpen:!this.state.calendarOpen
 	    });
     }
+
+  getHeartRateDownUpFormatted(){
+  	// Add parentheses "()" around the heartRateBeatDifference
+  	// if HR at start of HRR activity file is greator than 
+  	// HR at the end of workout activity
+  	let heartRateAtEndOfActivity = this.state.end_heartrate_activity;
+  	let heartRateAtStartOfHRR = this.state.HRR_start_beat;
+  	let heartRateBeatDifference = this.state.heart_rate_down_up;
+  	if(heartRateAtStartOfHRR && heartRateBeatDifference &&
+  		heartRateAtEndOfActivity < heartRateAtStartOfHRR){
+  		return "( "+heartRateBeatDifference+" )";
+  	}
+  	return heartRateBeatDifference;
+  }
+
   render(){
   	const {fix} = this.props;
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
-		        <div style = {{marginTop:"10px"}}>
-	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
-	                    <FontAwesome
-	                        name = "calendar"
-	                        size = "2x"
-	                    />
-	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+		       <div>
+					<span>
+						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+							<FontAwesome
+		                        name = "angle-left"
+		                        size = "2x"
+			                />
+						</span> 
+		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress"> 
+		                    <FontAwesome
+		                        name = "calendar"
+		                        size = "2x"
+		                    />
+		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+	                	</span>
+	                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+							<FontAwesome
+		                        name = "angle-right"
+		                        size = "2x"
+			                />
+						</span> 
+						
+						<span className = "button_padding">
+                    		<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
+                		</span>
+		            	<Popover
+				            placement="bottom"
+				            isOpen={this.state.calendarOpen}
+				            target="gd_progress"
+				            toggle={this.toggleCalendar}>
+			                <PopoverBody className="calendar2">
+			                <CalendarWidget  onDaySelect={this.processDate}/>
+			                </PopoverBody>
+		                </Popover>
+                	</span>
 
-                	</span>
-                	<span className = "button_padding">
-                    	<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
-                	</span>
-	            	<Popover
-			            placement="bottom"
-			            isOpen={this.state.calendarOpen}
-			            target="progress"
-			            toggle={this.toggleCalendar}>
-		                <PopoverBody className="calendar2">
-		                <CalendarWidget  onDaySelect={this.processDate}/>
-		                </PopoverBody>
-	                </Popover>
-	            </div>
+		        </div>
 
 	            {this.state.Did_you_measure_HRR == "yes"  &&
 	            <div className = "row justify-content-center hr_table_padd">
@@ -311,7 +407,7 @@ class HeartRateCal extends Component{
 
 				          	     <tr className = "hr_table_style_rows">
 					          	    <td className = "hr_table_style_rows">Heart rate beats your heart rate went down/(up) from end of workout file to start of HRR file</td>
-					          	    <td className = "hr_table_style_rows">{this.state.heart_rate_down_up}</td>
+					          	    <td className = "hr_table_style_rows">{this.getHeartRateDownUpFormatted()}</td>
 				          	    </tr>
 
 				          	    <tr className = "hr_table_style_rows">

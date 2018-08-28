@@ -34,6 +34,7 @@ from quicklook.models import UserQuickLook,\
 					Alcohol
 
 from quicklook.serializers import UserQuickLookSerializer
+import user_input.views.garmin_views
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -55,6 +56,56 @@ def _str_duration_to_dt(dobj,str_duration):
 			hour += 12
 		return datetime.combine(dobj.date(),time(hour,minute))
 	return None
+
+def _get_lst(lst,i,default = None):
+	""" get method for list similar to dictionary's get method """
+	try:
+		return lst[i];
+	except IndexError:
+		return default
+	except TypeError:
+		return default
+
+def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss"):
+	'''
+		Expect duration in this format - "hh:mm:ss"
+		convert in into hours, min or sec
+		
+		Arguments
+		- str_duration : type String, time in format 'hh:mm:ss'
+
+		- time_format: type String, possible values are [hour, minute, seconds]
+		  specified in what format time to be converted
+		  
+		- time_pattern: type String, possible values are substring of "hh:mm:ss"
+		  specify the position of hour, minute and second in the str_duration
+
+	'''
+	if str_duration:
+		hms = str_duration.split(":")
+		pattern_lst = time_pattern.split(":")
+		pattern_indexed = {
+			"hour":pattern_lst.index("hh") if "hh" in pattern_lst else None,
+			"minute":pattern_lst.index("mm") if "mm" in pattern_lst else None,
+			"second":pattern_lst.index("ss") if "ss" in pattern_lst else None
+		}
+
+		h = int(_get_lst(hms,pattern_indexed["hour"],0))\
+			if _get_lst(hms,pattern_indexed["hour"],0) else 0
+		m = int(_get_lst(hms,pattern_indexed["minute"],0))\
+			if _get_lst(hms,pattern_indexed["minute"],0) else 0
+		s = int(_get_lst(hms,pattern_indexed["second"],0))\
+			if _get_lst(hms,pattern_indexed["second"],0) else 0
+
+		t = 0
+		if time_format == 'hour':
+			t = h + (m/60) + (s/3600)
+		elif time_format == 'minute':
+			t = (h*60) + m + (s/60)
+		else:
+			t = (h * 3600) + (m * 60) + s
+		return round(t,3)
+	return 0
 
 def sec_to_hours_min_sec(seconds,include_sec = True):
 	seconds = int(seconds)
@@ -638,15 +689,85 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 	return sleep_stats
 
-def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+def is_potential_hrr_activity(activity):
+	'''
+	Check if activity is potential HRR file or not. 
+	Any activity is potential HRR if meets following criteria - 
+		1)it's not actually "HEART RATE RECOVERY" file
+		2) Not created manually by user from activity grid
+		3) Not yet submitted from the user input. How to check?
+			Any activity file submitted from user input activity grid 
+			will have "comments" key.  
+		4) Duration in seconds is greater than or equal to 1200 seconds
+		5) Distance in meters is greater than or equal to 1287.48 (0.8 miles) 
+	'''
+	if(activity 
+		and activity.get('activityType') != "HEART_RATE_RECOVERY"
+		and not activity.get('created_manually',False) # not manually created by user 
+		and not "comments" in activity # not edited by user yet 
+		and activity.get("durationInSeconds",0) <= 1200
+		and activity.get("distanceInMeters",0) <= 1287.48):
+		return True
+	return False
 
-	# If same id exist in user submited activities, give it more preference
-	# than manually edited activities 
+def get_renamed_to_hrr_activities(user,calendar_date,activities):
+	'''
+	Return the list of summary ids which has to be renamed as
+	"HEART_RATE_RECOVERY"
+
+	Args:
+		user(:obj:`User`): Currently logged user
+		calendar_date(datetime): Date for which calculation has to be done
+		activities(list): List of activities
+
+	Return:
+		list: List of summary id. Empty list if there is no activity which
+			need to be renamed 
+	'''
+	calendar_date = calendar_date.strftime("%Y-%m-%d")
+	renamed_summaries = []
+	any_potential_hrr = False
+	for activity in activities:
+		if not any_potential_hrr and is_potential_hrr_activity(activity):
+			any_potential_hrr = True
+			break
+	if any_potential_hrr:
+		try:
+			# call the FIT parser function and get the renamed activities
+			renamed_activities = user_input.views.garmin_views._get_activities(
+				user,calendar_date)
+		except Exception as e:
+			renamed_activities = None
+		if renamed_activities:	
+			for activity in activities:
+				renamed_act = renamed_activities.get(activity.get('summaryId'),None)
+				if(renamed_act 
+					and renamed_act.get('activityType') == 'HEART_RATE_RECOVERY'):
+					renamed_summaries.append(activity['summaryId'])
+	return renamed_summaries
+
+def get_filtered_activity_stats(activities_json,manually_updated_json,
+		userinput_activities=None,**kwargs):
+	
+	'''
+	Combine activities, manually edited activities and user input activities
+	and provide final list of activities.
+
+	During combining activities, information from activites are preferrend in
+	following order - user edited/modifies > Manually edited > normal activities 
+
+	Args:
+		activities_json (list): List of  activities
+		manually_updated_json (list): List of manually edited activities
+		userinput_activities (list): List of user created/modified activities
+	'''
 
 	activities_json = copy.deepcopy(activities_json)
 	userinput_activities = copy.deepcopy(userinput_activities)
 	manually_updated_json = copy.deepcopy(manually_updated_json)
 
+	# If same id exist in user submited activities, give it more preference
+	# than manually edited activities
 	def userinput_edited(obj):
 		obj_in_user_activities = userinput_activities.get(obj.get('summaryId'),None)
 		if obj_in_user_activities:
@@ -678,6 +799,7 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 				# it was present in normal unedited version of summary, in
 				# that case add the previous step data to the current summary
 				obj['steps'] = non_edited_steps
+
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
 			filtered_activities.append(obj)
@@ -690,9 +812,20 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,userinput_
 			activity['created_manually'] = True
 		filtered_activities += userinput_activities.values()
 
+	act_renamed_to_hrr = []
+	if kwargs.get('user') and kwargs.get('calendar_date') and filtered_activities:
+		act_renamed_to_hrr = get_renamed_to_hrr_activities(
+			user = kwargs.get('user'),
+			calendar_date = kwargs.get('calendar_date'),
+			activities = filtered_activities
+		)
+	for act in filtered_activities:
+		if act['summaryId'] in act_renamed_to_hrr:
+			act['activityType'] = 'HEART_RATE_RECOVERY'
+
 	return filtered_activities
 
-def get_activity_stats(activities_json,manually_updated_json,userinput_activities=None):
+def get_activity_stats(combined_user_activities):
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 
@@ -715,14 +848,10 @@ def get_activity_stats(activities_json,manually_updated_json,userinput_activitie
 	activities_duration = {}
 	max_duration = 0
 
-	filtered_activities = get_filtered_activity_stats(activities_json,
-		manually_updated_json,userinput_activities
-	)
-
-	if len(filtered_activities):
+	if len(combined_user_activities):
 		runs_count = 0
 		avg_run_speed_mps = 0
-		for obj in filtered_activities:
+		for obj in combined_user_activities:
 
 			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
 			if not obj_avg_hr:
@@ -815,20 +944,17 @@ def _get_avg_hr_points_range(age,workout_easy_hard):
 		return None
 	return point_range
 
-def _get_activities_start_end_time(todays_activities,todays_manually_updated_json,userinput_activities):
+def _get_activities_start_end_time(combined_user_activities):
 	'''
 		Return list of named tuples containing start and end datetime
 		object of each activities
 	'''
-	final_filtered_activities= get_filtered_activity_stats(activities_json=todays_activities,
-									manually_updated_json=todays_manually_updated_json,
-									userinput_activities=userinput_activities)
 
 	Time = namedtuple("Time",["start","end"])
 	activities_start_end_time = []
 
-	if final_filtered_activities:
-		for activity in final_filtered_activities:
+	if combined_user_activities:
+		for activity in combined_user_activities:
 			start_time = (
 				activity.get('startTimeInSeconds',0) 
 				+ activity.get('startTimeOffsetInSeconds')
@@ -851,16 +977,21 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	return False 
 
 def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
+	total_active_minutes = 0
 	active_hours = 0
 	inactive_hours = 0
 	total_steps = 0
 	sleeping_hours = 0
 	strength_hours = 0
 	exercise_hours = 0
+	nap_hours = 0
+	no_data_hours = 0
+	timezone_change_hours = 0
 
 	for interval,values in list(mc_data.items()):
 		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
-			'strength_hours','exercise_hours','total_steps']
+			'strength_hours','exercise_hours','total_steps','timezone_change_hours',
+			'no_data_hours','nap_hours','total_active_minutes','total_active_prcnt']
 		if interval not in non_interval_keys:
 			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -886,13 +1017,26 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 				strength_hours += 1
 			elif mc_data[interval]['status'] == 'exercise':
 				exercise_hours += 1
+			elif mc_data[interval]['status'] == 'nap':
+				nap_hours += 1
+			elif mc_data[interval]['status'] == 'no data yet':
+				no_data_hours += 1
+			elif mc_data[interval]['status'] == 'time zone change':
+				timezone_change_hours += 1
 			total_steps += values['steps']
+			total_active_minutes += values['active_duration']['duration']
 
+	mc_data['total_active_minutes'] = total_active_minutes
+	mc_data['total_active_prcnt'] = round(
+			(total_active_minutes / 1440)*100)
 	mc_data['active_hours'] = active_hours
 	mc_data['inactive_hours'] = inactive_hours
 	mc_data['sleeping_hours'] = sleeping_hours
 	mc_data['strength_hours'] = strength_hours
 	mc_data['exercise_hours'] = exercise_hours
+	mc_data['nap_hours'] = nap_hours
+	mc_data['no_data_hours'] = no_data_hours
+	mc_data['timezone_change_hours'] = timezone_change_hours
 	mc_data['total_steps'] = total_steps
 
 def _get_user_current_local_time(user,tz_offset=None):
@@ -921,11 +1065,142 @@ def _get_user_current_local_time(user,tz_offset=None):
 		return local_time
 	return utc_time_now
 
-def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,sleeps_today_json,
-					user_input_todays_bedtime,todays_activities,todays_manually_updated_json,userinput_activities,user_input_bedtime = None,
-					user_input_awake_time = None,user_input_timezone = None,
-					user_input_strength_start_time=None,user_input_strength_end_time=None,
-					):
+def check_timezone_change(today_epoch_data,
+ 		yesterday_epoch_data=None, tomorrow_epoch_data=None):
+	"""
+	Check timezone changes and return the list of time interval 
+	which have to be marked as "Timezone Change"
+	"""
+	timezone_change_interval = []
+	Interval = namedtuple('Interval',['start','end'])
+	if yesterday_epoch_data:
+		# sort record so that oldest record first and newest record last
+		yesterday_epoch_data = sorted(
+			yesterday_epoch_data,
+			key=lambda x: int(x.get('startTimeInSeconds')))
+
+	if tomorrow_epoch_data:
+		tomorrow_epoch_data = sorted(
+			tomorrow_epoch_data,
+			key=lambda x: int(x.get('startTimeInSeconds')))
+
+	if today_epoch_data:
+		today_epoch_data = sorted(
+			today_epoch_data,
+			key=lambda x: int(x.get('startTimeInSeconds')))
+		epoch_data_date = datetime.utcfromtimestamp(
+			today_epoch_data[0].get("startTimeInSeconds")
+			+ today_epoch_data[0].get("startTimeOffsetInSeconds"))
+		today_midnight_dt = datetime.combine(epoch_data_date.date(),time(0))
+		today_last_min_dt = datetime.combine(epoch_data_date.date(),time(23,59))
+
+		last_start_time = None
+		last_offset = None
+		for i,epoch in enumerate(today_epoch_data):
+			current_start_time = (epoch.get('startTimeInSeconds')
+				+ epoch.get('startTimeOffsetInSeconds'))
+			current_start_time = datetime.utcfromtimestamp(current_start_time)
+			current_offset = epoch.get('startTimeOffsetInSeconds',0)
+
+			if i == 0 and yesterday_epoch_data:
+				# if it is first record of the day and user
+				# moved in tz ahead of previous tz eg. if user switched
+				# timezone at 11:00 PM July 30 California to NY then
+				# the next summary would be recorded at 2:00 AM NY timezone.
+				# So we have to mark interval 12:00 - 12:59 AM and
+				# 1:00 to 1:59 AM on July 31 as timezone change 
+				yday_last_record = yesterday_epoch_data[-1]
+				yday_last_record_offset = yday_last_record.get(
+					'startTimeOffsetInSeconds')
+				if not current_offset == yday_last_record_offset:
+					if current_offset > yday_last_record_offset:
+						timezone_change_interval.append(
+							Interval(today_midnight_dt,current_start_time))
+
+			elif i == len(today_epoch_data)-1 and tomorrow_epoch_data:
+				# if it is last record of the day and user
+				# moved in tz ahead of current tz eg. if user switched
+				# timezone at 10:30 PM July 30 California to NY then
+				# the next summary would be recorded at 1:30 AM NY timezone.
+				# So we have to mark interval 10:00 - 10:59 AM and
+				# 11:00 to 11:59 AM on July 30 as timezone change
+				tomorrow_first_record = tomorrow_epoch_data[0]
+				tomorrow_first_record_offset = tomorrow_first_record.get(
+					'startTimeOffsetInSeconds')
+				if not current_offset == tomorrow_first_record_offset:
+					if current_offset < tomorrow_first_record_offset:
+						timezone_change_interval.append(
+							Interval(current_start_time,today_last_min_dt))
+
+			elif last_offset and last_start_time:
+				# check for timezone changes
+				if not current_offset == last_offset:
+					#offset are different, timezone got changed 
+					if current_offset > last_offset:
+						# user moved to time zone which is ahead of 
+						# last timezone eg. California to NY
+						timezone_change_interval.append(
+							Interval(last_start_time,current_start_time))
+					else:
+						# user moved to time zone which is behind 
+						# last timezone eg. NY to California
+						timezone_change_interval.append(
+							Interval(current_start_time,last_start_time))
+
+			last_start_time = current_start_time
+			last_offset = current_offset
+
+	return timezone_change_interval
+
+def _update_status_to_timezone_change(mc_data,timezone_change_interval,calendar_date):
+	'''
+	Update status of hourly intervals to "timezone change" according to 
+	the interval list
+
+	Args:
+		mc_data(dict): Dictionary containing hourly interval MC data
+		timezone_change_interval(list): A list containing named tuple,
+			representing time interval to be marked as "timezone change"
+		calendar_date(datetime): A datetime object representing date for which
+			this MC data is
+	'''
+	def in_tz_interval(hour_start):
+		for interval in timezone_change_interval:
+			interval_start = datetime.combine(
+				interval.start.date(),
+				time(interval.start.hour))
+			interval_end = datetime.combine(
+				interval.end.date(),
+				time(interval.end.hour,59))
+			if hour_start >= interval_start and hour_start <= interval_end:
+				return True
+		return False
+
+	for interval,values in list(mc_data.items()):
+		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
+			'strength_hours','exercise_hours','total_steps']
+		if interval not in non_interval_keys:
+			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
+			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
+			if am_or_pm == 'PM' and int(hour) != 12:
+				hour = int(hour) + 12
+			elif am_or_pm == 'AM' and int(hour) == 12:
+				hour = 0
+			else:
+				hour = int(hour)
+				
+			hour_start = datetime.combine(calendar_date.date(),time(hour))
+			if in_tz_interval(hour_start):
+				mc_data[interval]['status'] = 'time zone change'
+	return mc_data
+
+
+def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
+		sleeps_today_json,user_input_todays_bedtime,combined_user_activities,
+		user_input_bedtime = None,user_input_awake_time = None,
+		user_input_timezone = None,user_input_strength_start_time = None,
+		user_input_strength_end_time = None,yesterday_epoch_data = None,
+		tomorrow_epoch_data = None, nap_start_time = None, nap_end_time = None):
 	
 	'''
 		Calculate the movement consistency summary
@@ -940,19 +1215,27 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		user_input_strength_end_time = datetime.combine(user_input_strength_end_time.date(),
 			time(user_input_strength_end_time.hour,59))
 
+	if nap_start_time and nap_end_time:
+		nap_start_time = datetime.combine(nap_start_time.date(),
+			time(nap_start_time.hour))
+		nap_end_time = datetime.combine(nap_end_time.date(),
+			time(nap_end_time.hour,59))
+
 	movement_consistency = OrderedDict()
 	sleep_stats = get_sleep_stats(calendar_date,sleeps_json,sleeps_today_json, 
 		user_input_bedtime = user_input_bedtime,
 		user_input_awake_time = user_input_awake_time,
 		user_input_timezone = user_input_timezone ,str_dt=False)
 	
-	activities_start_end_time =_get_activities_start_end_time(todays_activities=todays_activities,
-		todays_manually_updated_json=todays_manually_updated_json,userinput_activities=userinput_activities)
+	activities_start_end_time =_get_activities_start_end_time(
+		combined_user_activities)
 
 	today_bedtime = None
-	if user_input_todays_bedtime and user_input_timezone:
-		target_tz = pytz.timezone(user_input_timezone)
-		today_bedtime = user_input_todays_bedtime.astimezone(target_tz).replace(tzinfo=None)
+	if (user_input_todays_bedtime 
+		and user_input_todays_bedtime[0] 
+		and user_input_todays_bedtime[1]):
+		target_tz = pytz.timezone(user_input_todays_bedtime[1])
+		today_bedtime = user_input_todays_bedtime[0].astimezone(target_tz).replace(tzinfo=None)
 	else:
 		sleeps_today_stats = get_sleep_stats(calendar_date,None,sleeps_today_json[::-1],
 			user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
@@ -967,6 +1250,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		today_bedtime = None
 		
 	if epochs_json:
+		timezone_change_interval = check_timezone_change(
+			epochs_json,yesterday_epoch_data,tomorrow_epoch_data)
 		epochs_json = sorted(epochs_json, key=lambda x: int(x.get('startTimeInSeconds')))
 		data_date = datetime.utcfromtimestamp(epochs_json[0].get("startTimeInSeconds") +
 											  epochs_json[0].get("startTimeOffsetInSeconds"))
@@ -978,7 +1263,12 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			time_interval = data_date_midnight.strftime("%I:%M %p")+" to "+end_hour.strftime("%I:%M %p")
 			movement_consistency[time_interval] = {
 				"steps":0,
-				"status":"sleeping"
+				"status":"sleeping",
+				"active_duration":{
+					'duration':0,
+					'unit':'minute'
+				},
+				"active_prcnt":0
 			}
 			data_date_midnight += td_hour
 
@@ -1011,20 +1301,35 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				else:
 					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
+				active_duration_min = data.get('activeTimeInSeconds',0)/60
+				interval_active_duration = movement_consistency[time_interval]['active_duration']
+				interval_active_duration['duration'] = round(
+					interval_active_duration['duration'] + active_duration_min)
+				active_prcnt = round((interval_active_duration['duration']/60)*100)
+				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
 
+		total_active_minutes = 0
 		active_hours = 0
 		inactive_hours = 0
 		total_steps = 0
 		sleeping_hours = 0
 		strength_hours = 0
 		exercise_hours = 0
+		no_data_hours = 0
+		nap_hours = 0
+		timezone_change_hours = 0
 		previous_hour_steps = None
 		last_sleeping_hour = None
 		have_steps_before_9_am  = False
 
 		user_current_local_time = _get_user_current_local_time(user)
+
+		# update interval status if there any timezone change
+		# Note: 'sleeping' can overide 'time zone change' status
+		_update_status_to_timezone_change(
+			movement_consistency,timezone_change_interval,calendar_date)
 
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
@@ -1052,7 +1357,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 					and hour_start > user_current_local_time):
 					movement_consistency[interval]['status'] = 'no data yet'
 					movement_consistency[interval]['steps'] = 0
-				elif not movement_consistency[interval]['steps']:
+				elif (not movement_consistency[interval]['steps'] 
+						and not movement_consistency[interval]['status'] == 'time zone change'):
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
 						
@@ -1060,9 +1366,14 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
 					
-				elif(user_input_strength_end_time and user_input_strength_start_time):
-					if hour_start >= user_input_strength_start_time and hour_start <= user_input_strength_end_time:
+				elif(user_input_strength_end_time and user_input_strength_start_time
+					and hour_start >= user_input_strength_start_time 
+					and hour_start <= user_input_strength_end_time):
 						movement_consistency[interval]['status'] = 'strength'
+				elif(nap_start_time and nap_start_time
+					and hour_start >= nap_start_time 
+					and hour_start <= nap_end_time):
+						movement_consistency[interval]['status'] = 'nap'
 				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
 					movement_consistency[interval]['status'] = 'exercise'
 
@@ -1103,15 +1414,27 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				strength_hours += 1
 			elif movement_consistency[interval]['status'] == 'exercise':
 				exercise_hours += 1
+			elif movement_consistency[interval]['status'] == 'no data yet':
+				no_data_hours += 1
+			elif movement_consistency[interval]['status'] == 'time zone change':
+				timezone_change_hours += 1
+			elif movement_consistency[interval]['status'] == 'nap':
+				nap_hours += 1
 			total_steps += values['steps']
+			total_active_minutes += values['active_duration']['duration']
 
+		movement_consistency['total_active_minutes'] = total_active_minutes
+		movement_consistency['total_active_prcnt'] = round(
+			(total_active_minutes / 1440)*100)
 		movement_consistency['active_hours'] = active_hours
 		movement_consistency['inactive_hours'] = inactive_hours
 		movement_consistency['sleeping_hours'] = sleeping_hours
 		movement_consistency['strength_hours'] = strength_hours
 		movement_consistency['exercise_hours'] = exercise_hours
+		movement_consistency['nap_hours'] = nap_hours
+		movement_consistency['no_data_hours'] = no_data_hours
+		movement_consistency['timezone_change_hours'] = timezone_change_hours
 		movement_consistency['total_steps'] = total_steps
-
 		if(not yesterday_bedtime and not today_awake_time and have_steps_before_9_am):
 			_update_status_to_sleep_hours(
 				movement_consistency,
@@ -1121,16 +1444,11 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
-		todays_manually_updated_json, userinput_activities, age):
+def cal_exercise_steps_total_steps(dailies_json,combined_user_activities,age):
 	'''
 		Calculate exercise steps and total steps
 	'''	
-	filtered_activities = get_filtered_activity_stats(
-		todays_activities_json,
-		todays_manually_updated_json,
-		userinput_activities
-	)
+
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
 	garmin_total_steps = 0
@@ -1141,8 +1459,8 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 	manual_non_exec_steps = 0
 
 	aerobic_zone = 180 - age - 30
-	if len(filtered_activities):
-		for obj in filtered_activities:
+	if len(combined_user_activities):
+		for obj in combined_user_activities:
 			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
 			# If average heart rate in beats per minute is not submitted by user
 			# then it would be by default empty string. In that case default it to 0 
@@ -1158,9 +1476,12 @@ def cal_exercise_steps_total_steps(dailies_json, todays_activities_json,
 			if ((avg_hr >= aerobic_zone 
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
-					or obj.get("steps_type","") == "exercise"):
+					or obj.get("steps_type","") == "exercise"
+					or(not avg_hr and obj.get("steps_type","") != "non_exercise")):
 				# If activity heart rate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
+				# If no avg heartrate information, simply treat activity steps as 
+				# exercise steps 
 				if obj.get('created_manually',False):
 					manual_exec_steps += steps
 				else:
@@ -1236,16 +1557,16 @@ def sleep_point_for_kids(sleep_duration):
 		if sleep_duration > _to_sec("14:00"):
 			points = 0
 		else: 
-			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
+			points = round(_sec_min((sleep_duration - 0)) * 0.00256 + 0, 5)
 
 	elif sleep_duration >= _to_sec("8:00") and sleep_duration <= _to_sec("12:00"):
 	   points = 4
 
-	elif ((sleep_duration >= _to_sec("7:31") and sleep_duration <= _to_sec("8:00")) or \
+	elif ((sleep_duration >= _to_sec("7:30") and sleep_duration <= _to_sec("7:59")) or \
 		(sleep_duration >= _to_sec("12:01") and sleep_duration <= _to_sec("12:30"))) :
 
-		if (sleep_duration >= _to_sec("7:31") and sleep_duration <= _to_sec("8:00")):
-			points = round(_sec_min(sleep_duration - _to_sec("7:31")) * 0.03333 + 3, 5)
+		if (sleep_duration >= _to_sec("7:30") and sleep_duration <= _to_sec("7:59")):
+			points = round(_sec_min(sleep_duration - _to_sec("7:30")) * 0.03333 + 3, 5)
 		elif(sleep_duration == _to_sec("12:30")):
 			points = round(1 - (_sec_min(sleep_duration - _to_sec("12:30")) * 0.03333) + 2,5)
 		else:
@@ -1257,7 +1578,7 @@ def sleep_point_for_kids(sleep_duration):
 		if(sleep_duration >= _to_sec("7:00") and sleep_duration <= _to_sec("7:29")):
 			points = round(_sec_min(sleep_duration - _to_sec("7:00")) * 0.03333 + 2, 5)
 		elif(sleep_duration == _to_sec("13:00")):
-			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01639) + 1,5)
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01667) + 1,5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _to_sec("12:30")) * 0.03333) + 2,5)
 
@@ -1267,7 +1588,7 @@ def sleep_point_for_kids(sleep_duration):
 		if(sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")):
 	   		points = round(_sec_min(sleep_duration - _to_sec("6:30")) * 0.03333 + 1, 5)
 		else:
-			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01639) + 1,5)
+			points = round(1 - (_sec_min(sleep_duration - _to_sec("13:00")) * 0.01667) + 1,5)
 	
 	return points
 
@@ -1287,8 +1608,8 @@ def sleep_point_for_adults(sleep_duration):
 	sleep_duration = _to_sec(sleep_duration)
 	points = 0
 
-	if sleep_duration < _to_sec("6:00") or sleep_duration > _to_sec("12:00"):
-		if sleep_duration > _to_sec("12:00"):
+	if sleep_duration < _to_sec("6:00") or sleep_duration > _to_sec("13:00"):
+		if sleep_duration > _to_sec("13:00"):
 			points = 0
 		else: 
 			points = round(_sec_min((sleep_duration - 0)) * 0.00278 + 0, 5)
@@ -1306,7 +1627,7 @@ def sleep_point_for_adults(sleep_duration):
 		else:
 			points = round(0.96667 - (_sec_min(sleep_duration - _to_sec("10:01")) * 0.03333) + 3,5)
 
-	elif ((sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("7:29")) or \
+	elif ((sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")) or \
 		(sleep_duration >= _to_sec("10:31") and sleep_duration <= _to_sec("11:00"))) :
 
 		if(sleep_duration >= _to_sec("6:30") and sleep_duration <= _to_sec("6:59")):
@@ -1323,6 +1644,9 @@ def sleep_point_for_adults(sleep_duration):
 	   		points = round(_sec_min(sleep_duration - _to_sec("6:00")) * 0.03333 + 1, 5)
 		else:
 			points = round(1 - (_sec_min(sleep_duration - _to_sec("11:00")) * 0.01639) + 1,5)
+
+	elif sleep_duration >= _to_sec("12:01") and sleep_duration <= _to_sec("13:00"):
+		points = round(1 - (_sec_min(sleep_duration - _to_sec("12:00")) * 0.01639),5)
 	
 	return points
 
@@ -1698,18 +2022,15 @@ def get_workout_effort_grade(todays_daily_strong):
 		workout_effort_level = ''
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
-def get_average_exercise_heartrate_grade(todays_activities,todays_manually_updated,
-										 todays_daily_strong,age,userinput_activities=None):
+def get_average_exercise_heartrate_grade(combined_user_activities,
+		todays_daily_strong, age):
 	
-	filtered_activities = get_filtered_activity_stats(
-		todays_activities,todays_manually_updated,userinput_activities
-	)
 	total_duration = 0
 	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
 	final_activities = []
 	# If same summary is edited manually then give it more preference.
 	
-	for i,act in enumerate(filtered_activities):
+	for i,act in enumerate(combined_user_activities):
 
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
 			pass
@@ -1770,8 +2091,8 @@ def get_overall_grade(grades):
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
 
-def get_weather_data(todays_daily_strong,todays_activities,
-					 todays_manually_updated, todays_date_epoch):
+def get_weather_data(todays_daily_strong,todays_date_epoch,
+	combined_user_activities):
 	manual_weather = False
 	if(safe_get(todays_daily_strong,'indoor_temperature','') or
 	   safe_get(todays_daily_strong,'outdoor_temperature','') or
@@ -1797,7 +2118,7 @@ def get_weather_data(todays_daily_strong,todays_activities,
 		}
 		return DATA
 	else:
-		activity_stat = get_activity_stats(todays_activities,todays_manually_updated)
+		activity_stat = get_activity_stats(combined_user_activities)
 		latitude = activity_stat['latitude']
 		longitude = activity_stat['longitude']
 		if latitude and longitude:
@@ -1823,6 +2144,25 @@ def did_workout_today(have_activities,user_did_workout):
 	else:
 		return ""
 
+def get_user_input_total_sleep(todays_daily_strong,daily_optional):
+	'''
+	Calculate total sleep duration as per user input. This includes
+	duration of Sleep last night and any nap user took.
+	'''
+	sleep_duration = safe_get(
+		todays_daily_strong,"sleep_time_excluding_awake_time","00:00")
+	sleep_duration = _str_to_hours_min_sec(
+		sleep_duration,time_format='seconds',time_pattern="hh:mm")
+	nap_duration = safe_get(
+		daily_optional,"nap_duration","00:00")
+	nap_duration = _str_to_hours_min_sec(
+		nap_duration,time_format='seconds',time_pattern="hh:mm")
+	total_duration_in_seconds = sleep_duration + nap_duration
+	
+	if total_duration_in_seconds:
+		return sec_to_hours_min_sec(total_duration_in_seconds,include_sec = False)
+	return None
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -1844,8 +2184,15 @@ def create_quick_look(user,from_date=None,to_date=None):
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
 
-		epochs = get_garmin_model_data(UserGarminDataEpoch,user,start_epoch,end_epoch,
-										order_by ='-id',filter_dup = True)
+		# epoch data for yesterday, today and tomorrow
+		epochs = get_garmin_model_data(
+			UserGarminDataEpoch,user,
+			start_epoch-86400,end_epoch+86400,
+			order_by ='-id',filter_dup = True)
+
+		epochs = get_weekly_data(
+			epochs,current_date+timedelta(days=1),current_date-timedelta(days=1))
+
 		# Get sleep data for yesterday
 		sleeps = get_garmin_model_data(UserGarminDataSleep,
 									   user,start_epoch-86400,end_epoch-86400,
@@ -1929,14 +2276,13 @@ def create_quick_look(user,from_date=None,to_date=None):
 
 		# todays_manually_updated_json.update(userinput_activities)
 		
-		epochs_json = [ast.literal_eval(dic) for dic in epochs]
+		epochs_json = epochs[current_date.strftime("%Y-%m-%d")]
+		yesterday_epoch = epochs[(current_date-timedelta(days=1)).strftime("%Y-%m-%d")]
+		tomorrow_epoch = epochs[(current_date+timedelta(days=1)).strftime("%Y-%m-%d")]
 		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
 		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
 		stress_json = [ast.literal_eval(dic) for dic in stress]
-
-		weather_data = get_weather_data(todays_daily_strong,todays_activities_json,
-										todays_manually_updated_json,start_epoch)
 
 		grades_calculated_data = get_blank_model_fields('grade')
 		exercise_calculated_data = get_blank_model_fields('exercise')
@@ -1947,8 +2293,17 @@ def create_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data = get_blank_model_fields("food")
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
-		# Exercise
-		activity_stats = get_activity_stats(todays_activities_json,todays_manually_updated_json,userinput_activities)
+		# Combined user activities (Garmin and user manually created activity)
+		# Some activities are automatically renamed to "HEART RATE RECOVERY",
+		# but not necessarily 
+		combined_user_activities = get_filtered_activity_stats(
+			todays_activities_json,todays_manually_updated_json,
+			userinput_activities,user = user, calendar_date = current_date)
+
+		weather_data = get_weather_data(todays_daily_strong,start_epoch,combined_user_activities)
+
+		# Exercise Calculation
+		activity_stats = get_activity_stats(combined_user_activities)
 		exercise_calculated_data['did_workout'] = did_workout_today(
 				activity_stats['have_activity'],
 				safe_get(todays_daily_strong,"workout","")
@@ -2023,7 +2378,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Sleeps
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)
 		user_input_awake_time = safe_get(todays_daily_strong,"sleep_awake_time",None)
-		user_input_sleep_duration = safe_get(todays_daily_strong,"sleep_time_excluding_awake_time",None)
+		user_input_sleep_duration = get_user_input_total_sleep(
+			todays_daily_strong,daily_optional)
 		user_input_timezone = todays_user_input.timezone if todays_user_input else None
 		
 		sleep_stats = get_sleep_stats(current_date,sleeps_json,sleeps_today_json,
@@ -2040,8 +2396,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
-		sleeps_calculated_data['sleep_per_user_input'] = safe_get(todays_daily_strong,
-														'sleep_time_excluding_awake_time','')
+		sleeps_calculated_data['sleep_per_user_input'] = (user_input_sleep_duration 
+			if user_input_sleep_duration else "")
 		comment = safe_get(todays_daily_strong,"sleep_comment",'')
 		sleeps_calculated_data['sleep_comments'] = comment if comment else ''
 
@@ -2071,9 +2427,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['workout_effortlvl_gpa'] = workout_effortlvl_grade_pts[1]
 
 		# Average exercise heartrate grade calculation
-		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(todays_activities_json,
-									todays_manually_updated_json,todays_daily_strong,
-									user.profile.age(),userinput_activities)
+		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(
+			combined_user_activities,todays_daily_strong,user.profile.age())
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
@@ -2129,23 +2484,31 @@ def create_quick_look(user,from_date=None,to_date=None):
 			user_input_strength_end_time = _str_duration_to_dt(current_date,user_input_strength_end_time)
 
 		todays_bedtime = None
+		tomorrows_user_input_tz = None
 		if tomorrows_user_input and tomorrows_user_input.strong_input:
 			todays_bedtime = tomorrows_user_input.strong_input.sleep_bedtime
-
+			tomorrows_user_input_tz = tomorrows_user_input.timezone
+		nap_start_time = safe_get(daily_optional, "nap_start_time", None)
+		nap_end_time = safe_get(daily_optional, "nap_end_time", None)
+		if nap_start_time and nap_end_time:
+			nap_start_time = _str_duration_to_dt(current_date,nap_start_time)
+			nap_end_time = _str_duration_to_dt(current_date,nap_end_time)
 		movement_consistency_summary = cal_movement_consistency_summary(
 			user,
 			current_date,
 			epochs_json,sleeps_json,
 			sleeps_today_json,
-			todays_activities=todays_activities,
-			todays_manually_updated_json=todays_manually_updated_json,
-			userinput_activities=userinput_activities,
-			user_input_todays_bedtime = todays_bedtime,
+			user_input_todays_bedtime = (todays_bedtime,tomorrows_user_input_tz),
 			user_input_bedtime = user_input_bedtime,
+			combined_user_activities = combined_user_activities,
 		  	user_input_awake_time = user_input_awake_time,
 		  	user_input_timezone = user_input_timezone,
 		  	user_input_strength_start_time = user_input_strength_start_time,
-		  	user_input_strength_end_time = user_input_strength_end_time
+		  	user_input_strength_end_time = user_input_strength_end_time,
+		  	yesterday_epoch_data = yesterday_epoch,
+		  	tomorrow_epoch_data = tomorrow_epoch,
+		  	nap_start_time = nap_start_time,
+		  	nap_end_time = nap_end_time
 		)
 		
 		if movement_consistency_summary:
@@ -2158,10 +2521,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		# Non-Exercise steps grade calculation
 		exercise_steps,non_exercise_steps,total_steps = cal_exercise_steps_total_steps(
 			dailies_json,
-			todays_activities_json,
-			todays_manually_updated_json,
-			userinput_activities,
-			user.profile.age()
+			combined_user_activities,
+			user.profile.age(),
 		)	
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps

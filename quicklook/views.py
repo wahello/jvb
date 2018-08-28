@@ -4,8 +4,6 @@ from decimal import Decimal, ROUND_HALF_UP
 import calendar
 import ast
 import json
-import xlsxwriter
-import pprint
 
 from django.http import JsonResponse  
 from django.shortcuts import get_object_or_404
@@ -17,20 +15,20 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from xlsxwriter.workbook import Workbook
 from fitparse import FitFile
-from garmin.models import GarminFitFiles ,\
+from garmin.models import GarminFitFiles,\
 						  UserGarminDataActivity,\
 						  UserLastSynced
 
 from registration.models import Profile
 
-from user_input.models import DailyUserInputOptional ,\
+from user_input.models import DailyUserInputOptional,\
 							  DailyUserInputEncouraged,\
 							  DailyUserInputStrong
 
 from .serializers import UserQuickLookSerializer,\
-						 GradesSerializer,\
-						 StepsSerializer,\
-						 SleepSerializer
+							GradesSerializer,\
+							StepsSerializer,\
+							SleepSerializer
 
 
 from .models import UserQuickLook,\
@@ -58,7 +56,7 @@ from progress_analyzer.helpers.helper_classes import ProgressReport
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
 from hrr.models import Hrr
 # from .calculation_helper import *
-
+from hrr.views import weekly_workout_helper
 
 class UserQuickLookView(generics.ListCreateAPIView):
 	'''
@@ -439,6 +437,7 @@ def export_users_xls(request):
 	sheet4 = book.add_worksheet('Food')
 	sheet5 = book.add_worksheet('Alcohol')
 	sheet6 = book.add_worksheet('Exercise Reporting')
+	weekly_workout_sheet = book.add_worksheet('Weekly Workout Summary')
 	hrr_sheet = book.add_worksheet('HRR')
 	sheet7 = book.add_worksheet('Swim Stats')
 	sheet8 = book.add_worksheet('Bike Stats')
@@ -455,6 +454,7 @@ def export_users_xls(request):
 	sheet9.set_column(1,1000,11)
 	sheet10.set_column(2,1000,11)
 	hrr_sheet.set_column(1,1000,11)
+	weekly_workout_sheet.set_column(1,1000,11)
 	sheet1.freeze_panes(1, 1)
 	sheet1.set_column('A:A',40)
 	sheet2.freeze_panes(1, 1)
@@ -524,6 +524,8 @@ def export_users_xls(request):
 	format = book.add_format({'align':'left','num_format': '#,##0'})
 	format1 = book.add_format({'align':'left','num_format': '0.00'})
 	format_grey = book.add_format({'align':'left','bg_color': '#A5A7A5'})
+	format_cream = book.add_format({'align':'left','bg_color': '#FEE9B9','num_format': '#,##0'})
+	format_darkcyan = book.add_format({'align':'left','bg_color': '#007DA8','num_format': '#,##0','font_color': 'white'})
 	format_exercise = book.add_format({'align':'left', 'bg_color': '#FD9A44','num_format': '#,##0'})
 	format_exe = book.add_format({'align':'left','num_format': '0.0'})
 	format_red_a = book.add_format({'align':'left', 'bg_color': 'red','num_format': '0.0'})
@@ -1400,14 +1402,15 @@ def export_users_xls(request):
 			current_date -= timedelta(days=1)
 	
 	last_sycn_obj = UserLastSynced.objects.filter(user = request.user)
-	last_sycn = [tmp.last_synced for tmp in last_sycn_obj]
-	last_sycn_offset = [tmp.offset for tmp in last_sycn_obj]
-	import time
-	unixtime = time.mktime(last_sycn[0].timetuple())
-	local_time = unixtime + last_sycn_offset[0]
-	value_last_sycn = datetime.fromtimestamp(local_time).strftime('%b %d,%Y @ %I:%M %p')
-	matter = 'Wearable Device Last Synced on'
-	sheet1.write_rich_string(0,0,matter,'\n',value_last_sycn)
+	if last_sycn_obj:
+		last_sycn = [tmp.last_synced for tmp in last_sycn_obj]
+		last_sycn_offset = [tmp.offset for tmp in last_sycn_obj]
+		import time
+		unixtime = time.mktime(last_sycn[0].timetuple())
+		local_time = unixtime + last_sycn_offset[0]
+		value_last_sycn = datetime.fromtimestamp(local_time).strftime('%b %d,%Y @ %I:%M %p')
+		matter = 'Wearable Device Last Synced on'
+		sheet1.write_rich_string(0,0,matter,'\n',value_last_sycn)
 	sheet1.write(1, 0, "Grades",bold)
 	sheet1.write(2, 0, "OVERALL HEALTH GRADES",bold)
 	col_num1 = 2
@@ -2790,9 +2793,206 @@ def export_users_xls(request):
 				hrr_sheet.write(i + 2, row_num, '')
 			current_date -= timedelta(days=1)
 
+	def convert_sec_to_hhmm(seconds):
+		'''
+			Make seconds to hours and minutes
+		'''
+		min,sec = divmod(seconds,60)
+		hours,minutes = divmod(min,60)
+		if minutes < 10:
+			minutes = "0"+str(int(minutes))
+		else:
+			minutes = str(int(minutes))
+		if hours < 10:
+			hours = "0"+str(int(hours))
+		else:
+			hours = str(int(hours))
+		return hours,minutes
+
+	def round_percentage(percent_value):
+		'''
+			Make decimals to round number
+		'''
+		rounded_percent = int(Decimal(percent_value).quantize(0,ROUND_HALF_UP))
+		return rounded_percent
+	
+	def show_values(value,col_num1,row_num,workout_type,total_activities=None):
+		'''
+			Print the values in Excel
+		'''
+		workout_copy = workout_type
+		workout_keys = ["days_with_activity","percent_of_days","duration",
+		"workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
+		"percent_aerobic","duration_in_anaerobic_range","percent_anaerobic",
+		"duration_below_aerobic_range","percent_below_aerobic",
+		"duration_hrr_not_recorded","percent_hrr_not_recorded"]
+		for key,values in enumerate(workout_keys):
+			if values == 'days_with_activity':
+				col_num1 = col_num1 + 1
+				weekly_workout_sheet.write(row_num,col_num1,value[values],innercell_format)
+			elif values == 'percent_of_days':
+				col_num1 = col_num1 + 1
+				percent_of_days = round_percentage(value[values])
+				weekly_workout_sheet.write(
+				row_num,col_num1,"{}{}".format(percent_of_days,'%'),innercell_format)
+			elif values == 'duration':
+				col_num1 = col_num1 + 1
+				seconds = value[values]
+				hours,minutes = convert_sec_to_hhmm(seconds)
+				weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+			elif values == 'workout_duration_percent':
+				col_num1 = col_num1 + 1
+				workout_percent = round_percentage(value[values])
+				weekly_workout_sheet.write(
+				row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+			elif values == 'average_heart_rate':
+				col_num1 = col_num1 + 1
+				if value[values]:
+					avg_heart = round_percentage(value[values])
+					weekly_workout_sheet.write(row_num,col_num1,avg_heart,innercell_format)
+			elif values == 'duration_in_aerobic_range':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(
+					row_num,col_num1,"{}:{}".format(hours,minutes))
+			elif values == 'percent_aerobic':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					if value[values] and value[values] != 0:
+						workout_percent = round_percentage(value[values])
+						weekly_workout_sheet.write(
+						row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+					else:
+						weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
+			elif values == 'duration_in_anaerobic_range':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+			elif values == 'percent_anaerobic':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					if value[values] and value[values] != 0:
+						workout_percent = round_percentage(value[values])
+						weekly_workout_sheet.write(
+						row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+					else:
+						weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
+			elif values == 'duration_below_aerobic_range':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+			elif values == 'percent_below_aerobic':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					if value[values] and value[values] != 0:
+						workout_percent = round_percentage(value[values])
+						weekly_workout_sheet.write(
+						row_num,col_num1,"{}{}".format(workout_percent,'%'),innercell_format)
+					else:
+						weekly_workout_sheet.write(row_num,col_num1,0,innercell_format)
+			elif values == 'duration_hrr_not_recorded':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					seconds = value[values]
+					hours,minutes = convert_sec_to_hhmm(seconds)
+					weekly_workout_sheet.write(row_num,col_num1,"{}:{}".format(hours,minutes))
+			elif values == 'percent_hrr_not_recorded':
+				col_num1 = col_num1 + 1
+				if value.get(values):
+					workout_percent = round_percentage(value[values])
+					weekly_workout_sheet.write(
+					row_num,col_num1,"{}{}".format(workout_percent,"%"),innercell_format)
+		wokout_distance = workout_type.lower()
+		wokout_distance = wokout_distance+'_distance'
+		
+		for i,k in value.items():
+			if i == wokout_distance:
+				if 'swimming' in wokout_distance:
+					length_workout = len(total_activities)
+					col_num_miles = col_num1 + length_workout
+					weekly_workout_sheet.write(
+					row_num,col_num_miles,round((k['value']*1.09361),2))
+				else:
+					length_workout = len(total_activities)
+					col_num_miles = col_num1 + length_workout
+					weekly_workout_sheet.write(
+					row_num,col_num_miles,round((k['value']*0.000621371),2))
+				
+
+	def workout_totals_miles(value,col_num1,row_num,total_activities):
+		'''
+			Print the Distance of activities
+		'''
+		col_num1 = 14
+		for i,k in enumerate(total_activities):
+			k_distance = k.lower()+"_distance"
+			if 'swimming' in k_distance:
+				weekly_workout_sheet.write(
+				row_num,col_num1,round((value[k_distance]['value']*1.09361),2))
+				col_num1 = col_num1 + 1
+			else:
+				weekly_workout_sheet.write(
+				row_num,col_num1,round((value[k_distance]['value']*0.000621371),2))
+				col_num1 = col_num1 + 1
 
 
-
+	# Weekly Workout Summary
+	weekly_workout_sheet.set_row(2,80)
+	weekly_workout_sheet.freeze_panes(3,1)
+	cell_format = book.add_format({'bold': True})
+	innercell_format = book.add_format({'align': 'left'})
+	headers = ["Workout Type","Avg # Of Days With Activity","% of Days","Avg. Workout Duration (hh:mm)",
+	"% of Total Duration","Avg Heart Rate","Avg Aerobic Duration (hh:mm)","Avg % Aerobic","Avg Anaerobic Duration (hh:mm)",
+	"Avg % Anaerobic","Avg Below Aerobic Duration (hh:mm)","Avg % Below Aerobic","Avg HR Not Recorded Duration (hh:mm)",
+	"Avg % HR Not Recorded"]
+	cell_format.set_text_wrap()
+	col_num = 0
+	row_num1 = 2
+	for col_num in range(len(headers)):
+		weekly_workout_sheet.write(row_num1,col_num,headers[col_num],cell_format)
+		col_num = col_num + 1
+	data = weekly_workout_helper(request.user,to_date)
+	col_num1 = 0
+	row_num = 3
+	total_activities = []
+	for key,value in data.items():
+		if key != 'Totals' and key != 'extra':
+			total_activities.append(key)
+			if 'SWIMMING' in key:
+				weekly_workout_sheet.write(
+				row_num1,col_num,"Avg {} Distance (In Yards)".format(key),cell_format)
+				col_num = col_num + 1
+			else:
+				weekly_workout_sheet.write(
+				row_num1,col_num,"Avg {} Distance (In Miles)".format(key),cell_format)
+				col_num = col_num + 1
+			weekly_workout_sheet.write(row_num,col_num1,key,)
+			show_values(value,col_num1,row_num,key,total_activities)
+			row_num = row_num + 1
+	
+	for key,value in data.items():
+		if key == 'Totals':
+			col_num1 = 0
+			weekly_workout_sheet.write(row_num,col_num1,key)
+			show_values(value,col_num1,row_num,key)
+			workout_totals_miles(value,col_num1,row_num,total_activities)
+			row_num = row_num + 1
+		elif key == 'extra':
+			weekly_workout_sheet.write(row_num,col_num1,"No Activity")
+			col_num1 = col_num1 + 1
+			weekly_workout_sheet.write(row_num,col_num1,value['days_no_activity'],innercell_format)
+			col_num1 = col_num1 + 1
+			rounded_percent = int(Decimal(value['percent_days_no_activity']).quantize(0,ROUND_HALF_UP))
+			weekly_workout_sheet.write(
+			row_num,col_num1,"{}{}".format(rounded_percent,"%"),innercell_format)
+			row_num = row_num + 1
+	
 
 	#movement consistenct
 	sheet11 = book.add_worksheet('Movement Consistency')
@@ -2806,6 +3006,8 @@ def export_users_xls(request):
 	sheet11.write(0,13,"Strength",format_purple)
 	sheet11.write(0,14,"Exercise",format_exercise)
 	sheet11.write(0,15,"No Data Yet",format_grey)
+	sheet11.write(0,16,"Time Zone",format_cream)
+	sheet11.write(0,17,"Nap",format_darkcyan)
 	sheet11.write(2,0,"Hour")
 	sheet11.write(3,0,"Date",bold)
 	format2 = book.add_format({'bold':True})
@@ -2826,7 +3028,7 @@ def export_users_xls(request):
 	"05:00 - 05:59 AM","06:00 - 06:59 AM","07:00 - 07:59 AM","08:00 - 08:59 AM","09:00 - 09:59 AM","10:00 - 10:59 AM","11:00 - 11:59 AM",
 	"12:00 - 12:59 PM","01:00 - 01:59 PM","02:00 - 02:59 PM","03:00 - 03:59 PM","04:00 - 04:59 PM","05:00 - 05:59 PM",
 	"06:00 - 06:59 PM","07:00 - 07:59 PM","08:00 - 08:59 PM","09:00 - 09:59 PM","10:00 - 10:59 PM","11:00 - 11:59 PM","Sleeping Hours",
-	"Active Hours","Inactive Hours","Strength Hours","Exercise Hours"]
+	"Nap Hours","Active Hours","Inactive Hours","Strength Hours","Exercise Hours","No Data Yet Hours","Time Zone Hours"]
 	hours_range1 = ["total_steps","12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM",
 	"05:00 AM to 05:59 AM","06:00 AM to 06:59 AM","07:00 AM to 07:59 AM","08:00 AM to 08:59 AM","09:00 AM to 09:59 AM","10:00 AM to 10:59 AM","11:00 AM to 11:59 AM",
 	"12:00 PM to 12:59 PM","01:00 PM to 01:59 PM","02:00 PM to 02:59 PM","03:00 PM to 03:59 PM","04:00 PM to 04:59 PM","05:00 PM to 05:59 PM",
@@ -2910,6 +3112,10 @@ def export_users_xls(request):
 							days_count['12:00 AM to 12:59 AM'] += 1
 					elif json1_data['12:00 AM to 12:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+1,"No Data Yet",format_grey)
+					elif json1_data['12:00 AM to 12:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_cream)
+					elif json1_data['12:00 AM to 12:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+1,json1_data['12:00 AM to 12:59 AM']['steps'],format_purple)
 					#111111111111111
@@ -2929,6 +3135,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_red_con)
 					elif json1_data['01:00 AM to 01:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+2,"No Data Yet",format_grey)
+					elif json1_data['01:00 AM to 01:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_cream)
+					elif json1_data['01:00 AM to 01:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+2,json1_data['01:00 AM to 01:59 AM']['steps'],format_purple)
 					#22222222222222222
@@ -2950,6 +3160,10 @@ def export_users_xls(request):
 							days_count['02:00 AM to 02:59 AM'] += 1
 					elif json1_data['02:00 AM to 02:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+3,"No Data Yet",format_grey)
+					elif json1_data['02:00 AM to 02:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_cream)
+					elif json1_data['02:00 AM to 02:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+3,json1_data['02:00 AM to 02:59 AM']['steps'],format_purple)
 					#333333333333333333
@@ -2971,6 +3185,10 @@ def export_users_xls(request):
 							days_count['03:00 AM to 03:59 AM'] += 1
 					elif json1_data['03:00 AM to 03:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+4,"No Data Yet",format_grey)
+					elif json1_data['03:00 AM to 03:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_cream)
+					elif json1_data['03:00 AM to 03:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+4,json1_data['03:00 AM to 03:59 AM']['steps'],format_purple)
 					#444444444444444444
@@ -2992,6 +3210,10 @@ def export_users_xls(request):
 							days_count['04:00 AM to 04:59 AM']+= 1
 					elif json1_data['04:00 AM to 04:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+5,"No Data Yet",format_grey)
+					elif json1_data['04:00 AM to 04:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_cream)
+					elif json1_data['04:00 AM to 04:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+5,json1_data['04:00 AM to 04:59 AM']['steps'],format_purple)
 					#555555555555
@@ -3013,6 +3235,10 @@ def export_users_xls(request):
 							days_count['05:00 AM to 05:59 AM']+= 1
 					elif json1_data['05:00 AM to 05:59 AM']['status'] == "no data yet":
 						sheet11.write(row,col+x+6,"No Data Yet",format_grey)
+					elif json1_data['05:00 AM to 05:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_cream)
+					elif json1_data['05:00 AM to 05:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+6,json1_data['05:00 AM to 05:59 AM']['steps'],format_purple)
 					#66666666666666
@@ -3033,6 +3259,10 @@ def export_users_xls(request):
 
 					elif json1_data['06:00 AM to 06:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+7,"No Data Yet",format_grey)
+					elif json1_data['06:00 AM to 06:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_cream)
+					elif json1_data['06:00 AM to 06:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+7,json1_data['06:00 AM to 06:59 AM']['steps'],format_purple)
 					#77777777777777777
@@ -3052,6 +3282,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_red_con)
 					elif json1_data['07:00 AM to 07:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+8,"No Data Yet",format_grey)
+					elif json1_data['07:00 AM to 07:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_cream)
+					elif json1_data['07:00 AM to 07:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+8,json1_data['07:00 AM to 07:59 AM']['steps'],format_purple)
 					#88888888888888888888
@@ -3071,6 +3305,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_red_con)
 					elif json1_data['08:00 AM to 08:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+9,"No Data Yet",format_grey)
+					elif json1_data['08:00 AM to 08:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_cream)
+					elif json1_data['08:00 AM to 08:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+9,json1_data['08:00 AM to 08:59 AM']['steps'],format_purple)
 					#9999999999999999999
@@ -3091,6 +3329,10 @@ def export_users_xls(request):
 
 					elif json1_data['09:00 AM to 09:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+10,"No Data Yet",format_grey)
+					elif json1_data['09:00 AM to 09:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_cream)
+					elif json1_data['09:00 AM to 09:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+10,json1_data['09:00 AM to 09:59 AM']['steps'],format_purple)
 					#101010101010
@@ -3110,6 +3352,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_red_con)
 					elif json1_data['10:00 AM to 10:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+11,"No Data Yet",format_grey)
+					elif json1_data['10:00 AM to 10:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_cream)
+					elif json1_data['10:00 AM to 10:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+11,json1_data['10:00 AM to 10:59 AM']['steps'],format_purple)
 					#11 11 11 11 11 
@@ -3129,6 +3375,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_red_con)
 					elif json1_data['11:00 AM to 11:59 AM']["status"] == "no data yet":
 						sheet11.write(row,col+x+12,"No Data Yet",format_grey)
+					elif json1_data['11:00 AM to 11:59 AM']["status"] == "time zone change":
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_cream)
+					elif json1_data['11:00 AM to 11:59 AM']["status"] == "nap":
+						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+12,json1_data['11:00 AM to 11:59 AM']['steps'],format_purple)
 					#12 12 12 12 12 12 12
@@ -3148,6 +3398,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_red_con)
 					elif json1_data['12:00 PM to 12:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+13,"No Data Yet",format_grey)
+					elif json1_data['12:00 PM to 12:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_cream)
+					elif json1_data['12:00 PM to 12:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+13,json1_data['12:00 PM to 12:59 PM']['steps'],format_purple)
 					#1111111111111111
@@ -3167,6 +3421,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_red_con)
 					elif json1_data['01:00 PM to 01:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+14,"No Data Yet",format_grey)
+					elif json1_data['01:00 PM to 01:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_cream)
+					elif json1_data['01:00 PM to 01:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+14,json1_data['01:00 PM to 01:59 PM']['steps'],format_purple)
 					#22222222222222
@@ -3186,6 +3444,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_red_con)
 					elif json1_data['02:00 PM to 02:59 PM']["status"]== "no data yet":
 						sheet11.write(row,col+x+15,"No Data Yet",format_grey)
+					elif json1_data['02:00 PM to 02:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_cream)
+					elif json1_data['02:00 PM to 02:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+15,json1_data['02:00 PM to 02:59 PM']['steps'],format_purple)
 					#3333333333333333
@@ -3205,6 +3467,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_red_con)
 					elif json1_data['03:00 PM to 03:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+16,"No Data Yet",format_grey)
+					elif json1_data['03:00 PM to 03:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_cream)
+					elif json1_data['03:00 PM to 03:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+16,json1_data['03:00 PM to 03:59 PM']['steps'],format_purple)
 					#44444444444444
@@ -3224,6 +3490,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_red_con)
 					elif json1_data['04:00 PM to 04:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+17,"No Data Yet",format_grey)
+					elif json1_data['04:00 PM to 04:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_cream)
+					elif json1_data['04:00 PM to 04:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+17,json1_data['04:00 PM to 04:59 PM']['steps'],format_purple)
 					#555555555555555
@@ -3243,6 +3513,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_red_con)
 					elif json1_data['05:00 PM to 05:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+18,"No Data Yet",format_grey)
+					elif json1_data['05:00 PM to 05:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_cream)
+					elif json1_data['05:00 PM to 05:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+18,json1_data['05:00 PM to 05:59 PM']['steps'],format_purple)
 					#6666666666666666
@@ -3262,6 +3536,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_red_con)
 					elif json1_data['06:00 PM to 06:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+19,"No Data Yet",format_grey)
+					elif json1_data['06:00 PM to 06:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_cream)
+					elif json1_data['06:00 PM to 06:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+19,json1_data['06:00 PM to 06:59 PM']['steps'],format_purple)
 					#77777777777777777
@@ -3281,6 +3559,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_red_con)
 					elif json1_data['07:00 PM to 07:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+20,"No Data Yet",format_grey)
+					elif json1_data['07:00 PM to 07:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_cream)
+					elif json1_data['07:00 PM to 07:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+20,json1_data['07:00 PM to 07:59 PM']['steps'],format_purple)
 					#8888888888888888888
@@ -3300,6 +3582,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_red_con)
 					elif json1_data['08:00 PM to 08:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+21,"No Data Yet",format_grey)
+					elif json1_data['08:00 PM to 08:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_cream)
+					elif json1_data['08:00 PM to 08:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+21,json1_data['08:00 PM to 08:59 PM']['steps'],format_purple)
 					#9999999999999999
@@ -3319,6 +3605,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_red_con)
 					elif json1_data['09:00 PM to 09:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+22,"No Data Yet",format_grey)
+					elif json1_data['09:00 PM to 09:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_cream)
+					elif json1_data['09:00 PM to 09:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+22,json1_data['09:00 PM to 09:59 PM']['steps'],format_purple)
 					#10 10 10 10 10 10 
@@ -3338,6 +3628,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_red_con)
 					elif json1_data['10:00 PM to 10:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+23,"No Data Yet",format_grey)
+					elif json1_data['10:00 PM to 10:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_cream)
+					elif json1_data['10:00 PM to 10:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+23,json1_data['10:00 PM to 10:59 PM']['steps'],format_purple)
 					#11 11 11 11 11 11 
@@ -3357,6 +3651,10 @@ def export_users_xls(request):
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_red_con)
 					elif json1_data['11:00 PM to 11:59 PM']["status"] == "no data yet":
 						sheet11.write(row,col+x+24,"No Data Yet",format_grey)
+					elif json1_data['11:00 PM to 11:59 PM']["status"] == "time zone change":
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_cream)
+					elif json1_data['11:00 PM to 11:59 PM']["status"] == "nap":
+						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_darkcyan)
 					else:
 						sheet11.write(row,col+x+24,json1_data['11:00 PM to 11:59 PM']['steps'],format_purple)
 
@@ -3367,10 +3665,13 @@ def export_users_xls(request):
 						return str(0)+" %"
 
 					sheet11.write(row,col+x+25,json1_data['sleeping_hours'])
-					sheet11.write(row,col+x+26,json1_data['active_hours'])
-					sheet11.write(row,col+x+27,json1_data['inactive_hours'])
-					sheet11.write(row,col+x+28,json1_data.get('strength_hours',0))
-					sheet11.write(row,col+x+29,json1_data.get('exercise_hours',0))
+					sheet11.write(row,col+x+26,json1_data.get('nap_hours',0))
+					sheet11.write(row,col+x+27,json1_data['active_hours'])
+					sheet11.write(row,col+x+28,json1_data['inactive_hours'])
+					sheet11.write(row,col+x+29,json1_data.get('strength_hours',0))
+					sheet11.write(row,col+x+30,json1_data.get('exercise_hours',0))
+					sheet11.write(row,col+x+31,json1_data.get('no_data_hours',0))
+					sheet11.write(row,col+x+32,json1_data.get('timezone_change_hours',0))
 					sheet11.write(5,2+1,str(round(((days_count["12:00 AM to 12:59 AM"]/total_days))*100,2))+" %",bold)
 					# print(((days_count["12:00 AM to 12:59 AM"]/total_days))*100)
 					sheet11.write(5,2+2,format_active_prcnt(days_count,'01:00 AM to 01:59 AM',total_days),bold)

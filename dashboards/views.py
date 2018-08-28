@@ -11,9 +11,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from quicklook.models import UserQuickLook
 from garmin.models import UserLastSynced
+from hrr.models import Hrr
 from user_input.models import UserDailyInput
 
-class MovementDashboardView(APIView):
+
+class MovementDashboardView(APIView):       
     '''
     API for Movement Dashboard 
     '''
@@ -84,8 +86,27 @@ class MovementDashboardView(APIView):
             else:
                 movement_data["mcs_score"] = None
                 movement_data["steps_this_hour"] = None
+        return Response(movement_data,status=status.HTTP_200_OK) 
 
-        return Response(movement_data,status=status.HTTP_200_OK)
+class HrrSummaryDashboardview(APIView):
+
+    def get(self,request,format=None):
+        user = request.user
+        date = request.query_params.get('date')
+        try:
+            userhrr = Hrr.objects.get(user_hrr = user, created_at = date)
+        except Hrr.DoesNotExist as e:
+            userhrr = None
+        hrr_data = {}
+        if userhrr:
+            hrr_data["time_to_99"] = userhrr.time_99
+            hrr_data["pure_time_to_99"] = userhrr.pure_time_99
+            hrr_data["pure_heart_beats_lowered_in_1st_min"] = userhrr.pure_1min_heart_beats
+            hrr_data["heart_beats_lowest_1st_minute"] = userhrr.No_beats_recovered
+             
+
+        return Response(hrr_data,status=status.HTTP_200_OK)
+
 
 class GradesDashboardView(APIView):
 
@@ -128,6 +149,7 @@ class GradesDashboardView(APIView):
             sleep_data = user_ql.sleep_ql
             step_data = user_ql.steps_ql
             food_data = user_ql.food_ql
+            exercise_data = user_ql.exercise_reporting_ql
             alcohol_data = user_ql.alcohol_ql
             if step_data.movement_consistency:
                 movement_consistency = json.loads(step_data.movement_consistency)
@@ -137,9 +159,11 @@ class GradesDashboardView(APIView):
             grades_data["exercise_consistency_score"] = grade_data.exercise_consistency_score
             grades_data["unprocessed_food_grade"] = food_data.prcnt_non_processed_food
             grades_data["alcoholic_drinks_per_week_grade"] = alcohol_data.alcohol_week
+            grades_data["alcohol_drinks_yesterday"] = alcohol_data.alcohol_day
             grades_data["sleep_aids_penalty"] = grade_data.sleep_aid_penalty
             grades_data["controlled_subtances_penalty"] = grade_data.ctrl_subs_penalty
             grades_data["smoking_penalty"] = grade_data.smoke_penalty
+            grades_data["did_you_workout"] = exercise_data.did_workout
             grades_data["non_exercise_steps"] = step_data.non_exercise_steps
 
             if user_input:

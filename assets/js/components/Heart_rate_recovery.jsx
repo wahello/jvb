@@ -44,6 +44,8 @@ class HeartRate extends Component{
 		this.renderHrrZoneTable = this.renderHrrZoneTable.bind(this);
 		this.successHeartrateZone = this.successHeartrateZone.bind(this);
 	 	this.errorHeartrateZone = this.errorHeartrateZone.bind(this);
+	 	this.renderAddDate = this.renderAddDate.bind(this);
+		this.renderRemoveDate = this.renderRemoveDate.bind(this);
 	    this.state = {
 	    	selectedDate:new Date(),
 	    	calendarOpen:false,
@@ -245,7 +247,7 @@ class HeartRate extends Component{
 		// This function will add the "%" symbol for the persentage values. 
 		let percentage;
 		if(value){
-			percentage = value +"%";
+			percentage = Math.round(value) +"%";
 		}
 		else if(value == 0){
 			percentage = "0%";
@@ -255,7 +257,64 @@ class HeartRate extends Component{
 		}
 		return percentage;
 	}
-
+	renderAddDate(){
+		var today = this.state.selectedDate;
+		var tomorrow = moment(today).add(1, 'days');
+		this.setState({
+			selectedDate:tomorrow.toDate(),
+			fetching_aerobic:true,
+			aerobic_zone:"",
+            anaerobic_zone:"",
+            below_aerobic_zone:"",
+            aerobic_range:"",
+            anaerobic_range:"",
+            below_aerobic_range:"",
+            hrr_not_recorded:"",
+            percent_hrr_not_recorded:"",
+			total_time:"",
+			percent_aerobic:"",
+			percent_below_aerobic:"",
+			percent_anaerobic:"",
+			total_percent:"",
+			empty:"",
+			aa_data:{},
+			hr_zone:{},
+		},()=>{
+			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
+			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
+		});
+	}
+	renderRemoveDate(){
+		var today = this.state.selectedDate;
+		var tomorrow = moment(today).subtract(1, 'days');
+		this.setState({
+			selectedDate:tomorrow.toDate(),
+			fetching_aerobic:true,
+			aerobic_zone:"",
+            anaerobic_zone:"",
+            below_aerobic_zone:"",
+            aerobic_range:"",
+            anaerobic_range:"",
+            below_aerobic_range:"",
+            hrr_not_recorded:"",
+            percent_hrr_not_recorded:"",
+			total_time:"",
+			percent_aerobic:"",
+			percent_below_aerobic:"",
+			percent_anaerobic:"",
+			total_percent:"",
+			empty:"",
+			aa_data:{},
+			hr_zone:{},
+		},()=>{
+			fetchHeartRateData(this.successHeartRate,this.errorHeartRate,this.state.selectedDate);
+			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
+			fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
+		});
+	}
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
@@ -342,7 +401,7 @@ class HeartRate extends Component{
 	renderTable(data){
 		let td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
-		"duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic","hrr_not_recorded","prcnt_hrr_not_recorded"];
+		"duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic","duration_hrr_not_recorded","percent_hrr_not_recorded"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
@@ -350,11 +409,11 @@ class HeartRate extends Component{
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "hrr_not_recorded"){
+				else if(key == "duration_hrr_not_recorded"){
 					let keyvalue =  this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "prcnt_hrr_not_recorded"){
+				else if(key == "percent_hrr_not_recorded"){
 					let keyvalue = this.renderpercentage(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
@@ -413,24 +472,40 @@ class HeartRate extends Component{
 				<div className = "container-fluid">
 			    	<NavbarMenu title = {<span style = {{fontSize:"22px"}}>Heartrate Aerobic/Anaerobic Ranges</span>} />
 					<div className="col-md-12,col-sm-12,col-lg-12">
-			            <div className="row" style = {{marginTop:"10px"}}>
-			            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
-			                    <FontAwesome
-			                        name = "calendar"
-			                        size = "2x"
-			                    />
-			                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
-		                	</span> 
-			            	<Popover
-					            placement="bottom"
-					            isOpen={this.state.calendarOpen}
-					            target="progress"
-					            toggle={this.toggleCalendar}>
-				                <PopoverBody className="calendar2">
-				                <CalendarWidget  onDaySelect={this.processDate}/>
-				                </PopoverBody>
-			                </Popover>
-			            </div>
+			           <div>
+					<span>
+						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+							<FontAwesome
+		                        name = "angle-left"
+		                        size = "2x"
+			                />
+						</span> 
+		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress"> 
+		                    <FontAwesome
+		                        name = "calendar"
+		                        size = "2x"
+		                    />
+		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+	                	</span>
+	                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+							<FontAwesome
+		                        name = "angle-right"
+		                        size = "2x"
+			                />
+						</span> 
+						
+		            	<Popover
+				            placement="bottom"
+				            isOpen={this.state.calendarOpen}
+				            target="gd_progress"
+				            toggle={this.toggleCalendar}>
+			                <PopoverBody className="calendar2">
+			                <CalendarWidget  onDaySelect={this.processDate}/>
+			                </PopoverBody>
+		                </Popover>
+                	</span>
+
+		        </div>
 		          	    <div className = "row justify-content-center hr_table_padd">
 			          	    <div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">

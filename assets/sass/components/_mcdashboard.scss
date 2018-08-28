@@ -1,0 +1,83 @@
+.last_sync{
+    font-size: 16px;
+}
+.arrow{
+    font-size: 28px;
+}
+ .date_sync{
+    font-size: 16px;
+  }
+@media (max-width: 480px) and (min-width: 320px) {
+	.arrow{
+		font-size: 20px;
+	}
+  .date_sync{
+    font-size: 13px;
+  }
+  .last_sync{
+    font-size: 13px;
+  }
+	.row .mc_calendar{
+		margin-top: 10px;
+   padding-bottom: 8px;
+	}
+   .mcs_dashboard  {
+    font-size: 9px;
+    min-width: 63px;   
+}
+.table .table_size {
+    min-width: 40px;
+    text-align: center;
+    font-size: 11px; 
+    padding:3px;
+}
+.table .mcs-dashboard {
+
+    min-width: 30px;
+    text-align: center;
+    font-size: 9px;
+    padding:0px;
+}
+.tableContent{
+  margin-left: 5px;
+}                 
+.table_process{
+  margin-left:8px;
+  margin-right:18px;
+}
+.table_size1{
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.table_pro{  
+  overflow-x: scroll;
+}
+.date_sync{
+    font-size: 12px;
+  }
+}
+@media (max-width: 320px) {
+ .table .table_size {
+    min-width: 40px;
+    font-size: 9px;
+}
+.date_sync{
+    font-size: 13px;
+  }
+.table .mcs-dashboard {
+    min-width: 30px;
+    font-size: 9px;
+    padding: 0px;
+ }
+  .last_sync{
+    font-size: 13px;
+  }
+}
+@media (max-width: 1023px){
+.last_sync{
+    font-size: 13px;
+}
+.date_sync{
+    font-size: 13px;
+  }
+}

@@ -32,27 +32,27 @@ export function personal_validate(values){
 		errors.last_name = "Last name must be atleast 2 character";
 	}
 
-	if(!values.dob_month || values.dob_month === 'dob_month'){
+	if(!values.dob_month || values.dob_month === 'Month'){
 		errors.dob_month = "month  required";
 	}
 
-	if(!values.dob_day || values.dob_day === 'dob_day'){
+	if(!values.dob_day || values.dob_day === 'Date'){
 		errors.dob_day = "date required";
 	}
 
-	if(!values.day_year || values.day_year === 'day_year'){
-		errors.day_year = "year  required";
+	if(!values.dob_year || values.dob_year === 'Year'){
+		errors.dob_year = "year  required";
 	}
 
-	if(!values.feet || values.feet === 'feet'){
+	if(!values.feet || values.feet === 'Feet'){
 		errors.feet = "Feet is required";
 	}
 
-	if(!values.inches || values.inches === 'inches'){
+	if(values.inches == null || values.inches == undefined || values.inches === 'Inches'){
 		errors.inches = "Inches is required";
 	}
 
-	if(!values.weight || values.weight === 'weight'){
+	if(!values.weight || values.weight === 'Weight'){
 		errors.weight = "weight is required";
 	}
 

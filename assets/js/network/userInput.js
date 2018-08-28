@@ -136,11 +136,22 @@ function formatJSON(data){
 		data.sleep_hours_bed_time,
 		data.sleep_mins_bed_time,
 		data.sleep_bedtime_am_pm);
+	
 	let  sleep_awake_time = createMomentObj(data.sleep_awake_time_date,
 		data.sleep_hours_awake_time,
 		data.sleep_mins_awake_time,
 		data.sleep_awake_time_am_pm);
-
+	
+	let nap_start_time = createString(
+		data.nap_start_time_hour,
+		data.nap_start_time_min,
+		data.nap_start_time_am_pm,
+		);
+	let nap_end_time = createString(
+		data.nap_end_time_hour,
+		data.nap_end_time_min,
+		data.nap_end_time_am_pm,
+		);
 	const strength_workout_start = createString(data.strength_workout_start_hour,
 		data.strength_workout_start_min,
 		data.strength_workout_start_am_pm);
@@ -248,6 +259,16 @@ function formatJSON(data){
 	json_data.optional_input['travel_destination'] = data.travel_destination;
 	json_data.optional_input['travel_purpose'] = data.travel_purpose;
 	json_data.optional_input['general_comment'] = data.general_comment;
+	json_data.optional_input['took_nap'] = data.took_nap;
+	json_data.optional_input['nap_start_time'] = nap_start_time;
+	json_data.optional_input['nap_end_time'] = nap_end_time;
+	if(data.nap_duration_hour && data.nap_duration_min)
+		json_data.optional_input['nap_duration'] = data.nap_duration_hour + ":" + data.nap_duration_min;
+	else
+		json_data.optional_input['nap_duration'] = "";
+	json_data.optional_input['nap_comment'] = data.nap_comment;
+
+
 	return json_data;
 }
 
@@ -303,7 +324,7 @@ export function userDailyInputUpdate(data,successCallback=undefined, errorCallba
 	let date = data.fetched_user_input_created_at;
 	data = formatJSON(data);
 	data['created_at'] = date;
-	console.log(data);
+	//console.log(data);
 	const config = {
 		url : URL,
 		data:data,
@@ -344,8 +365,12 @@ export function userDailyInputRecentFetch(date,successCallback=undefined, errorC
 	});
 }
 
-export function fetchGarminData(date, successCallback=undefined, errorCallback=undefined){
-	date = moment(date)
+export function fetchGarminData(date,successCallback=undefined, errorCallback=undefined){
+	let source = axios.CancelToken.source();
+	let token = source.token;
+	let tokenList = this.state.garminRequestCancelSource;
+	tokenList.push(source);
+	date = moment(date);
 	const URL = 'users/daily_input/garmin_data/';
 	const config = {
 		url : URL,
@@ -353,16 +378,26 @@ export function fetchGarminData(date, successCallback=undefined, errorCallback=u
 		params:{
 			"date":date.format('YYYY-MM-DD')
 		},
+		cancelToken:token,
 		withCredentials: true
 	};
-	axios(config).then(function(response){
+	// Add cancel token source for this ajax call to the state
+	// Later used to cancle this call is required.
+	// Read more here - https://github.com/axios/axios#cancellation
+	this.setState({
+		garminRequestCancelSource:tokenList
+	},()=>{
+		axios(config).then(function(response){
 		if(successCallback != undefined){
 			successCallback(response);
 		}
-	}).catch((error) => {
-		if(errorCallback != undefined){
-			errorCallback(error);
-		}
+		}).catch((error) => {
+			if (axios.isCancel(error)) {
+			    console.log('Request canceled', error);
+			}else if(errorCallback != undefined){
+				errorCallback(error);
+			}
+		});
 	});
 }
 

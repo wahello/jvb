@@ -292,6 +292,10 @@ class Quicklook extends Component{
                 sleep_per_wearable: data.sleep_ql.sleep_per_wearable, 		       
 		        sleep_bed_time: data.sleep_ql.sleep_bed_time,
 		        sleep_awake_time: data.sleep_ql.sleep_awake_time,
+		        nap_duration:user_input_data.optional_input.nap_duration,
+		        nap_start_time:user_input_data.optional_input.nap_start_time,
+		        nap_end_time:user_input_data.optional_input.nap_end_time,
+		        nap_comment:user_input_data.optional_input.nap_comment,
 		        deep_sleep: data.sleep_ql.deep_sleep,
 		        light_sleep: data.sleep_ql.light_sleep,
 		        awake_time: data.sleep_ql.awake_time,
@@ -371,7 +375,12 @@ class Quicklook extends Component{
 			              "sickness":data.optional_input.sickness,
 			              "stand_for_three_hours":data.optional_input.stand_for_three_hours,
 			              "type_of_diet_eaten":data.optional_input.type_of_diet_eaten,
-			       		  "general_comment":data.optional_input.general_comment
+			       		  "general_comment":data.optional_input.general_comment,
+			       		  "nap_duration":data.optional_input.nap_duration,
+		       		  	  "nap_start_time":data.optional_input.nap_start_time,
+			       		  "nap_end_time":data.optional_input.nap_end_time,
+			       		  "nap_comment":data.optional_input.nap_comment
+
 	                }
              };
              return properties;

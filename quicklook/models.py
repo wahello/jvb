@@ -11,7 +11,7 @@ class UserQuickLook(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
-	    dtime = str(self.created_at)
+	    dtime = str(self.created_at)                                     
 	    return "{}-{}".format(self.user.username,dtime)
 	    
 	class Meta:
