@@ -296,6 +296,7 @@ def get_blank_model_fields(model):
 			 'total_steps': 0,
 			 'floor_climed':0,
 			 'movement_consistency':'',
+			 'weight':{}
 		}
 		return fields
 
@@ -2163,6 +2164,27 @@ def get_user_input_total_sleep(todays_daily_strong,daily_optional):
 		return sec_to_hours_min_sec(total_duration_in_seconds,include_sec = False)
 	return None
 
+def get_weight(bodycmp_data,daily_optional):
+	weight = {}
+	weight_userinput = safe_get(daily_optional,"weight","")
+	if weight_userinput:
+		weight["value"] = weight_userinput
+		if weight_userinput == "i do not weigh myself today":
+			weight["unit"] = None
+		else:
+			weight["unit"] = "pound"
+		return json.dumps(weight)
+	elif bodycmp_data and not weight_userinput:
+		weight_val = safe_get_dict(bodycmp_data,"weightInGrams",None)
+		weight['value'] = weight_val
+		if weight_val:
+			weight['unit'] = 'gram'
+		else:
+			weight['unit'] = None
+		return json.dumps(weight)
+
+	return json.dumps(weight)
+
 def create_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -2254,13 +2276,9 @@ def create_quick_look(user,from_date=None,to_date=None):
 		if userinput_activities:
 			userinput_activities = json.loads(userinput_activities)
 		
-		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
-		# 	user_input__user = user,
-		# 	user_input__created_at = current_date)
-
-		# daily_optional = DailyUserInputOptional.objects.filter(
-		# 	user_input__user = user,
-		# 	user_input__created_at = current_date)
+		bodycmp = get_garmin_model_data(
+			UserGarminDataBodyComposition,user,
+			start_epoch,end_epoch,order_by = '-id')
 
 		daily_encouraged = [todays_user_input.encouraged_input if todays_user_input else None]
 
@@ -2283,6 +2301,7 @@ def create_quick_look(user,from_date=None,to_date=None):
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
 		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
 		stress_json = [ast.literal_eval(dic) for dic in stress]
+		bodycmp_json = [ast.literal_eval(dic) for dic in bodycmp]
 
 		grades_calculated_data = get_blank_model_fields('grade')
 		exercise_calculated_data = get_blank_model_fields('exercise')
@@ -2374,6 +2393,8 @@ def create_quick_look(user,from_date=None,to_date=None):
 		
 		# Steps
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
+		weight = get_weight(bodycmp_json,daily_optional)
+		steps_calculated_data['weight'] = weight
 
 		# Sleeps
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)

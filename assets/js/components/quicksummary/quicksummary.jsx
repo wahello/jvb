@@ -162,6 +162,22 @@ class Quicklook extends Component{
 					&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
 			}
 
+			let weight = ''
+			if(data.steps_ql.weight && !_.isEmpty(JSON.parse(data.steps_ql.weight))){
+				let weight_data = JSON.parse(data.steps_ql.weight);
+				if(weight_data.value === 'i do not weigh myself today')
+					weight = weight_data.value
+				// By defaut weight would be in grams,convert it to pounds
+				else if(weight_data.unit === 'gram')
+					weight = Math.round((weight_data.value)*0.00220462);
+				else if(weight_data.unit === 'pound')
+					weight = weight_data.value;
+			}else if(user_input_data && user_input_data.optional_input.weight){
+				// By defaut weight would be in pound, so display it
+				// otherwise update code to convert it to pounds
+				weight = user_input_data.optional_input.weight
+			}
+
    			var properties={
    			created_at:data.created_at, 
 			grades_ql: {
@@ -281,7 +297,7 @@ class Quicklook extends Component{
 		        "exercise_steps": data.steps_ql.exercise_steps,
 		        "total_steps": data.steps_ql.total_steps,
 		        "floor_climed": data.steps_ql.floor_climed,
-		        "weight":user_input_data.optional_input.weight,
+		        "weight":weight,
 		    },
 		    sleep_ql: {
 

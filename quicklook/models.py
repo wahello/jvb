@@ -203,6 +203,7 @@ class Steps(models.Model):
 	total_steps = models.PositiveIntegerField(blank=True,null=True)
 	floor_climed = models.PositiveIntegerField(blank=True,null=True)
 	movement_consistency = models.TextField(blank=True)
+	weight = models.TextField(blank=True)
 
 class Sleep(models.Model):
 	Yes = 'yes'
