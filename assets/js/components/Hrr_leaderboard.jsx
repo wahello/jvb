@@ -40,7 +40,7 @@ class HrrLeaderboard extends Component{
 	  			color = "black";
 	  		}
   		}
-  		return <td style ={{background:background,color:color}} className ="progress_table">{value}</td>
+  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{value}</td>
   	}
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -99,23 +99,23 @@ class HrrLeaderboard extends Component{
 			 let currentUser = '';
 			for(let key1 of keys){
 				if(key1 == "rank"|| key1 == "total_hrr_rank_point"){
-					td_values.push(<td className ="progress_table">{value[key1]}</td>);
+					td_values.push(<td className ="overall_rank_value">{value[key1]}</td>);
 				}
 				else if(key1 == "username"){
 					let user = value[key1];
 					if(user == Hrr_username){
-						td_values.push(<td className ="progress_table">{user}</td>);
+						td_values.push(<td className ="overall_rank_value">{user}</td>);
 						currentUser = user;
 					}
 					else{
-						td_values.push(<td className ="progress_table">{user}</td>);
+						td_values.push(<td className ="overall_rank_value">{user}</td>);
 						currentUser = '';
 					}
 				}
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
 					for(let [key3,value4] of Object.entries(value[key1])){
 						if(key3 == "rank"){
-							td_values.push(<td className ="progress_table">{value4}</td>);
+							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
 						else if(key3 == "score"){
 							td_values.push(this.heartBeatsColors(value4.value));
@@ -125,27 +125,45 @@ class HrrLeaderboard extends Component{
 				else{
 					for(let [key3,value4] of Object.entries(value[key1])){
 						if(key3 == "rank"){
-							td_values.push(<td className ="progress_table">{value4}</td>);
+							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
 						else if(key3 == "score"){
-							td_values.push(<td className ="progress_table">{value4.value}</td>);
+							td_values.push(<td className ="overall_rank_value">{value4.value}</td>);
 						}
 					}
 				}
 			}
 			++operationCount;
                 this.scrollCallback(operationCount);
-			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''} className ="progress_table">{td_values}</tr>);	
+			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
-		return td_rows;
-	}
-	render(){
-		return(
-				<div className = "container-fluid">
-					<div className = "row justify-content-center hr_table_padd">
-						<div className = "table table-responsive">
-			          	    <table id="my-table" className = "table table-striped table-bordered ">
-								<tr className ="progress_table">
+		let table;
+		 var x = window.matchMedia("(min-width: 319px) and (max-width: 1023px) and (orientation:landscape)");
+            if(x.matches){
+            		table =  <table id="my-table" className = "table-striped table-bordered overall_table">
+								<tr >
+									<th className ="overall_rank_value">Overall <br/>HRR <br/> Rank</th>
+									<th className ="overall_rank_value">User</th>
+									<th className ="overall_rank_value">Time <br/> to 99 <br/> (hh:mm)</th>
+									<th className ="overall_rank_value">Time<br/> to 99 <br/>Rank</th>
+									<th className ="overall_rank_value">Heart <br/>beats <br/>lowered <br/>in 1st<br/> minute</th>
+									<th className ="overall_rank_value">Lowered<br/> Beats <br/>Rank</th>
+									<th className ="overall_rank_value">Pure <br/>Time <br/>to 99 <br/>(hh:mm)</th>
+									<th className ="overall_rank_value">Pure <br/>Time <br/>to 99 <br/>Rank</th>
+									<th className ="overall_rank_value">Pure <br/>Heart <br/>beats <br/>lowered <br/>in 1st <br/>minute</th>
+									<th className ="overall_rank_value">Pure<br/> Heart<br/>beats <br/>lowered <br/>in 1st<br/> minute <br/>Rank</th>
+									<th className ="overall_rank_value">Total <br/>HRR <br/>Rank <br/>Points</th>
+								</tr>
+								<tbody>
+								{td_rows}	
+								</tbody>
+							</table>
+			}
+			else{
+				
+				table = <div className = "table table-responsive">
+			          	    <table id="my-table" className = "table table-striped table-bordered">
+								<tr>
 									<th>Overall HRR Rank</th>
 									<th>User</th>
 									<th>Time to 99 (hh:mm)</th>
@@ -159,10 +177,18 @@ class HrrLeaderboard extends Component{
 									<th>Total HRR Rank Points</th>
 								</tr>
 								<tbody>
-								{this.renderTable(this.props.Hrr_data,this.props.Hrr_username)}	
+								{td_rows}
 								</tbody>
 							</table>
 						</div>
+			}
+		return table;
+	}
+	render(){
+		return(
+				<div className = "container-fluid">
+					<div className = "row justify-content-center table_padd">
+						{this.renderTable(this.props.Hrr_data,this.props.Hrr_username)}	
 					</div>	
 				</div>
 			);
