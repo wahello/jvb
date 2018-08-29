@@ -247,7 +247,7 @@ class HeartRate extends Component{
 		// This function will add the "%" symbol for the persentage values. 
 		let percentage;
 		if(value){
-			percentage = value +"%";
+			percentage = Math.round(value) +"%";
 		}
 		else if(value == 0){
 			percentage = "0%";
@@ -401,7 +401,7 @@ class HeartRate extends Component{
 	renderTable(data){
 		let td_rows = [];
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
-		"duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic","hrr_not_recorded","prcnt_hrr_not_recorded"];
+		"duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic","duration_hrr_not_recorded","percent_hrr_not_recorded"];
 		for(let[key1,value] of Object.entries(data)){
 			let td_values = [];
 			for(let key of keys){
@@ -409,11 +409,11 @@ class HeartRate extends Component{
 					let keyvalue = this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "hrr_not_recorded"){
+				else if(key == "duration_hrr_not_recorded"){
 					let keyvalue =  this.renderTime(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
-				else if(key == "prcnt_hrr_not_recorded"){
+				else if(key == "percent_hrr_not_recorded"){
 					let keyvalue = this.renderpercentage(value[key]);
 				    td_values.push(<td>{keyvalue}</td>);
 				}
