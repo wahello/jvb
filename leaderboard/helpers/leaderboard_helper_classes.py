@@ -9,6 +9,20 @@ from leaderboard.helpers.leaderboard_helper import (
 	_str_to_hours_min_sec,
 	_hours_to_hours_min
 )
+def to_sec(duration):
+	'''
+	Convert min:sec string to seconds
+	
+	Args:
+		duration(string): String duration in format mm:ss eg 06:30
+
+	Example:
+		>>> _to_sec("05:30")
+		19800
+	'''
+	mins,secs = map(int,[0 if x == '' else x 
+				for x in duration.split(':')])
+	return mins * 60 + secs
 
 class LeaderboardCategories(object):
 	"""
@@ -517,6 +531,122 @@ class HrrOverallLeaderboard(Leaderboard):
 		else:
 			return self.ranked_scores
 
+class TimeTo99Leaderboard(Leaderboard):
+	def __init__(self,user,scores,category,
+			score_priority='lowest_last',privacy="private"):
+
+		super().__init__(user,scores,category,score_priority,privacy)
+		self.category_meta = LeaderboardCategories()
+		self._award_points()
+
+	def _award_points(self):
+		'''
+		Add points and update the RankedObject
+		to add this point in other scores
+		''' 
+		for score in self.scores:
+			points = self._calculate_points(score)
+			score.other_scores = {"points":points}
+
+	def _calculate_points(self,score):
+		'''check the scenerio and calculate the points to be awarded'''
+		if hasattr(score.user,'profile'):
+			aerobic_hr_zone_max = 180 - score.user.profile.age() + 5
+		else:
+			aerobic_hr_zone_max = 0
+		activity_end_hr = score.other_scores.get('activity_end_hr')
+		points = -1
+		time_to_99 = score.score
+		if (time_to_99 
+			and time_to_99 != self.category_meta.category_default_score.get(
+				score.category)
+			and activity_end_hr):
+			time_to_99 = _hours_to_hours_min(time_to_99)
+			if activity_end_hr <= aerobic_hr_zone_max + 10:
+				points = self._cal_pt_scenario_one(time_to_99)
+			elif(activity_end_hr >= aerobic_hr_zone_max + 11
+					and activity_end_hr <= aerobic_hr_zone_max + 25):
+				points = self._cal_pt_scenario_two(time_to_99)
+			elif activity_end_hr > aerobic_hr_zone_max + 25:
+				points = self._cal_pt_scenario_three(time_to_99)
+
+		return points
+
+	def _cal_pt_scenario_one(self,time_to_99):
+		'''
+		If a user's Heart Rate End Time Activity (from the HRR page)
+		in the activity file immediately preceeding the HRR file is
+		equal to the user's aerobic heart rate zone + 10 or lower
+		'''
+		time_to_99 = to_sec(time_to_99)
+		points = 0 
+		if time_to_99 < to_sec("00:02"):
+			points = 4
+		elif(time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("02:00")):
+			points = round(((to_sec("02:00") - time_to_99) * 0.00504) + 3.4,5)
+		elif(time_to_99 >= to_sec("02:01") and time_to_99 <= to_sec("03:00")):
+			points = round(((to_sec("03:00") - time_to_99) * 0.00667) + 3,5)
+		elif(time_to_99 >= to_sec("03:01") and time_to_99 <= to_sec("08:00")):
+			points = round(((to_sec("08:00") - time_to_99) * 0.00333) + 2,5)
+		elif(time_to_99 >= to_sec("08:01") and time_to_99 <= to_sec("10:00")):
+			points = round(((to_sec("10:00") - time_to_99) * 0.0083) + 1,5)
+		elif(time_to_99 >= to_sec("10:01") and time_to_99 <= to_sec("29:59")):
+			points = round((to_sec("30:00") - time_to_99) * 0.00083,5)
+		else:
+			points = 0
+
+		return points
+
+	def _cal_pt_scenario_two(self,time_to_99):
+		'''
+		If a user's Heart Rate End Time Activity (from the HRR page)
+		in the activity file immediately preceeding the HRR file
+		falls in the range of 
+			(1) the user's aerobic heart rate zone + 11  
+			(2) the user's aerobic heart rate zone + 25 
+		'''
+		time_to_99 = to_sec(time_to_99)
+		points = 0
+		if time_to_99 < to_sec("00:02"):
+			points = 4
+		elif time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("04:00"):
+			points = round(((to_sec("04:00") - time_to_99) * 0.00251) + 3.4,5)
+		elif time_to_99 >= to_sec("04:01") and time_to_99 <= to_sec("06:00"):
+			points = round(((to_sec("06:00") - time_to_99) * 0.00333) + 3,5)
+		elif time_to_99 >= to_sec("06:01") and time_to_99 <= to_sec("10:00"):
+			points = round(((to_sec("10:00") - time_to_99) * 0.00417) + 2,5)
+		elif time_to_99 >= to_sec("10:01") and time_to_99 <= to_sec("12:00"):
+			points = round(((to_sec("12:00") - time_to_99) * 0.00833) + 1,5)
+		elif time_to_99 >= to_sec("12:01") and time_to_99 <= to_sec("29:59"):
+			points = round(((to_sec("30:00") - time_to_99) * 0.00093),5)
+		else:
+			points = 0
+
+		return points
+
+	def _cal_pt_scenario_three(self,time_to_99):
+		'''
+		If a user's Heart Rate End Time Activity (from the HRR page)
+		in the activity file immediately preceeding the HRR file is
+		greater than the user's aerobic heart rate zone + 25
+		'''
+		time_to_99 = to_sec(time_to_99)
+		points = 0
+		if time_to_99 < to_sec("00:02"):
+			points = 4
+		elif time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("06:00"):
+			points = round(((to_sec("06:00") - time_to_99) * 0.00167) + 3.4,5)
+		elif time_to_99 >= to_sec("06:01") and time_to_99 <= to_sec("08:00"):
+			points = round(((to_sec("08:00") - time_to_99) * 0.00333) + 3,5)
+		elif time_to_99 >= to_sec("08:01") and time_to_99 <= to_sec("20:00"):
+			points = round(((to_sec("20:00") - time_to_99) * 0.00139) + 2,5)
+		elif time_to_99 >= to_sec("20:01") and time_to_99 <= to_sec("30:00"):
+			points = round(((to_sec("30:00") - time_to_99) * 0.00167) + 1,5)
+		elif time_to_99 >= to_sec("30:01") and time_to_99 <= to_sec("34:59"):
+			points = round(((to_sec("35:00") - time_to_99) * 0.00332),5)
+		else:
+			points = 0
+		return points
 
 class LeaderboardOverview(object):
 	'''
@@ -651,12 +781,6 @@ class LeaderboardOverview(object):
 
 		for user in user_model.objects.all():
 			data = ProgressReport(user,query_params).get_progress_report()
-
-			if hasattr(user,'profile'):
-				user_aerobic_hr_zone = 180 - user.profile.age() + 5
-			else:
-				user_aerobic_hr_zone = 0
-
 			if not self.duration_date:
 				self.duration_date = data.get("duration_date")
 			data = data['summary']
@@ -721,14 +845,7 @@ class LeaderboardOverview(object):
 						if score and score != "Not Provided":
 							score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss")
 						other_scores = {
-							"activity_end_hr":{
-								"value":data['other']['hrr_activity_end_hr'][dtype],
-								"verbose_name":"Activity Heart Rate at End"
-							},
-							"aerobic_hr_zone":{
-								"value":user_aerobic_hr_zone,
-								"verbose_name":"Aerobic Heart Rate Zone"
-							}
+							"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
 						}
 						category_wise_data[catg][dtype].append(
 							RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -737,14 +854,7 @@ class LeaderboardOverview(object):
 						if score and score != "Not Provided":
 							score = _str_to_hours_min_sec(score,time_format="minute", time_pattern="mm:ss")
 						other_scores = {
-							"activity_end_hr":{
-								"value":data['other']['hrr_activity_end_hr'][dtype],
-								"verbose_name":"Activity Heart Rate at End"
-							},
-							"aerobic_hr_zone":{
-								"value":user_aerobic_hr_zone,
-								"verbose_name":"Aerobic Heart Rate Zone"
-							}
+							"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
 						}
 						category_wise_data[catg][dtype].append(
 							RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -830,14 +940,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":{
-									"value":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data'],
-									"verbose_name":"Activity Heart Rate at End"
-								},
-								"aerobic_hr_zone":{
-									"value":user_aerobic_hr_zone,
-									"verbose_name":"Aerobic Heart Rate Zone"
-								}
+								"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -846,14 +949,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":{
-									"value":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data'],
-									"verbose_name":"Activity Heart Rate at End"
-								},
-								"aerobic_hr_zone":{
-									"value":user_aerobic_hr_zone,
-									"verbose_name":"Aerobic Heart Rate Zone"
-								}
+								"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -890,6 +986,13 @@ class LeaderboardOverview(object):
 				).get_leaderboard(format=format)
 			elif category == 'avg_sleep':
 				duration_lb[dtype] = SleepLeaderboard(
+					self.user,
+					self.category_wise_data[category][dtype],
+					category,
+					self.category_meta.category_score_priority[category]
+				).get_leaderboard(format=format)
+			elif category in ["time_99", "pure_time_99"]:
+				duration_lb[dtype] = TimeTo99Leaderboard(
 					self.user,
 					self.category_wise_data[category][dtype],
 					category,
