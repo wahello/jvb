@@ -98,7 +98,7 @@ class AllRank_Data1 extends Component{
                             names = null;
                           }
                           else{
-                            names = <th className = "progress_table">{value1[cat].verbose_name}</th>;
+                            names = <th className = "myranking_all">{value1[cat].verbose_name}</th>;
                           }
                         }
                     }
@@ -108,7 +108,7 @@ class AllRank_Data1 extends Component{
 renderScoreHeader1(data){
   let name;
     if(data){
-      name = <th className = "progress_table">{data}</th>
+      name = <th className = "myranking_all">{data}</th>
     };
     return name;
   }
@@ -140,18 +140,18 @@ renderScoreHeader1(data){
                                 while (rgx.test(x1)) {
                                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
                                   }
-                                values.push(<td className = "progress_table">{x1 + x2}</td>);
+                                values.push(<td className = "myranking_all">{x1 + x2}</td>);
                                }
                           }
                         }
                         else if(cat == "username"){
                             let user = value1[cat];
                             if(user == a_username){
-                                 values.push(<td className = "progress_table">{user}</td>);
+                                 values.push(<td className = "myranking_all">{user}</td>);
                                  currentUser = user;
                             }
                             else{
-                                values.push(<td className = "progress_table"><div>{user}</div></td>);
+                                values.push(<td className = "myranking_all"><div>{user}</div></td>);
                                 currentUser = '';
                             }
 
@@ -159,17 +159,17 @@ renderScoreHeader1(data){
                         else if(cat == "other_scores"){
                          if(c_name == "Percent Unprocessed Food" || c_name == "Average Sleep"){
                           for (let [key3,o_score] of Object.entries(value1[cat])){
-                                values.push(<td className = "progress_table">{o_score.value}</td>)
+                                values.push(<td className = "myranking_all">{o_score.value}</td>)
                               }
                             }
                         }
                         else{
-                            values.push(<td className = "progress_table">{value1[cat]}</td>);
+                            values.push(<td className = "myranking_all">{value1[cat]}</td>);
                         }
                     }
                     ++operationCount;
                     this.scrollCallback(operationCount);
-                rowData.push(<tr id={(currentUser) ? 'my-row' : ''} className ="progress_table">{values}</tr>);
+                rowData.push(<tr id={(currentUser) ? 'my-row' : ''} className ="myranking_all">{values}</tr>);
         }
         
         return rowData;
@@ -179,22 +179,22 @@ renderScoreHeader1(data){
         const rankdata = this.props.data;
         return(
             <div>
-                    <div className="col-sm-12 col-md-12 col-lg-12">
+                    <div className="col-xs-6 col-sm-6 col-md-12 col-lg-12">
                     <div style = {{paddingTop:"5px"}} className = "row justify-content-center ar_table_padd">
                     <div className = "table table-responsive ">
                     <div id="lbscroll">
                     <table id="my-table" className = "table table-striped table-bordered"> 
-                        <thead className = "progress_table">
-                            <th className = "progress_table">Rank</th>
-                            <th className = "progress_table">Username</th>
+                        <thead className = "myranking_all">
+                            <th className = "myranking_all">Rank</th>
+                            <th className = "myranking_all">Username</th>
                             {this.renderScoreHeader(this.props.data,this.props.active_category_name)}
                             {this.renderScoreHeader1(this.props.all_verbose_name)}         
                         </thead>
-                        <tbody className = "progress_table">
+                        <tbody className = "myranking_all">
                             {this.renderTable(this.props.data,this.props.active_username,this.props.active_category_name)}
                         </tbody>
                     </table>
-                    <div style={{height: "1000px"}}></div>
+                    <div style={{height: "100px"}}></div>
                     </div>
                     </div>
                     </div>
