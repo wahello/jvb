@@ -416,7 +416,8 @@ def create_hrr_instance(user, data, start_date):
 	Hrr.objects.create(user_hrr = user,created_at = created_at,**data)
 
 
-def add_created_activity1(di,data,below_aerobic,anaerobic):
+def add_created_activity1(
+	di,data,below_aerobic,anaerobic,aerobic_range,anaerobic_range,below_aerobic_range):
 	'''
 		This function will add user created activty in user input form to AA calculation
 	'''
@@ -425,9 +426,12 @@ def add_created_activity1(di,data,below_aerobic,anaerobic):
 		data_copy = data.copy()
 		data_copy["total_time"] = single_activity.get("durationInSeconds",0.0)
 		data_copy["total_percent"] = 100
+		data_copy['aerobic_range'] = aerobic_range
+		data_copy['anaerobic_range'] = anaerobic_range
+		data_copy['below_aerobic_range'] = below_aerobic_range
 		avg_hr = single_activity.get("averageHeartRateInBeatsPerMinute",0.0)
 		if avg_hr != '' and int(avg_hr) >= anaerobic:
-			data_copy["anaerobic_range"] = single_activity.get("durationInSeconds",0.0)
+			data_copy["anaerobic_zone"] = single_activity.get("durationInSeconds",0.0)
 			data_copy["percent_anaerobic"] = 100
 		elif avg_hr != '' and int(avg_hr) < anaerobic and int(avg_hr) > below_aerobic:
 			data_copy["aerobic_zone"] = single_activity.get("durationInSeconds",0.0)
@@ -490,19 +494,19 @@ def aa_data(user,start_date):
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
 
-	data = {"total_time":"",
-				"aerobic_zone":"",
-				"anaerobic_range":"",
-				"below_aerobic_zone":"",
-				"aerobic_range":"",
-				"anaerobic_range":"",
-				"below_aerobic_range":"",
-				"hrr_not_recorded":"",
-				"percent_hrr_not_recorded":"",
-				"percent_aerobic":"",
-				"percent_below_aerobic":"",
-				"percent_anaerobic":"",
-				"total_percent":""}
+	data = {"total_time":None,
+			"aerobic_zone":None,
+			"anaerobic_zone":None,
+			"below_aerobic_zone":None,
+			"aerobic_range":'',
+			"anaerobic_range":'',
+			"below_aerobic_range":'',
+			"hrr_not_recorded":None,
+			"percent_hrr_not_recorded":None,
+			"percent_aerobic":None,
+			"percent_below_aerobic":None,
+			"percent_anaerobic":None,
+			"total_percent":None}
 
 	user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
@@ -578,13 +582,12 @@ def aa_data(user,start_date):
 	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
+	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
+	anaerobic_range = '{} or above'.format(anaerobic_value+1)
+	below_aerobic_range = 'below {}'.format(below_aerobic_value	)
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
-
-		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-		anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
 		
 		anaerobic_range_list = []
 		below_aerobic_list = []
@@ -670,7 +673,11 @@ def aa_data(user,start_date):
 					"percent_anaerobic":None,
 					"total_percent":None}
 	if user_created_activity_list and user_input_strong:
-		data = add_created_activity1(di,data,below_aerobic_value,anaerobic_value)
+		data = add_created_activity1(
+			di,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
+		data_values = data.values()
+		data_list = list(data_values)
+		data = data_list[0]
 	return (data)
 
 def aa_update_helper(instance,data_dict):
