@@ -13,9 +13,10 @@ import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
+import ScrollUpButton from "react-scroll-up-button";
 import fetchProgress,{fetchUserRank,progressAnalyzerUpdateTime} from '../network/progress';
 import AllRank_Data1 from "./leader_all_exp";
-import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay    } from './dashboard_healpers';
+import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay} from './dashboard_healpers';
 
 var CalendarWidget = require('react-calendar-widget');  
 
@@ -60,6 +61,9 @@ class ProgressDashboard extends Component{
 			 dateRange1:false,
 			 dateRange2:false,
 			 dateRange3:false,
+             fetching_ql1:false,
+             fetching_ql2:false,
+             fetching_ql3:false,
 			 fetching_ql4:false,
 			 scrollingLock:false,
 			 dropdownOpen1:false,
@@ -177,7 +181,10 @@ class ProgressDashboard extends Component{
    		this.strToSecond = this.strToSecond.bind(this);
    		this.handleScroll = this.handleScroll.bind(this);
    		this.renderDateRangeDropdown = this.renderDateRangeDropdown.bind(this);
-   		this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
+        this.renderProgressFetchOverlay = renderProgressFetchOverlay.bind(this);
+        this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
+        this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
+        this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
    		this.toggle = this.toggle.bind(this);
    		this.renderOverallHealth = this.renderOverallHealth.bind(this);
    		this.renderMcs = this.renderMcs.bind(this);
@@ -209,6 +216,8 @@ class ProgressDashboard extends Component{
    		this.getInitialDur = this.getInitialDur.bind(this);
    		this.renderValue = this.renderValue.bind(this);
       this.toggle1 = this.toggle1.bind(this);
+      this.renderMcsLink = this.renderMcsLink.bind(this);
+      this.reanderAllHrr = this.reanderAllHrr.bind(this);
 
 	}
 	getInitialDur(){
@@ -217,7 +226,7 @@ class ProgressDashboard extends Component{
             "yesterday":"-",
             "month":"-",
            "custom_range":"-",
-            "today":"-",
+            "today":"-", 
             "year":"-"
        };
        return paDurationInitialState;
@@ -230,7 +239,7 @@ class ProgressDashboard extends Component{
        let d2 = d[2];
        let date2 =moment(d2).format('MMM DD, YYYY');
        let date = date1 + ' to ' + date2;
-       return date;
+       return date;  
 	}
 	gpascoreDecimal(gpa){
 		let value;
@@ -296,30 +305,55 @@ class ProgressDashboard extends Component{
 		}
 		return percent;
 	}
-	successRank(data){
+	successRank(data,renderAfterSuccess=undefined){
 	    this.setState({
-	        fetching_ql4:false,
+	        fetching_ql1:false,
+            fetching_ql2:false,
+            fetching_ql3:false,
+            fetching_ql4:false,
 	        rankData:data.data,
 	      //  duration_date:data.data.duration_date,
-	    });
+	    },()=>{
+            if(renderAfterSuccess){
+                this.reanderAllHrr(
+                    renderAfterSuccess.range,
+                    renderAfterSuccess.duration,
+                    renderAfterSuccess.caption
+                );
+            }
+        });
   	}
 
-	successProgress(data){
+	successProgress(data,renderAfterSuccess=undefined){
 		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
 	    this.setState({
-	    	fetching_ql4:false,
+	    	fetching_ql1:false,
+            fetching_ql2:false,
+            fetching_ql3:false,
+            fetching_ql4:false,
 	        report_date:data.data.report_date,
 	        summary:data.data.summary,
 	        duration_date:data.data.duration_date,
 	        capt:"Today",
 	        date:date,
 
-	    });
+	    },()=>{
+            if(renderAfterSuccess){
+                this.reanderAllHrr(
+                    renderAfterSuccess.range,
+                    renderAfterSuccess.duration,
+                    renderAfterSuccess.caption
+                );
+            }
+        });
   	}
   	errorProgress(error){
        console.log(error.message);
        this.setState({
-       		fetching_ql4:false
+       		fetching_ql1:false,
+            fetching_ql2:false,
+            fetching_ql3:false,
+            fetching_ql4:false,
        })
     }
 	handleChange(event){
@@ -441,9 +475,28 @@ class ProgressDashboard extends Component{
         }
         custom_ranges.push(this.state.cr1_start_date);
         custom_ranges.push(this.state.cr1_end_date);
-      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
-      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,custom_ranges);
 
+      let crange1 = this.state.cr1_start_date + " " + "to" + " " + this.state.cr1_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
+      fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+      fetchUserRank(
+            this.successRank,
+            this.errorProgress,
+            this.state.selectedDate,custom_ranges,
+            selected_range
+        );
+      // 
+      // let c_date = this.headerDates(date);
+      
+      // this.reanderAllHrr(date,c_date,'');
+   
     });
   }
  onSubmitDate2(event){
@@ -466,8 +519,28 @@ class ProgressDashboard extends Component{
 
         custom_ranges.push(this.state.cr2_start_date);
         custom_ranges.push(this.state.cr2_end_date);
-      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
-      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,custom_ranges);
+      let crange1 = this.state.cr2_start_date + " " + "to" + " " + this.state.cr2_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
+
+      fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+      fetchUserRank(
+            this.successRank,
+            this.errorProgress,
+            this.state.selectedDate,custom_ranges,
+            selected_range
+        );
+      // let date = this.state.cr2_start_date + " " + "to" + " " + this.state.cr2_end_date;
+      // let c_date = this.headerDates(date);
+      
+      // this.reanderAllHrr(date,c_date,'');
+    
 
     });
   }
@@ -490,9 +563,24 @@ class ProgressDashboard extends Component{
         }
         custom_ranges.push(this.state.cr3_start_date);
         custom_ranges.push(this.state.cr3_end_date);
-      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,custom_ranges);
-      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,custom_ranges);
+      let crange1 = this.state.cr3_start_date + " " + "to" + " " + this.state.cr3_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
 
+     fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+      fetchUserRank(
+            this.successRank,
+            this.errorProgress,
+            this.state.selectedDate,custom_ranges,
+            selected_range
+        );
+  
     });
   }
   	renderDateRangeDropdown(value,value5){
@@ -544,8 +632,6 @@ class ProgressDashboard extends Component{
 	  		else{
 	  			date = this.headerDates(dur);
 	  			capt = "";
-	  			
-
 	  		}
 
   			tableHeaders.push(
@@ -573,14 +659,18 @@ class ProgressDashboard extends Component{
   		let verbose_name = '';
   		if(dur && dur != "today" && dur != "month" &&
   			dur != "yesterday" && dur != "week" && dur != "year"){
-  			rank = value['custom_range'][dur].user_rank.rank;
-  			all_rank_data = value['custom_range'][dur].all_rank;
-  			userName = value['custom_range'][dur].user_rank.username;
-  			category = value['custom_range'][dur].user_rank.category;
-  			if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-  				verbose_name = value['custom_range'][dur].user_rank.score.verbose_name;
-  			}
-  		}
+            if(value && value['custom_range'] != undefined){
+                if(value['custom_range'][dur] != undefined){
+          			rank = value['custom_range'][dur].user_rank.rank;
+          			all_rank_data = value['custom_range'][dur].all_rank;
+          			userName = value['custom_range'][dur].user_rank.username;
+          			category = value['custom_range'][dur].user_rank.category;
+          			if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+          				verbose_name = value['custom_range'][dur].user_rank.score.verbose_name;
+          			}
+  		        }
+            }
+        }
   		else{
   			rank = value[dur].user_rank.rank;
   			all_rank_data = value[dur].all_rank;
@@ -602,6 +692,60 @@ class ProgressDashboard extends Component{
 						         		</a>
  		return code;
   	}
+    renderMcsLink(value,dur,dure_date){
+      let rank = '';
+      let all_rank_data = '';
+      let userName = '';
+      let category = '';
+      let verbose_name = '';
+      if(dur && dur != "today" && dur != "month" &&
+        dur != "yesterday" && dur != "week" && dur != "year"){
+        if(value && value['custom_range'] != undefined){
+            if(value['custom_range'][dur] != undefined){
+                rank = value['custom_range'][dur].user_rank.rank;
+                all_rank_data = value['custom_range'][dur].all_rank;
+                userName = value['custom_range'][dur].user_rank.username;
+                category = value['custom_range'][dur].user_rank.category;
+                if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+                  verbose_name = value['custom_range'][dur].user_rank.score.verbose_name;
+                }
+              }
+            }
+        }
+      else{
+        rank = value[dur].user_rank.rank;
+        all_rank_data = value[dur].all_rank;
+        userName = value[dur].user_rank.username;
+        category = value[dur].user_rank.category;
+        if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
+          verbose_name = value[dur].user_rank.score.verbose_name;
+        }
+      }
+      let code;
+      if(dur == "today" || dur == "yesterday"){
+            code = <Link to={`/mcs_dashboard?date=${moment(dure_date[dur]).format('YYYY-MM-DD')}`}>
+                                        <span id="lbfontawesome">
+                                       <FontAwesome
+                                       className = "fantawesome_style"
+                                         name = "external-link"
+                                          size = "1x"
+                                      />
+                                  </span> 
+                              </Link> 
+      }
+      else{
+        code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,verbose_name)}>
+                            <span id="lbfontawesome">
+                                      <FontAwesome
+                                      className = "fantawesome_style"
+                                        name = "external-link"
+                                        size = "1x"
+                                      />
+                            </span> 
+        </a>
+      }
+    return code;
+    }
   	getStylesForGrades(score){
 		let background = "";
 		let color = "";
@@ -793,11 +937,16 @@ class ProgressDashboard extends Component{
       
     }
     renderValue(value,dur){
+
     	let score = "";
     	if(dur && dur != "today" && dur != "month" &&
   			dur != "yesterday" && dur != "week" && dur != "year"){
-    		score = value['custom_range'][dur].data;
-    	}
+            if(value && value['custom_range'] != undefined){
+                if(value['custom_range'][dur] != undefined){
+    		  score = value['custom_range'][dur].data;
+    	       }
+            }
+        }
     	else{
     		score = value[dur];
     	}
@@ -875,7 +1024,7 @@ class ProgressDashboard extends Component{
         btnView:false
       })
     }
-  	renderMcs(value,dur,rank){
+  	renderMcs(value,dur,rank,dure_date){
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
 						style = {{fontSize:"14px"}}
@@ -884,7 +1033,7 @@ class ProgressDashboard extends Component{
 			          		<CardTitle className = "header_style"
 			          		 style = {{fontWeight:"bold"}}>
 			          		 	Movement Consistency
-			          		 </CardTitle>
+			          		 </CardTitle> 
 			          		<hr  
 			          			
 			          			/>
@@ -895,6 +1044,7 @@ class ProgressDashboard extends Component{
 		          					</div>
 		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
 						          		{ this.renderValue(value.movement_consistency_score,dur)}
+                                        {this.renderMcsLink(this.state.rankData.mc,this.state.selected_range,this.state.duration_date)} 
 		          					</div>
 		          				</div>
 		          				<hr  
@@ -1827,6 +1977,15 @@ class ProgressDashboard extends Component{
                                             {moment(this.state.selectedDate).format('MMM D, YYYY')}
                                     </span>  
                                 </span>
+                                 <span  onClick={this.toggleDate1} id="daterange1" className= "date_range1" style={{color:"white"}}>
+                                        <span className="date_range_btn">
+                                            <Button
+                                                className="daterange-btn btn"                            
+                                                id="daterange"
+                                                onClick={this.toggleDate1} >Custom Date Range1
+                                            </Button>
+                                        </span>
+                                </span>
 
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen1} navbar>
                                   <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
@@ -1835,7 +1994,7 @@ class ProgressDashboard extends Component{
                                     <Button className="btn createbutton mb5">Export Report</Button>
                                     </a>
                                 </span>
-                                <span  onClick={this.toggleDate1} id="daterange1" style={{color:"white"}}>
+                                <span  onClick={this.toggleDate1} id="daterange1" className= "date_rangee1"style={{color:"white"}}>
                                         <span className="date_range_btn">
                                             <Button
                                                 className="daterange-btn btn"                            
@@ -2056,7 +2215,7 @@ class ProgressDashboard extends Component{
            			 }
            			  {this.state.btnView &&
 			            <div className = "row justify-content-center">
-			            <span style={{float:"center",fontSize:"17px",fontWeight:"bold"}}>{this.state.active_category_name}</span>
+			            <span className = "Pa_dashboard_date">{this.state.active_category_name}<span style = {{marginLeft:"10px"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span></span>
 			          </div>
        				 }
 					<div className="col-sm-12 col-md-12 col-lg-12 card_padding1">
@@ -2067,7 +2226,7 @@ class ProgressDashboard extends Component{
 								{this.renderOverallHealth(this.state.summary.overall_health,this.state.selected_range,this.state.rankData.oh_gpa)}
 							</div>
 							<div className ="col-md-4 card_padding">
-								{this.renderMcs(this.state.summary.mc,this.state.selected_range,this.state.rankData.mc)}
+								{this.renderMcs(this.state.summary.mc,this.state.selected_range,this.state.rankData.mc,this.state.duration_date)}
 							</div>
 							<div className = "col-md-4 card_padding">
 								{this.renderEc(this.state.summary.ec,this.state.selected_range,this.state.rankData.ec)}
@@ -2121,7 +2280,21 @@ class ProgressDashboard extends Component{
 			            all_verbose_name = {this.state.all_verbose_name}/>
         			}
 					</div>
-					{this.renderProgressSelectedDateFetchOverlay()}
+
+                    <ScrollUpButton
+                      StopPosition={0}
+                      TransitionBtnPosition={150}
+                      EasingType='easeOutCubic'
+                      AnimationDuration={1000}
+                      ContainerClassName='ScrollUpButton__Container'
+                      TransitionClassName='ScrollUpButton__Toggled'
+                      style={{borderRadius:"80px",paddingLeft:"3px",fontSize:"9px"}}
+                      ToggledStyle={{textAlign:"center",paddingLeft:"3px",fontSize:"9px"}}
+                    />
+					{this.renderProgressFetchOverlay()}
+                    {this.renderProgress2FetchOverlay()}
+                    {this.renderProgress3FetchOverlay()}
+                    {this.renderProgressSelectedDateFetchOverlay()}
 			</div>
 			)
 	}
