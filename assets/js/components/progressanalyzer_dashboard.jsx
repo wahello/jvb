@@ -13,7 +13,6 @@ import NavbarMenu from './navbar';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
 import html2canvas from 'html2canvas';
-import ScrollUpButton from "react-scroll-up-button";
 import fetchProgress,{fetchUserRank,progressAnalyzerUpdateTime} from '../network/progress';
 import AllRank_Data1 from "./leader_all_exp";
 import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay} from './dashboard_healpers';
@@ -162,6 +161,7 @@ class ProgressDashboard extends Component{
         	active_username:"",
         	active_category_name:"",
         	all_verbose_name:"",
+            dateRange4:false,
 		};
 		this.successProgress = this.successProgress.bind(this);
 		this.successRank = this.successRank.bind(this);
@@ -171,6 +171,7 @@ class ProgressDashboard extends Component{
     	this.toggleDate1 = this.toggleDate1.bind(this);
    		this.toggleDate2 = this.toggleDate2.bind(this);
    		this.toggleDate3 = this.toggleDate3.bind(this);
+        this.toggleDate4 = this.toggleDate4.bind(this);
    		this.handleChange = this.handleChange.bind(this);
    		this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
    		this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -218,6 +219,7 @@ class ProgressDashboard extends Component{
       this.toggle1 = this.toggle1.bind(this);
       this.renderMcsLink = this.renderMcsLink.bind(this);
       this.reanderAllHrr = this.reanderAllHrr.bind(this);
+      this.onSubmitDate4 = this.onSubmitDate4.bind(this);
 
 	}
 	getInitialDur(){
@@ -394,6 +396,11 @@ class ProgressDashboard extends Component{
 	      dateRange3:!this.state.dateRange3
 	    });
    	}
+    toggleDate4(){
+        this.setState({
+          dateRange4:!this.state.dateRange4
+        });
+    }
    	toggleDropdown() {
 	    this.setState({
       		dropdownOpen: !this.state.dropdownOpen
@@ -461,7 +468,6 @@ class ProgressDashboard extends Component{
     this.setState({
       dateRange1:!this.state.dateRange1,
       fetching_ql1:true,
-      isOpen1: !this.state.isOpen1,
 
     },()=>{
         let custom_ranges = [];
@@ -499,12 +505,48 @@ class ProgressDashboard extends Component{
    
     });
   }
+  onSubmitDate4(event){
+    event.preventDefault();
+    this.setState({
+      dateRange4:!this.state.dateRange4,
+      fetching_ql1:true,
+
+    },()=>{
+        let custom_ranges = [];
+        if(this.state.cr2_start_date && this.state.cr2_end_date){
+            custom_ranges.push(this.state.cr2_start_date);
+            custom_ranges.push(this.state.cr2_end_date);
+        }
+         if(this.state.cr3_start_date && this.state.cr3_end_date){
+            custom_ranges.push(this.state.cr3_start_date);
+            custom_ranges.push(this.state.cr3_end_date);
+        }
+        custom_ranges.push(this.state.cr1_start_date);
+        custom_ranges.push(this.state.cr1_end_date);
+
+      let crange1 = this.state.cr1_start_date + " " + "to" + " " + this.state.cr1_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
+      fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+      fetchUserRank(
+            this.successRank,
+            this.errorProgress,
+            this.state.selectedDate,custom_ranges,
+            selected_range
+        );
+    });
+  }
  onSubmitDate2(event){
     event.preventDefault();
     this.setState({
       dateRange2:!this.state.dateRange2,
       fetching_ql2:true,
-      isOpen1: !this.state.isOpen1,
 
     },()=>{
          let custom_ranges = [];
@@ -549,8 +591,6 @@ class ProgressDashboard extends Component{
     this.setState({
       dateRange3:!this.state.dateRange3,
       fetching_ql3:true,
-      isOpen1: !this.state.isOpen1,
-
     },()=>{
          let custom_ranges = [];
          if(this.state.cr1_start_date && this.state.cr1_end_date){
@@ -1977,12 +2017,12 @@ class ProgressDashboard extends Component{
                                             {moment(this.state.selectedDate).format('MMM D, YYYY')}
                                     </span>  
                                 </span>
-                                 <span  onClick={this.toggleDate1} id="daterange1" className= "date_range1" style={{color:"white"}}>
+                                 <span  onClick={this.toggleDate4} id="daterange4" className= "date_range1" style={{color:"white"}}>
                                         <span className="date_range_btn">
                                             <Button
                                                 className="daterange-btn btn"                            
                                                 id="daterange"
-                                                onClick={this.toggleDate1} >Custom Date Range1
+                                                onClick={this.toggleDate4} >Custom Date Range1
                                             </Button>
                                         </span>
                                 </span>
@@ -2112,7 +2152,46 @@ class ProgressDashboard extends Component{
                             </div>
                        </PopoverBody>
                     </Popover>
+                     <Popover
+                    placement="bottom"
+                    isOpen={this.state.dateRange4}
+                    target="daterange4"
+                    toggle={this.toggleDate4}>
+                          <PopoverBody>
+                            <div >
 
+                               <Form>
+                                <div style={{paddingBottom:"12px"}} className="justify-content-center">
+                                  <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr1_start_date"
+                                   value={this.state.cr1_start_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" className="justify-content-center">
+
+                                  <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr1_end_date"
+                                   value={this.state.cr1_end_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+                                <button
+                                id="nav-btn"
+                                 style={{backgroundColor:"#ed9507"}}
+                                 type="submit"
+                                 className="btn btn-block-lg"
+                                 onClick={this.onSubmitDate4} style={{width:"175px"}}>SUBMIT</button>
+                                 </div>
+
+                               </Form>
+                            </div>
+                       </PopoverBody>
+                    </Popover>
                      <Popover
                     placement="bottom"
                     isOpen={this.state.dateRange2}
@@ -2280,17 +2359,6 @@ class ProgressDashboard extends Component{
 			            all_verbose_name = {this.state.all_verbose_name}/>
         			}
 					</div>
-
-                    <ScrollUpButton
-                      StopPosition={0}
-                      TransitionBtnPosition={150}
-                      EasingType='easeOutCubic'
-                      AnimationDuration={1000}
-                      ContainerClassName='ScrollUpButton__Container'
-                      TransitionClassName='ScrollUpButton__Toggled'
-                      style={{borderRadius:"80px",paddingLeft:"3px",fontSize:"9px"}}
-                      ToggledStyle={{textAlign:"center",paddingLeft:"3px",fontSize:"9px"}}
-                    />
 					{this.renderProgressFetchOverlay()}
                     {this.renderProgress2FetchOverlay()}
                     {this.renderProgress3FetchOverlay()}
