@@ -154,16 +154,32 @@ def change_hrr_key(workout_dict_percent):
 			workout_dict_percent_copy[key]['percent_hrr_not_recorded'] = 0
 	return workout_dict_percent
 
+def remove_spaces(weekly_workout):
+	'''
+		This function removes the White spaces for the activity type
+	'''
+	workouts_dict = {}
+	for single_workout in weekly_workout:
+		single_workout = ast.literal_eval(single_workout)
+		single_workout.pop('Totals',None)
+		for key,value in single_workout.items():
+			workout_type  = value["workout_type"]
+			workout_type_nospace = workout_type.strip()
+			value["workout_type"] = workout_type_nospace
+			workouts_dict[key] = value
+	workouts = [str(workouts_dict)]
+	return workouts
+	
 def weekly_workout_calculations(weekly_workout):
 	'''
 		Make Similar activities into single activity
 	'''
 	workout_type = []
 	workout_dict = {}
-	workout_summary_id = {} 
+	workout_summary_id = {}
+	weekly_workout = remove_spaces(weekly_workout)
 	for single_workout in weekly_workout:
 		single_workout = ast.literal_eval(single_workout)
-		single_workout.pop('Totals',None)	
 		for key,value in single_workout.items():
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
