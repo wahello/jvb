@@ -1046,14 +1046,26 @@ def total_percent(modified_data_total):
 	'''
 		Add percent to all the fields in Totals
 	'''
-	modified_data_total['Totals']['percent_aerobic'] = (
-	(modified_data_total["Totals"].get("duration_in_aerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
-	modified_data_total['Totals']['percent_below_aerobic'] = (
-	(modified_data_total["Totals"].get("duration_below_aerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
-	modified_data_total['Totals']['percent_anaerobic'] = (
-	(modified_data_total["Totals"].get("duration_in_anaerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
-	modified_data_total['Totals']['percent_hrr_not_recorded'] = (
-	(modified_data_total["Totals"].get("duration_hrr_not_recorded",0.0)/modified_data_total['Totals']['total_duration'])*100)
+	try:
+		modified_data_total['Totals']['percent_aerobic'] = (
+		(modified_data_total["Totals"].get("duration_in_aerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
+	except ZeroDivisionError:
+		modified_data_total['Totals']['percent_aerobic'] = 0
+	try:
+		modified_data_total['Totals']['percent_below_aerobic'] = (
+		(modified_data_total["Totals"].get("duration_below_aerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
+	except ZeroDivisionError:
+		modified_data_total['Totals']['percent_below_aerobic'] = 0
+	try:
+		modified_data_total['Totals']['percent_anaerobic'] = (
+		(modified_data_total["Totals"].get("duration_in_anaerobic_range",0.0)/modified_data_total['Totals']['total_duration'])*100)
+	except ZeroDivisionError:
+		modified_data_total['Totals']['percent_anaerobic'] = 0
+	try:
+		modified_data_total['Totals']['percent_hrr_not_recorded'] = (
+		(modified_data_total["Totals"].get("duration_hrr_not_recorded",0.0)/modified_data_total['Totals']['total_duration'])*100)
+	except ZeroDivisionError:
+		modified_data_total['Totals']['percent_hrr_not_recorded'] = 0
 	return(modified_data_total)
 
 def add_totals(modified_data):
