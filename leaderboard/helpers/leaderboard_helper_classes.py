@@ -26,6 +26,111 @@ def to_sec(duration):
 				for x in duration.split(':')])
 	return mins * 60 + secs
 
+def cal_t99_pt_scenario_one(time_to_99):
+	'''
+	Calculate the point for time to 99 or pure time to 99 for 
+	following scenario - 
+		If a user's Heart Rate End Time Activity (from the HRR page)
+		in the activity file immediately preceeding the HRR file is
+		equal to the user's aerobic heart rate zone + 10 or lower
+	'''
+	time_to_99 = to_sec(time_to_99)
+	points = 0 
+	if time_to_99 < to_sec("00:02"):
+		points = 4
+	elif(time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("02:00")):
+		points = round(((to_sec("02:00") - time_to_99) * 0.00504) + 3.4,5)
+	elif(time_to_99 >= to_sec("02:01") and time_to_99 <= to_sec("03:00")):
+		points = round(((to_sec("03:00") - time_to_99) * 0.00667) + 3,5)
+	elif(time_to_99 >= to_sec("03:01") and time_to_99 <= to_sec("08:00")):
+		points = round(((to_sec("08:00") - time_to_99) * 0.00333) + 2,5)
+	elif(time_to_99 >= to_sec("08:01") and time_to_99 <= to_sec("10:00")):
+		points = round(((to_sec("10:00") - time_to_99) * 0.0083) + 1,5)
+	elif(time_to_99 >= to_sec("10:01") and time_to_99 <= to_sec("29:59")):
+		points = round((to_sec("30:00") - time_to_99) * 0.00083,5)
+	else:
+		points = 0
+
+	return points
+
+def cal_t99_pt_scenario_two(time_to_99):
+	'''
+	Calculate the point for time to 99 or pure time to 99 for 
+	following scenario -
+		If a user's Heart Rate End Time Activity (from the HRR page)
+		in the activity file immediately preceeding the HRR file
+		falls in the range of 
+			(1) the user's aerobic heart rate zone + 11  
+			(2) the user's aerobic heart rate zone + 25 
+	'''
+	time_to_99 = to_sec(time_to_99)
+	points = 0
+	if time_to_99 < to_sec("00:02"):
+		points = 4
+	elif time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("04:00"):
+		points = round(((to_sec("04:00") - time_to_99) * 0.00251) + 3.4,5)
+	elif time_to_99 >= to_sec("04:01") and time_to_99 <= to_sec("06:00"):
+		points = round(((to_sec("06:00") - time_to_99) * 0.00333) + 3,5)
+	elif time_to_99 >= to_sec("06:01") and time_to_99 <= to_sec("10:00"):
+		points = round(((to_sec("10:00") - time_to_99) * 0.00417) + 2,5)
+	elif time_to_99 >= to_sec("10:01") and time_to_99 <= to_sec("12:00"):
+		points = round(((to_sec("12:00") - time_to_99) * 0.00833) + 1,5)
+	elif time_to_99 >= to_sec("12:01") and time_to_99 <= to_sec("29:59"):
+		points = round(((to_sec("30:00") - time_to_99) * 0.00093),5)
+	else:
+		points = 0
+
+	return points
+
+def cal_t99_pt_scenario_three(time_to_99):
+	'''
+	Calculate the point for time to 99 or pure time to 99 for 
+	following scenario -
+		If a user's Heart Rate End Time Activity (from the HRR page)
+		in the activity file immediately preceeding the HRR file is
+		greater than the user's aerobic heart rate zone + 25
+	'''
+	time_to_99 = to_sec(time_to_99)
+	points = 0
+	if time_to_99 < to_sec("00:02"):
+		points = 4
+	elif time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("06:00"):
+		points = round(((to_sec("06:00") - time_to_99) * 0.00167) + 3.4,5)
+	elif time_to_99 >= to_sec("06:01") and time_to_99 <= to_sec("08:00"):
+		points = round(((to_sec("08:00") - time_to_99) * 0.00333) + 3,5)
+	elif time_to_99 >= to_sec("08:01") and time_to_99 <= to_sec("20:00"):
+		points = round(((to_sec("20:00") - time_to_99) * 0.00139) + 2,5)
+	elif time_to_99 >= to_sec("20:01") and time_to_99 <= to_sec("30:00"):
+		points = round(((to_sec("30:00") - time_to_99) * 0.00167) + 1,5)
+	elif time_to_99 >= to_sec("30:01") and time_to_99 <= to_sec("34:59"):
+		points = round(((to_sec("35:00") - time_to_99) * 0.00332),5)
+	else:
+		points = 0
+	return points
+
+def calculate_t99_points(aerobic_hr_zone_max,activity_end_hr,time_to_99):
+	'''
+	Check the scenerio and calculate the points for time to 99
+	and pure time to 99
+
+	Args:
+		aerobic_hr_zone_max(int): The upper limit of the aerobic zone.
+			It can be calculated using this formula, 180-age+5
+		activity_end_hr(int): The heartrate at the end of the activity
+			immediately preceeding the HRR activity
+		time_to_99(str): Time took by heart beat to reach 99 beats in 
+			mm:ss format. Example, "01:02"
+	'''
+	points = -1
+	if activity_end_hr <= aerobic_hr_zone_max + 10:
+		points = cal_t99_pt_scenario_one(time_to_99)
+	elif(activity_end_hr >= aerobic_hr_zone_max + 11
+			and activity_end_hr <= aerobic_hr_zone_max + 25):
+		points = cal_t99_pt_scenario_two(time_to_99)
+	elif activity_end_hr > aerobic_hr_zone_max + 25:
+		points = cal_t99_pt_scenario_three(time_to_99)
+	return points
+
 class LeaderboardCategories(object):
 	"""
 	Class to represent possible categories for leader board and 
@@ -562,97 +667,16 @@ class TimeTo99Leaderboard(Leaderboard):
 		else:
 			aerobic_hr_zone_max = 0
 		activity_end_hr = score.other_scores.get('activity_end_hr')
-		points = -1
 		time_to_99 = score.score
+		points = -1
 		if (time_to_99 
 			and time_to_99 != self.category_meta.category_default_score.get(
 				score.category)
 			and activity_end_hr):
 			time_to_99 = _hours_to_hours_min(time_to_99)
-			if activity_end_hr <= aerobic_hr_zone_max + 10:
-				points = self._cal_pt_scenario_one(time_to_99)
-			elif(activity_end_hr >= aerobic_hr_zone_max + 11
-					and activity_end_hr <= aerobic_hr_zone_max + 25):
-				points = self._cal_pt_scenario_two(time_to_99)
-			elif activity_end_hr > aerobic_hr_zone_max + 25:
-				points = self._cal_pt_scenario_three(time_to_99)
+			points = calculate_t99_points(aerobic_hr_zone_max,
+				activity_end_hr,time_to_99)
 
-		return points
-
-	def _cal_pt_scenario_one(self,time_to_99):
-		'''
-		If a user's Heart Rate End Time Activity (from the HRR page)
-		in the activity file immediately preceeding the HRR file is
-		equal to the user's aerobic heart rate zone + 10 or lower
-		'''
-		time_to_99 = to_sec(time_to_99)
-		points = 0 
-		if time_to_99 < to_sec("00:02"):
-			points = 4
-		elif(time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("02:00")):
-			points = round(((to_sec("02:00") - time_to_99) * 0.00504) + 3.4,5)
-		elif(time_to_99 >= to_sec("02:01") and time_to_99 <= to_sec("03:00")):
-			points = round(((to_sec("03:00") - time_to_99) * 0.00667) + 3,5)
-		elif(time_to_99 >= to_sec("03:01") and time_to_99 <= to_sec("08:00")):
-			points = round(((to_sec("08:00") - time_to_99) * 0.00333) + 2,5)
-		elif(time_to_99 >= to_sec("08:01") and time_to_99 <= to_sec("10:00")):
-			points = round(((to_sec("10:00") - time_to_99) * 0.0083) + 1,5)
-		elif(time_to_99 >= to_sec("10:01") and time_to_99 <= to_sec("29:59")):
-			points = round((to_sec("30:00") - time_to_99) * 0.00083,5)
-		else:
-			points = 0
-
-		return points
-
-	def _cal_pt_scenario_two(self,time_to_99):
-		'''
-		If a user's Heart Rate End Time Activity (from the HRR page)
-		in the activity file immediately preceeding the HRR file
-		falls in the range of 
-			(1) the user's aerobic heart rate zone + 11  
-			(2) the user's aerobic heart rate zone + 25 
-		'''
-		time_to_99 = to_sec(time_to_99)
-		points = 0
-		if time_to_99 < to_sec("00:02"):
-			points = 4
-		elif time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("04:00"):
-			points = round(((to_sec("04:00") - time_to_99) * 0.00251) + 3.4,5)
-		elif time_to_99 >= to_sec("04:01") and time_to_99 <= to_sec("06:00"):
-			points = round(((to_sec("06:00") - time_to_99) * 0.00333) + 3,5)
-		elif time_to_99 >= to_sec("06:01") and time_to_99 <= to_sec("10:00"):
-			points = round(((to_sec("10:00") - time_to_99) * 0.00417) + 2,5)
-		elif time_to_99 >= to_sec("10:01") and time_to_99 <= to_sec("12:00"):
-			points = round(((to_sec("12:00") - time_to_99) * 0.00833) + 1,5)
-		elif time_to_99 >= to_sec("12:01") and time_to_99 <= to_sec("29:59"):
-			points = round(((to_sec("30:00") - time_to_99) * 0.00093),5)
-		else:
-			points = 0
-
-		return points
-
-	def _cal_pt_scenario_three(self,time_to_99):
-		'''
-		If a user's Heart Rate End Time Activity (from the HRR page)
-		in the activity file immediately preceeding the HRR file is
-		greater than the user's aerobic heart rate zone + 25
-		'''
-		time_to_99 = to_sec(time_to_99)
-		points = 0
-		if time_to_99 < to_sec("00:02"):
-			points = 4
-		elif time_to_99 >= to_sec("00:02") and time_to_99 <= to_sec("06:00"):
-			points = round(((to_sec("06:00") - time_to_99) * 0.00167) + 3.4,5)
-		elif time_to_99 >= to_sec("06:01") and time_to_99 <= to_sec("08:00"):
-			points = round(((to_sec("08:00") - time_to_99) * 0.00333) + 3,5)
-		elif time_to_99 >= to_sec("08:01") and time_to_99 <= to_sec("20:00"):
-			points = round(((to_sec("20:00") - time_to_99) * 0.00139) + 2,5)
-		elif time_to_99 >= to_sec("20:01") and time_to_99 <= to_sec("30:00"):
-			points = round(((to_sec("30:00") - time_to_99) * 0.00167) + 1,5)
-		elif time_to_99 >= to_sec("30:01") and time_to_99 <= to_sec("34:59"):
-			points = round(((to_sec("35:00") - time_to_99) * 0.00332),5)
-		else:
-			points = 0
 		return points
 
 class LeaderboardOverview(object):
