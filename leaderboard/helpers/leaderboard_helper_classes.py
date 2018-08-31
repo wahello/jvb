@@ -2,6 +2,8 @@ from datetime import datetime
 from operator import attrgetter,itemgetter
 from itertools import zip_longest
 from functools import cmp_to_key
+from copy import deepcopy
+
 from django.contrib.auth import get_user_model
 
 from progress_analyzer.helpers.helper_classes import ProgressReport
@@ -456,9 +458,14 @@ class HrrOverallLeaderboard(Leaderboard):
 		overall_scores = {}
 		catg_score_priority = self.category_meta.category_score_priority
 		for catg,data in self.category_wise_hrr_data.items():
-			catg_lb[catg] = Leaderboard(
-				self.user,data,catg,catg_score_priority[catg],privacy="public"
-			).get_leaderboard()
+			if catg in ["pure_time_99","time_99"]:
+				catg_lb[catg] = TimeTo99Leaderboard(
+					self.user,data,catg,catg_score_priority[catg],privacy="public"
+				).get_leaderboard()
+			else:
+				catg_lb[catg] = Leaderboard(
+					self.user,data,catg,catg_score_priority[catg],privacy="public"
+				).get_leaderboard()
 
 		for catg,lb in catg_lb.items():
 			for score in lb['all_rank']:
@@ -534,7 +541,7 @@ class HrrOverallLeaderboard(Leaderboard):
 class TimeTo99Leaderboard(Leaderboard):
 	def __init__(self,user,scores,category,
 			score_priority='lowest_last',privacy="private"):
-
+		scores = deepcopy(scores)
 		super().__init__(user,scores,category,score_priority,privacy)
 		self.category_meta = LeaderboardCategories()
 		self._award_points()
