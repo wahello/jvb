@@ -14,34 +14,41 @@
 	padding-top: 10px;
 }
 @media (min-width: 319px) and (max-width: 1023px) and (orientation:landscape) {
-  .overall_rank_value{
-  	font-size: 10px;
-  	padding:0px 0px 0px 0px !important;
-  }
   table th{
   	min-width: 55px;
+  	font-size: 9px;
+  	padding: 0.2rem !important;
+  }
+  table td{
+  	min-width: 55px;
+  	font-size: 9px;
+  	padding: 0.2rem !important;
+  }
+  .table_padd table-responsive{
+  	max-width: 520px !important;
   }
   .table_padd{
   	padding: 10px 10px 10px 10px !important;
+
   }
-  .overall_table{
-  	max-width: 520px;
-  }
-	.dropStyles{
+  .dropStyles{
 		padding-top: 10px;
-		margin-left: 15px;
-		}
-		.weekdate{
+		margin-left: 0px;
+  }
+  .weekdate{
 		margin-left: 10px;
 		color:gray;
 		padding-top: 5px;
-		font-size: 13px;
-	}
+  }
+  .drop_text{
+  	font-size: 11px;
+  }
 }
 @media (max-width: 1023px){
 	.dropStyles{
 	padding-top: 10px;
-	margin-left: 15px;
+	margin-left: 0px;
+	font-size: 11px;
 	}
 	.weekdate{
 	margin-left: 10px;

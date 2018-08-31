@@ -94,8 +94,8 @@ class OverallRank extends Component{
 		this.renderOverallHrrSelectedDateFetchOverlay = renderOverallHrrSelectedDateFetchOverlay.bind(this);
 		this.renderDate = this.renderDate.bind(this);
 		this.toggle = this.toggle.bind(this);
-		//this.doResizeCode = this.doResizeCode.bind(this);
-		//this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		// this.doResizeCode = this.doResizeCode.bind(this);
+		// this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 	}
 	successOverallHrrRank(data){
 		let date = this.renderDate(data.data.overall_hrr,data.data.duration_date);
@@ -111,6 +111,12 @@ class OverallRank extends Component{
 	        fetching_hrr4:false,
 		})
 	}
+	// doOnOrientationChange() {
+	//    console.log("********************",screen.orientation.angle)
+	// }
+	// doResizeCode(){
+	// 	window.addEventListener('orientationchange', this.doOnOrientationChange);
+	// }
 	errorOverallHrrRank(error){
 		console.log(error.message);
 		this.setState({
@@ -261,17 +267,6 @@ class OverallRank extends Component{
   		}
   		return date;
   	}
- //  	doOnOrientationChange() {
- //  		let view = window.orientation;
- //  		let land_view = '';
-	// 	if(view == 0){
-	// 		land_view = 90;
-	// 	}
-	//     return land_view;
-	// }
-	// doResizeCode(){
-	// 	window.addEventListener('orientationchange', this.doOnOrientationChange);
-	// }
    	renderOverallHrrTable(value,value5){
 		let category = "";
 	  	let durations = [];
@@ -545,7 +540,7 @@ class OverallRank extends Component{
                 <div className = "col-md-12 col-sm-12 col-lg-12" >
 			        <div className = "row dropStyles">
 				        <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-					        <DropdownToggle caret>
+					        <DropdownToggle caret className = "drop_text">
 					          Select Range
 					        </DropdownToggle>
 					        <DropdownMenu>
