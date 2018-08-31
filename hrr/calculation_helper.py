@@ -186,7 +186,10 @@ def weekly_workout_calculations(weekly_workout):
 				workout_summary_id[key] = [value['workout_type']]
 				no_workouts = dict(collections.Counter(workout_type))
 				repeated_workout = no_workouts[value['workout_type']]
-				workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+				if repeated_workout > 7:
+					workout_dict[value['workout_type']]['days_with_activity'] = 7
+				else:
+					workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				workout_dict[value['workout_type']]['duration'] = (
 					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
 				if value['average_heart_rate'] and workout_dict[value['workout_type']]['average_heart_rate']:
@@ -265,7 +268,10 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id):
 					activity_type.append(value['workout_type'])
 					no_workouts = dict(collections.Counter(activity_type))
 					repeated_workout = no_workouts[value['workout_type']]
-					aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+					if repeated_workout > 7:
+						aa_dict[value['workout_type']]['days_with_activity'] = 7
+					else:
+						aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 					aa_dict[value['workout_type']]['total_duration'] = (
 						(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
 					aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
