@@ -695,6 +695,7 @@ def store_aa_calculations(user,from_date,to_date):
 	print("HRR calculations got finished")
 	return None
 
+#data = aa_workout_data(user,start_date)
 def aa_workout_data(user,start_date):
 
 	start_date_str = start_date.strftime('%Y-%m-%d')
@@ -705,10 +706,13 @@ def aa_workout_data(user,start_date):
 	
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
+	only_hrr_summary_id = []
 	for ui_data_single in ui_data.values():
 		if ui_data_single['activityType'] == 'HEART_RATE_RECOVERY':
 			summaryId = ui_data_single['summaryId']
+			only_hrr_summary_id.append(summaryId)
 			ui_data_keys.remove(summaryId)
+
 	
 	try:
 		user_input_strong = DailyUserInputStrong.objects.filter(
@@ -778,6 +782,7 @@ def aa_workout_data(user,start_date):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
+	print(filtered_activities_files,"goggleeeeeeeeeeee")
 	act_id = []
 	workout = []
 	hrr = []
@@ -787,7 +792,7 @@ def aa_workout_data(user,start_date):
 	if activities:
 		if filtered_activities_files:
 			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in ui_hrr_keys:
+				if filtered_activities_files[i].get("summaryId") in only_hrr_summary_id:
 					hrr.append(filtered_activities_files[i])
 				else:
 					workout.append(filtered_activities_files[i])
