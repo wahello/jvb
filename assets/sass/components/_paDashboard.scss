@@ -15,7 +15,7 @@
 .date_range1{
 	display: none;
 }
-@media (max-width: 1023px) {
+@media (max-width: 1023px) {  
 	.text_center1{
 	text-align: center;
 	padding-bottom: 10px;
@@ -31,5 +31,16 @@
 }
 .date_rangee1{
 	display: none;
+}
+.padropStyles{
+	padding-top: 10px;
+	margin-left: 18px;
+	font-size: 11px;
+	}
+	.paweekdate{
+	margin-left: 10px;
+	color:gray;
+	padding-top: 5px;
+	font-size: 13px;
 }
 }

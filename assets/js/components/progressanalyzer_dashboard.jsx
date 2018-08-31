@@ -2274,7 +2274,7 @@ class ProgressDashboard extends Component{
                     </Popover>
                    	{this.state.active_view && 
 	                    <div className = "row gd_padding">
-						    <div className = "row dropStyles">
+						    <div className = "row padropStyles">
 						        <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
 							        <DropdownToggle caret>
 							          Select Range
@@ -2283,7 +2283,7 @@ class ProgressDashboard extends Component{
 							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
 							        </DropdownMenu>
 						      	</Dropdown>
-						      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+						      	<span className = "paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 				        	</div>
 						</div>
 					}
