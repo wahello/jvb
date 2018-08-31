@@ -7,9 +7,29 @@
 .card_padding1{
 	padding:0px 25px 25px 25px;
 }
+.Pa_dashboard_date{
+	font-size: 16px;
+	text-align: center;
+	font-weight: bold;
+}
+.date_range1{
+	display: none;
+}
 @media (max-width: 1023px) {
 	.text_center1{
 	text-align: center;
 	padding-bottom: 10px;
+}
+.Pa_dashboard_date{
+	font-size: 12px;
+	text-align: center;
+	font-weight: bold;
+}
+.date_range1{
+	display: inline;
+	
+}
+.date_rangee1{
+	display: none;
 }
 }
