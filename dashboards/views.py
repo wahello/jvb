@@ -1,11 +1,8 @@
 import json
 from datetime import datetime,timedelta
 
-from django.shortcuts import render
-from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -13,7 +10,17 @@ from quicklook.models import UserQuickLook
 from garmin.models import UserLastSynced
 from hrr.models import Hrr
 from user_input.models import UserDailyInput
+from leaderboard.helpers.leaderboard_helper_classes import calculate_t99_points
 
+def sec_to_min_sec(secs):
+    if secs or secs is not None:
+        mins,secs = divmod(secs,60)
+        mins = round(mins)
+        secs = round(secs)
+        if secs < 10:
+            mins = "{:02d}".format(secs) 
+        return "{}:{}".format(mins,secs)
+    return None 
 
 class MovementDashboardView(APIView):       
     '''
@@ -99,13 +106,36 @@ class HrrSummaryDashboardview(APIView):
             userhrr = None
         hrr_data = {}
         if userhrr:
-            hrr_data["time_to_99"] = userhrr.time_99
-            hrr_data["pure_time_to_99"] = userhrr.pure_time_99
+            time99_point,pure_time99_point = self._calculate_time99_points(userhrr)
+            hrr_data["time_to_99"] = {"time99":userhrr.time_99,
+                "points":time99_point}
+            hrr_data["pure_time_to_99"] = {"pure_time99":userhrr.pure_time_99,
+                "points":pure_time99_point}
             hrr_data["pure_heart_beats_lowered_in_1st_min"] = userhrr.pure_1min_heart_beats
             hrr_data["heart_beats_lowest_1st_minute"] = userhrr.No_beats_recovered
-             
 
         return Response(hrr_data,status=status.HTTP_200_OK)
+
+    def _calculate_time99_points(self,userhrr):
+        user = self.request.user
+        if hasattr(user,'profile'):
+            aerobic_hr_zone_max = 180 - user.profile.age() + 5
+        else:
+            aerobic_hr_zone_max = 0
+        activity_end_hr = userhrr.end_heartrate_activity
+        time99_point = -1
+        pure_time99_point = -1
+        time99 = userhrr.time_99
+        pure_time99 = userhrr.pure_time_99
+        if aerobic_hr_zone_max and activity_end_hr and time99 is not None:
+            time99 = sec_to_min_sec(time99)
+            time99_point = calculate_t99_points(aerobic_hr_zone_max,
+                activity_end_hr,time99)
+        if aerobic_hr_zone_max and activity_end_hr and pure_time99 is not None:
+            pure_time99 = sec_to_min_sec(pure_time99)
+            pure_time99_point = calculate_t99_points(aerobic_hr_zone_max,
+                activity_end_hr,pure_time99)
+        return (time99_point, pure_time99_point)
 
 
 class GradesDashboardView(APIView):
