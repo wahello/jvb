@@ -1950,6 +1950,10 @@ def hrr_data(user,start_date):
 				time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
 			else:
 				time_99 = None
+				
+		if diff_actity_hrr > 120:
+			pure_time_99 = None
+			pure_1min_heart_beats = None
 
 	else:
 		Did_you_measure_HRR = 'no'
