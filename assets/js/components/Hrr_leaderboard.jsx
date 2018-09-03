@@ -17,12 +17,26 @@ class HrrLeaderboard extends Component{
 	constructor(props) {
     super(props);
 	    this.state = {
+	    	 scrollingLock:false,
 	    }
 		this.renderTable = this.renderTable.bind(this);
 		this.heartBeatsColors = this.heartBeatsColors.bind(this);
 		this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		this.myFunction = this.myFunction.bind(this);
+		this.handleScroll = this.handleScroll.bind(this);
 	}
+	 handleScroll() {
+      if (window.scrollY >= 200 && !this.state.scrollingLock) {
+        this.setState({
+          scrollingLock: true
+        });
+      } else if(window.scrollY < 200 && this.state.scrollingLock) {                                               
+        this.setState({
+          scrollingLock: false
+        });
+      }
+  }
 	heartBeatsColors(value){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
   		let background = "";
@@ -108,7 +122,32 @@ class HrrLeaderboard extends Component{
 	}
 	componentDidMount(){
 		window.addEventListener('orientationchange', this.doOnOrientationChange);
+		window.addEventListener('scroll', this.myFunction);
 	}
+	 componentWillUnmount() {
+      window.removeEventListener('scroll', this.myFunction);
+  }
+
+myFunction() {
+var header = document.getElementById("myHeader");
+var sticky = header.offsetTop;
+var x = window.matchMedia("(min-width: 319px) and (max-width: 1023px) and (orientation:landscape)");
+var y = window.matchMedia("(max-width: 1023px)");
+if(x.matches){
+  if (window.pageYOffset > 230) {
+    header.classList.add("sticky");
+  } else {
+    header.classList.remove("sticky");
+  }
+}
+else{
+	if (window.pageYOffset > 100) {
+    header.classList.add("sticky");
+  } else {
+    header.classList.remove("sticky");
+  }
+}
+}
 	renderTable(Hrr_data,Hrr_username){
 		let operationCount = 0;
 		let td_rows = [];
@@ -158,23 +197,23 @@ class HrrLeaderboard extends Component{
 			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
 		let table = <div className = "table table-responsive table-bordered">
-			          	    <table id="my-table" className = "table table-striped ">
-								<tr>
-									<th>Overall HRR Rank</th>
+			          	    <table id="my-table" className = "table table-striped ">			 
+			          	   		<thead className="header" id="myHeader">
+									<th>Overall Hrr Rank</th>
 									<th>User</th>
 									<th>Time to 99 (hh:mm)</th>
 									<th>Time to 99 Rank</th>
 									<th>Heart beats lowered in 1st minute</th>
 									<th>Lowered Beats Rank</th>
 									<th>Pure Time to 99 (hh:mm)</th>
-									<th>Pure Time to 99 Rank</th>
+									<th>Pure Time to 99 Rank</th>  
 									<th>Pure Heart beats lowered in 1st minute</th>
 									<th>Pure Heart beats lowered in 1st minute Rank</th>
 									<th>Total HRR Rank Points</th>
-								</tr>
-								<tbody>
+								</thead>													
+								<tbody className="content">
 								{td_rows}
-								</tbody>
+								</tbody>				
 							</table>
 						</div>
 		return table;
