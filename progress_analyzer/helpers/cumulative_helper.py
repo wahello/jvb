@@ -112,6 +112,7 @@ def _get_blank_pa_model_fields(model):
 			"cum_hrr_lowest_hr_point":None,
 			"cum_hrr_pure_1_min_beats_lowered":None,
 			"cum_hrr_pure_time_to_99":None,
+			"cum_hrr_activity_end_hr":None,
 			"cum_floors_climbed":None
 		}
 		return fields
@@ -133,7 +134,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_reported_stress_days_count":None,
 			"cum_reported_alcohol_days_count":None,
 			"cum_hrr_pure_1_minute_beat_lowered_days_count":None,
-			"cum_hrr_pure_time_to_99_days_count":None
+			"cum_hrr_pure_time_to_99_days_count":None,
+			"cum_hrr_activity_end_hr_days_count":None
 		}
 		return fields
 
@@ -572,8 +574,8 @@ def _get_hrr_api_data(user,date):
 			"hrr_beats_lowered_first_minute":0,
 			"hrr_time_to_99":0,
 			"hrr_pure_1_min_beats_lowered":0,
-			"hrr_pure_time_to_99":0
-
+			"hrr_pure_time_to_99":0,
+			"hrr_activity_end_hr":0
 		}
 		measured_hrr = _safe_get_mobj(data,'Did_you_measure_HRR','')
 		if measured_hrr == 'yes' or measured_hrr == 'no':
@@ -615,6 +617,10 @@ def _get_hrr_api_data(user,date):
 				pure_time_99_in_min = round(
 					pure_time_99 / 60, 3)
 				formated_data["hrr_pure_time_to_99"] = pure_time_99_in_min
+
+			activity_end_hr = _safe_get_mobj(data,"end_heartrate_activity",0)
+			if activity_end_hr:
+				formated_data['hrr_activity_end_hr'] = activity_end_hr
 			return formated_data
 		return None	
 	except Exception as e:
@@ -646,7 +652,8 @@ def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 		"hrr_beats_lowered_first_minute":0,
 		"hrr_time_to_99":0,
 		"hrr_pure_1_min_beats_lowered":0,
-		"hrr_pure_time_to_99":0
+		"hrr_pure_time_to_99":0,
+		"hrr_activity_end_hr":0
 	}
 
 	if hrr_api_lookup:
@@ -698,6 +705,10 @@ def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 
 		data["hrr_pure_time_to_99"] = hrr_api_data.get(
 			"hrr_pure_time_to_99"
+		)
+
+		data["hrr_activity_end_hr"] = hrr_api_data.get(
+			"hrr_activity_end_hr"
 		)
 
 	return data
@@ -756,6 +767,14 @@ def _get_other_stats_cum_sum(today_ql_data,user_hrr_data,yday_cum_data=None):
 			)
 		)
 
+		other_stats_cum_data['cum_hrr_activity_end_hr'] = (
+			user_hrr_data["hrr_activity_end_hr"]
+			+_safe_get_mobj(
+				yday_cum_data.other_stats_cum,
+				"cum_hrr_activity_end_hr",0
+			)
+		)
+
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
 			today_ql_data.steps_ql,"floor_climed",0) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_floors_climbed",0)
@@ -784,6 +803,10 @@ def _get_other_stats_cum_sum(today_ql_data,user_hrr_data,yday_cum_data=None):
 			
 		other_stats_cum_data['cum_hrr_pure_time_to_99'] = user_hrr_data[
 			"hrr_pure_time_to_99"
+		]
+
+		other_stats_cum_data['cum_hrr_activity_end_hr'] = user_hrr_data[
+			"hrr_activity_end_hr"
 		]
 		
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
@@ -1000,6 +1023,17 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 				yday_cum_data.meta_cum,"cum_hrr_pure_time_to_99_days_count",0)
 		)
 
+		hrr_activity_end_hr = user_hrr_data.get(
+			"hrr_activity_end_hr",0
+		)
+		hrr_activity_end_hr = 1 if hrr_activity_end_hr else 0
+		meta_cum_data['cum_hrr_activity_end_hr_days_count'] = (
+			hrr_activity_end_hr
+			+ _safe_get_mobj(
+				yday_cum_data.meta_cum, "cum_hrr_activity_end_hr_days_count",0
+			)
+		)
+
 
 
 	elif today_ql_data:
@@ -1073,6 +1107,12 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 			"hrr_pure_time_to_99",0)
 		pure_time_to_99 = 1 if pure_time_to_99 else 0
 		meta_cum_data['cum_hrr_pure_time_to_99_days_count'] = pure_time_to_99
+
+		hrr_activity_end_hr = user_hrr_data.get(
+			"cum_hrr_activity_end_hr",0
+		)
+		hrr_activity_end_hr = 1 if hrr_activity_end_hr else 0
+		meta_cum_data['cum_hrr_activity_end_hr_days_count'] = hrr_activity_end_hr
 		
 	return meta_cum_data
 
