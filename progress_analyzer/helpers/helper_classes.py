@@ -67,6 +67,7 @@ class ToStressCumulative(object):
 		self.cum_days_low_stress = raw_data["cum_days_low_stress"]
 		self.cum_days_medium_stress = raw_data["cum_days_medium_stress"]
 		self.cum_days_high_stress = raw_data["cum_days_high_stress"]
+		self.cum_days_garmin_stress_lvl = raw_data["cum_days_garmin_stress_lvl"]
 
 class ToTravelCumulative(object):
 	def __init__(self,raw_data):
@@ -1471,6 +1472,11 @@ class ProgressReport():
 						)
 					return days_stress_reported
 
+				elif key == "garmin_stress_lvl":
+					avg_stress_level = self._get_average_for_duration(
+						todays_data.cum_days_garmin_stress_lvl,
+						current_data.cum_days_garmin_stress_lvl,alias)
+					return round(avg_stress_level,2)
 			return None
 
 		calculated_data = {
@@ -1481,6 +1487,7 @@ class ProgressReport():
 			'number_of_days_high_stress_reported':{d:None for d in self.duration_type},
 			'prcnt_of_days_high_stress':{d:None for d in self.duration_type},
 			'days_stress_level_reported':{d:None for d in self.duration_type},
+			'garmin_stress_lvl':{d:None for d in self.duration_type}
 		}
 		summary_type = "stress_cum"
 
