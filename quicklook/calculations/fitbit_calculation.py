@@ -23,7 +23,7 @@ from quicklook.models import (
 from fitbit.models import (
 	UserFitbitDataSleep,
 	UserFitbitDataHeartRate,
-	UserFitbitDataActivities,
+	UserFitbitDataActivities,                                                  
 	UserFitbitDataSteps,
 	UserFitbitDatabody,
 	UserFitbitDatafoods
@@ -114,7 +114,7 @@ def get_sleep_stats(sleep_data):
 			include_sec = False
 		)
 		sleep_stats["sleep_per_wearable"] = sec_to_hours_min_sec(
-			trans_sleep_data['durationInSeconds'],
+			trans_sleep_data['durationInSeconds'] - trans_sleep_data['awakeDurationInSeconds'],
 			include_sec = False
 		)
 
