@@ -35,7 +35,8 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Deep Sleep (hh:mm)'},
           {name: 'Light Sleep (hh:mm)'},
           {name: 'Awake Time (hh:mm)'},
-          {name: 'REM Sleep (hh:mm)'}                     
+          {name: 'REM Sleep (hh:mm)'},
+          {name: 'Garmin Stress Level'}                     
       ],
     };
   }

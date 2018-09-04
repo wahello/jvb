@@ -55,7 +55,7 @@ const attrVerboseName = {
     workout_elapsed_time: 'Workout Elapsed Time',
     timewatch_paused_workout: 'TimeWatch Paused Workout',
     exercise_consistency: 'Exercise Consistency',
-    heartrate_variability_stress: 'Heart Rate Variability Stress (Garmin)',
+    heartrate_variability_stress: 'Garmin Stress Level',
     fitness_age: 'Fitness Age',
     workout_comment: 'Workout Comments'                    
 }
