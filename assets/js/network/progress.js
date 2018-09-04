@@ -4,7 +4,8 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function fetchProgress(successProgress,errorProgress,selectedDate,custom_ranges=undefined){   
+export default function fetchProgress(successProgress,errorProgress,
+  selectedDate,custom_ranges=undefined,renderAfterSuccess=undefined){   
   selectedDate = moment(selectedDate);
   const URL=`/progress/user/report`;
   const config={
@@ -17,14 +18,18 @@ export default function fetchProgress(successProgress,errorProgress,selectedDate
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successProgress(response);
+    if(renderAfterSuccess!=undefined)
+      successProgress(response,renderAfterSuccess);
+    else
+      successProgress(response);
   }).catch(function(error){
     errorProgress(error);
   });
 
 }
 
-export function fetchUserRank(successRank,errorProgress,selectedDate,custom_ranges=undefined){   
+export function fetchUserRank(successRank,errorProgress,selectedDate,
+  custom_ranges=undefined,renderAfterSuccess=undefined){ 
   selectedDate = moment(selectedDate);
   const URL=`/leaderboard/`;
   // const URL = `https://app.jvbwellness.com/leaderboard`;
@@ -38,7 +43,12 @@ export function fetchUserRank(successRank,errorProgress,selectedDate,custom_rang
    withCredentials: true,
   };
   axios(config).then((response)=>{
-   successRank(response);
+   if(renderAfterSuccess != undefined){ 
+     successRank(response,renderAfterSuccess);
+   }
+   else{
+    successRank(response);
+  }
   }).catch(function(error){
     errorProgress(error);
   });

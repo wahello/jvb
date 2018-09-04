@@ -137,6 +137,7 @@ class MCS_Dashboard extends Component{
         }
       
             fetchLastSync(this.successLastSync,this.errorquick);
+            window.scrollTo(0,0);
     }
 
     toggle() {
