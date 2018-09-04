@@ -138,7 +138,8 @@ class ProgressDashboard extends Component{
           "number_of_days_medium_stress_reported":this.getInitialDur(),
           "prcnt_of_days_high_stress":this.getInitialDur(),
           "prcnt_of_days_low_stress":this.getInitialDur(),
-          "prcnt_of_days_medium_stress":this.getInitialDur()
+          "prcnt_of_days_medium_stress":this.getInitialDur(),
+          "garmin_stress_lvl":this.getInitialDur()
         },
         "standing":{
           "number_days_reported_stood_not_stood_three_hours":this.getInitialDur(),
@@ -1641,6 +1642,17 @@ class ProgressDashboard extends Component{
 			          			
 			          			/>
 			          		<CardText>
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          Garmin Stress Level
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          { this.renderValue(value.garmin_stress_lvl,dur) }
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
 				          		<div className = "row justify-content-center">
 					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
 						          		Number of Days Low Stress Reported
