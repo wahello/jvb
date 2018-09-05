@@ -296,6 +296,7 @@ def get_blank_model_fields(model):
 			 'total_steps': 0,
 			 'floor_climed':0,
 			 'movement_consistency':'',
+			 'weight':{}
 		}
 		return fields
 
@@ -977,6 +978,7 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	return False 
 
 def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
+	total_active_minutes = 0
 	active_hours = 0
 	inactive_hours = 0
 	total_steps = 0
@@ -990,7 +992,7 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 	for interval,values in list(mc_data.items()):
 		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
 			'strength_hours','exercise_hours','total_steps','timezone_change_hours',
-			'no_data_hours','nap_hours']
+			'no_data_hours','nap_hours','total_active_minutes','total_active_prcnt']
 		if interval not in non_interval_keys:
 			am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -1023,7 +1025,11 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 			elif mc_data[interval]['status'] == 'time zone change':
 				timezone_change_hours += 1
 			total_steps += values['steps']
+			total_active_minutes += values['active_duration']['duration']
 
+	mc_data['total_active_minutes'] = total_active_minutes
+	mc_data['total_active_prcnt'] = round(
+			(total_active_minutes / 1440)*100)
 	mc_data['active_hours'] = active_hours
 	mc_data['inactive_hours'] = inactive_hours
 	mc_data['sleeping_hours'] = sleeping_hours
@@ -1258,7 +1264,12 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			time_interval = data_date_midnight.strftime("%I:%M %p")+" to "+end_hour.strftime("%I:%M %p")
 			movement_consistency[time_interval] = {
 				"steps":0,
-				"status":"sleeping"
+				"status":"sleeping",
+				"active_duration":{
+					'duration':0,
+					'unit':'minute'
+				},
+				"active_prcnt":0
 			}
 			data_date_midnight += td_hour
 
@@ -1291,9 +1302,16 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				else:
 					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
+				active_duration_min = data.get('activeTimeInSeconds',0)/60
+				interval_active_duration = movement_consistency[time_interval]['active_duration']
+				interval_active_duration['duration'] = round(
+					interval_active_duration['duration'] + active_duration_min)
+				active_prcnt = round((interval_active_duration['duration']/60)*100)
+				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 				movement_consistency[time_interval]['status'] = status
 
+		total_active_minutes = 0
 		active_hours = 0
 		inactive_hours = 0
 		total_steps = 0
@@ -1404,7 +1422,11 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			elif movement_consistency[interval]['status'] == 'nap':
 				nap_hours += 1
 			total_steps += values['steps']
+			total_active_minutes += values['active_duration']['duration']
 
+		movement_consistency['total_active_minutes'] = total_active_minutes
+		movement_consistency['total_active_prcnt'] = round(
+			(total_active_minutes / 1440)*100)
 		movement_consistency['active_hours'] = active_hours
 		movement_consistency['inactive_hours'] = inactive_hours
 		movement_consistency['sleeping_hours'] = sleeping_hours
@@ -1455,9 +1477,12 @@ def cal_exercise_steps_total_steps(dailies_json,combined_user_activities,age):
 			if ((avg_hr >= aerobic_zone 
 					and obj.get('activityType') not in IGNORE_ACTIVITY
 					and obj.get("steps_type","") != "non_exercise")
-					or obj.get("steps_type","") == "exercise"):
+					or obj.get("steps_type","") == "exercise"
+					or(not avg_hr and obj.get("steps_type","") != "non_exercise")):
 				# If activity heart rate is above or in aerobic zone and it's not HRR 
 				# then only activity is considered as an exercise and steps are included.
+				# If no avg heartrate information, simply treat activity steps as 
+				# exercise steps 
 				if obj.get('created_manually',False):
 					manual_exec_steps += steps
 				else:
@@ -2139,8 +2164,28 @@ def get_user_input_total_sleep(todays_daily_strong,daily_optional):
 		return sec_to_hours_min_sec(total_duration_in_seconds,include_sec = False)
 	return None
 
-def create_garmin_quick_look(user,from_date=None,to_date=None):
+def get_weight(bodycmp_data,daily_optional):
+	weight = {}
+	weight_userinput = safe_get(daily_optional,"weight","")
+	if weight_userinput:
+		weight["value"] = weight_userinput
+		if weight_userinput == "i do not weigh myself today":
+			weight["unit"] = None
+		else:
+			weight["unit"] = "pound"
+		return json.dumps(weight)
+	elif bodycmp_data and not weight_userinput:
+		weight_val = safe_get_dict(bodycmp_data,"weightInGrams",None)
+		weight['value'] = weight_val
+		if weight_val:
+			weight['unit'] = 'gram'
+		else:
+			weight['unit'] = None
+		return json.dumps(weight)
 
+	return json.dumps(weight)
+
+def create_garmin_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
 
@@ -2231,13 +2276,9 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		if userinput_activities:
 			userinput_activities = json.loads(userinput_activities)
 		
-		# daily_encouraged = DailyUserInputEncouraged.objects.filter(
-		# 	user_input__user = user,
-		# 	user_input__created_at = current_date)
-
-		# daily_optional = DailyUserInputOptional.objects.filter(
-		# 	user_input__user = user,
-		# 	user_input__created_at = current_date)
+		bodycmp = get_garmin_model_data(
+			UserGarminDataBodyComposition,user,
+			start_epoch,end_epoch,order_by = '-id')
 
 		daily_encouraged = [todays_user_input.encouraged_input if todays_user_input else None]
 
@@ -2260,6 +2301,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
 		user_metrics_json = [ast.literal_eval(dic) for dic in user_metrics]
 		stress_json = [ast.literal_eval(dic) for dic in stress]
+		bodycmp_json = [ast.literal_eval(dic) for dic in bodycmp]
 
 		grades_calculated_data = get_blank_model_fields('grade')
 		exercise_calculated_data = get_blank_model_fields('exercise')
@@ -2351,6 +2393,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		
 		# Steps
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
+		weight = get_weight(bodycmp_json,daily_optional)
+		steps_calculated_data['weight'] = weight
 
 		# Sleeps
 		user_input_bedtime = safe_get(todays_daily_strong,"sleep_bedtime",None)

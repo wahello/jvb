@@ -94,22 +94,29 @@ class OverallRank extends Component{
 		this.renderOverallHrrSelectedDateFetchOverlay = renderOverallHrrSelectedDateFetchOverlay.bind(this);
 		this.renderDate = this.renderDate.bind(this);
 		this.toggle = this.toggle.bind(this);
-
+		// this.doResizeCode = this.doResizeCode.bind(this);
+		// this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 	}
 	successOverallHrrRank(data){
 		let date = this.renderDate(data.data.overall_hrr,data.data.duration_date);
 		this.setState({
 			Hrr_data:data.data.overall_hrr,
 			duration_date:data.data.duration_date,
-			all_hrr_rank_data:data.data.overall_hrr.week.all_rank,
-			date:this.headerDates(date),
-			capt:"Week",
+			all_hrr_rank_data:data.data.overall_hrr.today.all_rank,
+			date:date,
+			capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
 	        fetching_hrr4:false,
 		})
 	}
+	// doOnOrientationChange() {
+	//    console.log("********************",screen.orientation.angle)
+	// }
+	// doResizeCode(){
+	// 	window.addEventListener('orientationchange', this.doOnOrientationChange);
+	// }
 	errorOverallHrrRank(error){
 		console.log(error.message);
 		this.setState({
@@ -254,7 +261,7 @@ class OverallRank extends Component{
   	renderDate(value,value5){
   		let date;
   		for(let [key,val] of Object.entries(value)){
-  			if(key == "week"){
+  			if(key == "today"){
   				date = value5[key];
   			}
   		}
@@ -532,9 +539,8 @@ class OverallRank extends Component{
 
                 <div className = "col-md-12 col-sm-12 col-lg-12" >
 			        <div className = "row dropStyles">
-
 				        <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-					        <DropdownToggle caret>
+					        <DropdownToggle caret className = "drop_text">
 					          Select Range
 					        </DropdownToggle>
 					        <DropdownMenu>
@@ -552,6 +558,7 @@ class OverallRank extends Component{
                 {this.renderOverallHrr1FetchOverlay()}
                 {this.renderOverallHrr2FetchOverlay()}
                 {this.renderOverallHrr3FetchOverlay()}
+                {/*{this.doResizeCode()}*/}
 			</div>
 			);
 	}

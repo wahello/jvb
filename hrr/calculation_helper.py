@@ -154,23 +154,42 @@ def change_hrr_key(workout_dict_percent):
 			workout_dict_percent_copy[key]['percent_hrr_not_recorded'] = 0
 	return workout_dict_percent
 
+def remove_spaces(weekly_workout):
+	'''
+		This function removes the White spaces for the activity type
+	'''
+	workouts_dict = {}
+	for single_workout in weekly_workout:
+		single_workout = ast.literal_eval(single_workout)
+		single_workout.pop('Totals',None)
+		for key,value in single_workout.items():
+			workout_type  = value["workout_type"]
+			workout_type_nospace = workout_type.strip()
+			value["workout_type"] = workout_type_nospace
+			workouts_dict[key] = value
+	workouts = [str(workouts_dict)]
+	return workouts
+	
 def weekly_workout_calculations(weekly_workout):
 	'''
 		Make Similar activities into single activity
 	'''
 	workout_type = []
 	workout_dict = {}
-	workout_summary_id = {} 
+	workout_summary_id = {}
+	weekly_workout = remove_spaces(weekly_workout)
 	for single_workout in weekly_workout:
 		single_workout = ast.literal_eval(single_workout)
-		single_workout.pop('Totals',None)	
 		for key,value in single_workout.items():
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
 				workout_summary_id[key] = [value['workout_type']]
 				no_workouts = dict(collections.Counter(workout_type))
 				repeated_workout = no_workouts[value['workout_type']]
-				workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+				if repeated_workout > 7:
+					workout_dict[value['workout_type']]['days_with_activity'] = 7
+				else:
+					workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				workout_dict[value['workout_type']]['duration'] = (
 					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
 				if value['average_heart_rate'] and workout_dict[value['workout_type']]['average_heart_rate']:
@@ -235,7 +254,7 @@ def percent_calculations(aa_dict):
 
 def weekly_aa_calculations(weekly_aa,workout_summary_id):
 	'''
-		Add Aerobic and Anarobic ranhe values to activity
+		Add Aerobic and Anarobic range values to activity
 	'''
 	activity_type = []
 	aa_dict = {}
@@ -249,7 +268,10 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id):
 					activity_type.append(value['workout_type'])
 					no_workouts = dict(collections.Counter(activity_type))
 					repeated_workout = no_workouts[value['workout_type']]
-					aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+					if repeated_workout > 7:
+						aa_dict[value['workout_type']]['days_with_activity'] = 7
+					else:
+						aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 					aa_dict[value['workout_type']]['total_duration'] = (
 						(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
 					aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
@@ -276,12 +298,10 @@ def merge_activities(final_workout_data,final_aa_data):
 	'''
 		Merge Totals dict and activity dicts
 	'''
-	#print(final_workout_data,"final_workout_data")
 	for key,value in final_workout_data.items():
 		for key1,values1 in final_aa_data.items():
 			if key == key1:
 				final_workout_data[key].update(final_aa_data[key1])
-	#print(final_workout_data,"after modification")
 	return final_workout_data
 
 def percent_total(merged_data_total):

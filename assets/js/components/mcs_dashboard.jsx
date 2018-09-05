@@ -75,7 +75,7 @@ class MCS_Dashboard extends Component{
           let sync="";
         if(value != null){
           time = moment(value).format("MMM DD, YYYY @ hh:mm a")
-          sync = <div style = {{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
+          sync = <div className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
        }
         return sync;
        
@@ -137,6 +137,7 @@ class MCS_Dashboard extends Component{
         }
       
             fetchLastSync(this.successLastSync,this.errorquick);
+            window.scrollTo(0,0);
     }
 
     toggle() {
@@ -167,7 +168,7 @@ class MCS_Dashboard extends Component{
 	    }
 	}
 
-  	mcHistoricalData(score,status){
+  	mcHistoricalData(score,status,active_prcnt){
   		/* adding background color to card depends upon their steps ranges*/
 	  	  let background = "";
 		  let color = "";
@@ -204,7 +205,14 @@ class MCS_Dashboard extends Component{
 	        background = 'green';
 	        color = 'white';
 	      }
-	    return <td style = {{background:background,color:color}}>{this.stepsValueComma(score)}</td>
+	    return (
+	    	<td style = {{background:background,color:color}}>
+	    	<div>
+		    	{this.stepsValueComma(score)}
+		    </div> 
+		    	<div>{active_prcnt}</div>
+	    	</td>
+	    )
 	}
 	
   	renderTable(mc_data){
@@ -218,8 +226,14 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
-			         		}
+			         		 	let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
+			         		}	
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
 		         	}
@@ -239,7 +253,13 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
+			         		 	let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
 			         		}
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
@@ -260,7 +280,13 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
+			              		let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
 			         		}
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
@@ -282,7 +308,13 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 			              	for(let key3 of keys){
-			         		 	td_values.push(this.mcHistoricalData(values2[key3].steps,values2[key3].status));
+			         		 	let active_prcnt = (
+			         		 		values2[key3].active_prcnt !== null && values2[key3].active_prcnt !== undefined
+			         		 		?" ( "+values2[key3].active_prcnt+"% )"
+			         		 		:""
+			         		 	)
+			         		 	let styledTd = this.mcHistoricalData(values2[key3].steps,values2[key3].status,active_prcnt); 
+			         			td_values.push(styledTd);
 			         		}
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
@@ -317,7 +349,7 @@ class MCS_Dashboard extends Component{
     render(){
         return(
 			<div className="container-fluid">
-			   <NavbarMenu title = {<span style = {{fontSize:"18px"}}>Movement Consistency Score (MCS) Dashboard
+			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard
                     </span>} />
                
                     <div className="cla_center">
@@ -331,10 +363,11 @@ class MCS_Dashboard extends Component{
                 
 			            <span id="navlink"  onClick={this.toggleCalendar} id="gd_progress">
                             <FontAwesome
+                            className="arrow"
 			                  name = "calendar"
 			                  size = "2x"
 			                />
-			                <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+			                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
 		                </span>
 		                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
@@ -345,7 +378,7 @@ class MCS_Dashboard extends Component{
 			                />
 						</span>
 
-						 <span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
+						 <span  className="last_sync" style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -424,8 +457,8 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="mcs-dashboard" style={{background:'red',color:'white'}}>Inactive Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:'rgb(255,0,255)',color:'white'}}>Strength Hours</th>
 								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
-								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet Hours</th>
-								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Hours</th>
+								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet</th>
+								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Change</th>
 								
 		          	    	</tr>
 		          	    	<tbody>
@@ -437,14 +470,14 @@ class MCS_Dashboard extends Component{
 					</div>
 					<div className = "row justify-content-center mcs-dashboard">
 		          	<div className = "col-sm-9">
-	         
+	         				<p className="mcs_content" style={{marginLeft:"15px"}}>Data in each cell = Steps in that particular hour ( percentage of active minutes in that hour )</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Active Hours = Any hour with more than 300 steps when user was not sleeping</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Inactive Hours (MCS Score) = # of hours a day with 300 steps or less when a user is not sleeping</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Strength Hours = Hours user recorded strength exercises</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
-			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Hours = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
+			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Change = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
 		       				<p className="mcs_content" style={{marginLeft:"15px"}}>Nap Hours = Any portion of an hour user taking nap</p>
 		       		</div>
 		       		</div>
