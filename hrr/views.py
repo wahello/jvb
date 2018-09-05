@@ -2130,6 +2130,8 @@ def update_data_as_per_userinput_form(user,data,current_date):
 			data['HRR_start_beat'] =  float(hr_level)
 		if lowest_hr_first_minute:
 			data['lowest_hrr_1min'] =  float(lowest_hr_first_minute)
+			data['No_beats_recovered'] = data.get(
+				'HRR_start_beat',0)-float(lowest_hr_first_minute)
 
 	return data
 
