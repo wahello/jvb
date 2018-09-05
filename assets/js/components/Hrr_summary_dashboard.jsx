@@ -38,8 +38,14 @@ class Hrr_Dashboard extends Component{
 			fetching_hrr_dashboard:false,
 			heart_beats_lowest_1st_minute:"",
 			pure_heart_beats_lowered_in_1st_min:"",
-			pure_time_to_99:"",
-			time_to_99:"",
+			pure_time_to_99:{
+				pure_time99:"",
+				points:"",
+			},
+			time_to_99:{
+				time99:"",
+				points:"",
+			},
 			date_of_birth:"",
 			last_synced:null,
 			all_hrr_rank_data:"",
@@ -82,8 +88,14 @@ class Hrr_Dashboard extends Component{
 			this.setState({
 		  		heart_beats_lowest_1st_minute:null,
 				pure_heart_beats_lowered_in_1st_min:null,
-				pure_time_to_99:null,
-				time_to_99:null,
+				pure_time_to_99:{
+				pure_time99:null,
+				points:null,
+				},
+				time_to_99:{
+				time99:null,
+				points:null,
+				},
 				fetching_hrr_dashboard:false,
 			});
 		}
@@ -265,45 +277,46 @@ class Hrr_Dashboard extends Component{
 			dashView:false,
 		});
 	}
-	renderTimeTo99Color(score){
+	renderTimeTo99Color(score,value){
+
 		/* adding background color to card depends upon their Non-Exercise steps ranges*/
 		let background = "";
 		let color = "";
 		let hr_background = "";
-		// if(score){
-	 //            if(score >= 10000){
-	 //           		background = 'green';
-	 //               	color = 'white';
-	 //               	hr_background = 'white';
-	 //            }
-	 //            else if(score >= 7500 && score < 10000){
-	 //                background = '#32CD32';
-	 //                color = 'white';
-	 //                hr_background = 'white';
-	 //            }
-	 //            else if(score >= 5000 && score < 7500){
-	 //                background = '#FFFF01';
-	 //                color = 'black';
-	 //                hr_background = 'black';
-	 //            }
-	 //            else if(score >= 3500 && score < 5000){
-	 //                background = '#E26B0A';
-	 //                color = 'black';
-	 //                hr_background = 'black';
-	 //            }
-	 //            else if(score >= 0 && score < 3500){
-	 //                background = '#FF0101';
-	 //                color = 'black';
-	 //                hr_background = 'black';
-	 //            }
-  //       }
-  //      else{
-	 //        	score = "No Data Yet"
-	 //            background = 'white';
-	 //            color = '#5e5e5e';
-	 //            hr_background = '#e5e5e5';
-  //       }
-		// let score1 = this.renderCommaInSteps(score);
+		if(value){
+	            if(value >= 3.4){
+	           		background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(value >= 3 && value <= 3.39){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(value >= 2 && value < 3){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value >= 1 && value < 2){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value < 1) {
+	            	background = 'red';
+	            	color = 'black';
+	            	hr_background = 'black';
+	            }
+	            else{
+	            value = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+	        }
+		
 		var model = <Card className = "card_style"
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
@@ -318,6 +331,7 @@ class Hrr_Dashboard extends Component{
 		return model;
 	}
 	renderSecToMin(value){
+
   		/* Converting to Minutes and Seconds format from the Seconds */
   		let time;
   		if(value != null && value != "00:00" && value != undefined &&
@@ -337,11 +351,46 @@ class Hrr_Dashboard extends Component{
   		return time;
   	}
 
-	renderPureTimeTo99Colors(score){
+	renderPureTimeTo99Colors(score,value){
 		/* adding background color to card depends upon their Non-Exercise steps ranges*/
 		let background = "";
 		let color = "";
 		let hr_background = "";
+		if(value){
+		
+	            if(value >= 3.4){
+	           		background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(value >= 3 && value <= 3.39){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(value >= 2 && value < 3){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value >= 1 && value < 2){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value < 1) {
+	            	background = 'red';
+	            	color = 'black';
+	            	hr_background = 'black';
+	            }
+	            else{
+
+	            value = "No Data Yet"
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+	        }
 		var model = <Card className = "card_style"
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
@@ -385,6 +434,7 @@ class Hrr_Dashboard extends Component{
 	            color = '#5e5e5e';
 	            hr_background = '#E5E5E5';
         }
+
 		var model = <Card className = "card_style" 
 							id = "my-card-mcs"
 							 style = {{background:background, color:color}}>
@@ -505,7 +555,7 @@ class Hrr_Dashboard extends Component{
 							{this.renderOverallHrrRankColor(this.state.rank_data)}
 					    </div>
 						<div className = "col-md-6  table_margin ">
-				      		{this.renderTimeTo99Color(this.state.time_to_99)}
+				      		{this.renderTimeTo99Color(this.state.time_to_99.time99,this.state.time_to_99.points)}
 				      	</div>
 					</div>
 				}
@@ -515,7 +565,7 @@ class Hrr_Dashboard extends Component{
 							{this.renderHeartBeatsColors(this.state.heart_beats_lowest_1st_minute)}
 					    </div>
 						<div className = "col-md-6 table_margin ">
-							{this.renderPureTimeTo99Colors(this.state.pure_time_to_99)}
+							{this.renderPureTimeTo99Colors(this.state.pure_time_to_99.pure_time99,this.state.pure_time_to_99.points)}
 					    </div>
 					</div>
 				}
