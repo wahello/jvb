@@ -100,7 +100,8 @@ def _get_blank_pa_model_fields(model):
 		fields = {
 			"cum_days_low_stress":None,
 			"cum_days_medium_stress":None,
-			"cum_days_high_stress":None
+			"cum_days_high_stress":None,
+			"cum_days_garmin_stress_lvl":None
 		}
 		return fields
 	elif model == "other_stats":
@@ -901,6 +902,11 @@ def _get_stress_cum_sum(today_ql_data, yday_cum_data=None):
 		stress_cum_data["cum_days_high_stress"] = stress_high + \
 			_safe_get_mobj(yday_cum_data.stress_cum,"cum_days_high_stress",0)
 
+		garmin_stress_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"heartrate_variability_stress",-1)
+		stress_cum_data["cum_days_garmin_stress_lvl"] = garmin_stress_level + \
+			_safe_get_mobj(yday_cum_data.stress_cum,"cum_days_garmin_stress_lvl",0)
+
 	elif today_ql_data:
 		stress_level = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"stress_level",None
@@ -913,6 +919,10 @@ def _get_stress_cum_sum(today_ql_data, yday_cum_data=None):
 
 		stress_high = 1 if stress_level and stress_level == 'high' else 0
 		stress_cum_data["cum_days_high_stress"] = stress_high
+
+		garmin_stress_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"heartrate_variability_stress",-1)
+		stress_cum_data["cum_days_garmin_stress_lvl"] = garmin_stress_level
 
 	return stress_cum_data
 

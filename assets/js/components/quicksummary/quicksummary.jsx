@@ -315,7 +315,8 @@ class Quicklook extends Component{
 		        deep_sleep: data.sleep_ql.deep_sleep,
 		        light_sleep: data.sleep_ql.light_sleep,
 		        awake_time: data.sleep_ql.awake_time,
-		        rem_sleep: data.sleep_ql.rem_sleep
+		        rem_sleep: data.sleep_ql.rem_sleep,
+		        heartrate_variability_stress: data.exercise_reporting_ql.heartrate_variability_stress,
 		    },
 		    food_ql: {
 		        prcnt_non_processed_food: data.food_ql.prcnt_non_processed_food,

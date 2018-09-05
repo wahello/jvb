@@ -95,6 +95,7 @@ class StressCumulative(models.Model):
 	cum_days_low_stress = models.IntegerField(blank=True,null=True)
 	cum_days_medium_stress = models.IntegerField(blank=True,null=True)
 	cum_days_high_stress = models.IntegerField(blank=True,null=True)
+	cum_days_garmin_stress_lvl = models.IntegerField(blank=True,null=True)
 
 class MetaCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name='meta_cum')

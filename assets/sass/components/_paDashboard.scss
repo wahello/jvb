@@ -25,6 +25,14 @@
 .date_range1{
 	display: none;
 }
+
+.pa-db-info-content{
+	font-size: 14px;
+}
+.pa-db-info-header{
+	font-size: 16px;
+}
+
 @media (max-width: 1023px) {  
 	.text_center1{
 	text-align: center;
@@ -52,5 +60,11 @@
 	color:gray;
 	padding-top: 5px;
 	font-size: 13px;
+}
+.pa-db-info-content{
+	font-size: 14px;
+}
+.pa-db-info-header{
+	font-size: 14px;
 }
 }
