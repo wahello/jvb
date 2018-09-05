@@ -2354,7 +2354,8 @@ getGarminStressColors(stressValue){
                         <div>
                           Your stress level is recorded throughout the day. A level from 0 to 25
                           is a state of rest. Anything from 26 to 50 is a low stress level.
-                          51 to 75 is medium stress and 76 to 100 is high stress.  
+                          51 to 75 is medium stress and 76 to 100 is high stress. Level -1 indicates
+                          that there was not enough data to calculate your stress level.  
                         </div>
                       </ModalBody>
                     </Modal> 
