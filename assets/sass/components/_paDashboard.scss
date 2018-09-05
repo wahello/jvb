@@ -1,3 +1,13 @@
+.padropStyles{
+	padding-top: 20px;
+	margin-left: 35px;
+}
+.paweekdate{
+	margin-left: 400px;
+	padding-top: 10px;
+	font-weight: bold;
+	color:gray;
+}
 .card_padding{
 	padding:15px 7px 0px 7px; 
 }
@@ -7,9 +17,40 @@
 .card_padding1{
 	padding:0px 25px 25px 25px;
 }
-@media (max-width: 1023px) {
+.Pa_dashboard_date{
+	font-size: 16px;
+	text-align: center;
+	font-weight: bold;
+}
+.date_range1{
+	display: none;
+}
+@media (max-width: 1023px) {  
 	.text_center1{
 	text-align: center;
 	padding-bottom: 10px;
+}
+.Pa_dashboard_date{
+	font-size: 12px;
+	text-align: center;
+	font-weight: bold;
+}
+.date_range1{
+	display: inline;
+	
+}
+.date_rangee1{
+	display: none;
+}
+.padropStyles{
+	padding-top: 10px;
+	margin-left: 18px;
+	font-size: 11px;
+	}
+	.paweekdate{
+	margin-left: 10px;
+	color:gray;
+	padding-top: 5px;
+	font-size: 13px;
 }
 }

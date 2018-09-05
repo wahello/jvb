@@ -527,10 +527,12 @@ class Hrr_Dashboard extends Component{
 					</div>
 				}
 				{this.renderHrrSummaryDashboardDataFetchOverlay()}
+				<div className = "hr_dashboard_padd">
 				{this.state.gridview &&
 					<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
 	  							Hrr_username = {this.state.Hrr_username}/>
 				}
+				</div>
 			</div>
 		);
 	}
