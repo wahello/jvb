@@ -22,6 +22,8 @@ class HrrLeaderboard extends Component{
 		this.heartBeatsColors = this.heartBeatsColors.bind(this);
 		this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		this.time99Colors = this.time99Colors.bind(this);
+		
 	}
 	heartBeatsColors(value){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
@@ -42,6 +44,45 @@ class HrrLeaderboard extends Component{
 	  		}
   		}
   		return <td style ={{background:background,color:color}} className ="overall_rank_value">{value}</td>
+  	}
+  	time99Colors(score,value){
+  		/* Applying the colors for the table cells depends upon their heart beat ranges*/
+  		let background = "";
+		let color = "";
+		let hr_background = "";
+  		if(value){
+	            if(value >= 3.4){
+	           		background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(value >= 3.39 && value < 3.4){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(value >= 2.99 && value < 3.39){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value >= 1.99 && value < 2.99){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value >= 1.0 && value < 1) {
+	            	background = 'red';
+	            	color = 'black';
+	            	hr_background = 'black';
+	            }
+	            else{
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+	        }
+  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score}</td>
   	}
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -132,6 +173,7 @@ class HrrLeaderboard extends Component{
 						currentUser = '';
 					}
 				}
+
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
 					for(let [key3,value4] of Object.entries(value[key1])){
 						if(key3 == "rank"){
@@ -142,6 +184,18 @@ class HrrLeaderboard extends Component{
 						}
 					}
 				}
+				
+				else if(key1 == "time_99" || key1 == "pure_time_99"){
+					for(let [key3,value4] of Object.entries(value[key1])){
+						if(key3 == "rank"){
+							td_values.push(<td className ="overall_rank_value">{value4}</td>);
+						}
+						else if(key3 == "score"){
+							td_values.push(this.time99Colors(value4.value,value[key1].other_scores.points));
+						}
+						
+					}
+				}
 				else{
 					for(let [key3,value4] of Object.entries(value[key1])){
 						if(key3 == "rank"){
@@ -149,6 +203,7 @@ class HrrLeaderboard extends Component{
 						}
 						else if(key3 == "score"){
 							td_values.push(<td className ="overall_rank_value">{value4.value}</td>);
+
 						}
 					}
 				}
