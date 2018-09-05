@@ -1187,7 +1187,7 @@ def daily_aa_data(user, start_date):
 					else:
 						workout_data.append(di[i])
 						activities_workout.append(di[i]['summaryId'])
-	user_created_activity = list(set(garmin_activity_keys) - set(ui_data_keys))
+	user_created_activity = list(set(activities_workout) - set(garmin_activity_keys))
 	garmin_workout_keys = set(garmin_activity_keys) - set(activities_hrr)
 	user_created_activity_list = []
 	if workout_data and user_created_activity:
@@ -1950,6 +1950,10 @@ def hrr_data(user,start_date):
 				time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
 			else:
 				time_99 = None
+				
+		if diff_actity_hrr > 120:
+			pure_time_99 = None
+			pure_1min_heart_beats = None
 
 	else:
 		Did_you_measure_HRR = 'no'
@@ -1981,9 +1985,11 @@ def hrr_data(user,start_date):
 						daily_diff_99 = int(daily_diff_99) + 15
 						daily_diff_99 = str(daily_diff_99)
 						if daily_diff_data_99 == None:
-							Did_you_measure_HRR = "Heart Rate Data Not Provided"
+							no_fitfile_hrr_reach_99 = "Heart Rate Data Not Provided"
+							no_fitfile_hrr_time_reach_99 = 0.00
+							time_heart_rate_reached_99 = 0.00
 							break
-				if daily_diff_data_99 <= 99:
+				if daily_diff_data_99 != None and daily_diff_data_99 <= 99:
 					Did_heartrate_reach_99 = 'yes'
 				if daily_diff_data_60:
 					if daily_diff_data_60 < 99:
@@ -2014,6 +2020,10 @@ def hrr_data(user,start_date):
 			time_heart_rate_reached_99 = end_time_activity + no_fitfile_hrr_time_reach_99
 		else:
 			time_heart_rate_reached_99 = None
+		if daily_diff_data_99 == None:
+			Did_heartrate_reach_99 = "Heart Rate Data Not Provided"
+			no_fitfile_hrr_time_reach_99 = 0.00
+			time_heart_rate_reached_99 = 0.00
 
 	if (hrr and (Did_you_measure_HRR == 'yes' or
 		Did_you_measure_HRR == 'no')):
@@ -2063,27 +2073,6 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":no_file_beats_recovered,
 
 			"offset":offset,
-			}
-	elif Did_you_measure_HRR == 'Heart Rate Data Not Provided':
-		data = {"Did_you_measure_HRR":'Heart Rate Data Not Provided',
-			"Did_heartrate_reach_99":'',
-			"time_99":None,
-			"HRR_start_beat":None,
-			"lowest_hrr_1min":None,
-			"No_beats_recovered":None,
-			"end_time_activity":None,
-			"diff_actity_hrr":None,
-			"HRR_activity_start_time":None,
-			"end_heartrate_activity":None,
-			"heart_rate_down_up":None,
-			"pure_1min_heart_beats":None,
-			"pure_time_99":None,
-			"no_fitfile_hrr_reach_99":'',
-			"no_fitfile_hrr_time_reach_99":None,
-			"time_heart_rate_reached_99":None,
-			"lowest_hrr_no_fitfile":None,
-			"no_file_beats_recovered":None,
-			"offset":None,
 			}
 	else:
 		data = {"Did_you_measure_HRR":'',
@@ -2141,6 +2130,8 @@ def update_data_as_per_userinput_form(user,data,current_date):
 			data['HRR_start_beat'] =  float(hr_level)
 		if lowest_hr_first_minute:
 			data['lowest_hrr_1min'] =  float(lowest_hr_first_minute)
+			data['No_beats_recovered'] = data.get(
+				'HRR_start_beat',0)-float(lowest_hr_first_minute)
 
 	return data
 

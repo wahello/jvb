@@ -43,7 +43,10 @@ def check_negative_numbers(pa_data):
 	for summary_type,summary_data in pa_data['summary'].items():
 		for field_type, field_data in summary_data.items():
 			for duration_type, avg_data in field_data.items():
-				if (type(avg_data) is int or type(avg_data) is float) and avg_data < 0:
+				if ((type(avg_data) is int or type(avg_data) is float) 
+					and avg_data < 0
+					# Stress level can be -1 so ignore it
+					and not field_type == "garmin_stress_lvl"): 
 					# negative number detected
 					error_obj = {
 						"summary":summary_type,
