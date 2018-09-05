@@ -56,22 +56,22 @@ class HrrLeaderboard extends Component{
 	               	color = 'white';
 	               	hr_background = 'white';
 	            }
-	            else if(value >= 3.39 && value < 3.4){
+	            else if(value >= 3 && value <= 3.39){
 	                background = '#32CD32';
 	                color = 'white';
 	                hr_background = 'white';
 	            }
-	            else if(value >= 2.99 && value < 3.39){
+	            else if(value >= 2 && value < 3){
 	                background = '#FFFF01';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value >= 1.99 && value < 2.99){
+	            else if(value >= 1 && value < 2){
 	                background = '#E26B0A';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value >= 1.0 && value < 1) {
+	            else if(value < 1 && value != -1) {
 	            	background = 'red';
 	            	color = 'black';
 	            	hr_background = 'black';
@@ -175,7 +175,8 @@ class HrrLeaderboard extends Component{
 				}
 
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
-					for(let [key3,value4] of Object.entries(value[key1])){
+					for(let key3 of ['score','rank']){
+						let value4 = value[key1][key3];
 						if(key3 == "rank"){
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
@@ -186,7 +187,8 @@ class HrrLeaderboard extends Component{
 				}
 				
 				else if(key1 == "time_99" || key1 == "pure_time_99"){
-					for(let [key3,value4] of Object.entries(value[key1])){
+					for(let key3 of ['score','rank']){
+						let value4 = value[key1][key3];
 						if(key3 == "rank"){
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
@@ -197,8 +199,9 @@ class HrrLeaderboard extends Component{
 					}
 				}
 				else{
-					for(let [key3,value4] of Object.entries(value[key1])){
+					for(let key3 of ['score','rank']){
 						if(key3 == "rank"){
+							let value4 = value[key1][key3];
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
 						else if(key3 == "score"){

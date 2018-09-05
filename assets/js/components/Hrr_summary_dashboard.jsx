@@ -284,34 +284,32 @@ class Hrr_Dashboard extends Component{
 		let color = "";
 		let hr_background = "";
 		if(value){
-		
 	            if(value >= 3.4){
 	           		background = 'green';
 	               	color = 'white';
 	               	hr_background = 'white';
 	            }
-	            else if(value >= 3.39 && value < 3.4){
+	            else if(value >= 3 && value <= 3.39){
 	                background = '#32CD32';
 	                color = 'white';
 	                hr_background = 'white';
 	            }
-	            else if(value >= 2.99 && value < 3.39){
+	            else if(value >= 2 && value < 3){
 	                background = '#FFFF01';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value >= 1.99 && value < 2.99){
+	            else if(value >= 1 && value < 2){
 	                background = '#E26B0A';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value >= 1.0 && value < 1) {
+	            else if(value < 1) {
 	            	background = 'red';
 	            	color = 'black';
 	            	hr_background = 'black';
 	            }
 	            else{
-
 	            value = "No Data Yet"
 	            background = 'white';
 	            color = '#5e5e5e';
@@ -365,22 +363,22 @@ class Hrr_Dashboard extends Component{
 	               	color = 'white';
 	               	hr_background = 'white';
 	            }
-	            else if(value >= 3.39 && value < 3.4){
+	            else if(value >= 3 && value <= 3.39){
 	                background = '#32CD32';
 	                color = 'white';
 	                hr_background = 'white';
 	            }
-	            else if(value >= 2.99 && value < 3.39){
+	            else if(value >= 2 && value < 3){
 	                background = '#FFFF01';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value >= 1.99 && value < 2.99){
+	            else if(value >= 1 && value < 2){
 	                background = '#E26B0A';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value >= 1.0 && value < 0) {
+	            else if(value < 1) {
 	            	background = 'red';
 	            	color = 'black';
 	            	hr_background = 'black';
