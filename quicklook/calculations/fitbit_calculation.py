@@ -1,6 +1,9 @@
 from datetime import datetime,timedelta
 import ast
 import pdb
+import pytz
+
+from user_input.models import UserDailyInput
 
 from quicklook.serializers import UserQuickLookSerializer
 from .garmin_calculation import (
@@ -29,7 +32,8 @@ from fitbit.models import (
 	UserFitbitDatafoods
 )
 
-from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_sleep
+from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
+
 
 def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
@@ -70,16 +74,31 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 	else:
 		return None
 
-def get_sleep_stats(sleep_data):		
+def get_sleep_stats(sleep_data, ui_bedtime = None,
+ 	ui_awaketime = None, ui_sleep_duration = None,
+ 	ui_timezone = None):		
 	sleep_stats = {
 		"deep_sleep": '',
 		"light_sleep": '',
 		"awake_time": '',
 		"rem_sleep":'',
+		"restless":'',
 		"sleep_bed_time": '',
 		"sleep_awake_time": '',
-		"sleep_per_wearable":''
+		"sleep_per_wearable":'',
+		"sleep_per_userinput":''
 	}
+	have_userinput_sleep = False
+	trans_sleep_data = None
+	if ui_bedtime and ui_awaketime and ui_sleep_duration and ui_timezone:
+		# If manual sleep bedtime last night and awake time is submitted then we'll
+		# user this sleep bedtime time and awake time. We'll convert these time in
+		# timezone from where user input was submitted by user
+		have_userinput_sleep = True
+		target_tz = pytz.timezone(ui_timezone)
+		ui_bedtime = ui_bedtime.astimezone(target_tz)
+		ui_awaketime = ui_awaketime.astimezone(target_tz)
+
 	if sleep_data:
 		main_sleep_data = list(filter(lambda x:x.get('isMainSleep'),sleep_data['sleep']))
 		if not main_sleep_data:
@@ -87,16 +106,7 @@ def get_sleep_stats(sleep_data):
 		main_sleep_data = main_sleep_data[0]
 		trans_sleep_data = fitbit_to_garmin_sleep(main_sleep_data)
 
-		bed_time = datetime.strptime(
-			trans_sleep_data['startTimeInSeconds'],
-			"%Y-%m-%dT%H:%M:%S.%f")
-		wake_time = bed_time + timedelta(
-			seconds = trans_sleep_data['durationInSeconds'])
-
-
-		sleep_stats["sleep_bed_time"] = bed_time.strftime("%I:%M %p")
-		sleep_stats["sleep_awake_time"] = wake_time.strftime("%I:%M %p")
-
+	if trans_sleep_data:
 		sleep_stats["deep_sleep"] = sec_to_hours_min_sec(
 			trans_sleep_data['deepSleepDurationInSeconds'],
 			include_sec = False
@@ -110,13 +120,34 @@ def get_sleep_stats(sleep_data):
 			include_sec = False
 		)
 		sleep_stats["rem_sleep"] = sec_to_hours_min_sec(
-			trans_sleep_data['remSleepInSeconds'],
-			include_sec = False
+			trans_sleep_data['remSleepInSeconds'],include_sec = False
 		)
+		# sleep_stats["restless"] = sec_to_hours_min_sec(
+		# 	trans_sleep_data['restlessDurationInSeconds'],
+		# 	include_sec = False
+		# )
 		sleep_stats["sleep_per_wearable"] = sec_to_hours_min_sec(
-			trans_sleep_data['durationInSeconds'] - trans_sleep_data['awakeDurationInSeconds'],
+			(trans_sleep_data['durationInSeconds'] 
+			- trans_sleep_data['awakeDurationInSeconds'] 
+			- trans_sleep_data['restlessDurationInSeconds']),
 			include_sec = False
 		)
+
+	if have_userinput_sleep:
+		bed_time = ui_bedtime.replace(tzinfo = None)
+		awake_time = ui_awaketime.replace(tzinfo = None)
+		sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
+		sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		sleep_stats['sleep_per_userinput'] = ui_sleep_duration
+
+	elif trans_sleep_data:
+		bed_time = datetime.strptime(
+			trans_sleep_data['startTimeInSeconds'],
+			"%Y-%m-%dT%H:%M:%S.%f")
+		wake_time = bed_time + timedelta(
+			seconds = trans_sleep_data['durationInSeconds'])
+		sleep_stats["sleep_bed_time"] = bed_time.strftime("%I:%M %p")
+		sleep_stats["sleep_awake_time"] = wake_time.strftime("%I:%M %p")
 
 	return sleep_stats
 
@@ -146,15 +177,36 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data = get_blank_model_fields("food")
 		alcohol_calculated_data = get_blank_model_fields("alcohol")
 
-		# TODO: grabbing fitbit sleep data and populate sleeps_calculated_data fields
 		todays_sleep_data = get_fitbit_model_data(
-			UserFitbitDataSleep,user,current_date.date(),current_date.date())
+				UserFitbitDataSleep,user,current_date.date(),current_date.date())
+		try:
+			todays_user_input = UserDailyInput.objects.select_related(
+				'strong_input','encouraged_input','optional_input').filter(
+				created_at = current_date.date(), user=user)
+		except UserDailyInput.DoesNotExist:
+			todays_user_input = None
+
+		ui_bedtime = None
+		ui_awaketime = None
+		ui_timezone = None
+		ui_sleep_duration = None
+
+		if todays_user_input:
+			todays_user_input = todays_user_input[0]
+			ui_bedtime = todays_user_input.strong_input.sleep_bedtime
+			ui_awaketime = todays_user_input.strong_input.sleep_awake_time
+			ui_timezone = todays_user_input.timezone
+			ui_sleep_duration = todays_user_input.strong_input.sleep_time_excluding_awake_time
+
 		if todays_sleep_data:
 			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
 				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
 		else:
 			todays_sleep_data = None
-		sleep_stats = get_sleep_stats(todays_sleep_data)
+		sleep_stats = get_sleep_stats(todays_sleep_data,
+			ui_bedtime = ui_bedtime,ui_awaketime = ui_awaketime, 
+			ui_sleep_duration = ui_sleep_duration,ui_timezone = ui_timezone)
+
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
 		sleeps_calculated_data['light_sleep'] = sleep_stats['light_sleep']
 		sleeps_calculated_data['rem_sleep'] = sleep_stats['rem_sleep']
@@ -162,6 +214,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
+		sleeps_calculated_data['sleep_per_user_input'] = sleep_stats['sleep_per_userinput']
+		# sleeps_calculated_data['restless'] = sleep_stats['restless']
 		
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 

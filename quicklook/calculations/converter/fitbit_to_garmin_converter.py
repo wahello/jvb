@@ -4,12 +4,14 @@ def levelData(sleepLevelsMap,sleep_type):
 			'deep': [],
 			'light': [],
 			'awake': [],
-			'rem': []
+			'rem': [],
+			'restless': []
 		},
 		"deep_sleep_duration_in_sec":0,
 		"light_sleep_duration_in_sec":0,
 		"rem_sleep_duration_in_sec":0,
-		"awake_duration_in_sec":0
+		"awake_duration_in_sec":0,
+		"restless_duration_in_sec":0,                     
 	}
 
 	if sleep_type == "stages":
@@ -42,16 +44,16 @@ def levelData(sleepLevelsMap,sleep_type):
 					{'startTimeInSeconds': levelData['dateTime'],
 					 'endTimeInSeconds':levelData['seconds']})
 			elif levelData['level'] == "restless":
-				sleep_level_stats['level_map']["light"].append(
+				sleep_level_stats['level_map']["restless"].append(
 					{'startTimeInSeconds': levelData['dateTime'],
 					 'endTimeInSeconds':levelData['seconds']})
-
+		
 		sleep_level_stats['deep_sleep_duration_in_sec'] = int(
 			sleepLevelsMap['summary']['asleep']['minutes']*60)
-		sleep_level_stats['light_sleep_duration_in_sec'] = int(
-			sleepLevelsMap['summary']['restless']['minutes']*60)
 		sleep_level_stats['awake_duration_in_sec'] = int(
 			sleepLevelsMap['summary']['awake']['minutes']*60)
+		sleep_level_stats['restless_duration_in_sec'] = int(
+			sleepLevelsMap['summary']['restless']['minutes']*60)
 
 	return sleep_level_stats
 
@@ -65,6 +67,7 @@ def fitbit_to_garmin_sleep(sleep_summary):
 		'unmeasurableSleepInSeconds': None,
 		'deepSleepDurationInSeconds': None,
 		'lightSleepDurationInSeconds': None,
+		'restlessDurationInSeconds':None,
 		'remSleepInSeconds': None,
 		'awakeDurationInSeconds': None,
 		'sleepLevelsMap':{
@@ -83,4 +86,5 @@ def fitbit_to_garmin_sleep(sleep_summary):
 	garmin_sleep['lightSleepDurationInSeconds'] =sleep_level_stats["light_sleep_duration_in_sec"] 
 	garmin_sleep['remSleepInSeconds'] = sleep_level_stats["rem_sleep_duration_in_sec"]
 	garmin_sleep['awakeDurationInSeconds'] = sleep_level_stats["awake_duration_in_sec"]
+	garmin_sleep['restlessDurationInSeconds'] = sleep_level_stats["restless_duration_in_sec"]
 	return garmin_sleep
