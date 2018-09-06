@@ -715,9 +715,12 @@ class ProgressDashboard extends Component{
           			all_rank_data = value['custom_range'][dur].all_rank;
           			userName = value['custom_range'][dur].user_rank.username;
           			category = value['custom_range'][dur].user_rank.category;
-          			if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-          				verbose_name = value['custom_range'][dur].user_rank.score.verbose_name;
-          			}
+          			if(category == "Percent Unprocessed Food"){
+                  verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
+                }
+                else if(category == "Average Sleep"){
+                  verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
+                }
   		        }
             }
         }
@@ -726,9 +729,12 @@ class ProgressDashboard extends Component{
   			all_rank_data = value[dur].all_rank;
   			userName = value[dur].user_rank.username;
   			category = value[dur].user_rank.category;
-  			if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-  				verbose_name = value[dur].user_rank.score.verbose_name;
-  			}
+  			if(category == "Percent Unprocessed Food"){
+          verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
+        }
+        else if(category == "Average Sleep"){
+          verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
+        }
   		}
   		let code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,verbose_name)}>
 						         		<span style={{textDecoration:"underline"}}>{rank}</span>
