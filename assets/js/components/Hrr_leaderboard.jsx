@@ -23,20 +23,9 @@ class HrrLeaderboard extends Component{
 		this.heartBeatsColors = this.heartBeatsColors.bind(this);
 		this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
-		this.myFunction = this.myFunction.bind(this);
-		this.handleScroll = this.handleScroll.bind(this);
+		this.tableStickyHeader = this.tableStickyHeader.bind(this);
 	}
-	 handleScroll() {
-      if (window.scrollY >= 200 && !this.state.scrollingLock) {
-        this.setState({
-          scrollingLock: true
-        });
-      } else if(window.scrollY < 200 && this.state.scrollingLock) {                                               
-        this.setState({
-          scrollingLock: false
-        });
-      }
-  }
+
 	heartBeatsColors(value){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
   		let background = "";
@@ -58,6 +47,7 @@ class HrrLeaderboard extends Component{
   		return <td style ={{background:background,color:color}} className ="overall_rank_value">{value}</td>
   	}
   	scrollCallback(operationCount) {
+  		//functionality for table scrolling up to current user rank
       if (objectLength === operationCount) {
           setTimeout(function () {
             var x = window.matchMedia("(max-width: 900px)");
@@ -105,6 +95,7 @@ class HrrLeaderboard extends Component{
       }
   	}
   	doOnOrientationChange() {
+  		//functionality for orientation change
 	   let screen1 = screen.orientation.angle;
 	   let window1 = window.orientation;
 	   let final;
@@ -122,33 +113,35 @@ class HrrLeaderboard extends Component{
 	}
 	componentDidMount(){
 		window.addEventListener('orientationchange', this.doOnOrientationChange);
-		window.addEventListener('scroll', this.myFunction);
+		window.addEventListener('scroll', this.tableStickyHeader);
 	}
 	 componentWillUnmount() {
-      window.removeEventListener('scroll', this.myFunction);
+      window.removeEventListener('scroll', this.tableStickyHeader);
   }
 
-myFunction() {
-var header = document.getElementById("myHeader");
-var sticky = header.offsetTop;
-var x = window.matchMedia("(min-width: 319px) and (max-width: 1023px) and (orientation:landscape)");
-var y = window.matchMedia("(max-width: 1023px)");
-if(x.matches){
-  if (window.pageYOffset > 230) {
-    header.classList.add("sticky");
-  } else {
-    header.classList.remove("sticky");
-  }
-}
-else{
-	if (window.pageYOffset > 100) {
-    header.classList.add("sticky");
-  } else {
-    header.classList.remove("sticky");
-  }
-}
+tableStickyHeader() {
+	//functionality for table sticky header after 100px scrolling the window
+	var header = document.getElementById("myHeader");
+	var sticky = header.offsetTop;
+	var x = window.matchMedia("(min-width: 319px) and (max-width: 1023px) and (orientation:landscape)");
+	var y = window.matchMedia("(max-width: 1023px)");
+	if(x.matches){
+	  if (window.pageYOffset > 230) {
+	    header.classList.add("sticky");
+	  } else {
+	    header.classList.remove("sticky");
+	  }
+	}
+	else{
+		if (window.pageYOffset > 100) {
+	    header.classList.add("sticky");
+	  } else {
+	    header.classList.remove("sticky");
+	  }
+	}
 }
 	renderTable(Hrr_data,Hrr_username){
+		//functionality for creating table cells dynamically
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","time_99","beat_lowered","pure_time_99","pure_beat_lowered","total_hrr_rank_point"];
