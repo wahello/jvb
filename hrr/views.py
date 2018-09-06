@@ -1299,7 +1299,6 @@ def daily_aa_data(user, start_date):
 			for single_activity_key in no_hrr_actvities:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
-	print(user_created_activity_list,"user_created_activity_list")
 	profile = Profile.objects.filter(user=user)
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
@@ -1503,8 +1502,102 @@ def store_daily_aa_calculations(user,from_date,to_date):
 	print("A/A dailes finished")
 	return None
 
+def low_high_hr(low_end_heart,high_end_heart,heart_beat):
+	'''
+		Making ranges for A/A third chart
+	'''
+	low_hr = sorted(i for i in low_end_heart if i <= heart_beat)
+	high_hr = sorted(i for i in high_end_heart if i >= heart_beat)
+	return low_hr[-1],high_hr[1]
+
+def add_hr_nor_recorded_heartbeat(
+	no_hr_data,totals_data,low_end_heart,high_end_heart,below_aerobic_value,anaerobic_value):
+	'''
+		Adding user created activity to A/A third chart, When user has heartrate information
+	'''
+	data={}
+	for i,single_data in enumerate(no_hr_data):
+		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
+		print(heart_beat,"heart beat")
+		if heart_beat != '' and heart_beat != 0 and int(heart_beat) <= below_aerobic_value:
+			low_hr,high_hr = low_high_hr(low_end_heart,high_end_heart,int(heart_beat))
+			if not data.get(low_hr):
+				data[low_hr] = {}
+			data[low_hr]["classificaton"] = "below_aerobic_zone"
+			data[low_hr]["time_in_zone"]=single_data.get(
+			"durationInSeconds",0) +  data[low_hr].get("time_in_zone",0)
+			data[low_hr]["heart_rate_zone_low_end"] = low_hr
+			data[low_hr]["heart_rate_zone_high_end"] = high_hr
+		elif heart_beat != '' and heart_beat != 0 and int(heart_beat) > anaerobic_value:
+			low_hr,high_hr = low_high_hr(low_end_heart,high_end_heart,int(heart_beat))
+			if not data.get(low_hr):
+				data[low_hr] = {}
+			data[low_hr]["classificaton"] = "anaerobic_zone"
+			data[low_hr]["time_in_zone"]=single_data.get(
+			"durationInSeconds",0) +  data.get("time_in_zone",0)
+			data[low_hr]["heart_rate_zone_low_end"] = low_hr
+			data[low_hr]["heart_rate_zone_high_end"] = high_hr
+		elif heart_beat != '' and heart_beat != 0 and int(heart_beat) <= anaerobic_value and int(heart_beat) > below_aerobic_value:
+			low_hr,high_hr = low_high_hr(low_end_heart,high_end_heart,int(heart_beat))
+			if not data.get(low_hr):
+				data[low_hr] = {}
+			data[low_hr]["classificaton"] = "aerobic_zone"
+			data[low_hr]["time_in_zone"]=single_data.get(
+			"durationInSeconds",0) +  data.get("time_in_zone",0)
+			data[low_hr]["heart_rate_zone_low_end"] = low_hr
+			data[low_hr]["heart_rate_zone_high_end"] = high_hr
+	return data
+
+def add_hr_nor_recorded(no_hr_data,totals_data):
+	'''
+		Add new row to third chart in A/A, When Heart rate is not measured
+	'''
+	data={}
+	for i,single_data in enumerate(no_hr_data):
+		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
+		if heart_beat == '' or int(heart_beat) == 0:
+			data["classificaton"] = "heart_rate_not_recorded"
+			data["time_in_zone"]=single_data.get(
+			"durationInSeconds",0) +  data.get("time_in_zone",0)
+		
+	if totals_data:
+		try:
+			data["prcnt_total_duration_in_zone"]=(data.get(
+				"time_in_zone",0)/totals_data.get('total_duration',0))*100
+		except:
+			data["prcnt_total_duration_in_zone"] = 0
+	else:
+		data["prcnt_total_duration_in_zone"] = 100
+	return data
+
+def update_prcent(data,total_duration):
+	'''
+		Update the percent of each zone
+	'''
+	for key,value in data.items():
+		if key != 'total':
+			try:
+				value['prcnt_total_duration_in_zone'] = (value.get('time_in_zone',0)/total_duration)*100
+			except:
+				value['prcnt_total_duration_in_zone'] = 0
+	return data
+
+def percent_added_activity(data2,total_duration):
+	'''
+		This function add percentage of totals
+	'''
+	for key,value in data2.items():
+		if key != 'total' or key != 'heartrate_not_recorded':
+			try:
+				data2[key]['prcnt_total_duration_in_zone'] = (data2[key]['time_in_zone']/total_duration)*100
+			except:
+				pass
+	return data2
 
 def aa_low_high_end_data(user,start_date):
+	'''
+		This function calculates the A/A third chart data
+	''' 
 	heart_rate_zone_low_end = ""
 	heart_rate_zone_high_end = ""
 	time_in_zone_for_last_7_days = ""
@@ -1518,10 +1611,16 @@ def aa_low_high_end_data(user,start_date):
 	end_date_timestamp = start_date_timestamp + 86400
 
 	activity_files_qs=UserGarminDataActivity.objects.filter(user= user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	garmin_activity_keys = []
+	garmin_workout = []
 	if activity_files_qs:
 		activity_files = [pr.data for pr in activity_files_qs]
 		one_activity_file_dict =  ast.literal_eval(activity_files[0])
 		offset = one_activity_file_dict['startTimeOffsetInSeconds']
+		for i,single_activity in enumerate(activity_files):
+			one_activity_file =  ast.literal_eval(single_activity)
+			garmin_activity_keys.append(one_activity_file['summaryId'])
+			garmin_workout.append(one_activity_file)
 	else:
 		activity_files = ''
 		offset = 0
@@ -1539,11 +1638,11 @@ def aa_low_high_end_data(user,start_date):
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
 
-
 	activities = []
 	hrr_summary_id = []
 	workout_summary_id = []
 	id_act = 0
+	workout_data = []
 	if user_input_strong:
 		for tmp in user_input_strong:
 			sn = tmp.activities
@@ -1557,8 +1656,17 @@ def aa_low_high_end_data(user,start_date):
 						activities.append(di[i])
 						hrr_summary_id.append(di[i]['summaryId'])
 					else:
+						workout_data.append(di[i])
 						workout_summary_id.append(di[i]['summaryId'])
 
+	user_created_activity = list(set(workout_summary_id)- set(garmin_activity_keys))
+	garmin_workout_keys = set(garmin_activity_keys) - set(hrr_summary_id)
+	user_created_activity_list = []
+	if workout_data and user_created_activity:
+		for single_activity in workout_data:
+			for single_activity_key in user_created_activity:
+				if single_activity_key == single_activity['summaryId']:
+					user_created_activity_list.append(single_activity)
 	workout = []
 	hrr = []
 	start = start_date
@@ -1599,21 +1707,18 @@ def aa_low_high_end_data(user,start_date):
 	anaerobic_value = 180-user_age+5
 	data2 = {}
 	classification_dic = {}
+	low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
+						29,34,39,44,49,54,59]
+	high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-11,0,5,10,13,18,23,28,
+						33,38,43,48,53,58,63]
+
+	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
+	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
-
-		low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
-							29,34,39,44,49,54,59]
-		high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-11,0,5,10,13,18,23,28,
-							33,38,43,48,53,58,63]
-
-		low_end_heart = [180-user_age+tmp for tmp in low_end_values]
-		high_end_heart = [180-user_age+tmp for tmp in high_end_values]
-
 		low_end_dict = dict.fromkeys(low_end_heart,0)
 		# high_end_dict = dict.fromkeys(high_end_heart,0)
-
 		for a,b in zip(low_end_heart,high_end_heart):
 			for c,d in zip(workout_final_heartrate,workout_final_timestamp):
 				if c>=a and c<=b:
@@ -1643,6 +1748,32 @@ def aa_low_high_end_data(user,start_date):
 			data2['total'] = total
 		else:
 			data2['total'] = ""
+	if user_created_activity_list:
+		duration_activites = []
+		hr_not_recorded = add_hr_nor_recorded(user_created_activity_list,data2.get("total"))
+		hr_recorded = add_hr_nor_recorded_heartbeat(user_created_activity_list,data2.get(
+				"total"),low_end_heart,high_end_heart,below_aerobic_value,anaerobic_value)
+		if hr_recorded:
+			for key,value in hr_recorded.items():
+				if data2[str(key)]:
+					data2[str(key)]["time_in_zone"] = data2[str(key)]["time_in_zone"]+value['time_in_zone']
+				else:
+					data2[key] = value
+				duration = value.get("time_in_zone",0)
+				duration_activites.append(duration)
+		data2['heartrate_not_recorded'] = hr_not_recorded
+		if not data2.get('total'):
+			data2['total'] = {}
+			data2['total']['total_duration'] = sum(
+				duration_activites)+data2['heartrate_not_recorded']['time_in_zone']
+			data2['total']['total_percent'] = '100%'
+			data = update_prcent(data2,data2['total']['total_duration'])
+			data2 = data
+		else:
+			data2['total']['total_duration'] = (
+				data2['total']['total_duration']+data2['heartrate_not_recorded']['time_in_zone']+sum(
+					duration_activites))
+		data2 = percent_added_activity(data2,data2['total']['total_duration'])
 
 	if data2:
 		return data2
