@@ -378,7 +378,7 @@ class Hrr_Dashboard extends Component{
 	                color = 'black';
 	                hr_background = 'black';
 	            }
-	            else if(value < 1) {
+	            else if(value < 1 && value != -1) {
 	            	background = 'red';
 	            	color = 'black';
 	            	hr_background = 'black';
