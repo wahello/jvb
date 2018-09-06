@@ -1,5 +1,5 @@
 .dropStyles{
-	padding-top: 20px;
+	padding-top: 7px;
 	margin-left: 35px;
 }
 .weekdate{
@@ -8,15 +8,32 @@
 	font-weight: bold;
 	color:gray;
 }
-.table_padd{
+.table_padd table th{
+  	min-width: 114px;
+  	font-size: 15px;
+  	height: 40px;
+  }
+.sticky {
+  position: fixed;
+  top: 0;
+  z-index: 200px;
+}
+.header {
+  background: #F2F2F2;
+  color: #5E5E5E;
+}
+.sticky+.content {
+  padding-top: 2550px;
+}
+.table_padd{ 
 	padding-left: 47px;
 	padding-right: 45px;
 	padding-top: 10px;
 }
 @media (min-width: 319px) and (max-width: 1023px) and (orientation:landscape) {
   .table_padd table th{
-  	min-width: 55px;
-  	font-size: 9px;
+  	min-width: 58px;
+  	font-size: 10px;
   	padding: 0.2rem !important;
   }
   .hr_dashboard_padd{
@@ -48,11 +65,26 @@
   }
 }
 @media (max-width: 1023px){
+	.sticky {
+  position: fixed;
+  top: 0;
+  z-index: 200px;
+  overflow-x: scroll;
+}
 	.dropStyles{
 	padding-top: 10px;
 	margin-left: 0px;
 	font-size: 11px;
 	}
+	.table_padd table th{
+  	min-width: 58px;
+  	font-size: 9px;
+  	height: 40px;
+  }
+  .table_padd table td{
+  	min-width: 55px;
+  	font-size: 9px;
+  }
 	.weekdate{
 	margin-left: 10px;
 	color:gray;
@@ -62,6 +94,7 @@
 .table_padd{
 	padding-right: 10px;
 	padding-left: 10px;
+	padding-bottom: 1000px;
 }
 } 
 
