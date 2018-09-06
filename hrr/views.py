@@ -1755,7 +1755,7 @@ def aa_low_high_end_data(user,start_date):
 				"total"),low_end_heart,high_end_heart,below_aerobic_value,anaerobic_value)
 		if hr_recorded:
 			for key,value in hr_recorded.items():
-				if data2[str(key)]:
+				if data2.get(str(key)):
 					data2[str(key)]["time_in_zone"] = data2[str(key)]["time_in_zone"]+value['time_in_zone']
 				else:
 					data2[key] = value
@@ -1765,7 +1765,7 @@ def aa_low_high_end_data(user,start_date):
 		if not data2.get('total'):
 			data2['total'] = {}
 			data2['total']['total_duration'] = sum(
-				duration_activites)+data2['heartrate_not_recorded']['time_in_zone']
+				duration_activites)+data2['heartrate_not_recorded'].get('time_in_zone',0)
 			data2['total']['total_percent'] = '100%'
 			data = update_prcent(data2,data2['total']['total_duration'])
 			data2 = data
