@@ -1503,12 +1503,18 @@ def store_daily_aa_calculations(user,from_date,to_date):
 	return None
 
 def low_high_hr(low_end_heart,high_end_heart,heart_beat):
+	'''
+		Making ranges for A/A third chart
+	'''
 	low_hr = sorted(i for i in low_end_heart if i <= heart_beat)
 	high_hr = sorted(i for i in high_end_heart if i >= heart_beat)
 	return low_hr[-1],high_hr[1]
 
 def add_hr_nor_recorded_heartbeat(
 	no_hr_data,totals_data,low_end_heart,high_end_heart,below_aerobic_value,anaerobic_value):
+	'''
+		Adding user created activity to A/A third chart, When user has heartrate information
+	'''
 	data={}
 	for i,single_data in enumerate(no_hr_data):
 		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
@@ -1543,6 +1549,9 @@ def add_hr_nor_recorded_heartbeat(
 	return data
 
 def add_hr_nor_recorded(no_hr_data,totals_data):
+	'''
+		Add new row to third chart in A/A, When Heart rate is not measured
+	'''
 	data={}
 	for i,single_data in enumerate(no_hr_data):
 		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
@@ -1562,6 +1571,9 @@ def add_hr_nor_recorded(no_hr_data,totals_data):
 	return data
 
 def update_prcent(data,total_duration):
+	'''
+		Update the percent of each zone
+	'''
 	for key,value in data.items():
 		if key != 'total':
 			try:
@@ -1571,6 +1583,9 @@ def update_prcent(data,total_duration):
 	return data
 
 def percent_added_activity(data2,total_duration):
+	'''
+		This function add percentage of totals
+	'''
 	for key,value in data2.items():
 		if key != 'total' or key != 'heartrate_not_recorded':
 			try:
@@ -1580,6 +1595,9 @@ def percent_added_activity(data2,total_duration):
 	return data2
 
 def aa_low_high_end_data(user,start_date):
+	'''
+		This function calculates the A/A third chart data
+	''' 
 	heart_rate_zone_low_end = ""
 	heart_rate_zone_high_end = ""
 	time_in_zone_for_last_7_days = ""
