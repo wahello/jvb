@@ -672,7 +672,8 @@ class TimeTo99Leaderboard(Leaderboard):
 		if (time_to_99 
 			and time_to_99 != self.category_meta.category_default_score.get(
 				score.category)
-			and activity_end_hr):
+			and activity_end_hr
+			and not activity_end_hr == "Not Provided"):
 			time_to_99 = _hours_to_hours_min(time_to_99)
 			points = calculate_t99_points(aerobic_hr_zone_max,
 				activity_end_hr,time_to_99)
