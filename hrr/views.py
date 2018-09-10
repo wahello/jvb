@@ -1771,7 +1771,7 @@ def aa_low_high_end_data(user,start_date):
 			data2 = data
 		else:
 			data2['total']['total_duration'] = (
-				data2['total']['total_duration']+data2['heartrate_not_recorded']['time_in_zone']+sum(
+				data2['total']['total_duration']+data2['heartrate_not_recorded'].get('time_in_zone',0)+sum(
 					duration_activites))
 		data2 = percent_added_activity(data2,data2['total']['total_duration'])
 
@@ -2060,8 +2060,7 @@ def hrr_data(user,start_date):
 		pure_time_99 = time_99 + diff_actity_hrr
 		
 		if Did_heartrate_reach_99 == 'no':
-			Did_heartrate_reach_99 == 'yes'
-			pure_time_99 = None
+			Did_heartrate_reach_99 = 'yes'
 			if daily_starttime:
 				daily_start_time = end_time_activity - daily_starttime
 				make_to_daily_key = (daily_start_time) % 15
@@ -2079,6 +2078,7 @@ def hrr_data(user,start_date):
 					if daily_diff_data_99 == None or daily_diff_data_99 == 99:
 						break
 				time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
+				pure_time_99 = time_99 + diff_actity_hrr
 			else:
 				time_99 = None
 				
