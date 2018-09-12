@@ -104,7 +104,6 @@ def _get_activities(user,target_date):
 	final_act_data = {}
 	comments = {}
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
-	manually_edited = lambda x: manually_updated_act_data.get(x.get('summaryId'),x)
 	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=3)
@@ -145,28 +144,30 @@ def _get_activities(user,target_date):
 		else:
 			final_heart_rate.append([])
 
-	for single_activity in activity_data:
-		act_obj = manually_edited(single_activity)
+	combined_activities = quicklook.calculations.garmin_calculation\
+	.get_filtered_activity_stats(
+		activity_data, manually_updated_act_data
+	)
+	for single_activity in combined_activities:
 		if fitfiles:
 			for single_fitfiles,single_heartrate in zip(fitfiles,final_heart_rate):
 				meta = single_fitfiles.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
-				if (((act_obj.get("summaryId",None) == str(data_id)) and 
-					(act_obj.get("durationInSeconds",0) <= 1200) and 
-					(act_obj.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
+				if (((single_activity.get("summaryId",None) == str(data_id)) and 
+					(single_activity.get("durationInSeconds",0) <= 1200) and 
+					(single_activity.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
 					least_hr = min(single_heartrate)
 					hrr_difference = single_heartrate[0] - least_hr
 					if hrr_difference > 10:
-						act_obj["activityType"] = "HEART_RATE_RECOVERY"
+						single_activity["activityType"] = "HEART_RATE_RECOVERY"
 				else:
 					pass
-			finall = _create_activity_stat(user,act_obj,current_date)
+			finall = _create_activity_stat(user,single_activity,current_date)
 			final_act_data.update(finall)
 		else:
-			finall = _create_activity_stat(user,act_obj,current_date)
+			finall = _create_activity_stat(user,single_activity,current_date)
 			final_act_data.update(finall)
-	# print(final_act_data)
 	return final_act_data	
 		
 class GarminData(APIView):
