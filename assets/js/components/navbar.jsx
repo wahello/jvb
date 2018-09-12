@@ -48,31 +48,35 @@ class NavbarMenu extends React.Component {
     const {fix} = this.props;
     return (
       <div className="container-fluid">
-        <Navbar toggleable 
+        {/**<Navbar toggleable 
          fixed={fix ? 'top' : ''} 
           className="navbar navbar-expand-sm navbar-inverse">
-          <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
-           <FontAwesome 
-                 name = "bars"
-                 size = "1x"
-                                          
-             />
-            
-          </NavbarToggler>
-          <Link to='/'>
-            <NavbarBrand 
-              className="navbar-brand float-xs-right float-sm-left" 
-              id="navbarTogglerDemo">
-              <img className="img-fluid"
-               style={{maxWidth:"200px"}}
-               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-            </NavbarBrand>
-          </Link>
+          
+            <Link to='/'>
+              <NavbarBrand 
+                className="navbar-brand float-xs-right float-sm-left" 
+                id="navbarTogglerDemo">
+                <img className="img-fluid"
+                 style={{maxWidth:"200px"}}
+                 src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+              </NavbarBrand>
+            </Link>
+
+            <NavbarToggler className="navbar-toggler hidden-sm-up" onClick={this.toggle} >
+             <FontAwesome 
+                   name = "bars"
+                   size = "1x"
+                                            
+               />
+              
+            </NavbarToggler>
+
            <span id="header">
             <h2 className="head" id="head">{this.props.title}
             
             </h2>
-            </span>
+          </span>
+
           <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
             <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
               <NavItem className="float-sm-right">  
@@ -96,6 +100,54 @@ class NavbarMenu extends React.Component {
               </NavItem>  
             </Nav>
           </Collapse>
+        </Navbar>**/}
+
+
+
+
+        <Navbar className="navbar navbar-expand-sm navbar-inverse" fixed={fix ? 'top' : ''} >
+          <div className="col-md-4 col-sm-4 no-padding">
+              <span className="navbar-brand" href="#">
+              <Link to='/'>
+                <span
+                  className="navbar-brand" 
+                  id="navbarTogglerDemo">
+                  <img className="img-fluid"
+                   style={{maxWidth:"200px"}}
+                   src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
+                </span>
+              </Link>
+            </span>
+             <button className="navbar-toggler tgl_btn" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span className="fa fa-bars"></span>
+              </button>
+
+          </div>
+
+          <div className="col-md-4 col-sm-3 no-padding page_title text-center">
+                <h2>{this.props.title}</h2>
+          </div>
+
+          <div className="col-md-4 col-sm-5 no-padding">
+              <div className="collapse navbar-collapse navbar-right" id="collapsibleNavbar">
+                <ul className="navbar-nav nav_mobile">
+                  <li className="nav-item">
+                      <Link className="nav-link" to='/'>Home</Link>
+                  </li>
+                  <li className="nav-item">
+                      <Link className="nav-link" to='/'>
+                        <span><i className="fa fa-user"></i> {this.state.username}</span>
+                      </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="#" 
+                       className="nav-link"                    
+                       onClick={this.handleLogout}>Log Out
+                        </Link> 
+                  </li>    
+                </ul>
+              </div> 
+          </div>
         </Navbar>
       </div>
     );
