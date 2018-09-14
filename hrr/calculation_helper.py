@@ -173,8 +173,11 @@ def remove_spaces(weekly_workout):
 def add_dates(value,workout_dict):
 	for key,data in workout_dict.items():
 		if key == value.get("workout_type") and data.get('date',0) == value.get("date"):
+			print(key,"workout")
+			print(value.get("date"),"date of workout")
 			# workout_dict[key]["dates"][value["date"]]['duration'] = data.get(
 			# 	'duration',0)+value.get("duration",0)
+			workout_dict[key]["dates"][value["date"]]['workout_date'] = value.get("date")	
 			workout_dict[key]["dates"][value["date"]]['repeated'] = (
 				1+workout_dict[key]["dates"][value["date"]]['repeated'])
 	return workout_dict
@@ -202,10 +205,10 @@ def weekly_workout_calculations(weekly_workout):
 				workout_summary_id[key] = [value['workout_type']]
 				no_workouts = dict(collections.Counter(workout_type))
 				repeated_workout = no_workouts[value['workout_type']]
-				# if repeated_workout > 7:
-				# 	workout_dict[value['workout_type']]['days_with_activity'] = 7
-				# else:
-				# 	workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+				if repeated_workout > 7:
+					workout_dict[value['workout_type']]['days_with_activity'] = 7
+				else:
+					workout_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 				workout_dict[value['workout_type']]['duration'] = (
 					(workout_dict[value['workout_type']]['duration']) + (value['duration']))
 				if value['average_heart_rate'] and workout_dict[value['workout_type']]['average_heart_rate']:
@@ -219,8 +222,8 @@ def weekly_workout_calculations(weekly_workout):
 				workout_dict[value['workout_type']]['distance_meters'] = (
 					(workout_dict[value['workout_type']].get('distance_meters',0)) + (value.get('distance_meters',0)))
 
-				workout_dict = add_dates(value,workout_dict)
-				workout_dict = days_with_activity(workout_dict,value)
+				# workout_dict = add_dates(value,workout_dict)
+				# workout_dict = days_with_activity(workout_dict,value)
 
 			else:
 				workout_type.append(value['workout_type'])
@@ -292,10 +295,10 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id,final_workout_data):
 					activity_type.append(value['workout_type'])
 					no_workouts = dict(collections.Counter(activity_type))
 					repeated_workout = no_workouts[value['workout_type']]
-					# if repeated_workout > 7:
-					# 	aa_dict[value['workout_type']]['days_with_activity'] = 7
-					# else:
-					# 	aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+					if repeated_workout > 7:
+						aa_dict[value['workout_type']]['days_with_activity'] = 7
+					else:
+						aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
 					aa_dict[value['workout_type']]['days_with_activity'] = (
 						final_workout_data[value['workout_type']]['days_with_activity'])
 					aa_dict[value['workout_type']]['total_duration'] = (
