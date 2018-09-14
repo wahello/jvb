@@ -153,7 +153,7 @@ class HrrLeaderboard extends Component{
 		/**** Sticky Header on scroll ********/ 
 		window.addEventListener('scroll', this.handleScroll);
 
-		/****** mobile table styles 
+		/****** mobile table styles *******/
 		let getTable = this.refs.hrr_table;
 
 		if(screen.width < 1023){
@@ -162,7 +162,7 @@ class HrrLeaderboard extends Component{
 		else{
 			getTable.classList.remove('table_padd')
 		}
-		*******/
+		
 		/***********************/
 		let header = this.refs.table_header_hrr;		
 		if(screen.width < 650){
