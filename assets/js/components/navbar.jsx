@@ -29,7 +29,7 @@ class NavbarMenu extends React.Component {
     });
   }
   successProfile(data){
-    this.setState({
+    this.setState({            
       username:data.data.username
     })
   }
@@ -107,7 +107,7 @@ class NavbarMenu extends React.Component {
 
         <Navbar className="navbar navbar-expand-sm navbar-inverse" fixed={fix ? 'top' : ''} >
           <div className="col-md-4 col-sm-4 no-padding">
-              <span className="navbar-brand" href="#">
+              <span className="navbar-brand">
               <Link to='/'>
                 <span
                   className="navbar-brand" 
@@ -130,7 +130,7 @@ class NavbarMenu extends React.Component {
 
           <div className="col-md-4 col-sm-5 no-padding">
               <div className="collapse navbar-collapse navbar-right" id="collapsibleNavbar">
-                <ul className="navbar-nav nav_mobile">
+                <ul className="navbar-nav nav_mobile navbar_right">
                   <li className="nav-item">
                       <Link className="nav-link" to='/'>Home</Link>
                   </li>
@@ -143,7 +143,7 @@ class NavbarMenu extends React.Component {
                     <Link to="#" 
                        className="nav-link"                    
                        onClick={this.handleLogout}>Log Out
-                        </Link> 
+                    </Link> 
                   </li>    
                 </ul>
               </div> 
