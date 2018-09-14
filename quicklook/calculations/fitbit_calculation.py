@@ -133,12 +133,14 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 			include_sec = False
 		)
 
+	if ui_sleep_duration:
+		sleep_stats['sleep_per_userinput'] = ui_sleep_duration
+
 	if have_userinput_sleep:
 		bed_time = ui_bedtime.replace(tzinfo = None)
 		awake_time = ui_awaketime.replace(tzinfo = None)
 		sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
 		sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
-		sleep_stats['sleep_per_userinput'] = ui_sleep_duration
 
 	elif trans_sleep_data:
 		bed_time = datetime.strptime(
