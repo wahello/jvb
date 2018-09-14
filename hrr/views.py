@@ -2516,7 +2516,7 @@ def weekly_workout_helper(user,start_date):
 		user,week_start_date,week_end_date)
 	weekly_aa = [single_aa.data for single_aa in weekly_aa_query]
 	if weekly_aa:
-		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id)
+		final_aa_data = weekly_aa_calculations(weekly_aa,workout_summary_id,final_workout_data)
 	else:
 		final_aa_data = ''
 	if final_workout_data and final_aa_data:
@@ -2533,5 +2533,5 @@ def weekly_workout_helper(user,start_date):
 		data_v2 = remove_distance_meters(data)
 	else:
 		data_v2 = {}
-
+	# print(data_v2,"sssssssssssss")
 	return data_v2
