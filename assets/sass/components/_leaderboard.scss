@@ -63,3 +63,64 @@
     font-size: 16px;
     font-family: futura-pt;
 }
+
+/************** sticky table header ************/
+
+
+.hrr_table{
+	padding-top:10px;
+}
+.hrr_table .hrr_sticky th {
+	padding: 0.75rem;
+    vertical-align: top;
+    min-width: 115px;
+    text-align: center;
+    width:230px;
+}
+
+.hrr_table .hrr_sticky {
+  position: fixed;
+  top: 0;
+  width: inherit;
+  padding-right:35px;
+  background:#fff;
+  z-index:100;
+  border:none;
+}
+.hrr_table .hrr_sticky + tbody td{
+	min-width:115px;
+}
+
+@media screen and (max-width:649px){
+	.hrr_sticky{
+		position:relative !important;
+	}
+}
+
+@media (max-width: 1250px) and (min-width: 319px) and (orientation: landscape){
+	.hrr_table{
+		padding:10px;
+	}
+	.hrr_table tbody td{
+		min-width:55px;
+	}
+	.hrr_table th{
+		min-width:55px;
+     	font-size: 9px;
+    	padding: 0.2rem ;
+	}
+	.hrr_table .hrr_sticky + tbody td{
+		min-width:55px;
+	}
+	.hrr_table .hrr_sticky th {
+		min-width:55px;
+     	font-size: 9px;
+    	padding: 0.2rem !important;
+	}
+	.hrr_table .hrr_sticky{
+		padding-right:55px;
+	}
+}
+
+
+

@@ -169,11 +169,29 @@ def remove_spaces(weekly_workout):
 			workouts_dict[key] = value
 	workouts = [str(workouts_dict)]
 	return workouts
+
+def add_dates(value,workout_dict):
+	for key,data in workout_dict.items():
+		if key == value.get("workout_type") and data.get('date',0) == value.get("date"):
+			print(key,"workout")
+			print(value.get("date"),"date of workout")
+			# workout_dict[key]["dates"][value["date"]]['duration'] = data.get(
+			# 	'duration',0)+value.get("duration",0)
+			workout_dict[key]["dates"][value["date"]]['workout_date'] = value.get("date")	
+			workout_dict[key]["dates"][value["date"]]['repeated'] = (
+				1+workout_dict[key]["dates"][value["date"]]['repeated'])
+	return workout_dict
+
+def days_with_activity(workout_dict,value):
+	no_activities = len(workout_dict[value['workout_type']]["dates"])
+	workout_dict[value['workout_type']]['days_with_activity'] = no_activities
+	return workout_dict
 	
 def weekly_workout_calculations(weekly_workout):
 	'''
 		Make Similar activities into single activity
 	'''
+	# print(weekly_workout,"weekly_workout")
 	workout_type = []
 	workout_dict = {}
 	workout_summary_id = {}
@@ -181,6 +199,7 @@ def weekly_workout_calculations(weekly_workout):
 	for single_workout in weekly_workout:
 		single_workout = ast.literal_eval(single_workout)
 		for key,value in single_workout.items():
+			# print(key,"value")
 			if value['workout_type'] in workout_type:
 				workout_type.append(value['workout_type'])
 				workout_summary_id[key] = [value['workout_type']]
@@ -196,16 +215,24 @@ def weekly_workout_calculations(weekly_workout):
 					workout_dict[value['workout_type']]['average_heart_rate'] = (
 						(workout_dict[value['workout_type']]['average_heart_rate']) + (
 							value['average_heart_rate']))
-				else:
+				else:	
 					workout_dict[value['workout_type']]['average_heart_rate'] = None
 				workout_dict[value['workout_type']]['steps'] = (
 					(workout_dict[value['workout_type']]['steps']) + (value['steps']))
 				workout_dict[value['workout_type']]['distance_meters'] = (
 					(workout_dict[value['workout_type']].get('distance_meters',0)) + (value.get('distance_meters',0)))
 
+				# workout_dict = add_dates(value,workout_dict)
+				# workout_dict = days_with_activity(workout_dict,value)
+
 			else:
 				workout_type.append(value['workout_type'])
 				workout_dict[value['workout_type']] = value
+				workout_dict[value['workout_type']]["dates"] = {}
+				workout_dict[value['workout_type']]["dates"][value["date"]] = {}
+				workout_dict[value['workout_type']]["dates"][value["date"]]['workout_date'] = value['date']
+				workout_dict[value['workout_type']]["dates"][value["date"]]['duration'] = value['duration']
+				workout_dict[value['workout_type']]["dates"][value["date"]]['repeated'] = 1
 				workout_dict[value['workout_type']]['days_with_activity'] = 1
 				workout_summary_id[key] = [value['workout_type']]
 
@@ -252,7 +279,7 @@ def percent_calculations(aa_dict):
 				aa_dict[key]["percent_hrr_not_recorded"] = 0
 	return aa_dict
 
-def weekly_aa_calculations(weekly_aa,workout_summary_id):
+def weekly_aa_calculations(weekly_aa,workout_summary_id,final_workout_data):
 	'''
 		Add Aerobic and Anarobic range values to activity
 	'''
@@ -272,6 +299,8 @@ def weekly_aa_calculations(weekly_aa,workout_summary_id):
 						aa_dict[value['workout_type']]['days_with_activity'] = 7
 					else:
 						aa_dict[value['workout_type']]['days_with_activity'] = repeated_workout
+					aa_dict[value['workout_type']]['days_with_activity'] = (
+						final_workout_data[value['workout_type']]['days_with_activity'])
 					aa_dict[value['workout_type']]['total_duration'] = (
 						(aa_dict[value['workout_type']]['total_duration']) + (value['total_duration']))
 					aa_dict[value['workout_type']]['duration_in_aerobic_range'] = (
