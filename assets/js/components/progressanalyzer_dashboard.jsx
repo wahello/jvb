@@ -5,8 +5,9 @@ import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,
-        Input,Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Card, CardImg, CardText, 
-        CardBody,CardTitle, CardSubtitle} from 'reactstrap';
+        Input,Dropdown, DropdownToggle, DropdownMenu, DropdownItem,
+        Card, CardImg, CardText,CardBody,CardTitle, CardSubtitle,
+        Modal, ModalHeader, ModalBody} from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import NavbarMenu from './navbar';
@@ -141,7 +142,8 @@ class ProgressDashboard extends Component{
           "number_of_days_medium_stress_reported":this.getInitialDur(),
           "prcnt_of_days_high_stress":this.getInitialDur(),
           "prcnt_of_days_low_stress":this.getInitialDur(),
-          "prcnt_of_days_medium_stress":this.getInitialDur()
+          "prcnt_of_days_medium_stress":this.getInitialDur(),
+          "garmin_stress_lvl":this.getInitialDur()
         },
         "standing":{
           "number_days_reported_stood_not_stood_three_hours":this.getInitialDur(),
@@ -153,15 +155,16 @@ class ProgressDashboard extends Component{
           "prcnt_days_travel_away_from_home":this.getInitialDur()
         },
  	 	},
-			"duration_date": this.getInitialDur(),
-	       	selected_range:"today",
-	       	date:"",
-			capt:"",
-			active_category:"",
-        	active_username:"",
-        	active_category_name:"",
-        	all_verbose_name:"",
-            dateRange4:false,
+		"duration_date": this.getInitialDur(),
+	  selected_range:"today",
+	  date:"",
+		capt:"",
+		active_category:"",
+    active_username:"",
+    active_category_name:"",
+    all_verbose_name:"",
+    dateRange4:false,
+    isStressInfoModelOpen:false
 		};
 		this.successProgress = this.successProgress.bind(this);
 		this.successRank = this.successRank.bind(this);
@@ -220,6 +223,7 @@ class ProgressDashboard extends Component{
       this.renderMcsLink = this.renderMcsLink.bind(this);
       this.reanderAllHrr = this.reanderAllHrr.bind(this);
       this.onSubmitDate4 = this.onSubmitDate4.bind(this);
+      this.toggleStressInfo = this.toggleStressInfo.bind(this);
 
 	}
 	getInitialDur(){
@@ -623,6 +627,12 @@ class ProgressDashboard extends Component{
   
     });
   }
+
+  toggleStressInfo(){
+    this.setState({
+      isStressInfoModelOpen: !this.state.isStressInfoModelOpen
+    });
+  }
   	renderDateRangeDropdown(value,value5){
   		let duration_type = ["today","yesterday","week","month","year","custom_range"];
   		let duration_type1 = ["today","yesterday","week","month","year",];
@@ -705,9 +715,12 @@ class ProgressDashboard extends Component{
           			all_rank_data = value['custom_range'][dur].all_rank;
           			userName = value['custom_range'][dur].user_rank.username;
           			category = value['custom_range'][dur].user_rank.category;
-          			if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-          				verbose_name = value['custom_range'][dur].user_rank.score.verbose_name;
-          			}
+          			if(category == "Percent Unprocessed Food"){
+                  verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
+                }
+                else if(category == "Average Sleep"){
+                  verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
+                }
   		        }
             }
         }
@@ -716,9 +729,12 @@ class ProgressDashboard extends Component{
   			all_rank_data = value[dur].all_rank;
   			userName = value[dur].user_rank.username;
   			category = value[dur].user_rank.category;
-  			if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-  				verbose_name = value[dur].user_rank.score.verbose_name;
-  			}
+  			if(category == "Percent Unprocessed Food"){
+          verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
+        }
+        else if(category == "Average Sleep"){
+          verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
+        }
   		}
   		let code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,verbose_name)}>
 						         		<span style={{textDecoration:"underline"}}>{rank}</span>
@@ -992,6 +1008,42 @@ class ProgressDashboard extends Component{
     	}
     	return score;
     }
+
+getGarminStressColors(stressValue){
+  let background = "";
+  let fontColor = "";
+  if(stressValue != null 
+    && stressValue != undefined 
+    && stressValue != '-'){
+    if(stressValue >= 0 && stressValue <= 25){
+      background = 'green';
+      fontColor = 'white';
+    }
+    else if(stressValue >= 26 && stressValue <= 50){
+      background = '#32CD32';
+      fontColor = 'white';
+    }
+    else if(stressValue >= 51 && stressValue <= 75){
+      background = 'yellow';
+      fontColor = 'black';
+    }
+    else if(stressValue >= 76 && stressValue <= 100){
+      background = 'red';
+      fontColor = 'black';
+    }
+    else{
+      background = 'white';
+      fontColor = "#5e5e5e";
+    }
+  }else{
+    background = 'white';
+    fontColor = '#5e5e5e';
+  }
+  var model = <div style = {{background:background, color:fontColor}}>
+                {stressValue}
+              </div>
+  return model;
+}
   	renderOverallHealth(value,dur,rank){ 		
   		let card = <Card className = "card_style" 
 						id = "my-card-mcs"
@@ -1831,6 +1883,26 @@ class ProgressDashboard extends Component{
 			          			
 			          			/>
 			          		<CardText>
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          Garmin Stress Level
+                          <span id="garmin-stress-info"
+                             onClick={this.toggleStressInfo} 
+                             style={{paddingLeft:"15px",color:"gray"}}>
+                             <FontAwesome 
+                                style={{color:"#5E5E5E"}}
+                                  name = "info-circle"
+                                  size = "1.5x"                                                                              
+                              />
+                          </span>
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.getGarminStressColors(this.renderValue(value.garmin_stress_lvl,dur))}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
 				          		<div className = "row justify-content-center">
 					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
 						          		Number of Days Low Stress Reported
@@ -2272,9 +2344,30 @@ class ProgressDashboard extends Component{
                             </div>
                        </PopoverBody>
                     </Popover>
+                    <Modal 
+                      placement="bottom"
+                      target = "garmin-stress-info"
+                      isOpen={this.state.isStressInfoModelOpen} 
+                      toggle={this.toggleStressInfo}>
+                      <ModalHeader toggle={this.toggleStressInfo} className="pa-db-info-header">
+                        Understanding Your Stress Level                            
+                      </ModalHeader>
+                      <ModalBody className="pa-db-info-content">
+                        <div>
+                          Stress and rest (recovery) are measured by heart rate variability (HRV).
+                          Wearing your device both day and night will return more accurate results.
+                        </div>
+                        <div>
+                          Your stress level is recorded throughout the day. A level from 0 to 25
+                          is a state of rest. Anything from 26 to 50 is a low stress level.
+                          51 to 75 is medium stress and 76 to 100 is high stress. Level -1 indicates
+                          that there was not enough data to calculate your stress level.  
+                        </div>
+                      </ModalBody>
+                    </Modal> 
                    	{this.state.active_view && 
 	                    <div className = "row gd_padding">
-						    <div className = "row dropStyles">
+						    <div className = "row padropStyles">
 						        <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
 							        <DropdownToggle caret>
 							          Select Range
@@ -2283,7 +2376,7 @@ class ProgressDashboard extends Component{
 							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
 							        </DropdownMenu>
 						      	</Dropdown>
-						      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+						      	<span className = "paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 				        	</div>
 						</div>
 					}

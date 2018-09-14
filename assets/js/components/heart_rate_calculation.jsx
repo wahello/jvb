@@ -213,8 +213,11 @@ class HeartRateCal extends Component{
 
 	captilizeYes(value){
 		let cpatilize;
-		if(value){
+		if(value == 'yes' || value == 'no' && value != ''){
 			cpatilize = value[0].toUpperCase()+value.slice(1);
+	    }
+	    else{
+	    	cpatilize = value;
 	    }
 		return cpatilize;
 	}
@@ -242,12 +245,17 @@ class HeartRateCal extends Component{
   	}
 
   	renderTime(value){
+  		console.log(value,"heart rate reached 99")	
   		var z;
-  		if(value != null && value != "00:00:00"){
+  		if(value != null && value != "00:00:00" && value != 0){
   			 z = moment.unix(value).format("hh:mm:ss a");
   		}
   		else if(value == "00:00:00"){
   			 z = "-";
+  		}
+  		if(value == 0){
+  			console.log(value,"heart rate reached 99 in side else")
+  			z = "N/A"
   		}
   		return z
   	}
@@ -266,6 +274,9 @@ class HeartRateCal extends Component{
 	  	}
 	  	else{
 	  		time = "-"
+	  	}
+	  	if (value != null && value == 0){
+	  		time = "N/A"
 	  	}
   		return time;
   	}

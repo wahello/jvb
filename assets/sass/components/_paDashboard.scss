@@ -1,3 +1,13 @@
+.padropStyles{
+	padding-top: 20px;
+	margin-left: 35px;
+}
+.paweekdate{
+	margin-left: 400px;
+	padding-top: 10px;
+	font-weight: bold;
+	color:gray;
+}
 .card_padding{
 	padding:15px 7px 0px 7px; 
 }
@@ -15,7 +25,15 @@
 .date_range1{
 	display: none;
 }
-@media (max-width: 1023px) {
+
+.pa-db-info-content{
+	font-size: 14px;
+}
+.pa-db-info-header{
+	font-size: 16px;
+}
+
+@media (max-width: 1023px) {  
 	.text_center1{
 	text-align: center;
 	padding-bottom: 10px;
@@ -31,5 +49,22 @@
 }
 .date_rangee1{
 	display: none;
+}
+.padropStyles{
+	padding-top: 10px;
+	margin-left: 18px;
+	font-size: 11px;
+	}
+	.paweekdate{
+	margin-left: 10px;
+	color:gray;
+	padding-top: 5px;
+	font-size: 13px;
+}
+.pa-db-info-content{
+	font-size: 14px;
+}
+.pa-db-info-header{
+	font-size: 14px;
 }
 }

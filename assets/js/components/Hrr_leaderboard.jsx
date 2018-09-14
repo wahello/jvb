@@ -21,6 +21,9 @@ class HrrLeaderboard extends Component{
 		this.renderTable = this.renderTable.bind(this);
 		this.heartBeatsColors = this.heartBeatsColors.bind(this);
 		this.scrollCallback = this.scrollCallback.bind(this);
+		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		this.time99Colors = this.time99Colors.bind(this);
+		
 	}
 	heartBeatsColors(value){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
@@ -41,6 +44,45 @@ class HrrLeaderboard extends Component{
 	  		}
   		}
   		return <td style ={{background:background,color:color}} className ="overall_rank_value">{value}</td>
+  	}
+  	time99Colors(score,value){
+  		/* Applying the colors for the table cells depends upon their heart beat ranges*/
+  		let background = "";
+		let color = "";
+		let hr_background = "";
+  		if(value){
+	            if(value >= 3.4){
+	           		background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(value >= 3 && value <= 3.39){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(value >= 2 && value < 3){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value >= 1 && value < 2){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value < 1 && value != -1) {
+	            	background = 'red';
+	            	color = 'black';
+	            	hr_background = 'black';
+	            }
+	            else{
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+	        }
+  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score}</td>
   	}
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -88,7 +130,26 @@ class HrrLeaderboard extends Component{
             }
           },100);
       }
-  }
+  	}
+  	doOnOrientationChange() {
+	   let screen1 = screen.orientation.angle;
+	   let window1 = window.orientation;
+	   let final;
+	   if(window1 != undefined){
+	   }
+	   else{
+	   	if(screen1 == 90 || screen1 == -90){
+	   		final = screen1;	
+	   	}
+	   	else{
+	   		final = 0;
+	   	}
+	   }
+	   return final;
+	}
+	componentDidMount(){
+		window.addEventListener('orientationchange', this.doOnOrientationChange);
+	}
 	renderTable(Hrr_data,Hrr_username){
 		let operationCount = 0;
 		let td_rows = [];
@@ -112,8 +173,10 @@ class HrrLeaderboard extends Component{
 						currentUser = '';
 					}
 				}
+
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
-					for(let [key3,value4] of Object.entries(value[key1])){
+					for(let key3 of ['score','rank']){
+						let value4 = value[key1][key3];
 						if(key3 == "rank"){
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
@@ -122,13 +185,28 @@ class HrrLeaderboard extends Component{
 						}
 					}
 				}
-				else{
-					for(let [key3,value4] of Object.entries(value[key1])){
+				
+				else if(key1 == "time_99" || key1 == "pure_time_99"){
+					for(let key3 of ['score','rank']){
+						let value4 = value[key1][key3];
 						if(key3 == "rank"){
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
 						else if(key3 == "score"){
+							td_values.push(this.time99Colors(value4.value,value[key1].other_scores.points));
+						}
+						
+					}
+				}
+				else{
+					for(let key3 of ['score','rank']){
+						if(key3 == "rank"){
+							let value4 = value[key1][key3];
+							td_values.push(<td className ="overall_rank_value">{value4}</td>);
+						}
+						else if(key3 == "score"){
 							td_values.push(<td className ="overall_rank_value">{value4.value}</td>);
+
 						}
 					}
 				}
@@ -137,32 +215,8 @@ class HrrLeaderboard extends Component{
                 this.scrollCallback(operationCount);
 			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
-		let table;
-		 var x = window.matchMedia("(min-width: 319px) and (max-width: 1023px) and (orientation:landscape)");
-            if(x.matches){
-            		table =  <table id="my-table" className = "table-striped table-bordered overall_table">
-								<tr >
-									<th className ="overall_rank_value">Overall <br/>HRR <br/> Rank</th>
-									<th className ="overall_rank_value">User</th>
-									<th className ="overall_rank_value">Time <br/> to 99 <br/> (hh:mm)</th>
-									<th className ="overall_rank_value">Time<br/> to 99 <br/>Rank</th>
-									<th className ="overall_rank_value">Heart <br/>beats <br/>lowered <br/>in 1st<br/> minute</th>
-									<th className ="overall_rank_value">Lowered<br/> Beats <br/>Rank</th>
-									<th className ="overall_rank_value">Pure <br/>Time <br/>to 99 <br/>(hh:mm)</th>
-									<th className ="overall_rank_value">Pure <br/>Time <br/>to 99 <br/>Rank</th>
-									<th className ="overall_rank_value">Pure <br/>Heart <br/>beats <br/>lowered <br/>in 1st <br/>minute</th>
-									<th className ="overall_rank_value">Pure<br/> Heart<br/>beats <br/>lowered <br/>in 1st<br/> minute <br/>Rank</th>
-									<th className ="overall_rank_value">Total <br/>HRR <br/>Rank <br/>Points</th>
-								</tr>
-								<tbody>
-								{td_rows}	
-								</tbody>
-							</table>
-			}
-			else{
-				
-				table = <div className = "table table-responsive">
-			          	    <table id="my-table" className = "table table-striped table-bordered">
+		let table = <div className = "table table-responsive table-bordered">
+			          	    <table id="my-table" className = "table table-striped ">
 								<tr>
 									<th>Overall HRR Rank</th>
 									<th>User</th>
@@ -181,13 +235,12 @@ class HrrLeaderboard extends Component{
 								</tbody>
 							</table>
 						</div>
-			}
 		return table;
 	}
 	render(){
 		return(
 				<div className = "container-fluid">
-					<div className = "row justify-content-center table_padd">
+					<div className = "row table_padd">
 						{this.renderTable(this.props.Hrr_data,this.props.Hrr_username)}	
 					</div>	
 				</div>
