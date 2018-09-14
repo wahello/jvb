@@ -118,9 +118,15 @@ class NavbarMenu extends React.Component {
                 </span>
               </Link>
             </span>
-             <button className="navbar-toggler tgl_btn" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-                <span className="fa fa-bars"></span>
-              </button>
+           
+              <NavbarToggler className="navbar-toggler hidden-sm-up tgl_btn" onClick={this.toggle} >
+             <FontAwesome 
+                   name = "bars"
+                   size = "1x"
+                                            
+               />
+              
+            </NavbarToggler>
 
           </div>
 
@@ -129,24 +135,29 @@ class NavbarMenu extends React.Component {
           </div>
 
           <div className="col-md-4 col-sm-5 no-padding">
-              <div className="collapse navbar-collapse navbar-right" id="collapsibleNavbar">
-                <ul className="navbar-nav nav_mobile navbar_right">
-                  <li className="nav-item">
-                      <Link className="nav-link" to='/'>Home</Link>
-                  </li>
-                  <li className="nav-item">
-                      <Link className="nav-link" to='/'>
-                        <span><i className="fa fa-user"></i> {this.state.username}</span>
-                      </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link to="#" 
-                       className="nav-link"                    
-                       onClick={this.handleLogout}>Log Out
-                    </Link> 
-                  </li>    
-                </ul>
-              </div> 
+             <Collapse className="navbar-toggleable-xs" isOpen={this.state.isOpen} navbar>
+            <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+              <NavItem className="float-sm-right">  
+                <Link className="nav-link" to='/'>Home</Link>
+              </NavItem>
+              <NavItem className="float-sm-right">  
+                <Link className="nav-link" to='/'>
+                <span>
+                    <FontAwesome
+                              style = {{fontSize:"17px",marginRight:"6px"}}
+                              name = "user"
+                             
+                    />
+                </span><span>{this.state.username}</span></Link>
+              </NavItem>
+              <NavItem className="float-sm-right">                
+                   <Link to="#" 
+                   className="nav-link"                    
+                   onClick={this.handleLogout}>Log Out
+                    </Link>               
+              </NavItem>  
+            </Nav>
+          </Collapse>
           </div>
         </Navbar>
       </div>
