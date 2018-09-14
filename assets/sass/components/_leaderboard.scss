@@ -105,6 +105,7 @@
 	}
 	.hrr_table tbody td{
 		min-width:55px;
+		font-size:12px;
 	}
 	.hrr_table th{
 		min-width:55px;
@@ -113,6 +114,8 @@
 	}
 	.hrr_table .hrr_sticky + tbody td{
 		min-width:55px;
+		max-width:55px;
+		word-wrap:break-word;
 	}
 	.hrr_table .hrr_sticky th {
 		min-width:55px;
