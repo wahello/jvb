@@ -149,7 +149,45 @@ class HrrLeaderboard extends Component{
 	}
 	componentDidMount(){
 		window.addEventListener('orientationchange', this.doOnOrientationChange);
-	}
+
+		/**** Sticky Header on scroll ********/ 
+		window.addEventListener('scroll', this.handleScroll);
+
+		/****** mobile table styles *******/
+		let getTable = this.refs.hrr_table;
+		console.log(getTable)
+
+		if(screen.width < 1023){
+			getTable.classList.add('table_padd')
+		}
+		else{
+			getTable.classList.remove('table_padd')
+		}
+		/***********************/
+		let header = this.refs.table_header_hrr;		
+		if(screen.width < 650){
+			  header.classList.remove("hrr_sticky");
+		}
+
+	};
+
+
+	/******* sticky table header on scroll ********/
+	handleScroll = () => {
+		 let header = this.refs.table_header_hrr;	
+		 var rect = header.getBoundingClientRect()
+		 let sticky = rect.top+80;
+
+		 if(screen.width > 650){
+		 	if (window.pageYOffset > sticky) {
+		    header.classList.add("hrr_sticky");
+		  } else {
+		    header.classList.remove("hrr_sticky");
+		  }
+		 }
+
+	};
+
 	renderTable(Hrr_data,Hrr_username){
 		let operationCount = 0;
 		let td_rows = [];
@@ -216,8 +254,8 @@ class HrrLeaderboard extends Component{
 			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
 		let table = <div className = "table table-responsive table-bordered">
-			          	    <table id="my-table" className = "table table-striped ">
-								<tr>
+			          	    <table id="my-table" className = "table table-striped">
+								<tr ref="table_header_hrr">
 									<th>Overall HRR Rank</th>
 									<th>User</th>
 									<th>Time to 99 (hh:mm)</th>
@@ -240,7 +278,7 @@ class HrrLeaderboard extends Component{
 	render(){
 		return(
 				<div className = "container-fluid">
-					<div className = "row table_padd">
+					<div className = "hrr_table" ref="hrr_table">
 						{this.renderTable(this.props.Hrr_data,this.props.Hrr_username)}	
 					</div>	
 				</div>
