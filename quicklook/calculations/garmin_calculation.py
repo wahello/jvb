@@ -951,7 +951,7 @@ def _get_activities_start_end_time(combined_user_activities):
 		object of each activities
 	'''
 
-	Time = namedtuple("Time",["start","end"])
+	Time = namedtuple("Time",["start","end","duration"])
 	activities_start_end_time = []
 
 	if combined_user_activities:
@@ -965,6 +965,7 @@ def _get_activities_start_end_time(combined_user_activities):
 				Time(
 					datetime.utcfromtimestamp(start_time),
 					datetime.utcfromtimestamp(end_time),
+					activity.get('durationInSeconds',0)
 				)
 			)
 	return activities_start_end_time  
@@ -1195,6 +1196,46 @@ def _update_status_to_timezone_change(mc_data,timezone_change_interval,calendar_
 				mc_data[interval]['status'] = 'time zone change'
 	return mc_data
 
+def get_epoch_active_time(activites_time_list,epoch):
+	'''
+	Calculate active time for the given epoch data by considering
+	duration of any activity(ies) overlapping with epoch duration.
+	If activities overlap with epoch duration then, the overlapping duration
+	will be added to active minutes.
+
+	Args:
+		activites_time_list(list): List of named tuple containing start time,
+			end time and duration of activities.
+		epoch(dict): Epoch data
+
+	'''
+	epoch_start = datetime.utcfromtimestamp(
+		epoch.get('startTimeInSeconds')+ epoch.get('startTimeOffsetInSeconds'))
+	epoch_end = epoch_start + timedelta(seconds=epoch.get('durationInSeconds'))
+
+	overlapping_duration_in_sec = 0
+	for activity_time in activites_time_list:
+		if (activity_time.start >= epoch_start 
+			and activity_time.end <= epoch_end):
+			overlapping_duration_in_sec += activity_time.duration
+		elif (activity_time.start >= epoch_start 
+			and activity_time.start <= epoch_end):
+			overlapping_sec = (epoch_end - activity_time.start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (activity_time.end >= epoch_start 
+			and activity_time.end <= epoch_end):
+			overlapping_sec = (activity_time.end - epoch_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+	
+	if overlapping_duration_in_sec:
+		active_seconds = (overlapping_duration_in_sec 
+			+ epoch.get('activeTimeInSeconds',0))
+		# Active minuted per epoch data is capped to 15 mins (900 sec)
+		if active_seconds > 900:
+			active_seconds = 900
+	else:
+		active_seconds = epoch.get('activeTimeInSeconds',0)
+	return active_seconds
 
 def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		sleeps_today_json,user_input_todays_bedtime,combined_user_activities,
@@ -1302,10 +1343,18 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				else:
 					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
-				active_duration_min = data.get('activeTimeInSeconds',0)/60
+				# active_duration_min =  data.get('activeTimeInSeconds',0)/60
+				active_duration_min = (get_epoch_active_time(
+					activities_start_end_time,data)/60)
 				interval_active_duration = movement_consistency[time_interval]['active_duration']
-				interval_active_duration['duration'] = round(
-					interval_active_duration['duration'] + active_duration_min)
+
+				# Total active minute in the hourly interval is capped to 60 mins
+				if interval_active_duration['duration']+active_duration_min > 60:
+					interval_active_duration['duration'] = 60
+				else:	
+					interval_active_duration['duration'] = round(
+						interval_active_duration['duration'] + active_duration_min)
+
 				active_prcnt = round((interval_active_duration['duration']/60)*100)
 				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
 				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
