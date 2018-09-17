@@ -35,8 +35,8 @@ from fitbit.models import (
 	UserFitbitDatafoods
 )
 
-from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_sleep
-from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_activities
+from .convertor.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
+from .convertor.fitbit_to_garmin_converter import fitbit_to_garmin_activities
 
 def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
