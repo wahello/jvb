@@ -747,6 +747,76 @@ def get_renamed_to_hrr_activities(user,calendar_date,activities):
 					renamed_summaries.append(activity['summaryId'])
 	return renamed_summaries
 
+def is_duplicate_activity(activity, all_activities):
+	'''
+	Determine if the activity file is duplicate activity file or not
+	using following logic - 
+
+	1. Check if any two or more activities are overlapping (10 min or more)
+	   based on start and end time of activities and they are from different
+	   devices
+	2. Discard any activity which does not have average heart rate information,
+	   assuming at least some of them have heart rate information.
+	3. Now pick that activity which has the longest duration.
+	4. If all overlapping activities have no heart rate information, then pick
+	   the activity with the longest duration  [ALTERNATE SCENARIO]
+	'''
+	overlapping_activities = []
+	is_duplicate = False
+	activity_start = datetime.utcfromtimestamp(
+		activity.get('startTimeInSeconds',0)
+		+activity.get('startTimeOffsetInSeconds',0))
+	activity_end = (activity_start 
+		+ timedelta(seconds=activity.get('durationInSeconds',0)))
+
+	for act in all_activities:
+		overlapping_duration_in_sec = 0
+		act_start = datetime.utcfromtimestamp(
+			act.get('startTimeInSeconds',0)
+			+ act.get('startTimeOffsetInSeconds',0))
+		act_end = (act_start 
+			+ timedelta(seconds=act.get('durationInSeconds',0)))
+		if (act_start >= activity_start and act_end <= activity_end):
+			overlapping_duration_in_sec += act.get('durationInSeconds',0)
+		elif (act_start >= activity_start and act_start <= activity_end):
+			overlapping_sec = (activity_end - act_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (act_end >= activity_start and act_end <= activity_end):
+			overlapping_sec = (act_end - activity_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (act_start <= activity_start and act_end >= activity_end):
+			overlapping_sec = (activity_start - activity_end).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		if (overlapping_duration_in_sec 
+			and overlapping_duration_in_sec > 600
+			and (not activity.get('deviceName','manually_created') 
+				== act.get('deviceName','manually_created'))):
+			overlapping_activities.append(act)
+
+	activities_with_hr = filter(
+		lambda x:x.get('averageHeartRateInBeatsPerMinute',0),
+		overlapping_activities)
+
+	target_activities_list = None
+	if activities_with_hr:
+		target_activities_list = activities_with_hr
+	else:
+		target_activities_list = overlapping_activities
+
+	if target_activities_list:
+		original_act = None
+		longest_duration = 0
+		for act in activities_with_hr:
+			if act.get('durationInSeconds',0) >= longest_duration:
+				original_act = act
+				longest_duration = act.get('durationInSeconds',0)
+		if (original_act 
+			and original_act.get('summaryId') != activity.get('summaryId')):
+				is_duplicate = True
+
+	return is_duplicate
+
+
 def get_filtered_activity_stats(activities_json,manually_updated_json,
 		userinput_activities=None,**kwargs):
 	
