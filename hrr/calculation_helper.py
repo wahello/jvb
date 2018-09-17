@@ -470,9 +470,20 @@ def single_dates_obj(workout_date_list,single_data,data_copy):
 		except KeyError:
 			data_copy["Totals"]["dates"][single_workout_date] = {}
 			data_copy["Totals"]["dates"][single_workout_date]['workout_date'] = single_workout_date
-			data_copy["Totals"]["dates"][single_workout_date]['repeated'] = 1
+			data_copy["Totals"]["dates"][single_workout_date]['repeated'] = single_data["dates"].get(
+				single_workout_date,'0').get("repeated",'0')
 			data_copy["Totals"]["dates"][single_workout_date]['duration'] = single_data.get("duration",0)
 	return data_copy
+
+def add_duration_total(final_data,weekly_workout,workout_date_list):
+	# print(final_data,"data_copy")
+	for weekly_workout_str in weekly_workout:
+		single_workout = ast.literal_eval(weekly_workout_str)
+		for key,workout in single_workout.items():
+			for single_data in workout_date_list:
+				if single_data == single_workout[key]['date']:
+					final_data["Totals"]["dates"][single_data]["duration"] = single_workout[key]["duration"]
+	return final_data
 
 def add_dates_totals(data):	
 	data_copy = data.copy()
@@ -481,15 +492,17 @@ def add_dates_totals(data):
 			# print(single_data,"single data")
 			workout_date = single_data["dates"].keys()
 			workout_date_list = list(workout_date)
-			single_dates_obj(workout_date_list,single_data,data_copy)
-	return data_copy
+			data_total = single_dates_obj(workout_date_list,single_data,data_copy)
+	
+	return data_total,workout_date_list
 			
-def remove_distance_meters(data):
+def remove_distance_meters(data,weekly_workout):	
 	'''
 		Remove distace in meters key from all the dictionaries
 	'''
 	for key,value in data.items():
 		value.pop("distance_meters",None)
 	data["Totals"]["dates"] = {}
-	final_data = add_dates_totals(data)
+	final_data,workout_date_list = add_dates_totals(data)
+	data_duration_copy = add_duration_total(final_data,weekly_workout,workout_date_list)
 	return final_data
