@@ -1219,12 +1219,16 @@ def get_epoch_active_time(activites_time_list,epoch,intensity_level):
 			and activity_time.end <= epoch_end):
 			overlapping_duration_in_sec += activity_time.duration
 		elif (activity_time.start >= epoch_start 
-			and activity_time.start <= epoch_end):
+			  and activity_time.start <= epoch_end):
 			overlapping_sec = (epoch_end - activity_time.start).seconds
 			overlapping_duration_in_sec += overlapping_sec
 		elif (activity_time.end >= epoch_start 
-			and activity_time.end <= epoch_end):
+			  and activity_time.end <= epoch_end):
 			overlapping_sec = (activity_time.end - epoch_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (activity_time.start <= epoch_start
+			  and activity_time.end >= epoch_end):
+			overlapping_sec = (epoch_end - epoch_start).seconds
 			overlapping_duration_in_sec += overlapping_sec
 	
 	if overlapping_duration_in_sec:
