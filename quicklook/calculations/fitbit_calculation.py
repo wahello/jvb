@@ -1,29 +1,35 @@
 from datetime import datetime,timedelta
 import ast
+<<<<<<< HEAD
+import json
+import time
+=======
 import pdb
 import pytz
 
 from user_input.models import UserDailyInput
+>>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879
 
 from quicklook.serializers import UserQuickLookSerializer
 from .garmin_calculation import (
 	get_blank_model_fields,
 	str_to_datetime,
 	update_helper,
-	sec_to_hours_min_sec
+	sec_to_hours_min_sec,
+	get_activity_stats,
 	)
 from quicklook.models import (
 	UserQuickLook,
 	Grades,
 	Sleep,
 	Steps,
-	ExerciseAndReporting,
+	ExerciseAndReporting,     
 	SwimStats,
 	BikeStats,
-	Food,
+	Food,                                                                 
 	Alcohol
 )
-from fitbit.models import (
+from fitbit.models import (                        
 	UserFitbitDataSleep,
 	UserFitbitDataHeartRate,
 	UserFitbitDataActivities,                                                  
@@ -32,8 +38,13 @@ from fitbit.models import (
 	UserFitbitDatafoods
 )
 
+<<<<<<< HEAD
+from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_sleep
+from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_activities
+=======
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
 
+>>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879
 
 def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
@@ -49,7 +60,7 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 		date_field = "date_of_activities"
 		data_field = "activities_data"
 	elif model == UserFitbitDataSteps:
-		date_field = "date_of_steps"
+		date_field = "date_of_steps" 
 		data_field = "steps_data"
 	elif model == UserFitbitDatabody:
 		date_field = "date_of_body"
@@ -216,9 +227,38 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
+<<<<<<< HEAD
+
+		todays_activity_data = get_fitbit_model_data(
+			UserFitbitDataActivities,user,current_date.date(),current_date.date())
+		if todays_activity_data:
+			todays_activity_data = ast.literal_eval(todays_activity_data[0].replace(
+				"'activity_fitbit': {...}","'activity_fitbit': {}"))
+			todays_activity_data = todays_activity_data['activities']
+		else:
+			todays_activity_data = None
+		#print("**********",type(todays_activity_data))
+		#print(todays_activity_data)
+		if todays_activity_data:
+			trans_activity_data = list(map(fitbit_to_garmin_activities,
+				todays_activity_data))
+			activity_stats = get_activity_stats(trans_activity_data)
+			exercise_calculated_data['did_workout'] = activity_stats['have_activity']
+			exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
+			exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
+			exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
+			exercise_calculated_data['distance_other'] = activity_stats['distance_other_miles']
+			exercise_calculated_data['workout_duration'] = sec_to_hours_min_sec(
+				activity_stats['total_duration'])
+			exercise_calculated_data['pace'] = activity_stats['pace']
+			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
+			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
+		#print(exercise_calculated_data)
+=======
 		sleeps_calculated_data['sleep_per_user_input'] = sleep_stats['sleep_per_userinput']
 		# sleeps_calculated_data['restless'] = sleep_stats['restless']
 		
+>>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
 		try:

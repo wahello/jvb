@@ -86,5 +86,62 @@ def fitbit_to_garmin_sleep(sleep_summary):
 	garmin_sleep['lightSleepDurationInSeconds'] =sleep_level_stats["light_sleep_duration_in_sec"] 
 	garmin_sleep['remSleepInSeconds'] = sleep_level_stats["rem_sleep_duration_in_sec"]
 	garmin_sleep['awakeDurationInSeconds'] = sleep_level_stats["awake_duration_in_sec"]
+<<<<<<< HEAD:quicklook/calculations/convertor/fitbit_to_garmin_convertor.py
+	return garmin_sleep
+
+def fitbit_to_garmin_activities(active_summary):
+
+	garmin_activites = {
+		'summaryId': '',
+		'durationInSeconds': None,
+		'startTimeInSeconds': None, 
+		'startTimeOffsetInSeconds': None, 
+		'activityType': '', 
+		'averageHeartRateInBeatsPerMinute': None,
+		'averageRunCadenceInStepsPerMinute': None,
+		'averageSpeedInMetersPerSecond': None, 
+		'averagePaceInMinutesPerKilometer': None,  
+		'activeKilocalories': None,
+		'deviceName': 'forerunner935',
+		'distanceInMeters': None,
+		'maxHeartRateInBeatsPerMinute': None, 
+		'maxPaceInMinutesPerKilometer': None,
+		'maxRunCadenceInStepsPerMinute': None,
+		'maxSpeedInMetersPerSecond': None,     
+		'startingLatitudeInDegree': None, 
+		'startingLongitudeInDegree': None,
+		'steps': None, 
+		'totalElevationGainInMeters': None, 
+		'totalElevationLossInMeters': None
+
+	}
+	if active_summary:
+		garmin_activites['summaryId'] = active_summary['logId']
+		garmin_activites['durationInSeconds'] = int(active_summary['duration']/1000)
+		garmin_activites['startTimeInSeconds'] = active_summary['startTime']
+		garmin_activites['activityType'] = active_summary['activityName']
+		garmin_activites['activeKilocalories'] = active_summary['calories']
+		garmin_activites['distanceInMeters'] = active_summary.get("")
+		heartRate = []
+		x = len(active_summary['heartRateZones'])
+		for l in range(0,x):
+			max_value = active_summary['heartRateZones'][l]['max']
+			heartRate.append(max_value)
+		garmin_activites["averageHeartRateInBeatsPerMinute"] = sum(heartRate)/len(heartRate)
+		garmin_activites['averageRunCadenceInStepsPerMinute'] = active_summary.get("")
+		garmin_activites['averageSpeedInMetersPerSecond'] = active_summary.get("")
+		garmin_activites['averagePaceInMinutesPerKilometer'] = active_summary.get("")
+		garmin_activites['maxHeartRateInBeatsPerMinute'] = active_summary.get("")
+		garmin_activites['maxPaceInMinutesPerKilometer'] = active_summary.get("")
+		garmin_activites['maxRunCadenceInStepsPerMinute'] = active_summary.get("")
+		garmin_activites['maxSpeedInMetersPerSecond'] = active_summary.get("")
+		garmin_activites['steps'] = active_summary['steps']
+		garmin_activites['totalElevationGainInMeters'] = active_summary.get("")
+		garmin_activites['totalElevationLossInMeters'] = active_summary.get("")
+		return garmin_activites
+	else:
+		return None
+=======
 	garmin_sleep['restlessDurationInSeconds'] = sleep_level_stats["restless_duration_in_sec"]
 	return garmin_sleep
+>>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879:quicklook/calculations/converter/fitbit_to_garmin_converter.py
