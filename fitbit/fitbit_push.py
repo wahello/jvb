@@ -281,7 +281,6 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
 					update_fitbit_data(user,date_of_activity,create_notification,value,key)
 					print("Updated Activity-Fitbit successfully")
-					print("------------> Quicklook data has been refreshed")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
@@ -290,7 +289,6 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 					date_of_activities=date_of_activity,
 					activities_data=value,created_at=start_date)
 					print("Created Activity-Fitbit successfully")
-					print("------------> Quicklook data has been refreshed")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
@@ -390,6 +388,9 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 
 
 def job_to_update_fitbit_raw_data(user, start_date, end_date):
+	'''
+	This function is to run the job to automatically updating the raw data calculation when new fitbit data arrives.
+	'''
 	str_start_date = start_date.strftime('%Y-%m-%d')
 	str_end_date = end_date.strftime('%Y-%m-%d')
 	yesterday = datetime.now() - timedelta(days=1)
