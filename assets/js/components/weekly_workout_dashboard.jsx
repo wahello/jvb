@@ -327,9 +327,11 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" || key1 == "duration_below_aerobic_range" ||
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded" || key1 == "duration_hrr_not_recorded") {
 							
-							if(flag == 0) {
+							if(flag == 0 && value[key1] != null && value[key1] != "" && value[key1] != undefined) {
 								this.aeroAnaerobicMatrix(value, td_keys, td_values);
 								flag++;
+							} else {
+								td_values.push(<td>{"-"}</td>);
 							}
 						}
 						else if(key1 == "days_with_activity") {
@@ -337,7 +339,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						}
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
 							console.log("key1 in else if block: "+ key1);
-							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]); 
+							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]; 
 								let tempDayDuration = "";
 								let tempDayRepeated = "";
 								console.log("dateKey: "+dateKey);
@@ -349,9 +351,9 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 									} else if(finalDateKey == "duration") {
 										tempDayDuration = this.renderTime(finalDateValue);
 									}
-								
+								}	
 								td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
-							}
+							
 							tempIndex ++;
 						}
 						/*else if(key1 == sun || key1==mon || key1 == tue || key1 == wed || key1 == thu || key1 == fri || key1 == sat) {
@@ -457,9 +459,11 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" || key1 == "duration_below_aerobic_range" ||
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded" || key1 == "duration_hrr_not_recorded") {
 							
-							if(flag == 0) {
+							if(flag == 0 && value[key1] != null && value[key1] != "" && value[key1] != undefined) {
 								this.aeroAnaerobicMatrix(value, td_keys, td_totals);
 								flag++;
+							} else {
+								td_totals.push(<td>{"-"}</td>);
 							}
 						}
 						else if(key1 == "days_with_activity") {
@@ -468,7 +472,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && tempDate.includes(key1)) {
 							console.log("key1 in else total block: "+ key1);
 							console.log("key1 in else total block: "+ tempIndex);
-							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]);
+							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex];
 								let tempDayDuration = "";
 								let tempDayRepeated = "";
 								console.log("dateKey: "+dateKey);
