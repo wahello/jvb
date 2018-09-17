@@ -86,7 +86,7 @@ def fitbit_to_garmin_sleep(sleep_summary):
 	garmin_sleep['lightSleepDurationInSeconds'] =sleep_level_stats["light_sleep_duration_in_sec"] 
 	garmin_sleep['remSleepInSeconds'] = sleep_level_stats["rem_sleep_duration_in_sec"]
 	garmin_sleep['awakeDurationInSeconds'] = sleep_level_stats["awake_duration_in_sec"]
-<<<<<<< HEAD:quicklook/calculations/convertor/fitbit_to_garmin_convertor.py
+	garmin_sleep['restlessDurationInSeconds'] = sleep_level_stats["restless_duration_in_sec"]
 	return garmin_sleep
 
 def fitbit_to_garmin_activities(active_summary):
@@ -141,7 +141,3 @@ def fitbit_to_garmin_activities(active_summary):
 		return garmin_activites
 	else:
 		return None
-=======
-	garmin_sleep['restlessDurationInSeconds'] = sleep_level_stats["restless_duration_in_sec"]
-	return garmin_sleep
->>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879:quicklook/calculations/converter/fitbit_to_garmin_converter.py

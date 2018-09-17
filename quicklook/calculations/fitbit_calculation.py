@@ -1,14 +1,11 @@
 from datetime import datetime,timedelta
 import ast
-<<<<<<< HEAD
 import json
 import time
-=======
 import pdb
 import pytz
 
 from user_input.models import UserDailyInput
->>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879
 
 from quicklook.serializers import UserQuickLookSerializer
 from .garmin_calculation import (
@@ -38,13 +35,8 @@ from fitbit.models import (
 	UserFitbitDatafoods
 )
 
-<<<<<<< HEAD
 from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_sleep
 from .convertor.fitbit_to_garmin_convertor import fitbit_to_garmin_activities
-=======
-from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
-
->>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879
 
 def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
@@ -227,7 +219,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
-<<<<<<< HEAD
+		sleeps_calculated_data['sleep_per_user_input'] = sleep_stats['sleep_per_userinput']
+		# sleeps_calculated_data['restless'] = sleep_stats['restless']
 
 		todays_activity_data = get_fitbit_model_data(
 			UserFitbitDataActivities,user,current_date.date(),current_date.date())
@@ -237,8 +230,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			todays_activity_data = todays_activity_data['activities']
 		else:
 			todays_activity_data = None
-		#print("**********",type(todays_activity_data))
-		#print(todays_activity_data)
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
 				todays_activity_data))
@@ -253,12 +244,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['pace'] = activity_stats['pace']
 			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
-		#print(exercise_calculated_data)
-=======
-		sleeps_calculated_data['sleep_per_user_input'] = sleep_stats['sleep_per_userinput']
-		# sleeps_calculated_data['restless'] = sleep_stats['restless']
-		
->>>>>>> 5c9e007dd4eb3988335c82f1020c4275a0508879
+
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
 		try:
