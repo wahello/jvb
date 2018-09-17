@@ -234,6 +234,23 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 	renderTable(weekly_data){
 		//console.log(moment(this.state.selectedDate).startOf('week').format('MMM DD'));
 		//console.log(moment(this.state.selectedDate).startOf('week').add(1, 'days').format('MMM DD'));
+
+		/*******DUMMY DATA FOR TOTAL OBJECT *******/
+		let tempDatesObject = {
+			"03-Sep-18": {
+				"repeated": 1,
+				"workout_date": "03-Sep-18",
+				"duration": 3659
+			},
+			"05-Sep-18": {
+				"repeated": 1,
+				"workout_date": "05-Sep-18",
+
+				"duration": 3666
+			}
+		};
+		let tempDatesData = ["03-Sep-18", "05-Sep-18"];
+		/********************************************/
 		if (!_.isEmpty(weekly_data)){
 			let tr_values = [];
 			let td_totals = [];
@@ -241,14 +258,36 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 			/*let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
 			"percent_aerobic","duration_in_anaerobic_	range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
 			"duration_hrr_not_recorded","percent_hrr_not_recorded"];*/
-			let td_keys = ["workout_type","duration","workout_duration_percent","duration_in_aerobic_range", "percent_aerobic", "duration_in_anaerobic_range", "percent_anaerobic", "duration_below_aerobic_range", "percent_below_aerobic", "duration_hrr_not_recorded", "percent_hrr_not_recorded","days_with_activity","Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => !td_keys.includes(x));
+			let td_keys = ["workout_type","duration","workout_duration_percent","duration_in_aerobic_range", "percent_aerobic", "duration_in_anaerobic_range", "percent_anaerobic", "duration_below_aerobic_range", "percent_below_aerobic", "duration_hrr_not_recorded", "percent_hrr_not_recorded","days_with_activity"];
+
+			/*if(Object.keys(weekly_data['Totals']).indexOf("_distance") >0) {
+
+			}*/
+			let mon = moment(this.state.selectedDate).weekday(-6).format('DD-MMM-YY');
+			let tue = moment(this.state.selectedDate).weekday(-5).format('DD-MMM-YY');
+			let wed = moment(this.state.selectedDate).weekday(-4).format('DD-MMM-YY');
+			let thu = moment(this.state.selectedDate).weekday(-3).format('DD-MMM-YY');
+			let fri = moment(this.state.selectedDate).weekday(-2).format('DD-MMM-YY');
+			let sat = moment(this.state.selectedDate).weekday(-1).format('DD-MMM-YY');
+			let sun = moment(this.state.selectedDate).weekday(0).format('DD-MMM-YY');
+			td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
+			console.log("Object.keys(weekly_data['Totals']): "+Object.keys(weekly_data['Totals']));	
+			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => (x.indexOf("_distance")>=0));
 			td_keys = td_keys.concat(activity_distance_keys);
+			
+			console.log("activity_distance_keys: "+activity_distance_keys);
+			
 			let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity"];
 			for(let [key,value] of Object.entries(weekly_data)){
+				/*for(let [dateKey,dateValue] of Object.entries(value["dates"])) {
+					td_keys = td_keys.concat(dateKey);
+				}*/
+				
 				console.log(key+ " and value = " +value);
 				let flag = 0;
 				let td_values = [];
+				/*let tempDate = Object.keys(value['dates']);
+				console.log("tempDate: "+tempDate[0]);*/
 				if(key != "extra" && key != "Totals"){
 					/*Workout Type (# Workouts)	DONE
 									Total duration	DONE 
@@ -269,8 +308,12 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 									Sun Aug 26
 									*/
 
-						
+					let tempDate = Object.keys(value['dates']);
+					console.log("tempDate: "+tempDate[0]);
+					let tempIndex = 0;
+
 					for(let key1 of td_keys){
+						//console.log("Object.keys.filter(x => x=== key1): "+Object.keys(value['dates']).filter(a => key1 == a) + "key1"+key1);
 						if(key1== "workout_type") {
 							td_values.push(<td>{value[key1]}</td>);
 						}
@@ -292,6 +335,43 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						else if(key1 == "days_with_activity") {
 							td_values.push(<td>{value[key1]}</td>);
 						}
+						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
+							console.log("key1 in else if block: "+ key1);
+							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]); 
+								let tempDayDuration = "";
+								let tempDayRepeated = "";
+								console.log("dateKey: "+dateKey);
+								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
+									console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
+
+									if(finalDateKey == "repeated") {
+										tempDayRepeated = finalDateValue;
+									} else if(finalDateKey == "duration") {
+										tempDayDuration = this.renderTime(finalDateValue);
+									}
+								
+								td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+							}
+							tempIndex ++;
+						}
+						/*else if(key1 == sun || key1==mon || key1 == tue || key1 == wed || key1 == thu || key1 == fri || key1 == sat) {
+							for(let [dateKey,dateValue] of Object.entries(value["dates"])) {
+								let tempDayDuration = "";
+								let tempDayRepeated = "";
+								console.log("dateKey: "+dateKey);
+								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
+									console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
+
+									if(finalDateKey == "repeated") {
+										tempDayRepeated = finalDateValue;
+									} else if(finalDateKey == "duration") {
+										tempDayDuration = this.renderTime(finalDateValue);
+									}
+								}
+								td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+							}
+							
+						}*/
 						else if(activity_distance_keys.includes(key1)){
 							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
 								td_values.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
@@ -300,14 +380,9 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 								td_values.push(<td>{this.renderMetersToMiles(value[key1].value)}</td>);
 							}
 						}
-						else if(key1 == "Sun" || key1=="Mon" || key1 == "Tue" || key1 == "Wed" || key1 == "Thu" || key1 == "Fri" || key1 == "Sat") {
-							for(let [dateKey,dateValue] of Object.entries("dates")) {
-								console.log("Workedout_dates key: "+dateKey+ " Values= "+dateValue);
-							}
-							
-						}
+
 						else {
-							td_values.push(<td>{1}</td>);
+							td_values.push(<td>{"-"}</td>);
 						}
 						/*if(key1 == "percent_of_days" || key1 == "workout_duration_percent" ||
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" ||
@@ -335,6 +410,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							td_values.push(<td>{value[key1]}</td>);
 						}*/
 					}
+					tr_values.push(<tr>{td_values}</tr>);
 				}
 				else if(key == "Totals"){
 					/*for(let key1 of td_keys){
@@ -363,7 +439,11 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							td_totals.push(value[key1])
 						}
 					}*/
+					let tempDate = Object.keys(value['dates']);
+					console.log("tempDate: "+tempDate[0]);
+					let tempIndex = 0;
 					for(let key1 of td_keys){
+						
 						if(key1== "workout_type") {
 							td_totals.push(<td>{value[key1]}</td>);
 						}
@@ -385,6 +465,28 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						else if(key1 == "days_with_activity") {
 							td_totals.push(<td>{value[key1]}</td>);
 						}
+						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && tempDate.includes(key1)) {
+							console.log("key1 in else total block: "+ key1);
+							console.log("key1 in else total block: "+ tempIndex);
+							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]);
+								let tempDayDuration = "";
+								let tempDayRepeated = "";
+								console.log("dateKey: "+dateKey);
+
+								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
+									console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
+
+									if(finalDateKey == "repeated") {
+										tempDayRepeated = finalDateValue;
+									} else if(finalDateKey == "duration") {
+										tempDayDuration = this.renderTime(finalDateValue);
+									}
+								}
+								
+								td_totals.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+							
+							tempIndex ++;	
+						}
 						else if(activity_distance_keys.includes(key1)){
 							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
 								td_totals.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
@@ -394,7 +496,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							}
 						}
 						else {
-							td_totals.push(<td>{1}</td>);
+							td_totals.push(<td>{"-"}</td>);
 						}
 					}
 				}
@@ -411,14 +513,15 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						}
 					}
 				}
-				tr_values.push(<tr>{td_values}</tr>);
+				//tr_values.push(<tr>{td_values}</tr>);
 			}
 
-			let td_valuesTotal = [];
+			/*let td_valuesTotal = [];
 			for(let total of td_totals){
+				console.log("td_totals: "+total);
 				td_valuesTotal.push(<td>{total}</td>)
-			}
-			tr_values.push(<tr>{td_valuesTotal}</tr>);
+			}*/
+			tr_values.push(<tr>{td_totals}</tr>);
 
 			let td_valuesExtra = [];
 			for(let extra of td_extra){
@@ -459,8 +562,8 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 		let activities_keys = rendered_data[0];
 		let rendered_rows = rendered_data[1];
 		return(
-				<div className = "container-fluid">
-					<NavbarMenu title = {<span style = {{fontSize:"22px"}}>
+				<div className = "container-fluid" style = {{fontSize:"12px"}}>
+					<NavbarMenu title = {<span style = {{fontSize:"18px"}}>
 					Weekly Workout Summary Report
 					</span>} />
 
@@ -520,13 +623,13 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 										<th>% of Total Duration</th>
 										<th>Aerobic/Anaerobic Duration: (% of total time)</th>
 										<th># of Days With Activity</th>
-										<th>Sun {moment(this.state.selectedDate).startOf('week').format('MMM DD')}</th>
-										<th>Mon {moment(this.state.selectedDate).startOf('week').add(1, 'days').format('MMM DD')}</th>
-										<th>Tue {moment(this.state.selectedDate).startOf('week').add(2, 'days').format('MMM DD')}</th>
-										<th>Wed {moment(this.state.selectedDate).startOf('week').add(3, 'days').format('MMM DD')}</th>
-										<th>Thu {moment(this.state.selectedDate).startOf('week').add(4, 'days').format('MMM DD')}</th>
-										<th>Fri {moment(this.state.selectedDate).startOf('week').add(5, 'days').format('MMM DD')}</th>
-										<th>Sat {moment(this.state.selectedDate).startOf('week').add(6, 'days').format('MMM DD')}</th>
+										<th>Mon <br />{moment(this.state.selectedDate).weekday(-6).format('MMM DD')}</th>
+										<th>Tue <br /> {moment(this.state.selectedDate).weekday(-5).format('MMM DD')}</th>
+										<th>Wed <br /> {moment(this.state.selectedDate).weekday(-4).format('MMM DD')}</th>
+										<th>Thu <br /> {moment(this.state.selectedDate).weekday(-3).format('MMM DD')}</th>
+										<th>Fri <br /> {moment(this.state.selectedDate).weekday(-2).format('MMM DD')}</th>
+										<th>Sat <br /> {moment(this.state.selectedDate).weekday(-1).format('MMM DD')}</th>
+										<th>Sun <br /> {moment(this.state.selectedDate).weekday(0).format('MMM DD')}</th>
 										{/*<th>Avg HR Not Recorded Duration (hh:mm)</th>
 										<th>Avg % HR Not Recorded</th>*/}
 										{this.renderTableActivityHeader(activities_keys)}
