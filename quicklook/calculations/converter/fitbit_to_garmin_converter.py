@@ -123,10 +123,8 @@ def fitbit_to_garmin_activities(active_summary):
 		garmin_activites['activeKilocalories'] = active_summary['calories']
 		garmin_activites['distanceInMeters'] = active_summary.get("")
 		heartRate = []
-		x = len(active_summary['heartRateZones'])
-		for l in range(0,x):
-			max_value = active_summary['heartRateZones'][l]['max']
-			heartRate.append(max_value)
+		for hr_zone in active_summary.get('heartRateZones',[]):
+			heartRate.append(hr_zone['max'])
 		garmin_activites["averageHeartRateInBeatsPerMinute"] = sum(heartRate)/len(heartRate)
 		garmin_activites['averageRunCadenceInStepsPerMinute'] = active_summary.get("")
 		garmin_activites['averageSpeedInMetersPerSecond'] = active_summary.get("")
