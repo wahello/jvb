@@ -223,8 +223,19 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 					<td>{"HR Not Recorded"}<br />{duration_hrr_not_recorded + " (" + percent_hrr_not_recorded + ")"}</td>
 					</tr>
 					</div>);
-			}
+			} 
 		}
+	}
+	if(duration_below_aerobic_range == "" &&
+				percent_below_aerobic == "" &&
+				percent_aerobic == "" &&
+				duration_in_aerobic_range == "" &&
+				duration_hrr_not_recorded == "" &&
+				percent_hrr_not_recorded == "" &&
+				percent_anaerobic == ""&&
+				duration_in_anaerobic_range == "") 
+	{
+		td_values.push(<td> {" - "} </td>);
 	}
 }
 
@@ -235,22 +246,6 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 		//console.log(moment(this.state.selectedDate).startOf('week').format('MMM DD'));
 		//console.log(moment(this.state.selectedDate).startOf('week').add(1, 'days').format('MMM DD'));
 
-		/*******DUMMY DATA FOR TOTAL OBJECT *******/
-		let tempDatesObject = {
-			"03-Sep-18": {
-				"repeated": 1,
-				"workout_date": "03-Sep-18",
-				"duration": 3659
-			},
-			"05-Sep-18": {
-				"repeated": 1,
-				"workout_date": "05-Sep-18",
-
-				"duration": 3666
-			}
-		};
-		let tempDatesData = ["03-Sep-18", "05-Sep-18"];
-		/********************************************/
 		if (!_.isEmpty(weekly_data)){
 			let tr_values = [];
 			let td_totals = [];
@@ -327,11 +322,9 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" || key1 == "duration_below_aerobic_range" ||
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded" || key1 == "duration_hrr_not_recorded") {
 							
-							if(flag == 0 && value[key1] != null && value[key1] != "" && value[key1] != undefined) {
+							if(flag == 0) {
 								this.aeroAnaerobicMatrix(value, td_keys, td_values);
 								flag++;
-							} else {
-								td_values.push(<td>{"-"}</td>);
 							}
 						}
 						else if(key1 == "days_with_activity") {
@@ -459,11 +452,9 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" || key1 == "duration_below_aerobic_range" ||
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded" || key1 == "duration_hrr_not_recorded") {
 							
-							if(flag == 0 && value[key1] != null && value[key1] != "" && value[key1] != undefined) {
+							if(flag == 0) {
 								this.aeroAnaerobicMatrix(value, td_keys, td_totals);
 								flag++;
-							} else {
-								td_totals.push(<td>{"-"}</td>);
 							}
 						}
 						else if(key1 == "days_with_activity") {
@@ -566,12 +557,12 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 		let activities_keys = rendered_data[0];
 		let rendered_rows = rendered_data[1];
 		return(
-				<div className = "container-fluid" style = {{fontSize:"12px"}}>
+				<div className = "container-fluid">
 					<NavbarMenu title = {<span style = {{fontSize:"18px"}}>
 					Weekly Workout Summary Report
 					</span>} />
 
-					<div className = "cla_center">
+					<div className = "cla_center" style = {{fontSize:"12px"}}>
 						<span>
 							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
 								<FontAwesome
@@ -605,7 +596,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 	                	</span>
 	                	 <div style = {{textAlign:"center",fontWeight:"bold"}}>Weekly Workout Summary Report For The Week Ended: <span style = {{textDecoration:"underline"}}>{this.renderLastSunday(new Date(this.state.selectedDate))}</span></div> 
 		        	</div>
-					 <div className = "row justify-content-center hr_table_padd">
+					 <div className = "row justify-content-center hr_table_padd" style = {{fontSize:"12px"}}>
 							<div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
 									<tr>
