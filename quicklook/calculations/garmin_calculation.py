@@ -799,14 +799,15 @@ def is_duplicate_activity(activity, all_activities):
 
 	target_activities_list = None
 	if activities_with_hr:
-		target_activities_list = activities_with_hr
+		target_activities_list = list(activities_with_hr)
 	else:
 		target_activities_list = overlapping_activities
 
+	target_activities_list.append(activity)
 	if target_activities_list:
 		original_act = None
 		longest_duration = 0
-		for act in activities_with_hr:
+		for act in target_activities_list:
 			if act.get('durationInSeconds',0) >= longest_duration:
 				original_act = act
 				longest_duration = act.get('durationInSeconds',0)
@@ -893,6 +894,10 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
+
+	for act in filtered_activities:
+		print(is_duplicate_activity(act,filtered_activities))
+	print(len(filtered_activities))
 
 	return filtered_activities
 
