@@ -793,22 +793,13 @@ def is_duplicate_activity(activity, all_activities):
 				== act.get('deviceName','manually_created'))):
 			overlapping_activities.append(act)
 
-	activities_with_hr = filter(
-		lambda x:x.get('averageHeartRateInBeatsPerMinute',0),
-		overlapping_activities)
-
-	target_activities_list = None
-	if activities_with_hr:
-		target_activities_list = list(activities_with_hr)
-	else:
-		target_activities_list = overlapping_activities
-
-	target_activities_list.append(activity)
-	if target_activities_list:
+	overlapping_activities.append(activity)
+	if overlapping_activities:
 		original_act = None
 		longest_duration = 0
-		for act in target_activities_list:
-			if act.get('durationInSeconds',0) >= longest_duration:
+		for act in overlapping_activities:
+			if (act.get('durationInSeconds',0) >= longest_duration
+				and act.get('averageHeartRateInBeatsPerMinute',0)):
 				original_act = act
 				longest_duration = act.get('durationInSeconds',0)
 		if (original_act 
@@ -819,7 +810,7 @@ def is_duplicate_activity(activity, all_activities):
 
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,
-		userinput_activities=None,**kwargs):
+		userinput_activities=None,include_duplicate = False,**kwargs):
 	
 	'''
 	Combine activities, manually edited activities and user input activities
@@ -891,15 +882,25 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 			calendar_date = kwargs.get('calendar_date'),
 			activities = filtered_activities
 		)
+
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
 
+	unique_activities = []
 	for act in filtered_activities:
-		print(is_duplicate_activity(act,filtered_activities))
-	print(len(filtered_activities))
+		duplicate = is_duplicate_activity(act,filtered_activities)
+		# print(act.get('activityType'),duplicate)
+		if not duplicate:
+			act['duplicate'] = False
+			unique_activities.append(act)
+		else:
+			act['duplicate'] = True
 
-	return filtered_activities
+	if include_duplicate:
+		return filtered_activities
+	else:
+		return unique_activities
 
 def get_activity_stats(combined_user_activities):
 
