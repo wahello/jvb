@@ -121,6 +121,7 @@ class WorkoutDashboard extends Component{
 	}
 	gpascoreDecimal(gpa){
 		let value;
+		//console.log("gpascoreDecimal: "+gpa);
 		let x = gpa;
 		if( x !=  null && x != undefined){
 		    value =parseFloat(x).toFixed(2) + " %";
@@ -128,6 +129,7 @@ class WorkoutDashboard extends Component{
 		 else{
 		  value = "";
 		 }
+		 //console.log("gpascoreDecimal returned:"+value);
 		return value;
 	}
 	renderTime(value){
@@ -171,15 +173,18 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 		if((dataKey.indexOf("aerobic") >=0) || (dataKey == "duration_hrr_not_recorded") || (dataKey == "percent_hrr_not_recorded")) {
 			//console.log("dataKey inside aeroAnaerobicMatrix: "+dataKey);
 			//console.log("this.checkForUndefinedValue(value[dataKey]) inside aeroAnaerobicMatrix: "+ this.checkForUndefinedValue(value[dataKey]));
-				if(!this.checkForUndefinedValue(value[dataKey])) {
-					let tempDuration = "";
-					let tempPercentage = "";
+				//if(!this.checkForUndefinedValue(value[dataKey])) {
+					let tempDuration = null;
+					let tempPercentage = null;
 					//console.log("dataKey inside aeroAnaerobicMatrix2: "+dataKey);
 					if(dataKey.indexOf("duration")>=0) {
 						//console.log("tempDuration: "+tempDuration);
 						//console.log("tempPercentage: "+tempPercentage);
 						tempDuration = this.renderTime(value[dataKey]);
-						//console.log("tempDuration: "+tempDuration);
+						if(value[dataKey] === null || value[dataKey] === undefined || value[dataKey] === "") {
+							tempDuration = "-";
+						}
+						//console.log("tempDuration: "+tempDuration + "for"+dataKey);
 						if(dataKey == "duration_below_aerobic_range") {
 							duration_below_aerobic_range = tempDuration;
 						} else if(dataKey == "duration_hrr_not_recorded") {
@@ -191,7 +196,11 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						}
 					} else {
 						tempPercentage = this.gpascoreDecimal(value[dataKey]);
-						//console.log("tempPercentage: "+tempPercentage);
+						if(value[dataKey] === null || value[dataKey] === undefined || value[dataKey] === " ") {
+							tempPercentage = "-";
+						}
+						//console.log("value[dataKey]: "+value[dataKey]);
+						//console.log("tempPercentage: "+tempPercentage + "for"+dataKey);
 						if(dataKey == "percent_below_aerobic") {
 							percent_below_aerobic = tempPercentage;
 						} else if(dataKey == "percent_hrr_not_recorded") {
@@ -227,12 +236,12 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							</tr>
 							</div>);
 					} 
-				} else {
+				/*} else {
 					//console.log("-1");
 					td_values.push(<td> {" - "} </td>);
 					isUndefindValueFound = true;
 					break;
-			}
+				}*/
 		}
 	}
 	if(duration_below_aerobic_range == "" &&
@@ -292,13 +301,13 @@ checkForUndefinedValue(value) {
 			
 			//console.log("activity_distance_keys: "+activity_distance_keys);
 			
-			let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity"];
+			let td_keys1 = ["no_activity","days_no_activity","no_activity_in_week","percent_days_no_activity"];
 			for(let [key,value] of Object.entries(weekly_data)){
 				/*for(let [dateKey,dateValue] of Object.entries(value["dates"])) {
 					td_keys = td_keys.concat(dateKey);
 				}*/
 				
-				//console.log(key+ " and value = " +value);
+				console.log(key+ " and value = " +value);
 				let flag = 0;
 				let td_values = [];
 				/*let tempDate = Object.keys(value['dates']);
@@ -334,6 +343,7 @@ checkForUndefinedValue(value) {
    						//console.log("tempNoOfActivityInWeek: " + tempNoOfActivityInWeek);
    						//console.log("key1: "+ key1);
 						if(key1== "workout_type" || key1 == "no_activity_in_week") {
+							//console.log("key: "+ key);
 							if(key1== "workout_type" && !this.checkForUndefinedValue(value[key1])) {
 								tempWorkoutType = value[key1];
 							} else if(key1 == "no_activity_in_week" ){
@@ -471,10 +481,10 @@ checkForUndefinedValue(value) {
 						}
 					}*/
 					let tempDate = Object.keys(value['dates']).sort();
-					console.log("tempDate: "+tempDate[0]);
-					console.log("tempDate: "+tempDate[1]);
-					console.log("tempDate: "+tempDate[2]);
-					console.log("tempDate: "+tempDate[3]);
+					//console.log("tempDate: "+tempDate[0]);
+					//console.log("tempDate: "+tempDate[1]);
+					//console.log("tempDate: "+tempDate[2]);
+					//console.log("tempDate: "+tempDate[3]);
 					let tempIndex = 0;
 					let tempWorkoutType = null;
 					let tempNoOfActivityInWeek = null;
@@ -515,15 +525,15 @@ checkForUndefinedValue(value) {
 							td_totals.push(<td>{value[key1]}</td>);
 						}
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
-							console.log("key1 in else total block: "+ key1);
-							console.log("key1 in else total block: "+ tempIndex);
+							//console.log("key1 in else total block: "+ key1);
+							//console.log("key1 in else total block: "+ tempIndex);
 							let [dateKey,dateValue] = (Object.entries(value["dates"]).sort())[tempIndex];
 								let tempDayDuration = "";
 								let tempDayRepeated = "";
-								console.log("dateKey 22: "+dateKey);
+								//console.log("dateKey 22: "+dateKey);
 
 								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
-									console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
+									//console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
 
 									if(finalDateKey == "repeated") {
 										tempDayRepeated = finalDateValue;
@@ -570,15 +580,37 @@ checkForUndefinedValue(value) {
 					}
 				}
 				else{
+					let tempNoActivity = null;
+					let tempDaysNoActivity = null;
 					for(let key2 of td_keys1){
 						if(key2 == "percent_days_no_activity"){
-							td_extra.push(this.gpascoreDecimal(value[key2]))
+							td_extra.push(this.gpascoreDecimal(value[key2]));
 						}
-						else if(key2 == "no_activity"){
-							td_extra.push("No Activity")
+						else if(key2 == "no_activity" || key2 == "days_no_activity"){
+							//td_extra.push("No Activity");
+							if(key2== "no_activity") {
+								tempNoActivity = "No Activity";
+							} else if(key2 == "days_no_activity") {
+								//console.log("value[key1] :" + value[key1]);
+								if(this.checkForUndefinedValue(value[key2])) {
+									tempDaysNoActivity = "";
+								} else {
+									tempDaysNoActivity = "(" + value[key2] + ")";
+								}
+							}
+							console.log("tempNoActivity:" +tempNoActivity);
+								console.log("tempDaysNoActivity: "+tempDaysNoActivity);
+							if(tempNoActivity != null && tempNoActivity != undefined && tempDaysNoActivity != null && tempDaysNoActivity != undefined) {
+								console.log("tempNoActivity:" +tempNoActivity);
+								console.log("tempDaysNoActivity: "+tempDaysNoActivity);
+								td_extra.push(tempNoActivity + tempDaysNoActivity);
+							}
 						}
-						else{
-							td_extra.push(value[key2])
+						else if(key2 == "no_activity_in_week"){
+							td_extra.push("-");
+						} 
+						else {
+							td_extra.push(value[key2]);
 						}
 					}
 				}
