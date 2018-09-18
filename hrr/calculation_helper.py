@@ -109,9 +109,9 @@ def workout_percent(workout_dict):
 		calculating the average heart rate and percent of days having activities 
 	'''
 	for key,value in workout_dict.items():
-		if value.get('days_with_activity') and value.get("average_heart_rate"):
+		if value.get('no_activity_in_week') and value.get("average_heart_rate"):
 			workout_dict[key]["average_heart_rate"] = ((
-				workout_dict[key]["average_heart_rate"])/workout_dict[key]["days_with_activity"])
+				workout_dict[key]["average_heart_rate"])/workout_dict[key]["no_activity_in_week"])
 			workout_dict[key]["percent_of_days"] = ((
 				workout_dict[key]["days_with_activity"])/7)*100
 		elif value.get('days_with_activity'):	
@@ -239,7 +239,7 @@ def weekly_workout_calculations(weekly_workout):
 				workout_dict[value['workout_type']]['days_with_activity'] = 1
 				workout_dict[value['workout_type']]['no_activity_in_week'] = 1
 				workout_summary_id[key] = [value['workout_type']]
-	print(workout_dict,"work out dict")
+	
 	added_all_actiivtes = add_activity_type(workout_dict,workout_type)
 	workout_dict_percent = workout_percent(added_all_actiivtes)
 	final_workout_data = change_hrr_key(workout_dict_percent)
