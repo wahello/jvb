@@ -164,66 +164,75 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 	let percent_hrr_not_recorded = "";
 	let percent_anaerobic = "";
 	let duration_in_anaerobic_range = "";
+	let isUndefindValueFound = false;
 
 	for(let dataKey of td_keys) {
-		//console.log("dataKey: "+dataKey);
-
+		
 		if((dataKey.indexOf("aerobic") >=0) || (dataKey == "duration_hrr_not_recorded") || (dataKey == "percent_hrr_not_recorded")) {
-			let tempDuration = "";
-			let tempPercentage = "";
-			//console.log("dataKey: "+dataKey);
-			if(dataKey.indexOf("duration")>=0) {
-				//console.log("tempDuration: "+tempDuration);
-				//console.log("tempPercentage: "+tempPercentage);
-				tempDuration = this.renderTime(value[dataKey]);
-				console.log("tempDuration: "+tempDuration);
-				if(dataKey == "duration_below_aerobic_range") {
-					duration_below_aerobic_range = tempDuration;
-				} else if(dataKey == "duration_hrr_not_recorded") {
-					duration_hrr_not_recorded = tempDuration;
-				} else if(dataKey == "duration_in_anaerobic_range") {
-					duration_in_anaerobic_range = tempDuration;
+			//console.log("dataKey inside aeroAnaerobicMatrix: "+dataKey);
+			//console.log("this.checkForUndefinedValue(value[dataKey]) inside aeroAnaerobicMatrix: "+ this.checkForUndefinedValue(value[dataKey]));
+				if(!this.checkForUndefinedValue(value[dataKey])) {
+					let tempDuration = "";
+					let tempPercentage = "";
+					//console.log("dataKey inside aeroAnaerobicMatrix2: "+dataKey);
+					if(dataKey.indexOf("duration")>=0) {
+						//console.log("tempDuration: "+tempDuration);
+						//console.log("tempPercentage: "+tempPercentage);
+						tempDuration = this.renderTime(value[dataKey]);
+						//console.log("tempDuration: "+tempDuration);
+						if(dataKey == "duration_below_aerobic_range") {
+							duration_below_aerobic_range = tempDuration;
+						} else if(dataKey == "duration_hrr_not_recorded") {
+							duration_hrr_not_recorded = tempDuration;
+						} else if(dataKey == "duration_in_anaerobic_range") {
+							duration_in_anaerobic_range = tempDuration;
+						} else {
+							duration_in_aerobic_range = tempDuration;
+						}
+					} else {
+						tempPercentage = this.gpascoreDecimal(value[dataKey]);
+						//console.log("tempPercentage: "+tempPercentage);
+						if(dataKey == "percent_below_aerobic") {
+							percent_below_aerobic = tempPercentage;
+						} else if(dataKey == "percent_hrr_not_recorded") {
+							percent_hrr_not_recorded = tempPercentage;
+						} else if(dataKey == "percent_anaerobic") {
+							percent_anaerobic = tempPercentage;
+						} else {
+							percent_aerobic = tempPercentage;
+						}
+					}
+					if(duration_below_aerobic_range != "" &&
+						percent_below_aerobic != "" &&
+						percent_aerobic != "" &&
+						duration_in_aerobic_range != "" &&
+						duration_hrr_not_recorded != "" &&
+						percent_hrr_not_recorded != "" &&
+						percent_anaerobic != ""&&
+						duration_in_anaerobic_range != "") {
+						/*return (<td>
+							<tr><td>{"Aerobic"}<br />{duration_in_aerobic_range + " (" + percent_aerobic + ")"}</td>
+							<td>{"Anaerobic"}<br />{duration_in_anaerobic_range + " (" + percent_anaerobic + ")"}</td>
+							</tr>
+							<tr><td>{"Below Aerobic"}<br />{duration_below_aerobic_range + " (" + percent_below_aerobic + ")"}</td>
+							<td>{"HR Not Recorded"}<br />{duration_hrr_not_recorded + " (" + percent_hrr_not_recorded + ")"}</td>
+							</tr>
+							</td>);*/
+						td_values.push(<div>
+							<tr><td>{"Aerobic"}<br />{duration_in_aerobic_range + " (" + percent_aerobic + ")"}</td>
+							<td>{"Anaerobic"}<br />{duration_in_anaerobic_range + " (" + percent_anaerobic + ")"}</td>
+							</tr>
+							<tr><td>{"Below Aerobic"}<br />{duration_below_aerobic_range + " (" + percent_below_aerobic + ")"}</td>
+							<td>{"HR Not Recorded"}<br />{duration_hrr_not_recorded + " (" + percent_hrr_not_recorded + ")"}</td>
+							</tr>
+							</div>);
+					} 
 				} else {
-					duration_in_aerobic_range = tempDuration;
-				}
-			} else {
-				tempPercentage = this.gpascoreDecimal(value[dataKey]);
-				//console.log("tempPercentage: "+tempPercentage);
-				if(dataKey == "percent_below_aerobic") {
-					percent_below_aerobic = tempPercentage;
-				} else if(dataKey == "percent_hrr_not_recorded") {
-					percent_hrr_not_recorded = tempPercentage;
-				} else if(dataKey == "percent_anaerobic") {
-					percent_anaerobic = tempPercentage;
-				} else {
-					percent_aerobic = tempPercentage;
-				}
+					//console.log("-1");
+					td_values.push(<td> {" - "} </td>);
+					isUndefindValueFound = true;
+					break;
 			}
-			if(duration_below_aerobic_range != "" &&
-				percent_below_aerobic != "" &&
-				percent_aerobic != "" &&
-				duration_in_aerobic_range != "" &&
-				duration_hrr_not_recorded != "" &&
-				percent_hrr_not_recorded != "" &&
-				percent_anaerobic != ""&&
-				duration_in_anaerobic_range != "") {
-				/*return (<td>
-					<tr><td>{"Aerobic"}<br />{duration_in_aerobic_range + " (" + percent_aerobic + ")"}</td>
-					<td>{"Anaerobic"}<br />{duration_in_anaerobic_range + " (" + percent_anaerobic + ")"}</td>
-					</tr>
-					<tr><td>{"Below Aerobic"}<br />{duration_below_aerobic_range + " (" + percent_below_aerobic + ")"}</td>
-					<td>{"HR Not Recorded"}<br />{duration_hrr_not_recorded + " (" + percent_hrr_not_recorded + ")"}</td>
-					</tr>
-					</td>);*/
-				td_values.push(<div>
-					<tr><td>{"Aerobic"}<br />{duration_in_aerobic_range + " (" + percent_aerobic + ")"}</td>
-					<td>{"Anaerobic"}<br />{duration_in_anaerobic_range + " (" + percent_anaerobic + ")"}</td>
-					</tr>
-					<tr><td>{"Below Aerobic"}<br />{duration_below_aerobic_range + " (" + percent_below_aerobic + ")"}</td>
-					<td>{"HR Not Recorded"}<br />{duration_hrr_not_recorded + " (" + percent_hrr_not_recorded + ")"}</td>
-					</tr>
-					</div>);
-			} 
 		}
 	}
 	if(duration_below_aerobic_range == "" &&
@@ -233,15 +242,26 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 				duration_hrr_not_recorded == "" &&
 				percent_hrr_not_recorded == "" &&
 				percent_anaerobic == ""&&
-				duration_in_anaerobic_range == "") 
+				duration_in_anaerobic_range == "" && !isUndefindValueFound) 
 	{
 		td_values.push(<td> {" - "} </td>);
+		//console.log("-2");
 	}
 }
 
 /*============================================================================================*/
 
-
+/*************** CHECK FOR UNDEFINED VALUE IF KEY EXISTS IN td_keys **************/
+/*************** RETURNS 'TRUE' IF VALUE IS UNDEFINED OR ELSE 'FALSE **************/
+checkForUndefinedValue(value) {
+	//console.log("checkForUndefinedValue param: "+value);
+	if(value === undefined || value === null || value === "") {
+		return true;
+	} else {
+		return false;
+	}
+}
+/*================================================================================*/
 	renderTable(weekly_data){
 		//console.log(moment(this.state.selectedDate).startOf('week').format('MMM DD'));
 		//console.log(moment(this.state.selectedDate).startOf('week').add(1, 'days').format('MMM DD'));
@@ -253,7 +273,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 			/*let td_keys = ["workout_type","days_with_activity","percent_of_days","duration","workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
 			"percent_aerobic","duration_in_anaerobic_	range","percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
 			"duration_hrr_not_recorded","percent_hrr_not_recorded"];*/
-			let td_keys = ["workout_type","duration","workout_duration_percent","duration_in_aerobic_range", "percent_aerobic", "duration_in_anaerobic_range", "percent_anaerobic", "duration_below_aerobic_range", "percent_below_aerobic", "duration_hrr_not_recorded", "percent_hrr_not_recorded","days_with_activity"];
+			let td_keys = ["workout_type","no_activity_in_week","duration","workout_duration_percent","duration_in_aerobic_range", "percent_aerobic", "duration_in_anaerobic_range", "percent_anaerobic", "duration_below_aerobic_range", "percent_below_aerobic", "duration_hrr_not_recorded", "percent_hrr_not_recorded","days_with_activity"];
 
 			/*if(Object.keys(weekly_data['Totals']).indexOf("_distance") >0) {
 
@@ -266,11 +286,11 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 			let sat = moment(this.state.selectedDate).weekday(-1).format('DD-MMM-YY');
 			let sun = moment(this.state.selectedDate).weekday(0).format('DD-MMM-YY');
 			td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
-			console.log("Object.keys(weekly_data['Totals']): "+Object.keys(weekly_data['Totals']));	
+			//console.log("Object.keys(weekly_data['Totals']): "+Object.keys(weekly_data['Totals']));	
 			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => (x.indexOf("_distance")>=0));
 			td_keys = td_keys.concat(activity_distance_keys);
 			
-			console.log("activity_distance_keys: "+activity_distance_keys);
+			//console.log("activity_distance_keys: "+activity_distance_keys);
 			
 			let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity"];
 			for(let [key,value] of Object.entries(weekly_data)){
@@ -278,7 +298,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 					td_keys = td_keys.concat(dateKey);
 				}*/
 				
-				console.log(key+ " and value = " +value);
+				//console.log(key+ " and value = " +value);
 				let flag = 0;
 				let td_values = [];
 				/*let tempDate = Object.keys(value['dates']);
@@ -303,19 +323,34 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 									Sun Aug 26
 									*/
 
-					let tempDate = Object.keys(value['dates']);
-					console.log("tempDate: "+tempDate[0]);
+					let tempDate = Object.keys(value['dates']).sort();
+					//console.log("tempDate: "+tempDate[0]);
 					let tempIndex = 0;
-
+					let tempWorkoutType = null;
+					let tempNoOfActivityInWeek = null;
 					for(let key1 of td_keys){
 						//console.log("Object.keys.filter(x => x=== key1): "+Object.keys(value['dates']).filter(a => key1 == a) + "key1"+key1);
-						if(key1== "workout_type") {
-							td_values.push(<td>{value[key1]}</td>);
+						//console.log("tempWorkoutType: " + tempWorkoutType);
+   						//console.log("tempNoOfActivityInWeek: " + tempNoOfActivityInWeek);
+   						//console.log("key1: "+ key1);
+						if(key1== "workout_type" || key1 == "no_activity_in_week") {
+							if(key1== "workout_type" && !this.checkForUndefinedValue(value[key1])) {
+								tempWorkoutType = value[key1];
+							} else if(key1 == "no_activity_in_week" ){
+								if(this.checkForUndefinedValue(value[key1])) {
+									tempNoOfActivityInWeek = "";
+								} else{
+									tempNoOfActivityInWeek = "(" + value[key1] + ")";
+								}
+							}
+							if(tempWorkoutType != null && tempWorkoutType != undefined && tempNoOfActivityInWeek != null && tempNoOfActivityInWeek != undefined) {
+									td_values.push(<td>{tempWorkoutType + tempNoOfActivityInWeek }</td>);
+								}
 						}
-						else if(key1=="duration") {
+						else if(key1=="duration" && !this.checkForUndefinedValue(value[key1])) {
 							td_values.push(<td>{this.renderTime(value[key1])}</td>);
 						}
-						else if(key1=="workout_duration_percent") {
+						else if(key1=="workout_duration_percent" && !this.checkForUndefinedValue(value[key1])) {
 							td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
 						}
 						else if(key1 == "duration_in_aerobic_range" || key1 == "duration_in_anaerobic_range" ||
@@ -323,21 +358,22 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded" || key1 == "duration_hrr_not_recorded") {
 							
 							if(flag == 0) {
+								//console.log("Key value before calling aeroAnaerobicMatrix: "+ key1);
 								this.aeroAnaerobicMatrix(value, td_keys, td_values);
 								flag++;
 							}
 						}
-						else if(key1 == "days_with_activity") {
+						else if(key1 == "days_with_activity" && !this.checkForUndefinedValue(value[key1])) {
 							td_values.push(<td>{value[key1]}</td>);
 						}
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
-							console.log("key1 in else if block: "+ key1);
-							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]; 
+							//console.log("key1 in else if block: "+ key1);
+							let [dateKey,dateValue] = (Object.entries(value["dates"]).sort())[tempIndex].sort(); 
 								let tempDayDuration = "";
 								let tempDayRepeated = "";
-								console.log("dateKey: "+dateKey);
+								//console.log("dateKey: "+dateKey);
 								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
-									console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
+									//console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
 
 									if(finalDateKey == "repeated") {
 										tempDayRepeated = finalDateValue;
@@ -367,7 +403,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							}
 							
 						}*/
-						else if(activity_distance_keys.includes(key1)){
+						else if(activity_distance_keys.includes(key1) && !this.checkForUndefinedValue(value[key1])){
 							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
 								td_values.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
 							}
@@ -434,18 +470,36 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							td_totals.push(value[key1])
 						}
 					}*/
-					let tempDate = Object.keys(value['dates']);
+					let tempDate = Object.keys(value['dates']).sort();
 					console.log("tempDate: "+tempDate[0]);
+					console.log("tempDate: "+tempDate[1]);
+					console.log("tempDate: "+tempDate[2]);
+					console.log("tempDate: "+tempDate[3]);
 					let tempIndex = 0;
+					let tempWorkoutType = null;
+					let tempNoOfActivityInWeek = null;
+
 					for(let key1 of td_keys){
 						
-						if(key1== "workout_type") {
-							td_totals.push(<td>{value[key1]}</td>);
+						if(key1== "workout_type" || key1 == "no_activity_in_week") {
+							if(key1== "workout_type" && !this.checkForUndefinedValue(value[key1])) {
+								tempWorkoutType = value[key1];
+							} else if(key1 == "no_activity_in_week") {
+								//console.log("value[key1] :" + value[key1]);
+								if(this.checkForUndefinedValue(value[key1])) {
+									tempNoOfActivityInWeek = "";
+								} else {
+									tempNoOfActivityInWeek = + "(" + value[key1] + ")";
+								}
+							}
+							if(tempWorkoutType != null && tempWorkoutType != undefined && tempNoOfActivityInWeek != null && tempNoOfActivityInWeek != undefined) {
+								td_totals.push(<td>{tempWorkoutType + tempNoOfActivityInWeek}</td>);
+							}
 						}
-						else if(key1=="duration") {
+						else if(key1=="duration" && !this.checkForUndefinedValue(value[key1])) {
 							td_totals.push(<td>{this.renderTime(value[key1])}</td>);
 						}
-						else if(key1=="workout_duration_percent") {
+						else if(key1=="workout_duration_percent" && !this.checkForUndefinedValue(value[key1])) {
 							td_totals.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
 						}
 						else if(key1 == "duration_in_aerobic_range" || key1 == "duration_in_anaerobic_range" ||
@@ -457,16 +511,16 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 								flag++;
 							}
 						}
-						else if(key1 == "days_with_activity") {
+						else if(key1 == "days_with_activity" && !this.checkForUndefinedValue(value[key1])) {
 							td_totals.push(<td>{value[key1]}</td>);
 						}
-						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && tempDate.includes(key1)) {
+						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
 							console.log("key1 in else total block: "+ key1);
 							console.log("key1 in else total block: "+ tempIndex);
-							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex];
+							let [dateKey,dateValue] = (Object.entries(value["dates"]).sort())[tempIndex];
 								let tempDayDuration = "";
 								let tempDayRepeated = "";
-								console.log("dateKey: "+dateKey);
+								console.log("dateKey 22: "+dateKey);
 
 								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
 									console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
@@ -482,7 +536,27 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							
 							tempIndex ++;	
 						}
-						else if(activity_distance_keys.includes(key1)){
+						/*
+						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
+							//console.log("key1 in else if block: "+ key1);
+							let [dateKey,dateValue] = Object.entries(value["dates"])[tempIndex]; 
+								let tempDayDuration = "";
+								let tempDayRepeated = "";
+								//console.log("dateKey: "+dateKey);
+								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
+									//console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
+
+									if(finalDateKey == "repeated") {
+										tempDayRepeated = finalDateValue;
+									} else if(finalDateKey == "duration") {
+										tempDayDuration = this.renderTime(finalDateValue);
+									}
+								}	
+								td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+							
+							tempIndex ++;
+						}*/
+						else if(activity_distance_keys.includes(key1) && !this.checkForUndefinedValue(value[key1])){
 							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
 								td_totals.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
 							}
