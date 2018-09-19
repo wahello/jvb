@@ -951,7 +951,7 @@ def _get_activities_start_end_time(combined_user_activities):
 		object of each activities
 	'''
 
-	Time = namedtuple("Time",["start","end"])
+	Time = namedtuple("Time",["start","end","duration"])
 	activities_start_end_time = []
 
 	if combined_user_activities:
@@ -965,6 +965,7 @@ def _get_activities_start_end_time(combined_user_activities):
 				Time(
 					datetime.utcfromtimestamp(start_time),
 					datetime.utcfromtimestamp(end_time),
+					activity.get('durationInSeconds',0)
 				)
 			)
 	return activities_start_end_time  
@@ -1195,6 +1196,54 @@ def _update_status_to_timezone_change(mc_data,timezone_change_interval,calendar_
 				mc_data[interval]['status'] = 'time zone change'
 	return mc_data
 
+def get_epoch_active_time(activites_time_list,epoch,intensity_level):
+	'''
+	Calculate active time for the given epoch data by considering
+	duration of any activity(ies) overlapping with epoch duration.
+	If activities overlap with epoch duration then, the overlapping duration
+	will be added to active minutes.
+
+	Args:
+		activites_time_list(list): List of named tuple containing start time,
+			end time and duration of activities.
+		epoch(dict): Epoch data
+
+	'''
+	epoch_start = datetime.utcfromtimestamp(
+		epoch.get('startTimeInSeconds')+ epoch.get('startTimeOffsetInSeconds'))
+	epoch_end = epoch_start + timedelta(seconds=epoch.get('durationInSeconds'))
+
+	overlapping_duration_in_sec = 0
+	for activity_time in activites_time_list:
+		if (activity_time.start >= epoch_start 
+			and activity_time.end <= epoch_end):
+			overlapping_duration_in_sec += activity_time.duration
+		elif (activity_time.start >= epoch_start 
+			  and activity_time.start <= epoch_end):
+			overlapping_sec = (epoch_end - activity_time.start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (activity_time.end >= epoch_start 
+			  and activity_time.end <= epoch_end):
+			overlapping_sec = (activity_time.end - epoch_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (activity_time.start <= epoch_start
+			  and activity_time.end >= epoch_end):
+			overlapping_sec = (epoch_end - epoch_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+	
+	if overlapping_duration_in_sec:
+		active_seconds = overlapping_duration_in_sec
+		if intensity_level != 'SEDENTARY':
+			active_seconds += epoch.get('activeTimeInSeconds',0) 
+
+		# Active minuted per epoch data is capped to 15 mins (900 sec)
+		if active_seconds > 900:
+			active_seconds = 900
+	else:
+		active_seconds = 0
+		if intensity_level != 'SEDENTARY':
+			active_seconds = epoch.get('activeTimeInSeconds',0)
+	return active_seconds
 
 def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		sleeps_today_json,user_input_todays_bedtime,combined_user_activities,
@@ -1274,42 +1323,50 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			data_date_midnight += td_hour
 
 		for data in epochs_json:
-			if data.get('intensity') != 'SEDENTARY': 
-				start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
-				hour_start = datetime.utcfromtimestamp(start_time)
-				time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
-				steps_in_interval = movement_consistency[time_interval].get('steps')
+			start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
+			hour_start = datetime.utcfromtimestamp(start_time)
+			time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
+			steps_in_interval = movement_consistency[time_interval].get('steps',0)
+			status = "sleeping"
+			# ex 6:00 PM, not 6:32 PM
+			hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
+
+			if (yesterday_bedtime and
+				today_awake_time and
+				hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+				hour_start_zero_min <= today_awake_time):
 				status = "sleeping"
-				# ex 6:00 PM, not 6:32 PM
-				hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
+			elif(yesterday_bedtime and
+				hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+				today_bedtime and
+				(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
+				status = "sleeping"
+			elif(user_input_strength_start_time and user_input_strength_end_time and
+				hour_start >= user_input_strength_start_time and
+				hour_start <= user_input_strength_end_time):
+				status = "strength"
+			elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
+				status = "exercise"
+			else:
+				status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
-				if (yesterday_bedtime and
-					today_awake_time and
-					hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-					hour_start_zero_min <= today_awake_time):
-					status = "sleeping"
-				elif(yesterday_bedtime and
-					hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-					today_bedtime and
-					(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
-					status = "sleeping"
-				elif(user_input_strength_start_time and user_input_strength_end_time and
-					hour_start >= user_input_strength_start_time and
-					hour_start <= user_input_strength_end_time):
-					status = "strength"
-				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
-					status = "exercise"
-				else:
-					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
+			intensity_level = data.get('intensity')
+			# active_duration_min =  data.get('activeTimeInSeconds',0)/60
+			active_duration_min = (get_epoch_active_time(
+				activities_start_end_time,data,intensity_level)/60)
+			interval_active_duration = movement_consistency[time_interval]['active_duration']
 
-				active_duration_min = data.get('activeTimeInSeconds',0)/60
-				interval_active_duration = movement_consistency[time_interval]['active_duration']
+			# Total active minute in the hourly interval is capped to 60 mins
+			if interval_active_duration['duration']+active_duration_min > 60:
+				interval_active_duration['duration'] = 60
+			else:	
 				interval_active_duration['duration'] = round(
 					interval_active_duration['duration'] + active_duration_min)
-				active_prcnt = round((interval_active_duration['duration']/60)*100)
-				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
-				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
-				movement_consistency[time_interval]['status'] = status
+
+			active_prcnt = round((interval_active_duration['duration']/60)*100)
+			movement_consistency[time_interval]['active_prcnt'] = active_prcnt
+			movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
+			movement_consistency[time_interval]['status'] = status
 
 		total_active_minutes = 0
 		active_hours = 0
