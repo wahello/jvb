@@ -90,7 +90,6 @@ class DailyUserInputStrong(models.Model):
         ("injured","Injured"),
         ("sick", "Sick"),
         ("too busy/not enough time","Too Busy/Not Enough Time"),
-        ("didn’t feel like it","Didn’t Feel Like It"),
         ("work got in the way","Work Got in the Way"),
         ("travel day","Travel Day"),
         ("weather","Weather"),
@@ -253,7 +252,7 @@ class DailyUserInputStrong(models.Model):
         max_length=10, blank=True)
 
     weather_comment = models.TextField(blank=True)
-    activities = models.TextField(blank=True)
+    # activities = models.TextField(blank=True)
     
 class DailyUserInputEncouraged(models.Model):
 
@@ -440,7 +439,6 @@ class DailyUserInputOptional(models.Model):
     nap_duration = models.CharField(max_length = 10, blank = True)
     nap_comment = models.TextField(blank=True)
 
-
 class InputsChangesFromThirdSources(models.Model):
     user_input = models.OneToOneField(UserDailyInput, related_name='third_source_input')
     resting_heart_rate = models.FloatField( validators = [MinValueValidator(25),MaxValueValidator(125)])
@@ -482,3 +480,14 @@ class Goals(models.Model):
     user_input = models.OneToOneField(UserDailyInput, related_name='goals')
     goals = models.CharField(max_length=264,choices = CHOICE)
     other = models.CharField(max_length=264,null=True,blank=True)
+
+class DailyUserActivities(models.Model):
+    activity_id = models.CharField(
+        max_length=20,
+        validators = [CharMinValueValidator(1),CharMaxValueValidator(100)],
+        blank = True,null = True)
+    user_input = models.OneToOneField(UserDailyInput, related_name='activities_input')
+    submitted_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user_input', 'activity_id')
