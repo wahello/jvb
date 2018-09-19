@@ -760,51 +760,70 @@ def is_duplicate_activity(activity, all_activities):
 	3. Now pick that activity which has the longest duration.
 	4. If all overlapping activities have no heart rate information, then pick
 	   the activity with the longest duration  [ALTERNATE SCENARIO]
+	
+	Args:
+		activity(dict): Activity which needs to be classified
+		all_activities(list): A list of all activities
+
+	Return:
+		Bool: True is activity is duplicate else False 
 	'''
-	overlapping_activities = []
 	is_duplicate = False
-	activity_start = datetime.utcfromtimestamp(
-		activity.get('startTimeInSeconds',0)
-		+activity.get('startTimeOffsetInSeconds',0))
-	activity_end = (activity_start 
-		+ timedelta(seconds=activity.get('durationInSeconds',0)))
 
-	for act in all_activities:
-		overlapping_duration_in_sec = 0
-		act_start = datetime.utcfromtimestamp(
-			act.get('startTimeInSeconds',0)
-			+ act.get('startTimeOffsetInSeconds',0))
-		act_end = (act_start 
-			+ timedelta(seconds=act.get('durationInSeconds',0)))
-		if (act_start >= activity_start and act_end <= activity_end):
-			overlapping_duration_in_sec += act.get('durationInSeconds',0)
-		elif (act_start >= activity_start and act_start <= activity_end):
-			overlapping_sec = (activity_end - act_start).seconds
-			overlapping_duration_in_sec += overlapping_sec
-		elif (act_end >= activity_start and act_end <= activity_end):
-			overlapping_sec = (act_end - activity_start).seconds
-			overlapping_duration_in_sec += overlapping_sec
-		elif (act_start <= activity_start and act_end >= activity_end):
-			overlapping_sec = (activity_start - activity_end).seconds
-			overlapping_duration_in_sec += overlapping_sec
-		if (overlapping_duration_in_sec 
-			and overlapping_duration_in_sec > 600
-			and (not activity.get('deviceName','manually_created') 
-				== act.get('deviceName','manually_created'))):
-			overlapping_activities.append(act)
+	if activity and all_activities:
+		if 'duplicate' in activity:
+			# If user has already classified any activity then return 
+			# that classification otherwise proceed with full check.
+			duplicate = activity.get('duplicate',None)
+			print(activity.get('activityType'),"Is duplicate:",duplicate)
+			if duplicate is not None:
+				return duplicate
 
-	overlapping_activities.append(activity)
-	if overlapping_activities:
-		original_act = None
-		longest_duration = 0
-		for act in overlapping_activities:
-			if (act.get('durationInSeconds',0) >= longest_duration
-				and act.get('averageHeartRateInBeatsPerMinute',0)):
-				original_act = act
-				longest_duration = act.get('durationInSeconds',0)
-		if (original_act 
-			and original_act.get('summaryId') != activity.get('summaryId')):
-				is_duplicate = True
+		overlapping_activities = []
+		activity_start = datetime.utcfromtimestamp(
+			activity.get('startTimeInSeconds',0)
+			+activity.get('startTimeOffsetInSeconds',0))
+		activity_end = (activity_start 
+			+ timedelta(seconds=activity.get('durationInSeconds',0)))
+
+		for act in all_activities:
+			overlapping_duration_in_sec = 0
+			act_start = datetime.utcfromtimestamp(
+				act.get('startTimeInSeconds',0)
+				+ act.get('startTimeOffsetInSeconds',0))
+			act_end = (act_start 
+				+ timedelta(seconds=act.get('durationInSeconds',0)))
+			if (act_start >= activity_start and act_end <= activity_end):
+				overlapping_duration_in_sec += act.get('durationInSeconds',0)
+			elif (act_start >= activity_start and act_start <= activity_end):
+				overlapping_sec = (activity_end - act_start).seconds
+				overlapping_duration_in_sec += overlapping_sec
+			elif (act_end >= activity_start and act_end <= activity_end):
+				overlapping_sec = (act_end - activity_start).seconds
+				overlapping_duration_in_sec += overlapping_sec
+			elif (act_start <= activity_start and act_end >= activity_end):
+				overlapping_sec = (activity_start - activity_end).seconds
+				overlapping_duration_in_sec += overlapping_sec
+			if (overlapping_duration_in_sec 
+				and overlapping_duration_in_sec > 600
+				and (not activity.get('deviceName','manually_created') 
+					== act.get('deviceName','manually_created'))):
+				overlapping_activities.append(act)
+
+		overlapping_activities.append(activity)
+		if overlapping_activities:
+			original_act = None
+			longest_duration = 0
+			for act in overlapping_activities:
+				if (act.get('durationInSeconds',0) >= longest_duration
+					and act.get('averageHeartRateInBeatsPerMinute',0)):
+					original_act = act
+					longest_duration = act.get('durationInSeconds',0)
+			if (original_act 
+				and original_act.get('summaryId') != activity.get('summaryId')):
+					is_duplicate = True
+
+	print(activity.get("activityType"), is_duplicate)
 
 	return is_duplicate
 
@@ -837,13 +856,13 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 			userinput_activities.pop(obj.get('summaryId'))
 			filtered_obj = {}
 			for key,val in obj_in_user_activities.items():
-				# if any key have empty, null or 0 value then remove it
-				# and look for that key in original garmin provided summary because
-				# sometimes user submitted activities might have no value for fields
-				# like - avgHeartRateInBeatsPerMinute, steps etc. In that case empty value 
-				# will be taken for those keys even though value exist in original 
-				# summary provided by garmin 
-				if val:
+				# if any key (except 'duplicate') have empty, null or 0 value
+				# then remove it and look for that key in original garmin provided
+				# summary because sometimes user submitted activities might have
+				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
+				# etc. In that case empty value will be taken for those keys even
+				# though value exist in original summary provided by garmin 
+				if val or key == 'duplicate':
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj

@@ -842,7 +842,7 @@ def aa_workout_data(user,start_date):
 	# 				activities_dic[summaryId[i]]=input_files[summaryId[i]]
 	# except (ValueError, SyntaxError):
 	# 	pass
-	activities,activities_dic,user_input_strong = get_usernput_activities(user,start_date)
+	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(user,start_date)
 	count = 0
 	id_act = 0
 	activities = []
@@ -862,7 +862,6 @@ def aa_workout_data(user,start_date):
 						activities.append(single_activity_values[i])
 					else:
 						activities.append(single_activity_values[i])
-
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
 
@@ -872,7 +871,7 @@ def aa_workout_data(user,start_date):
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
-													userinput_activities=activities_dic)
+													userinput_activities=user_input_activities)
 	act_id = []
 	workout = []
 	hrr = []
