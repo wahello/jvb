@@ -109,9 +109,9 @@ def workout_percent(workout_dict):
 		calculating the average heart rate and percent of days having activities 
 	'''
 	for key,value in workout_dict.items():
-		if value.get('days_with_activity') and value.get("average_heart_rate"):
+		if value.get('no_activity_in_week') and value.get("average_heart_rate"):
 			workout_dict[key]["average_heart_rate"] = ((
-				workout_dict[key]["average_heart_rate"])/workout_dict[key]["days_with_activity"])
+				workout_dict[key]["average_heart_rate"])/workout_dict[key]["no_activity_in_week"])
 			workout_dict[key]["percent_of_days"] = ((
 				workout_dict[key]["days_with_activity"])/7)*100
 		elif value.get('days_with_activity'):	
@@ -141,6 +141,9 @@ def add_activity_type(workout_dict,workout_type):
 	return workout_dict
 
 def change_hrr_key(workout_dict_percent):
+	'''
+		Add duration for the activity which does not have the HRR
+	'''
 	workout_dict_percent_copy = workout_dict_percent.copy()
 	for key,value in workout_dict_percent.items():
 		if value['hrr_not_recorded']:
@@ -171,6 +174,9 @@ def remove_spaces(weekly_workout):
 	return workouts
 
 def add_dates(value,workout_dict):
+	'''
+		Add dates to single activity
+	'''
 	for key,data in workout_dict.items():
 		data_workout = value.get("date")
 		if key == value.get("workout_type"):
@@ -180,6 +186,8 @@ def add_dates(value,workout_dict):
 					workout_dict[key]["dates"][value["date"]]['workout_date'] = value.get("date")	
 					workout_dict[key]["dates"][value["date"]]['repeated'] = (
 						1+workout_dict[key]["dates"][value["date"]]['repeated'])
+					workout_dict[key]["dates"][value["date"]]['duration'] = value.get(
+						"duration",0)+workout_dict[key]["dates"][value["date"]].get('duration',0)
 
 			except KeyError:
 				workout_dict[key]["dates"][value["date"]] = {}
@@ -239,7 +247,7 @@ def weekly_workout_calculations(weekly_workout):
 				workout_dict[value['workout_type']]['days_with_activity'] = 1
 				workout_dict[value['workout_type']]['no_activity_in_week'] = 1
 				workout_summary_id[key] = [value['workout_type']]
-	print(workout_dict,"work out dict")
+	
 	added_all_actiivtes = add_activity_type(workout_dict,workout_type)
 	workout_dict_percent = workout_percent(added_all_actiivtes)
 	final_workout_data = change_hrr_key(workout_dict_percent)
@@ -451,14 +459,17 @@ def dynamic_activities(final_data,workout_type):
 	return final_data
 
 def single_dates_obj(workout_date_list,single_data,data_copy):
-	# print(single_data,"single_data")
+	'''
+		Add duration of the Activity for single date
+	'''
 	for single_workout_date in workout_date_list:
 		try:
 			if single_data["dates"].get(
 				single_workout_date,'0').get(
 				"workout_date",'0') == data_copy["Totals"]["dates"][single_workout_date]['workout_date']:	
 				data_copy["Totals"]["dates"][single_workout_date]['repeated'] = (
-					1+data_copy["Totals"]["dates"][single_workout_date]['repeated'])
+					data_copy["Totals"]["dates"][single_workout_date]['repeated']+single_data["dates"].get(
+						single_workout_date,'0').get("repeated",'0'))
 				data_copy["Totals"]["dates"][single_workout_date]['duration'] = single_data["dates"].get(
 				single_workout_date,'0').get("duration",'0') + data_copy["Totals"]["dates"][single_workout_date]['duration'] 
 
@@ -471,23 +482,30 @@ def single_dates_obj(workout_date_list,single_data,data_copy):
 	return data_copy
 
 def add_duration_total(final_data,weekly_workout,workout_date_list):
-	# print(final_data,"data_copy")
+	'''
+		Add total duration of the single date
+	'''
 	for weekly_workout_str in weekly_workout:
 		single_workout = ast.literal_eval(weekly_workout_str)
 		for key,workout in single_workout.items():
-			for single_data in workout_date_list:
+			for i,single_data in enumerate(workout_date_list):
 				if single_data == single_workout[key]['date']:		
 					final_data["Totals"]["dates"][single_data]["duration"] = single_workout["Totals"]["duration"]
 	return final_data
 
-def add_dates_totals(data):	
+def add_dates_totals(data):
+	'''
+		Add dated to the totals key
+	'''
+	workout_date_list = []	
 	data_copy = data.copy()
 	for key,single_data in data.items():
 		if key != "Totals" and key != "extra":
 			# print(single_data,"single data")
 			workout_date = single_data["dates"].keys()
-			workout_date_list = list(workout_date)
-			data_total = single_dates_obj(workout_date_list,single_data,data_copy)
+			workout_date = list(workout_date)
+			workout_date_list.extend(workout_date)
+			data_total = single_dates_obj(workout_date,single_data,data_copy)
 	
 	return data_total,workout_date_list
 			
@@ -500,4 +518,4 @@ def remove_distance_meters(data,weekly_workout):
 	data["Totals"]["dates"] = {}
 	final_data,workout_date_list = add_dates_totals(data)
 	data_duration_copy = add_duration_total(final_data,weekly_workout,workout_date_list)
-	return final_data
+	return data_duration_copy
