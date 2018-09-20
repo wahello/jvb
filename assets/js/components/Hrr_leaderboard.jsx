@@ -50,7 +50,7 @@ class HrrLeaderboard extends Component{
   		let background = "";
 		let color = "";
 		let hr_background = "";
-  		if(value){
+  		if(!isNaN(value)){
 	            if(value >= 3.4){
 	           		background = 'green';
 	               	color = 'white';
