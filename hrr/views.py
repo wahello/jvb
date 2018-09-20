@@ -2530,7 +2530,7 @@ def weekly_workout_helper(user,start_date):
 	else:
 		data = {}
 	if data:
-		data_v2 = remove_distance_meters(data)
+		data_v2 = remove_distance_meters(data,weekly_workout)
 	else:
 		data_v2 = {}
 	# print(data_v2,"sssssssssssss")
