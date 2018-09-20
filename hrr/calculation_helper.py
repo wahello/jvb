@@ -468,7 +468,8 @@ def single_dates_obj(workout_date_list,single_data,data_copy):
 				single_workout_date,'0').get(
 				"workout_date",'0') == data_copy["Totals"]["dates"][single_workout_date]['workout_date']:	
 				data_copy["Totals"]["dates"][single_workout_date]['repeated'] = (
-					1+data_copy["Totals"]["dates"][single_workout_date]['repeated'])
+					data_copy["Totals"]["dates"][single_workout_date]['repeated']+single_data["dates"].get(
+						single_workout_date,'0').get("repeated",'0'))
 				data_copy["Totals"]["dates"][single_workout_date]['duration'] = single_data["dates"].get(
 				single_workout_date,'0').get("duration",'0') + data_copy["Totals"]["dates"][single_workout_date]['duration'] 
 
