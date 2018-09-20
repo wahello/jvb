@@ -766,7 +766,7 @@ def is_duplicate_activity(activity, all_activities):
 		all_activities(list): A list of all activities
 
 	Return:
-		Bool: True is activity is duplicate else False 
+		Bool: True if activity is duplicate else False 
 	'''
 	is_duplicate = False
 
@@ -775,7 +775,6 @@ def is_duplicate_activity(activity, all_activities):
 			# If user has already classified any activity then return 
 			# that classification otherwise proceed with full check.
 			duplicate = activity.get('duplicate',None)
-			print(activity.get('activityType'),"Is duplicate:",duplicate)
 			if duplicate is not None:
 				return duplicate
 
@@ -819,11 +818,20 @@ def is_duplicate_activity(activity, all_activities):
 					and act.get('averageHeartRateInBeatsPerMinute',0)):
 					original_act = act
 					longest_duration = act.get('durationInSeconds',0)
+
+			if not original_act:
+				# If no original activity is found that means all of the 
+				# overlapping activities have no average heart rate information. 
+				# So in such case pick the activity with longest duration.
+				longest_duration = 0
+				for act in overlapping_activities:
+					if (act.get('durationInSeconds',0) >= longest_duration):
+						original_act = act
+						longest_duration = act.get('durationInSeconds',0)
+
 			if (original_act 
 				and original_act.get('summaryId') != activity.get('summaryId')):
 					is_duplicate = True
-
-	print(activity.get("activityType"), is_duplicate)
 
 	return is_duplicate
 
@@ -841,7 +849,8 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 	Args:
 		activities_json (list): List of  activities
 		manually_updated_json (list): List of manually edited activities
-		userinput_activities (list): List of user created/modified activities
+		userinput_activities (dict): dictionary of user created/modified
+			activities. Key is activity id and value is complete activity data 
 	'''
 
 	activities_json = copy.deepcopy(activities_json)
