@@ -508,37 +508,37 @@ def aa_data(user,start_date):
 			"percent_anaerobic":None,
 			"total_percent":None}
 
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
-
 	activities = []
 	user_input_keys = []
 	created_activity_dict = {}
 	id_act = 0
 	user_input_workout_keys = []
 	user_input_workout_data = []
-	if user_input_strong:
-		for tmp in user_input_strong:
-			sn = tmp.activities
-			if sn:
-				sn = json.loads(sn)
-				di = sn.values()
-				di = list(di)
-				for i,k in enumerate(di):
-					user_input_keys.append(di[i]['summaryId'])
-					user_input_summary_id = list(set(user_input_keys))
-					created_activity = list(set(
-						user_input_summary_id) - set(activities_summary_id))
-					if created_activity and di[i]['summaryId'] in created_activity:
-						summayid = di[i]['summaryId']
-						created_activity_dict[summayid] = k
-					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(di[i]['summaryId'])
-						activities.append(di[i])
-					else:
-						user_input_workout_keys.append(di[i]['summaryId'])
-						user_input_workout_data.append(di[i])
+	garmin_list,garmin_dic = get_garmin_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+		user,start_date)
+
+	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													manually_updated_json=manually_edited_dic,
+													userinput_activities=activities_dic)
+	# print(filtered_activities_files,"filtered activities")
+	for i,k in enumerate(filtered_activities_files):
+		user_input_keys.append(filtered_activities_files[i]['summaryId'])
+		user_input_summary_id = list(set(user_input_keys))
+		created_activity = list(set(
+			user_input_summary_id) - set(activities_summary_id))
+		if created_activity and filtered_activities_files[i]['summaryId'] in created_activity:
+			summayid = filtered_activities_files[i]['summaryId']
+			created_activity_dict[summayid] = k
+		if filtered_activities_files[i]['activityType'] == 'HEART_RATE_RECOVERY':
+			id_act = int(filtered_activities_files[i]['summaryId'])
+			activities.append(filtered_activities_files[i])
+		else:
+			user_input_workout_keys.append(filtered_activities_files[i]['summaryId'])
+			user_input_workout_data.append(filtered_activities_files[i])
 	user_created_activity = list(set(user_input_workout_keys)-set(activities_summary_id))
 	# garmin_workout_keys = set(activities_summary_id) - set(activities_hrr)
 	user_created_activity_list = []
@@ -674,7 +674,7 @@ def aa_data(user,start_date):
 					"total_percent":None}
 	if user_created_activity_list and user_input_strong:
 		data = add_created_activity1(
-			di,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
+			filtered_activities_files,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
 		data_values = data.values()
 		data_list = list(data_values)
 		data = data_list[0]
@@ -824,24 +824,6 @@ def aa_workout_data(user,start_date):
 			only_hrr_summary_id.append(summaryId)
 			ui_data_keys.remove(summaryId)
 	
-	# try:
-	# 	user_input_strong = DailyUserInputStrong.objects.filter(
-	# 	user_input__created_at=(start_date),
-	# 	user_input__user = user).order_by('-user_input__created_at')
-	# 	activities=[]
-	# 	activities_dic={}
-	# 	if user_input_strong:
-	# 		user_input_activities =[act.activities for act in user_input_strong]
-	# 		for i,k in enumerate(user_input_activities):
-	# 			input_files=json.loads(user_input_activities[i])
-	# 			summaryId = []
-	# 			for keys in input_files.keys():
-	# 				summaryId.append(keys)
-	# 			for i in range(len(summaryId)):
-	# 				activities.append(input_files[summaryId[i]])
-	# 				activities_dic[summaryId[i]]=input_files[summaryId[i]]
-	# except (ValueError, SyntaxError):
-	# 	pass
 	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(user,start_date)
 	count = 0
 	id_act = 0
@@ -871,7 +853,7 @@ def aa_workout_data(user,start_date):
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
-													userinput_activities=user_input_activities)
+													userinput_activities=activities_dic)
 	act_id = []
 	workout = []
 	hrr = []
@@ -1164,28 +1146,32 @@ def daily_aa_data(user, start_date):
 			summaryId = ui_data_single['summaryId']
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
+
+	garmin_list,garmin_dic = get_garmin_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+		user,start_date)
+
+	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													manually_updated_json=manually_edited_dic,
+													userinput_activities=activities_dic)
 	count = 0
 	id_act = 0
 	activities = []
 	activities_workout = []
 	activities_hrr = []
 	workout_data = []
-	if user_input_strong:
-		for tmp in user_input_strong:
-			sn = tmp.activities
-			if sn:
-				sn = json.loads(sn)
-				di = sn.values()
-				di = list(di)
-				for i,k in enumerate(di):
-					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(di[i]['summaryId'])
-						count = count + 1
-						activities.append(di[i])
-						activities_hrr.append(di[i]['summaryId'])
-					else:
-						workout_data.append(di[i])
-						activities_workout.append(di[i]['summaryId'])
+	for i,k in enumerate(filtered_activities_files):
+		if filtered_activities_files[i]['activityType'] == 'HEART_RATE_RECOVERY':
+			id_act = int(filtered_activities_files[i]['summaryId'])
+			count = count + 1
+			activities.append(filtered_activities_files[i])
+			activities_hrr.append(filtered_activities_files[i]['summaryId'])
+		else:
+			workout_data.append(filtered_activities_files[i])
+			activities_workout.append(filtered_activities_files[i]['summaryId'])
 	user_created_activity = list(set(activities_workout) - set(garmin_activity_keys))
 	garmin_workout_keys = set(garmin_activity_keys) - set(activities_hrr)
 	user_created_activity_list = []
@@ -1221,7 +1207,8 @@ def daily_aa_data(user, start_date):
 	end = start_date + timedelta(days=3)
 	
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-
+	filtered_activities_files_ui = get_filtered_activity_stats(activities_json=garmin_list,
+													manually_updated_json=manually_edited_dic)
 	try:
 		if activities:
 			for tmp in a1:
@@ -1233,9 +1220,9 @@ def daily_aa_data(user, start_date):
 				elif str(data_id) in garmin_workout_keys:
 					workout.append(tmp)
 					data_summaryid.append(data_id)
-				if activity_files_qs:
-					for i,k in enumerate(activity_files):
-						activity_files_dict = ast.literal_eval(activity_files[i])
+				if filtered_activities_files_ui:
+					for i,k in enumerate(filtered_activities_files_ui):
+						activity_files_dict = filtered_activities_files_ui[i]	
 						if activity_files_dict.get("summaryId",None) == str(data_id) and str(data_id) in garmin_workout_keys:
 							duration = activity_files_dict.get('durationInSeconds')
 							activities_duration.append(duration)
@@ -1266,9 +1253,9 @@ def daily_aa_data(user, start_date):
 					data_summaryid.append(data_id)
 				elif str(data_id) in ui_data_hrr:
 					hrr.append(tmp)
-				if activity_files_qs:
-					for i,k in enumerate(activity_files):
-						activity_files_dict = ast.literal_eval(activity_files[i])
+				if filtered_activities_files_ui:
+					for i,k in enumerate(filtered_activities_files_ui):
+						activity_files_dict = filtered_activities_files_ui[i]
 						if activity_files_dict.get("summaryId",None) == str(data_id) and str(data_id) in ui_data_keys:
 							duration = activity_files_dict.get('durationInSeconds')
 							activities_duration.append(duration)
@@ -1441,7 +1428,7 @@ def daily_aa_data(user, start_date):
 			daily_aa_data.update({key:value})	
 		return (add_totals(daily_aa_data))
 	elif user_input_strong:
-		data_ui = add_created_activity(di,data,below_aerobic_value,anaerobic_value)
+		data_ui = add_created_activity(filtered_activities_files,data,below_aerobic_value,anaerobic_value)
 		return (add_totals(data_ui))
 	if daily_aa_data:
 		return daily_aa_data
@@ -1636,27 +1623,29 @@ def aa_low_high_end_data(user,start_date):
 			summaryId = ui_data_single['summaryId']
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
+	garmin_list,garmin_dic = get_garmin_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+		user,start_date)
 
+	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													manually_updated_json=manually_edited_dic,
+													userinput_activities=activities_dic)
 	activities = []
 	hrr_summary_id = []
 	workout_summary_id = []
 	id_act = 0
 	workout_data = []
-	if user_input_strong:
-		for tmp in user_input_strong:
-			sn = tmp.activities
-			if sn:
-				sn = json.loads(sn)
-				di = sn.values()
-				di = list(di)
-				for i,k in enumerate(di):
-					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(di[i]['summaryId'])
-						activities.append(di[i])
-						hrr_summary_id.append(di[i]['summaryId'])
-					else:
-						workout_data.append(di[i])
-						workout_summary_id.append(di[i]['summaryId'])
+	for i,k in enumerate(filtered_activities_files):
+		if filtered_activities_files[i]['activityType'] == 'HEART_RATE_RECOVERY':
+			id_act = int(filtered_activities_files[i]['summaryId'])
+			activities.append(filtered_activities_files[i])
+			hrr_summary_id.append(filtered_activities_files[i]['summaryId'])
+		else:
+			workout_data.append(filtered_activities_files[i])
+			workout_summary_id.append(filtered_activities_files[i]['summaryId'])
 
 	user_created_activity = list(set(workout_summary_id)- set(garmin_activity_keys))
 	garmin_workout_keys = set(garmin_activity_keys) - set(hrr_summary_id)
@@ -1885,24 +1874,27 @@ def hrr_data(user,start_date):
 			summaryId = ui_data_single['summaryId']
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
+	garmin_list,garmin_dic = get_garmin_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
+		user,start_date_timestamp,end_date_timestamp)
+	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+		user,start_date)
+
+	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													manually_updated_json=manually_edited_dic,
+													userinput_activities=activities_dic)
 	count = 0
 	id_act = 0
 	activities = []
 	workout_id = []
-	if user_input_strong:
-		for tmp in user_input_strong:
-			sn = tmp.activities
-			if sn:
-				sn = json.loads(sn)
-				di = sn.values()
-				di = list(di)
-				for i,k in enumerate(di):
-					if di[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(di[i]['summaryId'])
-						count = count + 1
-						activities.append(di[i])
-					else:
-						workout_id.append(int(di[i]['summaryId']))
+	for i,k in enumerate(filtered_activities_files):
+		if filtered_activities_files[i]['activityType'] == 'HEART_RATE_RECOVERY':
+			id_act = int(filtered_activities_files[i]['summaryId'])
+			count = count + 1
+			activities.append(filtered_activities_files[i])
+		else:
+			workout_id.append(int(filtered_activities_files[i]['summaryId']))
 
 	
 	start_date_timestamp = start_date_timestamp
