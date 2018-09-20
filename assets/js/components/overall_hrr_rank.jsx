@@ -103,7 +103,7 @@ class OverallRank extends Component{
 			Hrr_data:data.data.overall_hrr,
 			duration_date:data.data.duration_date,
 			all_hrr_rank_data:data.data.overall_hrr.today.all_rank,
-			date:date,
+			date:moment(date).format("MMM D, YYYY"),
 			capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
