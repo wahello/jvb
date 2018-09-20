@@ -100,36 +100,30 @@ class GoalsSerializer(serializers.ModelSerializer):
 		fields = ('__all__')
 
 class DailyUserActivitiesSerializer(serializers.ModelSerializer):
-	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
-
-	def validate(self,data):
-		activity_val = data['activity_id']
-		pattern = re.compile("(^\d{1,3}).*")
-		if activity_val and not pattern.match(activity_val):
-			raise serializers.ValidationError("not a valid value")
-
-		if activity_val:
-			activity_val = pattern.match(activity_val).group(1)
-			data['activity_id'] = activity_val
-		return data
+	user = serializers.PrimaryKeyRelatedField(read_only = True)
 
 	class Meta:
 		model = DailyUserActivities
 		fields = ('__all__')
+
+	def get_queryset(self):
+		user_activity_objs = DailyUserActivities.objects.all()
+		query_set = user_activity_objs.filter(user=user.username)
+		return query_set
 
 class UserDailyInputSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
 	strong_input = DailyUserInputStrongSerializer()
 	encouraged_input = DailyUserInputEncouragedSerializer()
 	optional_input = DailyUserInputOptionalSerializer()
-	activities_input = DailyUserActivitiesSerializer()
+	daily_activities = DailyUserActivitiesSerializer()
 	# third_source_input = InputsChangesFromThirdSourcesSerializer()
 	# goals = GoalsSerializer()
 
 	class Meta:
 		model = UserDailyInput
 		fields = ('user','created_at','updated_at','timezone','report_type',
-			'strong_input','encouraged_input','optional_input', 'activities_input')
+			'strong_input','encouraged_input','optional_input', 'daily_activities')
 		
 		# fields = ('user','created_at','updated_at','strong_input','encouraged_input',
 		# 		  'optional_input','third_source_input','goals')
@@ -154,7 +148,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
 		optional_data = validated_data.pop('optional_input')
-		activities_data = validated_data.pop('activities_input')
+		activities_data = validated_data.pop('daily_activities')
 		# third_source_data = validated_data.pop('third_source_input')
 		# goals_data = validated_data.pop('goals')
 
@@ -200,7 +194,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
 		optional_data = validated_data.pop('optional_input')
-		activities_data = validated_data.pop('activities_input')
+		activities_data = validated_data.pop('daily_activities')
 		# third_source_data = validated_data.pop('third_source_input')
 		# goals_data = validated_data.pop('goals')
 		user_input_data = validated_data
@@ -218,7 +212,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		optional_obj = instance.optional_input
 		self._update_helper(optional_obj, optional_data)
 
-		activities_obj = instance.activities_input
+		activities_obj = instance.daily_activities
 		self._update_helper(activities_obj, activities_data)
 
 		# third_source_obj = instance.third_source_input
@@ -243,4 +237,3 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 			created=False)
 
 		return instance
-

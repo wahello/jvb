@@ -90,6 +90,7 @@ class DailyUserInputStrong(models.Model):
         ("injured","Injured"),
         ("sick", "Sick"),
         ("too busy/not enough time","Too Busy/Not Enough Time"),
+        ("didn’t feel like it","Didn’t Feel Like It"),
         ("work got in the way","Work Got in the Way"),
         ("travel day","Travel Day"),
         ("weather","Weather"),
@@ -252,7 +253,6 @@ class DailyUserInputStrong(models.Model):
         max_length=10, blank=True)
 
     weather_comment = models.TextField(blank=True)
-    # activities = models.TextField(blank=True)
     
 class DailyUserInputEncouraged(models.Model):
 
@@ -482,12 +482,16 @@ class Goals(models.Model):
     other = models.CharField(max_length=264,null=True,blank=True)
 
 class DailyUserActivities(models.Model):
-    activity_id = models.CharField(
-        max_length=20,
-        validators = [CharMinValueValidator(1),CharMaxValueValidator(100)],
-        blank = True,null = True)
-    user_input = models.OneToOneField(UserDailyInput, related_name='activities_input')
-    submitted_time = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, related_name='daily_activities')
+    activity_id = models.CharField(max_length=100, blank = True, null = True)
+    created_at = models.DateField()
+    activity_data = models.TextField()
+    activity_weather = models.TextField()
+
+    def __str__(self):
+        dtime = str(self.created_at)
+        return "{}-{}".format(self.user.username,dtime)
 
     class Meta:
-        unique_together = ('user_input', 'activity_id')
+        indexes = models.Index(fields=['user', 'activity_id'])
+        unique_together = ('user', 'activity_id')

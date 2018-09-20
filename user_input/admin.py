@@ -5,6 +5,7 @@ from user_input.models import DailyUserInputEncouraged,\
 							  InputsChangesFromThirdSources,\
 							  UserDailyInput,\
 							  Goals
+							  # DailyUserActivities
 
 class DailyUserInputStrongInline(admin.StackedInline):
 	model = DailyUserInputStrong
@@ -21,6 +22,9 @@ class InputsChangesFromThirdSourcesInline(admin.StackedInline):
 class GoalsInline(admin.StackedInline):
 	model = Goals
 
+# class DailyUserActivitiesInline(admin.StackedInline):
+# 	model = DailyUserActivities
+
 class UserInputAdmin(admin.ModelAdmin):
 	list_display=('user','report_type','created_at', 'updated_at')
 	list_filter = ('created_at','updated_at',)
@@ -29,6 +33,7 @@ class UserInputAdmin(admin.ModelAdmin):
 					 'user__last_name',)
 	inlines = [
 		DailyUserInputStrongInline,
+		# DailyUserActivitiesInline,
 		DailyUserInputEncouragedInline,
 		DailyUserInputOptionalInline,
 		InputsChangesFromThirdSourcesInline,
