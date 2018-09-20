@@ -377,24 +377,22 @@ checkForUndefinedValue(value) {
 							td_values.push(<td>{value[key1]}</td>);
 						}
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
-							//console.log("key1 in else if block: "+ key1);
-							let [dateKey,dateValue] = (Object.entries(value["dates"]).sort())[tempIndex].sort(); 
-								let tempDayDuration = "";
-								let tempDayRepeated = "";
-								//console.log("dateKey: "+dateKey);
-								for(let [finalDateKey, finalDateValue] of Object.entries(dateValue)){
-									//console.log("Workedout_dates key: "+finalDateKey+ " Values= "+finalDateValue);
-
-									if(finalDateKey == "repeated") {
-										tempDayRepeated = finalDateValue;
-									} else if(finalDateKey == "duration") {
-										tempDayDuration = this.renderTime(finalDateValue);
-									}
-								}	
-								td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
-							
+							let sortedDate = Object.keys(value["dates"]).map(dt => moment(dt)).sort((a,b)=>a-b)
+							let tempDayDuration = "";
+							let tempDayRepeated = "";
+							let currentDate = sortedDate[tempIndex];
+							let strDate = currentDate.format('DD-MMM-YY');
+							let tmpData = value["dates"][strDate];
+							for(let [finalDateKey,finalDateValue] of Object.entries(tmpData)){
+								if(finalDateKey == "repeated") {
+									tempDayRepeated = finalDateValue;
+								} else if(finalDateKey == "duration") {
+									tempDayDuration = this.renderTime(finalDateValue);
+								}
+							}
+							td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
 							tempIndex ++;
-						}
+					}
 						/*else if(key1 == sun || key1==mon || key1 == tue || key1 == wed || key1 == thu || key1 == fri || key1 == sat) {
 							for(let [dateKey,dateValue] of Object.entries(value["dates"])) {
 								let tempDayDuration = "";
@@ -527,7 +525,22 @@ checkForUndefinedValue(value) {
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
 							//console.log("key1 in else total block: "+ key1);
 							//console.log("key1 in else total block: "+ tempIndex);
-							let [dateKey,dateValue] = (Object.entries(value["dates"]).sort())[tempIndex];
+							let sortedDate = Object.keys(value["dates"]).map(dt => moment(dt)).sort((a,b)=>a-b)
+							let tempDayDuration = "";
+							let tempDayRepeated = "";
+							let currentDate = sortedDate[tempIndex];
+							let strDate = currentDate.format('DD-MMM-YY');
+							let tmpData = value["dates"][strDate];
+							for(let [finalDateKey,finalDateValue] of Object.entries(tmpData)){
+								if(finalDateKey == "repeated") {
+									tempDayRepeated = finalDateValue;
+								} else if(finalDateKey == "duration") {
+									tempDayDuration = this.renderTime(finalDateValue);
+								}
+							}
+							td_totals.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+							tempIndex ++;
+							/*let [dateKey,dateValue] = (Object.entries(value["dates"]).sort())[tempIndex];
 								let tempDayDuration = "";
 								let tempDayRepeated = "";
 								//console.log("dateKey 22: "+dateKey);
@@ -544,7 +557,7 @@ checkForUndefinedValue(value) {
 								
 								td_totals.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
 							
-							tempIndex ++;	
+							tempIndex ++;*/	
 						}
 						/*
 						else if(tempDate[tempIndex] != null && tempDate[tempIndex] != "" && tempDate[tempIndex] != undefined && key1 === tempDate[tempIndex]) {
