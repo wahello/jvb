@@ -133,7 +133,7 @@ def fitbit_to_garmin_activities(active_summary):
 		garmin_activites['maxPaceInMinutesPerKilometer'] = active_summary.get("")
 		garmin_activites['maxRunCadenceInStepsPerMinute'] = active_summary.get("")
 		garmin_activites['maxSpeedInMetersPerSecond'] = active_summary.get("")
-		garmin_activites['steps'] = active_summary['steps']
+		garmin_activites['steps'] = active_summary.get('steps',0)
 		garmin_activites['totalElevationGainInMeters'] = active_summary.get("")
 		garmin_activites['totalElevationLossInMeters'] = active_summary.get("")
 		return garmin_activites
