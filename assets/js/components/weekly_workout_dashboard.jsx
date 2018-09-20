@@ -295,6 +295,7 @@ checkForUndefinedValue(value) {
 			let sat = moment(this.state.selectedDate).weekday(-1).format('DD-MMM-YY');
 			let sun = moment(this.state.selectedDate).weekday(0).format('DD-MMM-YY');
 			td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
+
 			//console.log("Object.keys(weekly_data['Totals']): "+Object.keys(weekly_data['Totals']));	
 			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => (x.indexOf("_distance")>=0));
 			td_keys = td_keys.concat(activity_distance_keys);
@@ -332,11 +333,15 @@ checkForUndefinedValue(value) {
 									Sun Aug 26
 									*/
 
-					let tempDate = Object.keys(value['dates']).sort();
+					//let tempDate = Object.keys(value['dates']).sort();
 					//console.log("tempDate: "+tempDate[0]);
+					let tempDate = Object.keys(value["dates"])
+						.map(dt => moment(dt)).sort((a,b)=>a-b)
+						.map(momentDate => momentDate.format("DD-MMM-YY"));
 					let tempIndex = 0;
 					let tempWorkoutType = null;
 					let tempNoOfActivityInWeek = null;
+
 					for(let key1 of td_keys){
 						//console.log("Object.keys.filter(x => x=== key1): "+Object.keys(value['dates']).filter(a => key1 == a) + "key1"+key1);
 						//console.log("tempWorkoutType: " + tempWorkoutType);
@@ -478,7 +483,9 @@ checkForUndefinedValue(value) {
 							td_totals.push(value[key1])
 						}
 					}*/
-					let tempDate = Object.keys(value['dates']).sort();
+					let tempDate = Object.keys(value["dates"])
+						.map(dt => moment(dt)).sort((a,b)=>a-b)
+						.map(momentDate => momentDate.format("DD-MMM-YY"));
 					//console.log("tempDate: "+tempDate[0]);
 					//console.log("tempDate: "+tempDate[1]);
 					//console.log("tempDate: "+tempDate[2]);
