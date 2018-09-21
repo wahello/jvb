@@ -195,13 +195,23 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_awaketime = None
 		ui_timezone = None
 		ui_sleep_duration = None
-
 		if todays_user_input:
 			todays_user_input = todays_user_input[0]
 			ui_bedtime = todays_user_input.strong_input.sleep_bedtime
 			ui_awaketime = todays_user_input.strong_input.sleep_awake_time
 			ui_timezone = todays_user_input.timezone
 			ui_sleep_duration = todays_user_input.strong_input.sleep_time_excluding_awake_time
+			ui_workout_easy_hard = todays_user_input.strong_input.work_out_easy_or_hard
+			ui_medication = todays_user_input.strong_input.prescription_or_non_prescription_medication_yesterday
+			ui_smoke_substance = todays_user_input.strong_input.smoke_any_substances_whatsoever
+			ui_water_consumed_workout = todays_user_input.encouraged_input.water_consumed_during_workout
+			ui_pain = todays_user_input.encouraged_input.pains_twings_during_or_after_your_workout
+			ui_pain_area = todays_user_input.encouraged_input.pain_area
+			ui_stress_level = todays_user_input.encouraged_input.stress_level_yesterday
+			ui_chia_seeds_consumed_workout = todays_user_input.optional_input.chia_seeds_consumed_during_workout
+			ui_fast_before_workout = todays_user_input.optional_input.fasted_during_workout
+			ui_sick = todays_user_input.optional_input.sick
+			ui_workout_comment = todays_user_input.optional_input.general_Workout_Comments
 
 		if todays_sleep_data:
 			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
@@ -220,7 +230,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
 		sleeps_calculated_data['sleep_per_user_input'] = sleep_stats['sleep_per_userinput']
-		# sleeps_calculated_data['restless'] = sleep_stats['restless']
+		#sleeps_calculated_data['restless'] = sleep_stats['restless']
 
 		todays_activity_data = get_fitbit_model_data(
 			UserFitbitDataActivities,user,current_date.date(),current_date.date())
@@ -235,6 +245,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				todays_activity_data))
 			activity_stats = get_activity_stats(trans_activity_data)
 			exercise_calculated_data['did_workout'] = activity_stats['have_activity']
+			exercise_calculated_data['workout_easy_hard'] = ui_workout_easy_hard
 			exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 			exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
 			exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
@@ -244,6 +255,16 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['pace'] = activity_stats['pace']
 			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
+			exercise_calculated_data['water_consumed_workout'] = ui_water_consumed_workout
+			exercise_calculated_data['chia_seeds_consumed_workout'] = ui_chia_seeds_consumed_workout
+			exercise_calculated_data['fast_before_workout'] = ui_fast_before_workout
+			exercise_calculated_data['pain'] = ui_pain
+			exercise_calculated_data['pain_area'] = ui_pain_area
+			exercise_calculated_data['stress_level'] = ui_stress_level
+			exercise_calculated_data['sick'] = ui_sick
+			exercise_calculated_data['medication'] = ui_medication
+			exercise_calculated_data['smoke_substance'] = ui_smoke_substance
+			exercise_calculated_data['workout_comment'] = ui_workout_comment
 
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
