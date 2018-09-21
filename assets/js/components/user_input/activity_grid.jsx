@@ -367,7 +367,7 @@ toggleModal(){
       modal_activity_min:"",
       modal_exercise_steps:"",
       modal_exercise_steps_status:"",
-      modal_duplicate_info_status: false,
+      modal_duplicate_info_status:false,
       modal_activity_comment:"",
       selectedActivityId:"",
       activitystarttime_calender:"",
@@ -420,7 +420,7 @@ handleChangeModal(event){
     modal_activity_min:mins,
     modal_exercise_steps:current_activity?current_activity.steps:"",
     modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
-    modal_duplicate_info_status:current_activity?current_activity.duplicate: false,
+    modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
     modal_activity_comment:current_activity?current_activity.comments:"",
     selectedActivityId:selectedActivityId,
     activityEditModal:true,
@@ -982,7 +982,7 @@ EndTimeInSecondsSaveCalender(event){
 handleChange(event){
     const target = event.target;
     const value = target.value;
-    const name = target.name;
+    const name = target.name;//modal_duplicate_info_status
     if(value== "OTHER"){
         this.setState({
             [name]: value,
@@ -999,6 +999,11 @@ handleChange(event){
         || name == "modal_exercise_steps"){
         this.setState({
             [name]: parseInt(value)
+        });
+    }
+    else if (name == "modal_duplicate_info_status"){
+        this.setState({
+            [name]: (value == "true")
         });
     }
     else{
@@ -2089,13 +2094,13 @@ renderEditActivityModal(){
                               <Label className="btn radio1">
                                 <Input type="radio" 
                                 name="modal_duplicate_info_status" 
-                                defaultChecked={true}
+                                value={true}
                                 checked={this.state.modal_duplicate_info_status === true}
                                 onChange={this.handleChange}/> Duplicate
                               </Label>
                               <Label className="btn radio1">
                                 <Input type="radio" name="modal_duplicate_info_status" 
-                                defaultChecked={false}
+                                value={false}
                                 checked={this.state.modal_duplicate_info_status === false}
                                 onChange={this.handleChange}/> Not Duplicate
                               </Label>
