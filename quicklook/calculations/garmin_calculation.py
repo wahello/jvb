@@ -475,10 +475,11 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 		sleep_level_maps = data.get('sleepLevelsMap')
 		if sleep_level_maps:
 			for lvl_type,lvl_data in sleep_level_maps.items():
-				durations[lvl_type] += sum(
-					[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
-					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
-					for d in lvl_data])
+				if lvl_type in durations.keys():
+					durations[lvl_type] += sum(
+						[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+						- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
+						for d in lvl_data])
 		return durations
 
 	recent_auto_manual = None
