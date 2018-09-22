@@ -4,6 +4,7 @@ from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
 import copy
+import re
 
 from django.db.models import Q
 
@@ -81,7 +82,8 @@ def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss
 		  specify the position of hour, minute and second in the str_duration
 
 	'''
-	if str_duration:
+	pattern = re.compile(r"\d?\d:\d\d(:\d\d)?")
+	if str_duration and pattern.match(str_duration):
 		hms = str_duration.split(":")
 		pattern_lst = time_pattern.split(":")
 		pattern_indexed = {
@@ -475,10 +477,11 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 		sleep_level_maps = data.get('sleepLevelsMap')
 		if sleep_level_maps:
 			for lvl_type,lvl_data in sleep_level_maps.items():
-				durations[lvl_type] += sum(
-					[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
-					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
-					for d in lvl_data])
+				if lvl_type in durations.keys():
+					durations[lvl_type] += sum(
+						[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+						- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
+						for d in lvl_data])
 		return durations
 
 	recent_auto_manual = None
