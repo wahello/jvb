@@ -4,6 +4,7 @@ from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
 import copy
+import re
 
 from django.db.models import Q
 
@@ -81,7 +82,8 @@ def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss
 		  specify the position of hour, minute and second in the str_duration
 
 	'''
-	if str_duration:
+	pattern = re.compile(r"\d?\d:\d\d(:\d\d)?")
+	if str_duration and pattern.match(str_duration):
 		hms = str_duration.split(":")
 		pattern_lst = time_pattern.split(":")
 		pattern_indexed = {
