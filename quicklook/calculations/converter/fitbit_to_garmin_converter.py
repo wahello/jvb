@@ -15,8 +15,10 @@ def levelData(sleepLevelsMap,sleep_type):
 	}
 
 	if sleep_type == "stages":
+		valid_level = list(sleep_level_stats["level_map"].keys())
 		for levelData in sleepLevelsMap['data']:
-			if levelData['level'] != "wake":
+			if (levelData['level'] != "wake" 
+				and levelData['level'] in valid_level):
 				sleep_level_stats['level_map'][levelData['level']].append(
 					{'startTimeInSeconds': levelData['dateTime'],
 					 'endTimeInSeconds':levelData['seconds']})
