@@ -253,6 +253,7 @@ class DailyUserInputStrong(models.Model):
         max_length=10, blank=True)
 
     weather_comment = models.TextField(blank=True)
+    activities = models.TextField(blank=True)
     
 class DailyUserInputEncouraged(models.Model):
 
@@ -481,17 +482,34 @@ class Goals(models.Model):
     goals = models.CharField(max_length=264,choices = CHOICE)
     other = models.CharField(max_length=264,null=True,blank=True)
 
-class DailyUserActivities(models.Model):
+class DailyActivity(models.Model):
+    EXERCISE = 'exercise'
+    NON_EXERCISE = 'non_exercise'
+
+    STEPS_TYPE_CHOICES =  (
+        (EXERCISE,'Exercise'),
+        (NON_EXERCISE,'Non Exercise'),
+    )
+
     user = models.ForeignKey(User, related_name='daily_activities')
-    activity_id = models.CharField(max_length=100, blank = True, null = True)
+    activity_id = models.CharField(max_length=100)
     created_at = models.DateField()
     activity_data = models.TextField()
-    activity_weather = models.TextField()
+    activity_weather = models.TextField(blank=True)
+    can_update_steps_type = models.BooleanField(default=True)
+    
+    steps_type = models.CharField(
+        max_length=100,choices = STEPS_TYPE_CHOICES)
+
+    comments = models.TextField(blank=True)
+    duplicate = models.BooleanField(default=False)
 
     def __str__(self):
         dtime = str(self.created_at)
         return "{}-{}".format(self.user.username,dtime)
 
     class Meta:
-        indexes = models.Index(fields=['user', 'activity_id'])
         unique_together = ('user', 'activity_id')
+        indexes = [
+            models.Index(fields=['user', 'activity_id']),
+        ]

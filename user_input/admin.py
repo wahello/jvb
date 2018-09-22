@@ -1,11 +1,12 @@
 from django.contrib import admin
+# from django.contrib.auth.models import User
 from user_input.models import DailyUserInputEncouraged,\
 							  DailyUserInputStrong,\
 							  DailyUserInputOptional,\
 							  InputsChangesFromThirdSources,\
 							  UserDailyInput,\
-							  Goals
-							  # DailyUserActivities
+							  Goals,\
+							  DailyActivity
 
 class DailyUserInputStrongInline(admin.StackedInline):
 	model = DailyUserInputStrong
@@ -22,9 +23,6 @@ class InputsChangesFromThirdSourcesInline(admin.StackedInline):
 class GoalsInline(admin.StackedInline):
 	model = Goals
 
-# class DailyUserActivitiesInline(admin.StackedInline):
-# 	model = DailyUserActivities
-
 class UserInputAdmin(admin.ModelAdmin):
 	list_display=('user','report_type','created_at', 'updated_at')
 	list_filter = ('created_at','updated_at',)
@@ -33,13 +31,17 @@ class UserInputAdmin(admin.ModelAdmin):
 					 'user__last_name',)
 	inlines = [
 		DailyUserInputStrongInline,
-		# DailyUserActivitiesInline,
 		DailyUserInputEncouragedInline,
 		DailyUserInputOptionalInline,
 		InputsChangesFromThirdSourcesInline,
 		GoalsInline
 	]
 
+class DailyActivityAdmin(admin.ModelAdmin):
+	list_display = ('user', 'created_at', 'activity_data', 'activity_weather',)
+	search_fields = ('user__username', 'created_at', )
+
 # Register your models here.
 
 admin.site.register(UserDailyInput,UserInputAdmin)
+admin.site.register(DailyActivity, DailyActivityAdmin)

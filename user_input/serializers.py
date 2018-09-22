@@ -11,7 +11,7 @@ from .models import UserDailyInput,\
 					DailyUserInputOptional,\
 					InputsChangesFromThirdSources,\
 					Goals,\
-					DailyUserActivities
+					DailyActivity
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -89,9 +89,11 @@ class DailyUserInputOptionalSerializer(serializers.ModelSerializer):
 
 class InputsChangesFromThirdSourcesSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
+
 	class Meta:
 		model = InputsChangesFromThirdSources
 		fields = ('__all__')
+
 
 class GoalsSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
@@ -99,36 +101,41 @@ class GoalsSerializer(serializers.ModelSerializer):
 		model = Goals
 		fields = ('__all__')
 
-class DailyUserActivitiesSerializer(serializers.ModelSerializer):
+class DailyActivitySerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only = True)
 
 	class Meta:
-		model = DailyUserActivities
+		model = DailyActivity
 		fields = ('__all__')
-
-	def get_queryset(self):
-		user_activity_objs = DailyUserActivities.objects.all()
-		query_set = user_activity_objs.filter(user=user.username)
-		return query_set
 
 class UserDailyInputSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
 	strong_input = DailyUserInputStrongSerializer()
 	encouraged_input = DailyUserInputEncouragedSerializer()
 	optional_input = DailyUserInputOptionalSerializer()
-	daily_activities = DailyUserActivitiesSerializer()
 	# third_source_input = InputsChangesFromThirdSourcesSerializer()
 	# goals = GoalsSerializer()
 
 	class Meta:
 		model = UserDailyInput
 		fields = ('user','created_at','updated_at','timezone','report_type',
-			'strong_input','encouraged_input','optional_input', 'daily_activities')
+			'strong_input','encouraged_input','optional_input')
 		
 		# fields = ('user','created_at','updated_at','strong_input','encouraged_input',
 		# 		  'optional_input','third_source_input','goals')
 	
 		read_only_fields = ('updated_at',)
+
+
+	def to_representation(self, instance):
+		response_dict = dict()
+		response_dict[instance.summary_id] = {
+			'strong_data': DailyUserInputStrongSerializer(instance.strong_data.all(), many=True).data,
+			'encouraged_data': DailyUserInputEncouragedSerializer(instance.encouraged_data.all(), many=True).data,
+			'optional_data': DailyUserInputOptionalSerializer(instance.optional_data.all(), many=True).data
+		}
+		return response_dict
+
 
 	def _update_helper(self,instance, validated_data):
 		'''
@@ -148,7 +155,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
 		optional_data = validated_data.pop('optional_input')
-		activities_data = validated_data.pop('daily_activities')
 		# third_source_data = validated_data.pop('third_source_input')
 		# goals_data = validated_data.pop('goals')
 
@@ -164,10 +170,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		DailyUserInputOptional.objects.create(user_input=user_input_obj,
 														   **optional_data)
 
-		DailyUserActivities.objects.create(user_input=user_input_obj,
-														   **activities_data)
-
-		
 		# InputsChangesFromThirdSources.objects.create(user_input=user_input_obj,
 		# 												   **third_source_data)
 		# Goals.objects.create(user_input=user_input_obj,
@@ -194,7 +196,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		strong_data = validated_data.pop('strong_input')
 		encouraged_data = validated_data.pop('encouraged_input')
 		optional_data = validated_data.pop('optional_input')
-		activities_data = validated_data.pop('daily_activities')
 		# third_source_data = validated_data.pop('third_source_input')
 		# goals_data = validated_data.pop('goals')
 		user_input_data = validated_data
@@ -211,9 +212,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		optional_obj = instance.optional_input
 		self._update_helper(optional_obj, optional_data)
-
-		activities_obj = instance.daily_activities
-		self._update_helper(activities_obj, activities_data)
 
 		# third_source_obj = instance.third_source_input
 		# self._update_helper(third_source_obj, third_source_data)
