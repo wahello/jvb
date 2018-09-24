@@ -126,17 +126,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 	
 		read_only_fields = ('updated_at',)
 
-
-	def to_representation(self, instance):
-		response_dict = dict()
-		response_dict[instance.summary_id] = {
-			'strong_data': DailyUserInputStrongSerializer(instance.strong_data.all(), many=True).data,
-			'encouraged_data': DailyUserInputEncouragedSerializer(instance.encouraged_data.all(), many=True).data,
-			'optional_data': DailyUserInputOptionalSerializer(instance.optional_data.all(), many=True).data
-		}
-		return response_dict
-
-
 	def _update_helper(self,instance, validated_data):
 		'''
 		This function will iterate all fields of given instance
