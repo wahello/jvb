@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 import quicklook.calculations.garmin_calculation
+from quicklook.calculations.calculation_driver import which_device
 
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
@@ -173,7 +174,7 @@ def _get_activities(user,target_date):
 class GarminData(APIView):
 	permission_classes = (IsAuthenticated,)
 
-	def _get_sleep_stats(self,target_date):
+	def _get_garmin_sleep(self,target_date):
 		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
 		yesterday_date = current_date - timedelta(days=1)
 		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -189,6 +190,17 @@ class GarminData(APIView):
 		yesterday_sleep_data = sleep_data_parsed[yesterday_date.strftime('%Y-%m-%d')]
 		return quicklook.calculations.garmin_calculation.get_sleep_stats(
 			current_date,yesterday_sleep_data, todays_sleep_data,str_dt=False)
+
+	def _get_fitbit_sleep(self,target_date):
+		pass
+
+	def _get_sleep_stats(self,target_date):
+		user = self.request.user
+		device_type = which_device(user)
+		if device_type == 'garmin':
+			return self._get_garmin_sleep(target_date)
+		elif device_type == 'fitbit':
+			return self._get_fitbit_sleep(target_date)
 
 	def _get_weight(self, target_date):
 		weight = {
