@@ -6,7 +6,7 @@ import json
 
 from django.db.models import Q
 
-from quicklook import calculation_helper
+from quicklook.calculations import garmin_calculation
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
 from progress_analyzer.models import CumulativeSum
@@ -679,7 +679,7 @@ class ProgressReport():
 					return round(val,2)
 
 				elif key == 'overall_health_gpa_grade':
-					return calculation_helper.cal_overall_grade(
+					return garmin_calculation.cal_overall_grade(
 						self._get_average_for_duration(
 							todays_data.cum_overall_health_gpa_point,
 							current_data.cum_overall_health_gpa_point,alias
@@ -729,7 +729,7 @@ class ProgressReport():
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'movement_non_exercise_step_grade':
-					return calculation_helper.cal_non_exercise_step_grade(
+					return garmin_calculation.cal_non_exercise_step_grade(
 						self._get_average_for_duration(
 							todays_data.cum_non_exercise_steps,
 							current_data.cum_non_exercise_steps,alias
@@ -802,7 +802,7 @@ class ProgressReport():
 						todays_data.cum_overall_sleep_gpa,
 						current_data.cum_overall_sleep_gpa,alias),2)
 					if alias == 'today' or alias == 'yesterday':
-						return calculation_helper._get_sleep_grade_from_point(avg_sleep_gpa)
+						return garmin_calculation._get_sleep_grade_from_point(avg_sleep_gpa)
 					else:
 						return _get_sleep_grade_from_point_for_ranges(avg_sleep_gpa)
 
@@ -903,7 +903,7 @@ class ProgressReport():
 							current_meta_data.cum_mc_recorded_days_count
 						)
 
-						grade =  calculation_helper.cal_movement_consistency_grade(
+						grade =  garmin_calculation.cal_movement_consistency_grade(
 							_cal_custom_average(
 								todays_data.cum_movement_consistency_score,
 								current_data.cum_movement_consistency_score,
@@ -953,7 +953,7 @@ class ProgressReport():
 					return round(val,2)
 
 				elif key == 'exercise_consistency_grade':
-					return calculation_helper.cal_exercise_consistency_grade(
+					return garmin_calculation.cal_exercise_consistency_grade(
 						self._get_average_for_duration(
 							todays_data.cum_avg_exercise_day,
 							current_data.cum_avg_exercise_day,alias
@@ -995,7 +995,7 @@ class ProgressReport():
 						current_data.cum_prcnt_unprocessed_food_consumed_gpa,alias)
 					return round(val,2)
 				elif key == 'prcnt_unprocessed_food_grade':
-					return calculation_helper.cal_unprocessed_food_grade(
+					return garmin_calculation.cal_unprocessed_food_grade(
 						self._get_average_for_duration(
 							todays_data.cum_prcnt_unprocessed_food_consumed,
 							current_data.cum_prcnt_unprocessed_food_consumed,alias
@@ -1140,7 +1140,7 @@ class ProgressReport():
 						current_data.cum_alcohol_drink_per_week_gpa,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 				elif key == 'alcoholic_drinks_per_week_grade':
-					return calculation_helper.cal_alcohol_drink_grade(
+					return garmin_calculation.cal_alcohol_drink_grade(
 						self._get_average_for_duration(
 							todays_data.cum_average_drink_per_week,
 							current_data.cum_average_drink_per_week,alias
