@@ -1360,8 +1360,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			if interval_active_duration['duration']+active_duration_min > 60:
 				interval_active_duration['duration'] = 60
 			else:	
-				interval_active_duration['duration'] = round(
-					interval_active_duration['duration'] + active_duration_min)
+				interval_active_duration['duration'] = (
+					interval_active_duration['duration'] 
+					+ active_duration_min)
 
 			active_prcnt = round((interval_active_duration['duration']/60)*100)
 			movement_consistency[time_interval]['active_prcnt'] = active_prcnt
@@ -1461,6 +1462,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 						last_sleeping_hour = hour_start - timedelta(hours=1)
 					previous_hour_steps = movement_consistency[interval]['steps']
 
+			movement_consistency[interval]['active_duration']['duration'] = \
+				round(movement_consistency[interval]['active_duration']['duration'])
 
 			if movement_consistency[interval]['status'] == 'active': 
 				active_hours += 1 
