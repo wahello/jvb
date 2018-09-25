@@ -245,7 +245,6 @@ class HeartRateCal extends Component{
   	}
 
   	renderTime(value){
-  		console.log(value,"heart rate reached 99")	
   		var z;
   		if(value != null && value != "00:00:00" && value != 0){
   			 z = moment.unix(value).format("hh:mm:ss a");
@@ -263,6 +262,10 @@ class HeartRateCal extends Component{
   	renderSecToMin(value){
   		let time;
   		if(value != null && value != "00:00" && value != undefined && value != "00:00:00"){
+  			if (value == 99999){
+  				time = "Never"
+  			}
+  			else{
 	  		let min = parseInt(value/60);
 	  		let sec = (value % 60);
 	  		if(sec < 10){
@@ -272,10 +275,11 @@ class HeartRateCal extends Component{
 	  			time = min + ":" + sec;
 	  		}
 	  	}
+	  }
 	  	else{
-	  		time = "-"
+	  		time = "N/A"
 	  	}
-	  	if (value != null && value == 0){
+	  	if (value == null && value == 0){
 	  		time = "N/A"
 	  	}
   		return time;
