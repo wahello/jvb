@@ -123,7 +123,7 @@ class WorkoutDashboard extends Component{
 		let value;
 		let x = gpa;
 		if( x !=  null && x != undefined){
-		    value =parseFloat(x).toFixed(2) + " %";
+		    value =parseFloat(x).toFixed(2) + "%";
 		 }
 		 else{
 		  value = "";
@@ -508,13 +508,13 @@ checkForUndefinedValue(value) {
 		let activities_keys = rendered_data[0];
 		let rendered_rows = rendered_data[1];
 		return(
-				<div className = "container-fluid">
+				<div className = "container-fluid mnh-mobile-view">
 					<NavbarMenu title = {<span style = {{fontSize:"18px"}}>
 					Weekly Workout Summary Report
 					</span>} />
 
 					<div className = "cla_center" style = {{fontSize:"12px"}}>
-						<span>
+						<span className = "col-md-4 col-sm-4">
 							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
 								<FontAwesome
 			                        name = "angle-left"
@@ -545,16 +545,20 @@ checkForUndefinedValue(value) {
 				                </PopoverBody>
 			                </Popover>
 	                	</span>
-	                	 <div style = {{textAlign:"center",fontWeight:"bold"}}>Weekly Workout Summary Report For The Week Ended: <span style = {{textDecoration:"underline"}}>{this.renderLastSunday(new Date(this.state.selectedDate))}</span></div> 
+	                	<span className="col-md-8 col-sm-8" style = {{fontWeight:"bold"}}>Weekly Workout Summary Report For The Week Ended: <span style = {{textDecoration:"underline"}}>{this.renderLastSunday(new Date(this.state.selectedDate))}</span>
+	                	</span>
 		        	</div>
-					 <div className = "row justify-content-center hr_table_padd" style = {{fontSize:"12px"}}>
-					 		<div>
-					 			<b>Ae:</b> Aerobic Duration (% of total time) &nbsp;&nbsp;
-					 			<b>AN:</b> Anaerobic Duration (% of total time) &nbsp;&nbsp;
-					 			<b>BA:</b> Below Aerobic (% of total time) &nbsp;&nbsp;
-					 			<b>NR:</b> HR Not Recorded (% of total time &nbsp;&nbsp;)
-					 		</div>
+
+					 {/*<div className = "hr_table_padd" style = {{fontSize:"12px"}}>*/}
+					 <div style = {{fontSize:"12px"}}>
 							<div className = "table table-responsive">
+								<div className="mnh-mobile-view">
+								<br />
+						 			<b className = "boldText">AE:</b> Aerobic Duration (% of total time) &nbsp;&nbsp;
+						 			<b className = "boldText">AN:</b> Anaerobic Duration (% of total time) &nbsp;&nbsp;
+						 			<b className = "boldText">BA:</b> Below Aerobic (% of total time) &nbsp;&nbsp;
+						 			<b className = "boldText">NR:</b> HR Not Recorded (% of total time &nbsp;&nbsp;)
+					 			</div>
 				          	    <table className = "weeklyWorkoutTable table table-striped table-bordered">
 									<tr>
 										<th>Workout Type <br />(# Workouts)</th>
@@ -564,7 +568,7 @@ checkForUndefinedValue(value) {
 										<th className="weeklyWorkoutTHMatrix">
 											<tr>
 												<td>
-													Ae
+													AE
 												</td>
 												<td>
 													AN
