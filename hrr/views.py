@@ -2093,7 +2093,8 @@ def hrr_data(user,start_date):
 					hrr_no_fitfile = None
 			else:
 				Did_heartrate_reach_99 = 'no'
-				pure_time_99 = 99999
+				# -1 represents the pure time to 99 did not reach never
+				pure_time_99 = -1
 				pure_1min_heart_beats = None
 		else:
 			Did_heartrate_reach_99 = 'no'
@@ -2132,7 +2133,8 @@ def hrr_data(user,start_date):
 				time_99 = None
 				
 		if diff_actity_hrr > 120:
-			pure_time_99 = 99999
+			# -1 represents the pure time to 99 did not reach never
+			pure_time_99 = -1
 			pure_1min_heart_beats = None
 
 	else:
@@ -2168,7 +2170,7 @@ def hrr_data(user,start_date):
 						if daily_diff_data_99 == None:
 							no_fitfile_hrr_reach_99 = "no"
 							no_fitfile_hrr_time_reach_99 = 0.00
-							time_heart_rate_reached_99 = 99999
+							time_heart_rate_reached_99 = 0.00
 							break
 				if daily_diff_data_99 != None and daily_diff_data_99 <= 99:
 					Did_heartrate_reach_99 = 'yes'

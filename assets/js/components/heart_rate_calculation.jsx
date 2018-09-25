@@ -262,7 +262,7 @@ class HeartRateCal extends Component{
   	renderSecToMin(value){
   		let time;
   		if(value != null && value != "00:00" && value != undefined && value != "00:00:00"){
-  			if (value == 99999){
+  			if (value == -1){
   				time = "Never"
   			}
   			else{
