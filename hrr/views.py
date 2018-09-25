@@ -1201,7 +1201,7 @@ def daily_aa_data(user, start_date):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
 		if avg_hr == '' or avg_hr == 0:
 			user_created_activity_list.append(single_activity)
-	print(user_created_activity_list,"user_created_activity_list")
+	
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1530,7 +1530,6 @@ def add_hr_nor_recorded_heartbeat(
 	data={}
 	for i,single_data in enumerate(no_hr_data):
 		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
-		print(heart_beat,"heart beat")
 		if heart_beat != '' and heart_beat != 0 and int(heart_beat) <= below_aerobic_value:
 			low_hr,high_hr = low_high_hr(low_end_heart,high_end_heart,int(heart_beat))
 			if not data.get(low_hr):
