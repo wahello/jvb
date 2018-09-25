@@ -840,7 +840,8 @@ def is_duplicate_activity(activity, all_activities):
 
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,
-		userinput_activities=None,include_duplicate = False,**kwargs):
+		userinput_activities = None,include_duplicate = False,
+		include_deleted = False,**kwargs):
 	
 	'''
 	Combine activities, manually edited activities and user input activities
@@ -854,6 +855,10 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 		manually_updated_json (list): List of manually edited activities
 		userinput_activities (dict): dictionary of user created/modified
 			activities. Key is activity id and value is complete activity data 
+		include_duplicate (bool): Include duplicate activity summaries in the
+			final activities list if set to True. Default to False
+		include_deleted (bool): Include deleted activity summaries in the
+			final activities list if set to True. Default to False
 	'''
 
 	activities_json = copy.deepcopy(activities_json)
@@ -874,7 +879,7 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
 				# etc. In that case empty value will be taken for those keys even
 				# though value exist in original summary provided by garmin 
-				if val or key == 'duplicate':
+				if val or key == 'duplicate' or key == 'deleted':
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
@@ -918,20 +923,41 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 		if act['summaryId'] in act_renamed_to_hrr:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
 
-	unique_activities = []
+
+	deleted_activities = []
+	duplicate_activities = []
+	dup_del_activities = []
+	non_dup_non_del_activities = []
+
 	for act in filtered_activities:
 		duplicate = is_duplicate_activity(act,filtered_activities)
-		# print(act.get('activityType'),duplicate)
-		if not duplicate:
+		deleted = act.get('deleted',False)
+		if not duplicate and not deleted:
 			act['duplicate'] = False
-			unique_activities.append(act)
-		else:
+			act['deleted'] = False
+			non_dup_non_del_activities.append(act)
+		elif duplicate and deleted:
 			act['duplicate'] = True
+			dup_del_activities.append(act)
+		elif duplicate and not deleted:
+			act['duplicate'] = True
+			act['deleted'] = False
+			duplicate_activities.append(act)
+		elif deleted and not duplicate:
+			deleted_activities.append(act)
 
-	if include_duplicate:
-		return filtered_activities
+	final_activities = []
+	if include_duplicate and include_deleted:
+		final_activities = filtered_activities
+	elif not include_duplicate and not include_deleted:
+		final_activities = non_dup_non_del_activities
+	elif include_duplicate:
+		final_activities = non_dup_non_del_activities+duplicate_activities
+	elif include_deleted:
+		final_activities = non_dup_non_del_activities+deleted_activities
 	else:
-		return unique_activities
+		final_activities = filtered_activities
+	return final_activities
 
 def get_activity_stats(combined_user_activities):
 
