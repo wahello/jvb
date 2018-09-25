@@ -1,7 +1,10 @@
 from celery.decorators import task
 from celery.utils.log import get_task_logger
 
-from .email import send_userinput_update_email
+from .email import send_userinput_update_email,user_inputs_remind_emails,\
+		remind_sync_user_watch_shift1,remind_sync_user_watch_shift2
+
+
 
 logger = get_task_logger(__name__)
 
@@ -16,3 +19,40 @@ def notify_admins_task(admin_users_email,instance_meta):
 		logger.info("Sent email successfully")
 	except Exception as e:
 		logger.error(str(e),exc_info=True)
+
+
+@task(name="userinputs.remind_email")
+def remind_user_inputs_email():
+	'''
+		Celery task to send email to submits/updates user inputs
+	'''
+	try:
+		user_inputs_remind_emails()
+		logger.info("Sent email successfully")
+	except Exception as e:
+		logger.error(str(e),exc_info=True)
+
+
+
+@task(name="remind_users_sync_watch_shift1")
+def remind_users_sync_watch_day():
+	'''
+		Celery task to send email to Synchronize watch for before 9:00 AM
+	'''
+	try:
+		remind_sync_user_watch_shift1()
+		logger.info("Sent email successfully")
+	except Exception as e:
+		logger.error(str(e),exc_info=True)
+
+@task(name="remind_users_sync_watch_shift2")
+def remind_users_sync_watch_night():
+	'''
+		Celery task to send email to Synchronize watch for before 9:00 PM
+	'''
+	try:
+		remind_sync_user_watch_shift2()
+		logger.info("Sent email successfully")
+	except Exception as e:
+		logger.error(str(e),exc_info=True)
+
