@@ -1,17 +1,22 @@
 from datetime import timezone,timedelta,date
 import ast
+from django.contrib import messages
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-import quicklook.calculations.garmin_calculation
-from quicklook.calculations.calculation_driver import which_device
+from quicklook.calculations import garmin_calculation
+import quicklook.calculations.fitbit_calculation
+import quicklook.calculations.calculation_driver
 
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
 	UserGarminDataManuallyUpdated)
+
+from fitbit.models import UserFitbitDataSleep
 
 from hrr.models import Hrr
 from garmin.models import GarminFitFiles
@@ -192,11 +197,18 @@ class GarminData(APIView):
 			current_date,yesterday_sleep_data, todays_sleep_data,str_dt=False)
 
 	def _get_fitbit_sleep(self,target_date):
-		pass
-
+		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+		user = self.request.user
+		todays_sleep_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
+			UserFitbitDataSleep,user,current_date.date(),current_date.date())
+		if todays_sleep_data:
+			todays_sleep_data_dict = ast.literal_eval(todays_sleep_data[0])
+			sleep_stats = quicklook.calculations.fitbit_calculation.get_sleep_stats(
+				todays_sleep_data_dict)
+			return sleep_stats
 	def _get_sleep_stats(self,target_date):
 		user = self.request.user
-		device_type = which_device(user)
+		device_type = quicklook.calculations.calculation_driver.which_device(user)
 		if device_type == 'garmin':
 			return self._get_garmin_sleep(target_date)
 		elif device_type == 'fitbit':
@@ -240,6 +252,8 @@ class GarminData(APIView):
 		target_date = request.query_params.get('date',None)
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
+			if sleep_stats:
+				sleep_stats = self._get_fitbit_sleep(target_date)
 			have_activities = self._have_activity_record(target_date)
 			weight = self._get_weight(target_date)
 			activites = _get_activities(self.request.user,target_date)
