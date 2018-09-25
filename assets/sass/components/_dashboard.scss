@@ -85,6 +85,20 @@
 }
 
 /*Weekly workout table*/
+@media (min-width: 375px) and (max-width: 667px){
+	.weeklyWorkoutTable {	
+		font-size:60% !important;
+		width: 40px !important;
+	}
+	.mnh-mobile-view {
+		font-size:70% !important;
+	}
+}
+
+.boldText {
+	font-weight: bold;
+}
+
 .weeklyWorkoutTable th{
 	vertical-align: middle !important;
 	min-width: 70px !important;
