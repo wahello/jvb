@@ -2252,6 +2252,7 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":None,
 			"offset":None,
 			}
+	add_date_to_fitfile()
 	return data
 
 def hrr_calculations(request):
@@ -2561,3 +2562,50 @@ def weekly_workout_helper(user,start_date):
 		data_v2 = {}
 	# print(data_v2,"sssssssssssss")
 	return data_v2
+
+def particular_activity(user,activity_id):
+	activities = UserGarminDataActivity.objects.filter(
+					user=user,summary_id=activity_id)
+	if activities:
+		for value in activities:
+			data = value.data
+			data_formated = ast.literal_eval(data)
+			strat_time = data_formated.get("startTimeInSeconds",0)
+			if strat_time:
+				fitfile_belong_date = date.fromtimestamp(strat_time)
+			else:
+				fitfile_belong_date = None
+	else:
+		fitfile_belong_date = None
+
+	return fitfile_belong_date
+
+def get_activty_related_fitfile(fitfiles_no_date):
+	for single_fitfile in fitfiles_no_date:
+		user = single_fitfile.user
+		meta_data_fitfile = single_fitfile.meta_data_fitfile
+		meta_data_fitfile = ast.literal_eval(meta_data_fitfile)
+		activity_id = meta_data_fitfile.get('activityIds',0)
+		if activity_id[0] and user:
+			have_activity = particular_activity(user,str(activity_id[0]))
+		else:
+			have_activity = None
+		if have_activity:
+			single_fitfile.fit_file_belong_date = have_activity
+			single_fitfile.save()
+
+def add_date_to_fitfile():
+	data_now = date.today()
+	year = data_now.year
+	month = data_now.month
+	day = data_now.day
+	datetime_obj = datetime(year,month,day,0,0,0)
+	print(datetime_obj)
+	fitfiles_no_date = GarminFitFiles.objects.filter(
+		created_at__gte=datetime_obj,
+		fit_file_belong_date=None)
+	print(fitfiles_no_date,"fitfiles_no_date")
+	if fitfiles_no_date:
+		print("entered in ti first if")
+		get_activty_related_fitfile(fitfiles_no_date)
+

@@ -5,7 +5,7 @@ import json
 import io
 import base64
 import ast
-from datetime import datetime
+from datetime import datetime,date
 
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
@@ -191,6 +191,7 @@ class GarminConnectPing(APIView):
 		file_name = request.data['uploadMetaData']
 		oauthToken_fitfile = ast.literal_eval(file_name)
 		file_oauth = oauthToken_fitfile['oauthToken']
+		activity_id = oauthToken_fitfile.get('activityIds',0)
 
 		date_now = datetime.now()
 		date_str = date_now.strftime("%Y-%m-%d")
@@ -200,7 +201,27 @@ class GarminConnectPing(APIView):
 		except User.DoesNotExist:
 			user = None
 		if user:
-			fit_file_obj = GarminFitFiles.objects.create(user=user,fit_file=file2,meta_data_fitfile=oauthToken_fitfile)
+			if activity_id[0]:
+				activities = UserGarminDataActivity.objects.filter(
+					user=user,summary_id=str(activity_id[0]))
+				if activities:
+					for value in activities:
+						data = value.data
+						data_formated = ast.literal_eval(data)
+						strat_time = data_formated.get("startTimeInSeconds",0)
+						if strat_time:
+							fitfile_belong_date = date.fromtimestamp(strat_time)
+						else:
+							fitfile_belong_date = None
+				else:
+					fitfile_belong_date = None
+			else:
+				fitfile_belong_date = None
+
+			fit_file_obj = GarminFitFiles.objects.create(
+				user=user,fit_file=file2,
+				meta_data_fitfile=oauthToken_fitfile,
+				fit_file_belong_date=fitfile_belong_date)
 			create_hrrdata.delay(
 				user.id,
 				date_str,
