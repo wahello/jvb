@@ -132,9 +132,12 @@ class HrrSummaryDashboardview(APIView):
             time99_point = calculate_t99_points(aerobic_hr_zone_max,
                 activity_end_hr,time99)
         if aerobic_hr_zone_max and activity_end_hr and pure_time99 is not None:
-            pure_time99 = sec_to_min_sec(pure_time99)
-            pure_time99_point = calculate_t99_points(aerobic_hr_zone_max,
-                activity_end_hr,pure_time99)
+            if pure_time99 == -1:
+                pure_time99_point = 0
+            else:
+                pure_time99 = sec_to_min_sec(pure_time99)
+                pure_time99_point = calculate_t99_points(aerobic_hr_zone_max,
+                    activity_end_hr,pure_time99)
         return (time99_point, pure_time99_point)
 
 
