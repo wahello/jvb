@@ -8,13 +8,8 @@ import pytz
 from user_input.models import UserDailyInput
 
 from quicklook.serializers import UserQuickLookSerializer
-from .garmin_calculation import (
-	get_blank_model_fields,
-	str_to_datetime,
-	update_helper,
-	sec_to_hours_min_sec,
-	get_activity_stats,
-	)
+
+import quicklook.calculations.garmin_calculation
 from quicklook.models import (
 	UserQuickLook,
 	Grades,
@@ -79,7 +74,7 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
 def get_sleep_stats(sleep_data, ui_bedtime = None,
  	ui_awaketime = None, ui_sleep_duration = None,
- 	ui_timezone = None):		
+ 	ui_timezone = None,str_date=True):		
 	sleep_stats = {
 		"deep_sleep": '',
 		"light_sleep": '',
@@ -110,26 +105,26 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		trans_sleep_data = fitbit_to_garmin_sleep(main_sleep_data)
 
 	if trans_sleep_data:
-		sleep_stats["deep_sleep"] = sec_to_hours_min_sec(
+		sleep_stats["deep_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			trans_sleep_data['deepSleepDurationInSeconds'],
 			include_sec = False
 		)
-		sleep_stats["light_sleep"] = sec_to_hours_min_sec(
+		sleep_stats["light_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			trans_sleep_data['lightSleepDurationInSeconds'],
 			include_sec = False
 		)
-		sleep_stats["awake_time"] = sec_to_hours_min_sec(
+		sleep_stats["awake_time"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			trans_sleep_data['awakeDurationInSeconds'],
 			include_sec = False
 		)
-		sleep_stats["rem_sleep"] = sec_to_hours_min_sec(
+		sleep_stats["rem_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			trans_sleep_data['remSleepInSeconds'],include_sec = False
 		)
-		# sleep_stats["restless"] = sec_to_hours_min_sec(
+		# sleep_stats["restless"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 		# 	trans_sleep_data['restlessDurationInSeconds'],
 		# 	include_sec = False
 		# )
-		sleep_stats["sleep_per_wearable"] = sec_to_hours_min_sec(
+		sleep_stats["sleep_per_wearable"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			(trans_sleep_data['durationInSeconds'] 
 			- trans_sleep_data['awakeDurationInSeconds'] 
 			- trans_sleep_data['restlessDurationInSeconds']),
@@ -142,8 +137,12 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 	if have_userinput_sleep:
 		bed_time = ui_bedtime.replace(tzinfo = None)
 		awake_time = ui_awaketime.replace(tzinfo = None)
-		sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
-		sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		if str_date:
+			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
+			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		else:
+			sleep_stats['sleep_bed_time'] = bed_time
+			sleep_stats['sleep_awake_time'] = awake_time
 
 	elif trans_sleep_data:
 		bed_time = datetime.strptime(
@@ -151,8 +150,16 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 			"%Y-%m-%dT%H:%M:%S.%f")
 		wake_time = bed_time + timedelta(
 			seconds = trans_sleep_data['durationInSeconds'])
-		sleep_stats["sleep_bed_time"] = bed_time.strftime("%I:%M %p")
-		sleep_stats["sleep_awake_time"] = wake_time.strftime("%I:%M %p")
+		if str_date:
+			sleep_stats["sleep_bed_time"] = bed_time.strftime("%I:%M %p")
+			sleep_stats["sleep_awake_time"] = wake_time.strftime("%I:%M %p")
+		else:
+			sleep_stats['sleep_bed_time'] = bed_time
+			sleep_stats['sleep_awake_time'] = wake_time
+	else:
+		if not str_date:
+			sleep_stats['sleep_bed_time'] = None
+			sleep_stats['sleep_awake_time'] = None
 
 	return sleep_stats
 
@@ -208,20 +215,20 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 	'''
 	# date range for which quicklook is calculated
-	from_dt = str_to_datetime(from_date)
-	to_dt = str_to_datetime(to_date)
+	from_dt = quicklook.calculations.garmin_calculation.str_to_datetime(from_date)
+	to_dt = quicklook.calculations.garmin_calculation.str_to_datetime(to_date)
 	current_date = from_dt
 	SERIALIZED_DATA = []
 	while current_date <= to_dt:
 		
-		grades_calculated_data = get_blank_model_fields('grade')
-		exercise_calculated_data = get_blank_model_fields('exercise')
-		swim_calculated_data = get_blank_model_fields('swim')
-		bike_calculated_data = get_blank_model_fields('bike')
-		steps_calculated_data = get_blank_model_fields('step')
-		sleeps_calculated_data = get_blank_model_fields('sleep')
-		food_calculated_data = get_blank_model_fields("food")
-		alcohol_calculated_data = get_blank_model_fields("alcohol")
+		grades_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('grade')
+		exercise_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('exercise')
+		swim_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('swim')
+		bike_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('bike')
+		steps_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('step')
+		sleeps_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('sleep')
+		food_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields("food")
+		alcohol_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields("alcohol")
 
 		todays_sleep_data = get_fitbit_model_data(
 				UserFitbitDataSleep,user,current_date.date(),current_date.date())
@@ -262,15 +269,15 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			ui_workout_easy_hard = todays_user_input.strong_input.work_out_easy_or_hard
 			ui_medication = todays_user_input.strong_input.prescription_or_non_prescription_medication_yesterday
 			ui_smoke_substance = todays_user_input.strong_input.smoke_any_substances_whatsoever
-			ui_water_consumed_workout = todays_user_input.encouraged_input.water_consumed_during_workout
-			if ui_water_consumed_workout:
-				ui_water_consumed_workout = int(ui_water_consumed_workout)
+			water_consumed = todays_user_input.encouraged_input.water_consumed_during_workout
+			if water_consumed:
+				ui_water_consumed_workout = int(water_consumed)
 			ui_pain = todays_user_input.encouraged_input.pains_twings_during_or_after_your_workout
 			ui_pain_area = todays_user_input.encouraged_input.pain_area
 			ui_stress_level = todays_user_input.encouraged_input.stress_level_yesterday
-			ui_chia_seeds_consumed_workout = todays_user_input.optional_input.chia_seeds_consumed_during_workout
+			chia_seeds_consumed = todays_user_input.optional_input.chia_seeds_consumed_during_workout
 			if ui_chia_seeds_consumed_workout:
-				ui_chia_seeds_consumed_workout = int(ui_chia_seeds_consumed_workout)
+				ui_chia_seeds_consumed_workout = int(chia_seeds_consumed)
 			ui_fast_before_workout = todays_user_input.optional_input.fasted_during_workout
 			ui_sick = todays_user_input.optional_input.sick
 			ui_workout_comment = todays_user_input.optional_input.general_Workout_Comments
@@ -320,20 +327,19 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
 				todays_activity_data))
-			activity_stats = get_activity_stats(trans_activity_data)
-
+			activity_stats = quicklook.calculations.garmin_calculation.get_activity_stats(trans_activity_data)
 			exercise_calculated_data['did_workout'] = activity_stats['have_activity']
 			exercise_calculated_data['workout_easy_hard'] = ui_workout_easy_hard
 			exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 			exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
 			exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
 			exercise_calculated_data['distance_other'] = activity_stats['distance_other_miles']
-			exercise_calculated_data['workout_duration'] = sec_to_hours_min_sec(
+			exercise_calculated_data['workout_duration'] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 				activity_stats['total_duration'])
 			exercise_calculated_data['pace'] = activity_stats['pace']
 			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
-			
+		
 		fitbit_steps = fitbit_steps_data(user,current_date)
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
@@ -352,14 +358,14 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		# create new quicklook instance 
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
-			update_helper(user_ql.grades_ql,grades_calculated_data)
-			update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
-			update_helper(user_ql.swim_stats_ql, swim_calculated_data)
-			update_helper(user_ql.bike_stats_ql, bike_calculated_data)
-			update_helper(user_ql.steps_ql, steps_calculated_data)
-			update_helper(user_ql.sleep_ql, sleeps_calculated_data)
-			update_helper(user_ql.food_ql, food_calculated_data)
-			update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.grades_ql,grades_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.swim_stats_ql, swim_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.bike_stats_ql, bike_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.steps_ql, steps_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.sleep_ql, sleeps_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.food_ql, food_calculated_data)
+			quicklook.calculations.garmin_calculation.update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
 
 		except UserQuickLook.DoesNotExist:
 			user_ql = UserQuickLook.objects.create(user = user,created_at=current_date.date())
