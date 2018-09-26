@@ -202,10 +202,15 @@ class GarminData(APIView):
 		todays_sleep_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
 			UserFitbitDataSleep,user,current_date.date(),current_date.date())
 		if todays_sleep_data:
-			todays_sleep_data_dict = ast.literal_eval(todays_sleep_data[0])
-			sleep_stats = quicklook.calculations.fitbit_calculation.get_sleep_stats(
-				todays_sleep_data_dict)
-			return sleep_stats
+			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
+				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
+		else:
+			todays_sleep_data = None
+			
+		sleep_stats = quicklook.calculations.fitbit_calculation.get_sleep_stats(
+			todays_sleep_data,str_date=False)
+		return sleep_stats
+
 	def _get_sleep_stats(self,target_date):
 		user = self.request.user
 		device_type = quicklook.calculations.calculation_driver.which_device(user)
