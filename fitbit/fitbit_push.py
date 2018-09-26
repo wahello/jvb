@@ -41,8 +41,8 @@ def refresh_token_for_notification(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id='22CN46'
+	client_secret='94d717c6ec36c270ed59cc8b5564166f'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -74,8 +74,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id='22CN46',
+					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -191,7 +191,7 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		create_notification.state = "processing"
 		create_notification.save()
 		activity_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
 			user_id,date))
 		heartrate_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
@@ -199,8 +199,10 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		steps_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
 			user_id,date))
+		print(activity_fitbit,"collllllllllllllllllllllllllllllllllllllllllllllllllllllllll")
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
+			print(activity_fitbit,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 			store_data(activity_fitbit,user,date,create_notification,data_type="activity_fitbit")
 		if heartrate_fitbit:
 			heartrate_fitbit = heartrate_fitbit.json()
@@ -277,21 +279,31 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "activity_fitbit" == key:
 				date_of_activity = value['pagination']['afterDate']
-				try:
-					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
-					update_fitbit_data(user,date_of_activity,create_notification,value,key)
-					print("Updated Activity-Fitbit successfully")
-					if create_notification != None:
-						create_notification.state = "processed"
-						create_notification.save()
-				except UserFitbitDataActivities.DoesNotExist:
-					UserFitbitDataActivities.objects.create(user=user,
-					date_of_activities=date_of_activity,
-					activities_data=value,created_at=start_date)
-					print("Created Activity-Fitbit successfully")
-					if create_notification != None:
-						create_notification.state = "processed"
-						create_notification.save()
+				if value["activities"]:
+					fitbit_date = value['activities'][0].get("originalStartTime",0)
+					fitbit_date = fitbit_date[:10]
+					fitbit_date_obj = datetime.strptime(
+						fitbit_date, '%Y-%m-%d').date()
+
+					# print(fitbit_date_obj,"type of the activty")
+				else:
+					fitbit_date = 0
+				if fitbit_date == start_date:
+					try:
+						activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
+						update_fitbit_data(user,date_of_activity,create_notification,value,key)
+						print("Updated Activity-Fitbit successfully")
+						if create_notification != None:
+							create_notification.state = "processed"
+							create_notification.save()
+					except UserFitbitDataActivities.DoesNotExist:
+						UserFitbitDataActivities.objects.create(user=user,
+						date_of_activities=date_of_activity,
+						activities_data=value,created_at=start_date)
+						print("Created Activity-Fitbit successfully")
+						if create_notification != None:
+							create_notification.state = "processed"
+							create_notification.save()
 
 		except (KeyError, IndexError):
 			logging.exception("message")
