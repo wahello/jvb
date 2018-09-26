@@ -1,13 +1,11 @@
 from datetime import timezone,timedelta,date
 import ast
-from django.contrib import messages
-
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from quicklook.calculations import garmin_calculation
+import quicklook.calculations.garmin_calculation
 import quicklook.calculations.fitbit_calculation
 import quicklook.calculations.calculation_driver
 
@@ -18,9 +16,7 @@ from garmin.models import (UserGarminDataSleep,
 
 from fitbit.models import UserFitbitDataSleep
 
-from hrr.models import Hrr
 from garmin.models import GarminFitFiles
-from django.contrib.auth.models import User
 from registration.models import Profile
 from hrr.calculation_helper import fitfile_parse
 
