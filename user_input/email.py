@@ -43,17 +43,20 @@ JVB Health & Wellness
 			fail_silently = True  
 		)
 
-#Reminding Users to Submit DailyInputForm
-def user_inputs_remind_emails():
+# remind selected users to submit UserDailyInput
+def remind_selected_users_submit_user_input():
+	# users_names=["John","Philippe","Michelle","Brenda","Brook","Cheryl","Carol",
+	# 	"Linda","Dave","Justin","Lori","Michael","Mikayla","Kaiya","Yossi"]
+	users_names=["venky","norm","pavan","vignan"]
+	users_data=[User.objects.filter(username=users_names[index]) for index in range(len(users_names))]
 	feed_back_email="info@jvbwellness.com"
 	static_url="https://app.jvbwellness.com/"
-	all_users=User.objects.all()
 	input_users_data=UserDailyInput.objects.filter(created_at=date.today())
 	input_users_name=[input_users_data[index].user for index in range(
 		len(input_users_data)) ]
-	for user in range(len(all_users)):
-		input_users_data_created=UserDailyInput.objects.filter(user=all_users[user]).last()
-		if not all_users[user] in input_users_name:
+	for index in range(len(users_names)):
+		input_users_data_created=UserDailyInput.objects.filter(user=users_data[index][0]).last()
+		if not users_names[index][0] in input_users_name:
 			if input_users_data_created:
 				message= """
 Hi {},
@@ -68,13 +71,13 @@ Thanks and let us know if you have any questions by emailing mailto:{}
 Sincerely,
 JVB Health & Wellness   
 					"""
-				remind_users_email=[all_users[user].email]
+				remind_users_email=[users_data[index][0].email]
 				input_users_data_last_created_on=input_users_data_created.created_at 
 				if input_users_data_last_created_on == date.today()-timedelta(days = 1):
 					input_users_data_last_created="Yesterday"
 				else:
 					input_users_data_last_created=input_users_data_last_created_on
-				message=message.format(all_users[user].username,date.today(),input_users_data_last_created,static_url,feed_back_email)
+				message=message.format(users_data[index][0].first_name,date.today(),input_users_data_last_created,static_url,feed_back_email)
 				if remind_users_email:
 					send_mail(
 					subject="Reminder To Submit UserInput" ,
@@ -86,6 +89,7 @@ JVB Health & Wellness
 			else:
 				message= """
 Hi {},
+
 We noticed that you have not started to submit your user inputs. Click on the link below to submit them.
 
 {}userinputs
@@ -95,8 +99,8 @@ Thanks and let us know if you have any questions by emailing mailto:{}
 Sincerely,
 JVB Health and Wellness
 				"""
-				remind_users_email=[all_users[user].email]
-				message=message.format(all_users[user].username,static_url,feed_back_email)
+				remind_users_email=[users_data[index][0].email]
+				message=message.format(users_data[index][0].first_name,static_url,feed_back_email)
 				if remind_users_email:
 					send_mail(
 						subject="Reminder To Submit UserInput" ,
@@ -105,6 +109,70 @@ JVB Health and Wellness
 						recipient_list = remind_users_email,
 						fail_silently = True
 						)
+
+
+# #Reminding Users to Submit DailyInputForm
+# def user_inputs_remind_emails():
+# 	feed_back_email="info@jvbwellness.com"
+# 	static_url="https://app.jvbwellness.com/"
+# 	all_users=User.objects.all()
+# 	input_users_data=UserDailyInput.objects.filter(created_at=date.today())
+# 	input_users_name=[input_users_data[index].user for index in range(
+# 		len(input_users_data)) ]
+# 	for user in range(len(all_users)):
+# 		input_users_data_created=UserDailyInput.objects.filter(user=all_users[user]).last()
+# 		if not all_users[user] in input_users_name:
+# 			if input_users_data_created:
+# 				message= """
+# Hi {},
+
+# We noticed that you have not submitted your user inputs today {}, your last submission on {}. Click on the link below to submit them.
+
+# {}userinputs
+
+# If clicking the link above doesn't work, please copy and paste the URL into a new browser window instead.
+# Thanks and let us know if you have any questions by emailing mailto:{} 
+
+# Sincerely,
+# JVB Health & Wellness   
+# 					"""
+# 				remind_users_email=[all_users[user].email]
+# 				input_users_data_last_created_on=input_users_data_created.created_at 
+# 				if input_users_data_last_created_on == date.today()-timedelta(days = 1):
+# 					input_users_data_last_created="Yesterday"
+# 				else:
+# 					input_users_data_last_created=input_users_data_last_created_on
+# 				message=message.format(all_users[user].username,date.today(),input_users_data_last_created,static_url,feed_back_email)
+# 				if remind_users_email:
+# 					send_mail(
+# 					subject="Reminder To Submit UserInput" ,
+# 					message = message,
+# 					from_email = feed_back_email,
+# 					recipient_list = remind_users_email,
+# 					fail_silently = True  
+# 					)
+# 			else:
+# 				message= """
+# Hi {},
+# We noticed that you have not started to submit your user inputs. Click on the link below to submit them.
+
+# {}userinputs
+
+# Thanks and let us know if you have any questions by emailing mailto:{} 
+
+# Sincerely,
+# JVB Health and Wellness
+# 				"""
+# 				remind_users_email=[all_users[user].email]
+# 				message=message.format(all_users[user].username,static_url,feed_back_email)
+# 				if remind_users_email:
+# 					send_mail(
+# 						subject="Reminder To Submit UserInput" ,
+# 						message = message,
+# 						from_email = feed_back_email,
+# 						recipient_list = remind_users_email,
+# 						fail_silently = True
+# 						)
 
 
 # Reminding Users to Synchronize watch

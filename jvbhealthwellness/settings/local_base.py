@@ -44,11 +44,16 @@ CELERY_BEAT_SCHEDULE = {
 #         'task':'progress_analyzer.update_obsolete_pa_reports',
 #         'schedule':crontab(minute=2, hour=19)
 #     }
-    #execute every day at 8:00 PM EST (America/New_york)
-      "remind_user_inputs_email":{
-          'task':'userinputs.remind_email',
-          'schedule':crontab(minute=0,hour=20)
+        #execute every day at 10:00 PM EST (America/New_york)
+        "remind_selected_users_submit_input":{
+            'task':'remind_selected_users.submit_user__daily_input',
+            'schedule':crontab()
       },
+    # #execute every day at 8:00 PM EST (America/New_york)
+    #   "remind_user_inputs_email":{
+    #       'task':'userinputs.remind_email',
+    #       'schedule':crontab(minute=0,hour=20)
+    #   },
       #execute every day at 9:00 AM EST (America/New_york)
       "remind_users_sync_watch_day":{
             'task':'remind_users_sync_watch_shift1',
@@ -59,6 +64,8 @@ CELERY_BEAT_SCHEDULE = {
             'task':'remind_users_sync_watch_shift2',
             'schedule':crontab(minute=0,hour=21)
       }
+
+
 }
 
 # Email
