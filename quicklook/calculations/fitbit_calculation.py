@@ -74,7 +74,7 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
 def get_sleep_stats(sleep_data, ui_bedtime = None,
  	ui_awaketime = None, ui_sleep_duration = None,
- 	ui_timezone = None):		
+ 	ui_timezone = None,str_date=True):		
 	sleep_stats = {
 		"deep_sleep": '',
 		"light_sleep": '',
@@ -137,8 +137,12 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 	if have_userinput_sleep:
 		bed_time = ui_bedtime.replace(tzinfo = None)
 		awake_time = ui_awaketime.replace(tzinfo = None)
-		sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
-		sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		if str_date:
+			sleep_stats['sleep_bed_time'] = bed_time.strftime("%I:%M %p")
+			sleep_stats['sleep_awake_time'] = awake_time.strftime("%I:%M %p")
+		else:
+			sleep_stats['sleep_bed_time'] = bed_time
+			sleep_stats['sleep_awake_time'] = awake_time
 
 	elif trans_sleep_data:
 		bed_time = datetime.strptime(
@@ -146,8 +150,16 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 			"%Y-%m-%dT%H:%M:%S.%f")
 		wake_time = bed_time + timedelta(
 			seconds = trans_sleep_data['durationInSeconds'])
-		sleep_stats["sleep_bed_time"] = bed_time.strftime("%I:%M %p")
-		sleep_stats["sleep_awake_time"] = wake_time.strftime("%I:%M %p")
+		if str_date:
+			sleep_stats["sleep_bed_time"] = bed_time.strftime("%I:%M %p")
+			sleep_stats["sleep_awake_time"] = wake_time.strftime("%I:%M %p")
+		else:
+			sleep_stats['sleep_bed_time'] = bed_time
+			sleep_stats['sleep_awake_time'] = wake_time
+	else:
+		if not str_date:
+			sleep_stats['sleep_bed_time'] = None
+			sleep_stats['sleep_awake_time'] = None
 
 	return sleep_stats
 
