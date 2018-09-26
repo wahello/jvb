@@ -191,7 +191,7 @@ def fitbit_heartrate_data(user,current_date):
 		resting_heartrate = 0	
 	return resting_heartrate
 	
-def get_steps(trans_activity_data):
+def get_exercise_steps(trans_activity_data):
 	total_execrcise_steps = 0
 	for i,single_activity in enumerate(trans_activity_data):
 		total_execrcise_steps = total_execrcise_steps + int(single_activity.get("steps",0))
@@ -244,11 +244,11 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_workout_easy_hard = ""
 		ui_medication = ""
 		ui_smoke_substance = ""
-		ui_water_consumed_workout = None
+		ui_water_consumed_workout = 0
 		ui_pain = ""
 		ui_pain_area = ""
 		ui_stress_level = ""
-		ui_chia_seeds_consumed_workout = None
+		ui_chia_seeds_consumed_workout = 0
 		ui_fast_before_workout = ""
 		ui_sick = ''
 		ui_workout_comment = ""
@@ -265,16 +265,12 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			ui_water_consumed_workout = todays_user_input.encouraged_input.water_consumed_during_workout
 			if ui_water_consumed_workout:
 				ui_water_consumed_workout = int(ui_water_consumed_workout)
-			else:
-				ui_water_consumed_workout = None
 			ui_pain = todays_user_input.encouraged_input.pains_twings_during_or_after_your_workout
 			ui_pain_area = todays_user_input.encouraged_input.pain_area
 			ui_stress_level = todays_user_input.encouraged_input.stress_level_yesterday
 			ui_chia_seeds_consumed_workout = todays_user_input.optional_input.chia_seeds_consumed_during_workout
 			if ui_chia_seeds_consumed_workout:
 				ui_chia_seeds_consumed_workout = int(ui_chia_seeds_consumed_workout)
-			else:
-				ui_chia_seeds_consumed_workout = None
 			ui_fast_before_workout = todays_user_input.optional_input.fasted_during_workout
 			ui_sick = todays_user_input.optional_input.sick
 			ui_workout_comment = todays_user_input.optional_input.general_Workout_Comments
@@ -320,6 +316,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			todays_activity_data = todays_activity_data['activities']
 		else:
 			todays_activity_data = None
+
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
 				todays_activity_data))
@@ -337,12 +334,11 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
 			
-
-		# If quick look for provided date exist then update it otherwise
-		# create new quicklook instance 
 		fitbit_steps = fitbit_steps_data(user,current_date)
 		if todays_activity_data:
-			exercise_steps = get_steps(trans_activity_data)
+			trans_activity_data = list(map(fitbit_to_garmin_activities,
+				todays_activity_data))
+			exercise_steps = get_exercise_steps(trans_activity_data)
 			non_exercise_steps = int(fitbit_steps) - int(exercise_steps)
 			steps_calculated_data["total_steps"] = fitbit_steps
 			steps_calculated_data["non_exercise_steps"] = non_exercise_steps if non_exercise_steps >= 0 else 0
@@ -351,6 +347,9 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			steps_calculated_data["total_steps"] = fitbit_steps
 			steps_calculated_data["non_exercise_steps"] = fitbit_steps
 			steps_calculated_data["exercise_steps"] = 0
+
+		# If quick look for provided date exist then update it otherwise
+		# create new quicklook instance 
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
 			update_helper(user_ql.grades_ql,grades_calculated_data)
