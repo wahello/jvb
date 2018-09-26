@@ -1,8 +1,5 @@
 from django.core.mail import send_mail
-from django.contrib.auth.models import User
-from datetime import datetime,time,date,timezone,timedelta
-from garmin.models import UserLastSynced
-from django.db.models import Q
+from datetime import datetime,time,date,timedelta
 from user_input.models import UserDailyInput
 
 
