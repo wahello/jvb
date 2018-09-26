@@ -1569,6 +1569,11 @@ getGarminStressColors(stressValue){
           color = 'white';
           hr_background = 'white';
       }
+      else if(score >=30 && score <= 60){
+          background = 'green'; 
+          color = 'white';
+          hr_background = 'white';
+      }
       else if(score<30){
           background = 'red';
           color = 'black';
