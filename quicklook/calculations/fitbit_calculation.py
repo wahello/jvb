@@ -269,15 +269,15 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			ui_workout_easy_hard = todays_user_input.strong_input.work_out_easy_or_hard
 			ui_medication = todays_user_input.strong_input.prescription_or_non_prescription_medication_yesterday
 			ui_smoke_substance = todays_user_input.strong_input.smoke_any_substances_whatsoever
-			ui_water_consumed_workout = todays_user_input.encouraged_input.water_consumed_during_workout
-			if ui_water_consumed_workout:
-				ui_water_consumed_workout = int(ui_water_consumed_workout)
+			water_consumed = todays_user_input.encouraged_input.water_consumed_during_workout
+			if water_consumed:
+				ui_water_consumed_workout = int(water_consumed)
 			ui_pain = todays_user_input.encouraged_input.pains_twings_during_or_after_your_workout
 			ui_pain_area = todays_user_input.encouraged_input.pain_area
 			ui_stress_level = todays_user_input.encouraged_input.stress_level_yesterday
-			ui_chia_seeds_consumed_workout = todays_user_input.optional_input.chia_seeds_consumed_during_workout
+			chia_seeds_consumed = todays_user_input.optional_input.chia_seeds_consumed_during_workout
 			if ui_chia_seeds_consumed_workout:
-				ui_chia_seeds_consumed_workout = int(ui_chia_seeds_consumed_workout)
+				ui_chia_seeds_consumed_workout = int(chia_seeds_consumed)
 			ui_fast_before_workout = todays_user_input.optional_input.fasted_during_workout
 			ui_sick = todays_user_input.optional_input.sick
 			ui_workout_comment = todays_user_input.optional_input.general_Workout_Comments
@@ -339,7 +339,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['pace'] = activity_stats['pace']
 			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
-			
+		
 		fitbit_steps = fitbit_steps_data(user,current_date)
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
