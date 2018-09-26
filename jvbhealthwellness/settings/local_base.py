@@ -1,5 +1,5 @@
 from .base import *  # noqa
-from celery.schedules import crontab
+# from celery.schedules import crontab
 
 
 DEBUG = True
@@ -32,41 +32,24 @@ AUTH_PASSWORD_VALIDATORS = []  # allow easy passwords only on local
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_TIMEZONE = 'America/New_York'
-CELERY_BEAT_SCHEDULE = {
-#     #execute every day at 1:00 AM EST (America/New_york)
+CELERY_TIMEZONE = 'Asia/Kolkata'
+# CELERY_BEAT_SCHEDULE = {
+#     execute every day at 1:00 AM EST (America/New_york)
 #     'create-cumulative-sum':{
 #         'task':'progress_analyzer.generate_cumulative_instances',
 #         'schedule':crontab(minute=0, hour=1)
 #     },
-#     #execute every day at 2:00 AM EST (America/New_york)
+#     execute every day at 2:00 AM EST (America/New_york)
 #     'update-obsolete-progress-analyzer-report':{
 #         'task':'progress_analyzer.update_obsolete_pa_reports',
 #         'schedule':crontab(minute=2, hour=19)
-#     }
-        #execute every day at 10:00 PM EST (America/New_york)
-        "remind_selected_users_submit_input":{
-            'task':'remind_selected_users.submit_user__daily_input',
-            'schedule':crontab()
-      },
-    # #execute every day at 8:00 PM EST (America/New_york)
-    #   "remind_user_inputs_email":{
-    #       'task':'userinputs.remind_email',
-    #       'schedule':crontab(minute=0,hour=20)
-    #   },
-      #execute every day at 9:00 AM EST (America/New_york)
-      "remind_users_sync_watch_day":{
-            'task':'remind_users_sync_watch_shift1',
-            'schedule':crontab(minute=0,hour=9)
-      },
-      #execute every day at 9:00 PM EST (America/New_york)
-      "remind_users_sync_watch_night":{
-            'task':'remind_users_sync_watch_shift2',
-            'schedule':crontab(minute=0,hour=21)
-      }
-
-
-}
+#     },
+#     execute every day at 10:00 PM EST (America/New_york)
+#     "remind_selected_users_submit_input":{
+#         'task':'userinputs.submit_userinput_reminder',
+#         'schedule':crontab(minute=38, hour=21)
+#     },
+# }
 
 # Email
 INSTALLED_APPS += ('naomi',)
