@@ -206,7 +206,7 @@ class GarminData(APIView):
 				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
 		else:
 			todays_sleep_data = None
-			
+
 		sleep_stats = quicklook.calculations.fitbit_calculation.get_sleep_stats(
 			todays_sleep_data,str_date=False)
 		return sleep_stats
@@ -257,8 +257,6 @@ class GarminData(APIView):
 		target_date = request.query_params.get('date',None)
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
-			if sleep_stats:
-				sleep_stats = self._get_fitbit_sleep(target_date)
 			have_activities = self._have_activity_record(target_date)
 			weight = self._get_weight(target_date)
 			activites = _get_activities(self.request.user,target_date)
