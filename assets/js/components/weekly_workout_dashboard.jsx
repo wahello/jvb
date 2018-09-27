@@ -552,7 +552,7 @@ checkForUndefinedValue(value) {
 					 {/*<div className = "hr_table_padd" style = {{fontSize:"12px"}}>*/}
 					 <div style = {{fontSize:"12px"}}>
 							<div className = "table table-responsive">
-								<div className="mnh-mobile-view">
+								<div className="mnh-mobile-view" style = {{textAlign: "center"}}>
 								<br />
 						 			<b className = "boldText">AE:</b> Aerobic Duration (% of total time) &nbsp;&nbsp;
 						 			<b className = "boldText">AN:</b> Anaerobic Duration (% of total time) &nbsp;&nbsp;
