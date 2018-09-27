@@ -1111,7 +1111,6 @@ def add_created_activity(di,data,below_aerobic,anaerobic):
 			data_copy["duration_hrr_not_recorded"] = single_activity.get("durationInSeconds",0.0)
 			data_copy["percent_hrr_not_recorded"] = 100
 		modified_data[single_activity['summaryId']] = data_copy
-	print(modified_data,"modified_data")
 	return(modified_data)
 
 def daily_aa_data(user, start_date):
@@ -1170,7 +1169,8 @@ def daily_aa_data(user, start_date):
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
 	filtered_activities_only = get_filtered_activity_stats(activities_json=garmin_list,
-													manually_updated_json=manually_edited_dic)
+													manually_updated_json=manually_edited_dic,
+													user=user,calendar_date=start_date)
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
 	count = 0
 	id_act = 0
@@ -1201,7 +1201,7 @@ def daily_aa_data(user, start_date):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
 		if avg_hr == '' or avg_hr == 0:
 			user_created_activity_list.append(single_activity)
-	print(user_created_activity_list,"user_created_activity_list")
+	
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1306,7 +1306,6 @@ def daily_aa_data(user, start_date):
 			for single_activity_key in no_hrr_actvities:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
-
 	profile = Profile.objects.filter(user=user)
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
@@ -1454,7 +1453,7 @@ def daily_aa_data(user, start_date):
 			daily_aa_data.update({key:value})
 		return (add_totals(daily_aa_data))
 	elif user_input_strong:
-		data_ui = add_created_activity(filtered_activities_files,data,below_aerobic_value,anaerobic_value)
+		data_ui = add_created_activity(filtered_activities_only,data,below_aerobic_value,anaerobic_value)
 		return (add_totals(data_ui))
 	if daily_aa_data:
 		return daily_aa_data
@@ -1530,7 +1529,6 @@ def add_hr_nor_recorded_heartbeat(
 	data={}
 	for i,single_data in enumerate(no_hr_data):
 		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
-		print(heart_beat,"heart beat")
 		if heart_beat != '' and heart_beat != 0 and int(heart_beat) <= below_aerobic_value:
 			low_hr,high_hr = low_high_hr(low_end_heart,high_end_heart,int(heart_beat))
 			if not data.get(low_hr):
@@ -2094,7 +2092,8 @@ def hrr_data(user,start_date):
 					hrr_no_fitfile = None
 			else:
 				Did_heartrate_reach_99 = 'no'
-				pure_time_99 = 99999
+				# -1 represents the pure time to 99 did not reach never
+				pure_time_99 = -1
 				pure_1min_heart_beats = None
 		else:
 			Did_heartrate_reach_99 = 'no'
@@ -2133,7 +2132,8 @@ def hrr_data(user,start_date):
 				time_99 = None
 				
 		if diff_actity_hrr > 120:
-			pure_time_99 = 99999
+			# -1 represents the pure time to 99 did not reach never
+			pure_time_99 = -1
 			pure_1min_heart_beats = None
 
 	else:
@@ -2142,12 +2142,15 @@ def hrr_data(user,start_date):
 	if (not hrr) and workout and workout_final_heartrate:
 		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
-		daily_diff = end_time_activity - daily_starttime
-		daily_activty_end = daily_diff % 15
-		if daily_activty_end != 0:
-			daily_diff = daily_diff + (15 - daily_activty_end)
+		if daily_starttime:
+			daily_diff = end_time_activity - daily_starttime
+			daily_activty_end = daily_diff % 15
+			if daily_activty_end != 0:
+				daily_diff = daily_diff + (15 - daily_activty_end)
+			else:
+				pass
 		else:
-			pass
+			daily_diff = 0
 		if garmin_data_daily:
 			if garmin_data_daily.get('timeOffsetHeartRateSamples',None):
 				daily_diff1 = str(int(daily_diff))
@@ -2169,7 +2172,7 @@ def hrr_data(user,start_date):
 						if daily_diff_data_99 == None:
 							no_fitfile_hrr_reach_99 = "no"
 							no_fitfile_hrr_time_reach_99 = 0.00
-							time_heart_rate_reached_99 = 99999
+							time_heart_rate_reached_99 = 0.00
 							break
 				if daily_diff_data_99 != None and daily_diff_data_99 <= 99:
 					Did_heartrate_reach_99 = 'yes'
