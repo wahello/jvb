@@ -40,3 +40,27 @@ export function fetchHeartRefreshData(successHeart,errorHeart,selectedDate){
   });
 
 }
+
+export function updateHeartData(data,successCallback=undefined, errorCallback=undefined){
+  const URL = 'hrr/update/hrr_calculations';
+  let date = data.fetched_user_input_created_at;
+  data = formatJSON(data);
+  data['created_at'] = date;
+  //console.log(data);
+  const config = {
+    url : URL,
+    data:data,
+    method: 'put',
+    withCredentials: true
+  };
+  axios(config).then(function(response){
+    if(successCallback != undefined){
+      successCallback(response);
+    }
+  }).catch((error) => {
+    console.log(error.message);
+    if(errorCallback != undefined){
+      errorCallback(error);
+    }
+  });
+}
