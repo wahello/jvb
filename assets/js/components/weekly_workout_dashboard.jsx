@@ -496,7 +496,7 @@ checkForUndefinedValue(value) {
 				if(activity_name.toLowerCase().search("swimming") >= 0){
 					key = "Avg" + " " + activity_name + " Distance (In Yards)";
 				}else{
-					key = "Avg" + " " + activity_name + " Distance (In Meters)";
+					key = "Avg" + " " + activity_name + " Distance (In Miles)";
 				}
  				td_header.push(<th>{key}</th>);
 			}
