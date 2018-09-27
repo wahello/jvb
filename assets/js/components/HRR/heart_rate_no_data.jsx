@@ -248,6 +248,7 @@ class No_Hrr_Data extends Component{
 			"no_file_beats_recovered":this.state.no_file_beats_recovered,
 		}
 		 this.props.renderHrrData(data);
+		 updateHeartData(data, this.props.selectedDate, successCallback=undefined, errorCallback=undefined)
 	}
 	render(){
 		return(

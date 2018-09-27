@@ -41,11 +41,12 @@ export function fetchHeartRefreshData(successHeart,errorHeart,selectedDate){
 
 }
 
-export function updateHeartData(data,successCallback=undefined, errorCallback=undefined){
+export function updateHeartData(data, selectedDate, successHeart, errorHeart){
   const URL = 'hrr/update/hrr_calculations';
-  let date = data.fetched_user_input_created_at;
+  selectedDate = moment(selectedDate);
+  //let date = data.fetched_user_input_created_at;
   data = formatJSON(data);
-  data['created_at'] = date;
+  data['start_date'] = selectedDate;
   //console.log(data);
   const config = {
     url : URL,
