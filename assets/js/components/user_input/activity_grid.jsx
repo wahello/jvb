@@ -48,6 +48,7 @@ const activites = { "":"Select",
 "PADDLING":"PADDLING",
 "PILATES":"PILATES",
 "PIYO-PILATES/YOGA":"PIYO-PILATES/YOGA",
+"RECESS_PLAYING":"RECESS PLAYING",
 "RECUMBENT_CYCLING":"RECUMBENT CYCLING",
 "RESORT_SKIING_SNOWBOARDING":"RESORT SKIING SNOW BOARDING",
 "ROAD_BIKING":"ROAD BIKING",
@@ -126,6 +127,8 @@ this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
 this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
 let selected_date = this.props.selected_date;
+this.toggleInfo=this.toggleInfo.bind(this);
+this.infoPrint = this.infoPrint.bind(this);
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -174,6 +177,7 @@ this.state ={
     getselectedid:'',
     selectedId_starttime:'',
     selectedId_delete:'',
+    infoButton:false
 }
 }
 
@@ -1305,6 +1309,29 @@ handleChangeModalActivityTime(event){
     });
 }
  
+toggleInfo(){
+    this.setState({
+      infoButton:!this.state.infoButton
+    });
+}
+infoPrint(){
+    var mywindow = window.open('', 'PRINT');
+    mywindow.document.write('<html><head><style>' +
+        '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
+        '.print {visibility: hidden;}' +
+        '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
+        '</style><title>' + document.title  + '</title>');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write(document.getElementById('duplicate_info_modal_text').innerHTML);
+    mywindow.document.write('</body></html>');
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
+    mywindow.print();
+    mywindow.close();
+   }
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
@@ -1728,7 +1755,9 @@ renderTable(){
                     { 
                         this.state.activities_edit_mode[summaryId][key]?
                         <div>
-                            <span>{duplicateInfoLabel}</span>
+                            <span>
+                                {duplicateInfoLabel}
+                            </span>
                             <span>
                                 <label className="switch">
                                     <input type="checkbox"
@@ -2149,7 +2178,17 @@ return(
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm:ss)</td>
 <td id = "add_button" className="add_button_back">Exercise Steps</td>
 <td id = "add_button" className="add_button_back">Steps Type </td>
-<td id = "add_button" className="add_button_back">Duplicate Info </td>
+<td id = "add_button" className="add_button_back">
+    Duplicate Info 
+    <span id="infoModalWindow" onClick={this.toggleInfo}>
+        <a  className="infoBtn"> 
+            <FontAwesome style={{fontSize:"16px"}}
+                name = "info-circle"
+                size = "1x"                                      
+              />
+        </a>
+    </span>
+</td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
@@ -2157,6 +2196,28 @@ return(
 {this.renderTable()}
 </tbody>
 </table>
+{/*/************MODAL WINDOW FOR INFO BUTTON*************/}
+
+    <Modal 
+        className="pop"
+        id="infoModalWindow" 
+        placement="right" 
+        isOpen={this.state.infoButton}
+        target="infoModalWindow" 
+        toggle={this.toggleInfo}>
+         <ModalHeader toggle={this.toggleInfo}>
+       <span>
+        <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+            &nbsp;
+            Duplicate / Non Duplicate Files
+        </span>
+        </ModalHeader>
+          <ModalBody className="modalcontent" id="duplicate_info_modal_text">
+            <div>
+            We identify potential duplicate activities by labeling them "Duplicate File". This often happens when a user has two devices capturing data for the same workout, most commonly seen when triathletes/cyclists start a watch file and a bike computer file for the same cycling workout. In order not report duplicate activities to you, WE EXCLUDE ALL DUPLICATE FILE INFORMATION FROM EXERCISE STATS ON THE SITE (WEEKLY WORKOUT SUMMARIES, RAW DATA STATS, GRADES, AEROBIC/ANAEROBIC STATS, ETC.) If we have mis-identified a file as "duplicate", you can change it back to "non-duplicate.
+            </div>
+        </ModalBody>
+    </Modal>
 </div>
 {this.props.editable && 
  <div className="activity_add_btn btn4 mar_20 row"> 
