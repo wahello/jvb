@@ -2172,7 +2172,7 @@ def hrr_data(user,start_date):
 						if daily_diff_data_99 == None:
 							no_fitfile_hrr_reach_99 = "no"
 							no_fitfile_hrr_time_reach_99 = 0.00
-							time_heart_rate_reached_99 = 99999
+							time_heart_rate_reached_99 = 0.00
 							break
 				if daily_diff_data_99 != None and daily_diff_data_99 <= 99:
 					Did_heartrate_reach_99 = 'yes'
