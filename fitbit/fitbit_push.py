@@ -41,8 +41,8 @@ def refresh_token_for_notification(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN46'
-	client_secret='94d717c6ec36c270ed59cc8b5564166f'
+	client_id='22CN2D'
+	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -74,8 +74,8 @@ def session_fitbit():
 	return the session 
 	'''
 	service = OAuth2Service(
-					 client_id='22CN46',
-					 client_secret='94d717c6ec36c270ed59cc8b5564166f',
+					 client_id='22CN2D',
+					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -199,10 +199,8 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		steps_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
 			user_id,date))
-		print(activity_fitbit,"collllllllllllllllllllllllllllllllllllllllllllllllllllllllll")
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
-			print(activity_fitbit,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 			store_data(activity_fitbit,user,date,create_notification,data_type="activity_fitbit")
 		if heartrate_fitbit:
 			heartrate_fitbit = heartrate_fitbit.json()
