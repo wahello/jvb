@@ -503,6 +503,7 @@ class DailyActivity(models.Model):
 
     comments = models.TextField(blank=True)
     duplicate = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         dtime = str(self.created_at)

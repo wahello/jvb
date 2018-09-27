@@ -137,7 +137,7 @@ class DailyActivityView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DailyActivitySerializer
 
-    def get_queryset(self):
+    def get_queryset(self, format='json'):
         user = self.request.user
         start_dt = self.request.query_params.get('start_date', None)
         end_dt = self.request.query_params.get('end_date', None)
