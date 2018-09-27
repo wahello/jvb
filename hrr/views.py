@@ -1111,7 +1111,6 @@ def add_created_activity(di,data,below_aerobic,anaerobic):
 			data_copy["duration_hrr_not_recorded"] = single_activity.get("durationInSeconds",0.0)
 			data_copy["percent_hrr_not_recorded"] = 100
 		modified_data[single_activity['summaryId']] = data_copy
-	
 	return(modified_data)
 
 def daily_aa_data(user, start_date):
