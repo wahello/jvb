@@ -1,4 +1,7 @@
 from django.core.mail import send_mail
+from datetime import datetime,time,date,timedelta
+from user_input.models import UserDailyInput
+
 
 def send_userinput_update_email(admin_users_email,instance_meta):
 	'''
@@ -36,3 +39,61 @@ JVB Health & Wellness
 			recipient_list = admin_users_email,
 			fail_silently = True  
 		)
+
+# remind selected users to submit UserDailyInput
+def notify_user_to_submit_userinputs():
+	RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
+		"cherylcasone","Carol","lafmaf123","davelee","Justin","lalancaster",
+		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com"]
+	FEEDBACK_EMAIL = "info@jvbwellness.com"
+	ROOT_URL = "https://app.jvbwellness.com/"
+	USER_INPUT_URL = ROOT_URL+"userinputs"
+	# RECEPIENTS_USERNAME = ["venky","norm","pavan","vignan"]
+	last_userinput_of_users = {}
+	for username in RECEPIENTS_USERNAME:
+		last_userinput_of_users[username] = UserDailyInput.objects.filter(
+			user__username__iexact = username).last()
+
+	for username,last_ui in last_userinput_of_users.items():
+		if last_ui:
+			user_email = last_ui.user.email
+			user_first_name = last_ui.user.first_name
+			last_ui_date = datetime.combine(last_ui.created_at,time(0))
+			message = """
+Hi {},
+
+We noticed that you have not submitted your user inputs {}. Click on the link below to submit them.
+
+{}
+
+If clicking the link above doesn't work, please copy and paste the URL into a new browser window instead.
+Thanks and let us know if you have any questions by emailing mailto:{} 
+
+Sincerely,
+JVB Health & Wellness""" 
+			submission_from_text = ""
+			subject = "Submit User Inputs | {}"
+			if last_ui_date.date() == (datetime.now()-timedelta(days = 1)).date():
+				submission_from_text = "today ({})".format(
+					datetime.now().strftime("%b %d, %Y")
+				)
+				subject = subject.format(datetime.now().strftime("%b %d, %Y"))
+			else:
+				submission_from_text = "from {}".format(
+					(last_ui_date+timedelta(days=1)).strftime("%b %d, %Y")
+				)
+				subject = subject.format(
+					(last_ui_date+timedelta(days=1)).strftime("%b %d, %Y"))
+			message = message.format(
+				user_first_name.capitalize(),submission_from_text,
+				USER_INPUT_URL,FEEDBACK_EMAIL
+			)
+
+			if last_ui_date.date() != date.today():
+				send_mail(
+					subject = subject,
+					message = message,
+					from_email = FEEDBACK_EMAIL,
+					recipient_list = [user_email],
+					fail_silently = True  
+				)
