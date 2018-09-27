@@ -15,8 +15,10 @@ def levelData(sleepLevelsMap,sleep_type):
 	}
 
 	if sleep_type == "stages":
+		valid_level = list(sleep_level_stats["level_map"].keys())
 		for levelData in sleepLevelsMap['data']:
-			if levelData['level'] != "wake":
+			if (levelData['level'] != "wake" 
+				and levelData['level'] in valid_level):
 				sleep_level_stats['level_map'][levelData['level']].append(
 					{'startTimeInSeconds': levelData['dateTime'],
 					 'endTimeInSeconds':levelData['seconds']})
@@ -90,7 +92,6 @@ def fitbit_to_garmin_sleep(sleep_summary):
 	return garmin_sleep
 
 def fitbit_to_garmin_activities(active_summary):
-
 	garmin_activites = {
 		'summaryId': '',
 		'durationInSeconds': None,
@@ -112,7 +113,8 @@ def fitbit_to_garmin_activities(active_summary):
 		'startingLongitudeInDegree': None,
 		'steps': None, 
 		'totalElevationGainInMeters': None, 
-		'totalElevationLossInMeters': None
+		'totalElevationLossInMeters': None,
+		'resting_hr_last_night'     : None
 
 	}
 	if active_summary:
@@ -125,7 +127,10 @@ def fitbit_to_garmin_activities(active_summary):
 		heartRate = []
 		for hr_zone in active_summary.get('heartRateZones',[]):
 			heartRate.append(hr_zone['max'])
-		garmin_activites["averageHeartRateInBeatsPerMinute"] = sum(heartRate)/len(heartRate)
+		try:
+			garmin_activites["averageHeartRateInBeatsPerMinute"] = sum(heartRate)/len(heartRate)
+		except:
+			garmin_activites["averageHeartRateInBeatsPerMinute"] = 0
 		garmin_activites['averageRunCadenceInStepsPerMinute'] = active_summary.get("")
 		garmin_activites['averageSpeedInMetersPerSecond'] = active_summary.get("")
 		garmin_activites['averagePaceInMinutesPerKilometer'] = active_summary.get("")
@@ -136,6 +141,7 @@ def fitbit_to_garmin_activities(active_summary):
 		garmin_activites['steps'] = active_summary.get('steps',0)
 		garmin_activites['totalElevationGainInMeters'] = active_summary.get("")
 		garmin_activites['totalElevationLossInMeters'] = active_summary.get("")
+		garmin_activites['resting_hr_last_night'] = active_summary.get("")
 		return garmin_activites
 	else:
 		return None

@@ -391,6 +391,14 @@ class Hrr_Dashboard extends Component{
 	            hr_background = '#E5E5E5';
         }
 	        }
+
+	    if(score && score == -1){
+       		background = 'red';
+           	color = 'black';
+           	hr_background = 'black';
+	    }
+	    score = score && score == -1?'Never':this.renderSecToMin(score);
+
 		var model = <Card className = "card_style"
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
@@ -399,7 +407,7 @@ class Hrr_Dashboard extends Component{
 					          	<hr className = "hr_style"
 					          		id = "hr-style" 
 					          		style = {{background:hr_background}}/>
-					          	<CardText className = "value_style">{this.renderSecToMin(score)}</CardText>
+					          	<CardText className = "value_style">{score}</CardText>
 					        </CardBody>
 					    </Card>
 		return model;

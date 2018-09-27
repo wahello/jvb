@@ -4,6 +4,7 @@ from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
 import copy
+import re
 
 from django.db.models import Q
 
@@ -81,7 +82,8 @@ def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss
 		  specify the position of hour, minute and second in the str_duration
 
 	'''
-	if str_duration:
+	pattern = re.compile(r"\d?\d:\d\d(:\d\d)?")
+	if str_duration and pattern.match(str_duration):
 		hms = str_duration.split(":")
 		pattern_lst = time_pattern.split(":")
 		pattern_indexed = {
@@ -475,10 +477,11 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 		sleep_level_maps = data.get('sleepLevelsMap')
 		if sleep_level_maps:
 			for lvl_type,lvl_data in sleep_level_maps.items():
-				durations[lvl_type] += sum(
-					[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
-					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
-					for d in lvl_data])
+				if lvl_type in durations.keys():
+					durations[lvl_type] += sum(
+						[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+						- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
+						for d in lvl_data])
 		return durations
 
 	recent_auto_manual = None
@@ -1464,8 +1467,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			if interval_active_duration['duration']+active_duration_min > 60:
 				interval_active_duration['duration'] = 60
 			else:	
-				interval_active_duration['duration'] = round(
-					interval_active_duration['duration'] + active_duration_min)
+				interval_active_duration['duration'] = (
+					interval_active_duration['duration'] 
+					+ active_duration_min)
 
 			active_prcnt = round((interval_active_duration['duration']/60)*100)
 			movement_consistency[time_interval]['active_prcnt'] = active_prcnt
@@ -1565,6 +1569,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 						last_sleeping_hour = hour_start - timedelta(hours=1)
 					previous_hour_steps = movement_consistency[interval]['steps']
 
+			movement_consistency[interval]['active_duration']['duration'] = \
+				round(movement_consistency[interval]['active_duration']['duration'])
 
 			if movement_consistency[interval]['status'] == 'active': 
 				active_hours += 1 
