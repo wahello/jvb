@@ -1554,23 +1554,31 @@ getGarminStressColors(stressValue){
          	color = 'black';
          	hr_background = 'black';
       }
+      /*
+      return {background:'#ff8c00',color:'black'};//Orange
+    else if (score >=69 && score <= 74)
+        return {background:'#ffff00',color:'black'};//Yellow
+    else if (score >=61 && score <= 68)
+        return {background:'#32cd32',color:'white'};//Light Green
+    else if (score >=30 && score <= 60)
+        return {background:'#008000',color:'white'};//Green*/
       else if(score>=75 && score<=79){
-          background = '#e2920f'; //Orange
+          background = '#ff8c00'; //Orange
           color = 'black';
           hr_background = 'black';
       }
       else if(score>=69 && score<=74){
-          background = '#FFFF01' ; //Yellow
+          background = '#ffff00' ; //Yellow
           color = 'black';
           hr_background = 'black';
       }
       else if(score >=61 && score <= 68){
-          background = '#b9f280'; //Light getGarminToken
+          background = '#32cd32'; //Light getGarminToken
           color = 'white';
           hr_background = 'white';
       }
       else if(score >=30 && score <= 60){
-          background = 'green'; 
+          background = '008000'; 
           color = 'white';
           hr_background = 'white';
       }
