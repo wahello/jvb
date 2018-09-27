@@ -903,6 +903,7 @@ def aa_workout_data(user,start_date):
 	hrr_not_recorded_list = []
 	if workout:
 		start_date_timestamp = workout[0]['startTimeInSeconds']
+		start_date_timestamp = start_date_timestamp +  workout[0].get("startTimeOffsetInSeconds",0)
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
 		for workout in workout:
