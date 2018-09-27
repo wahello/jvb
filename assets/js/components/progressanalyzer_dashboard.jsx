@@ -1543,38 +1543,57 @@ getGarminStressColors(stressValue){
 					</div>
 		return model;
   	}
-  	getStylesForRhr(score){
-  		let background = "";
+  getStylesForRhr(score){
+    console.log("score:..."+score);
+  	let background = "";
 		let color = "";
 		let hr_background = "";
 		if(score || score == 0){
-	            if(score>=76){
-	           		background = 'red';
-	               	color = 'black';
-	               	hr_background = 'black';
-	            }
-	            else if(score>=63 && score<=75){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score >=30 && score <= 62){
-	                background = 'green';
-	                color = 'white';
-	                hr_background = 'white';
-	            }
-	            else if(score<30){
-	                background = 'red';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-        }
-       else{
-	        	score = "No Data Yet"
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#e5e5e5';
-        }
+      if(score>=80){
+     		background = 'red';
+         	color = 'black';
+         	hr_background = 'black';
+      }
+      /*
+      return {background:'#ff8c00',color:'black'};//Orange
+    else if (score >=69 && score <= 74)
+        return {background:'#ffff00',color:'black'};//Yellow
+    else if (score >=61 && score <= 68)
+        return {background:'#32cd32',color:'white'};//Light Green
+    else if (score >=30 && score <= 60)
+        return {background:'#008000',color:'white'};//Green*/
+      else if(score>=75 && score<=79){
+          background = '#ff8c00'; //Orange
+          color = 'black';
+          hr_background = 'black';
+      }
+      else if(score>=69 && score<=74){
+          background = '#ffff00' ; //Yellow
+          color = 'black';
+          hr_background = 'black';
+      }
+      else if(score >=61 && score <= 68){
+          background = '#32cd32'; //Light getGarminToken
+          color = 'white';
+          hr_background = 'white';
+      }
+      else if(score >=30 && score <= 60){
+          background = '008000'; 
+          color = 'white';
+          hr_background = 'white';
+      }
+      else if(score<30){
+          background = 'red';
+          color = 'black';
+          hr_background = 'black';
+      }
+    }
+    else{
+    	score = "No Data Yet"
+      background = 'white';
+      color = '#5e5e5e';
+      hr_background = '#e5e5e5';
+    }
 		var model = <div  style = {{background:background, color:color}}>
 						{this.renderComma(score)}
 					</div>
