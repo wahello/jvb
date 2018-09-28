@@ -26,6 +26,7 @@ class WorkoutDashboard extends Component{
 	    	fetching_weekly:false,
 		   	selectedDate:new Date(),
 		   	weekly_data:{},
+		   	avg_dist_desc:" "
 	    }
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
 	    this.renderAddDate = this.renderAddDate.bind(this);
@@ -40,6 +41,7 @@ class WorkoutDashboard extends Component{
 		this.renderLastSunday = this.renderLastSunday.bind(this);
 		this.renderWeeklySummaryOverlay = renderWeeklySummaryOverlay.bind(this);
 		this.renderTableActivityHeader = this.renderTableActivityHeader.bind(this);
+		this.renderTableActivityHeaderDescription = this.renderTableActivityHeaderDescription.bind(this);
 		this.renderMetersToYards = this.renderMetersToYards.bind(this);
 		this.renderMetersToMiles = this.renderMetersToMiles.bind(this);
 	}
@@ -72,6 +74,54 @@ class WorkoutDashboard extends Component{
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
+	}
+	renderTableActivityHeader(header_data){
+		let td_header = [];
+		let ind = 1;
+		if(header_data){
+			for(let key of header_data){
+				let patt = /_distance/i;
+				let pattern = new RegExp(patt);
+				let res = pattern.exec(key);
+				let sliceIndex = res.index;
+				let activity_name = key.slice(0,sliceIndex).split("_");
+				activity_name.forEach((x,i,arr) => {
+					arr[i] = x[0].toUpperCase()+x.slice(1);
+				})
+				activity_name = activity_name.join(" ")
+				if(activity_name.toLowerCase().search("swimming") >= 0){
+					key = " (In Yards)";
+				}else{
+					key = " (In Miles)";
+				}
+ 				td_header.push(<th>{"AD"}{ind}<br />{key}</th>);
+ 				ind++;
+			}
+		}
+		return td_header;
+	}
+
+	renderTableActivityHeaderDescription(header_data){
+		let th_header_desc = [];
+		let th_row = [];
+		let ind = 1;
+		if(header_data){
+			for(let key of header_data){
+				let patt = /_distance/i;
+				let pattern = new RegExp(patt);
+				let res = pattern.exec(key);
+				let sliceIndex = res.index;
+				let activity_name = key.slice(0,sliceIndex).split("_");
+				activity_name.forEach((x,i,arr) => {
+					arr[i] = x[0].toUpperCase()+x.slice(1);
+				})
+				activity_name = activity_name.join(" ")
+ 				th_header_desc.push(<span>&nbsp;&nbsp;<b className="boldText">{"AD"}{ind}{": "}</b>{"Avg "}{activity_name}{" Distance "}</span>);
+ 				ind++;
+			}
+		}
+
+		return th_header_desc;
 	}
 	renderRemoveDate(){
 		/*It is backward arrow button for the calender getting the last day date*/
@@ -112,6 +162,12 @@ class WorkoutDashboard extends Component{
 		},()=>{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
+	}
+	componentDidMount(){
+		this.setState({
+			fetching_weekly:true,
+		});
+		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 	}
 	componentDidMount(){
 		this.setState({
@@ -286,6 +342,8 @@ checkForUndefinedValue(value) {
 					let tempIndex = 0;
 					let tempWorkoutType = null;
 					let tempNoOfActivityInWeek = null;
+					let tempDuration = null;
+					let tempDurationInPercentage = null;
 
 					for(let key1 of td_keys){
 						if(key1== "workout_type" || key1 == "no_activity_in_week") {
@@ -302,11 +360,20 @@ checkForUndefinedValue(value) {
 									td_values.push(<td>{tempWorkoutType + tempNoOfActivityInWeek }</td>);
 								}
 							}
-							else if(key1=="duration" && !this.checkForUndefinedValue(value[key1])) {
-								td_values.push(<td>{this.renderTime(value[key1])}</td>);
+							else if((key1=="duration" && !this.checkForUndefinedValue(value[key1])) || (key1=="workout_duration_percent" && !this.checkForUndefinedValue(value[key1]))) {
+								if(key1== "duration") {
+									tempDuration = this.renderTime(value[key1]);
+								} else if(key1 == "workout_duration_percent"){
+								if(this.checkForUndefinedValue(value[key1])) {
+									tempDurationInPercentage = "";
+								} else{
+									tempDurationInPercentage = " (" + this.gpascoreDecimal(value[key1]) + ")";
+								}
 							}
-							else if(key1=="workout_duration_percent" && !this.checkForUndefinedValue(value[key1])) {
-								td_values.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
+							if(tempDuration != null && tempDuration != undefined && tempDurationInPercentage != null && tempDurationInPercentage != undefined) {
+									td_values.push(<td>{tempDuration} <br />{tempDurationInPercentage }</td>);
+								}
+
 							}
 							else if(key1 == "duration_in_aerobic_range" || key1 == "duration_in_anaerobic_range" ||
 							 key1 == "percent_aerobic" || key1 == "percent_anaerobic" || key1 == "duration_below_aerobic_range" ||
@@ -334,7 +401,7 @@ checkForUndefinedValue(value) {
 										tempDayDuration = this.renderTime(finalDateValue);
 									}
 								}
-								td_values.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+								td_values.push(<td>{tempDayDuration + " ("+tempDayRepeated+")"}</td>);
 								tempIndex ++;
 							}
 							else if(activity_distance_keys.includes(key1) && !this.checkForUndefinedValue(value[key1])){
@@ -360,6 +427,8 @@ checkForUndefinedValue(value) {
 					let tempIndex = 0;
 					let tempWorkoutType = null;
 					let tempNoOfActivityInWeek = null;
+					let tempDuration = null;
+					let tempDurationInPercentage = null;
 
 					for(let key1 of td_keys){
 						
@@ -377,13 +446,22 @@ checkForUndefinedValue(value) {
 							if(tempWorkoutType != null && tempWorkoutType != undefined && tempNoOfActivityInWeek != null && tempNoOfActivityInWeek != undefined) {
 								td_totals.push(<td>{tempWorkoutType + tempNoOfActivityInWeek}</td>);
 							}
-						}
-						else if(key1=="duration" && !this.checkForUndefinedValue(value[key1])) {
-							td_totals.push(<td>{this.renderTime(value[key1])}</td>);
-						}
-						else if(key1=="workout_duration_percent" && !this.checkForUndefinedValue(value[key1])) {
-							td_totals.push(<td>{this.gpascoreDecimal(value[key1])}</td>);
-						}
+						}	
+						else if((key1=="duration" && !this.checkForUndefinedValue(value[key1])) || (key1=="workout_duration_percent" && !this.checkForUndefinedValue(value[key1]))) {
+								if(key1== "duration") {
+									tempDuration = this.renderTime(value[key1]);
+								} else if(key1 == "workout_duration_percent"){
+								if(this.checkForUndefinedValue(value[key1])) {
+									tempDurationInPercentage = "";
+								} else{
+									tempDurationInPercentage = " (" + this.gpascoreDecimal(value[key1]) + ")";
+								}
+							}
+							if(tempDuration != null && tempDuration != undefined && tempDurationInPercentage != null && tempDurationInPercentage != undefined) {
+									td_totals.push(<td>{tempDuration} <br />{tempDurationInPercentage }</td>);
+								}
+
+							}
 						else if(key1 == "duration_in_aerobic_range" || key1 == "duration_in_anaerobic_range" ||
 						 key1 == "percent_aerobic" || key1 == "percent_anaerobic" || key1 == "duration_below_aerobic_range" ||
 						  key1 == "percent_below_aerobic" || key1 == "percent_hrr_not_recorded" || key1 == "duration_hrr_not_recorded") {
@@ -413,7 +491,7 @@ checkForUndefinedValue(value) {
 								}
 							}
 
-							td_totals.push(<td>{tempDayDuration + "("+tempDayRepeated+")"}</td>);
+							td_totals.push(<td>{tempDayDuration + " ("+tempDayRepeated+")"}</td>);
 							tempIndex ++;
 							
 						}
@@ -434,6 +512,8 @@ checkForUndefinedValue(value) {
 				else{
 					let tempNoActivity = null;
 					let tempDaysNoActivity = null;
+					let td_keys1 = ["no_activity","days_no_activity","percent_days_no_activity"];
+
 					for(let key2 of td_keys1){
 						if(key2 == "percent_days_no_activity"){
 							td_extra.push(this.gpascoreDecimal(value[key2]));
@@ -455,9 +535,6 @@ checkForUndefinedValue(value) {
 								
 								td_extra.push(tempNoActivity + tempDaysNoActivity);
 							}
-						}
-						else if(key2 == "no_activity_in_week"){
-							td_extra.push("-");
 						} 
 						else {
 							td_extra.push(value[key2]);
@@ -479,30 +556,7 @@ checkForUndefinedValue(value) {
 		}
 		return [null,null];
 	}
-	renderTableActivityHeader(header_data){
-		let td_header = [];
-		let th_row = [];
-		if(header_data){
-			for(let key of header_data){
-				let patt = /_distance/i;
-				let pattern = new RegExp(patt);
-				let res = pattern.exec(key);
-				let sliceIndex = res.index;
-				let activity_name = key.slice(0,sliceIndex).split("_");
-				activity_name.forEach((x,i,arr) => {
-					arr[i] = x[0].toUpperCase()+x.slice(1);
-				})
-				activity_name = activity_name.join(" ")
-				if(activity_name.toLowerCase().search("swimming") >= 0){
-					key = "Avg" + " " + activity_name + " Distance (In Yards)";
-				}else{
-					key = "Avg" + " " + activity_name + " Distance (In Miles)";
-				}
- 				td_header.push(<th>{key}</th>);
-			}
-		}
-		return td_header;
-	}
+	
 	render(){
 		let rendered_data = this.renderTable(this.state.weekly_data)
 		let activities_keys = rendered_data[0];
@@ -558,12 +612,13 @@ checkForUndefinedValue(value) {
 						 			<b className = "boldText">AN:</b> Anaerobic Duration (% of total time) &nbsp;&nbsp;
 						 			<b className = "boldText">BA:</b> Below Aerobic (% of total time) &nbsp;&nbsp;
 						 			<b className = "boldText">NR:</b> HR Not Recorded (% of total time &nbsp;&nbsp;)
+						 			{this.renderTableActivityHeaderDescription(activities_keys)}
 					 			</div>
 				          	    <table className = "weeklyWorkoutTable table table-striped table-bordered">
 									<tr>
 										<th>Workout Type <br />(# Workouts)</th>
-										<th>Total <br /> Duration</th>
-										<th>% of Total <br /> Duration</th>
+										<th>Total<br />Duration<br />(%)</th>
+										{/*<th>% of Total <br /> Duration</th>*/}
 										{/*<th>Aerobic/Anaerobic Duration: (% of total time)</th>*/}
 										<th className="weeklyWorkoutTHMatrix">
 											<tr>
@@ -583,14 +638,14 @@ checkForUndefinedValue(value) {
 												</td>
 											</tr>
 										</th>
-										<th># of Days With <br /> Activity</th>
-										<th>Mon {moment(this.state.selectedDate).weekday(-6).format('MMM DD')}</th>
-										<th>Tue {moment(this.state.selectedDate).weekday(-5).format('MMM DD')}</th>
-										<th>Wed {moment(this.state.selectedDate).weekday(-4).format('MMM DD')}</th>
-										<th>Thu {moment(this.state.selectedDate).weekday(-3).format('MMM DD')}</th>
-										<th>Fri  {moment(this.state.selectedDate).weekday(-2).format('MMM DD')}</th>
-										<th>Sat {moment(this.state.selectedDate).weekday(-1).format('MMM DD')}</th>
-										<th>Sun {moment(this.state.selectedDate).weekday(0).format('MMM DD')}</th>
+										<th># of Days<br />With<br />Activity</th>
+										<th>Mon<br />{moment(this.state.selectedDate).weekday(-6).format('MMM DD')}</th>
+										<th>Tue<br />{moment(this.state.selectedDate).weekday(-5).format('MMM DD')}</th>
+										<th>Wed<br />{moment(this.state.selectedDate).weekday(-4).format('MMM DD')}</th>
+										<th>Thu<br />{moment(this.state.selectedDate).weekday(-3).format('MMM DD')}</th>
+										<th>Fri<br />{moment(this.state.selectedDate).weekday(-2).format('MMM DD')}</th>
+										<th>Sat<br />{moment(this.state.selectedDate).weekday(-1).format('MMM DD')}</th>
+										<th>Sun<br />{moment(this.state.selectedDate).weekday(0).format('MMM DD')}</th>
 
 										{this.renderTableActivityHeader(activities_keys)}
 									</tr>

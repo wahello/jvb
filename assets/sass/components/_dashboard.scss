@@ -93,6 +93,15 @@
 	.mnh-mobile-view {
 		font-size:70% !important;
 	}
+	.weeklyWorkoutTable>tbody>tr>td:first-child {
+		word-break: break-all !important;
+	}
+	.weeklyWorkoutTable th{
+		min-width: 40px !important;
+	}
+	.weeklyWorkoutTable td{
+    	height: auto !important;
+	}
 }
 
 .boldText {
@@ -100,19 +109,20 @@
 }
 
 .weeklyWorkoutTable th{
-	vertical-align: middle !important;
-	min-width: 70px !important;
+	vertical-align: middle;
+	min-width: 70px;
+	padding: 0rem;
 }
 
 .weeklyWorkoutTable th tr td, .weeklyWorkoutTable th tr{
-	border:none !important;
+	border:none;
 }
 
 .weeklyWorkoutTable .weeklyWorkoutTHMatrix tr:first-child {
-	border-bottom: 1px solid #dee2e6 !important;	
+	border-bottom: 1px solid #dee2e6;	
 }
 .weeklyWorkoutTable th tr td:first-child {
-	border-right: 1px solid #dee2e6 !important;
+	border-right: 1px solid #dee2e6;
 }
 
 .weeklyWorkoutTable {	
@@ -123,15 +133,19 @@
     margin-right:auto;
 }
 .weeklyWorkoutTHMatrix {
-	padding: 0px !important;
+	padding: 0px;
 }
 .weeklyWorkoutTable tr{
-	border: none !important;
+	border: none;
 }
 .weeklyWorkoutTable td{
-	padding: 0px !important;
-	vertical-align: middle !important;
+	padding: 0rem !important;
+	vertical-align: middle;
 }
 .weeklyWorkoutTable tbody td{
-	padding: 3px 6px !important;
+	padding: 3px 6px;
+}
+.weeklyWorkoutTable>tbody>tr>td:first-child{
+	word-break: break-all;
+	white-space:pre-wrap;
 }
