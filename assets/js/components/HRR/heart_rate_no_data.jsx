@@ -12,6 +12,8 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,
         FormText,Label,Input, Modal, ModalHeader,
          ModalBody, ModalFooter} from 'reactstrap';
+import {updateHeartData} from '../../network/heart_cal';
+import {successHeart, errorHeart} from './heart_rate_calculation';
 class No_Hrr_Data extends Component{
 	constructor(props){
 		 super(props);
@@ -247,9 +249,11 @@ class No_Hrr_Data extends Component{
 			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
 			"no_file_beats_recovered":this.state.no_file_beats_recovered,
 		}
-		 this.props.renderHrrData(data);
-		 updateHeartData(data, this.props.selectedDate, successCallback=undefined, errorCallback=undefined)
+		console.log("DATA: " +data);
+		updateHeartData(data, successHeart, errorHeart);
+		this.props.renderHrrData(data);
 	}
+
 	render(){
 		return(
 				<div>

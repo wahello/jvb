@@ -41,12 +41,11 @@ export function fetchHeartRefreshData(successHeart,errorHeart,selectedDate){
 
 }
 
-export function updateHeartData(data, selectedDate, successHeart, errorHeart){
+export function updateHeartData(data, successHeart, errorHeart){
   const URL = 'hrr/update/hrr_calculations';
-  selectedDate = moment(selectedDate);
+  //selectedDate = moment(selectedDate);
   //let date = data.fetched_user_input_created_at;
-  data = formatJSON(data);
-  data['start_date'] = selectedDate;
+  //data['start_date'] = selectedDate;
   //console.log(data);
   const config = {
     url : URL,
@@ -55,13 +54,9 @@ export function updateHeartData(data, selectedDate, successHeart, errorHeart){
     withCredentials: true
   };
   axios(config).then(function(response){
-    if(successCallback != undefined){
-      successCallback(response);
-    }
+    successHeart(response)
   }).catch((error) => {
     console.log(error.message);
-    if(errorCallback != undefined){
-      errorCallback(error);
-    }
+    errorHeart(error);
   });
 }

@@ -10,6 +10,8 @@ import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
+import {updateHeartData} from '../../network/heart_cal';
+import {successHeart, errorHeart} from './heart_rate_calculation';
 
 class Heartrate_Data extends Component{
 	constructor(props){
@@ -154,8 +156,9 @@ class Heartrate_Data extends Component{
 		    	lowest_hrr_1min:this.state.lowest_hrr_1min,
 		    	No_beats_recovered:this.state.No_beats_recovered,
 		    };
-		    this.props.renderHrrData(data);
-  			
+		    
+  			updateHeartData(data, successHeart, errorHeart);
+  			this.props.renderHrrData(data);
   		}
 	render(){
 		return(<div>

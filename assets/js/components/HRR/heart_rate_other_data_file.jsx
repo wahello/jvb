@@ -12,6 +12,8 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,
         FormText,Label,Input, Modal, ModalHeader,
          ModalBody, ModalFooter} from 'reactstrap';
+import {updateHeartData} from '../../network/heart_cal';
+import {successHeart, errorHeart} from './heart_rate_calculation';
 class Other_Hrr_Data extends Component{
 	constructor(props){
 		 super(props);
@@ -239,8 +241,8 @@ class Other_Hrr_Data extends Component{
 				"pure_time_99":pure_time_99
 			}
 
-			this.props.renderHrrData(data);
-  			
+  			updateHeartData(data, successHeart, errorHeart);
+  			this.props.renderHrrData(data);
   		}
 	render(){
 		return(
