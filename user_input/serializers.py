@@ -103,15 +103,16 @@ class GoalsSerializer(serializers.ModelSerializer):
 
 class DailyActivitySerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only = True)
-	activities = serializers.SerializerMethodField('get_user_activities')
+	# activities = serializers.SerializerMethodField('get_user_activities')
+	
 	class Meta:
 		model = DailyActivity
 		fields = ('__all__')
 
-	def get_user_activities(self, user, obj):
+	def get_user_activities(self, obj):
 		print ('>>>>>>>>>>>>>>>>>>>>>>>>')
-		# user = self.request.user
-		activities_data = DailyUserInputStrong.objects.filter(
+		user = self.context['request'].user
+		activities_data = DailyUserInputStrong.objects.all().filter(
 			user_input=user.id).values('activities')
 		print ('>>>>>>>>>>>>>', activities_data)
 		DailyActivity.activity_data = activities_data
