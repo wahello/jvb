@@ -1,3 +1,4 @@
+import pytz
 from django.core.mail import send_mail
 from datetime import datetime,time,date,timedelta
 from user_input.models import UserDailyInput
@@ -44,15 +45,23 @@ JVB Health & Wellness
 def notify_user_to_submit_userinputs():
 	RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
 		"cherylcasone","Carol","lafmaf123","davelee","Justin","lalancaster",
-		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com"]
+		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
+		"atul","jvbhealth"]
 	FEEDBACK_EMAIL = "info@jvbwellness.com"
 	ROOT_URL = "https://app.jvbwellness.com/"
 	USER_INPUT_URL = ROOT_URL+"userinputs"
-	# RECEPIENTS_USERNAME = ["venky","norm","pavan","vignan"]
+	# RECEPIENTS_USERNAME = ["atul","overide"]
 	last_userinput_of_users = {}
 	for username in RECEPIENTS_USERNAME:
-		last_userinput_of_users[username] = UserDailyInput.objects.filter(
-			user__username__iexact = username).last()
+		try:
+			last_userinput_of_users[username] = UserDailyInput.objects.filter(
+				user__username__iexact = username).order_by('-created_at')[0]
+		except (IndexError,UserDailyInput.DoesNotExist) as e:
+			last_userinput_of_users[username] = None
+
+	today_utc = datetime.now()
+	NY_TZ = pytz.timezone('America/New_York')
+	today_local_time = pytz.utc.localize(today_utc).astimezone(NY_TZ)
 
 	for username,last_ui in last_userinput_of_users.items():
 		if last_ui:
@@ -73,11 +82,11 @@ Sincerely,
 JVB Health & Wellness""" 
 			submission_from_text = ""
 			subject = "Submit User Inputs | {}"
-			if last_ui_date.date() == (datetime.now()-timedelta(days = 1)).date():
+			if last_ui_date.date() == (today_local_time-timedelta(days = 1)).date():
 				submission_from_text = "today ({})".format(
-					datetime.now().strftime("%b %d, %Y")
+					today_local_time.strftime("%b %d, %Y")
 				)
-				subject = subject.format(datetime.now().strftime("%b %d, %Y"))
+				subject = subject.format(today_local_time.strftime("%b %d, %Y"))
 			else:
 				submission_from_text = "from {}".format(
 					(last_ui_date+timedelta(days=1)).strftime("%b %d, %Y")
@@ -89,7 +98,7 @@ JVB Health & Wellness"""
 				USER_INPUT_URL,FEEDBACK_EMAIL
 			)
 
-			if last_ui_date.date() != date.today():
+			if last_ui_date.date() != today_local_time.date():
 				send_mail(
 					subject = subject,
 					message = message,
