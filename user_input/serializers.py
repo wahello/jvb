@@ -103,7 +103,7 @@ class GoalsSerializer(serializers.ModelSerializer):
 
 class DailyActivitySerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only = True)
-	# activities = serializers.SerializerMethodField('get_user_activities')
+	activities = serializers.SerializerMethodField('get_user_activities')
 	
 	class Meta:
 		model = DailyActivity

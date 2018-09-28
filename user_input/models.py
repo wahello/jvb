@@ -505,7 +505,6 @@ class DailyActivity(models.Model):
     duplicate = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
 
-
     def __str__(self):
         dtime = str(self.created_at)
         return "{}-{}".format(self.user.username,dtime)
