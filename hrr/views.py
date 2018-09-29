@@ -1448,10 +1448,6 @@ def daily_aa_data(user, start_date):
 			daily_aa_data['Totals'] = {}
 	# print(daily_aa_data,"daily_aa_data")
 	if user_created_activity_list:
-		print(user_created_activity_list,"user_created_activity_list")
-		print(data,"data")
-		print(below_aerobic_value,"below_aerobic_value")
-		print(anaerobic_value,"anaerobic_value")
 		data_ui= add_created_activity(user_created_activity_list,data,below_aerobic_value,anaerobic_value)
 		daily_aa_data.pop('Totals',None)
 		for key,value in data_ui.items():
