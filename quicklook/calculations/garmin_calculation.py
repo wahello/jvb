@@ -1086,7 +1086,6 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	return False 
 
 def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
-	total_active_minutes = 0
 	active_hours = 0
 	inactive_hours = 0
 	total_steps = 0
@@ -1133,11 +1132,7 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 			elif mc_data[interval]['status'] == 'time zone change':
 				timezone_change_hours += 1
 			total_steps += values['steps']
-			total_active_minutes += values['active_duration']['duration']
-
-	mc_data['total_active_minutes'] = total_active_minutes
-	mc_data['total_active_prcnt'] = round(
-			(total_active_minutes / 1440)*100)
+			
 	mc_data['active_hours'] = active_hours
 	mc_data['inactive_hours'] = inactive_hours
 	mc_data['sleeping_hours'] = sleeping_hours
@@ -1363,6 +1358,24 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		Calculate the movement consistency summary
 	'''
 
+	def which_quarter(dt):
+		'''
+		Tell which quarter the given time is
+		0 - 14 min : quarter 0
+		15 - 29 min : quarter 1
+		30 - 44 min : quarter 2
+		45 - 59 min : quarter 3
+		'''
+		minute = dt.minute
+		if minute >= 0 and minute <= 14:
+			return 0
+		elif minute >= 15 and minute <= 29:
+			return 1
+		elif minute >= 30 and minute <= 44:
+			return 2
+		elif minute >= 45 and minute <= 59:
+			return 3
+
 	if user_input_strength_start_time and user_input_strength_end_time:
 		# Stretching strength start and end time to full hour eg. 
 		# Strength start time is 8:30 AM then it'll consider 8:00 AM
@@ -1378,7 +1391,6 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		nap_end_time = datetime.combine(nap_end_time.date(),
 			time(nap_end_time.hour,59))
 
-	movement_consistency = OrderedDict()
 	sleep_stats = get_sleep_stats(calendar_date,sleeps_json,sleeps_today_json, 
 		user_input_bedtime = user_input_bedtime,
 		user_input_awake_time = user_input_awake_time,
@@ -1405,6 +1417,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 	# In that case we have same yesterday_bedtime and today_bedtime 
 	if today_bedtime and today_awake_time and today_bedtime <= today_awake_time:
 		today_bedtime = None
+
+	movement_consistency = OrderedDict()
+	quarterly_active_seconds = OrderedDict()
 		
 	if epochs_json:
 		timezone_change_interval = check_timezone_change(
@@ -1427,6 +1442,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				},
 				"active_prcnt":0
 			}
+			quarterly_active_seconds[time_interval] = [0]*4
 			data_date_midnight += td_hour
 
 		for data in epochs_json:
@@ -1458,21 +1474,14 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
 			intensity_level = data.get('intensity')
-			# active_duration_min =  data.get('activeTimeInSeconds',0)/60
-			active_duration_min = (get_epoch_active_time(
-				activities_start_end_time,data,intensity_level)/60)
-			interval_active_duration = movement_consistency[time_interval]['active_duration']
-
-			# Total active minute in the hourly interval is capped to 60 mins
-			if interval_active_duration['duration']+active_duration_min > 60:
-				interval_active_duration['duration'] = 60
+			active_duration_sec = get_epoch_active_time(
+				activities_start_end_time,data,intensity_level)
+			quarter = which_quarter(hour_start)
+			if(quarterly_active_seconds[time_interval][quarter]
+				+ active_duration_sec > 900):
+				quarterly_active_seconds[time_interval][quarter] = 900
 			else:	
-				interval_active_duration['duration'] = (
-					interval_active_duration['duration'] 
-					+ active_duration_min)
-
-			active_prcnt = round((interval_active_duration['duration']/60)*100)
-			movement_consistency[time_interval]['active_prcnt'] = active_prcnt
+				quarterly_active_seconds[time_interval][quarter] += active_duration_sec
 			movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
 			movement_consistency[time_interval]['status'] = status
 
@@ -1569,8 +1578,13 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 						last_sleeping_hour = hour_start - timedelta(hours=1)
 					previous_hour_steps = movement_consistency[interval]['steps']
 
-			movement_consistency[interval]['active_duration']['duration'] = \
-				round(movement_consistency[interval]['active_duration']['duration'])
+			active_minutes = round(sum(quarterly_active_seconds[interval])/60)
+			# Total active minute in the hourly interval is capped to 60 mins
+			active_minutes  = 60 if active_minutes > 60 else active_minutes
+			active_minute_prcnt = round((active_minutes/60) * 100)
+			movement_consistency[interval]['active_duration']['duration'] = (
+				active_minutes)
+			movement_consistency[interval]['active_prcnt'] = active_minute_prcnt
 
 			if movement_consistency[interval]['status'] == 'active': 
 				active_hours += 1 
@@ -1589,7 +1603,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			elif movement_consistency[interval]['status'] == 'nap':
 				nap_hours += 1
 			total_steps += values['steps']
-			total_active_minutes += values['active_duration']['duration']
+			total_active_minutes += active_minutes
 
 		movement_consistency['total_active_minutes'] = total_active_minutes
 		movement_consistency['total_active_prcnt'] = round(
@@ -1603,6 +1617,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		movement_consistency['no_data_hours'] = no_data_hours
 		movement_consistency['timezone_change_hours'] = timezone_change_hours
 		movement_consistency['total_steps'] = total_steps
+
 		if(not yesterday_bedtime and not today_awake_time and have_steps_before_9_am):
 			_update_status_to_sleep_hours(
 				movement_consistency,
