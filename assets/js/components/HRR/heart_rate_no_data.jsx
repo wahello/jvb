@@ -31,7 +31,8 @@ class No_Hrr_Data extends Component{
 		 let lowest_hrr_no_fitfile = this.props.hrr.lowest_hrr_no_fitfile;
 		 let no_file_beats_recovered = this.props.hrr.no_file_beats_recovered;
 		 this.state = {
-		 	editable:false,
+		 	editable:this.props.hrr.editable,
+		 	editable_did_you_measure_HRR:false,
 		 	editable_end_time_activity:false,
 		 	editable_no_fitfile_hrr_reach_99:false,
 		 	editable_no_fitfile_hrr_time_reach_99:false,
@@ -77,6 +78,10 @@ class No_Hrr_Data extends Component{
 	 	this.updateData = this.updateData.bind(this);
 	 	this.getDTMomentObj = this.getDTMomentObj.bind(this);
 	}
+	componentWillReceiveProps(nextProps) {
+		console.log("componentWillReceiveProps: "+nextProps.hrr.editable);
+		this.setState({ editable: nextProps.hrr.editable });  
+  	}
 	editEndTimeActivity(){
 		this.setState({
 			editable_end_time_activity:!this.state.editable_end_time_activity,
@@ -84,7 +89,7 @@ class No_Hrr_Data extends Component{
 	}
 	editToggleDidyouWorkout(){
   		this.setState({
-  			editable:!this.state.editable
+  			editable_did_you_measure_HRR:!this.state.editable_did_you_measure_HRR
   		});
 	}
 	editNoFitfileHrrReach99(){
@@ -245,12 +250,12 @@ class No_Hrr_Data extends Component{
 			"no_fitfile_hrr_reach_99":this.state.no_fitfile_hrr_reach_99,
 			"no_fitfile_hrr_time_reach_99":no_fitfile_hrr_time_reach_99,
 			"time_heart_rate_reached_99":timeHeartRateReach99.utc().valueOf(),
-			"end_heartrate_activity":this.state.end_heartrate_activity,
-			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
-			"no_file_beats_recovered":this.state.no_file_beats_recovered,
+			"end_heartrate_activity": parseInt(this.state.end_heartrate_activity),
+			"lowest_hrr_no_fitfile": parseInt(this.state.lowest_hrr_no_fitfile),
+			"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
 		}
 		console.log("DATA: " +data);
-		updateHeartData(data, successHeart, errorHeart);
+		updateHeartData(data, this.props.selectedDate, successHeart, errorHeart);
 		this.props.renderHrrData(data);
 	}
 
@@ -331,17 +336,19 @@ class No_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 						          	    	: (this.state.end_time_activity_hour + ":" +this.state.end_time_activity_min + ":" + this.state.end_time_activity_sec + " " + this.state.end_time_activity_am_pm )}
-						          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editEndTimeActivity}
+						          	    	{this.state.editable &&            
+					                            <span  style = {{marginLeft:"30px"}}  onClick={this.editEndTimeActivity}
 		                            			className="fa fa-pencil fa-1x"
 		                            			>
 		                        			</span>
+					                        }
 										</td>
 					          	    </tr>
 
 					          	    <tr className = "hr_table_style_rows">
 						          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>
 										<td className = "hr_table_style_rows">
-										{this.state.editable ? 
+										{this.state.editable_did_you_measure_HRR ? 
 				          	    	<Input
 				          	    		style = {{maxWidth:"100px"}}
                                         type="select"
@@ -355,10 +362,12 @@ class No_Hrr_Data extends Component{
                                         <option value="no">No</option>
                                     </Input> 
 				          	    	:this.renderNoworkout(this.state.Did_you_measure_HRR)}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleDidyouWorkout}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
 									</td>
 					          	    </tr>
 
@@ -379,11 +388,12 @@ class No_Hrr_Data extends Component{
 		                                        <option value="no">No</option>
 		                                    </Input> 
 				          	    		: this.captilizeYes(this.state.no_fitfile_hrr_reach_99)}
+					          	    	{this.state.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editNoFitfileHrrReach99}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
-
+	                        			}
 										</td>
 					          	    </tr>
 
@@ -427,10 +437,12 @@ class No_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 				          	    		: (this.state.no_fitfile_hrr_time_reach_99_min + ":" +this.state.no_fitfile_hrr_time_reach_99_sec)}
+				          	    		{this.state.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editNoFitfileHrrTimeReach99}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 						          	   </td>
 					          	    </tr>
 
@@ -501,10 +513,12 @@ class No_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 						          	    	: (this.state.time_heart_rate_reached_99_hour + ":" +this.state.time_heart_rate_reached_99_min + ":" + this.state.time_heart_rate_reached_99_sec + " " + this.state.time_heart_rate_reached_99_am_pm )}
+						          	    	{this.state.editable &&
 						          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editTimeHeartRateReached99}
 		                            			className="fa fa-pencil fa-1x"
 		                            			>
 		                        			</span>
+		                        			}
 										</td>
 					          	    </tr>
 
@@ -523,10 +537,12 @@ class No_Hrr_Data extends Component{
 		                                        {this.createSleepDropdown(70,220)}
 		                                    </Input> 
 				          	    		: this.state.end_heartrate_activity}
+				          	    		{this.state.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editEndHeartrateActivity}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 
 						          	    </td>
 					          	    </tr>
@@ -546,10 +562,12 @@ class No_Hrr_Data extends Component{
 		                                        {this.createSleepDropdown(70,220)}
 		                                    </Input> 
 				          	    		: this.state.lowest_hrr_no_fitfile}
+				          	    		{this.state.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editLowestHrrNoFitfile}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 										</td>
 					          	    </tr>
 
@@ -568,10 +586,12 @@ class No_Hrr_Data extends Component{
 		                                        {this.createSleepDropdown(70,220)}
 		                                    </Input> 
 				          	    		: this.state.no_file_beats_recovered}
+				          	    		{this.state.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editNoFileBeatsRecovered}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 									</td>
 					          	    </tr>
 				          	    </tbody>

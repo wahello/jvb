@@ -22,7 +22,7 @@ export default function fetchHeartData(successHeart,errorHeart,selectedDate){
   });
 
 }
-export function fetchHeartRefreshData(successHeart,errorHeart,selectedDate){   
+/*export function fetchHeartRefreshData(successHeart,errorHeart,selectedDate){   
   selectedDate = moment(selectedDate);
   const URL=`hrr/refresh/hrr_calculations`;
   const config={
@@ -39,18 +39,21 @@ export function fetchHeartRefreshData(successHeart,errorHeart,selectedDate){
     errorHeart(error);
   });
 
-}
+}*/
 
-export function updateHeartData(data, successHeart, errorHeart){
+export function updateHeartData(data, selectedDate, successHeart, errorHeart){
   const URL = 'hrr/update/hrr_calculations';
-  //selectedDate = moment(selectedDate);
+  selectedDate = moment(selectedDate);
   //let date = data.fetched_user_input_created_at;
-  //data['start_date'] = selectedDate;
+  data['created_at'] = selectedDate.format('YYYY-MM-DD');
   //console.log(data);
   const config = {
     url : URL,
     data:data,
     method: 'put',
+    params:{
+     start_date: selectedDate.format('YYYY-MM-DD')
+   },
     withCredentials: true
   };
   axios(config).then(function(response){

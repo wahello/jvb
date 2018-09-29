@@ -35,6 +35,7 @@ class Other_Hrr_Data extends Component{
 		 let heart_rate_down_up = this.props.hrr.heart_rate_down_up;
 		 let pure_1min_heart_beats = this.props.hrr.pure_1min_heart_beats
 		this.state = {
+			editable:this.props.hrr.editable,
 			editable_end_time_activity:false,
 			editable_start_time_activity:false,
 			editable_diff_actity_hrr:false,
@@ -81,6 +82,10 @@ class Other_Hrr_Data extends Component{
 		this.updateData = this.updateData.bind(this);
 		this.getDTMomentObj = this.getDTMomentObj.bind(this);
 	}
+	componentWillReceiveProps(nextProps) {
+		console.log("componentWillReceiveProps: "+nextProps.hrr.editable);
+		this.setState({ editable: nextProps.hrr.editable });  
+  	}
 	editEndTimeActivity(){
 		this.setState({
 			editable_end_time_activity:!this.state.editable_end_time_activity,
@@ -235,13 +240,25 @@ class Other_Hrr_Data extends Component{
   				"end_time_activity":endTimeActivity.utc().valueOf(),
 				"diff_actity_hrr":diff_time,
 				"HRR_activity_start_time":startTimeActivity.utc().valueOf(),
-				"end_heartrate_activity":this.state.end_heartrate_activity,
-				"heart_rate_down_up":this.state.heart_rate_down_up,
-				"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
+				"end_heartrate_activity":parseInt(this.state.end_heartrate_activity),
+				"heart_rate_down_up":parseInt(this.state.heart_rate_down_up),
+				"pure_1min_heart_beats":parseInt(this.state.pure_1min_heart_beats),
 				"pure_time_99":pure_time_99
 			}
+			/*
+	{
+	"end_time_activity": 1538182800000,
+	"Did_you_measure_HRR": "yes",
+	"no_fitfile_hrr_reach_99": "yes",
+	"no_fitfile_hrr_time_reach_99": 420,
+	"time_heart_rate_reached_99": 1538193600000,
+	"end_heartrate_activity": 80,
+	"lowest_hrr_no_fitfile": 72,
+	"no_file_beats_recovered": 88,
+	"created_at": "2018-09-29"
+	}*/
 
-  			updateHeartData(data, successHeart, errorHeart);
+  			updateHeartData(data, this.props.selectedDate, successHeart, errorHeart);
   			this.props.renderHrrData(data);
   		}
 	render(){
@@ -321,10 +338,12 @@ class Other_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 						          	    	: (this.state.end_time_activity_hour + ":" +this.state.end_time_activity_min + ":" + this.state.end_time_activity_sec + " " + this.state.end_time_activity_am_pm )}
+						          	    	{this.state.editable && 
 						          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editEndTimeActivity}
 		                            			className="fa fa-pencil fa-1x"
 		                            			>
 		                        			</span>
+		                        			}
 					          	    </td>
 				          	    </tr>
 
@@ -369,10 +388,12 @@ class Other_Hrr_Data extends Component{
 					        				</Modal>              
 					          	    		: (this.state.diff_actity_hrr_min + ":" +this.state.diff_actity_hrr_sec)
 					          	    	}
+					          	    	{this.state.editable && 
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editDiffActivityHrr}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
                         			</td>
 				          	    </tr>
 
@@ -442,10 +463,12 @@ class Other_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 						          	    	: (this.state.start_time_activity_hour + ":" +this.state.start_time_activity_min + ":" + this.state.start_time_activity_sec + " " + this.state.start_time_activity_am_pm )}
+						          	    	{this.state.editable && 
 						          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editStartTimeActivity}
 		                            			className="fa fa-pencil fa-1x"
 		                            			>
 		                        			</span>
+		                        			}
 		                        			</td>
 				          	    </tr>
 
@@ -464,10 +487,12 @@ class Other_Hrr_Data extends Component{
 	                                        {this.createSleepDropdown(70,220)}
 	                                    </Input> 
 					          	    	: this.state.end_heartrate_activity}
+					          	    	{this.state.editable && 
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editEndHeartrateActivity}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 									</td>
 				          	    </tr>
 
@@ -486,10 +511,12 @@ class Other_Hrr_Data extends Component{
 	                                        {this.createSleepDropdown(1,220)}
 	                                    </Input> 
 					          	    	: this.state.heart_rate_down_up}
+					          	    	{this.state.editable && 
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editHeartRateDownUp}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 									</td>
 				          	    </tr>
 
@@ -508,10 +535,12 @@ class Other_Hrr_Data extends Component{
 	                                        {this.createSleepDropdown(1,220)}
 	                                    </Input> 
 					          	    	: this.state.pure_1min_heart_beats}
+					          	    	{this.state.editable && 
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editPure1minHeartBeats}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 	                        		</td>
 				          	    </tr>
 
@@ -556,10 +585,12 @@ class Other_Hrr_Data extends Component{
 					        				</Modal>              
 					          	    		: (this.state.pure_time_99_min + ":" +this.state.pure_time_99_sec)
 					          	    	}
+					          	    	{this.state.editable && 
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editPureTime99}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
 	                        			</span>
+	                        			}
 									</td>
 				          	    </tr>
 			          	    </tbody>

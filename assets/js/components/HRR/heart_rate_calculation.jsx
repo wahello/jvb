@@ -14,7 +14,7 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from '../navbar';
 import { getGarminToken,logoutUser} from '../../network/auth';
 import fetchHeartData from '../../network/heart_cal';
-import {fetchHeartRefreshData} from '../../network/heart_cal';
+//import {fetchHeartRefreshData} from '../../network/heart_cal';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 import Heartrate_Data from './heartrate_data_file';
 import Other_Hrr_Data from './heart_rate_other_data_file';
@@ -31,7 +31,7 @@ class HeartRateCal extends Component{
 					    	calendarOpen:false,
 						    isOpen:false,
 						    fetching_hrr:false,
-						    editable : false,
+						    editable : true,
 						    selectedDate:new Date(),
 				   			"Did_you_measure_HRR":"",
 							"Did_heartrate_reach_99":"",
@@ -58,6 +58,9 @@ class HeartRateCal extends Component{
 							edit_did_you_measure_HRR:"",
 		   				}
 		    this.toggleCalendar = this.toggleCalendar.bind(this);
+		    this.toggleEditForm = this.toggleEditForm.bind(this);
+		    this.renderAddDate = this.renderAddDate.bind(this);
+			this.renderRemoveDate = this.renderRemoveDate.bind(this);
 			this.toggle = this.toggle.bind(this);
 			this.successHeart = this.successHeart.bind(this);
 			this.errorHeart = this.errorHeart.bind(this);
@@ -67,12 +70,13 @@ class HeartRateCal extends Component{
 			this.renderSecToMin = this.renderSecToMin.bind(this);
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
-			this.hrrRefreshData = this.hrrRefreshData.bind(this);
+			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
   	}
   	
 	successHeart(data){
 	  	this.setState({
 	  	    		fetching_hrr:false,
+	  	    		editable:false,
 	  	   			Did_you_measure_HRR:data.data.Did_you_measure_HRR,
 					Did_heartrate_reach_99:data.data.Did_heartrate_reach_99,
 					time_99:data.data.time_99,
@@ -104,6 +108,72 @@ class HeartRateCal extends Component{
 			fetching_hrr:false,
 		})
     }
+    renderAddDate(){
+		/*It is forward arrow button for the calender getting the next day date*/
+		var today = this.state.selectedDate;
+		var tomorrow = moment(today).add(1, 'days');
+		this.setState({
+			selectedDate:tomorrow.toDate(),
+			fetching_hrr:true,
+			"Did_you_measure_HRR":"",
+			"Did_heartrate_reach_99":"",
+			"time_99":"",
+			"HRR_start_beat":"",
+			"lowest_hrr_1min":"",
+			"No_beats_recovered":"",
+
+			"end_time_activity":"",
+			"diff_actity_hrr":"",
+			"HRR_activity_start_time":"",
+			"end_heartrate_activity":"",
+			"heart_rate_down_up":"",
+			"pure_1min_heart_beats":"",
+			"pure_time_99":"",
+
+			"no_fitfile_hrr_reach_99":"",
+			"no_fitfile_hrr_time_reach_99":"",
+			"time_heart_rate_reached_99":"",
+			"lowest_hrr_no_fitfile":"",
+			"no_file_beats_recovered":"",
+
+			"offset":"",
+		},()=>{
+			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+		});
+	}
+	renderRemoveDate(){
+		/*It is backward arrow button for the calender getting the last day date*/
+		var today = this.state.selectedDate;
+		var yesterday = moment(today).subtract(1, 'days');
+		this.setState({
+			selectedDate:yesterday.toDate(),
+			fetching_hrr:true,
+			"Did_you_measure_HRR":"",
+			"Did_heartrate_reach_99":"",
+			"time_99":"",
+			"HRR_start_beat":"",
+			"lowest_hrr_1min":"",
+			"No_beats_recovered":"",
+
+			"end_time_activity":"",
+			"diff_actity_hrr":"",
+			"HRR_activity_start_time":"",
+			"end_heartrate_activity":"",
+			"heart_rate_down_up":"",
+			"pure_1min_heart_beats":"",
+			"pure_time_99":"",
+
+			"no_fitfile_hrr_reach_99":"",
+			"no_fitfile_hrr_time_reach_99":"",
+			"time_heart_rate_reached_99":"",
+			"lowest_hrr_no_fitfile":"",
+			"no_file_beats_recovered":"",
+
+			"offset":"",
+		},()=>{
+			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
+		});
+	}
     processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
@@ -190,12 +260,12 @@ class HeartRateCal extends Component{
 		});
 	}
 
-	hrrRefreshData(){
+	/*hrrRefreshData(){
 		this.setState({
 			fetching_hrr:true,
 		});
 		fetchHeartRefreshData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	}
+	}*/
 	componentDidMount(){
 		this.setState({
 			fetching_hrr:true,
@@ -266,27 +336,56 @@ class HeartRateCal extends Component{
 	    	calendarOpen:!this.state.calendarOpen
 	    });
     }
+    toggleEditForm(){
+       this.setState({
+         editable:!this.state.editable
+       });
+    }
   render(){
   	const {fix} = this.props;
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
 		        <div style = {{marginTop:"10px"}}>
-	            	<span id="navlink" onClick={this.toggleCalendar} id="progress">
-	                    <FontAwesome
-	                        name = "calendar"
-	                        size = "2x"
-	                    />
-	                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+		        	<span>
+		        		<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+							<FontAwesome
+		                        name = "angle-left"
+		                        size = "2x"
+			                />
+						</span>
+						<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
+		                    <FontAwesome
+		                        name = "calendar"
+		                        size = "2x"
+		                    />
+		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
+	                	</span>
+	                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+							<FontAwesome
+		                        name = "angle-right"
+		                        size = "2x"
+			                />
+						</span>
+		        	</span>
+		        	<span className = "button_padding">
+                    	<Button 
+                           id="nav-btn"
+                              size="sm"
+                              onClick={this.toggleEditForm}
+                              className="btn hidden-sm-up">
+                              {this.state.editable ? 'View Hrr Data' : 'Edit Hrr Data'}
+                        </Button>			      
                 	</span>
-                	<span className = "button_padding">
+	            	
+                	{/*<span className = "button_padding">
                     	<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
-                	</span>
+                	</span>*/}
 	            	<Popover
 			            placement="bottom"
 			            isOpen={this.state.calendarOpen}
-			            target="progress"
+			            target="gd_progress"
 			            toggle={this.toggleCalendar}>
 		                <PopoverBody className="calendar2">
 		                <CalendarWidget  onDaySelect={this.processDate}/>
@@ -295,31 +394,35 @@ class HeartRateCal extends Component{
 	            </div>
 
 	            {this.state.Did_you_measure_HRR == "yes"  &&
-	            	<Heartrate_Data  hrr={{"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
-								"Did_heartrate_reach_99":this.state.Did_heartrate_reach_99,
-								"time_99":this.state.time_99,
-								"HRR_start_beat":this.state.HRR_start_beat,
-								"lowest_hrr_1min":this.state.lowest_hrr_1min,
-								"No_beats_recovered":this.state.No_beats_recovered}}
-								selectedDate = {this.state.selectedDate}
-								renderHrrData = {this.renderHrrData.bind(this)}/>
+	            	<Heartrate_Data  hrr={{
+	            		"editable":this.state.editable,
+            			"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
+						"Did_heartrate_reach_99":this.state.Did_heartrate_reach_99,
+						"time_99":this.state.time_99,
+						"HRR_start_beat":this.state.HRR_start_beat,
+						"lowest_hrr_1min":this.state.lowest_hrr_1min,
+						"No_beats_recovered":this.state.No_beats_recovered}}
+						selectedDate = {this.state.selectedDate}
+						renderHrrData = {this.renderHrrData.bind(this)}/>
           		}
 
           	{this.state.Did_you_measure_HRR == "yes" &&
           	 	<Other_Hrr_Data hrr = {{
-          	 			"end_time_activity":this.state.end_time_activity,
-							"diff_actity_hrr":this.state.diff_actity_hrr,
-							"HRR_activity_start_time":this.state.HRR_activity_start_time,
-							"end_heartrate_activity":this.state.end_heartrate_activity,
-							"heart_rate_down_up":this.state.heart_rate_down_up,
-							"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
-							"pure_time_99":this.state.pure_time_99}}
-							selectedDate = {this.state.selectedDate}
-							renderHrrData = {this.renderHrrData1.bind(this)}/>
+      	 			"editable":this.state.editable,
+      	 			"end_time_activity":this.state.end_time_activity,
+					"diff_actity_hrr":this.state.diff_actity_hrr,
+					"HRR_activity_start_time":this.state.HRR_activity_start_time,
+					"end_heartrate_activity":this.state.end_heartrate_activity,
+					"heart_rate_down_up":this.state.heart_rate_down_up,
+					"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
+					"pure_time_99":this.state.pure_time_99}}
+					selectedDate = {this.state.selectedDate}
+					renderHrrData = {this.renderHrrData1.bind(this)}/>
           	}
 
           	{(this.state.Did_you_measure_HRR == "no" || this.state.Did_you_measure_HRR == "" || this.state.Did_you_measure_HRR == "Heart Rate Data Not Provided") &&
           		<No_Hrr_Data hrr = {{
+          			"editable":this.state.editable,
           			"end_time_activity":this.state.end_time_activity,
           			"no_fitfile_hrr_reach_99":this.state.no_fitfile_hrr_reach_99,
 					"no_fitfile_hrr_time_reach_99":this.state.no_fitfile_hrr_time_reach_99,

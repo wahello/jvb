@@ -26,7 +26,8 @@ class Heartrate_Data extends Component{
 		    let lowest_hrr_1min1 = this.props.hrr.lowest_hrr_1min;
 		    let No_beats_recovered = this.props.hrr.No_beats_recovered;
 		    this.state = {
-		    	editable:false,
+		    	editable:this.props.hrr.editable,
+		    	editable_did_you_measure_HRR:false,
 		    	editable_hrr_99_beats:false,
 		    	editable_time_99:false,
 		    	editable_HRR_start_beat:false,
@@ -55,9 +56,13 @@ class Heartrate_Data extends Component{
 		    this.editToggleNoBeats = this.editToggleNoBeats.bind(this);
 		    this.updateData = this.updateData.bind(this);
 		}
+		componentWillReceiveProps(nextProps) {
+			console.log("componentWillReceiveProps: "+nextProps.hrr.editable);
+			this.setState({ editable: nextProps.hrr.editable });  
+	  	}
 		editToggleDidyouWorkout(){
 	  		this.setState({
-	  			editable:!this.state.editable
+	  			editable_did_you_measure_HRR:!this.state.editable_did_you_measure_HRR
 	  		});
   		}
   		createSleepDropdown(start_num , end_num, mins=false, step=1){
@@ -152,12 +157,12 @@ class Heartrate_Data extends Component{
   				Did_you_measure_HRR:this.state.Did_you_measure_HRR,
 		    	Did_heartrate_reach_99:this.state.Did_heartrate_reach_99,
 		    	time_99:time,
-		    	HRR_start_beat:this.state.HRR_start_beat,
-		    	lowest_hrr_1min:this.state.lowest_hrr_1min,
-		    	No_beats_recovered:this.state.No_beats_recovered,
+		    	HRR_start_beat:parseInt(this.state.HRR_start_beat),
+		    	lowest_hrr_1min:parseInt(this.state.lowest_hrr_1min),
+		    	No_beats_recovered:parseInt(this.state.No_beats_recovered),
 		    };
 		    
-  			updateHeartData(data, successHeart, errorHeart);
+  			updateHeartData(data, this.props.selectedDate, successHeart, errorHeart);
   			this.props.renderHrrData(data);
   		}
 	render(){
@@ -172,7 +177,7 @@ class Heartrate_Data extends Component{
 			          	    <tbody>  
 			          	    <tr className = "hr_table_style_rows">   
 				          	    <td className = "hr_table_style_rows">Did you measure your heart rate recovery (HRR) after today’s aerobic workout?</td>    
-				          	    <td className = "hr_table_style_rows">{this.state.editable ? 
+				          	    <td className = "hr_table_style_rows">{this.state.editable_did_you_measure_HRR ? 
 				          	    	<Input
 				          	    		style = {{maxWidth:"100px"}}
                                         type="select"
@@ -186,10 +191,12 @@ class Heartrate_Data extends Component{
                                         <option value="no">No</option>
                                     </Input> 
 				          	    	:this.captilizeYes(this.state.Did_you_measure_HRR)}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleDidyouWorkout}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
 			          	    	</td>
 			          	    </tr>
 
@@ -210,10 +217,12 @@ class Heartrate_Data extends Component{
                                         <option value="no">No</option>
                                     </Input> 
 				          	    	: this.captilizeYes(this.state.Did_heartrate_reach_99)}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleHrr99Beats}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
 				          	    </td>
 			          	    </tr>
 
@@ -257,10 +266,12 @@ class Heartrate_Data extends Component{
 	          				</ModalFooter>
 	        				</Modal>              
 				          	    	: (this.state.time_99_min + ":" +this.state.time_99_sec)}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggletime99}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
 				          	    	</td>
 			          	    </tr>
 
@@ -279,10 +290,12 @@ class Heartrate_Data extends Component{
                                         {this.createSleepDropdown(70,220)}
                                     </Input> 
 				          	    	: this.state.HRR_start_beat}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleHrrStartBeat}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
 
 								</td>
 			          	    </tr>
@@ -302,10 +315,12 @@ class Heartrate_Data extends Component{
 	                                        {this.createSleepDropdown(70,220)}
 	                                    </Input> 
 				          	    	: this.state.lowest_hrr_1min}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleLowestHrr1min}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
 								</td>
 			          	    </tr>
 
@@ -324,10 +339,12 @@ class Heartrate_Data extends Component{
 	                                        {this.createSleepDropdown(0,220)}
 	                                    </Input> 
 				          	    	: this.state.No_beats_recovered}
+				          	    	{this.state.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleNoBeats}
                             			className="fa fa-pencil fa-1x"
                             			>
                         			</span>
+                        			}
                         			</td>
 			          	    </tr>
 			          	    </tbody>
