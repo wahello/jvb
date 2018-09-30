@@ -44,9 +44,9 @@ JVB Health & Wellness
 # remind selected users to submit UserDailyInput
 def notify_user_to_submit_userinputs():
 	RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
-		"cherylcasone","Carol","lafmaf123","davelee","Justin","lalancaster",
+		"cherylcasone","knitter61","lafmaf123","davelee","Justin","lalancaster",
 		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
-		"atul","jvbhealth"]
+		"atul","jvbhealth","Jvbtest"]
 	FEEDBACK_EMAIL = "info@jvbwellness.com"
 	ROOT_URL = "https://app.jvbwellness.com/"
 	USER_INPUT_URL = ROOT_URL+"userinputs"
