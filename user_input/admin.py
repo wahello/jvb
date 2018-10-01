@@ -37,7 +37,9 @@ class UserInputAdmin(admin.ModelAdmin):
 	]
 
 class DailyActivityAdmin(admin.ModelAdmin):
-	list_display = ('user', 'created_at', 'activity_data', 'activity_weather',)
+	list_display = ('user', 'created_at',)
+	list_filter = ('created_at',)
+	save_on_top = True
 	search_fields = ('user__username', 'created_at', )
 
 # Register your models here.

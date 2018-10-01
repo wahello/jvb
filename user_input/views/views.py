@@ -10,7 +10,7 @@ from rest_framework import status
 
 from user_input.serializers import UserDailyInputSerializer, DailyActivitySerializer
 
-from user_input.models import UserDailyInput, DailyActivity
+from user_input.models import UserDailyInput, DailyActivity, DailyUserInputStrong
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -137,17 +137,17 @@ class DailyActivityView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DailyActivitySerializer
 
-    def get_queryset(self, format='json'):
+    def get_queryset(self):
         user = self.request.user
         start_dt = self.request.query_params.get('start_date', None)
         end_dt = self.request.query_params.get('end_date', None)
 
-        if start_dt and end_date:
+        if start_dt and end_dt:
             return DailyActivity.objects.filter(
                 created_at__range=(start_dt,end_date), user=user)
         elif start_dt:
-            return DailyActivity.objects.filter(
+            activty_obj = DailyActivity.objects.filter(
                 created_at=start_dt, user=user)
+            return activty_obj 
         else:
             return DailyActivity.objects.all()
-
