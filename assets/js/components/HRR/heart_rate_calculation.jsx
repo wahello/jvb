@@ -106,7 +106,10 @@ class HeartRateCal extends Component{
 
 					offset:data.data.offset,
 	  	});
+	  	//setTimeout("alert('Hello')", 1000);
+	  	setTimeout(this.handleDismiss, 5000);
 	}
+
 	handleDismiss() {
 	    this.setState({ show: false });
 	}
@@ -120,6 +123,7 @@ class HeartRateCal extends Component{
 		this.setState({
 			fetching_hrr:false,
 		})
+		setTimeout(this.handleDismiss, 5000);
     }
     renderAddDate(){
 		/*It is forward arrow button for the calender getting the next day date*/
@@ -326,6 +330,7 @@ class HeartRateCal extends Component{
   		}
   		return z
   	}
+  	
 
   	renderSecToMin(value){
   		let time;
