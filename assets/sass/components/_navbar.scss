@@ -101,3 +101,43 @@ width:100%;
  }
 
 }
+/*****************************/
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form{
+	border:none;
+}
+.no-padding {
+	padding:0 !important;
+}
+.page_title h2{
+	font-size:16px;
+	color:#fff;
+}
+.page_title_mobile{
+	display:none;
+}
+.page_title_mobile h2{
+	font-size:16px;
+	color:#fff;
+}
+.tgl_btn{
+	position:absolute;
+	right:0;
+}
+.navbar_right{
+	position:absolute;
+	right:0;
+}
+.navbar-inverse .navbar-nav > li > a{
+	color:#fff;
+}
+@media screen and (max-width:768px){
+	.page_title{
+		
+	}
+	.page_title_mobile{
+		display:block;
+	}
+	.nav_mobile{
+		margin:0;
+	}
+}

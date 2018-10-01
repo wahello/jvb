@@ -10,7 +10,7 @@ class Hrr(models.Model):
 
 
 	Did_you_measure_HRR = models.CharField(max_length=100,blank=True,null=True)
-	Did_heartrate_reach_99 = models.CharField(max_length=3,blank=True,null=True)
+	Did_heartrate_reach_99 = models.CharField(max_length=100,blank=True,null=True)
 	time_99 = models.FloatField(blank=True,null=True)
 	HRR_start_beat = models.FloatField(blank=True,null=True)
 	lowest_hrr_1min = models.FloatField(blank=True,null=True)
@@ -24,7 +24,7 @@ class Hrr(models.Model):
 	pure_1min_heart_beats = models.FloatField(blank=True,null=True)
 	pure_time_99 = models.FloatField(blank=True,null=True)
 
-	no_fitfile_hrr_reach_99 = models.CharField(max_length=3,blank=True,null=True)
+	no_fitfile_hrr_reach_99 = models.CharField(max_length=100,blank=True,null=True)
 	no_fitfile_hrr_time_reach_99 = models.FloatField(blank=True,null=True)
 	time_heart_rate_reached_99 = models.FloatField(blank=True,null=True)
 	lowest_hrr_no_fitfile = models.FloatField(blank=True,null=True)

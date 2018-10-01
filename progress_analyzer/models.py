@@ -76,6 +76,7 @@ class OtherStatsCumulative(models.Model):
 	cum_floors_climbed = models.IntegerField(blank=True,null=True)
 	cum_hrr_pure_1_min_beats_lowered = models.IntegerField(blank=True,null=True)
 	cum_hrr_pure_time_to_99 = models.FloatField(blank=True, null = True)
+	cum_hrr_activity_end_hr = models.FloatField(blank=True,null=True)
 
 class SickCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name="sick_cum")
@@ -94,6 +95,7 @@ class StressCumulative(models.Model):
 	cum_days_low_stress = models.IntegerField(blank=True,null=True)
 	cum_days_medium_stress = models.IntegerField(blank=True,null=True)
 	cum_days_high_stress = models.IntegerField(blank=True,null=True)
+	cum_days_garmin_stress_lvl = models.IntegerField(blank=True,null=True)
 
 class MetaCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name='meta_cum')
@@ -121,6 +123,8 @@ class MetaCumulative(models.Model):
 	cum_hrr_pure_1_minute_beat_lowered_days_count = models.IntegerField(
 		blank=True,null=True)
 	cum_hrr_pure_time_to_99_days_count = models.IntegerField(
+		blank=True,null=True)
+	cum_hrr_activity_end_hr_days_count = models.IntegerField(
 		blank=True,null=True)
 
 

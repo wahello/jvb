@@ -211,7 +211,8 @@ constructor(props){
           "number_of_days_medium_stress_reported":this.getInitialDur(),
           "prcnt_of_days_high_stress":this.getInitialDur(),
           "prcnt_of_days_low_stress":this.getInitialDur(),
-          "prcnt_of_days_medium_stress":this.getInitialDur()
+          "prcnt_of_days_medium_stress":this.getInitialDur(),
+          "garmin_stress_lvl":this.getInitialDur()
         },
         "standing":{
           "number_days_reported_stood_not_stood_three_hours":this.getInitialDur(),
@@ -1775,6 +1776,15 @@ handleBackButton(){
             
         </thead>
         <tbody>
+        <tr className="progress_table">
+                <td className="progress_table">Garmin Stress Level</td>                
+                <td className="progress_table">{this.state.summary.stress.garmin_stress_lvl.today}</td>
+                <td className="progress_table">{this.state.summary.stress.garmin_stress_lvl.yesterday}</td>
+                <td className="progress_table">{this.state.summary.stress.garmin_stress_lvl.week}</td>
+                <td className="progress_table">{this.state.summary.stress.garmin_stress_lvl.month}</td>
+                <td className="progress_table">{this.state.summary.stress.garmin_stress_lvl.year}</td>
+                {this.renderCustomRangeTD(this.state.summary.stress.garmin_stress_lvl.custom_range)}
+            </tr>
              <tr className="progress_table">
                 <td className="progress_table">Number of Days Low Stress Reported</td>                
                 <td className="progress_table">{this.state.summary.stress.number_of_days_low_stress_reported.today}</td>

@@ -4,6 +4,7 @@ from decimal import Decimal, ROUND_HALF_DOWN
 import json, ast, pytz
 import requests
 import copy
+import re
 
 from django.db.models import Q
 
@@ -81,7 +82,8 @@ def _str_to_hours_min_sec(str_duration,time_format='hour',time_pattern="hh:mm:ss
 		  specify the position of hour, minute and second in the str_duration
 
 	'''
-	if str_duration:
+	pattern = re.compile(r"\d?\d:\d\d(:\d\d)?")
+	if str_duration and pattern.match(str_duration):
 		hms = str_duration.split(":")
 		pattern_lst = time_pattern.split(":")
 		pattern_indexed = {
@@ -190,7 +192,7 @@ def get_blank_model_fields(model):
 			'overall_health_grade':'',
 			'overall_health_gpa':0,
 			'movement_non_exercise_steps_grade':'',
-			'movement_non_exercise_steps_gpa':'',
+			'movement_non_exercise_steps_gpa':0,
 			'movement_consistency_grade': '',
 			'avg_sleep_per_night_grade':'',
 			'avg_sleep_per_night_gpa':0,
@@ -267,8 +269,8 @@ def get_blank_model_fields(model):
 			'workout_elapsed_time': '',
 			'timewatch_paused_workout': '',
 			'exercise_consistency':0,
-			'heartrate_variability_stress': '',
-			'fitness_age':'',
+			'heartrate_variability_stress': 0,
+			'fitness_age':0,
 			'workout_comment':''
 		}
 		return fields
@@ -475,10 +477,11 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 		sleep_level_maps = data.get('sleepLevelsMap')
 		if sleep_level_maps:
 			for lvl_type,lvl_data in sleep_level_maps.items():
-				durations[lvl_type] += sum(
-					[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
-					- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
-					for d in lvl_data])
+				if lvl_type in durations.keys():
+					durations[lvl_type] += sum(
+						[(datetime.utcfromtimestamp(d['endTimeInSeconds'])
+						- datetime.utcfromtimestamp(d['startTimeInSeconds'])).seconds
+						for d in lvl_data])
 		return durations
 
 	recent_auto_manual = None
@@ -747,8 +750,97 @@ def get_renamed_to_hrr_activities(user,calendar_date,activities):
 					renamed_summaries.append(activity['summaryId'])
 	return renamed_summaries
 
+def is_duplicate_activity(activity, all_activities):
+	'''
+	Determine if the activity file is duplicate activity file or not
+	using following logic - 
+
+	1. Check if any two or more activities are overlapping (10 min or more)
+	   based on start and end time of activities and they are from different
+	   devices
+	2. Discard any activity which does not have average heart rate information,
+	   assuming at least some of them have heart rate information.
+	3. Now pick that activity which has the longest duration.
+	4. If all overlapping activities have no heart rate information, then pick
+	   the activity with the longest duration  [ALTERNATE SCENARIO]
+	
+	Args:
+		activity(dict): Activity which needs to be classified
+		all_activities(list): A list of all activities
+
+	Return:
+		Bool: True if activity is duplicate else False 
+	'''
+	is_duplicate = False
+
+	if activity and all_activities:
+		if 'duplicate' in activity:
+			# If user has already classified any activity then return 
+			# that classification otherwise proceed with full check.
+			duplicate = activity.get('duplicate',None)
+			if duplicate is not None:
+				return duplicate
+
+		overlapping_activities = []
+		activity_start = datetime.utcfromtimestamp(
+			activity.get('startTimeInSeconds',0)
+			+activity.get('startTimeOffsetInSeconds',0))
+		activity_end = (activity_start 
+			+ timedelta(seconds=activity.get('durationInSeconds',0)))
+
+		for act in all_activities:
+			overlapping_duration_in_sec = 0
+			act_start = datetime.utcfromtimestamp(
+				act.get('startTimeInSeconds',0)
+				+ act.get('startTimeOffsetInSeconds',0))
+			act_end = (act_start 
+				+ timedelta(seconds=act.get('durationInSeconds',0)))
+			if (act_start >= activity_start and act_end <= activity_end):
+				overlapping_duration_in_sec += act.get('durationInSeconds',0)
+			elif (act_start >= activity_start and act_start <= activity_end):
+				overlapping_sec = (activity_end - act_start).seconds
+				overlapping_duration_in_sec += overlapping_sec
+			elif (act_end >= activity_start and act_end <= activity_end):
+				overlapping_sec = (act_end - activity_start).seconds
+				overlapping_duration_in_sec += overlapping_sec
+			elif (act_start <= activity_start and act_end >= activity_end):
+				overlapping_sec = (activity_start - activity_end).seconds
+				overlapping_duration_in_sec += overlapping_sec
+			if (overlapping_duration_in_sec 
+				and overlapping_duration_in_sec > 600
+				and (not activity.get('deviceName','manually_created') 
+					== act.get('deviceName','manually_created'))):
+				overlapping_activities.append(act)
+
+		overlapping_activities.append(activity)
+		if overlapping_activities:
+			original_act = None
+			longest_duration = 0
+			for act in overlapping_activities:
+				if (act.get('durationInSeconds',0) >= longest_duration
+					and act.get('averageHeartRateInBeatsPerMinute',0)):
+					original_act = act
+					longest_duration = act.get('durationInSeconds',0)
+
+			if not original_act:
+				# If no original activity is found that means all of the 
+				# overlapping activities have no average heart rate information. 
+				# So in such case pick the activity with longest duration.
+				longest_duration = 0
+				for act in overlapping_activities:
+					if (act.get('durationInSeconds',0) >= longest_duration):
+						original_act = act
+						longest_duration = act.get('durationInSeconds',0)
+
+			if (original_act 
+				and original_act.get('summaryId') != activity.get('summaryId')):
+					is_duplicate = True
+
+	return is_duplicate
+
+
 def get_filtered_activity_stats(activities_json,manually_updated_json,
-		userinput_activities=None,**kwargs):
+		userinput_activities=None,include_duplicate = False,**kwargs):
 	
 	'''
 	Combine activities, manually edited activities and user input activities
@@ -760,7 +852,8 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 	Args:
 		activities_json (list): List of  activities
 		manually_updated_json (list): List of manually edited activities
-		userinput_activities (list): List of user created/modified activities
+		userinput_activities (dict): dictionary of user created/modified
+			activities. Key is activity id and value is complete activity data 
 	'''
 
 	activities_json = copy.deepcopy(activities_json)
@@ -775,13 +868,13 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 			userinput_activities.pop(obj.get('summaryId'))
 			filtered_obj = {}
 			for key,val in obj_in_user_activities.items():
-				# if any key have empty, null or 0 value then remove it
-				# and look for that key in original garmin provided summary because
-				# sometimes user submitted activities might have no value for fields
-				# like - avgHeartRateInBeatsPerMinute, steps etc. In that case empty value 
-				# will be taken for those keys even though value exist in original 
-				# summary provided by garmin 
-				if val:
+				# if any key (except 'duplicate') have empty, null or 0 value
+				# then remove it and look for that key in original garmin provided
+				# summary because sometimes user submitted activities might have
+				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
+				# etc. In that case empty value will be taken for those keys even
+				# though value exist in original summary provided by garmin 
+				if val or key == 'duplicate':
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
@@ -820,11 +913,25 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 			calendar_date = kwargs.get('calendar_date'),
 			activities = filtered_activities
 		)
+
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
 
-	return filtered_activities
+	unique_activities = []
+	for act in filtered_activities:
+		duplicate = is_duplicate_activity(act,filtered_activities)
+		# print(act.get('activityType'),duplicate)
+		if not duplicate:
+			act['duplicate'] = False
+			unique_activities.append(act)
+		else:
+			act['duplicate'] = True
+
+	if include_duplicate:
+		return filtered_activities
+	else:
+		return unique_activities
 
 def get_activity_stats(combined_user_activities):
 
@@ -951,7 +1058,7 @@ def _get_activities_start_end_time(combined_user_activities):
 		object of each activities
 	'''
 
-	Time = namedtuple("Time",["start","end"])
+	Time = namedtuple("Time",["start","end","duration"])
 	activities_start_end_time = []
 
 	if combined_user_activities:
@@ -965,6 +1072,7 @@ def _get_activities_start_end_time(combined_user_activities):
 				Time(
 					datetime.utcfromtimestamp(start_time),
 					datetime.utcfromtimestamp(end_time),
+					activity.get('durationInSeconds',0)
 				)
 			)
 	return activities_start_end_time  
@@ -978,7 +1086,6 @@ def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	return False 
 
 def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
-	total_active_minutes = 0
 	active_hours = 0
 	inactive_hours = 0
 	total_steps = 0
@@ -1025,11 +1132,7 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 			elif mc_data[interval]['status'] == 'time zone change':
 				timezone_change_hours += 1
 			total_steps += values['steps']
-			total_active_minutes += values['active_duration']['duration']
-
-	mc_data['total_active_minutes'] = total_active_minutes
-	mc_data['total_active_prcnt'] = round(
-			(total_active_minutes / 1440)*100)
+			
 	mc_data['active_hours'] = active_hours
 	mc_data['inactive_hours'] = inactive_hours
 	mc_data['sleeping_hours'] = sleeping_hours
@@ -1195,6 +1298,54 @@ def _update_status_to_timezone_change(mc_data,timezone_change_interval,calendar_
 				mc_data[interval]['status'] = 'time zone change'
 	return mc_data
 
+def get_epoch_active_time(activites_time_list,epoch,intensity_level):
+	'''
+	Calculate active time for the given epoch data by considering
+	duration of any activity(ies) overlapping with epoch duration.
+	If activities overlap with epoch duration then, the overlapping duration
+	will be added to active minutes.
+
+	Args:
+		activites_time_list(list): List of named tuple containing start time,
+			end time and duration of activities.
+		epoch(dict): Epoch data
+
+	'''
+	epoch_start = datetime.utcfromtimestamp(
+		epoch.get('startTimeInSeconds')+ epoch.get('startTimeOffsetInSeconds'))
+	epoch_end = epoch_start + timedelta(seconds=epoch.get('durationInSeconds'))
+
+	overlapping_duration_in_sec = 0
+	for activity_time in activites_time_list:
+		if (activity_time.start >= epoch_start 
+			and activity_time.end <= epoch_end):
+			overlapping_duration_in_sec += activity_time.duration
+		elif (activity_time.start >= epoch_start 
+			  and activity_time.start <= epoch_end):
+			overlapping_sec = (epoch_end - activity_time.start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (activity_time.end >= epoch_start 
+			  and activity_time.end <= epoch_end):
+			overlapping_sec = (activity_time.end - epoch_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+		elif (activity_time.start <= epoch_start
+			  and activity_time.end >= epoch_end):
+			overlapping_sec = (epoch_end - epoch_start).seconds
+			overlapping_duration_in_sec += overlapping_sec
+	
+	if overlapping_duration_in_sec:
+		active_seconds = overlapping_duration_in_sec
+		if intensity_level != 'SEDENTARY':
+			active_seconds += epoch.get('activeTimeInSeconds',0) 
+
+		# Active minuted per epoch data is capped to 15 mins (900 sec)
+		if active_seconds > 900:
+			active_seconds = 900
+	else:
+		active_seconds = 0
+		if intensity_level != 'SEDENTARY':
+			active_seconds = epoch.get('activeTimeInSeconds',0)
+	return active_seconds
 
 def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		sleeps_today_json,user_input_todays_bedtime,combined_user_activities,
@@ -1206,6 +1357,24 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 	'''
 		Calculate the movement consistency summary
 	'''
+
+	def which_quarter(dt):
+		'''
+		Tell which quarter the given time is
+		0 - 14 min : quarter 0
+		15 - 29 min : quarter 1
+		30 - 44 min : quarter 2
+		45 - 59 min : quarter 3
+		'''
+		minute = dt.minute
+		if minute >= 0 and minute <= 14:
+			return 0
+		elif minute >= 15 and minute <= 29:
+			return 1
+		elif minute >= 30 and minute <= 44:
+			return 2
+		elif minute >= 45 and minute <= 59:
+			return 3
 
 	if user_input_strength_start_time and user_input_strength_end_time:
 		# Stretching strength start and end time to full hour eg. 
@@ -1222,7 +1391,6 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		nap_end_time = datetime.combine(nap_end_time.date(),
 			time(nap_end_time.hour,59))
 
-	movement_consistency = OrderedDict()
 	sleep_stats = get_sleep_stats(calendar_date,sleeps_json,sleeps_today_json, 
 		user_input_bedtime = user_input_bedtime,
 		user_input_awake_time = user_input_awake_time,
@@ -1249,6 +1417,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 	# In that case we have same yesterday_bedtime and today_bedtime 
 	if today_bedtime and today_awake_time and today_bedtime <= today_awake_time:
 		today_bedtime = None
+
+	movement_consistency = OrderedDict()
+	quarterly_active_seconds = OrderedDict()
 		
 	if epochs_json:
 		timezone_change_interval = check_timezone_change(
@@ -1271,45 +1442,48 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				},
 				"active_prcnt":0
 			}
+			quarterly_active_seconds[time_interval] = [0]*4
 			data_date_midnight += td_hour
 
 		for data in epochs_json:
-			if data.get('intensity') != 'SEDENTARY': 
-				start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
-				hour_start = datetime.utcfromtimestamp(start_time)
-				time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
-				steps_in_interval = movement_consistency[time_interval].get('steps')
+			start_time = data.get('startTimeInSeconds')+ data.get('startTimeOffsetInSeconds')
+			hour_start = datetime.utcfromtimestamp(start_time)
+			time_interval = hour_start.strftime("%I:00 %p")+" to "+hour_start.strftime("%I:59 %p")
+			steps_in_interval = movement_consistency[time_interval].get('steps',0)
+			status = "sleeping"
+			# ex 6:00 PM, not 6:32 PM
+			hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
+
+			if (yesterday_bedtime and
+				today_awake_time and
+				hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+				hour_start_zero_min <= today_awake_time):
 				status = "sleeping"
-				# ex 6:00 PM, not 6:32 PM
-				hour_start_zero_min = datetime.combine(hour_start.date(),time(hour_start.hour))
+			elif(yesterday_bedtime and
+				hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
+				today_bedtime and
+				(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
+				status = "sleeping"
+			elif(user_input_strength_start_time and user_input_strength_end_time and
+				hour_start >= user_input_strength_start_time and
+				hour_start <= user_input_strength_end_time):
+				status = "strength"
+			elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
+				status = "exercise"
+			else:
+				status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
-				if (yesterday_bedtime and
-					today_awake_time and
-					hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-					hour_start_zero_min <= today_awake_time):
-					status = "sleeping"
-				elif(yesterday_bedtime and
-					hour_start >= datetime.combine(yesterday_bedtime.date(),time(yesterday_bedtime.hour)) and
-					today_bedtime and
-					(hour_start >= datetime.combine(today_bedtime.date(),time(today_bedtime.hour)))):
-					status = "sleeping"
-				elif(user_input_strength_start_time and user_input_strength_end_time and
-					hour_start >= user_input_strength_start_time and
-					hour_start <= user_input_strength_end_time):
-					status = "strength"
-				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
-					status = "exercise"
-				else:
-					status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
-
-				active_duration_min = data.get('activeTimeInSeconds',0)/60
-				interval_active_duration = movement_consistency[time_interval]['active_duration']
-				interval_active_duration['duration'] = round(
-					interval_active_duration['duration'] + active_duration_min)
-				active_prcnt = round((interval_active_duration['duration']/60)*100)
-				movement_consistency[time_interval]['active_prcnt'] = active_prcnt
-				movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
-				movement_consistency[time_interval]['status'] = status
+			intensity_level = data.get('intensity')
+			active_duration_sec = get_epoch_active_time(
+				activities_start_end_time,data,intensity_level)
+			quarter = which_quarter(hour_start)
+			if(quarterly_active_seconds[time_interval][quarter]
+				+ active_duration_sec > 900):
+				quarterly_active_seconds[time_interval][quarter] = 900
+			else:	
+				quarterly_active_seconds[time_interval][quarter] += active_duration_sec
+			movement_consistency[time_interval]['steps'] = steps_in_interval + data.get('steps')
+			movement_consistency[time_interval]['status'] = status
 
 		total_active_minutes = 0
 		active_hours = 0
@@ -1404,6 +1578,13 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 						last_sleeping_hour = hour_start - timedelta(hours=1)
 					previous_hour_steps = movement_consistency[interval]['steps']
 
+			active_minutes = round(sum(quarterly_active_seconds[interval])/60)
+			# Total active minute in the hourly interval is capped to 60 mins
+			active_minutes  = 60 if active_minutes > 60 else active_minutes
+			active_minute_prcnt = round((active_minutes/60) * 100)
+			movement_consistency[interval]['active_duration']['duration'] = (
+				active_minutes)
+			movement_consistency[interval]['active_prcnt'] = active_minute_prcnt
 
 			if movement_consistency[interval]['status'] == 'active': 
 				active_hours += 1 
@@ -1422,7 +1603,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			elif movement_consistency[interval]['status'] == 'nap':
 				nap_hours += 1
 			total_steps += values['steps']
-			total_active_minutes += values['active_duration']['duration']
+			total_active_minutes += active_minutes
 
 		movement_consistency['total_active_minutes'] = total_active_minutes
 		movement_consistency['total_active_prcnt'] = round(
@@ -1436,6 +1617,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 		movement_consistency['no_data_hours'] = no_data_hours
 		movement_consistency['timezone_change_hours'] = timezone_change_hours
 		movement_consistency['total_steps'] = total_steps
+
 		if(not yesterday_bedtime and not today_awake_time and have_steps_before_9_am):
 			_update_status_to_sleep_hours(
 				movement_consistency,
@@ -2185,7 +2367,7 @@ def get_weight(bodycmp_data,daily_optional):
 
 	return json.dumps(weight)
 
-def create_quick_look(user,from_date=None,to_date=None):
+def create_garmin_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
 
