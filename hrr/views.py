@@ -527,8 +527,10 @@ def aa_data(user,start_date):
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
-													userinput_activities=activities_dic)
-	# print(filtered_activities_files,"filtered activities")
+													userinput_activities=activities_dic,
+													user=user,calendar_date=start_date)
+	filtered_activities_only = remove_hrr_file(filtered_activities_files)
+
 	if user_input_strong:
 		for i,k in enumerate(filtered_activities_files):
 			user_input_keys.append(filtered_activities_files[i]['summaryId'])
@@ -678,7 +680,7 @@ def aa_data(user,start_date):
 					"total_percent":None}
 	if user_created_activity_list:
 		data = add_created_activity1(
-			filtered_activities_files,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
+			filtered_activities_only,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
 		data_values = data.values()
 		data_list = list(data_values)
 		data = data_list[0]
@@ -1354,7 +1356,6 @@ def daily_aa_data(user, start_date):
 		activies_timestamp = [single_list for single_list in activies_timestamp if single_list]
 		below_aerobic_value = 180-user_age-30
 		anaerobic_value = 180-user_age+5
-
 		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
 		anaerobic_range = '{} or above'.format(anaerobic_value+1)
 		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
@@ -1448,10 +1449,6 @@ def daily_aa_data(user, start_date):
 			daily_aa_data['Totals'] = {}
 	# print(daily_aa_data,"daily_aa_data")
 	if user_created_activity_list:
-		print(user_created_activity_list,"user_created_activity_list")
-		print(data,"data")
-		print(below_aerobic_value,"below_aerobic_value")
-		print(anaerobic_value,"anaerobic_value")
 		data_ui= add_created_activity(user_created_activity_list,data,below_aerobic_value,anaerobic_value)
 		daily_aa_data.pop('Totals',None)
 		for key,value in data_ui.items():
@@ -1786,6 +1783,12 @@ def aa_low_high_end_data(user,start_date):
 			data2['total'] = total
 		else:
 			data2['total'] = ""
+	if data2:
+		data2["heartrate_not_recorded"] = {}
+		data2["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = 0
+		data2["heartrate_not_recorded"]["time_in_zone"] = 0
+		data2["heartrate_not_recorded"]["classificaton"] = "heart_rate_not_recorded"
+
 	if user_created_activity_list:
 
 		duration_activites = []
@@ -2383,6 +2386,7 @@ class UserheartzoneView(APIView):
 				percent_in_zone = hr[key].get('prcnt_total_duration_in_zone',0)
 				li_prcnt.append(percent_in_zone)
 		total_duration = []
+		no_hr_time = []
 		for hr in hr_values:
 			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
@@ -2392,6 +2396,8 @@ class UserheartzoneView(APIView):
 				time_in_zone = hr[key].get('time_in_zone',0)
 				avg_time = (sum(time)/no_days)*7
 				total_duration.append(time_in_zone)
+				if key == "heartrate_not_recorded":
+					no_hr_time.append(hr[key]["time_in_zone"])
 				try:
 					percent_duration = sum(prcnt)/len(prcnt)
 					percent_duration = int(Decimal(percent_duration).quantize(0,ROUND_HALF_UP))
@@ -2405,6 +2411,16 @@ class UserheartzoneView(APIView):
 								  "prcnt_total_duration_in_zone":percent_duration
 								  }
 				heartzone_dic[low_end] = heartzone_data
+		if heartzone_dic:
+			heartzone_dic["heartrate_not_recorded"] = {}
+			heartzone_dic["heartrate_not_recorded"]["classificaton"] = "heart_rate_not_recorded"
+			heartzone_dic["heartrate_not_recorded"]["time_in_zone"] = sum(no_hr_time)
+			try:
+				heartzone_dic["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = (
+					total_duration/sum(no_hr_time))
+			except:
+				heartzone_dic["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = 0
+
 		heartzone_dic['total'] = (sum(total_duration)/no_days)*7	
 		return heartzone_dic
 
