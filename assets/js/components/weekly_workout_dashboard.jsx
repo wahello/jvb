@@ -251,6 +251,16 @@ checkForUndefinedValue(value) {
 		return false;
 	}
 }
+/******************************/
+isSelectedDateIsSunday(selectedDate,day_num) {
+	let tempSelectedDate = moment(selectedDate).format("dddd");
+	console.log("tempSelectedDate: "+tempSelectedDate);
+	if(tempSelectedDate !== "Sunday") {
+		return(moment(selectedDate).weekday(day_num).format('MMM DD'));
+	} else {
+		return(moment(moment(selectedDate).subtract(1,"days")).weekday(day_num).format('MMM DD'));
+	}
+}
 /*================================================================================*/
 	renderTable(weekly_data){
 		
@@ -260,14 +270,27 @@ checkForUndefinedValue(value) {
 			let td_extra = [];	
 			
 			let td_keys = ["workout_type","no_activity_in_week","duration","workout_duration_percent","duration_in_aerobic_range", "percent_aerobic", "duration_in_anaerobic_range", "percent_anaerobic", "duration_below_aerobic_range", "percent_below_aerobic", "duration_hrr_not_recorded", "percent_hrr_not_recorded","days_with_activity"];
-			let mon = moment(this.state.selectedDate).weekday(-6).format('DD-MMM-YY');
-			let tue = moment(this.state.selectedDate).weekday(-5).format('DD-MMM-YY');
-			let wed = moment(this.state.selectedDate).weekday(-4).format('DD-MMM-YY');
-			let thu = moment(this.state.selectedDate).weekday(-3).format('DD-MMM-YY');
-			let fri = moment(this.state.selectedDate).weekday(-2).format('DD-MMM-YY');
-			let sat = moment(this.state.selectedDate).weekday(-1).format('DD-MMM-YY');
-			let sun = moment(this.state.selectedDate).weekday(0).format('DD-MMM-YY');
+
+			let tempSelectedDate = moment(this.state.selectedDate).format("dddd");
+			let tempDateSelected = null;
+			console.log("tempSelectedDate: "+tempSelectedDate);
+			if(tempSelectedDate !== "Sunday") {
+				tempDateSelected = this.state.selectedDate;
+			} else {
+				tempDateSelected = moment(this.state.selectedDate).subtract(1,"days");
+			}
+			console.log("selectedDate: "+this.state.selectedDate);
+			console.log("selectedDate: "+moment(tempDateSelected).format("DD-MMM-YY"));
+			let mon = moment(tempDateSelected).weekday(-6).format('DD-MMM-YY');
+			let tue = moment(tempDateSelected).weekday(-5).format('DD-MMM-YY');
+			let wed = moment(tempDateSelected).weekday(-4).format('DD-MMM-YY');
+			let thu = moment(tempDateSelected).weekday(-3).format('DD-MMM-YY');
+			let fri = moment(tempDateSelected).weekday(-2).format('DD-MMM-YY');
+			let sat = moment(tempDateSelected).weekday(-1).format('DD-MMM-YY');
+			let sun = moment(tempDateSelected).weekday(0).format('DD-MMM-YY');
+
 			td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
+			console.log("td_keys: "+td_keys);
 
 			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => (x.indexOf("_distance")>=0));
 			td_keys = td_keys.concat(activity_distance_keys);
@@ -275,7 +298,7 @@ checkForUndefinedValue(value) {
 			let td_keys1 = ["no_activity","days_no_activity","no_activity_in_week","percent_days_no_activity"];
 			for(let [key,value] of Object.entries(weekly_data)){
 				
-				console.log(key+ " and value = " +value);
+				//console.log(key+ " and value = " +value);
 				let flag = 0;
 				let td_values = [];
 
@@ -283,6 +306,7 @@ checkForUndefinedValue(value) {
 					let tempDate = Object.keys(value["dates"])
 						.map(dt => moment(dt)).sort((a,b)=>a-b)
 						.map(momentDate => momentDate.format("DD-MMM-YY"));
+				//console.log("tempDate: "+tempDate);
 					let tempIndex = 0;
 					let tempWorkoutType = null;
 					let tempNoOfActivityInWeek = null;
@@ -327,7 +351,9 @@ checkForUndefinedValue(value) {
 								let currentDate = sortedDate[tempIndex];
 								let strDate = currentDate.format('DD-MMM-YY');
 								let tmpData = value["dates"][strDate];
+								console.log("tmpData: "+tmpData);
 								for(let [finalDateKey,finalDateValue] of Object.entries(tmpData)){
+									console.log("finalDateKey: "+finalDateKey+" finalDateValue: "+finalDateValue);
 									if(finalDateKey == "repeated") {
 										tempDayRepeated = finalDateValue;
 									} else if(finalDateKey == "duration") {
@@ -504,6 +530,7 @@ checkForUndefinedValue(value) {
 		return td_header;
 	}
 	render(){
+
 		let rendered_data = this.renderTable(this.state.weekly_data)
 		let activities_keys = rendered_data[0];
 		let rendered_rows = rendered_data[1];
@@ -584,13 +611,26 @@ checkForUndefinedValue(value) {
 											</tr>
 										</th>
 										<th># of Days With <br /> Activity</th>
-										<th>Mon {moment(this.state.selectedDate).weekday(-6).format('MMM DD')}</th>
-										<th>Tue {moment(this.state.selectedDate).weekday(-5).format('MMM DD')}</th>
-										<th>Wed {moment(this.state.selectedDate).weekday(-4).format('MMM DD')}</th>
-										<th>Thu {moment(this.state.selectedDate).weekday(-3).format('MMM DD')}</th>
-										<th>Fri  {moment(this.state.selectedDate).weekday(-2).format('MMM DD')}</th>
-										<th>Sat {moment(this.state.selectedDate).weekday(-1).format('MMM DD')}</th>
-										<th>Sun {moment(this.state.selectedDate).weekday(0).format('MMM DD')}</th>
+										<th>Mon {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(-6))}</th>
+										<th>Tue {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(-5))
+										}</th>
+										<th>Wed {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(-4))
+										}</th>
+										<th>Thu {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(-3))
+										}</th>
+										<th>Fri  {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(-2))
+										}</th>
+										<th>Sat {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(-1))
+										}</th>
+										<th>Sun {
+											this.isSelectedDateIsSunday(this.state.selectedDate,(0))
+										}</th>
 
 										{this.renderTableActivityHeader(activities_keys)}
 									</tr>
