@@ -19,14 +19,16 @@ import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 import Heartrate_Data from './heartrate_data_file';
 import Other_Hrr_Data from './heart_rate_other_data_file';
 import No_Hrr_Data from './heart_rate_no_data.jsx'; 
+import { Alert } from 'reactstrap';
 
 axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
 class HeartRateCal extends Component{
-	constructor(props) {
-		    super(props);
+	
+	constructor(props, context) {
+		    super(props, context);
 		    this.state = {
 					    	calendarOpen:false,
 						    isOpen:false,
@@ -56,6 +58,7 @@ class HeartRateCal extends Component{
 
 							"offset":"",
 							edit_did_you_measure_HRR:"",
+							show: false,
 		   				}
 		    this.toggleCalendar = this.toggleCalendar.bind(this);
 		    this.toggleEditForm = this.toggleEditForm.bind(this);
@@ -70,6 +73,8 @@ class HeartRateCal extends Component{
 			this.renderSecToMin = this.renderSecToMin.bind(this);
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
+			this.handleDismiss = this.handleDismiss.bind(this);
+    		this.handleShow = this.handleShow.bind(this);
 			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
   	}
   	
@@ -77,6 +82,7 @@ class HeartRateCal extends Component{
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
+	  	    		show:true,
 	  	   			Did_you_measure_HRR:data.data.Did_you_measure_HRR,
 					Did_heartrate_reach_99:data.data.Did_heartrate_reach_99,
 					time_99:data.data.time_99,
@@ -100,6 +106,13 @@ class HeartRateCal extends Component{
 
 					offset:data.data.offset,
 	  	});
+	}
+	handleDismiss() {
+	    this.setState({ show: false });
+	}
+
+	handleShow() {
+	    this.setState({ show: true });
 	}
 
     errorHeart(error){
@@ -346,6 +359,12 @@ class HeartRateCal extends Component{
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
+		        {
+		        	this.state.show &&
+			        <Alert bsStyle="danger" closeLabel={'close me'} onDismiss={this.handleDismiss}>
+			          hi alert!
+			        </Alert>
+		    	}
 		        <div style = {{marginTop:"10px"}}>
 		        	<span>
 		        		<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
