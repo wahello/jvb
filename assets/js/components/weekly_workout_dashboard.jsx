@@ -251,10 +251,11 @@ checkForUndefinedValue(value) {
 		return false;
 	}
 }
-/******************************/
-isSelectedDateIsSunday(selectedDate,day_num) {
+/************** IT CHECKS WHETHER SELECTED DATE IS SUNDAY, IF IT IS SUNDAY 
+THEN GETS, LAST TO LAST WEEKS DATES BY SUBTRACTING ONE DAY FROM SELECTED DATE. ****************/
+getDateFromSelectedDay(selectedDate,day_num) {
+
 	let tempSelectedDate = moment(selectedDate).format("dddd");
-	console.log("tempSelectedDate: "+tempSelectedDate);
 	if(tempSelectedDate !== "Sunday") {
 		return(moment(selectedDate).weekday(day_num).format('MMM DD'));
 	} else {
@@ -273,14 +274,13 @@ isSelectedDateIsSunday(selectedDate,day_num) {
 
 			let tempSelectedDate = moment(this.state.selectedDate).format("dddd");
 			let tempDateSelected = null;
-			console.log("tempSelectedDate: "+tempSelectedDate);
+
 			if(tempSelectedDate !== "Sunday") {
 				tempDateSelected = this.state.selectedDate;
 			} else {
 				tempDateSelected = moment(this.state.selectedDate).subtract(1,"days");
 			}
-			console.log("selectedDate: "+this.state.selectedDate);
-			console.log("selectedDate: "+moment(tempDateSelected).format("DD-MMM-YY"));
+			
 			let mon = moment(tempDateSelected).weekday(-6).format('DD-MMM-YY');
 			let tue = moment(tempDateSelected).weekday(-5).format('DD-MMM-YY');
 			let wed = moment(tempDateSelected).weekday(-4).format('DD-MMM-YY');
@@ -290,7 +290,6 @@ isSelectedDateIsSunday(selectedDate,day_num) {
 			let sun = moment(tempDateSelected).weekday(0).format('DD-MMM-YY');
 
 			td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
-			console.log("td_keys: "+td_keys);
 
 			let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => (x.indexOf("_distance")>=0));
 			td_keys = td_keys.concat(activity_distance_keys);
@@ -298,7 +297,6 @@ isSelectedDateIsSunday(selectedDate,day_num) {
 			let td_keys1 = ["no_activity","days_no_activity","no_activity_in_week","percent_days_no_activity"];
 			for(let [key,value] of Object.entries(weekly_data)){
 				
-				//console.log(key+ " and value = " +value);
 				let flag = 0;
 				let td_values = [];
 
@@ -306,7 +304,7 @@ isSelectedDateIsSunday(selectedDate,day_num) {
 					let tempDate = Object.keys(value["dates"])
 						.map(dt => moment(dt)).sort((a,b)=>a-b)
 						.map(momentDate => momentDate.format("DD-MMM-YY"));
-				//console.log("tempDate: "+tempDate);
+				
 					let tempIndex = 0;
 					let tempWorkoutType = null;
 					let tempNoOfActivityInWeek = null;
@@ -351,9 +349,9 @@ isSelectedDateIsSunday(selectedDate,day_num) {
 								let currentDate = sortedDate[tempIndex];
 								let strDate = currentDate.format('DD-MMM-YY');
 								let tmpData = value["dates"][strDate];
-								console.log("tmpData: "+tmpData);
+								
 								for(let [finalDateKey,finalDateValue] of Object.entries(tmpData)){
-									console.log("finalDateKey: "+finalDateKey+" finalDateValue: "+finalDateValue);
+									
 									if(finalDateKey == "repeated") {
 										tempDayRepeated = finalDateValue;
 									} else if(finalDateKey == "duration") {
@@ -612,24 +610,24 @@ isSelectedDateIsSunday(selectedDate,day_num) {
 										</th>
 										<th># of Days With <br /> Activity</th>
 										<th>Mon {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(-6))}</th>
+											this.getDateFromSelectedDay(this.state.selectedDate,(-6))}</th>
 										<th>Tue {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(-5))
+											this.getDateFromSelectedDay(this.state.selectedDate,(-5))
 										}</th>
 										<th>Wed {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(-4))
+											this.getDateFromSelectedDay(this.state.selectedDate,(-4))
 										}</th>
 										<th>Thu {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(-3))
+											this.getDateFromSelectedDay(this.state.selectedDate,(-3))
 										}</th>
 										<th>Fri  {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(-2))
+											this.getDateFromSelectedDay(this.state.selectedDate,(-2))
 										}</th>
 										<th>Sat {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(-1))
+											this.getDateFromSelectedDay(this.state.selectedDate,(-1))
 										}</th>
 										<th>Sun {
-											this.isSelectedDateIsSunday(this.state.selectedDate,(0))
+											this.getDateFromSelectedDay(this.state.selectedDate,(0))
 										}</th>
 
 										{this.renderTableActivityHeader(activities_keys)}
