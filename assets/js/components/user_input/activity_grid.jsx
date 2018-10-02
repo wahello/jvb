@@ -236,7 +236,7 @@ setActivitiesEditModeFalse(){
     });
 }
 
-deleteActivity(event) {
+/*deleteActivity(event) {
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
     let updated_activites_state = this.state.activites;
@@ -256,6 +256,24 @@ deleteActivity(event) {
         this.props.updateParentActivities(this.state.activites);
     });
 
+    this.toggle_delete(event);
+}*/
+
+deleteActivity(event){
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let updated_activites_state = this.state.activites;
+    let updated_activities_edit_mode = this.state.activities_edit_mode;
+    updated_activites_state[selectedActivityId]['deleted'] = true;
+    for(let[key,val] of Object.entries(updated_activities_edit_mode[selectedActivityId])){
+        updated_activities_edit_mode[selectedActivityId][key] = false;
+    }
+    this.setState({
+        activites:updated_activites_state,
+        activities_edit_mode:updated_activities_edit_mode
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
+    });
     this.toggle_delete(event);
 }
 
@@ -1341,11 +1359,13 @@ renderTable(){
         let summaryId; 
         let hour;
         let min;
-
+        let isActivityDeleted;
         for (let key of activityKeys){
             let keyValue = value[key];
-            if(key === 'summaryId')
+            if(key === 'summaryId'){
                 summaryId = keyValue;
+                isActivityDeleted = this.state.activites[summaryId]['deleted'];
+            }
 
             else if(key === "activityType"){
                 var  activityType=keyValue;
@@ -1360,7 +1380,7 @@ renderTable(){
                                           onBlur={ this.editToggleHandlerActivityType.bind(this)}>
                                                   {this.activitySelectOptions()}                                                                                                                                                                
                                           </Input> : !this.state.activites[summaryId][key]? activityType :this.state.activites[summaryId][key] }
-                             {this.props.editable &&               
+                             {this.props.editable && !isActivityDeleted &&              
                             <span  data-name = {summaryId} onClick={this.editToggleHandlerActivityType.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
@@ -1388,7 +1408,7 @@ renderTable(){
                                         <option key="hours" value=" ">Select</option>
                                     {this.createSleepDropdown_heartrate(90,220)}  
                                       </Input>: hr}
-                                       {this.props.editable &&  
+                                       {this.props.editable && !isActivityDeleted &&
                                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
                             className="fa fa-pencil fa-1x progressActivity1"
                             id = "add_button">
@@ -1402,7 +1422,7 @@ renderTable(){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                 {start_time?start_time.format('MMM D, YYYY h:mm:ss a'):''} 
-                 {this.props.editable &&                               
+                 {this.props.editable && !isActivityDeleted &&                           
                         <span 
                             data-name = {summaryId}  
                             onClick={this.editToggleHandlerStartTime.bind(this,summaryId)}
@@ -1517,7 +1537,7 @@ renderTable(){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                             {end_time?end_time.format('MMM D, YYYY h:mm:ss a'):''}  
-                          {this.props.editable &&                 
+                          {this.props.editable && !isActivityDeleted &&                
                         <span 
                             data-name = {summaryId} 
                             className="fa fa-pencil fa-1x progressActivity1"
@@ -1694,7 +1714,7 @@ renderTable(){
                                               onBlur={this.editToggleHandler_steps.bind(this)}>                       
                                           </Input>
                                           </div>:this.addingCommaToSteps(this.state.activites[summaryId][key])}
-                                {this.props.editable &&            
+                                {this.props.editable && !isActivityDeleted &&           
                             <span data-name={summaryId} onClick={this.editToggleHandler_steps.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
                                   id = "add_button">
@@ -1732,7 +1752,7 @@ renderTable(){
                                                 </label>
                                                 </span>
                                           </div>:exerciseTypeLabel}
-                           {this.props.editable &&            
+                           {this.props.editable && !isActivityDeleted &&           
                             <span data-name={summaryId} onClick={this.editToggleHandler_steps_type.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
                                   id = "add_button">
@@ -1778,7 +1798,7 @@ renderTable(){
                         </div>:duplicateInfoLabel
                     }
                     {
-                        this.props.editable &&            
+                        this.props.editable && !isActivityDeleted &&            
                         <span data-name={summaryId} onClick={this.editToggleHandler_duplicate_info.bind(this)}
                               className="fa fa-pencil fa-1x progressActivity1 "
                               id = "add_button">
@@ -1802,7 +1822,7 @@ renderTable(){
                                           </Textarea><Button data-name={summaryId} size = "sm" id={summaryId} 
                                           className="btn btn-info save_btn" onClick={ this.editToggleHandler_comments.bind(this)}>Save
                                           </Button></div>:this.state.activites[summaryId][key]}
-                                {this.props.editable &&            
+                                {this.props.editable && !isActivityDeleted &&           
                             <span data-name={summaryId} onClick={this.editToggleHandler_comments.bind(this)}
                                   className="fa fa-pencil fa-1x progressActivity1 "
                                   id = "add_button">
@@ -1816,32 +1836,39 @@ renderTable(){
                 activityData.push(<td id = "add_button">{keyValue}</td>);
 
         }
-    activityRows.push(<tr name = {summaryId} id = "add_button">{activityData}
-                         {this.props.editable &&  
-                        <span className="checkbox_delete fa fa-close martp_20"
-                         data-name={summaryId}
-                         style={{color:"red", marginTop:"15px"}}
-                         onClick={this.toggle_delete}>  
-                        </span>
-                    }
+    console.log("Is activity Deleted:",isActivityDeleted);
+    activityRows.push(
+        <tr name = {summaryId} 
+            id = "add_button" 
+            className = {isActivityDeleted? "disableElement" : ""}>
+            {activityData}
+             {this.props.editable &&  
+                <span 
+                className= {isActivityDeleted? "checkbox_delete fa  fa-check martp_20" : "checkbox_delete fa fa-close martp_20"}
+                 data-name={summaryId}
+                 style={isActivityDeleted? {color:"green", marginTop:"15px"} : {color:"red", marginTop:"15px"}}
+                 
+                 onClick={this.toggle_delete}>  
+                </span>
+              }
 
-          <Modal 
-           isOpen={this.state.modal_delete && summaryId == this.state.selectedId_delete}
-           toggle={this.toggle_delete} >
-          <ModalBody toggle={this.toggle_delete}>
-          <div className=" display_flex" >
-                                  <div className=" align_width1">
-                                   Are you sure to delete this activity?
-                                  </div>
-                               </div>
-                    </ModalBody>
-              <ModalFooter>
-                <Button color="primary" data-name={this.state.selectedId_delete} onClick={this.deleteActivity}>Yes</Button>{' '}
-                <Button color="secondary" onClick={this.toggle_delete}>No</Button>
-              </ModalFooter>
-            </Modal>
+              <Modal 
+               isOpen={this.state.modal_delete && summaryId == this.state.selectedId_delete}
+               toggle={this.toggle_delete} >
+              <ModalBody toggle={this.toggle_delete}>
+              <div className=" display_flex" >
+                                      <div className=" align_width1">
+                                       Are you sure to delete this activity?
+                                      </div>
+                                   </div>
+                        </ModalBody>
+                  <ModalFooter>
+                    <Button color="primary" data-name={this.state.selectedId_delete} onClick={this.deleteActivity}>Yes</Button>{' '}
+                    <Button color="secondary" onClick={this.toggle_delete}>No</Button>
+                  </ModalFooter>
+                </Modal>
         </tr>
-        ); 
+    ); 
     }
           
     return activityRows.reverse();
@@ -2190,7 +2217,21 @@ return(
     </span>
 </td>
 <td id = "add_button" className="add_button_back">Comment</td>
- {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
+ {
+    this.props.editable &&  
+    <td 
+        id = "add_button" 
+        className="add_button_back">
+            <span id="deleteInfoModalWindow" onClick={this.toggleInfo}>
+                <a  className="infoBtn"> 
+                    <FontAwesome style={{fontSize:"16px"}}
+                        name = "info-circle"
+                        size = "1x"                                      
+                      />
+                </a>
+            </span>
+            Delete
+    </td>}
 </thead>
 <tbody className = "tbody_styles">
 {this.renderTable()}
@@ -2210,6 +2251,27 @@ return(
         <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
             &nbsp;
             Duplicate / Non Duplicate Files
+        </span>
+        </ModalHeader>
+          <ModalBody className="modalcontent" id="duplicate_info_modal_text">
+            <div>
+            We identify potential duplicate activities by labeling them "Duplicate File". This often happens when a user has two devices capturing data for the same workout, most commonly seen when triathletes/cyclists start a watch file and a bike computer file for the same cycling workout. In order not report duplicate activities to you, WE EXCLUDE ALL DUPLICATE FILE INFORMATION FROM EXERCISE STATS ON THE SITE (WEEKLY WORKOUT SUMMARIES, RAW DATA STATS, GRADES, AEROBIC/ANAEROBIC STATS, ETC.) If we have mis-identified a file as "duplicate", you can change it back to "non-duplicate".
+            </div>
+        </ModalBody>
+    </Modal>
+{/******* INFO MODAL WINDOW FOR DELETE FUNCTIONALITY ************/}    
+    <Modal 
+        className="pop"
+        id="deleteInfoModalWindow" 
+        placement="right" 
+        isOpen={this.state.infoButton}
+        target="infoModalWindow" 
+        toggle={this.toggleInfo}>
+         <ModalHeader toggle={this.toggleInfo}>
+       <span>
+        <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+            &nbsp;
+            
         </span>
         </ModalHeader>
           <ModalBody className="modalcontent" id="duplicate_info_modal_text">
