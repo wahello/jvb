@@ -92,7 +92,6 @@ def fitbit_to_garmin_sleep(sleep_summary):
 	return garmin_sleep
 
 def fitbit_to_garmin_activities(active_summary):
-
 	garmin_activites = {
 		'summaryId': '',
 		'durationInSeconds': None,
@@ -114,7 +113,8 @@ def fitbit_to_garmin_activities(active_summary):
 		'startingLongitudeInDegree': None,
 		'steps': None, 
 		'totalElevationGainInMeters': None, 
-		'totalElevationLossInMeters': None
+		'totalElevationLossInMeters': None,
+		'resting_hr_last_night'     : None
 
 	}
 	if active_summary:
@@ -124,10 +124,14 @@ def fitbit_to_garmin_activities(active_summary):
 		garmin_activites['activityType'] = active_summary['activityName']
 		garmin_activites['activeKilocalories'] = active_summary['calories']
 		garmin_activites['distanceInMeters'] = active_summary.get("")
+		garmin_activites['averageHeartRateInBeatsPerMinute'] = active_summary.get('averageHeartRate')
 		heartRate = []
 		for hr_zone in active_summary.get('heartRateZones',[]):
 			heartRate.append(hr_zone['max'])
-		garmin_activites["averageHeartRateInBeatsPerMinute"] = sum(heartRate)/len(heartRate)
+		try:
+			garmin_activites["maxHeartRateInBeatsPerMinute"] = sum(heartRate)/len(heartRate)
+		except:
+			garmin_activites["maxHeartRateInBeatsPerMinute"] = 0
 		garmin_activites['averageRunCadenceInStepsPerMinute'] = active_summary.get("")
 		garmin_activites['averageSpeedInMetersPerSecond'] = active_summary.get("")
 		garmin_activites['averagePaceInMinutesPerKilometer'] = active_summary.get("")
@@ -138,6 +142,7 @@ def fitbit_to_garmin_activities(active_summary):
 		garmin_activites['steps'] = active_summary.get('steps',0)
 		garmin_activites['totalElevationGainInMeters'] = active_summary.get("")
 		garmin_activites['totalElevationLossInMeters'] = active_summary.get("")
+		garmin_activites['resting_hr_last_night'] = active_summary.get("")
 		return garmin_activites
 	else:
 		return None
