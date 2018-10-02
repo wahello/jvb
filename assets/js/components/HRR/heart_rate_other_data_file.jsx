@@ -13,7 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
         FormText,Label,Input, Modal, ModalHeader,
          ModalBody, ModalFooter} from 'reactstrap';
 import {updateHeartData} from '../../network/heart_cal';
-import {successHeart, errorHeart} from './heart_rate_calculation';
+
 class Other_Hrr_Data extends Component{
 	constructor(props){
 		 super(props);
@@ -258,7 +258,8 @@ class Other_Hrr_Data extends Component{
 	"created_at": "2018-09-29"
 	}*/
 
-  			updateHeartData(data, this.props.selectedDate, successHeart, errorHeart);
+  			updateHeartData(data, this.props.selectedDate, this.props.successHeart, this.props.errorHeart);
+  			this.props.alertMsg("Other Hrr Data Updated Successfully.");
   			this.props.renderHrrData(data);
   		}
 	render(){

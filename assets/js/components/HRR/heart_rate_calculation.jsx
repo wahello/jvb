@@ -31,6 +31,7 @@ class HeartRateCal extends Component{
 		    super(props, context);
 		    this.state = {
 					    	calendarOpen:false,
+					    	alertMessage: "",
 						    isOpen:false,
 						    fetching_hrr:false,
 						    editable : true,
@@ -75,6 +76,7 @@ class HeartRateCal extends Component{
 			this.captilizeYes = this.captilizeYes.bind(this);
 			this.handleDismiss = this.handleDismiss.bind(this);
     		this.handleShow = this.handleShow.bind(this);
+    		this.alertMsg = this.alertMsg.bind(this);
 			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
   	}
   	
@@ -82,7 +84,6 @@ class HeartRateCal extends Component{
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
-	  	    		show:true,
 	  	   			Did_you_measure_HRR:data.data.Did_you_measure_HRR,
 					Did_heartrate_reach_99:data.data.Did_heartrate_reach_99,
 					time_99:data.data.time_99,
@@ -359,16 +360,25 @@ class HeartRateCal extends Component{
          editable:!this.state.editable
        });
     }
+    /******* Returns text for closable alert *****/
+    alertMsg(text) {
+    	console.log("text:: "+text);
+    	this.setState({
+	  	    show:true,
+    		alertMessage:text
+    	})
+    }
   render(){
   	const {fix} = this.props;
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
-		        {
-		        	this.state.show &&
-			        <Alert bsStyle="danger" closeLabel={'close me'} onDismiss={this.handleDismiss}>
-			          hi alert!
-			        </Alert>
+		        {this.state.show &&
+			        <div className = "row justify-content-center">
+				        <Alert bsStyle="danger" onDismiss={this.handleDismiss}>
+				          {this.state.alertMessage}
+				        </Alert>
+			    	</div>
 		    	}
 		        <div style = {{marginTop:"10px"}}>
 		        	<span>
@@ -427,6 +437,9 @@ class HeartRateCal extends Component{
 						"lowest_hrr_1min":this.state.lowest_hrr_1min,
 						"No_beats_recovered":this.state.No_beats_recovered}}
 						selectedDate = {this.state.selectedDate}
+						successHeart = {this.successHeart.bind(this)}
+						errorHeart = {this.errorHeart.bind(this)}
+						alertMsg = {this.alertMsg.bind(this)}
 						renderHrrData = {this.renderHrrData.bind(this)}/>
           		}
 
@@ -441,6 +454,9 @@ class HeartRateCal extends Component{
 					"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 					"pure_time_99":this.state.pure_time_99}}
 					selectedDate = {this.state.selectedDate}
+					successHeart = {this.successHeart.bind(this)}
+					errorHeart = {this.errorHeart.bind(this)}
+					alertMsg = {this.alertMsg.bind(this)}
 					renderHrrData = {this.renderHrrData1.bind(this)}/>
           	}
 
@@ -454,6 +470,9 @@ class HeartRateCal extends Component{
 					"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
 					"no_file_beats_recovered":this.state.no_file_beats_recovered}}
           			selectedDate = {this.state.selectedDate}
+          			successHeart = {this.successHeart.bind(this)}
+					errorHeart = {this.errorHeart.bind(this)}
+					alertMsg = {this.alertMsg.bind(this)}
           			renderHrrData = {this.renderHrrNoData.bind(this)}/>   
           	}
           	

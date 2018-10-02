@@ -13,7 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
         FormText,Label,Input, Modal, ModalHeader,
          ModalBody, ModalFooter} from 'reactstrap';
 import {updateHeartData} from '../../network/heart_cal';
-import {successHeart, errorHeart} from './heart_rate_calculation';
+
 class No_Hrr_Data extends Component{
 	constructor(props){
 		 super(props);
@@ -255,7 +255,8 @@ class No_Hrr_Data extends Component{
 			"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
 		}
 		console.log("DATA: " +data);
-		updateHeartData(data, this.props.selectedDate, successHeart, errorHeart);
+		updateHeartData(data, this.props.selectedDate, this.props.successHeart, this.props.errorHeart);
+		this.props.alertMsg("No Hrr Data Updated Successfully.");
 		this.props.renderHrrData(data);
 	}
 

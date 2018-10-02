@@ -11,7 +11,6 @@ import { Collapse, Navbar, NavbarToggler,
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
 import {updateHeartData} from '../../network/heart_cal';
-import {successHeart, errorHeart} from './heart_rate_calculation';
 
 class Heartrate_Data extends Component{
 	constructor(props){
@@ -55,6 +54,7 @@ class Heartrate_Data extends Component{
 		    this.editToggleLowestHrr1min = this.editToggleLowestHrr1min.bind(this);
 		    this.editToggleNoBeats = this.editToggleNoBeats.bind(this);
 		    this.updateData = this.updateData.bind(this);
+
 		}
 		componentWillReceiveProps(nextProps) {
 			console.log("componentWillReceiveProps: "+nextProps.hrr.editable);
@@ -162,7 +162,8 @@ class Heartrate_Data extends Component{
 		    	No_beats_recovered:parseInt(this.state.No_beats_recovered),
 		    };
 		    
-  			updateHeartData(data, this.props.selectedDate, successHeart, errorHeart);
+  			updateHeartData(data, this.props.selectedDate, this.props.successHeart, this.props.errorHeart);
+  			this.props.alertMsg("Heart-rate Data updated successfully.");
   			this.props.renderHrrData(data);
   		}
 	render(){

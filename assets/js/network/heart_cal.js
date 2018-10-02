@@ -56,10 +56,10 @@ export function updateHeartData(data, selectedDate, successHeart, errorHeart){
    },
     withCredentials: true
   };
-  axios(config).then(function(response){
-    successHeart(response)
-  }).catch((error) => {
-    console.log(error.message);
+  axios(config).then((response)=>{
+   successHeart(response);
+  }).catch(function(error){
+    console.log("ERROR:: "+error);
     errorHeart(error);
   });
 }
