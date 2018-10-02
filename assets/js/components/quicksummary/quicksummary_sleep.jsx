@@ -35,18 +35,24 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Deep Sleep (hh:mm)'},
           {name: 'Light Sleep (hh:mm)'},
           {name: 'Awake Time (hh:mm)'},
-          {name: 'REM Sleep (hh:mm)'}                     
+          {name: 'REM Sleep (hh:mm)'},
+          {name: 'Garmin Stress Level'}                     
       ],
     };
   }
-getStylesGpaBeforePanalities(score){	
-      if (score>=76)
+getStylesGpaBeforePanalities(score){
+
+    if (score>=80)
         return {background:'red',color:'black'};
-      else if (score>=63 && score<=75)
-        return {background:'yellow',color:'black'};
-      else if (score >=30 && score <= 62)
-        return {background:'green',color:'white'};
-      if (score<30)
+    else if (score>=75 && score<=79)
+        return {background:'#ff8c00',color:'black'};//Orange
+    else if (score >=69 && score <= 74)
+        return {background:'#ffff00',color:'black'};//Yellow
+    else if (score >=61 && score <= 68)
+        return {background:'#32cd32',color:'white'};//Light Green
+    else if (score >=30 && score <= 60)
+        return {background:'#008000',color:'white'};//Green
+    else if (score<30)
         return {background:'red',color:'black'};
       
     }
@@ -63,16 +69,16 @@ getStylesGpaBeforePanalities(score){
 			return {background:'red',color:'black'};
 		else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00"))
 			return {background:'green',color:'white'};
-    	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
-    	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30")))
-    		return {background:'green',color:'white'};
-    	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("7:29"))
-    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00")))
-    		return {background:'yellow',color:'black'};
-    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
-    	 || (this.strToSecond("11:30")<=value && value<= this.strToSecond("12:00")))
-    		return {background:'yellow',color:'black'};	
-    }
+		else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
+		 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30")))
+			return {background:'green',color:'white'};
+		else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("7:29"))
+		 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00")))
+			return {background:'yellow',color:'black'};
+		else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
+		 || (this.strToSecond("11:30")<=value && value<= this.strToSecond("12:00")))
+			return {background:'yellow',color:'black'};	
+	}
    getDayWithDate(date){
    let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -86,6 +92,26 @@ getStylesGpaBeforePanalities(score){
     }
     return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
 }
+
+getGarminStressColors(stressValue){
+	if(stressValue != null 
+		&& stressValue != undefined 
+		&& stressValue != '-'){
+		if(stressValue >= 0 && stressValue <= 25)
+			return {background: 'green', color: 'white'}
+		else if(stressValue >= 26 && stressValue <= 50)
+			return {background: '#32CD32', color: 'white'}
+		else if(stressValue >= 51 && stressValue <= 75)
+			return {background: 'yellow', color:'black'}
+		else if(stressValue >= 76 && stressValue <= 100)
+			return {background: 'red', color: 'black' }
+		else
+			return {}
+	}else{
+		return {};
+	}
+}
+
 renderTableColumns(dateWiseData,category,classes=""){
 		let columns = [];
 		for(let [date,data] of Object.entries(dateWiseData)){
@@ -127,6 +153,12 @@ renderTableColumns(dateWiseData,category,classes=""){
 						all_data.push({value:value,
 										style:this.getStylesGpaBeforePanalities(value)})
 					}
+					else if(key == 'heartrate_variability_stress'){
+						all_data.push({
+							value:value,
+							style:this.getGarminStressColors(value)
+						});
+					} 
 					else all_data.push({value:value,
 										style:''});
 				}

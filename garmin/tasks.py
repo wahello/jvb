@@ -8,6 +8,7 @@ from .garmin_push import store_garmin_health_push
 from .models import GarminPingNotification
 from .routine_jobs.garmin_token_validator import validate_garmin_tokens
 
+
 logger = get_task_logger(__name__)
 
 @task(name="garmin.store_health_data")
@@ -62,3 +63,5 @@ def validate_garmin_health_token():
 	except Exception as e:
 		message = "Check for invalid garmin health token failed"
 		logger.error(message.format(str(e)), exc_info=True)
+
+

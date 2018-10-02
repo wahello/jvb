@@ -6,7 +6,7 @@ import json
 
 from django.db.models import Q
 
-from quicklook import calculation_helper
+from quicklook.calculations import garmin_calculation
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
 from progress_analyzer.models import CumulativeSum
@@ -67,6 +67,7 @@ class ToStressCumulative(object):
 		self.cum_days_low_stress = raw_data["cum_days_low_stress"]
 		self.cum_days_medium_stress = raw_data["cum_days_medium_stress"]
 		self.cum_days_high_stress = raw_data["cum_days_high_stress"]
+		self.cum_days_garmin_stress_lvl = raw_data["cum_days_garmin_stress_lvl"]
 
 class ToTravelCumulative(object):
 	def __init__(self,raw_data):
@@ -91,6 +92,8 @@ class ToOtherStatsCumulative(object):
 			"cum_hrr_pure_1_min_beats_lowered"]
 		self.cum_hrr_pure_time_to_99 = raw_data[
 			"cum_hrr_pure_time_to_99"]
+		self.cum_hrr_activity_end_hr = raw_data[
+			"cum_hrr_activity_end_hr"]
 		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
 
 class ToMetaCumulative(object):
@@ -130,6 +133,9 @@ class ToMetaCumulative(object):
 		]
 		self.cum_hrr_pure_time_to_99_days_count = raw_data[
 			"cum_hrr_pure_time_to_99_days_count"
+		]
+		self.cum_hrr_activity_end_hr_days_count = raw_data[
+			"cum_hrr_activity_end_hr_days_count"
 		]
 
 class ToCumulativeSum(object):
@@ -673,7 +679,7 @@ class ProgressReport():
 					return round(val,2)
 
 				elif key == 'overall_health_gpa_grade':
-					return calculation_helper.cal_overall_grade(
+					return garmin_calculation.cal_overall_grade(
 						self._get_average_for_duration(
 							todays_data.cum_overall_health_gpa_point,
 							current_data.cum_overall_health_gpa_point,alias
@@ -723,7 +729,7 @@ class ProgressReport():
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
 				elif key == 'movement_non_exercise_step_grade':
-					return calculation_helper.cal_non_exercise_step_grade(
+					return garmin_calculation.cal_non_exercise_step_grade(
 						self._get_average_for_duration(
 							todays_data.cum_non_exercise_steps,
 							current_data.cum_non_exercise_steps,alias
@@ -796,7 +802,7 @@ class ProgressReport():
 						todays_data.cum_overall_sleep_gpa,
 						current_data.cum_overall_sleep_gpa,alias),2)
 					if alias == 'today' or alias == 'yesterday':
-						return calculation_helper._get_sleep_grade_from_point(avg_sleep_gpa)
+						return garmin_calculation._get_sleep_grade_from_point(avg_sleep_gpa)
 					else:
 						return _get_sleep_grade_from_point_for_ranges(avg_sleep_gpa)
 
@@ -897,7 +903,7 @@ class ProgressReport():
 							current_meta_data.cum_mc_recorded_days_count
 						)
 
-						grade =  calculation_helper.cal_movement_consistency_grade(
+						grade =  garmin_calculation.cal_movement_consistency_grade(
 							_cal_custom_average(
 								todays_data.cum_movement_consistency_score,
 								current_data.cum_movement_consistency_score,
@@ -947,7 +953,7 @@ class ProgressReport():
 					return round(val,2)
 
 				elif key == 'exercise_consistency_grade':
-					return calculation_helper.cal_exercise_consistency_grade(
+					return garmin_calculation.cal_exercise_consistency_grade(
 						self._get_average_for_duration(
 							todays_data.cum_avg_exercise_day,
 							current_data.cum_avg_exercise_day,alias
@@ -989,7 +995,7 @@ class ProgressReport():
 						current_data.cum_prcnt_unprocessed_food_consumed_gpa,alias)
 					return round(val,2)
 				elif key == 'prcnt_unprocessed_food_grade':
-					return calculation_helper.cal_unprocessed_food_grade(
+					return garmin_calculation.cal_unprocessed_food_grade(
 						self._get_average_for_duration(
 							todays_data.cum_prcnt_unprocessed_food_consumed,
 							current_data.cum_prcnt_unprocessed_food_consumed,alias
@@ -1134,7 +1140,7 @@ class ProgressReport():
 						current_data.cum_alcohol_drink_per_week_gpa,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 				elif key == 'alcoholic_drinks_per_week_grade':
-					return calculation_helper.cal_alcohol_drink_grade(
+					return garmin_calculation.cal_alcohol_drink_grade(
 						self._get_average_for_duration(
 							todays_data.cum_average_drink_per_week,
 							current_data.cum_average_drink_per_week,alias
@@ -1283,6 +1289,21 @@ class ProgressReport():
 						else:
 							return "Not Provided"
 					return None
+				elif key == 'hrr_activity_end_hr':
+					if todays_meta_data and current_meta_data:
+						hrr_activity_end_hr = (
+							todays_meta_data.cum_hrr_activity_end_hr_days_count 
+							- current_meta_data.cum_hrr_activity_end_hr_days_count
+						)
+						val = _cal_custom_average(
+							todays_data.cum_hrr_activity_end_hr,
+							current_data.cum_hrr_activity_end_hr,
+							hrr_activity_end_hr)
+						if hrr_activity_end_hr:
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+						else:
+							return "Not Provided"
+					return None
 				elif key == 'floors_climbed':
 					val = self._get_average_for_duration(
 						todays_data.cum_floors_climbed,
@@ -1298,6 +1319,7 @@ class ProgressReport():
 			'hrr_lowest_hr_point':{d:None for d in self.duration_type},
 			'hrr_pure_1_minute_beat_lowered':{d:None for d in self.duration_type},
 			'hrr_pure_time_to_99':{d:None for d in self.duration_type},
+			'hrr_activity_end_hr':{d:None for d in self.duration_type},
 			'floors_climbed':{d:None for d in self.duration_type}
 		}
 		summary_type = "other_stats_cum"
@@ -1450,6 +1472,11 @@ class ProgressReport():
 						)
 					return days_stress_reported
 
+				elif key == "garmin_stress_lvl":
+					avg_stress_level = self._get_average_for_duration(
+						todays_data.cum_days_garmin_stress_lvl,
+						current_data.cum_days_garmin_stress_lvl,alias)
+					return round(avg_stress_level,2)
 			return None
 
 		calculated_data = {
@@ -1460,6 +1487,7 @@ class ProgressReport():
 			'number_of_days_high_stress_reported':{d:None for d in self.duration_type},
 			'prcnt_of_days_high_stress':{d:None for d in self.duration_type},
 			'days_stress_level_reported':{d:None for d in self.duration_type},
+			'garmin_stress_lvl':{d:None for d in self.duration_type}
 		}
 		summary_type = "stress_cum"
 

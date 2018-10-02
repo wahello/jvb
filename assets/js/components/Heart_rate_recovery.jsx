@@ -370,11 +370,13 @@ class HeartRate extends Component{
 						else if(keyvalue == "aerobic_zone"){
 							 td_values.push(<td>Aerobic Zone</td>);
 						}
-						else{
-							td_values.push(<td>Anaerobic Zone</td>);
+						else if(keyvalue == "anaerobic_zone"){
+							 td_values.push(<td>Anaerobic Range</td>);
 						}
-					   
-					}
+						else{
+							td_values.push(<td>Heart rate not recorded</td>);
+						}
+					   }
 					else if(key == "prcnt_total_duration_in_zone"){
 						let keyvalue = this.renderpercentage(value[key]);
 					    td_values.push(<td>{keyvalue}</td>);

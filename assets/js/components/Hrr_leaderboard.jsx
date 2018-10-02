@@ -22,6 +22,8 @@ class HrrLeaderboard extends Component{
 		this.heartBeatsColors = this.heartBeatsColors.bind(this);
 		this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		this.time99Colors = this.time99Colors.bind(this);
+		
 	}
 	heartBeatsColors(value){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
@@ -42,6 +44,45 @@ class HrrLeaderboard extends Component{
 	  		}
   		}
   		return <td style ={{background:background,color:color}} className ="overall_rank_value">{value}</td>
+  	}
+  	time99Colors(score,value){
+  		/* Applying the colors for the table cells depends upon their heart beat ranges*/
+  		let background = "";
+		let color = "";
+		let hr_background = "";
+  		if(!isNaN(value)){
+	            if(value >= 3.4){
+	           		background = 'green';
+	               	color = 'white';
+	               	hr_background = 'white';
+	            }
+	            else if(value >= 3 && value <= 3.39){
+	                background = '#32CD32';
+	                color = 'white';
+	                hr_background = 'white';
+	            }
+	            else if(value >= 2 && value < 3){
+	                background = '#FFFF01';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value >= 1 && value < 2){
+	                background = '#E26B0A';
+	                color = 'black';
+	                hr_background = 'black';
+	            }
+	            else if(value < 1 && value != -1) {
+	            	background = 'red';
+	            	color = 'black';
+	            	hr_background = 'black';
+	            }
+	            else{
+	            background = 'white';
+	            color = '#5e5e5e';
+	            hr_background = '#E5E5E5';
+        }
+	        }
+  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score}</td>
   	}
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -108,7 +149,45 @@ class HrrLeaderboard extends Component{
 	}
 	componentDidMount(){
 		window.addEventListener('orientationchange', this.doOnOrientationChange);
-	}
+
+		/**** Sticky Header on scroll ********/ 
+		window.addEventListener('scroll', this.handleScroll);
+
+		/****** mobile table styles *******/
+		let getTable = this.refs.hrr_table;
+
+		if(screen.width < 1023){
+			getTable.classList.add('table_padd')
+		}
+		else{
+			getTable.classList.remove('table_padd')
+		}
+		
+		/***********************/
+		let header = this.refs.table_header_hrr;		
+		if(screen.width < 650){
+			  header.classList.remove("hrr_sticky");
+		}
+
+	};
+
+
+	/******* sticky table header on scroll ********/
+	handleScroll = () => {
+		 let header = this.refs.table_header_hrr;	
+		 var rect = header.getBoundingClientRect()
+		 let sticky = rect.top+80;
+
+		 if(screen.width > 650){
+		 	if (window.pageYOffset > sticky) {
+		    header.classList.add("hrr_sticky");
+		  } else {
+		    header.classList.remove("hrr_sticky");
+		  }
+		 }
+
+	};
+
 	renderTable(Hrr_data,Hrr_username){
 		let operationCount = 0;
 		let td_rows = [];
@@ -132,8 +211,10 @@ class HrrLeaderboard extends Component{
 						currentUser = '';
 					}
 				}
+
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
-					for(let [key3,value4] of Object.entries(value[key1])){
+					for(let key3 of ['score','rank']){
+						let value4 = value[key1][key3];
 						if(key3 == "rank"){
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
@@ -142,13 +223,28 @@ class HrrLeaderboard extends Component{
 						}
 					}
 				}
-				else{
-					for(let [key3,value4] of Object.entries(value[key1])){
+				
+				else if(key1 == "time_99" || key1 == "pure_time_99"){
+					for(let key3 of ['score','rank']){
+						let value4 = value[key1][key3];
 						if(key3 == "rank"){
 							td_values.push(<td className ="overall_rank_value">{value4}</td>);
 						}
 						else if(key3 == "score"){
+							td_values.push(this.time99Colors(value4.value,value[key1].other_scores.points));
+						}
+						
+					}
+				}
+				else{
+					for(let key3 of ['score','rank']){
+						if(key3 == "rank"){
+							let value4 = value[key1][key3];
+							td_values.push(<td className ="overall_rank_value">{value4}</td>);
+						}
+						else if(key3 == "score"){
 							td_values.push(<td className ="overall_rank_value">{value4.value}</td>);
+
 						}
 					}
 				}
@@ -158,8 +254,8 @@ class HrrLeaderboard extends Component{
 			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
 		let table = <div className = "table table-responsive table-bordered">
-			          	    <table id="my-table" className = "table table-striped ">
-								<tr>
+			          	    <table id="my-table" className = "table table-striped">
+								<tr ref="table_header_hrr">
 									<th>Overall HRR Rank</th>
 									<th>User</th>
 									<th>Time to 99 (hh:mm)</th>
@@ -182,7 +278,7 @@ class HrrLeaderboard extends Component{
 	render(){
 		return(
 				<div className = "container-fluid">
-					<div className = "row table_padd">
+					<div className = "hrr_table" ref="hrr_table">
 						{this.renderTable(this.props.Hrr_data,this.props.Hrr_username)}	
 					</div>	
 				</div>

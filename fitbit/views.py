@@ -116,7 +116,7 @@ def api_fitbit(session,date_fitbit):
 	'''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
 	activity_fitbit = session.get(
-	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
 	date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
@@ -248,7 +248,7 @@ def fetching_data_fitbit(request):
 		client secret   ---- e83ed7f9b5c3d49c89d6bdd0b4671b2b
 		redirect url    ---- https://app.jvbwellness.com/callbacks/fitbit
 	test
-		client id 		---- 22CN46
+		client id 		---- 22CN2D
 		client secret   ---- 94d717c6ec36c270ed59cc8b5564166f
 		redirect url    ---- http://127.0.0.1:8000/callbacks/fitbit
 '''		 

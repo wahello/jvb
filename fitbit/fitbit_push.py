@@ -20,7 +20,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-
 from rauth import OAuth2Service, OAuth2Session
 
 from .models import FitbitConnectToken,\
@@ -31,8 +30,12 @@ from .models import FitbitConnectToken,\
 					FitbitNotifications,\
 					UserFitbitDatabody,\
 					UserFitbitDatafoods
-
-
+from quicklook.tasks import generate_quicklook
+from garmin.garmin_push import _get_data_start_end_time
+from progress_analyzer.tasks import (
+	generate_cumulative_instances_custom_range,
+	set_pa_report_update_date
+)
 def refresh_token_for_notification(user):
 	'''
 	This function updates the expired tokens in database
@@ -188,7 +191,7 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		create_notification.state = "processing"
 		create_notification.save()
 		activity_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
+		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
 			user_id,date))
 		heartrate_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
@@ -274,21 +277,31 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "activity_fitbit" == key:
 				date_of_activity = value['pagination']['afterDate']
-				try:
-					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
-					update_fitbit_data(user,date_of_activity,create_notification,value,key)
-					print("Updated Activity-Fitbit successfully")
-					if create_notification != None:
-						create_notification.state = "processed"
-						create_notification.save()
-				except UserFitbitDataActivities.DoesNotExist:
-					UserFitbitDataActivities.objects.create(user=user,
-					date_of_activities=date_of_activity,
-					activities_data=value,created_at=start_date)
-					print("Created Activity-Fitbit successfully")
-					if create_notification != None:
-						create_notification.state = "processed"
-						create_notification.save()
+				if value["activities"]:
+					fitbit_date = value['activities'][0].get("originalStartTime",0)
+					fitbit_date = fitbit_date[:10]
+					fitbit_date_obj = datetime.strptime(
+						fitbit_date, '%Y-%m-%d').date()
+
+					# print(fitbit_date_obj,"type of the activty")
+				else:
+					fitbit_date_obj = 0
+				if fitbit_date_obj == start_date:
+					try:
+						activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
+						update_fitbit_data(user,date_of_activity,create_notification,value,key)
+						print("Updated Activity-Fitbit successfully")
+						if create_notification != None:
+							create_notification.state = "processed"
+							create_notification.save()
+					except UserFitbitDataActivities.DoesNotExist:
+						UserFitbitDataActivities.objects.create(user=user,
+						date_of_activities=date_of_activity,
+						activities_data=value,created_at=start_date)
+						print("Created Activity-Fitbit successfully")
+						if create_notification != None:
+							create_notification.state = "processed"
+							create_notification.save()
 
 		except (KeyError, IndexError):
 			logging.exception("message")
@@ -378,5 +391,38 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 			if create_notification != None:
 				create_notification.state = "failed"
 				create_notification.save()	
-
+# Call celery task to calculate/recalculate quick look for date to
+					# which received data belongs for the target user
+	job_to_update_fitbit_raw_data(user, start_date, start_date)
 	return None
+
+
+def job_to_update_fitbit_raw_data(user, start_date, end_date):
+	'''
+	This function is to run the job to automatically updating the raw data calculation when new fitbit data arrives.
+	'''
+	str_start_date = start_date.strftime('%Y-%m-%d')
+	str_end_date = end_date.strftime('%Y-%m-%d')
+	yesterday = datetime.now() - timedelta(days=1)
+
+	if start_date == yesterday.date():
+		# if receive yesterday data then update the cumulative sums for yesterday
+		# as well.  
+		chain = (
+			generate_quicklook.si(user.id,str_start_date,str_end_date)|
+		 	generate_cumulative_instances_custom_range.si(
+		 		user.id,str_start_date,str_start_date
+		 	)
+		)
+		chain.delay()
+	elif start_date != datetime.now().date():
+		# if received data is not for today (some historical data) then
+		# we have to update all the PA report from that date. So we need to record
+		# this date in database and update PA later as a celery task
+		generate_quicklook.delay(user.id,str_start_date,str_end_date)
+		set_pa_report_update_date.delay(
+			user.id, 
+			str_start_date
+		)
+	else:
+		generate_quicklook.delay(user.id,str_start_date,str_end_date)
