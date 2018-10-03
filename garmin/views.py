@@ -191,7 +191,6 @@ class GarminConnectPing(APIView):
 		file_name = request.data['uploadMetaData']
 		oauthToken_fitfile = ast.literal_eval(file_name)
 		file_oauth = oauthToken_fitfile['oauthToken']
-
 		date_now = datetime.now()
 		date_str = date_now.strftime("%Y-%m-%d")
 		try:

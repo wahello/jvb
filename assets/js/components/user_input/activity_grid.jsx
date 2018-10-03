@@ -48,6 +48,7 @@ const activites = { "":"Select",
 "PADDLING":"PADDLING",
 "PILATES":"PILATES",
 "PIYO-PILATES/YOGA":"PIYO-PILATES/YOGA",
+"RECESS_PLAYING":"RECESS PLAYING",
 "RECUMBENT_CYCLING":"RECUMBENT CYCLING",
 "RESORT_SKIING_SNOWBOARDING":"RESORT SKIING SNOW BOARDING",
 "ROAD_BIKING":"ROAD BIKING",
@@ -94,6 +95,9 @@ this.handleChange_time = this.handleChange_time.bind(this);
 this.handleChange_comments = this.handleChange_comments.bind(this);
 this.handleChange_steps = this.handleChange_steps.bind(this);
 this.handleChange_steps_type = this.handleChange_steps_type.bind(this);
+/************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
+this.handleChange_duplicate_info = this.handleChange_duplicate_info.bind(this);
+/************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 this.handleChange_start_time=this.handleChange_start_time.bind(this);
 this.handleChange_end_time=this.handleChange_end_time.bind(this);          
 this.createSleepDropdown = this.createSleepDropdown.bind(this);
@@ -123,6 +127,8 @@ this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
 this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
 let selected_date = this.props.selected_date;
+this.toggleInfo=this.toggleInfo.bind(this);
+this.infoPrint = this.infoPrint.bind(this);
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -139,6 +145,7 @@ this.state ={
     modal_activity_sec:"",
     modal_exercise_steps:"",
     modal_exercise_steps_status:"",
+    modal_duplicate_info_status:false,
     modal_activity_comment:"",
     activity_display_name:"",
     editToggle_heartrate:false,
@@ -170,6 +177,7 @@ this.state ={
     getselectedid:'',
     selectedId_starttime:'',
     selectedId_delete:'',
+    infoButton:false
 }
 }
 
@@ -363,6 +371,7 @@ toggleModal(){
       modal_activity_min:"",
       modal_exercise_steps:"",
       modal_exercise_steps_status:"",
+      modal_duplicate_info_status:false,
       modal_activity_comment:"",
       selectedActivityId:"",
       activitystarttime_calender:"",
@@ -415,6 +424,7 @@ handleChangeModal(event){
     modal_activity_min:mins,
     modal_exercise_steps:current_activity?current_activity.steps:"",
     modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
+    modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
     modal_activity_comment:current_activity?current_activity.comments:"",
     selectedActivityId:selectedActivityId,
     activityEditModal:true,
@@ -525,24 +535,24 @@ editToggleHandlerEndTime(selectedActivityId,event){
 }
 
 
-  editToggleHandler_comments(event){
-  $('#'+selectedActivityId,).css('display','block');
-  const target = event.target;
-   const selectedActivityId = target.getAttribute('data-name');
-     let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+    editToggleHandler_comments(event){
+    $('#'+selectedActivityId,).css('display','block');
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let categoryMode = this.state.activities_edit_mode[selectedActivityId];
             
-      categoryMode['comments'] = !categoryMode['comments'] 
-if(selectedActivityId){
-    this.setState({
-    ...this.state.activities_edit_mode,
-        [selectedActivityId]:categoryMode
-      },()=>{
-        this.props.updateParentActivities(this.state.activites);
-      });
-   if(!categoryMode['comments']){
-      $('#'+selectedActivityId).css('display','none');
+    categoryMode['comments'] = !categoryMode['comments'] 
+    if(selectedActivityId){
+        this.setState({
+            ...this.state.activities_edit_mode,
+            [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+       if(!categoryMode['comments']){
+            $('#'+selectedActivityId).css('display','none');
 
-   }
+        }
     }
   }
   editToggleHandler_steps(event){
@@ -573,6 +583,24 @@ editToggleHandler_steps_type(event){
         });
     }
 }
+
+/************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
+editToggleHandler_duplicate_info(event) {
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+    categoryMode['duplicate'] = !categoryMode['duplicate'] 
+    if(selectedActivityId){
+        this.setState({
+            ...this.state.activities_edit_mode,
+            [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+    }
+}
+/************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
+
 editToggleHandlerDuration(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -802,6 +830,26 @@ handleChange_steps_type(event){
       });
     }
 }
+
+/************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
+handleChange_duplicate_info(event) {
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let activity_data = this.state.activites[selectedActivityId];
+    let duplicate = activity_data['duplicate'];
+    if(duplicate == false)
+        duplicate = true;
+    else
+        duplicate = false;
+
+    activity_data['duplicate'] = duplicate;
+    if(true){
+      this.setState({
+        [selectedActivityId]: activity_data
+      });
+    }
+}
+/************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
   hour = hour ? parseInt(hour) : 0;
   min = min ? parseInt(min) : 0;
@@ -938,7 +986,7 @@ EndTimeInSecondsSaveCalender(event){
 handleChange(event){
     const target = event.target;
     const value = target.value;
-    const name = target.name;
+    const name = target.name;//modal_duplicate_info_status
     if(value== "OTHER"){
         this.setState({
             [name]: value,
@@ -955,6 +1003,11 @@ handleChange(event){
         || name == "modal_exercise_steps"){
         this.setState({
             [name]: parseInt(value)
+        });
+    }
+    else if (name == "modal_duplicate_info_status"){
+        this.setState({
+            [name]: (value == "true")
         });
     }
     else{
@@ -1026,6 +1079,7 @@ CreateNewActivity(data){
         "durationInSeconds":durationSeconds,
         "steps":steps,
         "steps_type":this.state.modal_exercise_steps_status,
+        "duplicate":this.state.modal_duplicate_info_status,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
         "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds,
@@ -1057,6 +1111,7 @@ CreateNewActivity(data){
         modal_activity_min:"",
         modal_exercise_steps:"",
         modal_exercise_steps_status:"",
+        modal_duplicate_info_status:false,
         modal_activity_comment:"",
         activitystarttime_calender:"",
         modalstarttime_activity_hour:"",
@@ -1254,9 +1309,32 @@ handleChangeModalActivityTime(event){
     });
 }
  
+toggleInfo(){
+    this.setState({
+      infoButton:!this.state.infoButton
+    });
+}
+infoPrint(){
+    var mywindow = window.open('', 'PRINT');
+    mywindow.document.write('<html><head><style>' +
+        '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
+        '.print {visibility: hidden;}' +
+        '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
+        '</style><title>' + document.title  + '</title>');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write('<h1>' + document.title  + '</h1>');
+    mywindow.document.write(document.getElementById('duplicate_info_modal_text').innerHTML);
+    mywindow.document.write('</body></html>');
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
+    mywindow.print();
+    mywindow.close();
+   }
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
-        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","comments"];
+        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
         let activityData = [];
@@ -1626,7 +1704,7 @@ renderTable(){
             }
 
              else if(key === "steps_type"){
-                 let  steps_type=keyValue;
+                 let steps_type=keyValue;
                  let exerciseTypeLabel = "Not Categorized";
                  if(this.state.activites[summaryId][key] == "exercise")
                     exerciseTypeLabel = "Exercise";
@@ -1662,6 +1740,53 @@ renderTable(){
                         }
                         </td>);
             }
+            //duplicate_info
+            /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
+            else if(key === "duplicate"){
+                let duplicate_info = keyValue;
+                let duplicateInfoLabel = "Not Duplicate";
+                if(this.state.activites[summaryId][key] == true)
+                    duplicateInfoLabel = "Duplicate";
+                else if (this.state.activites[summaryId][key] == false)
+                    duplicateInfoLabel = "Not Duplicate";
+
+                activityData.push(
+                    <td name={summaryId} className="comment_td" id = "add_button">
+                    { 
+                        this.state.activities_edit_mode[summaryId][key]?
+                        <div>
+                            <span>
+                                {duplicateInfoLabel}
+                            </span>
+                            <span>
+                                <label className="switch">
+                                    <input type="checkbox"
+                                        data-name={summaryId}
+                                        id="text_area"
+                                        style = {{marginLeft:"60px"}}
+                                        className="form-control"
+                                        value={this.state.activites[summaryId][key]} 
+
+                                        onChange={this.handleChange_duplicate_info}
+                                        disabled = {!true}
+                                        checked = {this.state.activites[summaryId][key] == true}
+                                        onBlur={this.editToggleHandler_duplicate_info.bind(this)}
+                                       />
+                                    <span className="slider round"></span>
+                                </label>
+                            </span>
+                        </div>:duplicateInfoLabel
+                    }
+                    {
+                        this.props.editable &&            
+                        <span data-name={summaryId} onClick={this.editToggleHandler_duplicate_info.bind(this)}
+                              className="fa fa-pencil fa-1x progressActivity1 "
+                              id = "add_button">
+                        </span>
+                    }
+                </td>);
+            }
+            /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
             else if(key === "comments"){
                 let  comments=keyValue;
                 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
@@ -1993,7 +2118,25 @@ renderEditActivityModal(){
                         </div>
                        </FormGroup>
                        <FormGroup>
-                      <Label className="padding1">8. Exercise Comments</Label>
+                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                      <Label className="padding1">9. Exercise Comments</Label>
                        <div className="input1 ">
                         <Textarea 
                           className="form-control"
@@ -2035,6 +2178,17 @@ return(
 <td id = "add_button" className="add_button_back">Exercise Duration (hh:mm:ss)</td>
 <td id = "add_button" className="add_button_back">Exercise Steps</td>
 <td id = "add_button" className="add_button_back">Steps Type </td>
+<td id = "add_button" className="add_button_back">
+    Duplicate Info 
+    <span id="infoModalWindow" onClick={this.toggleInfo}>
+        <a  className="infoBtn"> 
+            <FontAwesome style={{fontSize:"16px"}}
+                name = "info-circle"
+                size = "1x"                                      
+              />
+        </a>
+    </span>
+</td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {this.props.editable &&  <td id = "add_button" className="add_button_back">Delete</td>}
 </thead>
@@ -2042,6 +2196,28 @@ return(
 {this.renderTable()}
 </tbody>
 </table>
+{/*/************MODAL WINDOW FOR INFO BUTTON*************/}
+
+    <Modal 
+        className="pop"
+        id="infoModalWindow" 
+        placement="right" 
+        isOpen={this.state.infoButton}
+        target="infoModalWindow" 
+        toggle={this.toggleInfo}>
+         <ModalHeader toggle={this.toggleInfo}>
+       <span>
+        <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+            &nbsp;
+            Duplicate / Non Duplicate Files
+        </span>
+        </ModalHeader>
+          <ModalBody className="modalcontent" id="duplicate_info_modal_text">
+            <div>
+            We identify potential duplicate activities by labeling them "Duplicate File". This often happens when a user has two devices capturing data for the same workout, most commonly seen when triathletes/cyclists start a watch file and a bike computer file for the same cycling workout. In order not report duplicate activities to you, WE EXCLUDE ALL DUPLICATE FILE INFORMATION FROM EXERCISE STATS ON THE SITE (WEEKLY WORKOUT SUMMARIES, RAW DATA STATS, GRADES, AEROBIC/ANAEROBIC STATS, ETC.) If we have mis-identified a file as "duplicate", you can change it back to "non-duplicate".
+            </div>
+        </ModalBody>
+    </Modal>
 </div>
 {this.props.editable && 
  <div className="activity_add_btn btn4 mar_20 row"> 

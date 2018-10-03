@@ -614,7 +614,7 @@ def _get_hrr_api_data(user,date):
 				formated_data['hrr_pure_1_min_beats_lowered'] = pure_1min_heart_beats
 
 			pure_time_99 = _safe_get_mobj(data,"pure_time_99",0)
-			if pure_time_99:
+			if pure_time_99 and pure_time_99 != -1:
 				pure_time_99_in_min = round(
 					pure_time_99 / 60, 3)
 				formated_data["hrr_pure_time_to_99"] = pure_time_99_in_min

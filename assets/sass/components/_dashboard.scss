@@ -1,4 +1,4 @@
-body{
+	body{
 	overflow-x: hidden !important;
 }
 .padding{
@@ -82,4 +82,56 @@ body{
  	.navbar-collapse{
  		box-shadow: none;
  	}
+}
+
+/*Weekly workout table*/
+@media (min-width: 375px) and (max-width: 667px){
+	.weeklyWorkoutTable {	
+		font-size:60% !important;
+		width: 40px !important;
+	}
+	.mnh-mobile-view {
+		font-size:70% !important;
+	}
+}
+
+.boldText {
+	font-weight: bold;
+}
+
+.weeklyWorkoutTable th{
+	vertical-align: middle !important;
+	min-width: 70px !important;
+}
+
+.weeklyWorkoutTable th tr td, .weeklyWorkoutTable th tr{
+	border:none !important;
+}
+
+.weeklyWorkoutTable .weeklyWorkoutTHMatrix tr:first-child {
+	border-bottom: 1px solid #dee2e6 !important;	
+}
+.weeklyWorkoutTable th tr td:first-child {
+	border-right: 1px solid #dee2e6 !important;
+}
+
+.weeklyWorkoutTable {	
+	font-size:10px;
+	table-layout: auto;
+	width: 50px;
+	margin-left:auto; 
+    margin-right:auto;
+}
+.weeklyWorkoutTHMatrix {
+	padding: 0px !important;
+}
+.weeklyWorkoutTable tr{
+	border: none !important;
+}
+.weeklyWorkoutTable td{
+	padding: 0px !important;
+	vertical-align: middle !important;
+}
+.weeklyWorkoutTable tbody td{
+	padding: 3px 6px !important;
 }
