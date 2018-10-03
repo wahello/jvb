@@ -127,7 +127,8 @@ this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
 this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
 let selected_date = this.props.selected_date;
-this.toggleInfo=this.toggleInfo.bind(this);
+this.toggleInfo_duplicate=this.toggleInfo_duplicate.bind(this);
+this.toggleInfo_delete=this.toggleInfo_delete.bind(this);
 this.infoPrint = this.infoPrint.bind(this);
 this.state ={
     selected_date:selected_date,
@@ -177,7 +178,8 @@ this.state ={
     getselectedid:'',
     selectedId_starttime:'',
     selectedId_delete:'',
-    infoButton:false
+    infoButton_duplicate:false,
+    infoButton_delete:false
 }
 }
 
@@ -1327,12 +1329,17 @@ handleChangeModalActivityTime(event){
     });
 }
  
-toggleInfo(){
+toggleInfo_duplicate(){
     this.setState({
-      infoButton:!this.state.infoButton
+      infoButton_duplicate:!this.state.infoButton_duplicate
     });
 }
-infoPrint(){
+toggleInfo_delete(){
+    this.setState({
+      infoButton_delete:!this.state.infoButton_delete
+    });
+}
+infoPrint(infoPrintText){
     var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
         '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
@@ -1341,7 +1348,7 @@ infoPrint(){
         '</style><title>' + document.title  + '</title>');
     mywindow.document.write('</head><body >');
     mywindow.document.write('<h1>' + document.title  + '</h1>');
-    mywindow.document.write(document.getElementById('duplicate_info_modal_text').innerHTML);
+    mywindow.document.write(document.getElementById(infoPrintText).innerHTML);
     mywindow.document.write('</body></html>');
 
     mywindow.document.close(); // necessary for IE >= 10
@@ -2207,7 +2214,7 @@ return(
 <td id = "add_button" className="add_button_back">Steps Type </td>
 <td id = "add_button" className="add_button_back">
     Duplicate Info 
-    <span id="infoModalWindow" onClick={this.toggleInfo}>
+    <span id="infoModalWindow" onClick={this.toggleInfo_duplicate}>
         <a  className="infoBtn"> 
             <FontAwesome style={{fontSize:"16px"}}
                 name = "info-circle"
@@ -2222,7 +2229,8 @@ return(
     <td 
         id = "add_button" 
         className="add_button_back">
-            <span id="deleteInfoModalWindow" onClick={this.toggleInfo}>
+        Delete
+            <span id="deleteInfoModalWindow" onClick={this.toggleInfo_delete}>
                 <a  className="infoBtn"> 
                     <FontAwesome style={{fontSize:"16px"}}
                         name = "info-circle"
@@ -2230,7 +2238,7 @@ return(
                       />
                 </a>
             </span>
-            Delete
+            
     </td>}
 </thead>
 <tbody className = "tbody_styles">
@@ -2243,12 +2251,12 @@ return(
         className="pop"
         id="infoModalWindow" 
         placement="right" 
-        isOpen={this.state.infoButton}
+        isOpen={this.state.infoButton_duplicate}
         target="infoModalWindow" 
-        toggle={this.toggleInfo}>
-         <ModalHeader toggle={this.toggleInfo}>
+        toggle={this.toggleInfo_duplicate}>
+         <ModalHeader toggle={this.toggleInfo_duplicate}>
        <span>
-        <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+        <a href="#" onClick={()=>this.infoPrint("duplicate_info_modal_text")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
             &nbsp;
             Duplicate / Non Duplicate Files
         </span>
@@ -2264,19 +2272,19 @@ return(
         className="pop"
         id="deleteInfoModalWindow" 
         placement="right" 
-        isOpen={this.state.infoButton}
-        target="infoModalWindow" 
-        toggle={this.toggleInfo}>
-         <ModalHeader toggle={this.toggleInfo}>
+        isOpen={this.state.infoButton_delete}
+        target="deleteInfoModalWindow" 
+        toggle={this.toggleInfo_delete}>
+         <ModalHeader toggle={this.toggleInfo_delete}>
        <span>
-        <a href="#" onClick={this.infoPrint} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
+        <a href="#" onClick={() => this.infoPrint("delete_info_modal_text")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
             &nbsp;
-            
+            Delete Functionality
         </span>
         </ModalHeader>
-          <ModalBody className="modalcontent" id="duplicate_info_modal_text">
+          <ModalBody className="modalcontent" id="delete_info_modal_text">
             <div>
-            We identify potential duplicate activities by labeling them "Duplicate File". This often happens when a user has two devices capturing data for the same workout, most commonly seen when triathletes/cyclists start a watch file and a bike computer file for the same cycling workout. In order not report duplicate activities to you, WE EXCLUDE ALL DUPLICATE FILE INFORMATION FROM EXERCISE STATS ON THE SITE (WEEKLY WORKOUT SUMMARIES, RAW DATA STATS, GRADES, AEROBIC/ANAEROBIC STATS, ETC.) If we have mis-identified a file as "duplicate", you can change it back to "non-duplicate".
+            If you would like to delete an activity, click the X button and the activity file be deleted. If you delete a file, this will remove all stats from the deleted activity file everywhere on our website, including but not limited to in the raw data section, progress analyzer, aerobic/anaerobic charts, heart rate recovery, etc. We store all deleted files, so if you deleted the file by mistake, email us at info@jvbwellness.com and we can restore this file for you and include it in your stats.
             </div>
         </ModalBody>
     </Modal>
