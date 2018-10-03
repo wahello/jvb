@@ -16,7 +16,7 @@ export default function fetchHeartData(successHeart,errorHeart,selectedDate){
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successHeart(response);
+   successHeart(response,"fetch");
   }).catch(function(error){
     errorHeart(error);
   });
@@ -57,7 +57,7 @@ export function updateHeartData(data, selectedDate, successHeart, errorHeart){
     withCredentials: true
   };
   axios(config).then((response)=>{
-   successHeart(response);
+   successHeart(response,"update");
   }).catch(function(error){
     console.log("ERROR:: "+error);
     errorHeart(error);

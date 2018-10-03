@@ -13,6 +13,8 @@ import { Collapse, Navbar, NavbarToggler,
         FormText,Label,Input, Modal, ModalHeader,
          ModalBody, ModalFooter} from 'reactstrap';
 import {updateHeartData} from '../../network/heart_cal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 class Other_Hrr_Data extends Component{
 	constructor(props){
@@ -245,21 +247,13 @@ class Other_Hrr_Data extends Component{
 				"pure_1min_heart_beats":parseInt(this.state.pure_1min_heart_beats),
 				"pure_time_99":pure_time_99
 			}
-			/*
-	{
-	"end_time_activity": 1538182800000,
-	"Did_you_measure_HRR": "yes",
-	"no_fitfile_hrr_reach_99": "yes",
-	"no_fitfile_hrr_time_reach_99": 420,
-	"time_heart_rate_reached_99": 1538193600000,
-	"end_heartrate_activity": 80,
-	"lowest_hrr_no_fitfile": 72,
-	"no_file_beats_recovered": 88,
-	"created_at": "2018-09-29"
-	}*/
 
   			updateHeartData(data, this.props.selectedDate, this.props.successHeart, this.props.errorHeart);
-  			this.props.alertMsg("Other Hrr Data Updated Successfully.");
+  			
+  			toast.info("Updated Other Heart-rate Data!",{
+		          className:"dark"
+		    });
+  			
   			this.props.renderHrrData(data);
   		}
 	render(){
@@ -595,7 +589,16 @@ class Other_Hrr_Data extends Component{
 									</td>
 				          	    </tr>
 			          	    </tbody>
-		          	    </table>   
+		          	    </table> 
+		          	    <ToastContainer 
+		                    position="top-center"
+		                    type="success"
+		                    autoClose={5000}
+		                    hideProgressBar={true}
+		                    newestOnTop={false}
+		                    closeOnClick
+		                    className="toast-popup"
+		                />  
 	          	    </div>
           	  </div>
           	  	<div className = "row justify-content-center">

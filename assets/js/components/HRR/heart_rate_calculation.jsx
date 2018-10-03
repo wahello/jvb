@@ -19,7 +19,6 @@ import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 import Heartrate_Data from './heartrate_data_file';
 import Other_Hrr_Data from './heart_rate_other_data_file';
 import No_Hrr_Data from './heart_rate_no_data.jsx'; 
-import { Alert } from 'reactstrap';
 
 axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
@@ -31,7 +30,6 @@ class HeartRateCal extends Component{
 		    super(props, context);
 		    this.state = {
 					    	calendarOpen:false,
-					    	alertMessage: "",
 						    isOpen:false,
 						    fetching_hrr:false,
 						    editable : true,
@@ -58,8 +56,7 @@ class HeartRateCal extends Component{
 							"no_file_beats_recovered":"",
 
 							"offset":"",
-							edit_did_you_measure_HRR:"",
-							show: false,
+							edit_did_you_measure_HRR:""
 		   				}
 		    this.toggleCalendar = this.toggleCalendar.bind(this);
 		    this.toggleEditForm = this.toggleEditForm.bind(this);
@@ -74,9 +71,6 @@ class HeartRateCal extends Component{
 			this.renderSecToMin = this.renderSecToMin.bind(this);
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
-			this.handleDismiss = this.handleDismiss.bind(this);
-    		this.handleShow = this.handleShow.bind(this);
-    		this.alertMsg = this.alertMsg.bind(this);
 			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
   	}
   	
@@ -107,16 +101,6 @@ class HeartRateCal extends Component{
 
 					offset:data.data.offset,
 	  	});
-	  	//setTimeout("alert('Hello')", 1000);
-	  	setTimeout(this.handleDismiss, 5000);
-	}
-
-	handleDismiss() {
-	    this.setState({ show: false });
-	}
-
-	handleShow() {
-	    this.setState({ show: true });
 	}
 
     errorHeart(error){
@@ -124,7 +108,6 @@ class HeartRateCal extends Component{
 		this.setState({
 			fetching_hrr:false,
 		})
-		setTimeout(this.handleDismiss, 5000);
     }
     renderAddDate(){
 		/*It is forward arrow button for the calender getting the next day date*/
@@ -360,26 +343,12 @@ class HeartRateCal extends Component{
          editable:!this.state.editable
        });
     }
-    /******* Returns text for closable alert *****/
-    alertMsg(text) {
-    	console.log("text:: "+text);
-    	this.setState({
-	  	    show:true,
-    		alertMessage:text
-    	})
-    }
+    
   render(){
   	const {fix} = this.props;
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
-		        {this.state.show &&
-			        <div className = "row justify-content-center">
-				        <Alert bsStyle="danger" onDismiss={this.handleDismiss}>
-				          {this.state.alertMessage}
-				        </Alert>
-			    	</div>
-		    	}
 		        <div style = {{marginTop:"10px"}}>
 		        	<span>
 		        		<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
@@ -403,7 +372,8 @@ class HeartRateCal extends Component{
 			                />
 						</span>
 		        	</span>
-		        	<span className = "button_padding">
+		        	&nbsp;&nbsp;
+		        	<span>
                     	<Button 
                            id="nav-btn"
                               size="sm"
@@ -439,7 +409,6 @@ class HeartRateCal extends Component{
 						selectedDate = {this.state.selectedDate}
 						successHeart = {this.successHeart.bind(this)}
 						errorHeart = {this.errorHeart.bind(this)}
-						alertMsg = {this.alertMsg.bind(this)}
 						renderHrrData = {this.renderHrrData.bind(this)}/>
           		}
 
@@ -456,7 +425,6 @@ class HeartRateCal extends Component{
 					selectedDate = {this.state.selectedDate}
 					successHeart = {this.successHeart.bind(this)}
 					errorHeart = {this.errorHeart.bind(this)}
-					alertMsg = {this.alertMsg.bind(this)}
 					renderHrrData = {this.renderHrrData1.bind(this)}/>
           	}
 
@@ -472,7 +440,6 @@ class HeartRateCal extends Component{
           			selectedDate = {this.state.selectedDate}
           			successHeart = {this.successHeart.bind(this)}
 					errorHeart = {this.errorHeart.bind(this)}
-					alertMsg = {this.alertMsg.bind(this)}
           			renderHrrData = {this.renderHrrNoData.bind(this)}/>   
           	}
           	
