@@ -481,6 +481,9 @@ def add_created_activity1(
 	return data_copy
 
 def add_total_percent(added_data):
+	'''
+		Add percentages to the All Zones,HR not recorded
+	'''
 	try:
 		if added_data.get("anaerobic_zone",0):
 			added_data["percent_anaerobic"] = added_data.get(
@@ -517,6 +520,9 @@ def add_total_percent(added_data):
 	return added_data
 
 def aa_data(user,start_date):
+	'''
+		Calculate the A/A Aeroboc and Anarobic zones data
+	'''
 	start = start_date
 	end = start_date + timedelta(days=3)
 	start_date_str = start_date.strftime('%Y-%m-%d')
@@ -830,6 +836,9 @@ def store_aa_calculations(user,from_date,to_date):
 	return None
 
 def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
+	'''
+		Get Garmin activities from Garmn models
+	'''
 	try:
 		garmin_data_activities = UserGarminDataActivity.objects.filter(
 			user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
@@ -848,6 +857,9 @@ def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
 	return garmin_list,garmin_dic
 
 def get_garmin_manully_activities(user,start_date_timestamp,end_date_timestamp):
+	'''
+		Get Garmin manually edited activities from Garmn models
+	'''
 	try:
 		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(
 			user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
@@ -866,6 +878,9 @@ def get_garmin_manully_activities(user,start_date_timestamp,end_date_timestamp):
 	return manually_edited_dic,manually_edited_list
 
 def get_usernput_activities(user,start_date):
+	'''
+		Get activities from user input models
+	'''
 	try:
 		user_input_strong = DailyUserInputStrong.objects.filter(
 		user_input__created_at=(start_date),
@@ -1193,6 +1208,9 @@ def add_created_activity(di,data,below_aerobic,anaerobic):
 	return(modified_data)
 
 def remove_duplicate(final_date,duplicate_file):
+	'''
+		Remove duplicate files from user acticities
+	'''
 	for i,single_key in enumerate(duplicate_file):
 		final_date.pop(single_key,None)
 	return final_date
