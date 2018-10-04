@@ -234,9 +234,9 @@ class HrrLeaderboard extends Component{
 									<th>Overall HRR Rank</th>
 									<th>User</th>
 									<th>Time to 99<br />(Rank)</th>
-									<th>Heart beats lowered in 1st minute</th>
-									<th>Pure Time to 99</th>
-									<th>Pure Heart beats lowered in 1st minute</th>
+									<th>Heart beats lowered<br />in 1st minute (Rank)</th>
+									<th>Pure Time to 99<br />(Rank)</th>
+									<th>Pure Heart beats<br />lowered in 1st minute (Rank)</th>
 									<th>Total HRR Rank Points</th>
 								</tr>
 								<tbody>
