@@ -74,7 +74,8 @@ def _create_activity_stat(user,activity_obj,current_date):
 				"steps_type":"",
 				"can_update_steps_type":True,
 				"steps":0,
-				"duplicate":None
+				"duplicate":None,
+				"deleted":False
 			}
 		for k, v in activity_obj.items():
 			if k in activity_keys.keys():
@@ -148,7 +149,8 @@ def _get_activities(user,target_date):
 
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
-		activity_data, manually_updated_act_data,include_duplicate=True
+		activity_data, manually_updated_act_data,
+		include_duplicate=True,include_deleted=True
 	)
 	for single_activity in combined_activities:
 		if fitfiles:

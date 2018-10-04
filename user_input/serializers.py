@@ -1,5 +1,4 @@
 import re
-import pprint
 from datetime import timedelta
 from .custom_signals import user_input_post_save,user_input_notify
 
@@ -10,7 +9,8 @@ from .models import UserDailyInput,\
 					DailyUserInputEncouraged,\
 					DailyUserInputOptional,\
 					InputsChangesFromThirdSources,\
-					Goals
+					Goals,\
+					DailyActivity
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -98,6 +98,13 @@ class GoalsSerializer(serializers.ModelSerializer):
 		model = Goals
 		fields = ('__all__')
 
+class DailyActivitySerializer(serializers.ModelSerializer):
+	user = serializers.PrimaryKeyRelatedField(read_only = True)
+
+	class Meta:
+		model = DailyActivity
+		fields = ('__all__')
+
 class UserDailyInputSerializer(serializers.ModelSerializer):
 	user = serializers.PrimaryKeyRelatedField(read_only=True)
 	strong_input = DailyUserInputStrongSerializer()
@@ -116,7 +123,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 	
 		read_only_fields = ('updated_at',)
 
-
 	def _update_helper(self,instance, validated_data):
 		'''
 		This function will iterate all fields of given instance
@@ -129,7 +135,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 			setattr(instance,f,
 					validated_data.get(f,getattr(instance,f)))
 		instance.save()
-			
+
 	def create(self, validated_data):
 		user = self.context['request'].user
 		strong_data = validated_data.pop('strong_input')
@@ -149,7 +155,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		DailyUserInputOptional.objects.create(user_input=user_input_obj,
 														   **optional_data)
-		
+
 		# InputsChangesFromThirdSources.objects.create(user_input=user_input_obj,
 		# 												   **third_source_data)
 		# Goals.objects.create(user_input=user_input_obj,

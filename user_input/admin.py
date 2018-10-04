@@ -4,7 +4,8 @@ from user_input.models import DailyUserInputEncouraged,\
 							  DailyUserInputOptional,\
 							  InputsChangesFromThirdSources,\
 							  UserDailyInput,\
-							  Goals
+							  Goals,\
+							  DailyActivity
 
 class DailyUserInputStrongInline(admin.StackedInline):
 	model = DailyUserInputStrong
@@ -35,6 +36,11 @@ class UserInputAdmin(admin.ModelAdmin):
 		GoalsInline
 	]
 
+class DailyActivityAdmin(admin.ModelAdmin):
+	list_display = ('user', 'created_at',)
+	search_fields = ('user__username', 'created_at', )
+
 # Register your models here.
 
 admin.site.register(UserDailyInput,UserInputAdmin)
+admin.site.register(DailyActivity, DailyActivityAdmin)
