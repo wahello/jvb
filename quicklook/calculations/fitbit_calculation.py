@@ -324,7 +324,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			ui_processed_food = todays_user_input.strong_input.list_of_processed_food_consumed_yesterday
 			ui_diet_type = todays_user_input.optional_input.type_of_diet_eaten
 			ui_alcohol_day = todays_user_input.strong_input.number_of_alcohol_consumed_yesterday
-			#print("&&&&&&&&&&&&&",ui_alcohol_day)
+		
 		
 			'''user inputs of activites for displaying exercise reporting'''
 
