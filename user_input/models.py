@@ -510,7 +510,6 @@ class DailyActivity(models.Model):
         return "{}-{}".format(self.user.username,dtime)
 
     class Meta:
-        unique_together = ('user', 'activity_id')
         indexes = [
-            models.Index(fields=['user', 'activity_id']),
+            models.Index(fields=['user', 'created_at']),
         ]
