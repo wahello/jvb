@@ -77,8 +77,7 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
 def get_sleep_stats(sleep_data, ui_bedtime = None,
 	ui_awaketime = None, ui_sleep_duration = None,
-	ui_timezone = None, ui_sleep_comment = None,
-	ui_sleep_aid = None,str_date=True):		
+	ui_timezone = None,str_date=True):		
 	sleep_stats = {
 		"deep_sleep": '',
 		"light_sleep": '',
@@ -94,7 +93,7 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 	}
 	have_userinput_sleep = False
 	trans_sleep_data = None
-	if ui_bedtime and ui_awaketime and ui_sleep_duration and ui_sleep_comment and  ui_sleep_aid and ui_timezone:
+	if ui_bedtime and ui_awaketime and ui_sleep_duration and ui_timezone:
 		# If manual sleep bedtime last night and awake time is submitted then we'll
 		# user this sleep bedtime time and awake time. We'll convert these time in
 		# timezone from where user input was submitted by user
@@ -139,11 +138,6 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 
 	if ui_sleep_duration:
 		sleep_stats['sleep_per_userinput'] = ui_sleep_duration
-	if ui_sleep_comment:
-		sleep_stats['sleep_comment'] = ui_sleep_comment
-	if ui_sleep_aid:
-		sleep_stats['sleep_aid_taken'] = ui_sleep_aid
-
 
 	if have_userinput_sleep:
 		bed_time = ui_bedtime.replace(tzinfo = None)
@@ -264,9 +258,9 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_bedtime = None
 		ui_awaketime = None
 		ui_timezone = None
-		ui_sleep_duration = None
-		ui_sleep_comment = None
-		ui_sleep_aid = None
+		ui_sleep_duration = ""
+		ui_sleep_comment = ""
+		ui_sleep_aid = ""
 		ui_workout_easy_hard = ""
 		ui_medication = ""
 		ui_smoke_substance = ""
@@ -278,16 +272,12 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_fast_before_workout = ""
 		ui_sick = ''
 		ui_workout_comment = ""
-		ui_workout_effort_level = ""
-		ui_prcnt_unprocessed_food_consumed_yesterday = None
+		ui_workout_effort_level = 0
+		ui_prcnt_unprocessed_food_consumed_yesterday = 0
 		ui_non_processed_food = ""
 		ui_processed_food = ""
 		ui_diet_type = ""
 		ui_alcohol_day = ""
-
-		if daily_strong:
-			grade,avg_alcohol,avg_alcohol_gpa = quicklook.calculations.garmin_calculation.get_alcohol_grade_avg_alcohol_week(
-		 		daily_strong,user)
 
 		if todays_user_input:
 			todays_user_input = todays_user_input[0]
@@ -315,8 +305,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			effort_level = todays_user_input.strong_input.workout_effort_level
 			if effort_level:
 				ui_workout_effort_level = int(effort_level)
-			ui_dewpoint = todays_user_input.strong_input.dewpoint
-			ui_humidity = todays_user_input.strong_input.humidity
 			prcnt_non_processed_food = todays_user_input.strong_input.prcnt_unprocessed_food_consumed_yesterday
 			if prcnt_non_processed_food:
 				ui_prcnt_unprocessed_food_consumed_yesterday = int(prcnt_non_processed_food)
@@ -340,21 +328,23 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['smoke_substance'] = ui_smoke_substance
 			exercise_calculated_data['workout_comment'] = ui_workout_comment
 			exercise_calculated_data['effort_level'] = ui_workout_effort_level
-			exercise_calculated_data['dewpoint'] = ui_dewpoint
 
 		#Food 
-		
 		food_calculated_data['prcnt_non_processed_food'] = ui_prcnt_unprocessed_food_consumed_yesterday
 		food_calculated_data['non_processed_food'] = ui_non_processed_food
 		food_calculated_data['processed_food'] = ui_processed_food
 		food_calculated_data['diet_type'] =  ui_diet_type
 
 		#Alcohol
+		grade,avg_alcohol,avg_alcohol_gpa = quicklook.calculations\
+			.garmin_calculation\
+			.get_alcohol_grade_avg_alcohol_week(daily_strong,user)
 		alcohol_calculated_data['alcohol_day'] = ui_alcohol_day
+		grades_calculated_data['alcoholic_drink_per_week_grade'] = grade
 		alcohol_calculated_data['alcohol_week'] = avg_alcohol
+		grades_calculated_data['alcoholic_drink_per_week_gpa'] = avg_alcohol_gpa
 	
-			
-
+		#Sleep Calculations
 		if todays_sleep_data:
 			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
 				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
@@ -362,8 +352,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			todays_sleep_data = None
 		sleep_stats = get_sleep_stats(todays_sleep_data,
 			ui_bedtime = ui_bedtime,ui_awaketime = ui_awaketime, 
-			ui_sleep_duration = ui_sleep_duration, ui_sleep_comment = ui_sleep_comment,
-			ui_timezone = ui_timezone,ui_sleep_aid = ui_sleep_aid)
+			ui_sleep_duration = ui_sleep_duration,ui_timezone = ui_timezone)
 
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
 		sleeps_calculated_data['light_sleep'] = sleep_stats['light_sleep']
@@ -373,10 +362,11 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
 		sleeps_calculated_data['sleep_per_user_input'] = sleep_stats['sleep_per_userinput']
-		sleeps_calculated_data['sleep_comments'] = sleep_stats['sleep_comment']
-		sleeps_calculated_data['sleep_aid'] = sleep_stats['sleep_aid_taken']
+		sleeps_calculated_data['sleep_comments'] = ui_sleep_comment
+		sleeps_calculated_data['sleep_aid'] = ui_sleep_aid
 		#sleeps_calculated_data['restless'] = sleep_stats['restless']
 
+		# Exercise/Activity Calculations
 		todays_activity_data = get_fitbit_model_data(
 			UserFitbitDataActivities,user,current_date.date(),current_date.date())
 		if todays_activity_data:
@@ -391,7 +381,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				todays_activity_data))
 			activity_stats = quicklook.calculations.garmin_calculation.get_activity_stats(trans_activity_data)
 			exercise_calculated_data['did_workout'] = activity_stats['have_activity']
-			exercise_calculated_data['workout_easy_hard'] = ui_workout_easy_hard
 			exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 			exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
 			exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
@@ -402,6 +391,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
 		
+		# Steps calculation
 		fitbit_steps = fitbit_steps_data(user,current_date)
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
