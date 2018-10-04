@@ -1,5 +1,4 @@
 import re
-import pprint
 from datetime import timedelta
 from .custom_signals import user_input_post_save,user_input_notify
 
@@ -89,11 +88,9 @@ class DailyUserInputOptionalSerializer(serializers.ModelSerializer):
 
 class InputsChangesFromThirdSourcesSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
-
 	class Meta:
 		model = InputsChangesFromThirdSources
 		fields = ('__all__')
-
 
 class GoalsSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
