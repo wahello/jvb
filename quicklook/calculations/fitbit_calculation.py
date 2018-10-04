@@ -1,10 +1,6 @@
 from datetime import datetime,timedelta,date
 import ast
-import json
-import time
-import pdb
 import pytz
-from registration.models import Profile
 from user_input.models import UserDailyInput
 
 from quicklook.serializers import UserQuickLookSerializer
@@ -33,13 +29,10 @@ from fitbit.models import (
 )
 
 from user_input.models import DailyUserInputStrong
-from django.db.models import Q
 
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
 
-from user_input.models import UserDailyInput,\
-					DailyUserInputStrong
 
 def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
@@ -206,47 +199,16 @@ def fitbit_heartrate_data(user,current_date):
 		resting_heartrate = 0	
 	return resting_heartrate
 
-
-def get_non_exercise_steps(user,target_date):
-	ql_steps = Steps.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
-	non_exercise_steps = [single_obj.non_exercise_steps for single_obj in ql_steps]
-	if non_exercise_steps:
-		non_exercise_grades,non_exercise_points = quicklook.calculations.garmin_calculation.cal_non_exercise_step_grade(
-			non_exercise_steps[0])
-	else:
-		non_exercise_grades = 'F'
-	return non_exercise_grades
-
-'''def get_consistency(user,target_date):
-	ql_steps = Steps.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
-	consitency = [single_obj.non_exercise_steps for single_obj in ql_steps]
-	grades = [quicklook.calculations.garmin_calculation.cal_movement_consistency_grade(consitency[0])]
-	return grades[0]'''
-
-def get_age(user):
-	profile = Profile.objects.filter(user=user)
-	for tmp_profile in profile:
-		user_dob = tmp_profile.date_of_birth
-	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
-	return user_age
-
-def get_avg_sleep(user,target_date):
-	sleep = None
-	sleep_grades = None
-	ql_sleep = Sleep.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
-	if ql_sleep:
-		sleep = [single_obj.sleep_per_wearable for single_obj in ql_sleep]
-	age = get_age(user)
-	if sleep and sleep[0] != ''	:
-		sleep_grades,points = quicklook.calculations.garmin_calculation.cal_average_sleep_grade(
-			sleep[0],age)
-	return sleep_grades	
-
-# def get_exercise_consistency(user,target_date):
-# 	ql_exercise = ExerciseAndReporting.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
-# 	exercise_consistency = [single_obj.exercise_consistency for single_obj in ql_exercise]
-# 	consistency_grades,points = quicklook.calculations.garmin_calculation.cal_exercise_consistency_grade(exercise_consistency[0])
-# 	return consistency_grades[0]
+def get_avg_sleep_grade(ui_sleep_duration,sleep_per_wearable,age,sleep_aid):
+	if ui_sleep_duration and ui_sleep_duration != ":":
+		grade_point = quicklook.calculations.garmin_calculation\
+			.cal_average_sleep_grade(ui_sleep_duration,age,sleep_aid)
+		return grade_point
+	elif sleep_per_wearable:
+		grade_point = quicklook.calculations.garmin_calculation\
+			.cal_average_sleep_grade(sleep_per_wearable,age,sleep_aid)
+		return grade_point
+	return (None,None)
 
 def get_exercise_steps(trans_activity_data):
 	total_execrcise_steps = 0
@@ -268,11 +230,13 @@ def makeformat(trans_activity_data):
 	
 	return formated_data
 
-def exercise_consistency_grade_fun(user,current_date):
+def get_exercise_consistency_grade(user,current_date):
 	trans_activity_data = []
 	last_seven_days_date = current_date - timedelta(days=6)
-	week_activity_data =UserFitbitDataActivities.objects.filter(
-		Q(created_at__lte=current_date.date()) & Q(created_at__gte=last_seven_days_date.date()),user=user)
+	week_activity_data = UserFitbitDataActivities.objects.filter(
+		Q(created_at__lte=current_date.date()) 
+		& Q(created_at__gte=last_seven_days_date.date()),
+		user=user)
 	daily_strong = list(DailyUserInputStrong.objects.filter(
 			Q(user_input__created_at__gte = last_seven_days_date)&
 			Q(user_input__created_at__lte = current_date),
@@ -288,9 +252,10 @@ def exercise_consistency_grade_fun(user,current_date):
 			if todays_activity_data:
 				trans_activity_data.append(list(map(fitbit_to_garmin_activities,todays_activity_data)))
 	formated_data = makeformat(trans_activity_data)
-	exe_consistency_grade,exe_consistency_point = quicklook.calculations.garmin_calculation.get_exercise_consistency_grade(
+	exe_consistency_grade,exe_consistency_point = quicklook.calculations.\
+		garmin_calculation.get_exercise_consistency_grade(
 			weekly_daily_strong,formated_data,7)
-	return exe_consistency_grade
+	return (exe_consistency_grade,exe_consistency_point)
 
 
 
@@ -451,6 +416,17 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['sleep_aid'] = ui_sleep_aid
 		#sleeps_calculated_data['restless'] = sleep_stats['restless']
 
+		# Sleep grade point calculation
+		sleep_grade_point = get_avg_sleep_grade(
+			sleep_stats['sleep_per_userinput'],
+			sleep_stats['sleep_per_wearable'],
+			user.profile.age(),ui_sleep_aid
+			)
+		grades_calculated_data['avg_sleep_per_night_grade'] = \
+			sleep_grade_point[0] if sleep_grade_point[0] else ''
+		grades_calculated_data['avg_sleep_per_night_gpa'] = \
+			sleep_grade_point[1] if sleep_grade_point[1] else 0
+
 		# Exercise/Activity Calculations
 		todays_activity_data = get_fitbit_model_data(
 			UserFitbitDataActivities,user,current_date.date(),current_date.date())
@@ -477,49 +453,38 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
 		
 		# Steps calculation
-		fitbit_steps = fitbit_steps_data(user,current_date)
+		total_steps = fitbit_steps_data(user,current_date)
+		exercise_steps = 0
+		non_exercise_steps = 0
+		
 		if todays_activity_data:
 			trans_activity_data = list(map(fitbit_to_garmin_activities,
 				todays_activity_data))
 			exercise_steps = get_exercise_steps(trans_activity_data)
-			non_exercise_steps = int(fitbit_steps) - int(exercise_steps)
-			steps_calculated_data["total_steps"] = fitbit_steps
+			non_exercise_steps = int(total_steps) - int(exercise_steps)
+			steps_calculated_data["total_steps"] = int(total_steps)
 			steps_calculated_data["non_exercise_steps"] = non_exercise_steps if non_exercise_steps >= 0 else 0
-			steps_calculated_data["exercise_steps"] = exercise_steps
+			steps_calculated_data["exercise_steps"] = int(exercise_steps)
 		else:
-			steps_calculated_data["total_steps"] = fitbit_steps
-			steps_calculated_data["non_exercise_steps"] = fitbit_steps
+			non_exercise_steps = int(total_steps)
+			steps_calculated_data["total_steps"] = int(total_steps)
+			steps_calculated_data["non_exercise_steps"] = int(total_steps)
 			steps_calculated_data["exercise_steps"] = 0
 
+		# Non exercise steps grade and gpa calculation
+		moment_non_exercise_steps_grade_point = quicklook.calculations\
+			.garmin_calculation.cal_non_exercise_step_grade(non_exercise_steps)
+		grades_calculated_data['movement_non_exercise_steps_grade'] = \
+			moment_non_exercise_steps_grade_point[0]
+		grades_calculated_data['movement_non_exercise_steps_gpa'] = \
+			moment_non_exercise_steps_grade_point[1]
 			
-		
-		non_exercise_grade = ''
-		non_exercise_grade =get_non_exercise_steps(user,current_date)
-		if non_exercise_grade:
-			grades_calculated_data['movement_non_exercise_steps_grade'] = non_exercise_grade
-
-		
-		# exercise_consistency_grade =''
-		# exercise_consistency_grade =get_exercise_consistency(user,current_date)
-		# if exercise_consistency_grade:
-		# 	grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
-
-		'''consitency_grade = ''
-		consistency_grade =get_consistency(user,current_date)
-		if consistency_grade:
-			grades_calculated_data['movement_consistency_grade'] = consistency_grade[0]'''
-
-		sleep_grade = ''
-		sleep_grade =get_avg_sleep(user,current_date)
-		if sleep_grade:
-			grades_calculated_data['avg_sleep_per_night_grade'] = sleep_grade
-			
-		# Exercise Grade
-		exe_grade = exercise_consistency_grade_fun(user,current_date)
-		grades_calculated_data['exercise_consistency_grade'] = exe_grade
-
-
-		
+		# Exercise Grade and point calculation
+		exercise_consistency_grade_point = get_exercise_consistency_grade(user,current_date)
+		grades_calculated_data['exercise_consistency_grade'] = \
+			exercise_consistency_grade_point[0]
+		grades_calculated_data['exercise_consistency_score'] = \
+			exercise_consistency_grade_point[1]
 
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
