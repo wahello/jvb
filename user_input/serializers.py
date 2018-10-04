@@ -94,11 +94,9 @@ class DailyUserInputOptionalSerializer(serializers.ModelSerializer):
 
 class InputsChangesFromThirdSourcesSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
-
 	class Meta:
 		model = InputsChangesFromThirdSources
 		fields = ('__all__')
-
 
 class GoalsSerializer(serializers.ModelSerializer):
 	user_input = serializers.PrimaryKeyRelatedField(read_only = True)
