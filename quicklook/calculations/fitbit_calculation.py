@@ -87,9 +87,7 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		"sleep_bed_time": '',
 		"sleep_awake_time": '',
 		"sleep_per_wearable":'',
-		"sleep_per_userinput":'',
-		"sleep_comment" : '',
-		"sleep_aid_taken" : '',
+		"sleep_per_userinput":''
 	}
 	have_userinput_sleep = False
 	trans_sleep_data = None
