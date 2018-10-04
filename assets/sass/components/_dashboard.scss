@@ -85,22 +85,29 @@
 }
 
 /*Weekly workout table*/
-@media (min-width: 375px) and (max-width: 667px){
+@media (min-width: 375px) and (max-width: 736px){
 	.weeklyWorkoutTable {	
-		font-size:60% !important;
+		font-size:80% !important;
 		width: 40px !important;
 	}
 	.mnh-mobile-view {
-		font-size:70% !important;
+		font-size:80% !important;
 	}
 	.weeklyWorkoutTable>tbody>tr>td:first-child {
 		word-break: break-all !important;
 	}
 	.weeklyWorkoutTable th{
 		min-width: 40px !important;
+		padding: 0rem 0.2rem;
 	}
 	.weeklyWorkoutTable td{
     	height: auto !important;
+    	padding: 3px;
+		min-width: 40px !important;
+	}
+	.weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr td{
+		padding: 0rem 0.5rem !important;
+		min-width: 60px !important;
 	}
 }
 
@@ -110,7 +117,7 @@
 
 .weeklyWorkoutTable th{
 	vertical-align: middle;
-	min-width: 70px;
+	min-width: 60px;
 	padding: 0rem;
 }
 
@@ -139,13 +146,29 @@
 	border: none;
 }
 .weeklyWorkoutTable td{
-	padding: 0rem !important;
+	padding: 0rem 0.4rem !important;
 	vertical-align: middle;
 }
 .weeklyWorkoutTable tbody td{
 	padding: 3px 6px;
+	min-width: 60px;
 }
 .weeklyWorkoutTable>tbody>tr>td:first-child{
 	word-break: break-all;
 	white-space:pre-wrap;
+}
+.weeklyWorkoutTable>tr>th:first-child{
+	min-width: 80px !important;
+}
+.weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr:first-child td:first-child{
+	background-color: #DCDCDC !important;
+}
+.weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr:first-child td:nth-child(2){
+	background-color: #D3D3D3 !important;
+}
+.weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr:nth-child(2) td:first-child{
+	background-color: #C0C0C0 !important;
+}
+.weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr:nth-child(2) td:nth-child(2){
+	background-color: #A9A9A9 !important;
 }

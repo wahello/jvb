@@ -179,7 +179,7 @@ class WorkoutDashboard extends Component{
 		let value;
 		let x = gpa;
 		if( x !=  null && x != undefined){
-		    value =parseFloat(x).toFixed(2) + "%";
+		    value =Math.floor(parseFloat(x).toFixed(2)) + "%";
 		 }
 		 else{
 		  value = "";
@@ -272,7 +272,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 							<td>{"NR"}<br />{duration_hrr_not_recorded + " (" + percent_hrr_not_recorded + ")"}</td>
 							</tr>
 							</div>);*/
-							td_values.push(<div>
+							td_values.push(<div className="weeklyWorkoutTDMatrix">
 							<tr><td>{duration_in_aerobic_range + " (" + percent_aerobic + ")"}</td>
 							<td>{duration_in_anaerobic_range + " (" + percent_anaerobic + ")"}</td>
 							</tr>
