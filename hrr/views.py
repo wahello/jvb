@@ -1285,7 +1285,6 @@ def daily_aa_data(user, start_date):
 			for single_activity_key in user_created_activity:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
-	print(user_created_activity_list,"user_created_activity_list")
 	for i,single_activity in enumerate(filtered_activities_only):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
 		if avg_hr == '' or avg_hr == 0:
@@ -1387,8 +1386,7 @@ def daily_aa_data(user, start_date):
 							hrr_not_recorded_list.append(0)
 	except:
 		logging.exception("message")
-	print(workout,"workout")
-	print(hrr,"hrr")
+
 	data_summaryid = [str(summaryid) for summaryid in data_summaryid]
 	no_hrr_actvities = list(set(ui_data_keys) - set(data_summaryid))
 	no_hrr_actvities = list(set(no_hrr_actvities) - set(activities_hrr))
@@ -1653,7 +1651,7 @@ def add_hr_nor_recorded_heartbeat(
 			"durationInSeconds",0)+data.get("time_in_zone",0)
 			data[low_hr]["heart_rate_zone_low_end"] = low_hr
 			data[low_hr]["heart_rate_zone_high_end"] = high_hr
-	print(data,"dddddddddd")
+	
 	return data
 
 def add_hr_nor_recorded(no_hr_data,totals_data):
@@ -2511,9 +2509,7 @@ class UserheartzoneView(APIView):
 		total_duration = []
 		no_hr_time = []
 		for hr in hr_values:
-			print(hr,"hrrrrrrrrrrr")
 			for key,time,prcnt in zip(hr_keys,lists[0],lists[1]):
-				print(key,"keyyyyyy")
 				low_end = hr[key].get('heart_rate_zone_low_end',0)
 				high_end = hr[key].get('heart_rate_zone_high_end',0)
 				classification = hr[key].get('classificaton')
