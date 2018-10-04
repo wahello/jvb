@@ -1,13 +1,15 @@
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,date
 import ast
 import json
 import time
 import pdb
 import pytz
-
+from registration.models import Profile
 from user_input.models import UserDailyInput
 
 from quicklook.serializers import UserQuickLookSerializer
+from django.db.models import Q
+from collections import OrderedDict
 
 import quicklook.calculations.garmin_calculation
 from quicklook.models import (
@@ -35,6 +37,9 @@ from django.db.models import Q
 
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
+
+from user_input.models import UserDailyInput,\
+					DailyUserInputStrong
 
 def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 
@@ -200,12 +205,94 @@ def fitbit_heartrate_data(user,current_date):
 	else:
 		resting_heartrate = 0	
 	return resting_heartrate
-	
+
+
+def get_non_exercise_steps(user,target_date):
+	ql_steps = Steps.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
+	non_exercise_steps = [single_obj.non_exercise_steps for single_obj in ql_steps]
+	if non_exercise_steps:
+		non_exercise_grades,non_exercise_points = quicklook.calculations.garmin_calculation.cal_non_exercise_step_grade(
+			non_exercise_steps[0])
+	else:
+		non_exercise_grades = 'F'
+	return non_exercise_grades
+
+'''def get_consistency(user,target_date):
+	ql_steps = Steps.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
+	consitency = [single_obj.non_exercise_steps for single_obj in ql_steps]
+	grades = [quicklook.calculations.garmin_calculation.cal_movement_consistency_grade(consitency[0])]
+	return grades[0]'''
+
+def get_age(user):
+	profile = Profile.objects.filter(user=user)
+	for tmp_profile in profile:
+		user_dob = tmp_profile.date_of_birth
+	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+	return user_age
+
+def get_avg_sleep(user,target_date):
+	sleep = None
+	sleep_grades = None
+	ql_sleep = Sleep.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
+	if ql_sleep:
+		sleep = [single_obj.sleep_per_wearable for single_obj in ql_sleep]
+	age = get_age(user)
+	if sleep and sleep[0] != ''	:
+		sleep_grades,points = quicklook.calculations.garmin_calculation.cal_average_sleep_grade(
+			sleep[0],age)
+	return sleep_grades	
+
+# def get_exercise_consistency(user,target_date):
+# 	ql_exercise = ExerciseAndReporting.objects.filter(user_ql__user=user,user_ql__created_at=target_date)
+# 	exercise_consistency = [single_obj.exercise_consistency for single_obj in ql_exercise]
+# 	consistency_grades,points = quicklook.calculations.garmin_calculation.cal_exercise_consistency_grade(exercise_consistency[0])
+# 	return consistency_grades[0]
+
 def get_exercise_steps(trans_activity_data):
 	total_execrcise_steps = 0
 	for i,single_activity in enumerate(trans_activity_data):
 		total_execrcise_steps = total_execrcise_steps + int(single_activity.get("steps",0))
 	return total_execrcise_steps
+
+def makeformat(trans_activity_data):
+	fitbt_act = None
+	formated_data = None
+	formated_data = OrderedDict()
+	if trans_activity_data:
+		fitbt_act = trans_activity_data[0]
+	if fitbt_act:
+		for i,single_activity in enumerate(fitbt_act):
+			activity_date = single_activity["startTimeInSeconds"]
+			actvity_date = activity_date[:10]
+			formated_data[actvity_date] = single_activity
+	
+	return formated_data
+
+def exercise_consistency_grade_fun(user,current_date):
+	trans_activity_data = []
+	last_seven_days_date = current_date - timedelta(days=6)
+	week_activity_data =UserFitbitDataActivities.objects.filter(
+		Q(created_at__lte=current_date.date()) & Q(created_at__gte=last_seven_days_date.date()),user=user)
+	daily_strong = list(DailyUserInputStrong.objects.filter(
+			Q(user_input__created_at__gte = last_seven_days_date)&
+			Q(user_input__created_at__lte = current_date),
+			user_input__user = user).order_by('user_input__created_at'))
+	weekly_daily_strong = quicklook.calculations.garmin_calculation.get_weekly_user_input_data(
+		daily_strong,current_date,last_seven_days_date)
+
+	if week_activity_data:
+		for i in range(0,len(week_activity_data)):
+			todays_activity_data = ast.literal_eval(week_activity_data[i].activities_data.replace(
+				"'activity_fitbit': {...}","'activity_fitbit': {}"))
+			todays_activity_data = todays_activity_data.get('activities')
+			if todays_activity_data:
+				trans_activity_data.append(list(map(fitbit_to_garmin_activities,todays_activity_data)))
+	formated_data = makeformat(trans_activity_data)
+	exe_consistency_grade,exe_consistency_point = quicklook.calculations.garmin_calculation.get_exercise_consistency_grade(
+			weekly_daily_strong,formated_data,7)
+	return exe_consistency_grade
+
+
 
 def create_fitbit_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -403,6 +490,36 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			steps_calculated_data["total_steps"] = fitbit_steps
 			steps_calculated_data["non_exercise_steps"] = fitbit_steps
 			steps_calculated_data["exercise_steps"] = 0
+
+			
+		
+		non_exercise_grade = ''
+		non_exercise_grade =get_non_exercise_steps(user,current_date)
+		if non_exercise_grade:
+			grades_calculated_data['movement_non_exercise_steps_grade'] = non_exercise_grade
+
+		
+		# exercise_consistency_grade =''
+		# exercise_consistency_grade =get_exercise_consistency(user,current_date)
+		# if exercise_consistency_grade:
+		# 	grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade
+
+		'''consitency_grade = ''
+		consistency_grade =get_consistency(user,current_date)
+		if consistency_grade:
+			grades_calculated_data['movement_consistency_grade'] = consistency_grade[0]'''
+
+		sleep_grade = ''
+		sleep_grade =get_avg_sleep(user,current_date)
+		if sleep_grade:
+			grades_calculated_data['avg_sleep_per_night_grade'] = sleep_grade
+			
+		# Exercise Grade
+		exe_grade = exercise_consistency_grade_fun(user,current_date)
+		grades_calculated_data['exercise_consistency_grade'] = exe_grade
+
+
+		
 
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
