@@ -144,7 +144,7 @@ class DailyActivityView(generics.ListCreateAPIView):
 
         if start_dt and end_dt:
             return DailyActivity.objects.filter(
-                created_at__range=(start_dt,end_date), user=user)
+                created_at__range=(start_dt,end_dt), user=user)
         elif start_dt:
             return DailyActivity.objects.filter(
                 created_at=start_dt, user=user)

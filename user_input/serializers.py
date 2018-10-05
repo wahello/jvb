@@ -1,11 +1,8 @@
 import re
-import pprint
 import ast
 import json
 import copy
 from datetime import timedelta
-from rest_framework.response import Response
-from rest_framework import status
 from .custom_signals import user_input_post_save,user_input_notify
 
 from rest_framework import serializers
@@ -169,6 +166,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		self.create_update_activities(user,
 			strong_data['activities'],validated_data['created_at'])
+
 
 		#sending signal to calculate/update quicklook for today and yesterday
 		user_input_post_save.send(
