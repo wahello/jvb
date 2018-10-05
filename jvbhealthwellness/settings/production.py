@@ -80,10 +80,10 @@ CELERY_BEAT_SCHEDULE = {
         'task':'garmin.validate_garmin_health_token',
         'schedule':crontab(minute=0, hour=4)
     },
-    #execute everyday at 10:00 pm EST (America/New_york)
+    #execute every one hour
     "remind_selected_users_submit_input":{
         'task':'userinputs.submit_userinput_reminder',
-        'schedule':crontab(minute=0, hour=22)
+        'schedule':crontab(minute=0, hour='*/1')
     },
 }
 

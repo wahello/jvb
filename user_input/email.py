@@ -2,6 +2,7 @@ import pytz
 from django.core.mail import send_mail
 from datetime import datetime,time,date,timedelta
 from user_input.models import UserDailyInput
+from garmin.models import UserLastSynced
 
 
 def send_userinput_update_email(admin_users_email,instance_meta):
@@ -40,6 +41,27 @@ JVB Health & Wellness
 			recipient_list = admin_users_email,
 			fail_silently = True  
 		)
+# returns the users,offsets which relates to user local_time
+def get_users_having_local_time(email_timing,filter_username=None):
+	'''
+	Get the users infromation like local_time with their offsets 
+	'''
+	distinct_offsets = set(q['offset'] for q 
+		in UserLastSynced.objects.values('offset'))
+	offsets_in_local_time = []
+	for offset in distinct_offsets:
+		offset_localtime = (datetime.utcnow()+timedelta(seconds=offset))
+		if offset_localtime.hour == email_timing.hour:
+			offsets_in_local_time.append(offset)
+	if filter_username:
+		users_with_offset_in_local_time = UserLastSynced.objects.filter(
+			offset__in = offsets_in_local_time,
+			user__username__in = filter_username).select_related('user')
+	else:
+		users_with_offset_in_local_time = UserLastSynced.objects.filter(
+			offset__in = offsets_in_local_time).select_related('user')
+
+	return users_with_offset_in_local_time
 
 # remind selected users to submit UserDailyInput
 def notify_user_to_submit_userinputs():
@@ -47,26 +69,40 @@ def notify_user_to_submit_userinputs():
 		"cherylcasone","knitter61","lafmaf123","davelee","Justin","lalancaster",
 		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
 		"atul","jvbhealth","Jvbtest"]
+	# RECEPIENTS_USERNAME = ["dileep",'narendra','venky']
+
+	# Local time at which email notification should be sent to the user
+	# 10 PM local time
+	EMAIL_TIMING = time(22)
+
+	RECEPIENTS_WITH_OFFSET = get_users_having_local_time(
+		EMAIL_TIMING,RECEPIENTS_USERNAME)
 	FEEDBACK_EMAIL = "info@jvbwellness.com"
 	ROOT_URL = "https://app.jvbwellness.com/"
 	USER_INPUT_URL = ROOT_URL+"userinputs"
-	# RECEPIENTS_USERNAME = ["atul","overide"]
 	last_userinput_of_users = {}
-	for username in RECEPIENTS_USERNAME:
+	for user_lsync in RECEPIENTS_WITH_OFFSET:
+		user = user_lsync.user
+		last_userinput_of_users[user.username] = {
+			"last_ui":None,
+			"user_email":user.email,
+			"user_first_name":user.first_name,
+			"user_offset":user_lsync.offset
+		}
 		try:
-			last_userinput_of_users[username] = UserDailyInput.objects.filter(
-				user__username__iexact = username).order_by('-created_at')[0]
+			last_userinput_of_users[user.username]["last_ui"] = (
+				UserDailyInput.objects.filter(
+				user = user).order_by('-created_at')[0])
 		except (IndexError,UserDailyInput.DoesNotExist) as e:
-			last_userinput_of_users[username] = None
+			last_userinput_of_users[user.username]["last_ui"] = None
 
-	today_utc = datetime.now()
-	NY_TZ = pytz.timezone('America/New_York')
-	today_local_time = pytz.utc.localize(today_utc).astimezone(NY_TZ)
-
-	for username,last_ui in last_userinput_of_users.items():
-		if last_ui:
-			user_email = last_ui.user.email
-			user_first_name = last_ui.user.first_name
+	for username,user_meta in last_userinput_of_users.items():
+		if user_meta['last_ui']:
+			today_utc = datetime.now()
+			today_local_time = today_utc + timedelta(seconds = user_meta['user_offset'])
+			last_ui = user_meta['last_ui']
+			user_email = user_meta['user_email']
+			user_first_name = user_meta['user_first_name']
 			last_ui_date = datetime.combine(last_ui.created_at,time(0))
 			message = """
 Hi {},

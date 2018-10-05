@@ -47,7 +47,7 @@ CELERY_TIMEZONE = 'Asia/Kolkata'
 #     # execute every day at 10:00 PM EST (America/New_york)
 #     "remind_selected_users_submit_input":{
 #         'task':'userinputs.submit_userinput_reminder',
-#         'schedule':crontab(minute=49, hour=15)
+#         'schedule':crontab(minute=10, hour='*/1')
 #     },
 # }
 
