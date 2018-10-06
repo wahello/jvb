@@ -1,3 +1,4 @@
+
 from django.db.models import Q
 from django.db import IntegrityError
 
@@ -10,7 +11,7 @@ from rest_framework import status
 
 from user_input.serializers import UserDailyInputSerializer, DailyActivitySerializer
 
-from user_input.models import UserDailyInput, DailyActivity
+from user_input.models import UserDailyInput, DailyActivity, DailyUserInputStrong
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):

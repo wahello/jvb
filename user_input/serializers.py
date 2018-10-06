@@ -14,6 +14,7 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals,\
 					DailyActivity
+# from .views.weather_views import weather_data
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -165,7 +166,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# 								 **goals_data)
 
 		self.create_update_activities(user,
-			strong_data['activities'],validated_data['created_at'])
+			strong_data,validated_data['created_at'])
 
 
 		#sending signal to calculate/update quicklook for today and yesterday
@@ -213,7 +214,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		# self._update_helper(goals_obj, goals_data)
 
 		self.create_update_activities(instance.user, 
-			strong_data['activities'],validated_data['created_at'])
+			strong_data,validated_data['created_at'])
 
 		#sending signal to calculate/update quicklook for today and yesterday
 		user_input_post_save.send(
@@ -232,14 +233,16 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 		return instance
 
-	def create_update_activities(self, user, activities, creation_date):
-		if activities:
+	def create_update_activities(self, user, strong_data, creation_date):
+		if strong_data['activities']:
 			activities = list(json.loads(activities).values())
 			activities_model_objects = []
 			for activity in activities:
 				activity_stats = copy.deepcopy(activity)
 				# TODO: populate activity_weather with weather data
 				activity_weather = {}
+				# time = activity['startTimeInSeconds'] + activity['startTimeOffsetInSeconds']
+				# activity_weather = {weather_data(time)}
 				activity_weather = json.dumps(activity_weather)
 
 				# TODO: Delete weather information
@@ -248,6 +251,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					activity_stats['comments'],
 					activity_stats['steps_type'],
 					activity_stats['duplicate'])
+					# activity_stats['activity_weather']
+					# activity_stats['deleted']
 
 				act_obj = DailyActivity(
 					user = user,
