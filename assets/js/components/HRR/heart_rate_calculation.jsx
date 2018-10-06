@@ -26,8 +26,8 @@ var ReactDOM = require('react-dom');
 
 class HeartRateCal extends Component{
 	
-	constructor(props, context) {
-		    super(props, context);
+	constructor(props) {
+		    super(props);
 		    this.state = {
 					    	calendarOpen:false,
 						    isOpen:false,
@@ -56,7 +56,8 @@ class HeartRateCal extends Component{
 							"no_file_beats_recovered":"",
 
 							"offset":"",
-							edit_did_you_measure_HRR:""
+							edit_did_you_measure_HRR:"",
+							created_at:new Date()
 		   				}
 		    this.toggleCalendar = this.toggleCalendar.bind(this);
 		    this.toggleEditForm = this.toggleEditForm.bind(this);
@@ -75,6 +76,7 @@ class HeartRateCal extends Component{
   	}
   	
 	successHeart(data){
+		console.log("DATA received: ", data);
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
@@ -93,13 +95,14 @@ class HeartRateCal extends Component{
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
 
-					"no_fitfile_hrr_time_reach_99":data.data.no_fitfile_hrr_time_reach_99,
+					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
 					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
 					time_heart_rate_reached_99:data.data.time_heart_rate_reached_99,
 					lowest_hrr_no_fitfile:data.data.lowest_hrr_no_fitfile,
 					no_file_beats_recovered:data.data.no_file_beats_recovered,
 
 					offset:data.data.offset,
+					created_at:data.data.created_at
 	  	});
 	}
 
@@ -247,6 +250,7 @@ class HeartRateCal extends Component{
 		})
 	}
 	renderHrrNoData(data){
+		console.log("Data: ", data);
 		this.setState({
 			"end_time_activity":data.end_time_activity,
 			"Did_you_measure_HRR":data.Did_you_measure_HRR,
@@ -256,8 +260,6 @@ class HeartRateCal extends Component{
 			"end_heartrate_activity":data.end_heartrate_activity,
 			"lowest_hrr_no_fitfile":data.lowest_hrr_no_fitfile,
 			"no_file_beats_recovered":data.no_file_beats_recovered,
-		},()=>{
-			//console.log("******************",this.state);
 		});
 	}
 
@@ -436,11 +438,13 @@ class HeartRateCal extends Component{
 					"no_fitfile_hrr_time_reach_99":this.state.no_fitfile_hrr_time_reach_99,
 					"time_heart_rate_reached_99":this.state.time_heart_rate_reached_99,
 					"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
+					"created_at":this.state.created_at,
 					"no_file_beats_recovered":this.state.no_file_beats_recovered}}
           			selectedDate = {this.state.selectedDate}
+          			renderHrrData = {this.renderHrrNoData.bind(this)}
           			successHeart = {this.successHeart.bind(this)}
 					errorHeart = {this.errorHeart.bind(this)}
-          			renderHrrData = {this.renderHrrNoData.bind(this)}/>   
+          			/>   
           	}
           	
           	{this.renderHrrSelectedDateFetchOverlay()}
