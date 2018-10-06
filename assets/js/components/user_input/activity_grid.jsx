@@ -130,6 +130,7 @@ let selected_date = this.props.selected_date;
 this.toggleInfo_duplicate=this.toggleInfo_duplicate.bind(this);
 this.toggleInfo_delete=this.toggleInfo_delete.bind(this);
 this.infoPrint = this.infoPrint.bind(this);
+this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -179,7 +180,8 @@ this.state ={
     selectedId_starttime:'',
     selectedId_delete:'',
     infoButton_duplicate:false,
-    infoButton_delete:false
+    infoButton_delete:false,
+    isActivityStepsTypeOpen:false
 }
 }
 
@@ -834,20 +836,45 @@ handleChange_steps(event){
   });
 }
 handleChange_steps_type(event){
-  const target = event.target;
-  const selectedActivityId = target.getAttribute('data-name');
-  let activity_data = this.state.activites[selectedActivityId];
-  let steps_type = activity_data['steps_type'];
-  if(steps_type == "exercise")
-    steps_type = "non_exercise";
-  else
-    steps_type = "exercise";
-  
-  activity_data['steps_type'] = steps_type;
-  if(activity_data['can_update_steps_type']){
-      this.setState({
-        [selectedActivityId]: activity_data
-      });
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let activitiesObj = this.state.activites;
+    let activity_data = activitiesObj[selectedActivityId];
+    let steps_type = activity_data['steps_type'];
+    let count = 0;
+    let activitiesLen = 0;
+    if(steps_type == "exercise"){
+        for(let activityId of Object.keys(activitiesObj)) {
+            if(activitiesObj[activityId]["deleted"] !== true && activitiesObj[activityId]["duplicate"] !== true){
+                if(activitiesObj[activityId]["activityType"] !== "HEART_RATE_RECOVERY")
+                    activitiesLen ++;
+                console.log("activitiesLen: "+activitiesLen);
+                for(let key of Object.keys(activitiesObj[activityId])){
+
+                    if((key === "activityType" && activitiesObj[activityId][key] !== "HEART_RATE_RECOVERY" && activitiesObj[activityId]["steps_type"] === "non_exercise")) {
+                        count ++;
+                        console.log("count: "+count);
+                    }
+                }
+            }
+                
+        }
+        if((activity_data["activityType"] !== "HEART_RATE_RECOVERY") && ((count === 0 && activitiesLen === 1) || (count === (activitiesLen -1)))) {
+            console.log("Sorry,You can't do this. Atleast one activity step should be exercise");
+            this.activityStepsTypeModalToggle();
+            steps_type = "exercise";
+        } else {
+            steps_type = "non_exercise";
+        }
+    }
+    else {
+        steps_type = "exercise";
+    }
+    activity_data['steps_type'] = steps_type;
+    if(activity_data['can_update_steps_type']){
+        this.setState({
+            [selectedActivityId]: activity_data
+        });
     }
 }
 
@@ -1339,6 +1366,11 @@ toggleInfo_delete(){
       infoButton_delete:!this.state.infoButton_delete
     });
 }
+activityStepsTypeModalToggle() {
+    this.setState({
+        isActivityStepsTypeOpen:!this.state.isActivityStepsTypeOpen
+    });
+}
 infoPrint(infoPrintText){
     var mywindow = window.open('', 'PRINT');
     mywindow.document.write('<html><head><style>' +
@@ -1730,42 +1762,42 @@ renderTable(){
                         </td>);
             }
 
-             else if(key === "steps_type"){
-                 let steps_type=keyValue;
-                 let exerciseTypeLabel = "Not Categorized";
-                 if(this.state.activites[summaryId][key] == "exercise")
+            else if(key === "steps_type"){
+                let steps_type=keyValue;
+                let exerciseTypeLabel = "Not Categorized";
+                if(this.state.activites[summaryId][key] == "exercise")
                     exerciseTypeLabel = "Exercise";
-                 else if (this.state.activites[summaryId][key] == "non_exercise")
+                else if (this.state.activites[summaryId][key] == "non_exercise")
                     exerciseTypeLabel = "Non Exercise";
 
                 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
-                                              { this.state.activities_edit_mode[summaryId][key]?
-                                               <div>
-                                                <span>{exerciseTypeLabel}</span>
-                                                <span>
-                                                <label className="switch">
-                                                      <input type="checkbox"
-                                                        data-name={summaryId}
-                                                        id="text_area"
-                                                        style = {{marginLeft:"60px"}}
-                                                        className="form-control"
-                                                        value={this.state.activites[summaryId][key]} 
-                                                        onChange={this.handleChange_steps_type}
-                                                        checked = {this.state.activites[summaryId][key] == "exercise"}
-                                                        disabled = {!this.state.activites[summaryId]["can_update_steps_type"]}
-                                                        onBlur={this.editToggleHandler_steps_type.bind(this)}
-                                                       />
-                                                      <span className="slider round"></span>
-                                                </label>
-                                                </span>
-                                          </div>:exerciseTypeLabel}
-                           {this.props.editable && !isActivityDeleted &&           
-                            <span data-name={summaryId} onClick={this.editToggleHandler_steps_type.bind(this)}
-                                  className="fa fa-pencil fa-1x progressActivity1 "
-                                  id = "add_button">
-                             </span>
-                        }
-                        </td>);
+                    { this.state.activities_edit_mode[summaryId][key]?
+                    <div>
+                    <span>{exerciseTypeLabel}</span>
+                    <span>
+                    <label className="switch">
+                          <input type="checkbox"
+                            data-name={summaryId}
+                            id="text_area"
+                            style = {{marginLeft:"60px"}}
+                            className="form-control"
+                            value={this.state.activites[summaryId][key]} 
+                            onChange={this.handleChange_steps_type}
+                            checked = {this.state.activites[summaryId][key] == "exercise"}
+                            disabled = {!this.state.activites[summaryId]["can_update_steps_type"]}
+                            onBlur={this.editToggleHandler_steps_type.bind(this)}
+                           />
+                          <span className="slider round"></span>
+                    </label>
+                    </span>
+                    </div>:exerciseTypeLabel}
+                   {this.props.editable && !isActivityDeleted &&           
+                    <span data-name={summaryId} onClick={this.editToggleHandler_steps_type.bind(this)}
+                          className="fa fa-pencil fa-1x progressActivity1 "
+                          id = "add_button">
+                     </span>
+                }
+                </td>);
             }
             //duplicate_info
             /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
@@ -1843,7 +1875,6 @@ renderTable(){
                 activityData.push(<td id = "add_button">{keyValue}</td>);
 
         }
-    console.log("Is activity Deleted:",isActivityDeleted);
     activityRows.push(
         <tr name = {summaryId} 
             id = "add_button" 
@@ -2287,6 +2318,27 @@ return(
             If you would like to delete an activity, click the X button and the activity file be deleted. If you delete a file, this will remove all stats from the deleted activity file everywhere on our website, including but not limited to in the raw data section, progress analyzer, aerobic/anaerobic charts, heart rate recovery, etc. We store all deleted files, so if you deleted the file by mistake, email us at info@jvbwellness.com and we can restore this file for you and include it in your stats.
             </div>
         </ModalBody>
+    </Modal>
+{/****Modal window for activitity steps change, if validation fails****/}
+    <Modal 
+        className="pop"
+        id="activityStepsTypeModalWindow" 
+        placement="right" 
+        isOpen={this.state.isActivityStepsTypeOpen}
+        target="activityStepsTypeModalWindow" 
+        toggle={this.activityStepsTypeModalToggle}>
+        
+          <ModalBody className="modalcontent" id="activity_steps_type_modal_text">
+            <div>
+            One workout file must characterize its steps as Exercise Steps. Please classify one activity as "exercise steps"
+            </div>
+            <Button
+            className="btn btn-info" size="sm" style={{ float: "right"}}
+            onClick={this.activityStepsTypeModalToggle}>
+                OK
+        </Button>
+        </ModalBody>
+        
     </Modal>
 </div>
 {this.props.editable && 
