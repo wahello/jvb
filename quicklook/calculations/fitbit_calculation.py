@@ -94,7 +94,7 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 	}
 	have_userinput_sleep = False
 	trans_sleep_data = None
-	if ui_bedtime and ui_awaketime and ui_sleep_duration and ui_sleep_comment and  ui_sleep_aid and ui_timezone:
+	if ui_bedtime and ui_awaketime and ui_sleep_duration and ui_timezone:
 		# If manual sleep bedtime last night and awake time is submitted then we'll
 		# user this sleep bedtime time and awake time. We'll convert these time in
 		# timezone from where user input was submitted by user
@@ -283,11 +283,22 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_non_processed_food = ""
 		ui_processed_food = ""
 		ui_diet_type = ""
-		ui_alcohol_day = ""
+		ui_alcohol_day = 0
+		#ui_sleep_aid_penalty = 0
 
 		if daily_strong:
 			grade,avg_alcohol,avg_alcohol_gpa = quicklook.calculations.garmin_calculation.get_alcohol_grade_avg_alcohol_week(
 		 		daily_strong,user)
+
+		# if avg_sleep_per_night_gpa:
+		#  	penalty = grades.get('ctrl_subs_penalty')+grades.get('smoke_penalty')
+		#  else:
+		#  	penalty = (grades.get('ctrl_subs_penalty')+
+		#  	grades.get('smoke_penalty')+
+		#  	grades.get('sleep_aid_penalty'))
+		#  	penalty = quicklook.calculations.garmin_calculation.cal_penalty(daily_strong,user)
+
+
 
 		if todays_user_input:
 			todays_user_input = todays_user_input[0]
@@ -324,6 +335,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			ui_processed_food = todays_user_input.strong_input.list_of_processed_food_consumed_yesterday
 			ui_diet_type = todays_user_input.optional_input.type_of_diet_eaten
 			ui_alcohol_day = todays_user_input.strong_input.number_of_alcohol_consumed_yesterday
+			#ui_sleep_aid_penalty = todays_user_input.strong_input.sleep_aid_penalty
 		
 		
 			'''user inputs of activites for displaying exercise reporting'''
@@ -351,8 +363,15 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 		#Alcohol
 		alcohol_calculated_data['alcohol_day'] = ui_alcohol_day
-		alcohol_calculated_data['alcohol_week'] = avg_alcohol
-	
+		#alcohol_calculated_data['alcohol_week'] = avg_alcohol
+
+		#penalty
+		 # penalties = {
+		 # "smoke_penalty":smoke_penalty,
+		 # "ctrl_subs_penalty":ctrl_subs_penalty,
+		 # "sleep_aid_penalty": sleep_aid_penalty
+	 	# }
+		 # grades_calculated_data['sleep_aid_penalty'] = ui_sleep_aid_penalty 	
 			
 
 		if todays_sleep_data:
