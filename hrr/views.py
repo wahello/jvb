@@ -332,17 +332,16 @@ def fitfile_parse(obj,offset,start_date_str):
 		# print(type(record)) # generator
 		for record_data in record:
 			# print(type(record_data)) # <class 'fitparse.records.DataMessage'>
-			for ss in record_data:
+			for single_record in record_data:
 				# print(type(ss)) # <class 'fitparse.records.FieldData'>
-				if(ss.name=='heart_rate'):
-					b = ss.value
-					if b:
-						heartrate_complete.extend([b])
+				if(single_record.name=='heart_rate'):
+					single_heartrate_value = single_record.value
+					if single_heartrate_value:
+						heartrate_complete.extend([single_heartrate_value])
 
-				if(ss.name=='timestamp'):
-					c = ss.value
-					cc = c.strftime('%Y-%m-%d')
-					timestamp_complete.extend([c])
+				if(single_record.name=='timestamp'):
+					single_timestamp_vale = single_record.value
+					timestamp_complete.extend([single_timestamp_vale])
 
 	heartrate_selected_date = []
 	timestamp_selected_date = []
