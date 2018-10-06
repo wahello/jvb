@@ -2333,7 +2333,7 @@ return(
             One workout file must characterize its steps as Exercise Steps. Please classify one activity as "exercise steps"
             </div>
             <Button
-            className="btn btn-info" size="sm" style={{ float: "right"}}
+            className="btn btn-info" size="sm" style={{ float: "right", backgroundColor:"#ed9507"}}
             onClick={this.activityStepsTypeModalToggle}>
                 OK
         </Button>
