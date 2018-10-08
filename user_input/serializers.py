@@ -14,7 +14,7 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals,\
 					DailyActivity
-# from .views.weather_views import weather_data
+from .views.weather_views import weather_data
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -235,24 +235,20 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 	def create_update_activities(self, user, strong_data, creation_date):
 		if strong_data['activities']:
-			activities = list(json.loads(activities).values())
+			activities = list(json.loads(strong_data['activities']).values())
 			activities_model_objects = []
 			for activity in activities:
 				activity_stats = copy.deepcopy(activity)
-				# TODO: populate activity_weather with weather data
-				activity_weather = {}
-				# time = activity['startTimeInSeconds'] + activity['startTimeOffsetInSeconds']
-				# activity_weather = {weather_data(time)}
-				activity_weather = json.dumps(activity_weather)
+				time = activity['startTimeInSeconds'] + activity['startTimeOffsetInSeconds']
+				weather_report = weather_data(user, time, activity['summaryId'])
+				activity_weather = json.dumps(weather_report)
 
-				# TODO: Delete weather information
-				# TODO: Delete activity_stats['deleted']
 				del(activity_stats['can_update_steps_type'],
 					activity_stats['comments'],
 					activity_stats['steps_type'],
-					activity_stats['duplicate'])
-					# activity_stats['activity_weather']
-					# activity_stats['deleted']
+					activity_stats['duplicate'],
+					activity_stats['activity_weather'])
+				activity_stats.pop('deleted', None)
 
 				act_obj = DailyActivity(
 					user = user,
