@@ -18,8 +18,61 @@ import 'react-toastify/dist/ReactToastify.min.css';
 
 class No_Hrr_Data extends Component{
 
-	getInitialState(){
-		console.log("INITIALIZED:::::::::::::::::::::::::::::::::");
+	getInitialState(props){
+		
+		let end_time = this.renderTime(props.hrr.end_time_activity);
+		let end_time_split = null;
+		let end_time_am_pm = null;
+		let end_time_hour = null;
+		let end_time_min = null;
+		let end_time_activity_sec = null;
+		let end_time_activity_am_pm = null;
+
+		if(end_time != null && end_time != "" && end_time != undefined) {
+			end_time_split = end_time.split(":");
+			end_time_am_pm = end_time_split[2].split(" ");
+			end_time_hour = end_time_split[0];
+			end_time_min = end_time_split[1];
+			end_time_activity_sec = end_time_am_pm[0];
+			end_time_activity_am_pm = end_time_am_pm[1];
+		}
+		
+		let Did_you_measure_HRR = props.hrr.Did_you_measure_HRR;
+		let no_fitfile_hrr_reach_99 = props.hrr.no_fitfile_hrr_reach_99;
+		let no_fitfile_hrr_time_reach_99 = this.renderSecToMin(props.hrr.no_fitfile_hrr_time_reach_99);
+		let no_fitfile_hrr_time_reach_99_splite = null;
+		let no_fitfile_hrr_time_reach_99_min = null;
+		let no_fitfile_hrr_time_reach_99_sec = null;
+
+		if(no_fitfile_hrr_time_reach_99 != null && no_fitfile_hrr_time_reach_99 != "" && no_fitfile_hrr_time_reach_99 != undefined) {
+			
+			no_fitfile_hrr_time_reach_99_splite = no_fitfile_hrr_time_reach_99.split(":");
+			no_fitfile_hrr_time_reach_99_min = no_fitfile_hrr_time_reach_99[0];
+			no_fitfile_hrr_time_reach_99_sec = no_fitfile_hrr_time_reach_99[1];
+		}
+		let time_heart_rate_reached_99 = this.renderTime(props.hrr.time_heart_rate_reached_99);
+		let time_heart_rate_reached_99_split = null;
+		let time_heart_rate_reached_99_am_pm_split = null;
+		let time_heart_rate_reached_99_am_pm = null;
+		let time_heart_rate_reached_99_hour = null;
+		let time_heart_rate_reached_99_min = null;
+		let time_heart_rate_reached_99_sec = null;
+
+		if(time_heart_rate_reached_99 != null && time_heart_rate_reached_99 != "" && time_heart_rate_reached_99 != undefined) {
+			time_heart_rate_reached_99_split = time_heart_rate_reached_99.split(":");
+			time_heart_rate_reached_99_am_pm_split = time_heart_rate_reached_99_split[2].split(" ");
+			time_heart_rate_reached_99_hour = time_heart_rate_reached_99_split[0];
+			time_heart_rate_reached_99_min = time_heart_rate_reached_99_split[1];
+			time_heart_rate_reached_99_am_pm = time_heart_rate_reached_99_am_pm_split[1];
+			time_heart_rate_reached_99_sec = time_heart_rate_reached_99_am_pm_split[0];
+		}
+		
+		let end_heartrate_activity = props.hrr.end_heartrate_activity;
+		let lowest_hrr_no_fitfile = props.hrr.lowest_hrr_no_fitfile;
+		let no_file_beats_recovered = props.hrr.no_file_beats_recovered;
+
+			
+			
       	const initialState = {
 		 	editable:false,
 		 	editable_did_you_measure_HRR:false,
@@ -29,23 +82,23 @@ class No_Hrr_Data extends Component{
 		 	editable_time_heart_rate_reached_99:false,
 		 	editable_lowest_hrr_no_fitfile:false,
 		 	editable_no_file_beats_recovered:false,
-		 	end_time_activity_hour:"test",
-			end_time_activity_min:"",
-			end_time_activity_sec:"",
-			end_time_activity_am_pm:"",
-			Did_you_measure_HRR:"",
-			no_fitfile_hrr_reach_99:"",
-			no_fitfile_hrr_time_reach_99_min:"",
-			no_fitfile_hrr_time_reach_99_sec:"",
-			time_heart_rate_reached_99_hour:"",
-			time_heart_rate_reached_99_min:"",
-			time_heart_rate_reached_99_sec:"",
-			time_heart_rate_reached_99_am_pm:"",
-			end_heartrate_activity:"",
-			lowest_hrr_no_fitfile:"",
-			no_file_beats_recovered:"",
-			end_time_activity:"",
-			no_fitfile_hrr_time_reach_99:"",
+		 	end_time_activity_hour:end_time_hour,
+			end_time_activity_min:end_time_min,
+			end_time_activity_sec:end_time_activity_sec,
+			end_time_activity_am_pm:end_time_activity_am_pm,
+			Did_you_measure_HRR:Did_you_measure_HRR,
+			no_fitfile_hrr_reach_99:no_fitfile_hrr_reach_99,
+			no_fitfile_hrr_time_reach_99_min:no_fitfile_hrr_time_reach_99_min,
+			no_fitfile_hrr_time_reach_99_sec:no_fitfile_hrr_time_reach_99_sec,
+			time_heart_rate_reached_99_hour:time_heart_rate_reached_99_hour,
+			time_heart_rate_reached_99_min:time_heart_rate_reached_99_hour,
+			time_heart_rate_reached_99_sec:time_heart_rate_reached_99_sec,
+			time_heart_rate_reached_99_am_pm:time_heart_rate_reached_99_am_pm,
+			end_heartrate_activity:props.hrr.end_heartrate_activity,
+			lowest_hrr_no_fitfile:props.hrr.lowest_hrr_no_fitfile,
+			no_file_beats_recovered:props.hrr.no_file_beats_recovered,
+			end_time_activity:props.hrr.end_time_activity,
+			no_fitfile_hrr_time_reach_99:props.hrr.no_fitfile_hrr_time_reach_99,
 
 		 }
 		 return initialState;
@@ -53,8 +106,7 @@ class No_Hrr_Data extends Component{
 
 	constructor(props){
 		super(props);
-		 
-		this.state = this.getInitialState();
+		this.state = this.getInitialState(props);
 	 	this.renderTime = this.renderTime.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
 		this.renderNoworkout = this.renderNoworkout.bind(this);
@@ -74,8 +126,7 @@ class No_Hrr_Data extends Component{
 	 	this.editNoFileBeatsRecovered = this.editNoFileBeatsRecovered.bind(this);
 	 	this.updateData = this.updateData.bind(this);
 	 	this.getDTMomentObj = this.getDTMomentObj.bind(this);
-	 	this.forceUpdateHandler = this.forceUpdateHandler.bind(this);	
-	 	console.log("AT END OF THE CONSTRUCTOR::::::::::::::");
+	 	this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
 	}
 	forceUpdateHandler(){
 		console.log("INSIDE FORCEUPDATE HANDLER :::::::::");
@@ -85,71 +136,91 @@ class No_Hrr_Data extends Component{
 		let dateSeleted_nextProps = moment(nextProps.hrr.created_at).format("DD-MM-YYYY");
 		let dateSelected_thisProps = moment(this.props.hrr.created_at).format("DD-MM-YYYY");
 
-		console.log("dateSeleted_nextProps: ", dateSeleted_nextProps);
-		console.log("dateSelected_thisProps: ", dateSelected_thisProps);
-		console.log("nextProps before if condition: ", nextProps);
 		if( dateSeleted_nextProps!=dateSelected_thisProps){
             
-            console.log("INSIDE this.props: ", this.props.hrr);
-            console.log("nextProps: ", nextProps);
 			let end_time = this.renderTime(nextProps.hrr.end_time_activity);
-			console.log("end_time: ", this.props.hrr);
-			let end_time_split = end_time.split(":");
-			let end_time_am_pm = end_time_split[2].split(" ");
+			let end_time_split = null;
+			let end_time_am_pm = null;
+			let end_time_hour = null;
+			let end_time_min = null;
+			let end_time_activity_sec = null;
+			let end_time_activity_am_pm = null;
+			if(end_time != null && end_time != "" && end_time != undefined) {
+				end_time_split = end_time.split(":");
+				end_time_am_pm = end_time_split[2].split(" ");
+				end_time_hour = end_time_split[0];
+				end_time_min = end_time_split[1];
+				end_time_activity_sec = end_time_am_pm[0];
+				end_time_activity_am_pm = end_time_am_pm[1];
+			}
+			
 			let Did_you_measure_HRR = nextProps.hrr.Did_you_measure_HRR;
 			let no_fitfile_hrr_reach_99 = nextProps.hrr.no_fitfile_hrr_reach_99;
 			let no_fitfile_hrr_time_reach_99 = this.renderSecToMin(nextProps.hrr.no_fitfile_hrr_time_reach_99);
-			let no_fitfile_hrr_time_reach_99_splite = no_fitfile_hrr_time_reach_99.split(":");
+			let no_fitfile_hrr_time_reach_99_splite = null;
+			let no_fitfile_hrr_time_reach_99_min = null;
+			let no_fitfile_hrr_time_reach_99_sec = null;
+
+			if(no_fitfile_hrr_time_reach_99 != null && no_fitfile_hrr_time_reach_99 != "" && no_fitfile_hrr_time_reach_99 != undefined) {
+				
+				no_fitfile_hrr_time_reach_99_splite = no_fitfile_hrr_time_reach_99.split(":");
+				no_fitfile_hrr_time_reach_99_min = no_fitfile_hrr_time_reach_99_splite[0];
+				no_fitfile_hrr_time_reach_99_sec = no_fitfile_hrr_time_reach_99_splite[1];
+			}
 			let time_heart_rate_reached_99 = this.renderTime(nextProps.hrr.time_heart_rate_reached_99);
-			let time_heart_rate_reached_99_split = time_heart_rate_reached_99.split(":");
-			let time_heart_rate_reached_99_am_pm = time_heart_rate_reached_99_split[2].split(" ");
+			let time_heart_rate_reached_99_split = null;
+			let time_heart_rate_reached_99_am_pm_split = null;
+			let time_heart_rate_reached_99_am_pm = null;
+			let time_heart_rate_reached_99_hour = null;
+			let time_heart_rate_reached_99_min = null;
+			let time_heart_rate_reached_99_sec = null;
+
+			if(time_heart_rate_reached_99 != null && time_heart_rate_reached_99 != "" && time_heart_rate_reached_99 != undefined) {
+				time_heart_rate_reached_99_split = time_heart_rate_reached_99.split(":");
+				time_heart_rate_reached_99_am_pm_split = time_heart_rate_reached_99_split[2].split(" ");
+				time_heart_rate_reached_99_hour = time_heart_rate_reached_99_split[0];
+				time_heart_rate_reached_99_min = time_heart_rate_reached_99_split[1];
+				time_heart_rate_reached_99_am_pm = time_heart_rate_reached_99_am_pm_split[1];
+				time_heart_rate_reached_99_sec = time_heart_rate_reached_99_am_pm_split[0];
+			}
+			
 			let end_heartrate_activity = nextProps.hrr.end_heartrate_activity;
 			let lowest_hrr_no_fitfile = nextProps.hrr.lowest_hrr_no_fitfile;
 			let no_file_beats_recovered = nextProps.hrr.no_file_beats_recovered;
-			this.setState = ({
-			 	editable:nextProps.hrr.editable,
-			 	editable_did_you_measure_HRR:false,
-			 	editable_end_time_activity:false,
-			 	editable_no_fitfile_hrr_reach_99:false,
-			 	editable_no_fitfile_hrr_time_reach_99:false,
-			 	editable_time_heart_rate_reached_99:false,
-			 	editable_lowest_hrr_no_fitfile:false,
-			 	editable_no_file_beats_recovered:false,
-			 	end_time_activity_hour:end_time_split[0],
-				end_time_activity_min:end_time_split[1],
-				end_time_activity_sec:end_time_am_pm[0],
-				end_time_activity_am_pm:end_time_am_pm[1],
-				Did_you_measure_HRR:Did_you_measure_HRR,
-				no_fitfile_hrr_reach_99:no_fitfile_hrr_reach_99,
-				no_fitfile_hrr_time_reach_99_min:no_fitfile_hrr_time_reach_99_splite[0],
-				no_fitfile_hrr_time_reach_99_sec:no_fitfile_hrr_time_reach_99_splite[1],
-				time_heart_rate_reached_99_hour:time_heart_rate_reached_99_split[0],
-				time_heart_rate_reached_99_min:time_heart_rate_reached_99_split[1],
-				time_heart_rate_reached_99_sec:time_heart_rate_reached_99_am_pm[0],
-				time_heart_rate_reached_99_am_pm:time_heart_rate_reached_99_am_pm[1],
-				end_heartrate_activity:end_heartrate_activity,
-				lowest_hrr_no_fitfile:lowest_hrr_no_fitfile,
-				no_file_beats_recovered:no_file_beats_recovered,
-				end_time_activity:"",
-				no_fitfile_hrr_time_reach_99:"",
-
-			},function(){
-				console.log("This one is not called:::",this.state.end_time_activity_hour); //here you will get updated values.
-				this.props.renderHrrData(this.state);
-			});
-
-			console.log("end_time_split[0]: "+end_time_split[0]);
-			
-
-			
-			
+			this.setState({
+					editable:nextProps.hrr.editable,
+					editable_did_you_measure_HRR:false,
+					editable_end_time_activity:false,
+					editable_no_fitfile_hrr_reach_99:false,
+					editable_no_fitfile_hrr_time_reach_99:false,
+					editable_time_heart_rate_reached_99:false,
+					editable_lowest_hrr_no_fitfile:false,
+					editable_no_file_beats_recovered:false,
+					end_time_activity_hour:end_time_hour,
+					end_time_activity_min:end_time_min,
+					end_time_activity_sec:end_time_activity_sec,
+					end_time_activity_am_pm:end_time_activity_am_pm,
+					Did_you_measure_HRR:Did_you_measure_HRR,
+					no_fitfile_hrr_reach_99:no_fitfile_hrr_reach_99,
+					no_fitfile_hrr_time_reach_99_min:no_fitfile_hrr_time_reach_99_min,
+					no_fitfile_hrr_time_reach_99_sec:no_fitfile_hrr_time_reach_99_sec,
+					time_heart_rate_reached_99_hour:time_heart_rate_reached_99_hour,
+					time_heart_rate_reached_99_min:time_heart_rate_reached_99_min,
+					time_heart_rate_reached_99_sec:time_heart_rate_reached_99_sec,
+					time_heart_rate_reached_99_am_pm:time_heart_rate_reached_99_am_pm,
+					end_heartrate_activity:end_heartrate_activity,
+					lowest_hrr_no_fitfile:lowest_hrr_no_fitfile,
+					no_file_beats_recovered:no_file_beats_recovered,
+					end_time_activity:nextProps.hrr.end_time_activity,
+					no_fitfile_hrr_time_reach_99:nextProps.hrr.no_fitfile_hrr_time_reach_99
+				});
         }  
   	}
-  	componentDidUpdate(nextProps) {
+  	/*componentDidUpdate(nextProps) {
   		console.log( 'INSIDE ComponentDidUpdate ======> this.state ::: ' + JSON.stringify( this.state ) );
   		console.log( 'INSIDE ComponentDidUpdate ======> this.props ::: ' + JSON.stringify( this.props ) );
   		
-  	}
+  	}*/
 	editEndTimeActivity(){
 		this.setState({
 			editable_end_time_activity:!this.state.editable_end_time_activity,
@@ -224,12 +295,9 @@ class No_Hrr_Data extends Component{
 	  	});
 	}
 	renderTime(value){
-		console.log("renderTime value:: "+value);
-
   		var z;
-  		if(value != null && value != "00:00:00"){
+  		if(value != null && value != "00:00:00" && value != ""){
   			 z = moment.unix(value).format("hh:mm:ss a");
-  			 console.log("z: "+z);
   		}
   		else if(value == "00:00:00"){
   			 z = "-";
@@ -410,7 +478,7 @@ class No_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 						          	    	: (this.state.end_time_activity_hour + ":" +this.state.end_time_activity_min + ":" + this.state.end_time_activity_sec + " " + this.state.end_time_activity_am_pm )}
-						          	    	{this.state.editable &&            
+						          	    	{this.props.hrr.editable &&            
 					                            <span  style = {{marginLeft:"30px"}}  onClick={this.editEndTimeActivity}
 		                            			className="fa fa-pencil fa-1x"
 		                            			>
@@ -436,7 +504,7 @@ class No_Hrr_Data extends Component{
                                         <option value="no">No</option>
                                     </Input> 
 				          	    	:this.renderNoworkout(this.state.Did_you_measure_HRR)}
-				          	    	{this.state.editable &&
+				          	    	{this.props.hrr.editable &&
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleDidyouWorkout}
                             			className="fa fa-pencil fa-1x"
                             			>
@@ -462,7 +530,7 @@ class No_Hrr_Data extends Component{
 		                                        <option value="no">No</option>
 		                                    </Input> 
 				          	    		: this.captilizeYes(this.state.no_fitfile_hrr_reach_99)}
-					          	    	{this.state.editable &&
+					          	    	{this.props.hrr.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editNoFitfileHrrReach99}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
@@ -511,7 +579,7 @@ class No_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 				          	    		: (this.state.no_fitfile_hrr_time_reach_99_min + ":" +this.state.no_fitfile_hrr_time_reach_99_sec)}
-				          	    		{this.state.editable &&
+				          	    		{this.props.hrr.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editNoFitfileHrrTimeReach99}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
@@ -587,7 +655,7 @@ class No_Hrr_Data extends Component{
 					          				</ModalFooter>
 					        				</Modal>              
 						          	    	: (this.state.time_heart_rate_reached_99_hour + ":" +this.state.time_heart_rate_reached_99_min + ":" + this.state.time_heart_rate_reached_99_sec + " " + this.state.time_heart_rate_reached_99_am_pm )}
-						          	    	{this.state.editable &&
+						          	    	{this.props.hrr.editable &&
 						          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editTimeHeartRateReached99}
 		                            			className="fa fa-pencil fa-1x"
 		                            			>
@@ -611,7 +679,7 @@ class No_Hrr_Data extends Component{
 		                                        {this.createSleepDropdown(70,220)}
 		                                    </Input> 
 				          	    		: this.state.end_heartrate_activity}
-				          	    		{this.state.editable &&
+				          	    		{this.props.hrr.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editEndHeartrateActivity}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
@@ -636,7 +704,7 @@ class No_Hrr_Data extends Component{
 		                                        {this.createSleepDropdown(70,220)}
 		                                    </Input> 
 				          	    		: this.state.lowest_hrr_no_fitfile}
-				          	    		{this.state.editable &&
+				          	    		{this.props.hrr.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editLowestHrrNoFitfile}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>
@@ -660,7 +728,7 @@ class No_Hrr_Data extends Component{
 		                                        {this.createSleepDropdown(70,220)}
 		                                    </Input> 
 				          	    		: this.state.no_file_beats_recovered}
-				          	    		{this.state.editable &&
+				          	    		{this.props.hrr.editable &&
 					          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editNoFileBeatsRecovered}
 	                            			className="fa fa-pencil fa-1x"
 	                            			>

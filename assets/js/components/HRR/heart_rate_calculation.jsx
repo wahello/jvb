@@ -32,7 +32,7 @@ class HeartRateCal extends Component{
 					    	calendarOpen:false,
 						    isOpen:false,
 						    fetching_hrr:false,
-						    editable : true,
+						    editable : false,
 						    selectedDate:new Date(),
 				   			"Did_you_measure_HRR":"",
 							"Did_heartrate_reach_99":"",
@@ -417,6 +417,7 @@ class HeartRateCal extends Component{
           	{this.state.Did_you_measure_HRR == "yes" &&
           	 	<Other_Hrr_Data hrr = {{
       	 			"editable":this.state.editable,
+      	 			"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
       	 			"end_time_activity":this.state.end_time_activity,
 					"diff_actity_hrr":this.state.diff_actity_hrr,
 					"HRR_activity_start_time":this.state.HRR_activity_start_time,
@@ -433,11 +434,13 @@ class HeartRateCal extends Component{
           	{(this.state.Did_you_measure_HRR == "no" || this.state.Did_you_measure_HRR == "" || this.state.Did_you_measure_HRR == "Heart Rate Data Not Provided") &&
           		<No_Hrr_Data hrr = {{
           			"editable":this.state.editable,
+          			"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
           			"end_time_activity":this.state.end_time_activity,
           			"no_fitfile_hrr_reach_99":this.state.no_fitfile_hrr_reach_99,
 					"no_fitfile_hrr_time_reach_99":this.state.no_fitfile_hrr_time_reach_99,
 					"time_heart_rate_reached_99":this.state.time_heart_rate_reached_99,
 					"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
+					"end_heartrate_activity":this.state.end_heartrate_activity,
 					"created_at":this.state.created_at,
 					"no_file_beats_recovered":this.state.no_file_beats_recovered}}
           			selectedDate = {this.state.selectedDate}
