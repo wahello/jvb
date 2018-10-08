@@ -1,3 +1,29 @@
+from datetime import datetime
+
+def get_epoch_offset_from_timestamp(timestamp):
+	'''
+	Parse ISO 8601 timestamp string and return offset and 
+	POSIX timestamp (time in seconds in UTC). For example - if timestamp
+	is "2018-08-19T15:46:35.000-05:00", then returned value would be a 
+	tuple like this -  (POSIX timestamp, UTC offset in seconds)
+	So, for timestamp in example, it would be  - (1534711595, -18000)
+
+	Args:
+		timestamp(str): Timestamp in string
+	'''
+	if timestamp:
+		if timestamp[-3:-2] == ':':
+			# Before Python 3.7, if tz offset have colon in it
+			# then strptime cannot parse it and throw error
+			# More - https://bugs.python.org/msg169952
+			# So a simple workaround is to remove the colon 
+			timestamp = timestamp[:-3]+timestamp[-2:]
+
+		dobj = datetime.strptime(timestamp,"%Y-%m-%dT%H:%M:%S.%f%z")
+		offset = int(dobj.utcoffset().total_seconds())
+		time_in_utc_seconds = int(dobj.timestamp())
+		return (time_in_utc_seconds,offset)
+
 def levelData(sleepLevelsMap,sleep_type):
 	sleep_level_stats = {
 		"level_map":{
@@ -118,9 +144,13 @@ def fitbit_to_garmin_activities(active_summary):
 
 	}
 	if active_summary:
+		start_time_in_sec,start_time_offset_in_sec = get_epoch_offset_from_timestamp(
+			active_summary['startTime'])
+
 		garmin_activites['summaryId'] = active_summary['logId']
 		garmin_activites['durationInSeconds'] = int(active_summary['duration']/1000)
-		garmin_activites['startTimeInSeconds'] = active_summary['startTime']
+		garmin_activites['startTimeInSeconds'] = start_time_in_sec
+		garmin_activites['startTimeOffsetInSeconds'] = start_time_offset_in_sec
 		garmin_activites['activityType'] = active_summary['activityName']
 		garmin_activites['activeKilocalories'] = active_summary['calories']
 		garmin_activites['distanceInMeters'] = active_summary.get("")

@@ -224,9 +224,10 @@ def makeformat(trans_activity_data):
 		fitbt_act = trans_activity_data[0]
 	if fitbt_act:
 		for i,single_activity in enumerate(fitbt_act):
-			activity_date = single_activity["startTimeInSeconds"]
-			actvity_date = activity_date[:10]
-			formated_data[actvity_date] = single_activity
+			activity_date = datetime.utcfromtimestamp(
+				single_activity["startTimeInSeconds"]
+				+ single_activity["startTimeOffsetInSeconds"]).strftime("%Y-%m-%d")
+			formated_data[activity_date] = single_activity
 	
 	return formated_data
 
