@@ -1364,7 +1364,10 @@ toggleInfo_duplicate(){
 toggleInfo_delete(){
     this.setState({
       infoButton_delete:!this.state.infoButton_delete
+    }, function() {
+        this.createModalWindow("deleteInfoModalWindow", this.state.infoButton_delete, this.toggleInfo_delete, "eoritoerert", "", "");
     });
+
 }
 activityStepsTypeModalToggle() {
     this.setState({
@@ -1389,6 +1392,29 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
+createModalWindow(target, isOpenValue, toggleMethod, modalBodyText, submitButtonClickMethod, submitButtonText) {
+    console.log("Inside createModalWindow");
+    return ('<Modal className="pop"' +
+                'id={' + target + '}' +
+                'placement="right"' + 
+                'isOpen={' + isOpenValue + '}' +
+                'target={' + target + '}' + 
+                'toggle={' + toggleMethod + '}>' +
+                
+                '<ModalBody className="modalcontent" id="modalBodyId">' +
+                    '<div>' +
+                        '{' + modalBodyText + '}' +
+                    '</div>' +
+                    '<Button className="btn btn-info"' +
+                     'size="sm"' +
+                     ' style={{ float: "right", backgroundColor:"#ed9507"}}' +
+                    'onClick={' + submitButtonClickMethod + '}>' +
+                        '{' + submitButtonText + '}' +
+                    '</Button>' +
+                '</ModalBody>' +
+            '</Modal>');
+
+}
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
@@ -2299,7 +2325,7 @@ return(
         </ModalBody>
     </Modal>
 {/******* INFO MODAL WINDOW FOR DELETE FUNCTIONALITY ************/}    
-    <Modal 
+    {/*<Modal 
         className="pop"
         id="deleteInfoModalWindow" 
         placement="right" 
@@ -2318,7 +2344,7 @@ return(
             If you would like to delete an activity, click the X button and the activity file be deleted. If you delete a file, this will remove all stats from the deleted activity file everywhere on our website, including but not limited to in the raw data section, progress analyzer, aerobic/anaerobic charts, heart rate recovery, etc. We store all deleted files, so if you deleted the file by mistake, email us at info@jvbwellness.com and we can restore this file for you and include it in your stats.
             </div>
         </ModalBody>
-    </Modal>
+    </Modal>*/}
 {/****Modal window for activitity steps change, if validation fails****/}
     <Modal 
         className="pop"
@@ -2340,6 +2366,10 @@ return(
         </ModalBody>
         
     </Modal>
+{/************ MODAL WINDOW FOR ALL INFO BUTTONS ***********/}
+    
+    
+{/********** MODAL WINDOW CODE:ENDS HERE***********/}
 </div>
 {this.props.editable && 
  <div className="activity_add_btn btn4 mar_20 row"> 
