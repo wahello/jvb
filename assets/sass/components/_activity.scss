@@ -139,3 +139,10 @@ right:500px
     left: 141px;
 }
 }
+
+.disableElement {
+	background-color:#eaeaea;
+    color:#9c9999;
+    pointer-events:none;
+    cursor: not-allowed !important;
+}

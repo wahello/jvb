@@ -161,7 +161,7 @@ class HeartrateZone extends Component{
 			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>(7 day averages over {no_of_days} days period)</span>
 		}
 		else{
-			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>(7 days)</span>
+			modal = <span style = {{marginLeft:"10px",fontWeight:"bold",marginTop:"9px"}}>({no_of_days} days)</span>
 		}
 		return modal;
 	}

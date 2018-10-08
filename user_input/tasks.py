@@ -25,7 +25,7 @@ def notify_admins_task(admin_users_email,instance_meta):
 def remind_selected_users_submit_input():
 	'''
 		Celery task to send email to users to submit user
-		input form at 10:00 pm NY time
+		input form at 10:00 pm local time
 	'''
 	try:
 		notify_user_to_submit_userinputs()
