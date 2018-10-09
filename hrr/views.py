@@ -647,10 +647,6 @@ def aa_data(user,start_date):
 				ui_activity = activities_dic.get(single_activity["summaryId"],0)
 				if ui_activity:
 					hrr_not_recorded_list.append(ui_activity.get('durationInSeconds',0))
-				else:
-					hrr_not_recorded_list.append(ui_activity.get('durationInSeconds',0))
-			else:
-				hrr_not_recorded_list.append(single_activity.get('durationInSeconds',0))
 
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
@@ -1334,8 +1330,6 @@ def daily_aa_data(user, start_date):
 			and activities_dic.get(single_actiivty["summaryId"])):
 			user_created_activity_list.append(
 				activities_dic.get(single_actiivty["summaryId"]))
-		else:
-			user_created_activity_list.append(single_actiivty)
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1847,16 +1841,13 @@ def aa_low_high_end_data(user,start_date):
 			and activities_dic.get(single_actiivty["summaryId"])):
 			user_created_activity_list.append(
 				activities_dic.get(single_actiivty["summaryId"]))
-		else:
-			user_created_activity_list.append(single_actiivty)
-
 	workout = []
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	a1=GarminFitFiles.objects.filter(user= user,created_at__range=[start,end])
-	if activities and a1:
-		for tmp in a1:
+	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	if activities and fitfiles_obj:
+		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
@@ -1864,8 +1855,8 @@ def aa_low_high_end_data(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in hrr_summary_id	:
 				hrr.append(tmp)
-	elif a1:
-		for tmp in a1:
+	elif fitfiles_obj:
+		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
