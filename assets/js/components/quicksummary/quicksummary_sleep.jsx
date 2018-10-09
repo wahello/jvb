@@ -40,14 +40,19 @@ import { StyleSheet, css } from 'aphrodite';
       ],
     };
   }
-getStylesGpaBeforePanalities(score){	
-      if (score>=76)
+getStylesGpaBeforePanalities(score){
+
+    if (score>=80)
         return {background:'red',color:'black'};
-      else if (score>=63 && score<=75)
-        return {background:'yellow',color:'black'};
-      else if (score >=30 && score <= 62)
-        return {background:'green',color:'white'};
-      if (score<30)
+    else if (score>=75 && score<=79)
+        return {background:'#ff8c00',color:'black'};//Orange
+    else if (score >=69 && score <= 74)
+        return {background:'#ffff00',color:'black'};//Yellow
+    else if (score >=61 && score <= 68)
+        return {background:'#32cd32',color:'white'};//Light Green
+    else if (score >=30 && score <= 60)
+        return {background:'#008000',color:'white'};//Green
+    else if (score<30)
         return {background:'red',color:'black'};
       
     }

@@ -192,7 +192,6 @@ class GarminConnectPing(APIView):
 		oauthToken_fitfile = ast.literal_eval(file_name)
 		file_oauth = oauthToken_fitfile['oauthToken']
 		activity_id = oauthToken_fitfile.get('activityIds',0)
-
 		date_now = datetime.now()
 		date_str = date_now.strftime("%Y-%m-%d")
 		try:
