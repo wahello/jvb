@@ -378,7 +378,8 @@ def fitfile_parse(obj,offset,start_date_str):
 	for i,k in zip(heartrate_selected_date,timestamp_difference):
 		if (k <= 200) and (k >= 0):
 			final_heartrate.extend([i])
-			final_timestamp.extend([k]) 
+			final_timestamp.extend([k])
+	print(to_timestamp,"to_timestamp") 
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def update_helper(instance,data_dict):
@@ -1311,20 +1312,16 @@ def daily_aa_data(user, start_date):
 			activities_workout.append(filtered_activities_files[i]['summaryId'])
 	user_created_activity = list(set(activities_workout) - set(garmin_activity_keys))
 	garmin_workout_keys = list(set(garmin_activity_keys) - set(activities_hrr))
-
 	user_created_activity_list = []
 	if workout_data and user_created_activity:
 		for single_activity in workout_data:
 			for single_activity_key in user_created_activity:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
-	
 	for i,single_activity in enumerate(filtered_activities_only):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
 		if avg_hr == '' or avg_hr == 0:
 			user_created_activity_list.append(single_activity)
-		
-
 	for i,single_actiivty in enumerate(garmin_list):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
@@ -1333,8 +1330,6 @@ def daily_aa_data(user, start_date):
 				activities_dic.get(single_actiivty["summaryId"]))
 		else:
 			user_created_activity_list.append(single_actiivty)
-
-	
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1842,15 +1837,11 @@ def aa_low_high_end_data(user,start_date):
 			user_created_activity_list.append(single_activity)
 
 	for i,single_actiivty in enumerate(garmin_list):
-		if single_actiivty.get("manual",0) == True:
-			if activities_dic:
-				ui_activity = activities_dic.get(single_actiivty["summaryId"])
-				if ui_activity:
-					user_created_activity_list.append(ui_activity)
-				else:
-					user_created_activity_list.append(single_actiivty)
-			else:
-				user_created_activity_list.append(single_actiivty)
+		if (single_actiivty.get("manual",0) == True 
+			and activities_dic
+			and activities_dic.get(single_actiivty["summaryId"])):
+			user_created_activity_list.append(
+				activities_dic.get(single_actiivty["summaryId"]))
 		else:
 			user_created_activity_list.append(single_actiivty)
 
