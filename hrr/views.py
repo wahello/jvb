@@ -1324,16 +1324,13 @@ def daily_aa_data(user, start_date):
 		if avg_hr == '' or avg_hr == 0:
 			user_created_activity_list.append(single_activity)
 		
+
 	for i,single_actiivty in enumerate(garmin_list):
-		if single_actiivty.get("manual",0) == True:
-			if activities_dic:
-				ui_activity = activities_dic.get(single_actiivty["summaryId"])
-				if ui_activity:
-					user_created_activity_list.append(ui_activity)
-				else:
-					user_created_activity_list.append(single_actiivty)
-			else:
-				user_created_activity_list.append(single_actiivty)
+		if (single_actiivty.get("manual",0) == True 
+			and activities_dic
+			and activities_dic.get(single_actiivty["summaryId"])):
+			user_created_activity_list.append(
+				activities_dic.get(single_actiivty["summaryId"]))
 		else:
 			user_created_activity_list.append(single_actiivty)
 
