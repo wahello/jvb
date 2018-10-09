@@ -3,27 +3,25 @@ import json
 import requests
 from rest_framework.views import APIView
 from user_input.models import DailyActivity
-from garmin.models import UserGarminDataActivity
+from django.contrib.auth.models import User
+from garmin.models import UserGarminDataActivity, UserGarminDataManuallyUpdated
+# from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
 
-def weather_data(user, time, summaryId):
-    # activity_weather should contain humidity, dewpoint, temperature, wind\
-    # temperature_feels_like, max_temp, min_temp
+def get_weather_data(user, time, summaryId, activities):
+    filtered_activities_files = quicklook.calculations.garmin_calculation\
+        .get_filtered_activity_stats(activities_json=garmin_list,
+                                    manually_updated_json=manually_edited_dic,
+                                    userinput_activities=activities_dic)
+    print ('$$$$$$$$$$$$$$$$$$$$$$$$$$', filtered_activities_files)
 
-    '''
-        Function will return the weather_report for an activity if the user_input actvity present 
-        in the garmin activities along with starting latitude and starting longitude 
-
-        Either the starting latitude and starting longitude not present in garmin activities or 
-        user_input activity is manually created then the activity_weather data will be null 
-        (because we don't have latitude and longitude to caliculate weather report) 
-    '''
-    weather_report = {}
+    weather_report = {'dewPoint':' ','humidity':' ','temperature':' ','wind':' ','description': ' '}
     try:
         garmin_activity = UserGarminDataActivity.objects.get(user=user, summary_id=summaryId)
         garmin_activity_data = ast.literal_eval(garmin_activity.data)
         if 'startingLatitudeInDegree' in garmin_activity_data:
             latitude = garmin_activity_data['startingLatitudeInDegree']
             longitude = garmin_activity_data['startingLongitudeInDegree']
+            
             weather_info = get_weather_information(latitude, longitude, time)
             weather_report.update({'dewPoint':weather_info['currently']['dewPoint'],
                 'humidity': weather_info['currently']['humidity'],
@@ -33,6 +31,26 @@ def weather_data(user, time, summaryId):
         return weather_report
     except UserGarminDataActivity.DoesNotExist:
         return weather_report
+
+# def get_weather_info_for_garmin_activities():
+#     all_users = User.objects.all()
+#     for user in all_users:
+#         print (user)
+#         queryset = UserGarminDataActivity.objects.filter(user=user)
+#         for garmin_activity in queryset:
+#             garmin_activity_data = ast.literal_eval(garmin_activity.data)
+#             weather_report = {}
+#             if 'startingLatitudeInDegree' in garmin_activity_data:
+#                 latitude = garmin_activity_data['startingLatitudeInDegree']
+#                 longitude = garmin_activity_data['startingLongitudeInDegree']
+#                 time = garmin_activity_data['startTimeInSeconds'] + garmin_activity_data['startTimeOffsetInSeconds']
+#                 weather_info = get_weather_information(latitude, longitude, time)
+#                 weather_report.update({'dewPoint':weather_info['currently']['dewPoint'],
+#                     'humidity': weather_info['currently']['humidity'],
+#                     'temperature':weather_info['currently']['temperature'],
+#                     'wind':weather_info['currently']['windSpeed'],
+#                     'description':weather_info['currently']['icon']})
+#             return {'activity_weather': weather_report}
 
 def get_weather_information(latitude, longitude, time, unit='si',include_block=['currently']):
 

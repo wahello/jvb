@@ -14,7 +14,8 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals,\
 					DailyActivity
-from .views.weather_views import weather_data
+from weather.views import get_weather_data
+from garmin.models import UserGarminDataActivity
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -240,14 +241,13 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 			for activity in activities:
 				activity_stats = copy.deepcopy(activity)
 				time = activity['startTimeInSeconds'] + activity['startTimeOffsetInSeconds']
-				weather_report = weather_data(user, time, activity['summaryId'])
+				weather_report = get_weather_data(user, time, activity['summaryId'], activities)
 				activity_weather = json.dumps(weather_report)
 
 				del(activity_stats['can_update_steps_type'],
 					activity_stats['comments'],
 					activity_stats['steps_type'],
-					activity_stats['duplicate'],
-					activity_stats['activity_weather'])
+					activity_stats['duplicate'])
 				activity_stats.pop('deleted', None)
 
 				act_obj = DailyActivity(
