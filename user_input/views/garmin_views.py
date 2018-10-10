@@ -6,15 +6,17 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 import quicklook.calculations.garmin_calculation
+import quicklook.calculations.fitbit_calculation
+import quicklook.calculations.calculation_driver
 
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
 	UserGarminDataManuallyUpdated)
 
-from hrr.models import Hrr
+from fitbit.models import UserFitbitDataSleep
+
 from garmin.models import GarminFitFiles
-from django.contrib.auth.models import User
 from registration.models import Profile
 from hrr.calculation_helper import fitfile_parse
 
@@ -72,7 +74,8 @@ def _create_activity_stat(user,activity_obj,current_date):
 				"steps_type":"",
 				"can_update_steps_type":True,
 				"steps":0,
-				"duplicate":None
+				"duplicate":None,
+				"deleted":False
 			}
 		for k, v in activity_obj.items():
 			if k in activity_keys.keys():
@@ -146,7 +149,8 @@ def _get_activities(user,target_date):
 
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
-		activity_data, manually_updated_act_data,include_duplicate=True
+		activity_data, manually_updated_act_data,
+		include_duplicate=True,include_deleted=True
 	)
 	for single_activity in combined_activities:
 		if fitfiles:
@@ -173,7 +177,7 @@ def _get_activities(user,target_date):
 class GarminData(APIView):
 	permission_classes = (IsAuthenticated,)
 
-	def _get_sleep_stats(self,target_date):
+	def _get_garmin_sleep(self,target_date):
 		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
 		yesterday_date = current_date - timedelta(days=1)
 		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -189,6 +193,29 @@ class GarminData(APIView):
 		yesterday_sleep_data = sleep_data_parsed[yesterday_date.strftime('%Y-%m-%d')]
 		return quicklook.calculations.garmin_calculation.get_sleep_stats(
 			current_date,yesterday_sleep_data, todays_sleep_data,str_dt=False)
+
+	def _get_fitbit_sleep(self,target_date):
+		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+		user = self.request.user
+		todays_sleep_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
+			UserFitbitDataSleep,user,current_date.date(),current_date.date())
+		if todays_sleep_data:
+			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
+				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
+		else:
+			todays_sleep_data = None
+
+		sleep_stats = quicklook.calculations.fitbit_calculation.get_sleep_stats(
+			todays_sleep_data,str_date=False)
+		return sleep_stats
+
+	def _get_sleep_stats(self,target_date):
+		user = self.request.user
+		device_type = quicklook.calculations.calculation_driver.which_device(user)
+		if device_type == 'garmin':
+			return self._get_garmin_sleep(target_date)
+		elif device_type == 'fitbit':
+			return self._get_fitbit_sleep(target_date)
 
 	def _get_weight(self, target_date):
 		weight = {

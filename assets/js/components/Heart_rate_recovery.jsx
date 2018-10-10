@@ -371,7 +371,7 @@ class HeartRate extends Component{
 							 td_values.push(<td>Aerobic Zone</td>);
 						}
 						else if(keyvalue == "anaerobic_zone"){
-							 td_values.push(<td>Aerobic Zone</td>);
+							 td_values.push(<td>Anaerobic Range</td>);
 						}
 						else{
 							td_values.push(<td>Heart rate not recorded</td>);

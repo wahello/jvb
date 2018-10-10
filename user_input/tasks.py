@@ -5,8 +5,6 @@ from .email import (send_userinput_update_email,
 	notify_user_to_submit_userinputs,notify_users_to_sync_watch)
 
 
-
-
 logger = get_task_logger(__name__)
 
 @task(name="userinputs.email")

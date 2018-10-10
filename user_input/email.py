@@ -1,4 +1,4 @@
-from django.db.models import Q
+import pytz
 from django.core.mail import send_mail
 from datetime import datetime,time,date,timedelta
 from user_input.models import UserDailyInput
