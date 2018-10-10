@@ -52,15 +52,10 @@ def _create_activity_stat(user,activity_obj,current_date):
 		keys as summary id and value as a dictonary, in the dictonary modified key and values
 		which are to be shown in activity grid
 	'''
-	profile = Profile.objects.filter(user=user)
-	
-	for tmp_profile in profile:
-		user_dob = tmp_profile.date_of_birth
-	user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+	user_age = user.profile.age()
 	
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
-	aerobic_value_half = 180-user_age-15
 
 	if activity_obj:
 		activity_keys = {
@@ -89,8 +84,6 @@ def _create_activity_stat(user,activity_obj,current_date):
 				else:
 					activity_keys["steps_type"] = "exercise"
 				if int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
-					activity_keys["can_update_steps_type"] = False
-				elif int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) > aerobic_value_half:
 					activity_keys["can_update_steps_type"] = False
 
 		return {activity_obj['summaryId']:activity_keys}

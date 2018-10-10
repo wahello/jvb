@@ -25,32 +25,40 @@ class HrrLeaderboard extends Component{
 		this.time99Colors = this.time99Colors.bind(this);
 		
 	}
-	heartBeatsColors(value){
+	heartBeatsColors(score, rank){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
   		let background = "";
   		let color = "";
-  		if(value && value != "N/A"){
-	  		if(value >= 20){
+  		if(score && score != "N/A"){
+	  		if(score >= 30){
 	  			background = "green";
 	  			color = "white";
 	  		}
-	  		else if(value >= 12 && value < 20){
+	  		else if(score >= 20 && score <= 29){
+	  			background = "#32CD32";
+	  			color = "white";
+	  		}
+	  		else if(score >= 14 && score <= 19){
 	  			background = "yellow";
 	  			color = "black";
 	  		}
-	  		else if(value > 0 && value < 12){
+	  		else if(score >= 12 && score <= 13){
+	  			background = "#FF8C00";
+	  			color = "black";
+	  		}
+	  		else if(score > 0 && score < 12){
 	  			background = "red";
 	  			color = "black";
 	  		}
   		}
-  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{value}</td>
+  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score + " (" + rank + ")"}</td>
   	}
-  	time99Colors(score,value){
+  	time99Colors(score,value, rank){
   		/* Applying the colors for the table cells depends upon their heart beat ranges*/
   		let background = "";
 		let color = "";
 		let hr_background = "";
-  		if(!isNaN(value)){
+  		if(!(isNaN(value))){
 	            if(value >= 3.4){
 	           		background = 'green';
 	               	color = 'white';
@@ -82,7 +90,7 @@ class HrrLeaderboard extends Component{
 	            hr_background = '#E5E5E5';
         }
 	        }
-  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score}</td>
+  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score + " (" + rank + ")"}</td>
   	}
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -213,28 +221,41 @@ class HrrLeaderboard extends Component{
 				}
 
 				else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
+					let tempRank = null;
+					let tempScore = null;
 					for(let key3 of ['score','rank']){
 						let value4 = value[key1][key3];
-						if(key3 == "rank"){
-							td_values.push(<td className ="overall_rank_value">{value4}</td>);
+						if(key3 == "rank" && tempRank == null){
+							tempRank = value4;
 						}
-						else if(key3 == "score"){
-							td_values.push(this.heartBeatsColors(value4.value));
+						else if(key3 == "score" && tempScore == null){
+							tempScore = value4.value;
 						}
 					}
+					if(tempRank != null && tempScore != null)
+					{
+						td_values.push(this.heartBeatsColors(tempScore, tempRank));
+					}
+					
 				}
 				
 				else if(key1 == "time_99" || key1 == "pure_time_99"){
+					let tempRank = null;
+					let tempScore = null;
+					let tempValue = null;
 					for(let key3 of ['score','rank']){
 						let value4 = value[key1][key3];
-						if(key3 == "rank"){
-							td_values.push(<td className ="overall_rank_value">{value4}</td>);
+						if(key3 == "rank" && tempRank == null){
+							tempRank = value4;
 						}
-						else if(key3 == "score"){
-							td_values.push(this.time99Colors(value4.value,value[key1].other_scores.points));
+						else if(key3 == "score" && tempScore == null){
+							//tempScore = this.time99Colors(value4.value,value[key1].other_scores.points, tempRank);
+							tempScore = value4.value;
+							tempValue = value[key1].other_scores.points;
 						}
-						
 					}
+					if(tempRank != null && tempScore != null)
+						td_values.push(this.time99Colors(tempScore, tempValue, tempRank));
 				}
 				else{
 					for(let key3 of ['score','rank']){
@@ -258,14 +279,10 @@ class HrrLeaderboard extends Component{
 								<tr ref="table_header_hrr">
 									<th>Overall HRR Rank</th>
 									<th>User</th>
-									<th>Time to 99 (hh:mm)</th>
-									<th>Time to 99 Rank</th>
-									<th>Heart beats lowered in 1st minute</th>
-									<th>Lowered Beats Rank</th>
-									<th>Pure Time to 99 (hh:mm)</th>
-									<th>Pure Time to 99 Rank</th>
-									<th>Pure Heart beats lowered in 1st minute</th>
-									<th>Pure Heart beats lowered in 1st minute Rank</th>
+									<th>Time to 99<br />(Rank)</th>
+									<th>Heart beats lowered<br />in 1st minute (Rank)</th>
+									<th>Pure Time to 99<br />(Rank)</th>
+									<th>Pure Heart beats<br />lowered in 1st minute (Rank)</th>
 									<th>Total HRR Rank Points</th>
 								</tr>
 								<tbody>

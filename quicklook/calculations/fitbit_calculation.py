@@ -1,3 +1,4 @@
+
 from datetime import datetime,timedelta,date,timezone
 import ast
 import pytz
@@ -204,7 +205,6 @@ def fitbit_heartrate_data(user,current_date):
 	else:
 		resting_heartrate = 0	
 	return resting_heartrate
-
 
 def get_avg_sleep_grade(ui_sleep_duration,sleep_per_wearable,age,sleep_aid):
 	if ui_sleep_duration and ui_sleep_duration != ":":
