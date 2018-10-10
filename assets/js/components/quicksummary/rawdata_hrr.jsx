@@ -110,7 +110,9 @@ class Raw_Hrr extends Component{
   		/*Adding the background colors for the table data depends upon the Scenarios
   		 in "time to reach 99" and "pure time to reach time to 99"*/
   		if(value && age && beats){
-  			if(beats < (180 - age + 4 + 10)){
+        if(value == -1)
+          return {background:"red",color:"black"}
+  			else if(beats < (180 - age + 4 + 10)){
   				if(value <= this.strToSecond("2:00")){
   					return {background:"green",color:"white"}
   				}
@@ -215,10 +217,10 @@ class Raw_Hrr extends Component{
 									style:this.heartBeatsColors(value)});
 				}
 				else if(key == "time_99" || key == "pure_time_99"){
-					let time = value;
+					let time = value && value == -1?"Never":this.renderSecToMin(value);
 					let age = data['age'];
 					let beats = data['end_heartrate_activity'];
-					all_data.push({value:this.renderSecToMin(time),
+					all_data.push({value:time,
 									style:this.renderTimeColors(value,age,beats)});
 				}
 				else{
