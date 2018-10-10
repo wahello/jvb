@@ -419,8 +419,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_smoking_penalty = ""
 		ui_did_workout = ''
 		
-
 		todays_user_input_copy = todays_user_input
+
 		if todays_user_input:
 			todays_user_input = todays_user_input[0]
 			ui_bedtime = todays_user_input.strong_input.sleep_bedtime
@@ -508,12 +508,14 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		alcohol_calculated_data['alcohol_week'] = avg_alcohol
 		grades_calculated_data['alcoholic_drink_per_week_gpa'] = avg_alcohol_gpa
 
+
 		# Penalties
 		if todays_daily_strong:
 			penalties = get_penality_grades(ui_smoking_penalty,ui_controlled_substance_penalty,ui_sleep_aid_penalty)
 			grades_calculated_data["sleep_aid_penalty"] = penalties['sleep_aid_penalty']
 			grades_calculated_data['ctrl_subs_penalty'] = penalties['ctrl_subs_penalty']
 			grades_calculated_data['smoke_penalty'] = penalties['smoke_penalty']
+
 	
 		#Sleep Calculations
 		if todays_sleep_data:

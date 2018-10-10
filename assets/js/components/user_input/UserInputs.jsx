@@ -353,7 +353,8 @@ transformActivity(activity){
       "steps":0,
       "steps_type":"",
       "summaryId":"",
-      "duplicate":false
+      "duplicate":false,
+      "deleted":false
   }
   for(let[key,value] of Object.entries(activity)){
       defaultActivityObject[key] = value
