@@ -852,19 +852,17 @@ handleChange_steps_type(event){
             if(activitiesObj[activityId]["deleted"] !== true && activitiesObj[activityId]["duplicate"] !== true){
                 if(activitiesObj[activityId]["activityType"] !== "HEART_RATE_RECOVERY")
                     activitiesLen ++;
-                console.log("activitiesLen: "+activitiesLen);
                 for(let key of Object.keys(activitiesObj[activityId])){
 
                     if((key === "activityType" && activitiesObj[activityId][key] !== "HEART_RATE_RECOVERY" && activitiesObj[activityId]["steps_type"] === "non_exercise")) {
                         count ++;
-                        console.log("count: "+count);
                     }
                 }
             }
                 
         }
         if((activity_data["activityType"] !== "HEART_RATE_RECOVERY") && ((count === 0 && activitiesLen === 1) || (count === (activitiesLen -1)))) {
-            console.log("Sorry,You can't do this. Atleast one activity step should be exercise");
+            
             this.activityStepsTypeModalToggle();
             steps_type = "exercise";
         } else {
@@ -2370,7 +2368,7 @@ return(
         
           <ModalBody className="modalcontent" id="activity_steps_type_modal_text">
             <div>
-            One workout file must characterize its steps as Exercise Steps. Please classify one activity as "exercise steps"
+            One workout (non HRR) file must characterize its steps as Exercise Steps. Please classify one activity as "exercise steps"
             </div>
             <Button
             className="btn btn-info" size="sm" style={{ float: "right", backgroundColor:"#ed9507"}}
@@ -2422,6 +2420,71 @@ return(
           <ModalBody className="modalcontent" id="steps_type_info_modal_body">
             <div>
                 We define steps in 2 different ways:  (1) exercise steps (steps accumulated during exercise, generally when a person’s heart rate is elevated to the aerobic or anaerobic zone); and (2) non exercise steps (generally when moving around throughout the day when not exercising (i.e., the heart rate is lower and a person may not consider this movement as “exercise”).   We receive “activity steps” from various wearable devices and use the logic below to characterize steps and “exercise” or “non exercise” steps (and this characterization also determines the “Non Exercise Steps” grade on our site as well as other stats we provide).  We give you the ability to recharacterize your steps as “exercise” or “non exercise” steps in certain scenarios, as you may create an activity file on your wearable device (we encourage this) that you may characterize differently than the logic we use below.  To recharacterize your steps between exercise and non exercise steps, select the toggle button in the “Steps Type” column.  NOTE: USERS CAN NOT CHANGE EXERCISE STEPS TO NON EXERCISE STEPS IN THE ACTIVITY FILE HAS AN AVERAGE HEART RATE IN THE ANAEROBIC ZONE.  If you’d like to recharacterize it as non exercise steps for some reason, email info@jvbwellness.com to request this and explain why)
+                <table className="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td>
+                                Exercise/Non-Exercise Steps Characterization
+                            </td>
+                            <td colSpan="3">
+                                If the average heart rate of an activity file is:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+
+                            </td>
+                            <td>
+                                Below Aerobic zone
+                            </td>
+                            <td>
+                                Aerobic Zone
+                            </td>
+                            <td>
+                                Anaerobic zone
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Heart Rate Recovery (“HRR”) File
+                            </td>
+                            <td>
+                                Default: Non-exercise steps
+                                Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
+                            </td>
+                            <td>
+                                Default: Non-Exercise steps
+                                Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+                            <td>
+                                Default: Non-Exercise steps
+                                Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Activity (Exercise) File
+                            </td>
+                            <td>
+                                Default: Non Exercise steps
+                                Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                Allow User to Characterize as Exercise or Non Exercise Steps: Yes*
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                Allow User to Characterize as Exercise or Non Exercise Steps:  No
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colSpan="4">
+                                 *If multiple activities, a user must characterize one activity as “exercise steps”
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </ModalBody>
     </Modal>
