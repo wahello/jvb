@@ -862,7 +862,7 @@ handleChange_steps_type(event){
                 
         }
         if((activity_data["activityType"] !== "HEART_RATE_RECOVERY") && ((count === 0 && activitiesLen === 1) || (count === (activitiesLen -1)))) {
-            
+
             this.activityStepsTypeModalToggle();
             steps_type = "exercise";
         } else {
@@ -2395,7 +2395,18 @@ return(
         </ModalHeader>
           <ModalBody className="modalcontent" id="activitySteps_info_modal_body">
             <div>
-                We define steps in 2 different ways:  (1) exercise steps (steps accumulated during exercise, generally when a person’s heart rate is elevated to the aerobic or anaerobic zone); and (2) non exercise steps (generally when moving around throughout the day when not exercising (i.e., the heart rate is lower and a person would generally not consider this movement as “exercise”.   We receive “activity steps” from various wearable devices provide what we receive as activity steps.  If you enter an activity in manually ,you can decide whether you want to call these steps exercise or non exercise steps.   For more information, also see the information button next to “Steps Type”
+                We define steps in 2 different ways:  
+                <ol>
+                    <li>Exercise steps (steps accumulated during exercise, generally when a person’s heart rate is elevated to the aerobic or anaerobic zone).
+                    </li>
+                    <li>
+                        Non exercise steps (generally when moving around throughout the day when not exercising i.e., the heart rate is lower and a person would generally not consider this movement as “exercise”). 
+                    </li>
+                    </ol>
+                    <p>  We receive “activity steps” from various wearable devices provide what we receive as activity steps.  If you enter an activity in manually ,you can decide whether you want to call these steps exercise or non exercise steps.
+                    </p>
+                    <p>For more information, also see the information button next to “Steps Type”.
+                    </p>
             </div>
         </ModalBody>
     </Modal>
@@ -2419,7 +2430,21 @@ return(
         </ModalHeader>
           <ModalBody className="modalcontent" id="steps_type_info_modal_body">
             <div>
-                We define steps in 2 different ways:  (1) exercise steps (steps accumulated during exercise, generally when a person’s heart rate is elevated to the aerobic or anaerobic zone); and (2) non exercise steps (generally when moving around throughout the day when not exercising (i.e., the heart rate is lower and a person may not consider this movement as “exercise”).   We receive “activity steps” from various wearable devices and use the logic below to characterize steps and “exercise” or “non exercise” steps (and this characterization also determines the “Non Exercise Steps” grade on our site as well as other stats we provide).  We give you the ability to recharacterize your steps as “exercise” or “non exercise” steps in certain scenarios, as you may create an activity file on your wearable device (we encourage this) that you may characterize differently than the logic we use below.  To recharacterize your steps between exercise and non exercise steps, select the toggle button in the “Steps Type” column.  NOTE: USERS CAN NOT CHANGE EXERCISE STEPS TO NON EXERCISE STEPS IN THE ACTIVITY FILE HAS AN AVERAGE HEART RATE IN THE ANAEROBIC ZONE.  If you’d like to recharacterize it as non exercise steps for some reason, email info@jvbwellness.com to request this and explain why)
+                We define steps in 2 different ways:
+                <ol>
+                    <li>
+                        Exercise steps (steps accumulated during exercise, generally when a person’s heart rate is elevated to the aerobic or anaerobic zone)
+                    </li>
+                    <li>
+                        Non exercise steps (generally when moving around throughout the day when not exercising i.e., the heart rate is lower and a person may not consider this movement as “exercise”)
+                    </li>
+                </ol> 
+                <p>We receive “activity steps” from various wearable devices and use the logic below to characterize steps and “exercise” or “non exercise” steps (and this characterization also determines the “Non Exercise Steps” grade on our site as well as other stats we provide).  We give you the ability to recharacterize your steps as “exercise” or “non exercise” steps in certain scenarios, as you may create an activity file on your wearable device (we encourage this) that you may characterize differently than the logic we use below.  To recharacterize your steps between exercise and non exercise steps, select the toggle button in the “Steps Type” column.  
+                </p>
+                <p>NOTE: USERS CAN NOT CHANGE EXERCISE STEPS TO NON EXERCISE STEPS IN THE ACTIVITY FILE HAS AN AVERAGE HEART RATE IN THE ANAEROBIC ZONE.
+                </p>  
+                <p>If you’d like to recharacterize it as non exercise steps for some reason, email info@jvbwellness.com to request this and explain why
+                </p>
                 <table className="table table-bordered">
                     <tbody>
                         <tr>
@@ -2427,7 +2452,7 @@ return(
                                 Exercise/Non-Exercise Steps Characterization
                             </td>
                             <td colSpan="3">
-                                If the average heart rate of an activity file is:
+                                If the average heart rate of an activity file is
                             </td>
                         </tr>
                         <tr>
@@ -2450,15 +2475,15 @@ return(
                             </td>
                             <td>
                                 Default: Non-exercise steps
-                                Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
                             </td>
                             <td>
                                 Default: Non-Exercise steps
-                                Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                                <br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                             <td>
                                 Default: Non-Exercise steps
-                                Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                         </tr>
                         <tr>
@@ -2467,15 +2492,15 @@ return(
                             </td>
                             <td>
                                 Default: Non Exercise steps
-                                Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
                             </td>
                             <td>
                                 Default: Exercise steps
-                                Allow User to Characterize as Exercise or Non Exercise Steps: Yes*
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes*
                             </td>
                             <td>
                                 Default: Exercise steps
-                                Allow User to Characterize as Exercise or Non Exercise Steps:  No
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  No
                             </td>
                         </tr>
                         <tr>
