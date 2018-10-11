@@ -316,7 +316,7 @@ class Hrr_Dashboard extends Component{
 	            hr_background = '#E5E5E5';
         }
 	        }
-		
+		 
 		var model = <Card className = "card_style"
 						 id = "my-card"
 						 style = {{background:background, color:color}}>
