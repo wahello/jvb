@@ -231,8 +231,10 @@ def makeformat(trans_activity_data,current_date,last_seven_days_date):
 	fitbt_act = None
 	if trans_activity_data:
 			for i,single_activity in enumerate(trans_activity_data):
-				activity_date = trans_activity_data[i][0]["startTimeInSeconds"]
-				actvity_date = activity_date[:10]
+				activity_start_time = trans_activity_data[i][0]["startTimeInSeconds"]
+				activity_offset = trans_activity_data[i][0]["startTimeOffsetInSeconds"]
+				actvity_date = datetime.utcfromtimestamp(activity_start_time
+					+ activity_offset).strftime("%Y-%m-%d")
 				if actvity_date:
 					# if datetime.strptime(actvity_date,'%Y-%m-%d') <= current_date:
 					formated_data[actvity_date] = single_activity	
