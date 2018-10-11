@@ -52,7 +52,7 @@ CELERY_TIMEZONE = 'Asia/Kolkata'
 #     #execute every hour EST (America/New_york)
 #     "remind_users_sync_watch":{
 #         'task':'sync_watch.reminder',
-#         'schedule':crontab(minute=53, hour=17)
+#         'schedule':crontab(minute=53, hour='*/1')
 #     },
 # }
 
