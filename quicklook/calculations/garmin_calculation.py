@@ -879,7 +879,7 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
 				# etc. In that case empty value will be taken for those keys even
 				# though value exist in original summary provided by garmin 
-				if val or key == 'duplicate' or key == 'deleted':
+				if val or key == 'duplicate' or key == 'deleted' or key == 'comments':
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
