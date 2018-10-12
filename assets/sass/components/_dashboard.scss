@@ -94,7 +94,7 @@
 		font-size:80% !important;
 	}
 	.weeklyWorkoutTable>tbody>tr>td:first-child {
-		word-break: break-all !important;
+		font-size:85% !important;
 	}
 	.weeklyWorkoutTable th{
 		min-width: 40px !important;
@@ -154,8 +154,7 @@
 	min-width: 60px;
 }
 .weeklyWorkoutTable>tbody>tr>td:first-child{
-	word-break: break-all;
-	white-space:pre-wrap;
+	font-size: 85%
 }
 .weeklyWorkoutTable>tr>th:first-child{
 	min-width: 80px !important;
