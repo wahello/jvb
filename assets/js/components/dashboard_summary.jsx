@@ -158,9 +158,15 @@ constructor(props){
 
                   },
             "mc":{
-                "movement_consistency_gpa":this.getInitialDur(),
-                     "movement_consistency_grade":this.getInitialDur(),
-                     "movement_consistency_score":this.getInitialDur()
+                  "movement_consistency_gpa":this.getInitialDur(),
+                  "movement_consistency_grade":this.getInitialDur(),
+                  "movement_consistency_score":this.getInitialDur(),
+                  "total_active_minutes":this.getInitialDur(),
+                  "total_active_minutes_prcnt":this.getInitialDur(),
+                  "active_minutes_without_sleep":this.getInitialDur(),
+                  "active_minutes_without_sleep_prcnt":this.getInitialDur(),
+                  "active_minutes_without_sleep_exercise":this.getInitialDur(),
+                  "active_minutes_without_sleep_exercise_prcnt":this.getInitialDur()
                   },
             "non_exercise":{
                  "non_exericse_steps_gpa":this.getInitialDur(),
@@ -1203,6 +1209,62 @@ handleBackButton(){
                 <td className="progress_table">{this.gpascoreDecimal(this.state.summary.mc.movement_consistency_gpa .year)}</td>
                 {this.gpascoreCustomRangeTD(this.state.summary.mc.movement_consistency_gpa.custom_range)}
             </tr>
+          {/**********************************************************/}
+          <tr className="progress_table">
+                <td className="progress_table">Active Minutes (24 hours)</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes.today}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes.yesterday}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes.week}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes.month}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes .year}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.total_active_minutes.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Active Minutes (24 Hours)</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes_prcnt.today}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes_prcnt.yesterday}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes_prcnt.week}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes_prcnt.month}</td>
+                <td className="progress_table">{this.state.summary.mc.total_active_minutes_prcnt .year}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.total_active_minutes_prcnt.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">Active Minutes (when not sleeping)</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep.today}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep.yesterday}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep.week}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep.month}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep .year}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.active_minutes_without_sleep.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Active Minutes (when not sleeping)</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_prcnt.today}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_prcnt.yesterday}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_prcnt.week}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_prcnt.month}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_prcnt .year}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.active_minutes_without_sleep_prcnt.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">Active Minutes (when not sleeping and exercising)</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise.today}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise.yesterday}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise.week}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise.month}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise .year}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.active_minutes_without_sleep_exercise.custom_range)}
+            </tr>
+            <tr className="progress_table">
+                <td className="progress_table">% of Active Minutes (when not sleeping and exercising)</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise_prcnt.today}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise_prcnt.yesterday}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise_prcnt.week}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise_prcnt.month}</td>
+                <td className="progress_table">{this.state.summary.mc.active_minutes_without_sleep_exercise_prcnt .year}</td>
+                {this.gpascoreCustomRangeTD(this.state.summary.mc.active_minutes_without_sleep_exercise_prcnt.custom_range)}
+            </tr>
+          {/*****************************************************/}
         </tbody>
     </table>
 </div> 
