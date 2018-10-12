@@ -14,8 +14,8 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals,\
 					DailyActivity
-from weather.views import get_filtered_activities, get_weather_data
-# from user_input.utils.daily_activity_table_related import get_activities_old_format
+from weather.views import get_weather_data
+# from weather.views.ActivityWeather import get_filtered_activities
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -240,10 +240,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 	        activities_model_objects = []
 	        for activity in activities:
 	            activity_stats = copy.deepcopy(activity)
-
-	            time = activity['startTimeInSeconds'] + activity['startTimeOffsetInSeconds']
-	            activity_weather = get_weather_data(user, time, activity['summaryId'])
-
+	            activity_weather = {}
 	            activity_weather = json.dumps(activity_weather)
 	            del(activity_stats['comments'],
 	            activity_stats['steps_type'],
@@ -281,7 +278,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 	                activities_model_objects.append(act_obj)
 	        DailyActivity.objects.bulk_create(activities_model_objects)
 	        
-	        # weather_report = get_filtered_activities(user, creation_date)
 
 	def get_activities(self, ui_date, user):
 		activities = DailyActivity.objects.filter(
@@ -297,9 +293,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				activity["activity_weather"], activity['activity_id'])
 			activity_data_dict = ast.literal_eval(activity_data)
 			activity_weather_dict = ast.literal_eval(activity_weather)
-			activities_data[activity_id] = {**activity_data_dict, **activity, \
+			activities_data[activity_id] = {**activity_data_dict, **activity, 
 											'activity_weather':activity_weather_dict}
-		# print ('>>>> activities_data', activities_data)
 		return activities_data
 
 	def to_representation(self, instance):
@@ -307,6 +302,5 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		created_at = instance.created_at
 		user = instance.user
 		activities = json.dumps(self.get_activities(created_at,user))
-		# activities = json.dumps(get_activities_old_format(user, created_at))
 		serialized_data['strong_input']['activities'] = activities
 		return serialized_data
