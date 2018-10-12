@@ -352,7 +352,9 @@ transformActivity(activity){
       "startTimeOffsetInSeconds":"",
       "steps":0,
       "steps_type":"",
-      "summaryId":""
+      "summaryId":"",
+      "duplicate":false,
+      "deleted":false
   }
   for(let[key,value] of Object.entries(activity)){
       defaultActivityObject[key] = value

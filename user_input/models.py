@@ -440,7 +440,6 @@ class DailyUserInputOptional(models.Model):
     nap_duration = models.CharField(max_length = 10, blank = True)
     nap_comment = models.TextField(blank=True)
 
-
 class InputsChangesFromThirdSources(models.Model):
     user_input = models.OneToOneField(UserDailyInput, related_name='third_source_input')
     resting_heart_rate = models.FloatField( validators = [MinValueValidator(25),MaxValueValidator(125)])
@@ -482,3 +481,35 @@ class Goals(models.Model):
     user_input = models.OneToOneField(UserDailyInput, related_name='goals')
     goals = models.CharField(max_length=264,choices = CHOICE)
     other = models.CharField(max_length=264,null=True,blank=True)
+
+class DailyActivity(models.Model):
+    EXERCISE = 'exercise'
+    NON_EXERCISE = 'non_exercise'
+
+    STEPS_TYPE_CHOICES =  (
+        (EXERCISE,'Exercise'),
+        (NON_EXERCISE,'Non Exercise'),
+    )
+
+    user = models.ForeignKey(User, related_name='daily_activities')
+    activity_id = models.CharField(max_length=100)
+    created_at = models.DateField()
+    activity_data = models.TextField()
+    activity_weather = models.TextField(blank=True)
+    can_update_steps_type = models.BooleanField(default=True)
+    
+    steps_type = models.CharField(
+        max_length=100,choices = STEPS_TYPE_CHOICES)
+
+    comments = models.TextField(blank=True)
+    duplicate = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        dtime = str(self.created_at)
+        return "{}-{}".format(self.user.username,dtime)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+        ]
