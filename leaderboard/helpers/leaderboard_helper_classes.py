@@ -163,7 +163,12 @@ class LeaderboardCategories(object):
 			"pure_time_99":"Pure Time To 99",
 			"beat_lowered":"Heart Beats Lowered In 1st Minute",
 			"pure_beat_lowered":"Pure Heart Beats Lowered In 1st Minute",
-			"overall_hrr":"Overall HRR"
+			"overall_hrr":"Overall HRR",
+			"active_min_total":"Active Minute Per Day (24 hours)",
+			"active_min_exclude_sleep":("Active Minute Per Day "
+				+"(Excludes Active Minutes When Sleeping)"),
+			"active_min_exclude_sleep_exercise":("Active Minute Per Day "+
+				"(Excludes Active Minutes When Sleeping and Exercising)")
 		}
 
 		# default score value for each leader board category
@@ -183,7 +188,10 @@ class LeaderboardCategories(object):
 			'time_99':self.DEFAULT_MAXIMUM_SCORE,
 			'pure_time_99':self.DEFAULT_MAXIMUM_SCORE,
 			'beat_lowered':self.DEFAULT_MINIMUM_SCORE,
-			'pure_beat_lowered':self.DEFAULT_MINIMUM_SCORE
+			'pure_beat_lowered':self.DEFAULT_MINIMUM_SCORE,
+			'active_min_total':self.DEFAULT_MINIMUM_SCORE,
+			'active_min_exclude_sleep':self.DEFAULT_MINIMUM_SCORE,
+			'active_min_exclude_sleep_exercise':self.DEFAULT_MINIMUM_SCORE
 		}
 
 		# Verbose name for score of certain category
@@ -203,7 +211,10 @@ class LeaderboardCategories(object):
 			'time_99':'Time To Reach 99',
 			'pure_time_99':'Pure Time To 99 ',
 			'beat_lowered':'Heart Beat Lowered In 1st Minute',
-			'pure_beat_lowered':'Pure Heart Beat Lowered In 1st Minute'
+			'pure_beat_lowered':'Pure Heart Beat Lowered In 1st Minute',
+			'active_min_total':'Active Minutes (24 hours)',
+			'active_min_exclude_sleep':'Active Minutes (when not sleeping)',
+			'active_min_exclude_sleep_exercise':'Active Minutes (when not sleeping and exercising)'
 		}
 		self.category_score_priority = self.__get_catg_score_priority()
 
@@ -896,6 +907,40 @@ class LeaderboardOverview(object):
 					elif catg == 'pure_beat_lowered':
 						score = data['other']['hrr_pure_1_minute_beat_lowered'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'active_min_total':
+						score = data['mc']['total_active_minutes'][dtype]
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score))
+					elif catg == 'active_min_exclude_sleep':
+						score = data['mc']['active_minutes_without_sleep'][dtype]
+						other_scores = {
+							'prcnt_active_min':{
+								"value":data['mc']['active_minutes_without_sleep_prcnt'][dtype],
+								"verbose_name":"% Active Minutes (when not sleeping)"
+							},
+							'sleep_duration':{
+								"value":data['sleep']['total_sleep_in_hours_min'][dtype],
+								"verbose_name":"Sleep Duration (hh:mm)"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores)
+						)
+					elif catg == 'active_min_exclude_sleep_exercise':
+						score = data['mc']['active_minutes_without_sleep_exercise'][dtype]
+						other_scores = {
+							'prcnt_active_min':{
+								"value":data['mc']['active_minutes_without_sleep_exercise_prcnt'][dtype],
+								"verbose_name":"% Active Minutes (when not sleeping and exercising)"
+							},
+							'sleep_duration':{
+								"value":data['sleep']['total_sleep_in_hours_min'][dtype],
+								"verbose_name":"Sleep Duration (hh:mm)"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores)
+						)
 
 
 				if self.custom_ranges:
@@ -993,6 +1038,40 @@ class LeaderboardOverview(object):
 							score = data['other']['hrr_pure_1_minute_beat_lowered']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score))
+						elif catg == 'active_min_total':
+							score = data['mc']['total_active_minutes']['custom_range'][str_range]['data']
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'active_min_exclude_sleep':
+							score = data['mc']['active_minutes_without_sleep']['custom_range'][str_range]['data']
+							other_scores = {
+								'prcnt_active_min':{
+									"value":data['mc']['active_minutes_without_sleep_prcnt']['custom_range'][str_range]['data'],
+									"verbose_name":"% Active Minutes (when not sleeping)"
+								},
+								'sleep_duration':{
+									"value":data['sleep']['total_sleep_in_hours_min']['custom_range'][str_range]['data'],
+									"verbose_name":"Sleep Duration (hh:mm)"
+								}
+							}
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score,other_scores=other_scores)
+							)
+						elif catg == 'active_min_exclude_sleep_exercise':
+							score = data['mc']['active_minutes_without_sleep_exercise']['custom_range'][str_range]['data']
+							other_scores = {
+								'prcnt_active_min':{
+									"value":data['mc']['active_minutes_without_sleep_exercise_prcnt']['custom_range'][str_range]['data'],
+									"verbose_name":"% Active Minutes (when not sleeping and exercising)"
+								},
+								'sleep_duration':{
+									"value":data['sleep']['total_sleep_in_hours_min']['custom_range'][str_range]['data'],
+									"verbose_name":"Sleep Duration (hh:mm)"
+								}
+							}
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score,other_scores=other_scores)
+							)
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):

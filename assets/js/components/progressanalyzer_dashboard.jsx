@@ -722,10 +722,10 @@ class ProgressDashboard extends Component{
           			userName = value['custom_range'][dur].user_rank.username;
           			category = value['custom_range'][dur].user_rank.category;
           			if(category == "Percent Unprocessed Food"){
-                  verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
+                  verbose_name = value['custom_range'][dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
                 }
                 else if(category == "Average Sleep"){
-                  verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
+                  verbose_name = value['custom_range'][dur].user_rank.other_scores.sleep_duration.verbose_name;
                 }
   		        }
             }
