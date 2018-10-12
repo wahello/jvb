@@ -113,7 +113,7 @@ We noticed that you have not submitted your user inputs {}. Click on the link be
 {}
 
 If clicking the link above doesn't work, please copy and paste the URL into a new browser window instead.
-Thanks and let us know if you have any questions by emailing mailto:{} 
+Thanks and let us know if you have any questions by emailing {} 
 
 Sincerely,
 JVB Health & Wellness""" 
@@ -187,7 +187,7 @@ Hi {},
 
 We just noticed that you have not sync’d your wearable device in a while {}. If you want to see all your cool health and activity stats and rankings, sync your watch now.
 
-Thanks and let us know if you have any questions by emailing mailto:{} 
+Thanks and let us know if you have any questions by emailing {} 
 
 Sincerely,
 JVB Health and Wellness
@@ -196,10 +196,13 @@ JVB Health and Wellness
 				user_first_name.capitalize(),synchronize_from_text,
 				FEEDBACK_EMAIL
 			)	
-			send_mail(
-				subject = subject,
-				message = message,
-				from_email = FEEDBACK_EMAIL,
-				recipient_list = [user_email],
-				fail_silently = True  
-			)
+			if not (last_sync.hour > time(5) and last_sync.hour < time(9)) or (
+				last_sync.hour > time(17) and last_sync.hour < time(21)):
+				print(message)
+				send_mail(
+					subject = subject,
+					message = message,
+					from_email = FEEDBACK_EMAIL,
+					recipient_list = [user_email],
+					fail_silently = True  
+				)
