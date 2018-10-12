@@ -1,4 +1,3 @@
-# from datetime import datetime
 import re
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator,BaseValidator
