@@ -69,7 +69,7 @@ def notify_user_to_submit_userinputs():
 	RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
 		"cherylcasone","knitter61","lafmaf123","davelee","Justin","lalancaster",
 		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
-		"atul","jvbhealth","Jvbtest"]
+		"atul","jvbhealth","Jvbtest","Vickykolovou"]
 	# RECEPIENTS_USERNAME = ["dileep",'narendra','venky']
 
 	# Local time at which email notification should be sent to the user
@@ -148,8 +148,9 @@ JVB Health & Wellness"""
 def notify_users_to_sync_watch():
 
 	RECEPIENTS_USERNAME = ["johnb",'pw',"BrookPorter",
-		"Justin","lalancaster","MikeC","atul","jvbhealth","Jvbtest"]
-	# RECEPIENTS_USERNAME = ['venky']
+		"Justin","lalancaster","MikeC","atul","jvbhealth","Jvbtest",
+		"missbgymnast","squishyturtle24","Vickykolovou"]
+	# RECEPIENTS_USERNAME = ['atul']
 	EMAIL_TIMING = [time(9),time(21)]
 	RECEPIENTS_WITH_OFFSET = get_users_having_local_time(
 		EMAIL_TIMING,RECEPIENTS_USERNAME)
@@ -196,9 +197,9 @@ JVB Health and Wellness
 				user_first_name.capitalize(),synchronize_from_text,
 				FEEDBACK_EMAIL
 			)	
-			if not (last_sync.hour > time(5) and last_sync.hour < time(9)) or (
-				last_sync.hour > time(17) and last_sync.hour < time(21)):
-				print(message)
+			if not(today_local_time.date() == last_sync.date() and
+				((last_sync.hour >= 5 and last_sync.hour <= 9) 
+				or(last_sync.hour >= 17 and last_sync.hour <= 21))):
 				send_mail(
 					subject = subject,
 					message = message,
