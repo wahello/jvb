@@ -640,10 +640,6 @@ def aa_data(user,start_date):
 				ui_activity = activities_dic.get(single_activity["summaryId"],0)
 				if ui_activity:
 					hrr_not_recorded_list.append(ui_activity.get('durationInSeconds',0))
-				else:
-					hrr_not_recorded_list.append(ui_activity.get('durationInSeconds',0))
-			else:
-				hrr_not_recorded_list.append(single_activity.get('durationInSeconds',0))
 
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
@@ -1326,10 +1322,8 @@ def daily_aa_data(user, start_date):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
-			user_created_activity_list.append(
-				activities_dic.get(single_actiivty["summaryId"]))
-		else:
-			user_created_activity_list.append(single_actiivty)
+			user_created_activity_list.append(activities_dic.get(single_actiivty["summaryId"]))
+
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1361,7 +1355,7 @@ def daily_aa_data(user, start_date):
 													manually_updated_json=manually_edited_dic)
 
 	try:
-		if activities:
+		if user_input_strong:
 			for tmp in a1:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -1842,8 +1836,6 @@ def aa_low_high_end_data(user,start_date):
 			and activities_dic.get(single_actiivty["summaryId"])):
 			user_created_activity_list.append(
 				activities_dic.get(single_actiivty["summaryId"]))
-		else:
-			user_created_activity_list.append(single_actiivty)
 
 	workout = []
 	hrr = []
