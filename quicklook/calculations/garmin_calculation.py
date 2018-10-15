@@ -36,6 +36,7 @@ from quicklook.models import UserQuickLook,\
 
 from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -2480,10 +2481,12 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 		
-		userinput_activities = safe_get(todays_daily_strong,'activities',None)
-		if userinput_activities:
-			userinput_activities = json.loads(userinput_activities)
-		
+		# userinput_activities = safe_get(todays_daily_strong,'activities',None)
+		# if userinput_activities:
+		# 	userinput_activities = json.loads(userinput_activities)
+		userinput_activities = get_daily_activities_in_base_format(
+			user,current_date.date())
+
 		bodycmp = get_garmin_model_data(
 			UserGarminDataBodyComposition,user,
 			start_epoch,end_epoch,order_by = '-id')
