@@ -10,35 +10,41 @@ from quicklook.calculations.garmin_calculation import get_filtered_activity_stat
 from user_input.utils.daily_activity_table_related import get_activities_old_format
 
 
-def get_filtered_activities(user, dt):
-    date = dt.strftime('%Y-%m-%d')
-    activities = get_activities_old_format(user, date)
-    garmin_list, manually_edited_list = _get_activities_data(user, date)
-    manually_edited = {dic['summaryId']:dic for dic in manually_edited_list}
+class ActivityWeather(APIView):
 
-    filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
-                        manually_updated_json=manually_edited,
-                        userinput_activities=activities)
-    for activity in filtered_activities_list:
-        if activity['activity_weather'] == {}:
-            epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
-            if 'startingLatitudeInDegree' in activity:
-                latitude = activity['startingLatitudeInDegree']
-                longitude = activity['startingLongitudeInDegree']
-                weather_info = get_weather_information(latitude, longitude, epoch_time)
-                activity['activity_weather'].update(
-                    {'dewPoint':weather_info['currently']['dewPoint'],
-                    'humidity': weather_info['currently']['humidity'],
-                    'temperature':weather_info['currently']['temperature'],
-                    'wind':weather_info['currently']['windSpeed'],
-                    'temperature_feels_like':weather_info['currently']['apparentTemperature']})
-            weather_report = get_weather_data(user, epoch_time, activity['summaryId'])
-            activity['activity_weather'] = weather_report
-    return filtered_activities_list
+    def get_filtered_activities(user, dt):
+        date = dt.strftime('%Y-%m-%d')
+        activities = get_activities_old_format(user, date)
+        garmin_list, manually_edited_list = _get_activities_data(user, date)
+        manually_edited = {dic['summaryId']:dic for dic in manually_edited_list}
+
+        filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
+                            manually_updated_json=manually_edited,
+                            userinput_activities=activities)
+        weather_data = {} 
+        for activity in filtered_activities_list:
+            if (activity['activity_weather'] == {}) or ('activity_weather' not in activity):
+                epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
+                if 'startingLatitudeInDegree' in activity:
+                    latitude = activity['startingLatitudeInDegree']
+                    longitude = activity['startingLongitudeInDegree']
+                    weather_info = get_weather_information(latitude, longitude, epoch_time)
+                    activity['activity_weather'].update(
+                        {'dewPoint':weather_info['currently']['dewPoint'],
+                        'humidity': weather_info['currently']['humidity'],
+                        'temperature':weather_info['currently']['temperature'],
+                        'wind':weather_info['currently']['windSpeed'],
+                        'temperature_feels_like':weather_info['currently']['apparentTemperature']})
+                weather_report = get_weather_data(user, epoch_time, activity['summaryId'])
+                weather_data[activity['summaryId']] = {**weather_report}
+            activity_weather_dict = ast.literal_eval(activity['activity_weather'])
+            weather_data[activity['summaryId']] = {**activity_weather_dict}
+        return weather_data
 
 
 def get_weather_data(user, epoch_time, summaryId):
-    weather_report = {}
+    weather_report = {'dewPoint':' ', 'humidity': ' ', 'temperature':' ', 
+                        'wind':' ', 'temperature_feels_like': ' '}
     try:
         garmin_activity = UserGarminDataActivity.objects.get(user=user, summary_id=summaryId)
         garmin_activity_data = ast.literal_eval(garmin_activity.data)
