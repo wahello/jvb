@@ -233,49 +233,49 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		return instance
 
 	def create_update_activities(self, user, activities, creation_date):
-	    if activities:
-	        activities = list(json.loads(activities).values())
-	        activities_model_objects = []
-	        for activity in activities:
-	            activity_stats = copy.deepcopy(activity)
-	            activity_weather = {}
-	            activity_weather = json.dumps(activity_weather)
-	            del(activity_stats['comments'],
-	            activity_stats['steps_type'],
-	            activity_stats['can_update_steps_type'],
-	            activity_stats['duplicate'])
-	            activity_stats.pop('deleted', None)
-	            activity_stats.pop('activity_weather', None)
+		if activities:
+			activities = list(json.loads(activities).values())
+			activities_model_objects = []
+			for activity in activities:
+				activity_stats = copy.deepcopy(activity)
+				activity_weather = {}
+				activity_weather = json.dumps(activity_weather)
+				del(activity_stats['comments'],
+					activity_stats['steps_type'],
+					activity_stats['can_update_steps_type'],
+					activity_stats['duplicate'])
+				activity_stats.pop('deleted', None)
+				activity_stats.pop('activity_weather', None)
 
-	            act_obj = DailyActivity(
-	                user = user,
-	                activity_id = activity['summaryId'],
-	                created_at = creation_date,
-	                activity_data = activity_stats,
-	                activity_weather = activity_weather, 
-	                can_update_steps_type = activity.get(
-	                    'can_update_steps_type',True),
-	                steps_type = activity.get('steps_type'),
-	                comments = activity.get('comments'),
-	                duplicate = activity.get('duplicate',False),
-	                deleted = activity.get('deleted',False)
-	            )
-	            activities = DailyActivity.objects.filter(
-	                activity_id=activity['summaryId']) 
-	            if activities:
-	                activities.update(
-	                    activity_data = activity_stats,
-	                    activity_weather = activity_weather,
-	                    can_update_steps_type = activity.get(
-	                        'can_update_steps_type',True),
-	                    steps_type = activity.get('steps_type'),
-	                    comments = activity.get('comments'),
-	                    duplicate = activity.get('duplicate',False),
-	                    deleted = activity.get('deleted',False))
-	            else:
-	                activities_model_objects.append(act_obj)
-	        DailyActivity.objects.bulk_create(activities_model_objects)
-	        
+				act_obj = DailyActivity(
+					user = user,
+					activity_id = activity['summaryId'],
+					created_at = creation_date,
+					activity_data = activity_stats,
+					activity_weather = activity_weather, 
+					can_update_steps_type = activity.get(
+						'can_update_steps_type',True),
+					steps_type = activity.get('steps_type'),
+					comments = activity.get('comments'),
+					duplicate = activity.get('duplicate',False),
+					deleted = activity.get('deleted',False)
+				)
+				activities = DailyActivity.objects.filter(
+					activity_id=activity['summaryId']) 
+				if activities:
+					activities.update(
+						activity_data = activity_stats,
+						activity_weather = activity_weather,
+						can_update_steps_type = activity.get(
+							'can_update_steps_type',True),
+						steps_type = activity.get('steps_type'),
+						comments = activity.get('comments'),
+						duplicate = activity.get('duplicate',False),
+						deleted = activity.get('deleted',False))
+				else:
+					activities_model_objects.append(act_obj)
+			DailyActivity.objects.bulk_create(activities_model_objects)
+
 
 	def get_activities(self, ui_date, user):
 		activities = DailyActivity.objects.filter(

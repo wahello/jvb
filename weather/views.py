@@ -12,7 +12,7 @@ from user_input.utils.daily_activity_table_related import get_activities_old_for
 
 class ActivityWeatherView(APIView):
 
-    def get_filtered_activities(user, dt):
+    def get_weather_info_for_filtered_activities(user, dt):
         date = dt.strftime('%Y-%m-%d')
         activities = get_activities_old_format(user, date)
         garmin_list, manually_edited_list = _get_activities_data(user, date)
@@ -28,21 +28,23 @@ class ActivityWeatherView(APIView):
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
-                    weather_info = get_weather_information(latitude, longitude, epoch_time)
+                    weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
                     activity['activity_weather'].update(
                         {'dewPoint':weather_info['currently']['dewPoint'],
                         'humidity': weather_info['currently']['humidity'],
                         'temperature':weather_info['currently']['temperature'],
                         'wind':weather_info['currently']['windSpeed'],
                         'temperature_feels_like':weather_info['currently']['apparentTemperature']})
-                weather_report = get_weather_data(user, epoch_time, activity['summaryId'])
+                weather_report = get_weather_info_using_garmin_activity(
+                                            user, epoch_time, activity['summaryId'])
                 weather_data[activity['summaryId']] = {**weather_report}
-            activity_weather_dict = ast.literal_eval(activity['activity_weather'])
-            weather_data[activity['summaryId']] = {**activity_weather_dict}
+            weather_report = ast.literal_eval(activity['activity_weather'])
+            weather_data[activity['summaryId']] = {**weather_report}
+        print ('>>>>>>>>>>>>>>>     ', weather_data)
         return weather_data
 
 
-def get_weather_data(user, epoch_time, summaryId):
+def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
     weather_report = {'dewPoint':' ', 'humidity': ' ', 'temperature':' ', 
                         'wind':' ', 'temperature_feels_like': ' '}
     try:
@@ -52,7 +54,7 @@ def get_weather_data(user, epoch_time, summaryId):
             latitude = garmin_activity_data['startingLatitudeInDegree']
             longitude = garmin_activity_data['startingLongitudeInDegree']
             
-            weather_info = get_weather_information(latitude, longitude, epoch_time)
+            weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
             weather_report.update({'dewPoint':weather_info['currently']['dewPoint'],
                 'humidity': weather_info['currently']['humidity'],
                 'temperature':weather_info['currently']['temperature'],
@@ -63,7 +65,7 @@ def get_weather_data(user, epoch_time, summaryId):
         return weather_report
 
 
-def get_weather_information(latitude, longitude, epoch_time, unit='si',include_block=['currently']):
+def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='si',include_block=['currently']):
 
     KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
     POSSIBLE_DATA_BLOCK = ['currently', 'minutely','hourly', 'daily', 'alerts','flags'] 
