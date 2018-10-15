@@ -14,8 +14,6 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals,\
 					DailyActivity
-from weather.views import get_weather_data
-# from weather.views.ActivityWeather import get_filtered_activities
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -286,15 +284,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		activities_data = {}
 		for activity in activities:
 			activity_data  = activity["activity_data"]
-			activity_weather = activity["activity_weather"]
 			activity_id = activity.get("activity_id")
 			del (activity['activity_data'], activity['user'], 
-				activity['id'], activity['created_at'], 
-				activity["activity_weather"], activity['activity_id'])
+				activity['id'], activity['created_at'], activity['activity_id'])
 			activity_data_dict = ast.literal_eval(activity_data)
-			activity_weather_dict = ast.literal_eval(activity_weather)
-			activities_data[activity_id] = {**activity_data_dict, **activity, 
-											'activity_weather':activity_weather_dict}
+			activities_data[activity_id] = {**activity_data_dict, **activity}
 		return activities_data
 
 	def to_representation(self, instance):

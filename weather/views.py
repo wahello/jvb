@@ -10,7 +10,7 @@ from quicklook.calculations.garmin_calculation import get_filtered_activity_stat
 from user_input.utils.daily_activity_table_related import get_activities_old_format
 
 
-class ActivityWeather(APIView):
+class ActivityWeatherView(APIView):
 
     def get_filtered_activities(user, dt):
         date = dt.strftime('%Y-%m-%d')
