@@ -196,10 +196,19 @@ JVB Health and Wellness
 			message = message.format(
 				user_first_name.capitalize(),synchronize_from_text,
 				FEEDBACK_EMAIL
-			)	
+			)
+
+			synced_in_past_4_hours = False
+			notification_shift = 'evening' if today_local_time.hour > 11 else 'morning'
+			if (notification_shift == 'evening' 
+				and last_sync.hour >= 17 and last_sync.hour <= 21):
+				synced_in_past_4_hours = True
+			elif (notification_shift == 'morning'
+				and (last_sync.hour >= 5 and last_sync.hour <= 9)):
+				synced_in_past_4_hours = True
+
 			if not(today_local_time.date() == last_sync.date() and
-				((last_sync.hour >= 5 and last_sync.hour <= 9) 
-				or(last_sync.hour >= 17 and last_sync.hour <= 21))):
+				synced_in_past_4_hours):
 				send_mail(
 					subject = subject,
 					message = message,
