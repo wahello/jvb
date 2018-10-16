@@ -208,8 +208,10 @@ class GarminConnectPing(APIView):
 						data = value.data
 						data_formated = ast.literal_eval(data)
 						strat_time = data_formated.get("startTimeInSeconds",0)
-						if strat_time:
-							fitfile_belong_date = date.fromtimestamp(strat_time)
+						activity_offset = data_formated.get("startTimeOffsetInSeconds",0)
+						start_time = strat_time + activity_offset
+						if start_time:
+							fitfile_belong_date = date.fromtimestamp(start_time)
 						else:
 							fitfile_belong_date = None
 				else:

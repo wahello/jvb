@@ -383,10 +383,12 @@ def fitfile_parse(obj,offset,start_date_str):
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def get_fitfiles(user,start_date,start,end):
+	'''
+		get the today fitfiles or 3 days fitfiles
+	'''
 	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
 	if not fitfiles_obj:
 		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-
 	return fitfiles_obj
 
 def update_helper(instance,data_dict):
@@ -2043,7 +2045,6 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 	
 
 def hrr_data(user,start_date):
-	
 	Did_heartrate_reach_99 = ''
 	time_99 = 0.0
 	HRR_start_beat = 0.0
@@ -2126,8 +2127,7 @@ def hrr_data(user,start_date):
 
 	start = start_date
 	end = start_date + timedelta(days=3)
-	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-	
+	fitfiles_obj = get_fitfiles(user,start_date,start,end)
 	workout = []
 	hrr = []
 	
@@ -2136,10 +2136,9 @@ def hrr_data(user,start_date):
 		hrr file if it fails then else block will do assumtion calculation for idetifying
 		the HRR fit file
 	'''
-
 	try:
 		if activities:
-			for tmp in a1:
+			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = int(meta['activityIds'][0])
@@ -2148,7 +2147,7 @@ def hrr_data(user,start_date):
 				elif data_id in workout_id:
 					workout.append(tmp)
 		else:
-			for tmp in a1:
+			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = meta['activityIds'][0]
@@ -2161,7 +2160,6 @@ def hrr_data(user,start_date):
 	all_activities_heartrate = []
 	all_activities_timestamp = []
 	all_activities_timestamp_raw = []
-
 	if workout:
 		for single_fitfiles in workout:
 			workout_activities = fitfile_parse([single_fitfiles],offset,start_date_str)
@@ -2432,6 +2430,27 @@ def hrr_data(user,start_date):
 
 			"offset":offset,
 			}
+	elif workout and not workout_final_heartrate:
+		data = {"Did_you_measure_HRR":'no',
+			"Did_heartrate_reach_99":'Heart rate data did not provided',
+			"time_99":None,
+			"HRR_start_beat":None,
+			"lowest_hrr_1min":None,
+			"No_beats_recovered":None,
+			"end_time_activity":None,
+			"diff_actity_hrr":None,
+			"HRR_activity_start_time":None,
+			"end_heartrate_activity":None,
+			"heart_rate_down_up":None,
+			"pure_1min_heart_beats":None,
+			"pure_time_99":None,
+			"no_fitfile_hrr_reach_99":'',
+			"no_fitfile_hrr_time_reach_99":None,
+			"time_heart_rate_reached_99":None,
+			"lowest_hrr_no_fitfile":None,
+			"no_file_beats_recovered":None,
+			"offset":None,
+			}
 	else:
 		data = {"Did_you_measure_HRR":'',
 			"Did_heartrate_reach_99":'',
@@ -2453,7 +2472,7 @@ def hrr_data(user,start_date):
 			"no_file_beats_recovered":None,
 			"offset":None,
 			}
-	add_date_to_fitfile()
+	# add_date_to_fitfile()
 	return data
 
 def hrr_calculations(request):
@@ -2785,8 +2804,10 @@ def particular_activity(user,activity_id):
 			data = value.data
 			data_formated = ast.literal_eval(data)
 			strat_time = data_formated.get("startTimeInSeconds",0)
-			if strat_time:
-				fitfile_belong_date = date.fromtimestamp(strat_time)
+			activity_offset = data_formated.get("startTimeOffsetInSeconds",0)
+			start_time = strat_time + activity_offset
+			if start_time:
+				fitfile_belong_date = date.fromtimestamp(start_time)
 			else:
 				fitfile_belong_date = None
 	else:
@@ -2809,17 +2830,16 @@ def get_activty_related_fitfile(fitfiles_no_date):
 			single_fitfile.save()
 
 def add_date_to_fitfile():
-	data_now = date.today()
-	year = data_now.year
-	month = data_now.month
-	day = data_now.day
-	datetime_obj = datetime(year,month,day,0,0,0)
-	print(datetime_obj)
-	fitfiles_no_date = GarminFitFiles.objects.filter(
-		created_at__gte=datetime_obj,
-		fit_file_belong_date=None)
+	# data_now = date.today()
+	# year = data_now.year
+	# month = data_now.month
+	# day = data_now.day
+	# datetime_obj = datetime(year,month,day,0,0,0)
+	# print(datetime_obj)
+	fitfiles_no_date = GarminFitFiles.objects.filter(fit_file_belong_date=None)
 	print(fitfiles_no_date,"fitfiles_no_date")
 	if fitfiles_no_date:
-		print("entered in ti first if")
 		get_activty_related_fitfile(fitfiles_no_date)
+
+
 
