@@ -2713,12 +2713,16 @@ def weekly_workout_summary(request):
 	return JsonResponse(complete_data)
 
 def weekly_workout_helper(user,start_date):
-
 	week_start_date,week_end_date = week_date(start_date)
 	print("start date",week_start_date,"end date",week_end_date)
 	weekly_workouts_query = get_weekly_workouts(
 		user,week_start_date,week_end_date)
-
+	user_age = user.profile.age()
+	below_aerobic_value = 180-user_age-30
+	anaerobic_value = 180-user_age+5
+	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
+	anaerobic_range = '{} or above'.format(anaerobic_value+1)
+	below_aerobic_range = 'below {}'.format(below_aerobic_value	)
 	weekly_workout = [single_workout.data for single_workout in weekly_workouts_query]
 	if weekly_workout:
 		final_workout_data,workout_summary_id,workout_type = weekly_workout_calculations(
@@ -2745,7 +2749,12 @@ def weekly_workout_helper(user,start_date):
 		data = {}
 	if data:
 		data_v2 = remove_distance_meters(data,weekly_workout)
+		data_v2["heartrate_ranges"] = {}
+		data_v2["heartrate_ranges"]["aerobic_range"] = aerobic_range
+		data_v2["heartrate_ranges"]["below_aerobic_range"] = below_aerobic_range
+		data_v2["heartrate_ranges"]["anaerobic_range"] = anaerobic_range
 	else:
 		data_v2 = {}
-	# print(data_v2,"sssssssssssss")
+
+	# print(data_v2,"sssssssssssss") 
 	return data_v2
