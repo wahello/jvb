@@ -6,7 +6,7 @@ from datetime import timedelta
 from .custom_signals import user_input_post_save,user_input_notify
 
 from rest_framework import serializers
-
+from .utils.daily_activity import get_daily_activities_in_base_format
 from .models import UserDailyInput,\
 					DailyUserInputStrong,\
 					DailyUserInputEncouraged,\
@@ -233,6 +233,15 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		return instance
 
 	def create_update_activities(self, user, activities, creation_date):
+		todays_activities = {dailyactivity.activity_id:dailyactivity 
+								for dailyactivity in DailyActivity.objects.filter(
+									user=user, created_at=creation_date)}
+
+		# todays_activities = {}
+		# dailyactivities = DailyActivity.objects.filter(user=user, created_at=creation_date)
+		# for dailyactivity in dailyactivities:
+		# 	todays_activities.update(dailyactivity['activity_id']: dailyactivity)
+		print ('@@@@@@@@@@@@@@@@@@@@	', todays_activities)
 		if activities:
 			activities = list(json.loads(activities).values())
 			activities_model_objects = []
@@ -260,36 +269,25 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					duplicate = activity.get('duplicate',False),
 					deleted = activity.get('deleted',False)
 				)
-				activities = DailyActivity.objects.filter(
-					activity_id=activity['summaryId']) 
-				if activities:
-					activities.update(
+				if todays_activities and todays_activities.get(activity['summaryId'],None) :
+					todays_activities.update(
 						activity_data = activity_stats,
-						activity_weather = activity_weather,
+						activity_weather = activity_weather, 
 						can_update_steps_type = activity.get(
 							'can_update_steps_type',True),
 						steps_type = activity.get('steps_type'),
 						comments = activity.get('comments'),
 						duplicate = activity.get('duplicate',False),
 						deleted = activity.get('deleted',False))
+					print ('>>>>>>>>>>>>>>>>	', todays_activities)
 				else:
 					activities_model_objects.append(act_obj)
 			DailyActivity.objects.bulk_create(activities_model_objects)
 
 
 	def get_activities(self, ui_date, user):
-		activities = DailyActivity.objects.filter(
-			user = user, created_at = ui_date)
-		activities = [DailyActivitySerializer(act).data for act in activities]
-		activities_data = {}
-		for activity in activities:
-			activity_data  = activity["activity_data"]
-			activity_id = activity.get("activity_id")
-			del (activity['activity_data'], activity['user'], 
-				activity['id'], activity['created_at'], activity['activity_id'])
-			activity_data_dict = ast.literal_eval(activity_data)
-			activities_data[activity_id] = {**activity_data_dict, **activity}
-		return activities_data
+		activities = get_daily_activities_in_base_format(user, ui_date)
+		return activities
 
 	def to_representation(self, instance):
 		serialized_data = super().to_representation(instance)

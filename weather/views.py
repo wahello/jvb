@@ -11,6 +11,12 @@ from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
 class ActivityWeatherView(APIView):
 
+    def get(self):
+        user = self.request.user
+        start_dt = self.request.query_params.get('from',None)
+        weather_report = get_weather_info_for_filtered_activities(user, start_dt)
+        return weather_report
+
     def get_weather_info_for_filtered_activities(user, dt):
         date = dt.strftime('%Y-%m-%d')
         activities = get_daily_activities_in_base_format(user, date)
