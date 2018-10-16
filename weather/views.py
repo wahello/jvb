@@ -7,14 +7,13 @@ from django.contrib.auth.models import User
 from garmin.models import UserGarminDataActivity
 from user_input.views.garmin_views import _get_activities_data
 from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
-from user_input.utils.daily_activity_table_related import get_activities_old_format
-
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
 class ActivityWeatherView(APIView):
 
     def get_weather_info_for_filtered_activities(user, dt):
         date = dt.strftime('%Y-%m-%d')
-        activities = get_activities_old_format(user, date)
+        activities = get_daily_activities_in_base_format(user, date)
         garmin_list, manually_edited_list = _get_activities_data(user, date)
         manually_edited = {dic['summaryId']:dic for dic in manually_edited_list}
 
@@ -40,7 +39,6 @@ class ActivityWeatherView(APIView):
                 weather_data[activity['summaryId']] = {**weather_report}
             weather_report = ast.literal_eval(activity['activity_weather'])
             weather_data[activity['summaryId']] = {**weather_report}
-        print ('>>>>>>>>>>>>>>>     ', weather_data)
         return weather_data
 
 

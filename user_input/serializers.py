@@ -243,8 +243,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				del(activity_stats['comments'],
 					activity_stats['steps_type'],
 					activity_stats['can_update_steps_type'],
-					activity_stats['duplicate'])
-				activity_stats.pop('deleted', None)
+					activity_stats['duplicate'],
+					activity_stats['deleted'])
 				activity_stats.pop('activity_weather', None)
 
 				act_obj = DailyActivity(
