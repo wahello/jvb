@@ -84,10 +84,27 @@ const categoryMeta = {
 		short_name:"time_99",
 		url_name:"time-99"
 	},
+	/*******/
+	"Active Minute Per Day (24 hours)":{
+		short_name:"active_min_total",
+		url_name:"active-min-total"
+	},
+	"Active Minute Per Day (Excludes Active Minutes When Sleeping)":{
+		short_name:"active_min_exclude_sleep",
+		url_name:"active-min-exclude-sleep"
+	},
+	"Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)":{
+		short_name:"active_min_exclude_sleep_exercise",
+		url_name:"active-min-exclude-sleep-exercise"
+	}
+	/*******/
 };
 const overallHrrcategory = ["overall_hrr"];
-const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","total_steps","mc","ec","awake_time","resting_hr",
-"deep_sleep","nes","floor_climbed","beat_lowered","pure_beat_lowered","pure_time_99","time_99",];
+const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf",
+	"total_steps","mc","ec","awake_time","resting_hr","deep_sleep",
+	"nes","floor_climbed","beat_lowered","pure_beat_lowered",
+	"pure_time_99","time_99","active_min_total","active_min_exclude_sleep",
+	"active_min_exclude_sleep_exercise"];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
 class LeaderBoard1 extends Component{
@@ -457,7 +474,7 @@ class LeaderBoard1 extends Component{
 	  	let ranks = [];
 	  	let usernames;
 	  	let other_score_name;
-	  	let other_Scores = [];
+	  	let other_Scores = {};
 	  	let tableRows = [];
 	  	let durations_type = ["today","yesterday","week","month","year","custom_range"];
 	  	for(let duration of durations_type){
@@ -466,14 +483,26 @@ class LeaderBoard1 extends Component{
 	  			for(let [range,value1] of Object.entries(val)){
 	  				durations.push(this.headerDates(range));
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
+
+			  			let otherScoreObject = c_rankData.other_scores;
 		  				if(c_key == "user_rank"){
 			  		 		if(!category){
 			  		 			category = c_rankData.category;
 			  		 		}
-			  		 		if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-			  		 		for (let [key3,o_score] of Object.entries(c_rankData.other_scores)){
-			  		 		other_Scores.push(o_score.value);
-			  		 		other_score_name = o_score.verbose_name;
+			  		 		if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+				  		 		for (let [key3,o_score] of Object.entries(otherScoreObject)){
+				  		 			if(o_score != null && o_score != undefined && o_score != "") {
+				  		 				if(!other_Scores[key3]){
+					  		 				other_Scores[key3] = {
+					  		 					verbose_name:o_score.verbose_name,
+					  		 					scores:[]
+					  		 				}
+					  		 			}
+					  		 			if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
+					  		 				other_Scores[key3]["scores"].push(o_score.value);
+					  		 			}
+					  		 			other_score_name = o_score.verbose_name;
+				  		 			}
 				  		 		}
 			  		 	    }
 			  		 		usernames = c_rankData.username;
@@ -488,17 +517,26 @@ class LeaderBoard1 extends Component{
 	  			if (val){ 
 			  		durations.push(duration);
 			  		for (let [key,rankData] of Object.entries(val)){
+			  			let otherScoreObject = rankData.other_scores;
 			  		 	if(key == "user_rank"){
 			  		 		if(!category){
 			  		 			category = rankData.category;
 			  		 		}
-			  		 		if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-				  		 		for (let [key3,o_score] of Object.entries(rankData.other_scores)){
-				  		 			other_Scores.push(o_score.value);
-				  		 			other_score_name = o_score.verbose_name;
+			  		 		if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+				  		 		for (let [key3,o_score] of Object.entries(otherScoreObject)){
+				  		 			if(o_score != null && o_score != undefined && o_score != "") {
+				  		 				if(!other_Scores[key3]){
+					  		 				other_Scores[key3] = {
+					  		 					verbose_name:o_score.verbose_name,
+					  		 					scores:[]
+					  		 				}
+					  		 			}
+					  		 			other_Scores[key3]["scores"].push(o_score.value);
+					  		 			other_score_name = o_score.verbose_name;
+				  		 			}
 				  		 		}
 			  		 	    }
-
+			  		 	    
 			  		 		usernames = rankData.username;
 			  		 		scores.push(rankData.score.value);
 			  	
@@ -556,7 +594,7 @@ class LeaderBoard1 extends Component{
 			  	}
 		  		rankTableData.push(
 			  		<td className = "lb_table_style_rows">
-			  		<a  onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,category,other_score_name)}>
+			  		<a  onClick = {this.reanderAll.bind(this,all_cat_rank,usernames,category,other_Scores)}>
 			  				<span style={{textDecoration:"underline"}}>{rank.rank}</span>
 			  				 <span id="lbfontawesome">
 			                    <FontAwesome
@@ -667,7 +705,28 @@ class LeaderBoard1 extends Component{
 	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
 	  							  className = "lb_table_style_rows">
 	  							  {"Time To 99"}</td>);
-	    }									
+	    }
+	    /********************************/
+
+
+
+	    else if(category == "Active Minute Per Day (24 hours)"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Active Minutes (24 hours)"}</td>);
+	    }
+	     else if(category == "Active Minute Per Day (Excludes Active Minutes When Sleeping)"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Active Minutes (when not sleeping)"}</td>);
+	    }
+	     else if(category == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+	  	scoreTableData.push(<td style={{fontWeight:"bold"}}
+	  							  className = "lb_table_style_rows">
+	  							  {"Active Minutes (when not sleeping and exercising)"
+									}</td>);
+	    }
+	    /********************************/									
 	  	for(let score of scores){
 	  		if(category == "Total Steps"){
 	  			var value = score;
@@ -711,31 +770,19 @@ class LeaderBoard1 extends Component{
 	  		tableRows.push(<tr className = "lb_table_style_rows">{scoreTableData}</tr>);
 	  	}
 
-
-	if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-	  	let other_scoresData = [];
-	  	if(category == "Average Sleep"){
-	  	other_scoresData.push(<td style={{fontWeight:"bold"}}
-	  							  className = "lb_table_style_rows">
-	  							  {"Sleep Duration (hh:mm)"}</td>);
-	    }
-	    else if(category == "Percent Unprocessed Food"){
-	  	other_scoresData.push(<td style={{fontWeight:"bold"}}
-	  							  className = "lb_table_style_rows">
-	  							  {"% Unprocessed Food"}</td>);
-	    }
-	  	for(let otherScore of other_Scores){
-	  
-	  		other_scoresData.push(<td className = "lb_table_style_rows">{otherScore}</td>);
-	  	
-	  	}
-	  	if(category == "Percent Unprocessed Food"){
-	  		tableRows.push(<tr className = "lb_table_style_rows">{other_scoresData}</tr>);
-	    }
-	    else{
-	    	tableRows.push(<tbody><tr className = "lb_table_style_rows">{other_scoresData}</tr></tbody>);
-	    }
-	  }
+	for (let [otherScoreCatg,otherScoreData] of Object.entries(other_Scores)){
+		if(category == "Percent Unprocessed Food" || category == "Average Sleep" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+		  	let other_scoresData = [];
+		  	other_scoresData.push(<td style={{fontWeight:"bold"}}
+		  							  className = "lb_table_style_rows">
+		  							  {otherScoreData['verbose_name']}</td>);
+		    for(let score of otherScoreData['scores']){
+			  	other_scoresData.push(<td className = "lb_table_style_rows">{score}</td>);
+			  }
+		  	
+		    tableRows.push(<tbody><tr className = "lb_table_style_rows">{other_scoresData}</tr></tbody>);
+		  }
+		}
 
 	  	return  <table className = "table table-striped table-bordered">{tableRows}</table>;
   	};
@@ -1094,6 +1141,30 @@ class LeaderBoard1 extends Component{
 			        </div>
 		        </div>
 		    }
+			{/*****************************/}
+			{this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.active_min_total,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.active_min_exclude_sleep,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+		    
+		    {this.state.active_view &&
+		        <div className = "row justify-content-center lb_table_style">
+			        <div className = "table table-responsive">
+			        	{this.renderTablesTd(this.state.ranking_data.active_min_exclude_sleep_exercise,this.state.duration_date)}
+			        </div>
+		        </div>
+		    }
+			{/****************************/}
 	      	{this.state.btnView && 
 		        <AllRank_Data1 data={this.state.active_category} 
 		        active_username = {this.state.active_username} 
