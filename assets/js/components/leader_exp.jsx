@@ -489,7 +489,7 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category){
 			  		 			category = c_rankData.category;
 			  		 		}
-			  		 		if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+			  		 		if(category != "Pure Time To 99" && category != "Time To 99" && (otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != "")){
 				  		 		for (let [key3,o_score] of Object.entries(otherScoreObject)){
 				  		 			if(o_score != null && o_score != undefined && o_score != "") {
 				  		 				if(!other_Scores[key3]){
@@ -522,7 +522,7 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category){
 			  		 			category = rankData.category;
 			  		 		}
-			  		 		if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+			  		 		if(category != "Pure Time To 99" && category != "Time To 99" && otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
 				  		 		for (let [key3,o_score] of Object.entries(otherScoreObject)){
 				  		 			if(o_score != null && o_score != undefined && o_score != "") {
 				  		 				if(!other_Scores[key3]){
