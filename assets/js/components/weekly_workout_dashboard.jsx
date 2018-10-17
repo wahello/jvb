@@ -26,7 +26,10 @@ class WorkoutDashboard extends Component{
 	    	fetching_weekly:false,
 		   	selectedDate:new Date(),
 		   	weekly_data:{},
-		   	avg_dist_desc:" "
+		   	avg_dist_desc:" ",
+		   	aerobic_range:"0",
+		   	anaerobic_range:"0",
+		   	below_aerobic_range:"0"
 	    }
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
 	    this.renderAddDate = this.renderAddDate.bind(this);
@@ -333,13 +336,15 @@ renderTable(weekly_data){
 		let activity_distance_keys = Object.keys(weekly_data['Totals']).filter(x => (x.indexOf("_distance")>=0));
 		td_keys = td_keys.concat(activity_distance_keys);
 		
-		let td_keys1 = ["no_activity","days_no_activity","no_activity_in_week","percent_days_no_activity"];
+		//let td_keys1 = ["no_activity","days_no_activity","no_activity_in_week","percent_days_no_activity"];
+		let td_keys_hearrate_ranges = ["aerobic_range", "anaerobic_range", "below_aerobic_range"];
+		let total_distance_count = 0;
 
 		for(let [key,value] of Object.entries(weekly_data)){
 			let flag = 0;
 			let td_values = [];
 
-			if(key != "extra" && key != "Totals"){
+			if(key != "extra" && key != "Totals" && key != "heartrate_ranges"){
 				let tempDate = Object.keys(value["dates"])
 					.map(dt => moment(dt)).sort((a,b)=>a-b)
 					.map(momentDate => momentDate.format("DD-MMM-YY"));
@@ -409,16 +414,19 @@ renderTable(weekly_data){
 							td_values.push(<td>{tempDayDuration + " ("+tempDayRepeated+")"}</td>);
 							tempIndex ++;
 						}
-						else if(activity_distance_keys.includes(key1) && !this.checkForUndefinedValue(value[key1])){
-							if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
+						else if(activity_distance_keys.includes(key1) ){
+							/*if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
 								td_values.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
 							}
 							else{
 								td_values.push(<td>{this.renderMetersToMiles(value[key1].value)}</td>);
-							}
+							}*/
+							if(!this.checkForUndefinedValue(value[key1]))
+								td_values.push(<td>{this.renderMetersToMiles(value[key1].value)}</td>);
 						}
 
 						else {
+							console.log("key:"+key1);
 							td_values.push(<td>{"-"}</td>);
 						}
 					}
@@ -502,15 +510,34 @@ renderTable(weekly_data){
 					}
 					
 					else if(activity_distance_keys.includes(key1) && !this.checkForUndefinedValue(value[key1])){
-						if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
+						/*if(key1 == "swimming_distance" || key1 == "lap_swimming_distance"){
 							td_totals.push(<td>{this.renderMetersToYards(value[key1].value)}</td>);
 						}
 						else{
 							td_totals.push(<td>{this.renderMetersToMiles(value[key1].value)}</td>);
-						}
+						}*/
+						total_distance_count += value[key1].value;
 					}
 					else {
 						td_totals.push(<td>{"-"}</td>);
+					}
+				}
+			}
+			else if (key == "heartrate_ranges") {
+				
+				for(let key1 of td_keys_hearrate_ranges){
+					if(key1== "aerobic_range" && !this.checkForUndefinedValue(value[key1])) {
+						this.setState({
+							aerobic_range:value[key1]
+						});
+					} else if(key1 == "anaerobic_range" ){
+						this.setState({
+							anaerobic_range:value[key1]
+						});
+					} else if(key1 == "below_aerobic_range" ){
+						this.setState({
+							below_aerobic_range:value[key1]
+						});
 					}
 				}
 			}
@@ -548,7 +575,7 @@ renderTable(weekly_data){
 			}
 			//tr_values.push(<tr>{td_values}</tr>);
 		}
-
+			td_totals.push(<td>{this.renderMetersToMiles(total_distance_count)}</td>);
 			tr_values.push(<tr>{td_totals}</tr>);
 
 			let td_valuesExtra = [];
@@ -656,6 +683,9 @@ renderTable(weekly_data){
 							 			<b className = "boldText">Anaerobic:</b> Anaerobic Duration (% of total time) &nbsp;&nbsp;
 							 			<b className = "boldText">Below Aerobic:</b> Below Aerobic Duration (% of total time) &nbsp;&nbsp;
 							 			<b className = "boldText">Not Recorded:</b> HR Not Recorded Duration (% of total time &nbsp;&nbsp;)
+						 			<div>
+						 				<b className = "boldText">Heart Rate Ranges:</b> Aerobic ({this.state.aerobic_range}); Anaerobic ({this.state.anaerobic_range}); Below Aerobic Range ({this.state.below_aerobic_range}).
+						 			</div>
 						 			<div> * Distance represents total weekly workout distance in miles or kilometers, except for swimming which is in yards or meters. </div>
 						 			<div>
 						 				<b className = "boldText">Note: </b> All workout durations are in the (hh:mm) format
