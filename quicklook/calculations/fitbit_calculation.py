@@ -319,15 +319,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
 
-		sleeps = get_fitbit_model_data(UserFitbitDataSleep,
-									   user,start_epoch-86400,end_epoch-86400,
-									   order_by = '-id')
-		sleeps_today = get_fitbit_model_data(UserFitbitDataSleep,
-											user, start_epoch,end_epoch,order_by = '-id')
-
-		sleeps_json = [ast.literal_eval(dic) for dic in sleeps]
-		sleeps_today_json = [ast.literal_eval(dic) for dic in sleeps_today]
-
 		grades_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('grade')
 		exercise_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('exercise')
 		swim_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields('swim')
