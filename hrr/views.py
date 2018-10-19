@@ -2810,13 +2810,15 @@ def particular_activity(user,activity_id):
 			activity_offset = data_formated.get("startTimeOffsetInSeconds",0)
 			start_time = strat_time + activity_offset
 			if start_time:
-				fitfile_belong_date = date.fromtimestamp(start_time)
+				fitfile_belong_date = datetime.utcfromtimestamp(start_time)
 			else:
 				fitfile_belong_date = None
 	else:
 		fitfile_belong_date = None
-
-	return fitfile_belong_date
+	if fitfile_belong_date:
+		return fitfile_belong_date.date()
+	else:
+		return fitfile_belong_date
 
 def get_activty_related_fitfile(fitfiles_no_date):
 	'''

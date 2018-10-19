@@ -110,7 +110,6 @@ def _get_activities(user,target_date):
 	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=3)
-	print(type(current_date),"type of current date")
 	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
 	if not fitfiles:
 		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
