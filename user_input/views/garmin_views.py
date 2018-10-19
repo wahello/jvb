@@ -1,5 +1,6 @@
-from datetime import timezone,timedelta,date
+from datetime import timezone,timedelta
 import ast
+import json
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,7 +18,6 @@ from garmin.models import (UserGarminDataSleep,
 from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 
 from garmin.models import GarminFitFiles
-from registration.models import Profile
 from hrr.calculation_helper import fitfile_parse
 
 from user_input.models import DailyUserInputStrong
@@ -168,7 +168,31 @@ def _get_activities(user,target_date):
 			finall = _create_activity_stat(user,single_activity,current_date)
 			final_act_data.update(finall)
 	return final_act_data	
-		
+
+def _get_fitbit_activities_data(user,target_date):
+	activity_data= {}
+	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+	activity_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
+		UserFitbitDataActivities,user,current_date.date(),current_date.date())
+	if activity_data:
+		activity_data = ast.literal_eval(activity_data[0].replace(
+			"'activity_fitbit': {...}","'activity_fitbit': {}"))
+		activity_data = activity_data['activities']
+
+	if activity_data:
+		activity_data = [
+				quicklook.calculations.converter.\
+				fitbit_to_garmin_converter.fitbit_to_garmin_activities(act)
+			for act in activity_data]
+
+		activity_data = [
+			_create_activity_stat(user,act,current_date)[act['summaryId']]
+			for act in activity_data
+		]
+
+	activity_data = {act.get('summaryId'):act for act in activity_data}
+	return activity_data
+
 class GarminData(APIView):
 	permission_classes = (IsAuthenticated,)
 
@@ -235,66 +259,19 @@ class GarminData(APIView):
 		else:
 			return weight
 
-
 	def get_all_activities_data(self,target_date):
 		user = self.request.user
 		device_type = quicklook.calculations.calculation_driver.which_device(user)
 		if device_type == 'garmin':
-			return _get_activities(target_date)
+			return _get_activities(user,target_date)
 		elif device_type == 'fitbit':
-			return self.get_fitbit_activities_data(target_date)
-
-	def get_fitbit_activities_data(self,target_date):
-		activity_data = None
-		updated_data = None
-		user = self.request.user
-		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
-		activity_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(UserFitbitDataActivities,user, current_date.date(),current_date.date())
-		if activity_data:
-			try:
-				activity_data = ast.literal_eval(activity_data)
-			except:
-				pass
-		fitbit_activity_data = {}
-		trans_activity_list = []
-		trans_activity_dict = {}
-		trans_activity_data = {}
-		if activity_data:
-			try:
-				fitbit_activity_data = quicklook.calculations.converter.fitbit_to_garmin_converter.fitbit_to_garmin_activities(activity_data)
-			except:
-				pass
-		if fitbit_activity_data:
-			fitbit_activity_data = json.loads(fitbit_activity_data[0])
-			trans_activity_list.append(fitbit_activity_data)
-		if trans_activity_list or fitbit_activity_data:
-			updated_data = quicklook.calculations.garmin_calculation\
-			.get_filtered_activity_stats(trans_activity_list,fitbit_activity_data,\
-				DailyUserInputStrong.activities)
-		if updated_data:
-			for single_activity in updated_data:
-				trans_activity_data.update(_create_activity_stat(user,updated_data,current_date))
-				# print(updated_data)
-		return trans_activity_data
-
-	def _have_activity_record(self, target_date):
-		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
-		current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
-		start_epoch = current_date_epoch
-		end_epoch = current_date_epoch + 86400
-		activity_records = quicklook.calculations.garmin_calculation.get_garmin_model_data(
-			UserGarminDataActivity,self.request.user,
-			start_epoch,end_epoch,order_by = '-id')
-
-		return True if activity_records else False
+			return _get_fitbit_activities_data(user,target_date)
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)
-		user  = request.user
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			# have_activities = self._have_activity_record(target_date)
 			have_activities = True if activites else False
 			weight = self._get_weight(target_date)
 			data = {
@@ -305,4 +282,3 @@ class GarminData(APIView):
 			}
 			return Response(data)
 		return Response({})
-
