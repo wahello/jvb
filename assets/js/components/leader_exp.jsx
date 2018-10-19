@@ -220,7 +220,6 @@ class LeaderBoard1 extends Component{
 	}
 
 	errorLeaderBoard(error){
-		console.log(error.message);
 		this.setState({
 			fetching_lb1:false,
 	        fetching_lb2:false,
@@ -498,9 +497,7 @@ class LeaderBoard1 extends Component{
 					  		 					scores:[]
 					  		 				}
 					  		 			}
-					  		 			if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
-					  		 				other_Scores[key3]["scores"].push(o_score.value);
-					  		 			}
+					  		 			other_Scores[key3]["scores"].push(o_score.value);
 					  		 			other_score_name = o_score.verbose_name;
 				  		 			}
 				  		 		}
@@ -574,7 +571,6 @@ class LeaderBoard1 extends Component{
 	  	}
 	 
 	  	tableRows.push(<thead className = "lb_table_style_rows">{tableHeaders}</thead>);
-
 	  	// creating table rows for ranks
 	  	let rankTableData = [<td style={{fontWeight:"bold"}}
 	  							 className = "lb_table_style_rows">
@@ -771,7 +767,9 @@ class LeaderBoard1 extends Component{
 	  	}
 
 	for (let [otherScoreCatg,otherScoreData] of Object.entries(other_Scores)){
-		if(category == "Percent Unprocessed Food" || category == "Average Sleep" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+		if(category == "Percent Unprocessed Food" || category == "Average Sleep" 
+			|| category == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" 
+			|| category == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
 		  	let other_scoresData = [];
 		  	other_scoresData.push(<td style={{fontWeight:"bold"}}
 		  							  className = "lb_table_style_rows">
