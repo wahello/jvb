@@ -3,6 +3,7 @@ import ast
 import time
 import logging
 import collections
+import itertools
 from datetime import datetime,timedelta,date
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -342,7 +343,7 @@ def fitfile_parse(obj,offset,start_date_str):
 				if(single_record.name=='timestamp'):
 					single_timestamp_vale = single_record.value
 					timestamp_complete.extend([single_timestamp_vale])
-
+	# print(timestamp_complete,"timestamp_complete")
 	heartrate_selected_date = []
 	timestamp_selected_date = []
 	
@@ -356,14 +357,14 @@ def fitfile_parse(obj,offset,start_date_str):
 		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj:
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
-
+	# print(timestamp_selected_date,"timestamp_selected_date")
 	to_timestamp = []
 	for i,k in enumerate(timestamp_selected_date):
 		dtt = k.timetuple()
 		ts = time.mktime(dtt)
 		ts = ts+offset
 		to_timestamp.extend([ts])
-	
+	# print(to_timestamp,"to_timestamp")
 	timestamp_difference = []
 	for i,k in enumerate(to_timestamp):
 		try:
@@ -682,14 +683,28 @@ def aa_data(user,start_date):
 	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
 	anaerobic_range = '{} or above'.format(anaerobic_value+1)
 	below_aerobic_range = 'below {}'.format(below_aerobic_value	)
+
+	all_activities_heartrate = []
+	all_activities_timestamp = []
+	activies_timestamp = []
 	
 	if workout:
-		workout_data = fitfile_parse(workout,offset,start_date_str)
-		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+		for tmp in workout:
+			workout_activities = fitfile_parse([tmp],offset,start_date_str)
+			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
+			all_activities_heartrate.append(workout_final_heartrate)
+			all_activities_timestamp.append(workout_final_timestamp)
+			activies_timestamp.append(workout_timestamp)
+		all_activities_heartrate_list = [single_list for single_list in all_activities_heartrate if single_list]
+		all_activities_timestamp_list = [single_list for single_list in all_activities_timestamp if single_list]
+		activies_timestamp = [single_list for single_list in activies_timestamp if single_list]
+		all_activities_heartrate_list = list(itertools.chain.from_iterable(all_activities_heartrate_list))
+		all_activities_timestamp_list = list(itertools.chain.from_iterable(all_activities_timestamp_list))
 		anaerobic_range_list = []
 		below_aerobic_list = []
 		aerobic_list = []
-		for a, b in zip(workout_final_heartrate,workout_final_timestamp):
+		for a, b in zip(all_activities_heartrate_list,all_activities_timestamp_list):
+			# print(a,"aaaaaaaaa")
 			if a > anaerobic_value:
 				anaerobic_range_list.extend([b])
 			elif a < below_aerobic_value:
