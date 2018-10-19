@@ -336,27 +336,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			todays_user_input = UserDailyInput.objects.select_related(
 				'strong_input','encouraged_input','optional_input').filter(
 				created_at = current_date.date(), user=user)
-			# user_inputs = {q.created_at.strftime("%Y-%m-%d"):q for q in todays_user_input}
-			# todays_user_input = user_inputs.get(current_date.strftime("%Y-%m-%d"))
-			# tomorrows_user_input = user_inputs.get(tomorrow_date.strftime("%Y-%m-%d"))
 		except UserDailyInput.DoesNotExist:
 			todays_user_input = None
-			# tomorrows_user_input = None			# tomorrows_user_input = None
-
-
-		manually_updated = quicklook.calculations.garmin_calculation.get_garmin_model_data(
-			UserGarminDataManuallyUpdated,user,
-			last_seven_days_date.replace(tzinfo=timezone.utc).timestamp(),end_epoch,
-			order_by = '-id', filter_dup = True)
-
-		# Already parsed from json to python objects
-		weekly_manual_activities = quicklook.calculations.garmin_calculation.get_weekly_data(
-			manually_updated,current_date,last_seven_days_date)
-		todays_manually_updated = weekly_manual_activities.get(current_date.strftime('%Y-%m-%d'))
-
-		todays_manually_updated_json = {}
-		for dic in todays_manually_updated:
-			todays_manually_updated_json[dic.get('summaryId')] = dic
 
 		# pull data for past 7 days (incuding today)
 		daily_strong = list(DailyUserInputStrong.objects.filter(
@@ -429,34 +410,18 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_sleep_aid_penalty = ""
 		ui_controlled_substance_penalty = ""
 		ui_smoking_penalty = ""
-<<<<<<< HEAD
-		ui_did_workout = ''
-=======
 		ui_did_workout = ""
-		ui_nap_start_time = None
-		ui_nap_end_time = None
-		
-		# adding nap hours for sleep per user input felid
-		ui_bedtime = quicklook.calculations.garmin_calculation.safe_get(todays_daily_strong,"sleep_bedtime",None)
-		ui_awaketime = quicklook.calculations.garmin_calculation.safe_get(todays_daily_strong,"sleep_awake_time",None)
-		ui_sleep_duration = quicklook.calculations.garmin_calculation.get_user_input_total_sleep(
-			todays_daily_strong,todays_daily_optional)
-	
 
 		# calling the resting hearate from fitbit models
 		resting_heartrate = fitbit_heartrate_data(user,current_date)
 		#passing resting heart rate value to exercise dictionary
 		exercise_calculated_data['resting_hr_last_night'] = resting_heartrate
 
-		todays_user_input_copy = todays_user_input
->>>>>>> 5c67e3588030197a2e7004fe8955050f44347027
-
 		if todays_user_input:
 			todays_user_input = todays_user_input[0]
 			ui_bedtime = todays_user_input.strong_input.sleep_bedtime
 			ui_awaketime = todays_user_input.strong_input.sleep_awake_time
 			ui_timezone = todays_user_input.timezone
-			#ui_sleep_duration = todays_user_input.strong_input.sleep_time_excluding_awake_time
 			ui_sleep_comment = todays_user_input.strong_input.sleep_comment
 			ui_sleep_aid = todays_user_input.strong_input.prescription_or_non_prescription_sleep_aids_last_night
 			ui_workout_easy_hard = todays_user_input.strong_input.work_out_easy_or_hard
@@ -543,6 +508,12 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 	
 		#Sleep Calculations
+		
+		# adding nap hours for sleep per user input felid
+		ui_sleep_duration = quicklook.calculations.garmin_calculation.\
+			get_user_input_total_sleep(
+				todays_daily_strong,todays_daily_optional)
+
 		if todays_sleep_data:
 			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
 				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
