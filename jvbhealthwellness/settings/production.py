@@ -85,6 +85,11 @@ CELERY_BEAT_SCHEDULE = {
         'task':'userinputs.submit_userinput_reminder',
         'schedule':crontab(minute=0, hour='*/1')
     },
+    #executr every one hour
+    'add-date-to-fitfile':{
+        'task':'hrr.add_date_to_fitfile',
+        'schedule':crontab(minute=0, hour='*/1')
+    }
 }
 
 # Whitenoise

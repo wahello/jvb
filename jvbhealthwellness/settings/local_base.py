@@ -33,7 +33,7 @@ CELERY_TASK_ALWAYS_EAGER = True
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_TIMEZONE = 'Asia/Kolkata'
-CELERY_BEAT_SCHEDULE = {
+# CELERY_BEAT_SCHEDULE = {
     # # execute every day at 1:00 AM EST (America/New_york)
     # 'create-cumulative-sum':{
     #     'task':'progress_analyzer.generate_cumulative_instances',
@@ -49,12 +49,12 @@ CELERY_BEAT_SCHEDULE = {
     #     'task':'userinputs.submit_userinput_reminder',
     #     'schedule':crontab(minute=10, hour='*/1')
     # },
-    'add-date-to-fitfile':{
-        'task':'hrr.add_date_to_fitfile',
-        'schedule':crontab(minute='*/5')
-    }
+    # 'add-date-to-fitfile':{
+    #     'task':'hrr.add_date_to_fitfile',
+    #     'schedule':crontab(minute='*/5')
+    # }
 
-}
+# }
 
 # Email
 INSTALLED_APPS += ('naomi',)

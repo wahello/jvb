@@ -2797,6 +2797,9 @@ def weekly_workout_helper(user,start_date):
 	return data_v2
 
 def particular_activity(user,activity_id):
+	'''
+		Update the fitfile belong date to the particular Fitfile
+	'''
 	activities = UserGarminDataActivity.objects.filter(
 					user=user,summary_id=activity_id)
 	if activities:
@@ -2816,6 +2819,9 @@ def particular_activity(user,activity_id):
 	return fitfile_belong_date
 
 def get_activty_related_fitfile(fitfiles_no_date):
+	'''
+		this function will get the related activities to the Fitfiles
+	'''
 	for single_fitfile in fitfiles_no_date:
 		user = single_fitfile.user
 		meta_data_fitfile = single_fitfile.meta_data_fitfile
@@ -2830,6 +2836,10 @@ def get_activty_related_fitfile(fitfiles_no_date):
 			single_fitfile.save()
 
 def add_date_to_fitfile():
+	'''
+		This fuction will work as if thre is none value in the fitfile belong date 
+		then update that field
+	'''
 	# data_now = date.today()
 	# year = data_now.year
 	# month = data_now.month
@@ -2837,7 +2847,7 @@ def add_date_to_fitfile():
 	# datetime_obj = datetime(year,month,day,0,0,0)
 	# print(datetime_obj)
 	fitfiles_no_date = GarminFitFiles.objects.filter(fit_file_belong_date=None)
-	print(fitfiles_no_date,"fitfiles_no_date")
+	# print(fitfiles_no_date,"fitfiles_no_date")
 	if fitfiles_no_date:
 		get_activty_related_fitfile(fitfiles_no_date)
 
