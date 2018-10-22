@@ -2801,7 +2801,7 @@ def particular_activity(user,activity_id):
 		Update the fitfile belong date to the particular Fitfile
 	'''
 	activities = UserGarminDataActivity.objects.filter(
-					user=user,summary_id=activity_id)
+					user=user,summary_id=activity_id).order_by('id')
 	if activities:
 		for value in activities:
 			data = value.data
