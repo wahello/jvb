@@ -440,6 +440,8 @@ handleChangeModal(event){
             hour = parseInt(min/60); 
             mins = parseInt(min%60);
             mins = (mins && mins < 10) ? "0" + mins : mins;
+            let sec = parseInt(activityDuration/(60*60));
+            secs = parseInt()
         }
     }
     this.setState({
@@ -448,6 +450,7 @@ handleChangeModal(event){
     modal_activity_heart_rate:current_activity?current_activity.averageHeartRateInBeatsPerMinute:"",
     modal_activity_hour:hour,
     modal_activity_min:mins,
+    modal_activity_sec:secs,
     modal_exercise_steps:current_activity?current_activity.steps:"",
     modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
     modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
@@ -474,7 +477,20 @@ editToggleHandlerActivityType(event){
     }
 }
 
-
+/*editToggleHandler(event) {
+    //activityEditModal
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    if(selectedActivityId){
+        this.setState({
+            selectedActivityId:selectedActivityId,
+            activityEditModal:true
+        },()=>{
+            this.renderEditActivityModal;
+        });
+    
+    }
+}*/
 
 
 editToggleHandler_heartrate(event){
@@ -1177,7 +1193,7 @@ CreateNewActivity(data){
         editToggle_heartrate:false,
         editToggle_comments:false,
         editToggle_time:false,
-        activityEditModal: !this.state.activityEditModal,
+        //activityEditModal: !this.state.activityEditModal,
         activities_edit_mode:{
             ...this.state.activities_edit_mode,
             [newActivityID]:edit_mode_state
@@ -1417,9 +1433,18 @@ renderTable(){
         let isActivityDeleted;
         for (let key of activityKeys){
             let keyValue = value[key];
+
             if(key === 'summaryId'){
                 summaryId = keyValue;
                 isActivityDeleted = this.state.activites[summaryId]['deleted'];
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                {this.props.editable && !isActivityDeleted &&              
+                    <span  data-name = {summaryId} onClick={this.handleChangeModal}
+                    className="fa fa-pencil fa-1x progressActivity1"
+                    id = "add_button">
+                </span>
+                }
+                </td>);
             }
 
             else if(key === "activityType"){
@@ -1932,6 +1957,7 @@ renderTable(){
 
 
 renderEditActivityModal(){
+    console.log("INSIDE renderEditActivityModal");
       if (this.state.activityEditModal){
                  let modal = <Modal
                           placement="bottom"
