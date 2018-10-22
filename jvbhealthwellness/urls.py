@@ -15,6 +15,7 @@ from fitbit import views as fitbitViews
 from hrr import urls as hrrUrls
 from fitbit import urls as fitbitUrls
 from dashboards import urls as dashboardUrls
+from weather import urls as weatherUrls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -65,6 +66,7 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^(.*)$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
+    url(r'^weather/',include(weatherUrls)),
 ]
 
 if settings.DEBUG:
