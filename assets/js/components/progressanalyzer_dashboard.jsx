@@ -1234,7 +1234,7 @@ getGarminStressColors(stressValue){
                           % of Active Minutes (24 Hours)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.total_active_minutes_prcnt,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes_prcnt,dur) +" %"}
+                          {this.renderValue(value.total_active_minutes_prcnt,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes_prcnt,dur) +"%"}
                         </div>
                       </div>
                       <hr  
@@ -1267,7 +1267,7 @@ getGarminStressColors(stressValue){
                            % of Active Minutes (when not sleeping)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.active_minutes_without_sleep_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_prcnt,dur) + " %"}
+                          {this.renderValue(value.active_minutes_without_sleep_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_prcnt,dur) + "%"}
                         </div>
                       </div>
                       <hr  
@@ -1300,7 +1300,7 @@ getGarminStressColors(stressValue){
                           % of Active Minutes (when not sleeping and exercising)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) + " %"}
+                          {this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) + "%"}
                         </div>
                       </div>
                       <hr  
