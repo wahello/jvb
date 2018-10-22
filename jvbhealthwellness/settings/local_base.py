@@ -34,26 +34,26 @@ CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 # CELERY_BEAT_SCHEDULE = {
-    # # execute every day at 1:00 AM EST (America/New_york)
-    # 'create-cumulative-sum':{
-    #     'task':'progress_analyzer.generate_cumulative_instances',
-    #     'schedule':crontab(minute=0, hour=1)
-    # },
-    # # execute every day at 2:00 AM EST (America/New_york)
-    # 'update-obsolete-progress-analyzer-report':{
-    #     'task':'progress_analyzer.update_obsolete_pa_reports',
-    #     'schedule':crontab(minute=2, hour=19)
-    # },
-    # # execute every day at 10:00 PM EST (America/New_york)
-    # "remind_selected_users_submit_input":{
-    #     'task':'userinputs.submit_userinput_reminder',
-    #     'schedule':crontab(minute=10, hour='*/1')
-    # },
-    # 'add-date-to-fitfile':{
-    #     'task':'hrr.add_date_to_fitfile',
-    #     'schedule':crontab(minute='*/5')
-    # }
-
+#     # execute every day at 1:00 AM EST (America/New_york)
+#     'create-cumulative-sum':{
+#         'task':'progress_analyzer.generate_cumulative_instances',
+#         'schedule':crontab(minute=0, hour=1)
+#     },
+#     # execute every day at 2:00 AM EST (America/New_york)
+#     'update-obsolete-progress-analyzer-report':{
+#         'task':'progress_analyzer.update_obsolete_pa_reports',
+#         'schedule':crontab(minute=2, hour=19)
+#     },
+#     # execute every hour EST (America/New_york)
+#     "remind_selected_users_submit_input":{
+#         'task':'userinputs.submit_userinput_reminder',
+#         'schedule':crontab(minute=53, hour='*/1')
+#     },
+#     #execute every hour EST (America/New_york)
+#     "remind_users_sync_watch":{
+#         'task':'sync_watch.reminder',
+#         'schedule':crontab(minute=53, hour='*/1')
+#     },
 # }
 
 # Email

@@ -89,9 +89,15 @@ class ProgressDashboard extends Component{
 
                   },
             "mc":{
-                "movement_consistency_gpa":this.getInitialDur(),
-                     "movement_consistency_grade":this.getInitialDur(),
-                     "movement_consistency_score":this.getInitialDur()
+                    "movement_consistency_gpa":this.getInitialDur(),
+                    "movement_consistency_grade":this.getInitialDur(),
+                    "movement_consistency_score":this.getInitialDur(),
+                    "total_active_minutes":this.getInitialDur(),
+                    "total_active_minutes_prcnt":this.getInitialDur(),
+                    "active_minutes_without_sleep":this.getInitialDur(),
+                    "active_minutes_without_sleep_prcnt":this.getInitialDur(),
+                    "active_minutes_without_sleep_exercise":this.getInitialDur(),
+                    "active_minutes_without_sleep_exercise_prcnt":this.getInitialDur()
                   },
             "non_exercise":{
                  "non_exericse_steps_gpa":this.getInitialDur(),
@@ -169,61 +175,61 @@ class ProgressDashboard extends Component{
 		this.successProgress = this.successProgress.bind(this);
 		this.successRank = this.successRank.bind(this);
 		this.headerDates = this.headerDates.bind(this);
-    	this.errorProgress = this.errorProgress.bind(this);
-    	this.toggleCalendar=this.toggleCalendar.bind(this);
-    	this.toggleDate1 = this.toggleDate1.bind(this);
-   		this.toggleDate2 = this.toggleDate2.bind(this);
-   		this.toggleDate3 = this.toggleDate3.bind(this);
-        this.toggleDate4 = this.toggleDate4.bind(this);
-   		this.handleChange = this.handleChange.bind(this);
-   		this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
-   		this.toggleDropdown = this.toggleDropdown.bind(this);
-   		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
-   		this.onSubmitDate2 = this.onSubmitDate2.bind(this);
-   		this.onSubmitDate3 = this.onSubmitDate3.bind(this);
-   		this.processDate = this.processDate.bind(this);
-   		this.strToSecond = this.strToSecond.bind(this);
-   		this.handleScroll = this.handleScroll.bind(this);
-   		this.renderDateRangeDropdown = this.renderDateRangeDropdown.bind(this);
-        this.renderProgressFetchOverlay = renderProgressFetchOverlay.bind(this);
-        this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
-        this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
-        this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
-   		this.toggle = this.toggle.bind(this);
-   		this.renderOverallHealth = this.renderOverallHealth.bind(this);
-   		this.renderMcs = this.renderMcs.bind(this);
-   		this.renderNonExerciseSteps = this.renderNonExerciseSteps.bind(this);
-   		this.renderNutrition = this.renderNutrition.bind(this);
-   		this.renderAlcohol = this.renderAlcohol.bind(this);
-   		this.renderEc = this.renderEc.bind(this);
-   		this.renderExerciseStats = this.renderExerciseStats.bind(this);
-   		this.renderOther = this.renderOther.bind(this);
-   		this.renderSleep = this.renderSleep.bind(this);
-   		this.renderSick = this.renderSick.bind(this);
-   		this.renderStress = this.renderStress.bind(this);
-   		this.renderStanding = this.renderStanding.bind(this);
-   		this.renderTravel = this.renderTravel.bind(this);
-   		this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
-   		this.renderComma = this.renderComma.bind(this);
-   		this.exerciseStatsNoWorkOut = this.exerciseStatsNoWorkOut.bind(this);
-   		this.vo2MaxNotReported = this.vo2MaxNotReported.bind(this);
-   		this.renderPercent = this.renderPercent.bind(this);
-   		this.renderRank = this.renderRank.bind(this);
-   		this.handleBackButton = this.handleBackButton.bind(this);
-   		this.getStylesForGrades = this.getStylesForGrades.bind(this);
-   		this.getStylesForGpa = this.getStylesForGpa.bind(this);
-   		this.getStylesForsteps = this.getStylesForsteps.bind(this);
-   		this.getStylesForSleep = this.getStylesForSleep.bind(this);
-   		this.getStylesForBeats = this.getStylesForBeats.bind(this);
-   		this.getStylesForRhr = this.getStylesForRhr.bind(this);
-   		this.getStylesForFood = this.getStylesForFood.bind(this);
-   		this.getInitialDur = this.getInitialDur.bind(this);
-   		this.renderValue = this.renderValue.bind(this);
-      this.toggle1 = this.toggle1.bind(this);
-      this.renderMcsLink = this.renderMcsLink.bind(this);
-      this.reanderAllHrr = this.reanderAllHrr.bind(this);
-      this.onSubmitDate4 = this.onSubmitDate4.bind(this);
-      this.toggleStressInfo = this.toggleStressInfo.bind(this);
+  	this.errorProgress = this.errorProgress.bind(this);
+  	this.toggleCalendar=this.toggleCalendar.bind(this);
+  	this.toggleDate1 = this.toggleDate1.bind(this);
+ 		this.toggleDate2 = this.toggleDate2.bind(this);
+ 		this.toggleDate3 = this.toggleDate3.bind(this);
+    this.toggleDate4 = this.toggleDate4.bind(this);
+ 		this.handleChange = this.handleChange.bind(this);
+ 		this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
+ 		this.toggleDropdown = this.toggleDropdown.bind(this);
+ 		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
+ 		this.onSubmitDate2 = this.onSubmitDate2.bind(this);
+ 		this.onSubmitDate3 = this.onSubmitDate3.bind(this);
+ 		this.processDate = this.processDate.bind(this);
+ 		this.strToSecond = this.strToSecond.bind(this);
+ 		this.handleScroll = this.handleScroll.bind(this);
+ 		this.renderDateRangeDropdown = this.renderDateRangeDropdown.bind(this);
+    this.renderProgressFetchOverlay = renderProgressFetchOverlay.bind(this);
+    this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
+    this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
+    this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
+ 		this.toggle = this.toggle.bind(this);
+ 		this.renderOverallHealth = this.renderOverallHealth.bind(this);
+ 		this.renderMcs = this.renderMcs.bind(this);
+ 		this.renderNonExerciseSteps = this.renderNonExerciseSteps.bind(this);
+ 		this.renderNutrition = this.renderNutrition.bind(this);
+ 		this.renderAlcohol = this.renderAlcohol.bind(this);
+ 		this.renderEc = this.renderEc.bind(this);
+ 		this.renderExerciseStats = this.renderExerciseStats.bind(this);
+ 		this.renderOther = this.renderOther.bind(this);
+ 		this.renderSleep = this.renderSleep.bind(this);
+ 		this.renderSick = this.renderSick.bind(this);
+ 		this.renderStress = this.renderStress.bind(this);
+ 		this.renderStanding = this.renderStanding.bind(this);
+ 		this.renderTravel = this.renderTravel.bind(this);
+ 		this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
+ 		this.renderComma = this.renderComma.bind(this);
+ 		this.exerciseStatsNoWorkOut = this.exerciseStatsNoWorkOut.bind(this);
+ 		this.vo2MaxNotReported = this.vo2MaxNotReported.bind(this);
+ 		this.renderPercent = this.renderPercent.bind(this);
+ 		this.renderRank = this.renderRank.bind(this);
+ 		this.handleBackButton = this.handleBackButton.bind(this);
+ 		this.getStylesForGrades = this.getStylesForGrades.bind(this);
+ 		this.getStylesForGpa = this.getStylesForGpa.bind(this);
+ 		this.getStylesForsteps = this.getStylesForsteps.bind(this);
+ 		this.getStylesForSleep = this.getStylesForSleep.bind(this);
+ 		this.getStylesForBeats = this.getStylesForBeats.bind(this);
+ 		this.getStylesForRhr = this.getStylesForRhr.bind(this);
+ 		this.getStylesForFood = this.getStylesForFood.bind(this);
+ 		this.getInitialDur = this.getInitialDur.bind(this);
+ 		this.renderValue = this.renderValue.bind(this);
+    this.toggle1 = this.toggle1.bind(this);
+    this.renderMcsLink = this.renderMcsLink.bind(this);
+    this.reanderAllHrr = this.reanderAllHrr.bind(this);
+    this.onSubmitDate4 = this.onSubmitDate4.bind(this);
+    this.toggleStressInfo = this.toggleStressInfo.bind(this);
 
 	}
 	getInitialDur(){
@@ -716,10 +722,10 @@ class ProgressDashboard extends Component{
           			userName = value['custom_range'][dur].user_rank.username;
           			category = value['custom_range'][dur].user_rank.category;
           			if(category == "Percent Unprocessed Food"){
-                  verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
+                  verbose_name = value['custom_range'][dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
                 }
                 else if(category == "Average Sleep"){
-                  verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
+                  verbose_name = value['custom_range'][dur].user_rank.other_scores.sleep_duration.verbose_name;
                 }
   		        }
             }
@@ -1004,7 +1010,7 @@ class ProgressDashboard extends Component{
             }
         }
     	else{
-    		score = value[dur];
+      		score = value[dur];
     	}
     	return score;
     }
@@ -1172,6 +1178,73 @@ getGarminStressColors(stressValue){
 					          			{this.getStylesForGpa(this.renderValue(value.movement_consistency_gpa,dur)) }
 					          		</div>
 					          	</div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          Active Minutes (24 hours)
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderValue(value.total_active_minutes,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes,dur)}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          % of Active Minutes (24 Hours)
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderValue(value.total_active_minutes_prcnt,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes_prcnt,dur) +"%"}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                           Active Minutes (when not sleeping)
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderValue(value.active_minutes_without_sleep,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep,dur)}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                           % of Active Minutes (when not sleeping)
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderValue(value.active_minutes_without_sleep_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_prcnt,dur) + "%"}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          Active Minutes (when not sleeping and exercising)
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderValue(value.active_minutes_without_sleep_exercise,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise,dur)}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          % of Active Minutes (when not sleeping and exercising)
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) + "%"}
+                        </div>
+                      </div>
+
 			          		</CardText>
 			        	</CardBody>
 		      		</Card>
@@ -2416,51 +2489,57 @@ getGarminStressColors(stressValue){
 							<div className ="col-md-4 card_padding"> 
 								{this.renderOverallHealth(this.state.summary.overall_health,this.state.selected_range,this.state.rankData.oh_gpa)}
 							</div>
-							<div className ="col-md-4 card_padding">
-								{this.renderMcs(this.state.summary.mc,this.state.selected_range,this.state.rankData.mc,this.state.duration_date)}
-							</div>
 							<div className = "col-md-4 card_padding">
 								{this.renderEc(this.state.summary.ec,this.state.selected_range,this.state.rankData.ec)}
 							</div>
+              
+              <div className = "col-md-4 card_padding">
+                
+                  {this.renderStanding(this.state.summary.standing,this.state.selected_range)}           
+                
+              </div>
 						</div>
 						<div className = "row">
-							<div className = "col-md-4 card_padding">
-								{this.renderSleep(this.state.summary.sleep,this.state.selected_range,this.state.rankData.avg_sleep)}
-							</div>
+							
+              <div className = "col-md-4 card_padding">
+                {this.renderSleep(this.state.summary.sleep,this.state.selected_range,this.state.rankData.avg_sleep)}
+              </div>
 							<div className = "col-md-4 card_padding">
 								{this.renderAlcohol(this.state.summary.alcohol,this.state.selected_range,this.state.rankData.alcohol)}
 							</div>
-							<div className ="col-md-4 card_padding">
-								{this.renderNonExerciseSteps(this.state.summary.non_exercise,this.state.selected_range,this.state.rankData.nes)}
-							</div>
+              <div className = "col-md-4 card_padding">
+                {this.renderSick(this.state.summary.sick,this.state.selected_range)}
+              </div>
+              
 						</div>
-						<div className = "row">
-							<div className = "col-md-4 card_padding">
-								{this.renderExerciseStats(this.state.summary.exercise,this.state.selected_range)}
-							</div>
-							<div className = "col-md-4 card_padding">
-								{this.renderSick(this.state.summary.sick,this.state.selected_range)}
-							</div>
-							
+            <div className = "row">
+              <div className ="col-md-4 card_padding">
+                {this.renderNonExerciseSteps(this.state.summary.non_exercise,this.state.selected_range,this.state.rankData.nes)}
+              </div>
 							<div className = "col-md-4 card_padding">
 								{this.renderNutrition(this.state.summary.nutrition,this.state.selected_range,this.state.rankData.prcnt_uf)}
 							</div>
+              <div className = "col-md-4 card_padding">
+                {this.renderExerciseStats(this.state.summary.exercise,this.state.selected_range)}
+              </div>
+              
 						</div>
-						<div className = "row">
+            <div className = "row">
 							<div className = "col-md-4 card_padding">
-								{this.renderOther(this.state.summary.other,this.state.selected_range,this.state.rankData)}
-							</div>
+                {this.renderOther(this.state.summary.other,this.state.selected_range,this.state.rankData)}
+              </div>
 							<div className = "col-md-4 card_padding">
+                <div>
 								{this.renderStress(this.state.summary.stress,this.state.selected_range)}
+                </div>
+                <div style = {{marginTop:"15px"}}>
+                  {this.renderTravel(this.state.summary.travel,this.state.selected_range)}
+                </div>
 							</div>
-							<div className = "col-md-4 card_padding">
-								<div>
-									{this.renderStanding(this.state.summary.standing,this.state.selected_range)}
-								</div>
-								<div style = {{marginTop:"15px"}}>
-									{this.renderTravel(this.state.summary.travel,this.state.selected_range)}
-								</div>
-							</div>
+							
+              <div className ="col-md-4 card_padding">
+                {this.renderMcs(this.state.summary.mc,this.state.selected_range,this.state.rankData.mc,this.state.duration_date)}
+              </div>
 						</div>
 						</div>
 					}

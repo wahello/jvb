@@ -30,12 +30,20 @@ class HrrLeaderboard extends Component{
   		let background = "";
   		let color = "";
   		if(score && score != "N/A"){
-	  		if(score >= 20){
+	  		if(score >= 30){
 	  			background = "green";
 	  			color = "white";
 	  		}
-	  		else if(score >= 12 && score < 20){
+	  		else if(score >= 20 && score <= 29){
+	  			background = "#32CD32";
+	  			color = "white";
+	  		}
+	  		else if(score >= 14 && score <= 19){
 	  			background = "yellow";
+	  			color = "black";
+	  		}
+	  		else if(score >= 12 && score <= 13){
+	  			background = "#FF8C00";
 	  			color = "black";
 	  		}
 	  		else if(score > 0 && score < 12){
@@ -50,7 +58,7 @@ class HrrLeaderboard extends Component{
   		let background = "";
 		let color = "";
 		let hr_background = "";
-  		if(!isNaN(value)){
+  		if(!(isNaN(value))){
 	            if(value >= 3.4){
 	           		background = 'green';
 	               	color = 'white';
