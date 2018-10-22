@@ -236,12 +236,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 		todays_activities = {dailyactivity.activity_id:dailyactivity 
 								for dailyactivity in DailyActivity.objects.filter(
 									user=user, created_at=creation_date)}
-
-		# todays_activities = {}
-		# dailyactivities = DailyActivity.objects.filter(user=user, created_at=creation_date)
-		# for dailyactivity in dailyactivities:
-		# 	todays_activities.update(dailyactivity['activity_id']: dailyactivity)
-		print ('@@@@@@@@@@@@@@@@@@@@	', todays_activities)
 		if activities:
 			activities = list(json.loads(activities).values())
 			activities_model_objects = []
@@ -249,18 +243,20 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				activity_stats = copy.deepcopy(activity)
 				activity_weather = {}
 				activity_weather = json.dumps(activity_weather)
+				start_time = activity_stats['startTimeInSeconds'] + \
+									activity_stats['startTimeOffsetInSeconds']
 				del(activity_stats['comments'],
 					activity_stats['steps_type'],
 					activity_stats['can_update_steps_type'],
 					activity_stats['duplicate'],
 					activity_stats['deleted'])
 				activity_stats.pop('activity_weather', None)
-
 				act_obj = DailyActivity(
 					user = user,
 					activity_id = activity['summaryId'],
 					created_at = creation_date,
 					activity_data = activity_stats,
+					start_time_in_seconds  = start_time,
 					activity_weather = activity_weather, 
 					can_update_steps_type = activity.get(
 						'can_update_steps_type',True),
@@ -269,17 +265,19 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					duplicate = activity.get('duplicate',False),
 					deleted = activity.get('deleted',False)
 				)
-				if todays_activities and todays_activities.get(activity['summaryId'],None) :
-					todays_activities.update(
+				if todays_activities:
+					todays_activity = todays_activities.get(activity['summaryId'],None)
+					todays_activity.__dict__.update(
 						activity_data = activity_stats,
 						activity_weather = activity_weather, 
+						start_time_in_seconds  = start_time,
 						can_update_steps_type = activity.get(
 							'can_update_steps_type',True),
 						steps_type = activity.get('steps_type'),
 						comments = activity.get('comments'),
 						duplicate = activity.get('duplicate',False),
 						deleted = activity.get('deleted',False))
-					print ('>>>>>>>>>>>>>>>>	', todays_activities)
+					todays_activity.save()
 				else:
 					activities_model_objects.append(act_obj)
 			DailyActivity.objects.bulk_create(activities_model_objects)
@@ -287,6 +285,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 	def get_activities(self, ui_date, user):
 		activities = get_daily_activities_in_base_format(user, ui_date)
+		print ('>>>>	', activities)
 		return activities
 
 	def to_representation(self, instance):
