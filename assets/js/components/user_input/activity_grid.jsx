@@ -419,6 +419,7 @@ handleChangeModal(event){
     let current_activity = "";
     let hour = "";
     let mins = "";
+    let secs = "";
 
     if(selectedActivityId){
         current_activity = this.state.activites[selectedActivityId];
@@ -440,8 +441,7 @@ handleChangeModal(event){
             hour = parseInt(min/60); 
             mins = parseInt(min%60);
             mins = (mins && mins < 10) ? "0" + mins : mins;
-            let sec = parseInt(activityDuration/(60*60));
-            secs = parseInt()
+            secs = parseInt(activityDuration-(hours * 3600) - (mins * 60));
         }
     }
     this.setState({
