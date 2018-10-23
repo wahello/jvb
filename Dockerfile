@@ -8,7 +8,7 @@ RUN apt-get -qq -y install curl
 RUN apt-get -y install sudo
 RUN sudo apt install default-jdk -y
 RUN sudo apt install default-jre
-RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 RUN apt-get install --yes build-essential
 RUN sudo apt-get install -y nodejs
 RUN npm install
@@ -71,3 +71,6 @@ RUN DATABASE_URL=none /code/venv/bin/python3 manage.py collectstatic --noinput
 RUN /code/venv/bin/python3 manage.py migrate
 RUN ["chmod", "+x", "/code/docker-entrypoint.sh"]
 ENTRYPOINT ["/code/docker-entrypoint.sh"]
+RUN npm run build
+# default command to execute    
+CMD exec gunicorn jvbhealthwellness.wsgi:application --bind 0.0.0.0:8000 --workers 3

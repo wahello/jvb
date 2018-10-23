@@ -105,75 +105,109 @@ class AllRank_Data1 extends Component{
                 }
                 return names;
   }
-renderScoreHeader1(data){
-  let name;
-    if(data){
+renderScoreHeader1(otherScoreObject){
+  let name = [];
+  if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+    for (let [otherScoreCatg,otherScoreData] of Object.entries(otherScoreObject)){
+        let other_scoresData = [];
+        name.push(<th className = "myranking_all">{otherScoreData['verbose_name']}</th>);
+    }
+  }
+    /*if(data){
       name = <th className = "myranking_all">{data}</th>
-    };
+    };*/
     return name;
   }
 
     renderTable(data,a_username,c_name){
-        let rowData = [];
-        let category = ["rank","username","score","other_scores"];
-        let keys = [];
-        let operationCount = 0;
-        let trCount = 0;
+      let rowData = [];
+      let category = ["rank","username","score","other_scores"];
+      let keys = [];
+      let operationCount = 0;
+      let trCount = 0;
         
-        objectLength = Object.keys(data).length;
-                for (let [key1,value1] of Object.entries(data)){
-                    let values =[];
-                    let currentUser = '';
-                    for (let cat of category){
-                        if(cat == "score"){
-                          if(c_name == "Percent Unprocessed Food"){
-                            values.push(null);
-                          }
-                          else{
-                            let value = value1[cat].value;
-                            if(value != undefined){
-                                value += '';
-                                var x = value.split('.');
-                                var x1 = x[0];
-                                var x2 = x.length > 1 ? '.' + x[1] : '';
-                                var rgx = /(\d+)(\d{3})/;
-                                while (rgx.test(x1)) {
-                                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                  }
-                                values.push(<td className = "myranking_all">{x1 + x2}</td>);
-                               }
-                          }
-                        }
-                        else if(cat == "username"){
-                            let user = value1[cat];
-                            if(user == a_username){
-                                 values.push(<td className = "myranking_all">{user}</td>);
-                                 currentUser = user;
-                            }
-                            else{
-                                values.push(<td className = "myranking_all"><div>{user}</div></td>);
-                                currentUser = '';
-                            }
+      objectLength = Object.keys(data).length;
+      for (let [key1,value1] of Object.entries(data)){
+        let values =[];
+        let currentUser = '';
+        for (let cat of category){
+          if(cat == "score"){
+            if(c_name == "Percent Unprocessed Food"){
+              values.push(null);
+            }
+            else{
+              let value = value1[cat].value;
+              if(value != undefined){
+                value += '';
+                var x = value.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                values.push(<td className = "myranking_all">{x1 + x2}</td>);
+               }
+              }
+            }
+            else if(cat == "username"){
+                let user = value1[cat];
+                if(user == a_username){
+                     values.push(<td className = "myranking_all">{user}</td>);
+                     currentUser = user;
+                }
+                else{
+                    values.push(<td className = "myranking_all"><div>{user}</div></td>);
+                    currentUser = '';
+                }
 
+            }
+            else if(cat == "other_scores"){
+              if(value1[cat] != null && value1[cat] != undefined && value1[cat] != "") {
+                if(c_name == "Percent Unprocessed Food" || c_name == "Average Sleep" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+                for (let [key3,o_score] of Object.entries(value1[cat])){
+                    //values.push(<td className = "myranking_all">{o_score.value}</td>)
+                    if(o_score != null && o_score != undefined && o_score != "") {
+                        if(!values[key3]){
+                          values[key3] = {
+                            verbose_name:o_score.verbose_name,
+                            scores:[]
+                          }
                         }
-                        else if(cat == "other_scores"){
-                         if(c_name == "Percent Unprocessed Food" || c_name == "Average Sleep"){
-                          for (let [key3,o_score] of Object.entries(value1[cat])){
-                                values.push(<td className = "myranking_all">{o_score.value}</td>)
-                              }
-                            }
-                        }
-                        else{
-                            values.push(<td className = "myranking_all">{value1[cat]}</td>);
-                        }
-                    }
-                    ++operationCount;
-                    this.scrollCallback(operationCount);
-                rowData.push(<tr id={(currentUser) ? 'my-row' : ''} className ="myranking_all">{values}</tr>);
+                        //if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
+                          values[key3]["scores"].push(<td className = "myranking_all">{o_score.value}</td>);
+                        
+                      }
+                  }
+                }
+              }
+            }
+            else{
+                values.push(<td className = "myranking_all">{value1[cat]}</td>);
+            }
         }
-        
-        return rowData;
-    }
+        ++operationCount;
+        this.scrollCallback(operationCount);
+         if(c_name == "Percent Unprocessed Food" || c_name == "Average Sleep" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+          let rowData1 = [];
+          rowData1.push(values);
+          let flag = 1;
+          for (let [otherScoreCatg,otherScoreData] of Object.entries(values)){                         
+            
+              if(isNaN(otherScoreCatg)){
+                rowData1.push(otherScoreData["scores"]);
+              }
+          }
+          rowData.push(<tr id={(currentUser) ? 'my-row' : ''} className ="myranking_all">{rowData1}</tr>);
+        }
+        else {
+          rowData.push(<tr id={(currentUser) ? 'my-row' : ''} className ="myranking_all">{values}</tr>);
+        }
+                
+      }
+      
+      return rowData;
+  }
     render(){
         const {fix} = this.props;
         const rankdata = this.props.data;
