@@ -440,8 +440,10 @@ handleChangeModal(event){
             let min = parseInt(activityDuration/60); 
             hour = parseInt(min/60); 
             mins = parseInt(min%60);
-            mins = (mins && mins < 10) ? "0" + mins : mins;
-            secs = parseInt(activityDuration-(hours * 3600) - (mins * 60));
+            mins = (!isNaN(mins) && !isNaN(mins) < 10) ? "0" + mins : mins;
+            secs = parseInt(activityDuration-(hour * 3600) - (mins * 60));
+            secs = (!isNaN(secs) && !isNaN(secs) < 10) ? "0" + secs : secs;
+            console.log("activityDuration: ",activityDuration," secs: ",secs," mins: ", mins);
         }
     }
     this.setState({
@@ -457,6 +459,9 @@ handleChangeModal(event){
     modal_activity_comment:current_activity?current_activity.comments:"",
     selectedActivityId:selectedActivityId,
     activityEditModal:true,
+    }
+    , () => {
+        console.log("After set state, secs: ",secs," mins: ", mins);
     });
 }
 
@@ -1332,14 +1337,14 @@ handleChangeModelActivityStartTimeDate(date){
     this.setState({
         activitystarttime_calender:date
     },()=>{
-            let duration = this.getTotalActivityDuration();
-            if(duration){  
-                this.setState({
-                    modal_activity_hour:duration.split(":")[0],
-                    modal_activity_min: duration.split(":")[1],
-                    modal_activity_sec:duration.split(":")[2]
-                });
-            }
+        let duration = this.getTotalActivityDuration();
+        if(duration){  
+            this.setState({
+                modal_activity_hour:duration.split(":")[0],
+                modal_activity_min: duration.split(":")[1],
+                modal_activity_sec:duration.split(":")[2]
+            });
+        }
     });
 }
 
@@ -1958,6 +1963,8 @@ renderTable(){
 
 renderEditActivityModal(){
     console.log("INSIDE renderEditActivityModal");
+    console.log("modal_activity_sec: ", this.state.modal_activity_sec);
+    console.log("modal_activity_min: ", this.state.modal_activity_min);
       if (this.state.activityEditModal){
                  let modal = <Modal
                           placement="bottom"
