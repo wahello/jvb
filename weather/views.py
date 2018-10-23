@@ -27,9 +27,10 @@ class ActivityWeatherView(APIView):
         filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
                             manually_updated_json=manually_edited,
                             userinput_activities=activities)
-        weather_data = {}        
+
+        weather_data = {}
         for activity in filtered_activities_list:
-            if activity['activity_weather'] == {}:            
+            if activity['activity_weather'] == {}:
                 epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
@@ -45,7 +46,7 @@ class ActivityWeatherView(APIView):
                 else:
                     weather_report = get_weather_info_using_garmin_activity(
                                                 user, epoch_time, activity['summaryId'])
-                    weather_data[activity['summaryId']] = {**weather_report}            
+                    weather_data[activity['summaryId']] = {**weather_report}
             else:
                 weather_data[activity['summaryId']] = {**activity['activity_weather']}
         return Response(weather_data)
@@ -53,7 +54,7 @@ class ActivityWeatherView(APIView):
 
 def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
     weather_report = {'dewPoint': {'value': None, 'units': None},
-                                'humidity': {'value': None, 'units': None},
+                                'humidity': {'value': None},
                                 'temperature':{'value': None, 'units': None},
                                 'wind': {'value': None, 'units': None},
                                 'temperature_feels_like':{'value': None, 'units': None}}
