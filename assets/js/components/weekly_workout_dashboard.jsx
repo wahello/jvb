@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
@@ -49,9 +50,23 @@ class WorkoutDashboard extends Component{
 		this.renderMetersToMiles = this.renderMetersToMiles.bind(this);
 	}
 	successWeeklyWorkoutData(data){
+		let aerobic_range = "0"
+		let anaerobic_range = "0";
+		let below_aerobic_range = "0";
+
+		if(data.data && !_.isEmpty(data.data.heartrate_ranges)){
+			let heartrate_ranges = data.data.heartrate_ranges;
+			aerobic_range = heartrate_ranges["aerobic_range"];
+			anaerobic_range = heartrate_ranges["anaerobic_range"];
+			below_aerobic_range = heartrate_ranges["below_aerobic_range"];
+		}
+
 		this.setState({
 			weekly_data:data.data,
 			fetching_weekly:false,
+			aerobic_range:aerobic_range,
+			anaerobic_range:anaerobic_range,
+			below_aerobic_range:below_aerobic_range
 		});
   	}
   	errorWeeklyWorkoutData(error){
@@ -426,7 +441,6 @@ renderTable(weekly_data){
 						}
 
 						else {
-							console.log("key:"+key1);
 							td_values.push(<td>{"-"}</td>);
 						}
 					}
@@ -523,24 +537,8 @@ renderTable(weekly_data){
 					}
 				}
 			}
-			else if (key == "heartrate_ranges") {
-				
-				for(let key1 of td_keys_hearrate_ranges){
-					if(key1== "aerobic_range" && !this.checkForUndefinedValue(value[key1])) {
-						this.setState({
-							aerobic_range:value[key1]
-						});
-					} else if(key1 == "anaerobic_range" ){
-						this.setState({
-							anaerobic_range:value[key1]
-						});
-					} else if(key1 == "below_aerobic_range" ){
-						this.setState({
-							below_aerobic_range:value[key1]
-						});
-					}
-				}
-			}
+			else if (key == "heartrate_ranges")
+				continue;
 			else{
 				let tempNoActivity = null;
 				let tempDaysNoActivity = null;
