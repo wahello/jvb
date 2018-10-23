@@ -82,7 +82,7 @@ class GarminConnectTokenAdmin(admin.ModelAdmin):
 	search_fields = ('user__username','user__email','user__first_name',
 					 'user__last_name',)
 class GarminFitFilesAdmin(admin.ModelAdmin):
-	list_display = ('user','created_at','meta_data_fitfile',)
+	list_display = ('user','created_at','fit_file_belong_date','meta_data_fitfile',)
 	search_fields = ('user__username','user__email','user__first_name',
 					 'user__last_name',)
 

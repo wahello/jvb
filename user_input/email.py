@@ -51,8 +51,9 @@ def get_users_having_local_time(email_timing,filter_username=None):
 	offsets_in_local_time = []
 	for offset in distinct_offsets:
 		offset_localtime = (datetime.utcnow()+timedelta(seconds=offset))
-		if offset_localtime.hour == email_timing.hour:
-			offsets_in_local_time.append(offset)
+		for time in email_timing:
+			if offset_localtime.hour == time.hour:
+				offsets_in_local_time.append(offset)
 	if filter_username:
 		users_with_offset_in_local_time = UserLastSynced.objects.filter(
 			offset__in = offsets_in_local_time,
@@ -68,12 +69,12 @@ def notify_user_to_submit_userinputs():
 	RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
 		"cherylcasone","knitter61","lafmaf123","davelee","Justin","lalancaster",
 		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
-		"atul","jvbhealth","Jvbtest"]
+		"atul","jvbhealth","Jvbtest","Vickykolovou"]
 	# RECEPIENTS_USERNAME = ["dileep",'narendra','venky']
 
 	# Local time at which email notification should be sent to the user
 	# 10 PM local time
-	EMAIL_TIMING = time(22)
+	EMAIL_TIMING = [time(22)]
 
 	RECEPIENTS_WITH_OFFSET = get_users_having_local_time(
 		EMAIL_TIMING,RECEPIENTS_USERNAME)
@@ -112,7 +113,7 @@ We noticed that you have not submitted your user inputs {}. Click on the link be
 {}
 
 If clicking the link above doesn't work, please copy and paste the URL into a new browser window instead.
-Thanks and let us know if you have any questions by emailing mailto:{} 
+Thanks and let us know if you have any questions by emailing {} 
 
 Sincerely,
 JVB Health & Wellness""" 
@@ -135,6 +136,79 @@ JVB Health & Wellness"""
 			)
 
 			if last_ui_date.date() != today_local_time.date():
+				send_mail(
+					subject = subject,
+					message = message,
+					from_email = FEEDBACK_EMAIL,
+					recipient_list = [user_email],
+					fail_silently = True  
+				)
+
+# Reminding Users to Synchronize watch
+def notify_users_to_sync_watch():
+
+	RECEPIENTS_USERNAME = ["johnb",'pw',"BrookPorter",
+		"Justin","lalancaster","MikeC","atul","jvbhealth","Jvbtest",
+		"missbgymnast","squishyturtle24","Vickykolovou"]
+	# RECEPIENTS_USERNAME = ['atul']
+	EMAIL_TIMING = [time(9),time(21)]
+	RECEPIENTS_WITH_OFFSET = get_users_having_local_time(
+		EMAIL_TIMING,RECEPIENTS_USERNAME)
+	FEEDBACK_EMAIL = "info@jvbwellness.com"
+	last_synced_of_users = {}
+	for user_lsync in RECEPIENTS_WITH_OFFSET:
+		user = user_lsync.user
+		last_synced_of_users[user.username] = {
+			"last_sync":None,
+			"user_email":user.email,
+			"user_first_name":user.first_name,
+			"user_offset":user_lsync.offset
+		}
+		try:
+			last_synced_obj = UserLastSynced.objects.filter(user = user)[0]
+			last_sync_local_dtime = last_synced_obj.last_synced + timedelta(
+				seconds=last_synced_obj.offset) 
+			last_synced_of_users[user.username]["last_sync"] = last_sync_local_dtime
+		except (IndexError,UserLastSynced.DoesNotExist) as e:
+			last_synced_of_users[user.username]["last_sync"] = None
+
+	for username,user_meta in last_synced_of_users.items():
+		if user_meta['last_sync']:
+			today_utc = datetime.now()
+			today_local_time = today_utc + timedelta(seconds = user_meta['user_offset'])
+			last_sync = user_meta['last_sync']
+			user_email = user_meta['user_email']
+			user_first_name = user_meta['user_first_name']
+			synchronize_from_text = "(since {})".format(
+					last_sync.strftime("%b %d, %Y @ %I:%M %p"))
+			subject = "Synchronize Watch | {}".format(
+				last_sync.strftime("%b %d, %Y @ %I:%M %p"))
+			message="""
+Hi {},
+
+We just noticed that you have not sync’d your wearable device in a while {}. If you want to see all your cool health and activity stats and rankings, sync your watch now.
+
+Thanks and let us know if you have any questions by emailing {} 
+
+Sincerely,
+JVB Health and Wellness
+"""
+			message = message.format(
+				user_first_name.capitalize(),synchronize_from_text,
+				FEEDBACK_EMAIL
+			)
+
+			synced_in_past_4_hours = False
+			notification_shift = 'evening' if today_local_time.hour > 11 else 'morning'
+			if (notification_shift == 'evening' 
+				and last_sync.hour >= 17 and last_sync.hour <= 21):
+				synced_in_past_4_hours = True
+			elif (notification_shift == 'morning'
+				and (last_sync.hour >= 5 and last_sync.hour <= 9)):
+				synced_in_past_4_hours = True
+
+			if not(today_local_time.date() == last_sync.date() and
+				synced_in_past_4_hours):
 				send_mail(
 					subject = subject,
 					message = message,

@@ -1,5 +1,5 @@
 from .base import *  # noqa
-# from celery.schedules import crontab
+from celery.schedules import crontab
 
 
 DEBUG = True
@@ -44,10 +44,15 @@ CELERY_TIMEZONE = 'Asia/Kolkata'
 #         'task':'progress_analyzer.update_obsolete_pa_reports',
 #         'schedule':crontab(minute=2, hour=19)
 #     },
-#     # execute every day at 10:00 PM EST (America/New_york)
+#     # execute every hour EST (America/New_york)
 #     "remind_selected_users_submit_input":{
 #         'task':'userinputs.submit_userinput_reminder',
-#         'schedule':crontab(minute=10, hour='*/1')
+#         'schedule':crontab(minute=53, hour='*/1')
+#     },
+#     #execute every hour EST (America/New_york)
+#     "remind_users_sync_watch":{
+#         'task':'sync_watch.reminder',
+#         'schedule':crontab(minute=53, hour='*/1')
 #     },
 # }
 

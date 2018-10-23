@@ -52,6 +52,9 @@ def _get_blank_pa_model_fields(model):
 		fields = {
 			"cum_movement_consistency_gpa":None,
 			"cum_movement_consistency_score":None,
+			"cum_total_active_min":None,
+			"cum_sleep_active_min":None,
+			"cum_exercise_active_min":None
 		}
 		return fields
 	elif model == "ec":
@@ -424,6 +427,35 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 
 	return sleep_per_night_cum_data
 
+def _get_mc_active_min(ql_data):
+	'''
+	Calculate total active minutes, active minute during 
+	sleeping and active minute during exercise from 
+	movement consistency data.
+
+	Returns:
+		tuple: A Tuple having above mentioned active minutes
+		information in following order - 
+		(total active mins, sleep active mins, exercise act mins)
+	'''
+	mc = _safe_get_mobj(ql_data.steps_ql,"movement_consistency",None)
+	total_active_min = 0
+	sleep_active_min = 0
+	exercise_active_min = 0
+	NON_INTERVAL_KEYS = ['total_active_minutes','total_active_prcnt',
+		'active_hours','inactive_hours','sleeping_hours','strength_hours',
+		'exercise_hours','nap_hours','no_data_hours','timezone_change_hours',
+		'total_steps']
+	if mc:
+		mc = json.loads(mc)
+		total_active_min = mc['total_active_minutes']
+		for key,data in mc.items():
+			if(key not in NON_INTERVAL_KEYS and (data['status'] == 'sleeping'
+				or data['status'] == 'nap')):
+				sleep_active_min += data['active_duration']['duration']
+			elif(key not in NON_INTERVAL_KEYS and data['status'] == 'exercise'):
+				exercise_active_min += data['active_duration']['duration']
+	return (total_active_min,sleep_active_min,exercise_active_min)
 
 def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 	mc_cum_data = _get_blank_pa_model_fields("mc")
@@ -436,21 +468,49 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 			inactive_hours += int(mc.get('no_data_hours',0))
 			return inactive_hours
 		return 0
-
 	if today_ql_data and yday_cum_data:
-		mc_cum_data['cum_movement_consistency_gpa'] = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"movement_consistency_grade","F")] \
-			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,"cum_movement_consistency_gpa",0)
+		total_active_min,sleep_active_min,exercise_active_min = (
+			_get_mc_active_min(today_ql_data))
+		
+		mc_cum_data['cum_movement_consistency_gpa'] = (GRADE_POINT[
+			_safe_get_mobj(
+			today_ql_data.grades_ql,"movement_consistency_grade","F")]
+			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
+			"cum_movement_consistency_gpa",0))
 
-		mc_cum_data['cum_movement_consistency_score'] = _get_mc_score(today_ql_data) \
-			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum, "cum_movement_consistency_score",0)
+		mc_cum_data['cum_movement_consistency_score'] = (
+			_get_mc_score(today_ql_data)
+			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
+			"cum_movement_consistency_score",0))
+
+		mc_cum_data['cum_total_active_min'] = (total_active_min
+			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
+			"cum_total_active_min",0))
+
+		mc_cum_data['cum_sleep_active_min'] = (sleep_active_min
+			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
+			"cum_sleep_active_min",0))
+
+		mc_cum_data['cum_exercise_active_min'] = (exercise_active_min
+			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
+			"cum_exercise_active_min",0))
 
 	elif today_ql_data:
-		mc_cum_data['cum_movement_consistency_gpa'] = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"movement_consistency_grade","F")]
+		total_active_min,sleep_active_min,exercise_active_min = (
+			_get_mc_active_min(today_ql_data))
+		mc_cum_data['cum_movement_consistency_gpa'] = GRADE_POINT[
+			_safe_get_mobj(
+				today_ql_data.grades_ql,"movement_consistency_grade","F")]
 
-		mc_cum_data['cum_movement_consistency_score'] = _get_mc_score(today_ql_data)
-			
+		mc_cum_data['cum_movement_consistency_score'] = (
+			_get_mc_score(today_ql_data))
+
+		mc_cum_data['cum_total_active_min'] = total_active_min
+
+		mc_cum_data['cum_sleep_active_min'] = sleep_active_min
+		
+		mc_cum_data['cum_exercise_active_min'] = exercise_active_min
+		
 	return mc_cum_data
 
 
