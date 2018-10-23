@@ -1,5 +1,5 @@
 from .base import *  # noqa
-# from celery.schedules import crontab
+from celery.schedules import crontab
 
 
 DEBUG = True
