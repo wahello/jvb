@@ -132,12 +132,14 @@ def call_push_api(data):
 				call_api(date,user_id,data_type,user,session,create_notification)
 			if user and data_type == 'activities':
 				latest_data = UserFitbitDataActivities.objects.latest('created_at')
+				print(latest_data,"hhhhhhhhhhhhhhhhhhhhhh")
 				latest_act_data = latest_data.activities_data
 				converted_activities = ast.literal_eval(latest_act_data.\
 					replace("'activity_fitbit': {...}","'activity_fitbit': {}"))
 				activity_data = converted_activities['activities'][0] 
 				start_time = activity_data['originalStartTime']
 				offset_conversion = get_epoch_offset_from_timestamp(start_time)
+				print(offset_conversion,"iiiiiiiiiiiiiiiiiiiiiiiiiii")
 				return views.fitbit_create_update_sync_time(
 					user, present_time, offset_conversion[1])
 			else:
