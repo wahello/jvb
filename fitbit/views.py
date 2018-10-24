@@ -348,7 +348,7 @@ def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
 		if last_sync_timestamp < fitbit_sync_time:
 			last_sync_obj.last_synced_fitbit = pytz.utc.localize(
 				datetime.utcfromtimestamp(fitbit_sync_time.timestamp()))
-			last_sync_obj.offset = offset if offset!=last_sync_obj.offset else last_sync_obj.offset
+			last_sync_obj.offset = offset if offset!=last_sync_obj.offset and offset!=0 else last_sync_obj.offset
 
 			last_sync_obj.save()
 	except UserFitbitLastSynced.DoesNotExist as e:
