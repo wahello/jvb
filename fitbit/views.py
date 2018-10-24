@@ -352,7 +352,6 @@ def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
 
 			last_sync_obj.save()
 	except UserFitbitLastSynced.DoesNotExist as e:
-	#ssssssssssssssss if last sync info for user is not present, create record
 		UserFitbitLastSynced.objects.create(
 			user = user,
 			last_synced_fitbit = fitbit_sync_time,
