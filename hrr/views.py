@@ -1390,13 +1390,8 @@ def daily_aa_data(user, start_date):
 													manually_updated_json=manually_edited_dic)
 
 	try:
-<<<<<<< HEAD
 		if activities_dic:
-			for tmp in a1:
-=======
-		if activities:
 			for tmp in fitfiles_obj:
->>>>>>> de1bac9068fefd0db5e4fab3e5afd6aa0692bb4c
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = int(meta['activityIds'][0])
@@ -2131,7 +2126,7 @@ def hrr_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
-	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+	activities_dic = get_usernput_activities(
 		user,start_date)
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
@@ -2170,7 +2165,7 @@ def hrr_data(user,start_date):
 		the HRR fit file
 	'''
 	try:
-		if activities:
+		if activities_dic:
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
