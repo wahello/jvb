@@ -285,7 +285,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 
 	def get_activities(self, ui_date, user):
 		activities = get_daily_activities_in_base_format(user, ui_date)
-		print ('>>>>	', activities)
 		return activities
 
 	def to_representation(self, instance):

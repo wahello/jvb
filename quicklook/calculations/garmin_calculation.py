@@ -2486,7 +2486,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		# if userinput_activities:
 		# 	userinput_activities = json.loads(userinput_activities)
 		userinput_activities = get_daily_activities_in_base_format(
-			user,current_date.date())
+			user,current_date.date(),include_all=True)
 
 		bodycmp = get_garmin_model_data(
 			UserGarminDataBodyComposition,user,

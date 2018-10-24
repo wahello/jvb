@@ -661,7 +661,7 @@ def aa_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end)
-	if activities_dic:	
+	if activities_dic:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
@@ -843,11 +843,9 @@ def store_aa_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the AA calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("AA calculations got started",user.username)
@@ -914,7 +912,7 @@ def get_garmin_manully_activities(user,start_date_timestamp,end_date_timestamp):
 def get_usernput_activities(user,start_date):
 	'''
 		Get activities from user input models
-	# '''
+	'''
 	# try:
 	# 	user_input_strong = DailyUserInputStrong.objects.filter(
 	# 	user_input__created_at=(start_date),
@@ -935,6 +933,7 @@ def get_usernput_activities(user,start_date):
 	# 	activities =[]
 	# 	activities_dic = {}
 	# 	user_input_strong = ''
+	# return activities,activities_dic,user_input_strong
 	activities_dic = get_daily_activities_in_base_format(user,start_date)
 	if activities_dic:
 		return activities_dic
@@ -996,7 +995,7 @@ def aa_workout_data(user,start_date):
 				ui_hrr_keys.append(single_activity_values[i]['summaryId'])
 				activities.append(single_activity_values[i])
 			else:
-				activities.append(single_activity_values[i])
+				activities.append(single_activity_values[i])					
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
 
@@ -1155,11 +1154,9 @@ def store_aa_workout_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the Daily A/A
 	workout calculations then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("HRR A/A Workout started")
@@ -1653,11 +1650,9 @@ def store_daily_aa_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the Daily A/A calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("A/A dailies got started")
@@ -1803,11 +1798,6 @@ def aa_low_high_end_data(user,start_date):
 	else:
 		activity_files = ''
 		offset = 0
-
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
-
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	ui_data_hrr = []
@@ -1876,7 +1866,7 @@ def aa_low_high_end_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end)
-	if activities and fitfiles_obj:
+	if activities_dic and fitfiles_obj:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
@@ -2047,11 +2037,9 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 	This function takes user start date and end date, calculate the low_high_end 
 	HR calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
@@ -2100,9 +2088,6 @@ def hrr_data(user,start_date):
 	end_date_timestamp = start_date_timestamp + 86400
 
 	start_date_str = start_date.strftime('%Y-%m-%d')
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
 	
@@ -2545,11 +2530,9 @@ def store_hhr(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the HRR calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("HRR calculations got started",user.username)
