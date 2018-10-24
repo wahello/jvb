@@ -835,11 +835,9 @@ def store_aa_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the AA calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("AA calculations got started",user.username)
@@ -1147,11 +1145,9 @@ def store_aa_workout_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the Daily A/A
 	workout calculations then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("HRR A/A Workout started")
@@ -1646,11 +1642,9 @@ def store_daily_aa_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the Daily A/A calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("A/A dailies got started")
@@ -2041,11 +2035,9 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 	This function takes user start date and end date, calculate the low_high_end 
 	HR calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
@@ -2521,11 +2513,9 @@ def store_hhr(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the HRR calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("HRR calculations got started",user.username)
