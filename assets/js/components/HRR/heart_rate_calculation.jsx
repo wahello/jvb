@@ -72,11 +72,13 @@ class HeartRateCal extends Component{
 			this.renderSecToMin = this.renderSecToMin.bind(this);
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
+			this.hrr_data_measured = this.hrr_data_measured.bind(this);
 			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
   	}
   	
 	successHeart(data){
 		console.log("DATA received: ", data);
+		{this.renderHrrSelectedDateFetchOverlay()}
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
@@ -250,7 +252,6 @@ class HeartRateCal extends Component{
 		})
 	}
 	renderHrrNoData(data){
-		console.log("Data: ", data);
 		this.setState({
 			"end_time_activity":data.end_time_activity,
 			"Did_you_measure_HRR":data.Did_you_measure_HRR,
@@ -345,6 +346,13 @@ class HeartRateCal extends Component{
          editable:!this.state.editable
        });
     }
+    hrr_data_measured(newVal) {
+    	this.setState({
+    		Did_you_measure_HRR:newVal
+    	}, () => {
+    		console.log("From parent");
+    	})
+    }
     
   render(){
   	const {fix} = this.props;
@@ -409,8 +417,7 @@ class HeartRateCal extends Component{
 						"lowest_hrr_1min":this.state.lowest_hrr_1min,
 						"No_beats_recovered":this.state.No_beats_recovered}}
 						selectedDate = {this.state.selectedDate}
-						successHeart = {this.successHeart.bind(this)}
-						errorHeart = {this.errorHeart.bind(this)}
+						HRR_measured = {this.hrr_data_measured}
 						renderHrrData = {this.renderHrrData.bind(this)}/>
           		}
 
@@ -426,8 +433,7 @@ class HeartRateCal extends Component{
 					"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 					"pure_time_99":this.state.pure_time_99}}
 					selectedDate = {this.state.selectedDate}
-					successHeart = {this.successHeart.bind(this)}
-					errorHeart = {this.errorHeart.bind(this)}
+					HRR_measured = {this.hrr_data_measured}
 					renderHrrData = {this.renderHrrData1.bind(this)}/>
           	}
 
@@ -444,9 +450,8 @@ class HeartRateCal extends Component{
 					"created_at":this.state.created_at,
 					"no_file_beats_recovered":this.state.no_file_beats_recovered}}
           			selectedDate = {this.state.selectedDate}
+          			HRR_measured = {this.hrr_data_measured}
           			renderHrrData = {this.renderHrrNoData.bind(this)}
-          			successHeart = {this.successHeart.bind(this)}
-					errorHeart = {this.errorHeart.bind(this)}
           			/>   
           	}
           	

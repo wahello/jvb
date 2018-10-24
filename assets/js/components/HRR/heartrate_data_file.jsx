@@ -13,6 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
 import {updateHeartData} from '../../network/heart_cal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 
 class Heartrate_Data extends Component{
 	constructor(props){
@@ -56,10 +57,12 @@ class Heartrate_Data extends Component{
 		    this.editToggleLowestHrr1min = this.editToggleLowestHrr1min.bind(this);
 		    this.editToggleNoBeats = this.editToggleNoBeats.bind(this);
 		    this.updateData = this.updateData.bind(this);
+		    this.successHeart = this.successHeart.bind(this);
+			this.errorHeart = this.errorHeart.bind(this);
+			this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
 
 		}
 		componentWillReceiveProps(nextProps) {
-			console.log("componentWillReceiveProps: "+nextProps.hrr.editable);
 			this.setState({ editable: nextProps.hrr.editable });  
 	  	}
 		editToggleDidyouWorkout(){
@@ -151,24 +154,71 @@ class Heartrate_Data extends Component{
 		  	}
 	  		return time;
   		}
+
+  		successHeart(data){
+			console.log("DATA received: ", data);
+			{this.renderHrrSelectedDateFetchOverlay()}
+				/*toast.info("Updated Heart-rate Data!",{
+		          className:"dark"
+		        });*/
+	  		this.setState({
+	  	    		fetching_hrr:false,
+	  	    		editable:false,
+	  	   			Did_you_measure_HRR:data.data.Did_you_measure_HRR,
+					Did_heartrate_reach_99:data.data.Did_heartrate_reach_99,
+					time_99:data.data.time_99,
+					HRR_start_beat:data.data.HRR_start_beat,
+					lowest_hrr_1min:data.data.lowest_hrr_1min,
+					No_beats_recovered:data.data.No_beats_recovered,
+
+					end_time_activity:data.data.end_time_activity,
+					diff_actity_hrr:data.data.diff_actity_hrr,
+					HRR_activity_start_time:data.data.HRR_activity_start_time,
+					end_heartrate_activity:data.data.end_heartrate_activity,
+					heart_rate_down_up:data.data.heart_rate_down_up,
+					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
+					pure_time_99:data.data.pure_time_99,
+
+					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
+					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
+					time_heart_rate_reached_99:data.data.time_heart_rate_reached_99,
+					lowest_hrr_no_fitfile:data.data.lowest_hrr_no_fitfile,
+					no_file_beats_recovered:data.data.no_file_beats_recovered,
+
+					offset:data.data.offset,
+					created_at:data.data.created_at
+		  	});
+		  	this.props.HRR_measured(data.data.Did_you_measure_HRR);
+		  	console.log("From child hrr");
+		}
+		errorHeart(error){
+			console.log(error.message); 
+			this.setState({
+				fetching_hrr:false,
+			})
+	    }
+
   		updateData(){
   			let mins = parseInt(this.state.time_99_min) * 60;
   			let sec = parseInt(this.state.time_99_sec);
   			let time = mins + sec;
-  			let data = {
-  				Did_you_measure_HRR:this.state.Did_you_measure_HRR,
-		    	Did_heartrate_reach_99:this.state.Did_heartrate_reach_99,
-		    	time_99:time,
-		    	HRR_start_beat:parseInt(this.state.HRR_start_beat),
-		    	lowest_hrr_1min:parseInt(this.state.lowest_hrr_1min),
-		    	No_beats_recovered:parseInt(this.state.No_beats_recovered),
-		    };
-		    
-  			updateHeartData(data, this.props.selectedDate, this.props.successHeart, this.props.errorHeart);
-  			toast.info("Updated Heart-rate Data!",{
-	          className:"dark"
-	        });
-  			this.props.renderHrrData(data);
+  			this.setState({
+  				fetching_hrr:true
+  			}, () => {
+  				let data = {
+	  				Did_you_measure_HRR:this.state.Did_you_measure_HRR,
+			    	Did_heartrate_reach_99:this.state.Did_heartrate_reach_99,
+			    	time_99:time,
+			    	HRR_start_beat:parseInt(this.state.HRR_start_beat),
+			    	lowest_hrr_1min:parseInt(this.state.lowest_hrr_1min),
+			    	No_beats_recovered:parseInt(this.state.No_beats_recovered),
+			    };
+			    
+	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
+	  			
+  			})
+	  			
+  			//this.props.renderHrrData(data);
   		}
 	render(){
 		return(<div>
