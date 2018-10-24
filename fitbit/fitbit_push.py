@@ -9,7 +9,7 @@ import ast
 import logging
 import time
 from pytz import timezone
-
+from dateutil.parser import parse
 from django.db.models import Q
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -36,6 +36,10 @@ from progress_analyzer.tasks import (
 	generate_cumulative_instances_custom_range,
 	set_pa_report_update_date
 )
+from . import views
+
+from quicklook.calculations.converter.fitbit_to_garmin_converter import get_epoch_offset_from_timestamp
+
 def refresh_token_for_notification(user):
 	'''
 	This function updates the expired tokens in database
@@ -95,6 +99,7 @@ def call_push_api(data):
 	if data:
 		for i,k in enumerate(data):
 			# k = ast.literal_eval(k)
+			
 			notification = k
 			date = k['date']
 			user_id = k['ownerId']
@@ -125,7 +130,18 @@ def call_push_api(data):
 			else:
 				session = get_session_and_access_token(user)
 				call_api(date,user_id,data_type,user,session,create_notification)
-	return None
+			if user and data_type == 'activities':
+				latest_data = UserFitbitDataActivities.objects.latest('created_at')
+				latest_act_data = latest_data.activities_data
+				converted_activities = ast.literal_eval(latest_act_data.\
+					replace("'activity_fitbit': {...}","'activity_fitbit': {}"))
+				activity_data = converted_activities['activities'][0] 
+				start_time = activity_data['originalStartTime']
+				offset_conversion = get_epoch_offset_from_timestamp(start_time)
+				return views.fitbit_create_update_sync_time(
+					user, present_time, offset_conversion[1])
+			else:
+				return views.fitbit_create_update_sync_time(user, present_time, 0)
 
 def get_session_and_access_token(user):
 	refresh_token,access_token = refresh_token_for_notification(user)
@@ -426,3 +442,4 @@ def job_to_update_fitbit_raw_data(user, start_date, end_date):
 		)
 	else:
 		generate_quicklook.delay(user.id,str_start_date,str_end_date)
+
