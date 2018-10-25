@@ -10,7 +10,6 @@ import logging
 import time
 import pytz
 from pytz import timezone
-from dateutil.parser import parse
 from django.db.models import Q
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -94,11 +93,6 @@ def call_push_api(data):
 		This function take the latest created_at from FitbitNotifications and get the data 
 	'''
 	print("Startes for checking notifications in database")
-
-	# create_data = FitbitNotifications.objects.create(data_notification=data)
-	# print(FitbitNotifications._meta.get_fields(),"fields")
-	# updated_data = create_data.data_notification
-	# updated_data = FitbitNotifications.objects.latest('created_at')
 	if data:
 		for i,k in enumerate(data):
 			# k = ast.literal_eval(k)
@@ -112,16 +106,20 @@ def call_push_api(data):
 			except FitbitConnectToken.DoesNotExist as e:
 				user = None
 			if user:
-				create_notification = FitbitNotifications.objects.create(user=user,collection_type=data_type,
+				create_notification = FitbitNotifications.objects.create(
+					user=user,collection_type=data_type,
 					notification_date=date,state="unprocessed",notification= notification)
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
 			'''
-		The updated_at will check the time when the access_token is (created or updated)
-		As the access_token expires at every 8Hours. When celery job runs first we will check
-		the access_token is not expries. If it expries we will update the access_token first then
-		run the push notification job.
+				--The updated_at will check the time when the access_token is 
+				(created or updated)
+				--As the access_token expires at every 8Hours. When celery job runs first 
+				we will check
+				--the access_token is not expries. If it expries we will update 
+				the access_token first then
+				--run the push notification job.
 			'''
 			token_updated_time = tokens.updated_at
 			present_time = datetime.utcnow()
@@ -171,30 +169,6 @@ def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
 			user = user,
 			last_synced_fitbit = fitbit_sync_time,
 			offset = offset if offset else 0)
-	# except DatabaseError as e:
-	# # In case of race conditions which result in unexpected
-	# # results/errors
-	# 	message = """MESSAGE: User last sync time create/update failed
-	# 	ERROR: {}
-	# 	"""
-	# 	print(message.format(str(e)))
-
-
-            # serializer_class = UserLastSyncedSerializer
-    # queryset = UserLastSynced.objects.all()
-    # def post(user,created_at,format="json"):
-
-    #   if store_fitbit_data.call_push_api.filter(data).exists():
-
-
-
-    # user = User.objects.get(UserFitbitLastSynced.user)
-    #    created_at =
-    # if (collection_type = activities):
-    #   return(offset=user.UserFitbitLastSynced(offset))
-
-    # else:
-    #   return(offset=0)
 
 def get_session_and_access_token(user):
 	refresh_token,access_token = refresh_token_for_notification(user)
