@@ -139,15 +139,14 @@ def call_push_api(data):
 				activity_fitbit = activities_data['activity_summary']
 			else:
 				activity_fitbit = None
-			if user and data_type == 'activities' and activity_fitbit:
-				# latest_data = UserFitbitDataActivities.objects.latest('created_at')
-				# latest_act_data = activity_fitbit#latest_data.activities_data
-				if activity_fitbit['activities']:
-					activity_data = activity_fitbit['activities'][0] 
-					start_time = activity_data['originalStartTime']
-					offset_conversion = get_epoch_offset_from_timestamp(start_time)
-					return fitbit_create_update_sync_time(
-						user, present_time, offset_conversion[1])
+			if (user and data_type == 'activities'
+				and activity_fitbit
+				and activity_fitbit['activities']):
+				activity_data = activity_fitbit['activities'][0] 
+				start_time = activity_data['originalStartTime']
+				offset_conversion = get_epoch_offset_from_timestamp(start_time)
+				return fitbit_create_update_sync_time(
+					user, present_time, offset_conversion[1])
 			else:
 				return fitbit_create_update_sync_time(user, present_time, 0)
 
