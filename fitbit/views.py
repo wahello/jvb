@@ -29,11 +29,9 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataHeartRate,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
-					FitbitNotifications,\
-					UserFitbitLastSynced
+					FitbitNotifications
 
 from .fitbit_push import store_data,session_fitbit
-import pytz
 
 
 # Create your views here.
@@ -336,47 +334,3 @@ class HaveFitbitTokens(APIView):
 			have_tokens['have_fitbit_tokens'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
-
-
-
-def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
-	try:
-	# If last sync info is already present, update it
-		last_sync_obj = UserFitbitLastSynced.objects.get(user=user)
-		last_sync_timestamp = last_sync_obj.last_synced_fitbit
-		fitbit_sync_time = pytz.utc.localize(fitbit_sync_time)
-		if last_sync_timestamp < fitbit_sync_time:
-			last_sync_obj.last_synced_fitbit = pytz.utc.localize(
-				datetime.utcfromtimestamp(fitbit_sync_time.timestamp()))
-			last_sync_obj.offset = offset if offset!=last_sync_obj.offset and offset!=0 else last_sync_obj.offset
-
-			last_sync_obj.save()
-	except UserFitbitLastSynced.DoesNotExist as e:
-		UserFitbitLastSynced.objects.create(
-			user = user,
-			last_synced_fitbit = fitbit_sync_time,
-			offset = offset if offset else 0)
-	# except DatabaseError as e:
-	# # In case of race conditions which result in unexpected
-	# # results/errors
-	# 	message = """MESSAGE: User last sync time create/update failed
-	# 	ERROR: {}
-	# 	"""
-	# 	print(message.format(str(e)))
-
-
-            # serializer_class = UserLastSyncedSerializer
-    # queryset = UserLastSynced.objects.all()
-    # def post(user,created_at,format="json"):
-
-    #   if store_fitbit_data.call_push_api.filter(data).exists():
-
-
-
-    # user = User.objects.get(UserFitbitLastSynced.user)
-    #    created_at =
-    # if (collection_type = activities):
-    #   return(offset=user.UserFitbitLastSynced(offset))
-
-    # else:
-    #   return(offset=0)

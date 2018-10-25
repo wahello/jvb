@@ -8,6 +8,7 @@ from datetime import datetime, timedelta , date, timezone
 import ast
 import logging
 import time
+import pytz
 from pytz import timezone
 from dateutil.parser import parse
 from django.db.models import Q
@@ -29,7 +30,9 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataSteps,\
 					FitbitNotifications,\
 					UserFitbitDatabody,\
-					UserFitbitDatafoods
+					UserFitbitDatafoods,\
+					UserFitbitLastSynced
+
 from quicklook.tasks import generate_quicklook
 from garmin.garmin_push import _get_data_start_end_time
 from progress_analyzer.tasks import (
@@ -126,22 +129,64 @@ def call_push_api(data):
 			check_token_expire = (datetime_obj_utc - token_updated_time).total_seconds()
 			session = service.get_session(access_token)
 			if check_token_expire < 28800:
-				call_api(date,user_id,data_type,user,session,create_notification)
+				activity_fitbit = call_api(date,user_id,data_type,user,session,create_notification)
 			else:
 				session = get_session_and_access_token(user)
-				call_api(date,user_id,data_type,user,session,create_notification)
-			if user and data_type == 'activities':
-				latest_data = UserFitbitDataActivities.objects.latest('created_at')
-				latest_act_data = latest_data.activities_data
+				activity_fitbit =call_api(date,user_id,data_type,user,session,create_notification)
+			if user and data_type == 'activities' and activity_fitbit:
+				# latest_data = UserFitbitDataActivities.objects.latest('created_at')
+				latest_act_data = activity_fitbit#latest_data.activities_data
 				converted_activities = ast.literal_eval(latest_act_data.\
 					replace("'activity_fitbit': {...}","'activity_fitbit': {}"))
 				activity_data = converted_activities['activities'][0] 
 				start_time = activity_data['originalStartTime']
 				offset_conversion = get_epoch_offset_from_timestamp(start_time)
-				return views.fitbit_create_update_sync_time(
+				return fitbit_create_update_sync_time(
 					user, present_time, offset_conversion[1])
 			else:
-				return views.fitbit_create_update_sync_time(user, present_time, 0)
+				return fitbit_create_update_sync_time(user, present_time, 0)
+
+def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
+	try:
+	# If last sync info is already present, update it
+		last_sync_obj = UserFitbitLastSynced.objects.get(user=user)
+		last_sync_timestamp = last_sync_obj.last_synced_fitbit
+		fitbit_sync_time = pytz.utc.localize(fitbit_sync_time)
+		if last_sync_timestamp < fitbit_sync_time:
+			last_sync_obj.last_synced_fitbit = pytz.utc.localize(
+				datetime.utcfromtimestamp(fitbit_sync_time.timestamp()))
+			last_sync_obj.offset = offset if offset!=last_sync_obj.offset and offset!=0 else last_sync_obj.offset
+
+			last_sync_obj.save()
+	except UserFitbitLastSynced.DoesNotExist as e:
+		UserFitbitLastSynced.objects.create(
+			user = user,
+			last_synced_fitbit = fitbit_sync_time,
+			offset = offset if offset else 0)
+	# except DatabaseError as e:
+	# # In case of race conditions which result in unexpected
+	# # results/errors
+	# 	message = """MESSAGE: User last sync time create/update failed
+	# 	ERROR: {}
+	# 	"""
+	# 	print(message.format(str(e)))
+
+
+            # serializer_class = UserLastSyncedSerializer
+    # queryset = UserLastSynced.objects.all()
+    # def post(user,created_at,format="json"):
+
+    #   if store_fitbit_data.call_push_api.filter(data).exists():
+
+
+
+    # user = User.objects.get(UserFitbitLastSynced.user)
+    #    created_at =
+    # if (collection_type = activities):
+    #   return(offset=user.UserFitbitLastSynced(offset))
+
+    # else:
+    #   return(offset=0)
 
 def get_session_and_access_token(user):
 	refresh_token,access_token = refresh_token_for_notification(user)
@@ -162,7 +207,7 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		  session(created sesssion)
 	Return: returns nothing
 	'''
-	
+	activity_fitbit = {}
 	if data_type == 'body':
 		body_fat_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/log/fat/date/{}.json".format(
