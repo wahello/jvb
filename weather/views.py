@@ -37,11 +37,11 @@ class ActivityWeatherView(APIView):
                     longitude = activity['startingLongitudeInDegree']
                     weather_info = get_weather_info_using_lat_lng_time(
                                                 latitude, longitude, epoch_time)
-                    activity_weather = {'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'Degrees Celsius'},
+                    activity_weather = {'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
                                 'humidity': {'value': weather_info['currently']['humidity']},
-                                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'Degrees Celsius'},
-                                'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'Meters per second'},
-                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'Degrees Celsius'}}
+                                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
+                                'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'meter/second'},
+                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'}}
                     weather_data[activity['summaryId']] = {**activity_weather}
                 else:
                     weather_report = get_weather_info_using_garmin_activity(
@@ -66,11 +66,11 @@ def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
             longitude = garmin_activity_data['startingLongitudeInDegree']
             
             weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
-            weather_report.update({'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'Degrees Celsius'},
+            weather_report.update({'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
                                 'humidity': {'value': weather_info['currently']['humidity']},
-                                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'Degrees Celsius'},
-                                'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'Meters per second'},
-                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'Degrees Celsius'}})
+                                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
+                                'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'meter/second'},
+                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'}})
         return weather_report
     except UserGarminDataActivity.DoesNotExist:
         return weather_report
@@ -94,8 +94,8 @@ def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='s
         raise ValueError ('Given {} is not present in UNITS'.format(unit))
     
     EXCLUDE_KEYS = set(POSSIBLE_DATA_BLOCK)-set(include_block)
-    URL = 'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}&unit={}'.format(
-            KEY, latitude,longitude, epoch_time, ','.join(EXCLUDE_KEYS), UNITS)
+    URL = 'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}&units={}'.format(
+            KEY, latitude,longitude, epoch_time, ','.join(EXCLUDE_KEYS), unit)
     try:
         weather_report = requests.get(url=URL)
         return weather_report.json()
