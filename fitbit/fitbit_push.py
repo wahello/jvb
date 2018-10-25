@@ -129,10 +129,18 @@ def call_push_api(data):
 			check_token_expire = (datetime_obj_utc - token_updated_time).total_seconds()
 			session = service.get_session(access_token)
 			if check_token_expire < 28800:
-				activity_fitbit = call_api(date,user_id,data_type,user,session,create_notification)
+				call_api_data = call_api(date,user_id,data_type,user,session,create_notification)
 			else:
 				session = get_session_and_access_token(user)
-				activity_fitbit =call_api(date,user_id,data_type,user,session,create_notification)
+				call_api_data =call_api(date,user_id,data_type,user,session,create_notification)
+			if call_api_data:
+				activities_data = call_api_data['activities']
+			else:
+				activities_data = None
+			if activities_data:
+				activity_fitbit = activities_data['activity_summary']
+			else:
+				activity_fitbit = None
 			if user and data_type == 'activities' and activity_fitbit:
 				# latest_data = UserFitbitDataActivities.objects.latest('created_at')
 				latest_act_data = activity_fitbit#latest_data.activities_data
@@ -207,13 +215,15 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		  session(created sesssion)
 	Return: returns nothing
 	'''
-	activity_fitbit = {}
+	fitbit_pull_data = {}
 	if data_type == 'body':
 		body_fat_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/log/fat/date/{}.json".format(
 			user_id,data_type,date))
 		body_fat_fitbit = body_fat_fitbit.json()
 		store_data(body_fat_fitbit,user,date,create_notification,data_type='body_fat_fitbit')
+		fitbit_pull_data['body_fat'] = body_fat_fitbit
+		return fitbit_pull_data
 		#print(body_fat_fitbit, "testttttttttttt1")
 		# body_weight_fitbit = session.get(
 		# 	"https://api.fitbit.com/1/user/{}/body/log/weight/date/{}.json ".format(
@@ -231,6 +241,10 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 			user_id,data_type,date))
 		foods_goal_logs = foods_goal_logs.json()
 		store_data(foods_goal_logs,user,date,create_notification,data_type='foods_goal_logs')
+		fitbit_pull_data['foods'] = {}
+		fitbit_pull_data['foods']['goals'] = foods_goal_logs
+
+		return fitbit_pull_data
 		# foods_goal_logs = foods_goal_logs.json()
 		# print(foods_goal_logs, "foodssssssssssssss")
 		# foods_water_logs = session.get(
@@ -248,6 +262,8 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 			user_id,data_type,date))
 		sleep_fitbit = sleep_fitbit.json()
 		store_data(sleep_fitbit,user,date,create_notification,data_type='sleep_fitbit')
+		fitbit_pull_data['sleep'] = sleep_fitbit
+		return fitbit_pull_data
 	elif data_type == 'activities':
 		create_notification.state = "processing"
 		create_notification.save()
@@ -263,16 +279,19 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
 			store_data(activity_fitbit,user,date,create_notification,data_type="activity_fitbit")
+			fitbit_pull_data['activities'] = {}
+			fitbit_pull_data['activities']['activity_summary'] = activity_fitbit
 		if heartrate_fitbit:
 			heartrate_fitbit = heartrate_fitbit.json()
 			store_data(heartrate_fitbit,user,date,create_notification,data_type="heartrate_fitbit")
+			fitbit_pull_data['activities']['heartrate'] = heartrate_fitbit
 		if steps_fitbit:
 			steps_fitbit = steps_fitbit.json()
 			store_data(steps_fitbit,user,date,create_notification,data_type="steps_fitbit")
-			# FitbitNotifications.objects.filter(user=user,
-			# 	collection_type='Activities').update(state="processed") 
+			fitbit_pull_data['activities']['steps'] = steps_fitbit
+		return fitbit_pull_data
 		
-	return None
+	return fitbit_pull_data
 
 def update_fitbit_data(user,date,create_notification,data,collection_type):
 	'''
