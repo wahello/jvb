@@ -172,7 +172,6 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 				trans_sleep_data = get_combined_sleep_data(trans_sleep_data_list, 
 					first_sleep_start_time,
 					awaketime_between_naps)
-				print ('trans sleep data:	',trans_sleep_data)
 			else:
 				for single_sleep_record in sleep_data['sleep']:
 					if single_sleep_record['isMainSleep'] == False:
@@ -214,12 +213,9 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		# 	trans_sleep_data['restlessDurationInSeconds'],
 		# 	include_sec = False
 		# )
-		print ('durationInSeconds	',trans_sleep_data['durationInSeconds'])
-		print ('awakeDurationInSeconds	',trans_sleep_data['awakeDurationInSeconds'])
-		print ('restlessDurationInSeconds	',trans_sleep_data['restlessDurationInSeconds'])
 		sleep_stats["sleep_per_wearable"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			(trans_sleep_data['durationInSeconds'] 
-			- trans_sleep_data['awakeDurationInSeconds'] 
+			- trans_sleep_data['awakeDurationInSeconds']
 			- trans_sleep_data['restlessDurationInSeconds']),
 			include_sec = False
 		)
@@ -253,8 +249,7 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		if not str_date:
 			sleep_stats['sleep_bed_time'] = None
 			sleep_stats['sleep_awake_time'] = None
-
-	print ('::::::	', sleep_stats)
+	print (':::::::		', sleep_stats)
 	return sleep_stats
 
 
