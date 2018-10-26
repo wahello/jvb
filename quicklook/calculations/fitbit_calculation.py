@@ -1,4 +1,4 @@
-from datetime import datetime,timedelta,date,timezone
+from datetime import datetime,timedelta,date,timezone, time
 import ast
 import pytz
 import json
@@ -80,6 +80,49 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 	else:
 		return None
 
+def get_epoch_time_from_timestamp(timestamp):
+	if timestamp:
+		if timestamp[-3:-2] == ':':
+			timestamp = timestamp[:-3]+timestamp[-2:]
+
+		dobj = datetime.strptime(timestamp,"%Y-%m-%dT%H:%M:%S.%f")
+		time_in_utc_seconds = int(dobj.timestamp())
+		return (time_in_utc_seconds)
+
+def get_combined_sleep_data(sleep_data, sleep_start_time, awaketime_between_naps):
+
+	remSleepInSeconds = sleep_data[0]['remSleepInSeconds']+sleep_data[1]['remSleepInSeconds']
+	restlessDurationInSeconds = sleep_data[0]['restlessDurationInSeconds']+sleep_data[1]['restlessDurationInSeconds']
+	validation = sleep_data[0]['validation']+sleep_data[1]['validation']
+	deepSleepDurationInSeconds = sleep_data[0]['deepSleepDurationInSeconds']+sleep_data[1]['deepSleepDurationInSeconds']
+	lightSleepDurationInSeconds = sleep_data[0]['lightSleepDurationInSeconds']+sleep_data[1]['lightSleepDurationInSeconds']
+	unmeasurableSleepInSeconds = sleep_data[0]['unmeasurableSleepInSeconds']
+	startTimeOffsetInSeconds = sleep_data[0]['startTimeOffsetInSeconds']
+	durationInSeconds = sleep_data[0]['durationInSeconds']+sleep_data[1]['durationInSeconds']
+	awakeDurationInSeconds = sleep_data[0]['awakeDurationInSeconds']+sleep_data[1]['awakeDurationInSeconds']
+
+	light = sleep_data[0]['sleepLevelsMap']['light'] + sleep_data[1]['sleepLevelsMap']['light']
+	rem = sleep_data[0]['sleepLevelsMap']['rem'] + sleep_data[1]['sleepLevelsMap']['rem']
+	deep = sleep_data[0]['sleepLevelsMap']['deep'] + sleep_data[1]['sleepLevelsMap']['deep']
+	awake = sleep_data[0]['sleepLevelsMap']['awake'] + sleep_data[1]['sleepLevelsMap']['awake']
+	restless = sleep_data[0]['sleepLevelsMap']['restless'] + sleep_data[1]['sleepLevelsMap']['restless']
+	sleepLevelsMap = dict({'light':light, 'rem':rem, 'awake':awake, 'deep':deep, 'restless':restless})			
+
+	trans_sleep_data = dict({'remSleepInSeconds': remSleepInSeconds,
+		'restlessDurationInSeconds':restlessDurationInSeconds,
+		'validation':validation, 
+		'deepSleepDurationInSeconds': deepSleepDurationInSeconds,
+		'summaryId':sleep_data[0]['summaryId'], 
+		'lightSleepDurationInSeconds': lightSleepDurationInSeconds,
+		'unmeasurableSleepInSeconds':unmeasurableSleepInSeconds,
+		'startTimeOffsetInSeconds':startTimeOffsetInSeconds, 
+		'startTimeInSeconds':sleep_start_time, 
+		'durationInSeconds':durationInSeconds + awaketime_between_naps,
+		'sleepLevelsMap':sleepLevelsMap, 
+		'awakeDurationInSeconds':awakeDurationInSeconds + awaketime_between_naps,
+		'calendarDate':sleep_data[0]['calendarDate']})
+	return trans_sleep_data
+
 def get_sleep_stats(sleep_data, ui_bedtime = None,
 	ui_awaketime = None, ui_sleep_duration = None,
 	ui_timezone = None,str_date=True):		
@@ -106,11 +149,50 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		ui_awaketime = ui_awaketime.astimezone(target_tz)
 
 	if sleep_data:
-		main_sleep_data = list(filter(lambda x:x.get('isMainSleep'),sleep_data['sleep']))
-		if not main_sleep_data:
-			main_sleep_data = sleep_data['sleep']
-		main_sleep_data = main_sleep_data[0]
-		trans_sleep_data = fitbit_to_garmin_sleep(main_sleep_data)
+
+
+		if len(sleep_data['sleep']) > 1:
+			trans_sleep_data_list = []
+			for single_sleep_record in sleep_data['sleep']:
+
+				trans_sleep_data_list.append(fitbit_to_garmin_sleep(single_sleep_record))
+				
+				if single_sleep_record['isMainSleep'] == False:
+					first_sleep_start_time = single_sleep_record['startTime']
+					first_sleep_end_time = single_sleep_record['endTime']
+				else:
+					second_sleep_start_time = single_sleep_record['startTime']
+					second_sleep_end_time = single_sleep_record['endTime']
+
+			first_sleep_end_time_utc_seconds = get_epoch_time_from_timestamp(first_sleep_end_time)
+			second_sleep_start_time_utc_seconds = get_epoch_time_from_timestamp(second_sleep_start_time)
+			awaketime_between_naps = second_sleep_start_time_utc_seconds - first_sleep_end_time_utc_seconds
+
+			if  awaketime_between_naps <= 9000:
+				trans_sleep_data = get_combined_sleep_data(trans_sleep_data_list, 
+					first_sleep_start_time,
+					awaketime_between_naps)
+				print ('trans sleep data:	',trans_sleep_data)
+			else:
+				for single_sleep_record in sleep_data['sleep']:
+					if single_sleep_record['isMainSleep'] == False:
+						trans_sleep_data = fitbit_to_garmin_sleep(single_sleep_record)
+
+		else:
+			main_sleep_data = list(filter(lambda x:x.get('isMainSleep'),sleep_data['sleep']))
+			if not main_sleep_data:
+				main_sleep_data = sleep_data['sleep']
+			main_sleep_data = main_sleep_data[0]
+			trans_sleep_data = fitbit_to_garmin_sleep(main_sleep_data)
+
+
+
+		# main_sleep_data = list(filter(lambda x:x.get('isMainSleep'),sleep_data['sleep']))
+		# if not main_sleep_data:
+		# 	main_sleep_data = sleep_data['sleep']
+		# main_sleep_data = main_sleep_data[0]
+		# trans_sleep_data = fitbit_to_garmin_sleep(main_sleep_data)
+
 
 	if trans_sleep_data:
 		sleep_stats["deep_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
@@ -132,6 +214,9 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		# 	trans_sleep_data['restlessDurationInSeconds'],
 		# 	include_sec = False
 		# )
+		print ('durationInSeconds	',trans_sleep_data['durationInSeconds'])
+		print ('awakeDurationInSeconds	',trans_sleep_data['awakeDurationInSeconds'])
+		print ('restlessDurationInSeconds	',trans_sleep_data['restlessDurationInSeconds'])
 		sleep_stats["sleep_per_wearable"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			(trans_sleep_data['durationInSeconds'] 
 			- trans_sleep_data['awakeDurationInSeconds'] 
@@ -169,6 +254,7 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 			sleep_stats['sleep_bed_time'] = None
 			sleep_stats['sleep_awake_time'] = None
 
+	print ('::::::	', sleep_stats)
 	return sleep_stats
 
 
