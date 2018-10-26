@@ -27,21 +27,22 @@ class ActivityWeatherView(APIView):
         filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
                             manually_updated_json=manually_edited,
                             userinput_activities=activities)
-
         weather_data = {}
         for activity in filtered_activities_list:
             if activity['activity_weather'] == {}:
                 epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
+                print (activity['startingLatitudeInDegree'], activity['startingLongitudeInDegree'], epoch_time)
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
                     weather_info = get_weather_info_using_lat_lng_time(
                                                 latitude, longitude, epoch_time)
                     activity_weather = {'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
-                                'humidity': {'value': weather_info['currently']['humidity']},
+                                'humidity': {'value': weather_info['currently']['humidity'], 'units': 'percentage'},
                                 'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
                                 'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'meter/second'},
-                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'}}
+                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
+                                'weather_condition': weather_info['currently']['icon']}
                     weather_data[activity['summaryId']] = {**activity_weather}
                 else:
                     weather_report = get_weather_info_using_garmin_activity(
@@ -49,15 +50,17 @@ class ActivityWeatherView(APIView):
                     weather_data[activity['summaryId']] = {**weather_report}
             else:
                 weather_data[activity['summaryId']] = {**activity['activity_weather']}
+        print (weather_data)
         return Response(weather_data)
 
 
 def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
     weather_report = {'dewPoint': {'value': None, 'units': None},
-                                'humidity': {'value': None},
+                                'humidity': {'value': None, 'units': None},
                                 'temperature':{'value': None, 'units': None},
                                 'wind': {'value': None, 'units': None},
-                                'temperature_feels_like':{'value': None, 'units': None}}
+                                'temperature_feels_like':{'value': None, 'units': None},
+                                'weather_condition': None}
     try:
         garmin_activity = UserGarminDataActivity.objects.get(user=user, summary_id=summaryId)
         garmin_activity_data = ast.literal_eval(garmin_activity.data)
@@ -67,10 +70,11 @@ def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
             
             weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
             weather_report.update({'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
-                                'humidity': {'value': weather_info['currently']['humidity']},
+                                'humidity': {'value': weather_info['currently']['humidity'], 'units': 'percentage'},
                                 'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
                                 'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'meter/second'},
-                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'}})
+                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
+                                'weather_condition': weather_info['currently']['icon']})
         return weather_report
     except UserGarminDataActivity.DoesNotExist:
         return weather_report
