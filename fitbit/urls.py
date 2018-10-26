@@ -5,4 +5,5 @@ urlpatterns = [
 	
 	url(r'users/have_fitbit_tokens', views.HaveFitbitTokens.as_view(), name="have_fitbit_tokens"),
 	#url(r'call_api', views.call_push_api, name="call_api"),
+	# url(r'users/UserFitbitLastSynced', views.UserFitbitLastSynced.as_view(), name="UserFitbitLastSynced"),
 ]
