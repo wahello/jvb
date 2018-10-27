@@ -959,7 +959,30 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 		final_activities = filtered_activities
 	return final_activities
 
-def get_activity_stats(combined_user_activities):
+def do_user_has_exercise_activity(combined_user_activities,user_age):
+	aerobic_range = 180-user_age-30
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
+	have_activities = False
+	if combined_user_activities:
+		for act in combined_user_activities:
+			act_summary_type = act.get("activityType","")
+			act_hr = act.get('averageHeartRateInBeatsPerMinute',0)
+			if not act_hr:
+				act_hr = 0
+			act_steps_type = act.get("steps_type","")
+			if(not act_steps_type):
+				if(act_hr > aerobic_range 
+					and act_summary_type not in IGNORE_ACTIVITY):
+					act_steps_type = 'exercise'
+				else:
+					act_steps_type = 'non_exercise'
+			if not have_activities:
+				if act_steps_type == 'exercise':
+					have_activities = True
+
+	return have_activities
+
+def get_activity_stats(combined_user_activities,user_age):
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 
@@ -992,7 +1015,9 @@ def get_activity_stats(combined_user_activities):
 				obj_avg_hr = 0
 
 			if not activity_stats['have_activity']:
-				activity_stats['have_activity'] = True
+				activity_stats['have_activity'] = (
+					do_user_has_exercise_activity(
+						combined_user_activities,user_age))
 			obj_act = obj.get('activityType')
 
 			activities_duration[obj['activityType']] = obj.get('durationInSeconds',0)
@@ -2200,13 +2225,15 @@ def get_alcohol_grade_avg_alcohol_week(daily_strong,user):
 	alcohol_stats = cal_alcohol_drink_grade(drink_avg,user.profile.gender)
 	return alcohol_stats
 
-def get_exercise_consistency_grade(workout_over_period,weekly_activity,period):
+def get_exercise_consistency_grade(workout_over_period,weekly_activity,period,age):
 	points = 0
-	for (strong_obj,activity_list) in zip(workout_over_period.values(),weekly_activity.values()):
+	for (strong_obj,activity_list) in zip(
+			workout_over_period.values(),weekly_activity.values()):
 		have_no_workout = not strong_obj or (strong_obj and strong_obj.workout != "yes")
-		have_activities = activity_list or (
-			strong_obj and strong_obj.activities and json.loads(strong_obj.activities)
-		)
+		# have_activities = activity_list or (
+		# 	strong_obj and strong_obj.activities and json.loads(strong_obj.activities)
+		# )
+		have_activities = do_user_has_exercise_activity(activity_list,age)	
 		if strong_obj and (strong_obj.workout == 'yes'):
 			points += 1
 		elif(have_no_workout and have_activities):
@@ -2301,7 +2328,7 @@ def get_overall_grade(grades):
 	return cal_overall_grade(gpa)
 
 def get_weather_data(todays_daily_strong,todays_date_epoch,
-	combined_user_activities):
+	activity_stat):
 	manual_weather = False
 	if(safe_get(todays_daily_strong,'indoor_temperature','') or
 	   safe_get(todays_daily_strong,'outdoor_temperature','') or
@@ -2327,7 +2354,6 @@ def get_weather_data(todays_daily_strong,todays_date_epoch,
 		}
 		return DATA
 	else:
-		activity_stat = get_activity_stats(combined_user_activities)
 		latitude = activity_stat['latitude']
 		longitude = activity_stat['longitude']
 		if latitude and longitude:
@@ -2393,6 +2419,42 @@ def get_weight(bodycmp_data,daily_optional):
 
 	return json.dumps(weight)
 
+def get_weekly_combined_activities(weekly_activities,
+	weekly_manully_edited_activities, weekly_user_input_activities,
+	week_start_date, week_end_date):
+	weekly_combined_activities = OrderedDict()
+	current_date = week_start_date
+	while(current_date <= week_end_date):
+		current_date_str = current_date.strftime('%Y-%m-%d')
+		weekly_combined_activities[current_date_str] = None
+		
+		# temporarily here, with new activity architecture we don't need this
+		userinput_activities = weekly_user_input_activities[current_date_str]
+		if userinput_activities and userinput_activities.activities:
+			userinput_activities = json.loads(userinput_activities.activities)
+		
+		activities = weekly_activities.get(current_date_str,[])
+		manually_edited_activities = (
+			weekly_manully_edited_activities.get(current_date_str))
+
+		if manually_edited_activities:
+			manually_edited_activities = {act['summaryId']:act
+				for act in manually_edited_activities}
+		else:
+			manually_edited_activities = {}
+
+		combined_user_activities = get_filtered_activity_stats(
+			activities,manually_edited_activities,userinput_activities)
+
+		if combined_user_activities:
+			weekly_combined_activities[current_date_str] = (
+				combined_user_activities)
+		current_date += timedelta(days=1)
+
+	return weekly_combined_activities
+
+
+
 def create_garmin_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -2408,6 +2470,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 	to_dt = str_to_datetime(to_date)
 	current_date = from_dt
 	SERIALIZED_DATA = []
+	user_age = user.profile.age()
 
 	while current_date <= to_dt:
 		last_seven_days_date = current_date - timedelta(days=6)
@@ -2461,6 +2524,14 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 			Q(user_input__created_at__gte = last_seven_days_date)&
 			Q(user_input__created_at__lte = current_date),
 			user_input__user = user).order_by('user_input__created_at'))
+
+		#dict of weekly strong data
+		weekly_daily_strong = get_weekly_user_input_data(
+			daily_strong,current_date,last_seven_days_date)
+
+		weekly_combined_activities = get_weekly_combined_activities(
+			weekly_activities,weekly_manual_activities,weekly_daily_strong,
+			last_seven_days_date,current_date, )
 
 		try:
 			tomorrow_date = current_date + timedelta(days=1)
@@ -2526,11 +2597,10 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		combined_user_activities = get_filtered_activity_stats(
 			todays_activities_json,todays_manually_updated_json,
 			userinput_activities,user = user, calendar_date = current_date)
-
-		weather_data = get_weather_data(todays_daily_strong,start_epoch,combined_user_activities)
+		activity_stats = get_activity_stats(combined_user_activities,user_age)
+		weather_data = get_weather_data(todays_daily_strong,start_epoch,activity_stats)
 
 		# Exercise Calculation
-		activity_stats = get_activity_stats(combined_user_activities)
 		exercise_calculated_data['did_workout'] = did_workout_today(
 				activity_stats['have_activity'],
 				safe_get(todays_daily_strong,"workout","")
@@ -2657,7 +2727,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 
 		# Average exercise heartrate grade calculation
 		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(
-			combined_user_activities,todays_daily_strong,user.profile.age())
+			combined_user_activities,todays_daily_strong,user_age)
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
@@ -2687,7 +2757,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 			user_input_sleep_duration = user_input_sleep_duration,
 			user_input_timezone = user_input_timezone,
 			sleep_aid = user_input_sleep_aid,
-			age = user.profile.age()
+			age = user_age
 		)
 		grades_calculated_data['avg_sleep_per_night_grade'] = grade_point[0] if grade_point[0] else ''
 		grades_calculated_data['avg_sleep_per_night_gpa'] = grade_point[1] if grade_point[1] else 0
@@ -2754,7 +2824,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		exercise_steps,non_exercise_steps,total_steps = cal_exercise_steps_total_steps(
 			daily_total_steps,
 			combined_user_activities,
-			user.profile.age(),
+			user_age
 		)	
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps
@@ -2766,9 +2836,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		
 
 		# Exercise Consistency grade calculation over period of 7 days
-		weekly_daily_strong = get_weekly_user_input_data(daily_strong,current_date,last_seven_days_date)
 		exercise_consistency_grade_point = get_exercise_consistency_grade(
-			weekly_daily_strong,weekly_activities,7)
+			weekly_daily_strong,weekly_combined_activities,7,user_age)
 
 		grades_calculated_data['exercise_consistency_grade'] = exercise_consistency_grade_point[0]
 		grades_calculated_data['exercise_consistency_score'] = exercise_consistency_grade_point[1]
