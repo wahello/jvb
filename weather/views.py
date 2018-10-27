@@ -27,6 +27,7 @@ class ActivityWeatherView(APIView):
         filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
                             manually_updated_json=manually_edited,
                             userinput_activities=activities)
+        print (filtered_activities_list)
         weather_data = {}
         for activity in filtered_activities_list:
             if activity['activity_weather'] == {}:
