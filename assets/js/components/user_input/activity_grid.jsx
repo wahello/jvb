@@ -870,6 +870,7 @@ handleChange_steps_type(event){
             [selectedActivityId]: activity_data
         });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 
 /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
@@ -889,6 +890,7 @@ handleChange_duplicate_info(event) {
         [selectedActivityId]: activity_data
       });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){

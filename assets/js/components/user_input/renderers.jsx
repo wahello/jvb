@@ -313,13 +313,22 @@ export function renderSubmitOverlay(){
 export function renderActivityGrid(){
 	const updateParentActivities = function(activities){
 		let workout = this.state.workout;
-		if(!_.isEmpty(activities))
-			workout = "yes";
-		this.setState({
-			workout:workout,
-			activities:activities
-		});
-	}.bind(this);
+        if(!_.isEmpty(activities)){
+            let have_exercise_activity = false;
+            for(let [key,act] of Object.entries(activities)){
+                if(!act.deleted && !act.duplicate && act.steps_type === 'exercise'){
+                    have_exercise_activity = true;
+                    break;
+                }
+            }
+            workout = have_exercise_activity?'yes':'no';
+        }
+
+        this.setState({
+            workout:workout,
+            activities:activities
+        });
+    }.bind(this);
 	return(
 		<ActivityGrid
 			updateParentActivities = {updateParentActivities}
