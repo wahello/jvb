@@ -230,7 +230,8 @@ class ProgressDashboard extends Component{
     this.reanderAllHrr = this.reanderAllHrr.bind(this);
     this.onSubmitDate4 = this.onSubmitDate4.bind(this);
     this.toggleStressInfo = this.toggleStressInfo.bind(this);
-
+    this.MinToHours = this.MinToHours.bind(this);
+    this.renderActiveMinsValue = this.renderActiveMinsValue.bind(this);
 	}
 	getInitialDur(){
 		 let paDurationInitialState = {
@@ -1015,6 +1016,70 @@ class ProgressDashboard extends Component{
     	return score;
     }
 
+    renderActiveMinsValue(value,dur) {
+      let score = "";
+      if(dur && dur != "today" && dur != "month" &&
+        dur != "yesterday" && dur != "week" && dur != "year"){
+            if(value && value['custom_range'] != undefined){
+                if(value['custom_range'][dur] != undefined){
+          score = this.MinToHours(value['custom_range'][dur].data);
+             }
+            }
+        }
+      else{
+          score = this.MinToHours(value[dur]);
+      }
+      return score;
+    }
+
+MinToHours(score){
+  let time;// undefined
+      if(score != null && score != undefined && score != ""){
+        if (score == -1){
+          time = "Never"
+        }
+        else{
+          let hours = parseInt(score/60);//3
+          let minutes = (score % 60);//9
+          if(hours < 10){// 3<10 
+            hours = "0" + hours;  //time = 03
+          }
+          else{
+            hours = hours; // time = 03 
+          }
+          if(minutes < 10){// 9<10 
+            time = hours + ":0" + minutes; // time = 03:09
+          }
+          else{
+            time = hours + ":" + minutes;// time = 3:9
+          }
+        }
+      }
+      else{
+        time = "N/A"
+      }
+      if (score == null || score == 0){
+        time = "N/A"
+      }
+      return time;
+    }// time = 03:09
+
+/*minutestohours(score)
+  {
+    let hours = Math.floor(score) / 60;
+    let minutes = (score)% 60;
+    return hours,minutes 
+  }
+
+addzero(num)
+{
+   num = hours,minutes;
+   if num<10;
+      num = "0"+"num";
+   else
+
+}*/
+
 getGarminStressColors(stressValue){
   let background = "";
   let fontColor = "";
@@ -1183,10 +1248,10 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Active Minutes (24 hours)
+                          Time Moving / Active (hh:mm) (24 hours)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.total_active_minutes,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes,dur)}
+                          {this.renderActiveMinsValue(value.total_active_minutes,dur) == null?"Not Reported":this.renderActiveMinsValue(value.total_active_minutes,dur)}
                         </div>
                       </div>
                       <hr  
@@ -1194,7 +1259,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          % of Active Minutes (24 Hours)
+                          % of Time Moving / Active (hh:mm) (24 hours)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderValue(value.total_active_minutes_prcnt,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes_prcnt,dur) +"%"}
@@ -1205,10 +1270,10 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           Active Minutes (when not sleeping)
+                           Time Moving / Active (when not sleeping) (hh:mm)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.active_minutes_without_sleep,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep,dur)}
+                          {this.renderActiveMinsValue(value.active_minutes_without_sleep,dur) == null?"Not Reported":this.renderActiveMinsValue(value.active_minutes_without_sleep,dur)}
                         </div>
                       </div>
                       <hr  
@@ -1216,7 +1281,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           % of Active Minutes (when not sleeping)
+                           % of Time Moving / Active (when not sleeping) (hh:mm)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderValue(value.active_minutes_without_sleep_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_prcnt,dur) + "%"}
@@ -1227,10 +1292,10 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Active Minutes (when not sleeping and exercising)
+                          Time Moving / Active (when not sleeping and exercising) (hh:mm)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.active_minutes_without_sleep_exercise,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise,dur)}
+                          {this.renderActiveMinsValue(value.active_minutes_without_sleep_exercise,dur) == null?"Not Reported":this.renderActiveMinsValue(value.active_minutes_without_sleep_exercise,dur)}
                         </div>
                       </div>
                       <hr  
@@ -1238,7 +1303,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          % of Active Minutes (when not sleeping and exercising)
+                          % of Time Moving / Active (when not sleeping and exercising) (hh:mm)
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) + "%"}
