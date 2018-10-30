@@ -13,7 +13,7 @@ const activites = { "":"Select",
 "OTHER":"OTHER",
 "HEART_RATE_RECOVERY":"HEART RATE RECOVERY(HRR)",
 "JVB_STRENGTH_EXERCISES":"JVB STRENGTH EXERCISES",
-'ARC_TRAINER':'ARC TRAINER',
+"ARC_TRAINER":"ARC TRAINER",
 "BACKCOUNTRY_SKIING_SNOWBOARDING":"BACKCOUNTRY SKIING SNOWBOARDING",
 "BARRE_CLASS":"BARRE CLASS",
 "BASKETBALL":"BASKETBALL",
@@ -849,26 +849,7 @@ handleChange_steps_type(event){
     let count = 0;
     let activitiesLen = 0;
     if(steps_type == "exercise"){
-        for(let activityId of Object.keys(activitiesObj)) {
-            if(activitiesObj[activityId]["deleted"] !== true && activitiesObj[activityId]["duplicate"] !== true){
-                if(activitiesObj[activityId]["activityType"] !== "HEART_RATE_RECOVERY")
-                    activitiesLen ++;
-                for(let key of Object.keys(activitiesObj[activityId])){
-
-                    if((key === "activityType" && activitiesObj[activityId][key] !== "HEART_RATE_RECOVERY" && activitiesObj[activityId]["steps_type"] === "non_exercise")) {
-                        count ++;
-                    }
-                }
-            }
-                
-        }
-        if((activity_data["activityType"] !== "HEART_RATE_RECOVERY") && ((count === 0 && activitiesLen === 1) || (count === (activitiesLen -1)))) {
-
-            this.activityStepsTypeModalToggle();
-            steps_type = "exercise";
-        } else {
-            steps_type = "non_exercise";
-        }
+        steps_type = "non_exercise";
     }
     else {
         steps_type = "exercise";
@@ -879,6 +860,7 @@ handleChange_steps_type(event){
             [selectedActivityId]: activity_data
         });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 
 /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
@@ -898,6 +880,7 @@ handleChange_duplicate_info(event) {
         [selectedActivityId]: activity_data
       });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
