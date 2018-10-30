@@ -965,20 +965,19 @@ def do_user_has_exercise_activity(combined_user_activities,user_age):
 	have_activities = False
 	if combined_user_activities:
 		for act in combined_user_activities:
-			act_summary_type = act.get("activityType","")
-			act_hr = act.get('averageHeartRateInBeatsPerMinute',0)
-			if not act_hr:
-				act_hr = 0
-			act_steps_type = act.get("steps_type","")
-			if(not act_steps_type):
-				if(act_hr > aerobic_range 
-					and act_summary_type not in IGNORE_ACTIVITY):
-					act_steps_type = 'exercise'
-				else:
-					act_steps_type = 'non_exercise'
-			if not have_activities:
-				if act_steps_type == 'exercise':
-					have_activities = True
+			if act.get("activityType","") not in IGNORE_ACTIVITY:
+				act_hr = act.get('averageHeartRateInBeatsPerMinute',0)
+				if not act_hr:
+					act_hr = 0
+				act_steps_type = act.get("steps_type","")
+				if not act_steps_type:
+					if(act_hr > aerobic_range):
+						act_steps_type = 'exercise'
+					else:
+						act_steps_type = 'non_exercise'
+				if not have_activities:
+					if act_steps_type == 'exercise':
+						have_activities = True
 
 	return have_activities
 
