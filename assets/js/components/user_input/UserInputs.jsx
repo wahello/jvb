@@ -28,7 +28,7 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate,userDailyInputRecentFetch,
-        fetchGarminData,fetchGarminHrrData} from '../../network/userInput';
+        fetchGarminData,fetchGarminHrrData,userDailyInputWeatherReportFetch} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
@@ -283,6 +283,8 @@ class UserInputs extends React.Component{
     this.extraTab = this.extraTab.bind(this);
     this.renderAddDate = this.renderAddDate.bind(this);
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
+    this.onWeatherReportFetchSuccess = this.onWeatherReportFetchSuccess.bind(this);
+    this.onWeatherReportFetchFailure = this.onWeatherReportFetchFailure.bind(this);
     }
     
     _extractDateTimeInfo(dateObj){
@@ -537,7 +539,7 @@ transformActivity(activity){
           travel:have_optional_input?data.data.optional_input.travel:'',
           travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
-          general_comment:(have_optional_input&&canUpdateForm)?data.data.optional_input.general_comment:'',
+          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
           
           took_nap:have_optional_input?data.data.optional_input.took_nap:'',
           //nap_start_time_date:nap_start_time_info.calendarDate,
@@ -569,6 +571,14 @@ transformActivity(activity){
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
+        /******** CALLING WEATHER REPORT API *******/
+        userDailyInputWeatherReportFetch((this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone));
+      }
+    }
+    onFetchSuccess(data,canUpdateForm=undefined){
+      if (!_.isEmpty(data.data)){
+        const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition',
+                                'dewPoint','temperature'];
       }
     }
 
@@ -1030,6 +1040,7 @@ getTotalSleep(){
     },function(){
         const clone = true;
         userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+
       }.bind(this));
   }
   renderRemoveDate(){
