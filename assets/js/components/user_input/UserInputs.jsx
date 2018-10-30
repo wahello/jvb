@@ -575,11 +575,27 @@ transformActivity(activity){
         userDailyInputWeatherReportFetch((this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone));
       }
     }
-    onFetchSuccess(data,canUpdateForm=undefined){
+    onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
       if (!_.isEmpty(data.data)){
-        const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition',
-                                'dewPoint','temperature'];
+        const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
+        const activities = this.state.activities;
+        for(let [summaryID,val] of Object.entries[data.data]) {
+          if(activities[summaryID] != null && activities[summaryID] != undefined && activities[summaryID] != "") {
+              for(let field of WEATHER_FIELDS){
+                activities[summaryID][field] = val.field.value;
+              }
+          }
+        }
       }
+    }
+
+    onWeatherReportFetchFailure(error){
+      this.setState(
+        {
+        selected_date:this.state.selected_date,
+        gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
     }
 
     onFetchRecentSuccessFullReport(data){
