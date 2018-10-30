@@ -355,7 +355,6 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 				# if fitbit_date_obj == start_date:
 				try:
 					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
-					print (value, key)
 					update_fitbit_data(user,date_of_activity,create_notification,value,key)
 					print("Updated Activity-Fitbit successfully")
 					if create_notification != None:
