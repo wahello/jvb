@@ -976,7 +976,7 @@ def do_user_has_exercise_activity(combined_user_activities,user_age):
 					else:
 						act_steps_type = 'non_exercise'
 				if not have_activities:
-					if act_steps_type == 'exercise':
+					if act_steps_type == 'exercise' or not act_hr:
 						have_activities = True
 
 	return have_activities
