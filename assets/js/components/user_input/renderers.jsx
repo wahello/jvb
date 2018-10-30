@@ -313,7 +313,6 @@ export function renderSubmitOverlay(){
 export function renderActivityGrid(){
 	const updateParentActivities = function(activities){
 		let workout = this.state.workout;
-		console.log("Workout:", workout);
 		if(!_.isEmpty(activities)){
 			let have_exercise_activity = false;
 			for(let [key,act] of Object.entries(activities)){
