@@ -16,6 +16,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .tasks import store_fitbit_data
@@ -29,6 +30,7 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
 					FitbitNotifications
+
 from .fitbit_push import store_data,session_fitbit
 
 

@@ -2820,6 +2820,7 @@ def export_users_xls(request):
 		'''
 			Print the values in Excel
 		'''
+		print(value,"ddddddd")
 		workout_copy = workout_type
 		workout_keys = ["days_with_activity","percent_of_days","duration",
 		"workout_duration_percent","average_heart_rate","duration_in_aerobic_range",
@@ -2962,7 +2963,7 @@ def export_users_xls(request):
 	row_num = 3
 	total_activities = []
 	for key,value in data.items():
-		if key != 'Totals' and key != 'extra':
+		if key != 'Totals' and key != 'extra' and key!= 'heartrate_ranges':
 			total_activities.append(key)
 			if 'SWIMMING' in key:
 				weekly_workout_sheet.write(
