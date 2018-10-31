@@ -77,7 +77,8 @@ def _create_activity_stat(user,activity_obj,current_date):
 		for k, v in activity_obj.items():
 			if k in activity_keys.keys():
 				activity_keys[k] = v
-				avg_hr = int(activity_keys.get("averageHeartRateInBeatsPerMinute",0))
+				avg_hr = activity_keys.get("averageHeartRateInBeatsPerMinute",0)
+				avg_hr = int(avg_hr) if avg_hr else 0
 				# If there is no average HR information, then consider
 				# steps as "exercise steps"
 				if ((avg_hr and avg_hr < below_aerobic_value) or
@@ -85,7 +86,7 @@ def _create_activity_stat(user,activity_obj,current_date):
 					activity_keys["steps_type"] = "non_exercise"
 				else:
 					activity_keys["steps_type"] = "exercise"
-				if int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
+				if avg_hr > anaerobic_value:
 					activity_keys["can_update_steps_type"] = False
 
 		return {activity_obj['summaryId']:activity_keys}
@@ -105,7 +106,10 @@ def _get_activities(user,target_date):
 	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=3)
-	fitfiles=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
+	if not fitfiles:
+		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -272,7 +276,8 @@ class GarminData(APIView):
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			have_activities = True if activites else False
+			have_activities = quicklook.calculations.garmin_calculation.\
+				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,

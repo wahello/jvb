@@ -24,7 +24,7 @@ var ReactDOM = require('react-dom');
 
 import { getGarminToken,logoutUser} from '../network/auth';
 const catagory = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec","resting_hr",
-"beat_lowered","pure_beat_lowered","pure_time_99","time_99",];
+"beat_lowered","pure_beat_lowered","pure_time_99","time_99","active_min_exclude_sleep","active_min_exclude_sleep_exercise","active_min_total",];
 const duration = ["week","today","yesterday","year","month","custom_range"];
 
 class ProgressDashboard extends Component{
@@ -714,6 +714,8 @@ class ProgressDashboard extends Component{
   		let userName = '';
   		let category = '';
   		let verbose_name = '';
+      let other_Scores = {};
+
   		if(dur && dur != "today" && dur != "month" &&
   			dur != "yesterday" && dur != "week" && dur != "year"){
             if(value && value['custom_range'] != undefined){
@@ -722,12 +724,30 @@ class ProgressDashboard extends Component{
           			all_rank_data = value['custom_range'][dur].all_rank;
           			userName = value['custom_range'][dur].user_rank.username;
           			category = value['custom_range'][dur].user_rank.category;
-          			if(category == "Percent Unprocessed Food"){
+
+          			/*if(category == "Percent Unprocessed Food"){
                   verbose_name = value['custom_range'][dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
                 }
                 else if(category == "Average Sleep"){
                   verbose_name = value['custom_range'][dur].user_rank.other_scores.sleep_duration.verbose_name;
+                }*/
+                let otherScoreObject = value['custom_range'][dur].user_rank.other_scores;
+                if(category != "Pure Time To 99" && category != "Time To 99" && (otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != "")){
+                  for (let [key3,o_score] of Object.entries(otherScoreObject)){
+                    if(o_score != null && o_score != undefined && o_score != "") {
+                      if(!other_Scores[key3]){
+                        other_Scores[key3] = {
+                          verbose_name:o_score.verbose_name,
+                          scores:[]
+                        }
+                      }
+                      if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
+                        other_Scores[key3]["scores"].push(o_score.value);
+                      }
+                    }
+                  }
                 }
+
   		        }
             }
         }
@@ -736,14 +756,31 @@ class ProgressDashboard extends Component{
   			all_rank_data = value[dur].all_rank;
   			userName = value[dur].user_rank.username;
   			category = value[dur].user_rank.category;
-  			if(category == "Percent Unprocessed Food"){
+  			/*if(category == "Percent Unprocessed Food"){
           verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
         }
         else if(category == "Average Sleep"){
           verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
-        }
+        }*/
+        let otherScoreObject = value[dur].user_rank.other_scores;
+        if(category != "Pure Time To 99" && category != "Time To 99" && (otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != "")){
+          for (let [key3,o_score] of Object.entries(otherScoreObject)){
+            if(o_score != null && o_score != undefined && o_score != "") {
+              if(!other_Scores[key3]){
+                other_Scores[key3] = {
+                  verbose_name:o_score.verbose_name,
+                  scores:[]
+                }
+              }
+              if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
+                other_Scores[key3]["scores"].push(o_score.value);
+              }
+            }
+          }
+          }
+
   		}
-  		let code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,verbose_name)}>
+  		let code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,other_Scores)}>
 						         		<span style={{textDecoration:"underline"}}>{rank}</span>
 					         			 	<span id="lbfontawesome">
 					                          	<FontAwesome
@@ -1271,6 +1308,20 @@ getGarminStressColors(stressValue){
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
                            Time Moving / Active (when not sleeping) (hh:mm)
+
+                          Rank against other users
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderRank(this.state.rankData.active_min_total,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_total,this.state.selected_range)}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                           Active Minutes (when not sleeping)
+
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderActiveMinsValue(value.active_minutes_without_sleep,dur) == null?"Not Reported":this.renderActiveMinsValue(value.active_minutes_without_sleep,dur)}
@@ -1292,7 +1343,22 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+
                           Time Moving / Active (when not sleeping and exercising) (hh:mm)
+
+                          Rank against other users
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderRank(this.state.rankData.active_min_exclude_sleep,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_exclude_sleep,this.state.selected_range)}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          Active Minutes (when not sleeping and exercising)
+
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderActiveMinsValue(value.active_minutes_without_sleep_exercise,dur) == null?"Not Reported":this.renderActiveMinsValue(value.active_minutes_without_sleep_exercise,dur)}
@@ -1307,6 +1373,17 @@ getGarminStressColors(stressValue){
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) + "%"}
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
+                          Rank against other users
+                        </div>
+                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
+                          {this.renderRank(this.state.rankData.active_min_exclude_sleep_exercise,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_exclude_sleep_exercise,this.state.selected_range)}
                         </div>
                       </div>
 
@@ -2543,7 +2620,7 @@ getGarminStressColors(stressValue){
 		              </div>
            			 }
            			  {this.state.btnView &&
-			            <div className = "row justify-content-center">
+			            <div className = "row justify-content-center" style={{marginLeft:"0px", marginRight:"0px"}}>
 			            <span className = "Pa_dashboard_date">{this.state.active_category_name}<span style = {{marginLeft:"10px"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span></span>
 			          </div>
        				 }
