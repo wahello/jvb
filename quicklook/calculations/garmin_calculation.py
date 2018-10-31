@@ -2431,6 +2431,8 @@ def get_weekly_combined_activities(weekly_activities,
 		userinput_activities = weekly_user_input_activities[current_date_str]
 		if userinput_activities and userinput_activities.activities:
 			userinput_activities = json.loads(userinput_activities.activities)
+		else:
+			userinput_activities = None
 		
 		activities = weekly_activities.get(current_date_str,[])
 		manually_edited_activities = (
