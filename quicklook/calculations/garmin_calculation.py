@@ -36,6 +36,7 @@ from quicklook.models import UserQuickLook,\
 
 from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -879,7 +880,8 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
 				# etc. In that case empty value will be taken for those keys even
 				# though value exist in original summary provided by garmin 
-				if val or key == 'duplicate' or key == 'deleted':
+				if(val or key == 'duplicate' or key == 'deleted' 
+					or key == 'comments' or key == 'activity_weather'):
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
@@ -2552,10 +2554,12 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 		
-		userinput_activities = safe_get(todays_daily_strong,'activities',None)
-		if userinput_activities:
-			userinput_activities = json.loads(userinput_activities)
-		
+		# userinput_activities = safe_get(todays_daily_strong,'activities',None)
+		# if userinput_activities:
+		# 	userinput_activities = json.loads(userinput_activities)
+		userinput_activities = get_daily_activities_in_base_format(
+			user,current_date.date(),include_all=True)
+
 		bodycmp = get_garmin_model_data(
 			UserGarminDataBodyComposition,user,
 			start_epoch,end_epoch,order_by = '-id')
