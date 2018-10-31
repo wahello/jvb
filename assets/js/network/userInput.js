@@ -424,7 +424,7 @@ export function fetchGarminHrrData(start_date, successCallback=undefined, errorC
 }
 
 export function userDailyInputWeatherReportFetch(date, successCallback=undefined, errorCallback=undefined,clone){
-	const URL = 'weather/activity_weather_report';
+	const URL = 'weather/activity_weather_report/';
 	
     const created_at = moment(date).format('YYYY-MM-DD');
 	const config = {

@@ -554,6 +554,8 @@ transformActivity(activity){
           nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
           nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
         },()=>{
+          /******** CALLING WEATHER REPORT API *******/
+          userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today")){
@@ -571,7 +573,6 @@ transformActivity(activity){
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
-        /******** CALLING WEATHER REPORT API *******/
         
       }
     }
@@ -579,10 +580,10 @@ transformActivity(activity){
       if (!_.isEmpty(data.data)){
         const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
         const activities = this.state.activities;
-        for(let [summaryID,val] of Object.entries[data.data]) {
+        for(let[summaryID,val] of Object.entries(data.data)) {
           if(activities[summaryID] != null && activities[summaryID] != undefined && activities[summaryID] != "") {
               for(let field of WEATHER_FIELDS){
-                activities[summaryID][field] = val.field.value;
+                activities[summaryID][field] = val[field].value;
               }
           }
         }
@@ -1056,7 +1057,6 @@ getTotalSleep(){
     },function(){
         const clone = true;
         userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
-        userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
 
       }.bind(this));
   }
@@ -1073,7 +1073,6 @@ getTotalSleep(){
     },function(){
         const clone = true;
         userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
-        userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
       }.bind(this));
   }
 
@@ -1091,7 +1090,6 @@ getTotalSleep(){
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
-        userDailyInputWeatherReportFetch(date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
       }.bind(this));
     }
 
@@ -1105,7 +1103,6 @@ getTotalSleep(){
         cloning_data:true
       },function(){
         userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
-        userDailyInputWeatherReportFetch(yesterday,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
       }.bind(this))
     }
 
@@ -1164,7 +1161,6 @@ getTotalSleep(){
       });
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
-      userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
       getUserProfile(this.onProfileSuccessFetch);
       
       window.addEventListener('scroll', this.handleScroll);

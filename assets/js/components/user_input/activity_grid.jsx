@@ -2296,6 +2296,21 @@ return(
         </a>
     </span>
 </td>
+<td id = "add_button" className="add_button_back">
+    weather<table><tbody><tr>
+    <td >Humidity
+    </td>
+    <td >Temperature Feels Like
+    </td>
+    <td>Weather Condition
+    </td>
+    <td >Temperature
+    </td>
+    <td>Dew Point
+    </td>
+    <td>Wind
+    </td></tr></tbody></table>
+</td>
 <td id = "add_button" className="add_button_back">Comment</td>
  {
     this.props.editable &&  
