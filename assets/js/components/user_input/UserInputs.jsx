@@ -572,7 +572,7 @@ transformActivity(activity){
           window.scrollTo(0,0);
         });
         /******** CALLING WEATHER REPORT API *******/
-        userDailyInputWeatherReportFetch((this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone));
+        
       }
     }
     onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
@@ -1056,6 +1056,7 @@ getTotalSleep(){
     },function(){
         const clone = true;
         userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+        userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
 
       }.bind(this));
   }
@@ -1072,6 +1073,7 @@ getTotalSleep(){
     },function(){
         const clone = true;
         userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+        userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
       }.bind(this));
   }
 
@@ -1089,6 +1091,7 @@ getTotalSleep(){
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
+        userDailyInputWeatherReportFetch(date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
       }.bind(this));
     }
 
@@ -1102,6 +1105,7 @@ getTotalSleep(){
         cloning_data:true
       },function(){
         userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
+        userDailyInputWeatherReportFetch(yesterday,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,clone);
       }.bind(this))
     }
 
@@ -1160,6 +1164,7 @@ getTotalSleep(){
       });
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
+      userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
       getUserProfile(this.onProfileSuccessFetch);
       
       window.addEventListener('scroll', this.handleScroll);
