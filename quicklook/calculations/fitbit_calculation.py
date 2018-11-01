@@ -249,7 +249,6 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		if not str_date:
 			sleep_stats['sleep_bed_time'] = None
 			sleep_stats['sleep_awake_time'] = None
-	print (':::::::		', sleep_stats)
 	return sleep_stats
 
 
