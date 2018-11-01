@@ -118,7 +118,7 @@ def api_fitbit(session,date_fitbit):
 	'''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
 	activity_fitbit = session.get(
-	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
+	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
 	date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
