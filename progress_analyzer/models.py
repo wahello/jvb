@@ -46,6 +46,8 @@ class MovementConsistencyCumulative(models.Model):
 	cum_total_active_min = models.FloatField(blank=True,null=True)
 	cum_sleep_active_min = models.FloatField(blank=True,null=True)
 	cum_exercise_active_min = models.FloatField(blank=True,null=True)
+	cum_sleep_hours = models.FloatField(blank=True, null=True)
+	cum_exercise_hours = models.FloatField(blank=True, null=True)
 	
 class ExerciseConsistencyCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="exercise_consistency_cum")

@@ -321,7 +321,7 @@ def makeformat(trans_activity_data,current_date,last_seven_days_date):
 					formated_data[actvity_date] = single_activity	
 	return formated_data
 
-def get_exercise_consistency_grade(user,current_date):
+def get_exercise_consistency_grade(user,current_date,user_age):
 	trans_activity_data = []
 	last_seven_days_date = current_date - timedelta(days=6)
 	week_activity_data = UserFitbitDataActivities.objects.filter(
@@ -342,9 +342,13 @@ def get_exercise_consistency_grade(user,current_date):
 			if todays_activity_data:
 				trans_activity_data.append(list(map(fitbit_to_garmin_activities,todays_activity_data)))
 	formated_data = makeformat(trans_activity_data,current_date,last_seven_days_date)
+	weekly_combined_activities = quicklook.calculations.\
+		garmin_calculation.get_weekly_combined_activities(
+			formated_data,{},weekly_daily_strong,
+			last_seven_days_date,current_date)
 	exe_consistency_grade,exe_consistency_point = quicklook.calculations.\
 		garmin_calculation.get_exercise_consistency_grade(
-			weekly_daily_strong,formated_data,7)
+			weekly_daily_strong,weekly_combined_activities,7,user_age)
 	return (exe_consistency_grade,exe_consistency_point)
 
 def get_unprocessed_food_grade(daily_strong_input,current_date):
@@ -396,6 +400,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 	to_dt = quicklook.calculations.garmin_calculation.str_to_datetime(to_date)
 	current_date = from_dt
 	SERIALIZED_DATA = []
+	user_age = user.profile.age()
 	while current_date <= to_dt:
 		last_seven_days_date = current_date - timedelta(days=6)
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -620,7 +625,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		sleep_grade_point = get_avg_sleep_grade(
 			sleep_stats['sleep_per_userinput'],
 			sleep_stats['sleep_per_wearable'],
-			user.profile.age(),ui_sleep_aid
+			user_age,ui_sleep_aid
 			)
 		grades_calculated_data['avg_sleep_per_night_grade'] = \
 			sleep_grade_point[0] if sleep_grade_point[0] else ''
@@ -629,7 +634,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise/Activity Calculations
 		activity_stats = quicklook.calculations.garmin_calculation.get_activity_stats(
-			combined_user_activities)
+			combined_user_activities,user_age)
 		exercise_calculated_data['did_workout'] = activity_stats['have_activity']
 		exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 		exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
@@ -651,7 +656,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			garmin_calculation.cal_exercise_steps_total_steps(
 				int(daily_total_steps),
 				combined_user_activities,
-				user.profile.age()
+				user_age
 			)	
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		steps_calculated_data['exercise_steps'] = exercise_steps
@@ -666,7 +671,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			moment_non_exercise_steps_grade_point[1]
 			
 		# Exercise Grade and point calculation
-		exe_consistency_grade = get_exercise_consistency_grade(user,current_date)
+		exe_consistency_grade = get_exercise_consistency_grade(
+			user,current_date,user_age)
 		grades_calculated_data['exercise_consistency_grade'] = \
 			exe_consistency_grade[0]
 		grades_calculated_data['exercise_consistency_score'] = \
