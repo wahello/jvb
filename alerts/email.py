@@ -7,7 +7,7 @@ def notify_user_movement_consistency_steps(user_email,user_firstname,activity_st
 	FEEDBACK_EMAIL = "info@jvbwellness.com"
 	message = '''
 Hi {},
-You have only {} steps from {} to {} which is not good for improve of health please make more moment of steps for better health.
+You have only {} steps from {} to {}, please make more moment of steps for better health.
 
 Sincerely,
 JVB Health & Wellness 
