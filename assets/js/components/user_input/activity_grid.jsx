@@ -1464,7 +1464,7 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm:ss a'):''} 
+                {start_time?moment(start_time).format('MMM D, YYYY h:mm:ss a'):''} 
                  {this.props.editable && !isActivityDeleted &&                           
                         <span 
                             data-name = {summaryId}  
@@ -1579,7 +1579,7 @@ renderTable(){
             else if(key === "endTimeInSeconds"){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            {end_time?end_time.format('MMM D, YYYY h:mm:ss a'):''}  
+                            {end_time?moment(end_time).format('MMM D, YYYY h:mm:ss a'):''}  
                           {this.props.editable && !isActivityDeleted &&                
                         <span 
                             data-name = {summaryId} 

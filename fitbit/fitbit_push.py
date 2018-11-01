@@ -299,7 +299,6 @@ def get_activities_data(activities, date):
 	
 		if fitbit_date_obj == date:
 			activities_list.append(activity)
-
 	return activities_list
 
 def store_data(fitbit_all_data,user,start_date,create_notification,data_type=None):
