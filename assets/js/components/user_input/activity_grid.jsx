@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
-
+import { ToastContainer, toast } from 'react-toastify';
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
@@ -134,6 +134,9 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+
+this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
+
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -1301,6 +1304,18 @@ handleChangeModelActivityStartTimeDate(date){
         activitystarttime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1316,6 +1331,18 @@ handleChangeModelActivityEndTimeDate(date){
         activityendtime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm,'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1333,6 +1360,18 @@ handleChangeModalActivityTime(event){
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1389,6 +1428,21 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
+
+   resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+      this.setState({
+        [end_date_prop_name] : null,
+        [end_hours_prop_name] : '',
+        [end_mins_prop_name] : '',
+        [end_am_pm_prop_name] : '',
+        [end_secs_prop_name]:''
+      },()=>{
+              toast.info(" Time of your workout started should be less than time of your workout ended ",{
+              className:"dark"
+              })
+      });
+    }
+
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
@@ -1475,7 +1529,7 @@ renderTable(){
                     }
                         <Modal 
                         isOpen={this.state.activities_edit_mode[summaryId]["startTimeInSeconds"]}
-                        toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} 
+                        toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} class="modal"
                         >
                           <ModalHeader
                               toggle={this.editToggleHandlerStartTime.bind(this,summaryId)}>
@@ -2230,7 +2284,6 @@ renderEditActivityModal(){
 render(){
 
 return(
-
 <div className = "container_fluid">
 <div className="row justify-content-center">
 <div id = "activity_table">
