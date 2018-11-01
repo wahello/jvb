@@ -31,8 +31,6 @@ import {userDailyInputSend,userDailyInputFetch,
         fetchGarminData,fetchGarminHrrData} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
-import ActivityGrid from './activity_grid';
-
 class UserInputs extends React.Component{
 
     getInitialState(){
@@ -175,7 +173,6 @@ class UserInputs extends React.Component{
         nap_duration_hour:"",
         nap_duration_min:"",
         nap_comment:"",
-        '': '',
       };
       return initialState;
     }
@@ -1396,7 +1393,6 @@ handleScroll() {
         [end_hours_prop_name] : '',
         [end_mins_prop_name] : '',
         [end_am_pm_prop_name] : '',
-        [end_secs_prop_name]:''
       },()=>{
               toast.info(" Time fell asleep should be less than time woke up ",{
               className:"dark"
