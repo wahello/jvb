@@ -441,9 +441,9 @@ handleChangeModal(event){
             let min = parseInt(activityDuration/60); 
             hour = parseInt(min/60); 
             mins = parseInt(min%60);
-            mins = (!isNaN(mins) && !isNaN(mins) < 10) ? "0" + mins : mins;
+            mins = ((mins) && (mins < 10)) ? "0" + mins : mins;
             secs = parseInt(activityDuration-(hour * 3600) - (mins * 60));
-            secs = (!isNaN(secs) && !isNaN(secs) < 10) ? "0" + secs : secs;
+            secs = ((secs) && (secs < 10)) ? "0" + secs : secs;
         }
     }
     this.setState({
