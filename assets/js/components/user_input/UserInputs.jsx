@@ -1423,6 +1423,8 @@ handleScroll() {
       end_time_hours = Number(end_time_hours);
       end_time_mins = Number(end_time_mins);
       end_time_secs = Number(end_time_secs);
+      start_time_date.startOf('day');
+      end_time_date.startOf('day');
   
       if(start_time_date && start_time_hours && start_time_mins && start_time_secs && start_time_am_pm && end_time_date && end_time_hours && end_time_mins &&     end_time_secs && end_time_am_pm)
       {
@@ -1430,7 +1432,7 @@ handleScroll() {
           //nothing
         }
         else if(end_time_date < start_time_date){
-          this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);      
+          this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);     
         }
         else{
               if((start_time_am_pm == "am" && end_time_am_pm == "am")||(start_time_am_pm == "pm" && end_time_am_pm == "pm")){
