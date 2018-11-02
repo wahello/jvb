@@ -335,6 +335,8 @@ export function renderActivityGrid(){
 			activities = {this.state.activities}
 			selected_date = {this.state.selected_date}
 			editable = {this.state.editable}
+			dateTimeValidation = {this.dateTimeValidation}
+			ref = "child"
 		/>
 	);
 }

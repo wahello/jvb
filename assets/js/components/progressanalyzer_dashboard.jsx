@@ -1101,21 +1101,6 @@ MinToHours(score){
       return time;
     }// time = 03:09
 
-/*minutestohours(score)
-  {
-    let hours = Math.floor(score) / 60;
-    let minutes = (score)% 60;
-    return hours,minutes 
-  }
-
-addzero(num)
-{
-   num = hours,minutes;
-   if num<10;
-      num = "0"+"num";
-   else
-
-}*/
 
 getGarminStressColors(stressValue){
   let background = "";
@@ -1307,9 +1292,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           Time Moving / Active (when not sleeping) (hh:mm)
-
-                          Rank against other users
+                           Rank against other users
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderRank(this.state.rankData.active_min_total,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_total,this.state.selected_range)}
@@ -1320,7 +1303,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           Active Minutes (when not sleeping)
+                           Time Moving / Active (when not sleeping) (hh:mm)
 
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
@@ -1343,10 +1326,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-
-                          Time Moving / Active (when not sleeping and exercising) (hh:mm)
-
-                          Rank against other users
+                         Rank against other users
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
                           {this.renderRank(this.state.rankData.active_min_exclude_sleep,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_exclude_sleep,this.state.selected_range)}
@@ -1357,7 +1337,7 @@ getGarminStressColors(stressValue){
                       />
                       <div className = "row justify-content-center">
                         <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Active Minutes (when not sleeping and exercising)
+                          Time Moving / Active (when not sleeping and exercising) (hh:mm)
 
                         </div>
                         <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
