@@ -579,7 +579,7 @@ transformActivity(activity){
     onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
       if (!_.isEmpty(data.data)){
         const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
-        const activities = this.state.activities;
+        let activities = this.state.activities;
         for(let[summaryID,val] of Object.entries(data.data)) {
           if(activities[summaryID] != null && activities[summaryID] != undefined && activities[summaryID] != "") {
               for(let field of WEATHER_FIELDS){
@@ -587,6 +587,11 @@ transformActivity(activity){
               }
           }
         }
+        this.setState({
+          activities:activities
+        }, () => {
+          this.props.updateParentActivities(this.state.activites);
+        });
       }
     }
 

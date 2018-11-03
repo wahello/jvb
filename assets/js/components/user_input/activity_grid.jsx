@@ -1408,7 +1408,8 @@ infoPrint(infoPrintText){
    }
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
-        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments","weather"];
+        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments","humidity","temperature_feels_like","weather_condition","dewPoint","temperature"];
+        /*const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];*/
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
         let activityData = [];
@@ -1864,8 +1865,141 @@ renderTable(){
                     }
                 </td>);
             }
-            else if(key === "weather") {
-                
+            //const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
+            else if(key === "humidity") {
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="select" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={this.handleChange_heartrate}
+                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                    
+                            <option key="hours" value=" ">Select</option>
+                            {this.createSleepDropdown_heartrate(90,220)}  
+                        </Input>: hr}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "temperature_feels_like") {
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="select" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={this.handleChange_heartrate}
+                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                    
+                            <option key="hours" value=" ">Select</option>
+                            {this.createSleepDropdown_heartrate(90,220)}  
+                        </Input>: hr}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "temperature") {
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="select" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={this.handleChange_heartrate}
+                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                    
+                            <option key="hours" value=" ">Select</option>
+                            {this.createSleepDropdown_heartrate(90,220)}  
+                        </Input>: hr}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "weather_condition") {
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="select" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={this.handleChange_heartrate}
+                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                    
+                            <option key="hours" value=" ">Select</option>
+                            {this.createSleepDropdown_heartrate(90,220)}  
+                        </Input>: hr}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "dewPoint") {
+                let averageHeartRateInBeatsPerMinute=keyValue;
+                let hr = this.state.activites[summaryId][key];
+                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="select" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={this.handleChange_heartrate}
+                        onBlur={this.editToggleHandler_heartrate.bind(this)}>
+                    
+                            <option key="hours" value=" ">Select</option>
+                            {this.createSleepDropdown_heartrate(90,220)}  
+                        </Input>: hr}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
             }
             /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
             else if(key === "comments"){
