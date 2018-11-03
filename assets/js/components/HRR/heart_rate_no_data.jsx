@@ -294,8 +294,34 @@ class No_Hrr_Data extends Component{
 	  	const value = target.value;	
 	  	const name = target.name;
 	  	this.setState({
-			[name]: value
-	  	});
+			[name]: value},
+			()=>{
+				if(target.name=='Did_you_measure_HRR'){
+					this.setState({
+						editable_did_you_measure_HRR:!this.state.editable_did_you_measure_HRR
+  					});
+				}
+				else if(target.name=='no_fitfile_hrr_reach_99'){
+					this.setState({
+						editable_no_fitfile_hrr_reach_99:!this.state.editable_no_fitfile_hrr_reach_99
+					})
+				}
+				else if(target.name=='end_heartrate_activity'){
+					this.setState({
+						editable_end_heartrate_activity:!this.state.editable_end_heartrate_activity
+					})
+				}
+				else if(target.name=='lowest_hrr_no_fitfile'){
+					this.setState({
+						editable_lowest_hrr_no_fitfile:!this.state.editable_lowest_hrr_no_fitfile
+					})
+				}
+				else if(target.name=='no_file_beats_recovered'){
+					this.setState({
+						editable_no_file_beats_recovered:!this.state.editable_no_file_beats_recovered
+					})
+				}
+		});
 	}
 	renderTime(value){
   		var z;
@@ -402,6 +428,7 @@ class No_Hrr_Data extends Component{
 			fetching_hrr:false,
 		})
     }
+
 	updateData(){
 		let endTimeActivity = this.getDTMomentObj(
   				this.state.end_time_activity_hour,
@@ -445,7 +472,6 @@ class No_Hrr_Data extends Component{
 		});
 			
 	}
-
 	render(){
 		return(
 				<div>

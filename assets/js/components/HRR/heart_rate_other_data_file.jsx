@@ -150,8 +150,24 @@ class Other_Hrr_Data extends Component{
 	  	const value = target.value;	
 	  	const name = target.name;
 	  	this.setState({
-			[name]: value
-	  	});
+			[name]: value},
+			()=>{
+				if(target.name=='end_heartrate_activity'){
+					this.setState({
+						editable_end_heartrate_activity:!this.state.editable_end_heartrate_activity,
+					})
+				}
+				else if(target.name=='heart_rate_down_up'){
+					this.setState({
+						editable_heart_rate_down_up:!this.state.editable_heart_rate_down_up,
+					})
+				}
+				else if(target.name=='pure_1min_heart_beats'){
+					this.setState({
+						editable_pure_1min_heart_beats:!this.state.editable_pure_1min_heart_beats,
+					})
+				}
+		});
 	}
 	createSleepDropdown(start_num , end_num, mins=false, step=1){
 		    let elements = [];

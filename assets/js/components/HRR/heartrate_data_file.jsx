@@ -134,8 +134,42 @@ class Heartrate_Data extends Component{
 		  	const value = target.value;	
 		  	const name = target.name;
 		  	this.setState({
-				[name]: value
-		  	});
+				[name]: value},
+				()=>{
+					if(target.name=='Did_you_measure_HRR'){
+						this.setState({
+	  						editable_did_you_measure_HRR:!this.state.editable_did_you_measure_HRR
+	  					});
+					}
+					else if(target.name=='Did_heartrate_reach_99'){
+						this.setState({
+	  						editable_hrr_99_beats:!this.state.editable_hrr_99_beats
+	  					});
+					}
+					else if(target.name=='HRR_start_beat'){
+						let beats = parseInt(this.state.HRR_start_beat);
+			  			let beats1 = parseInt(this.state.lowest_hrr_1min);
+			 			let diff = beats - beats1;
+				  		this.setState({
+				  			editable_HRR_start_beat:!this.state.editable_HRR_start_beat,
+				  			No_beats_recovered:diff
+				  		});
+					}
+					else if(target.name=='lowest_hrr_1min'){
+						let beats = parseInt(this.state.HRR_start_beat);
+			  			let beats1 = parseInt(this.state.lowest_hrr_1min);
+			 			let diff = beats - beats1;
+				  		this.setState({
+				  			editable_lowest_hrr_1min:!this.state.editable_lowest_hrr_1min,
+				  			No_beats_recovered:diff
+				  		});
+					}
+					else if(target.name=='No_beats_recovered'){
+						this.setState({
+	  						editable_no_beats:!this.state.editable_no_beats,
+	  					});
+					}
+			});
 		}
 		renderSecToMin(value){
   		let time;
