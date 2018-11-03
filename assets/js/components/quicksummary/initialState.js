@@ -151,6 +151,7 @@ export function getInitialState(start_dt, end_dt){
 	           "deep_sleep": '-',
 	           "light_sleep": '-',
 	           "awake_time": '-',
+	           "restless_sleep": '-',
 	           "rem_sleep": '-',
 	           "heartrate_variability_stress":'-'
 	       
