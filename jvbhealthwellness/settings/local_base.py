@@ -54,6 +54,11 @@ CELERY_TIMEZONE = 'Asia/Kolkata'
 #         'task':'sync_watch.reminder',
 #         'schedule':crontab(minute=53, hour='*/1')
 #     },
+#     #execute every hour at 30 mins (America/New_york)
+#     "notify_users_mcs":{
+#         'task':'mcsteps.email',
+#         'schedule':crontab()
+#     },
 # }
 
 # Email

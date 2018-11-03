@@ -283,8 +283,11 @@ class UserInputs extends React.Component{
     this.extraTab = this.extraTab.bind(this);
     this.renderAddDate = this.renderAddDate.bind(this);
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
-    }
-    
+
+    this.dateTimeValidation = this.dateTimeValidation.bind(this);
+    this.resetEndTime = this.resetEndTime.bind(this);
+    this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
+ }   
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
@@ -1136,6 +1139,7 @@ getTotalSleep(){
       getUserProfile(this.onProfileSuccessFetch);
       
       window.addEventListener('scroll', this.handleScroll);
+
     }
 
 createDropdown(start_num , end_num, step=1){
@@ -1383,7 +1387,93 @@ handleScroll() {
       window.scrollTo(0, scrollHeight-80);
     }
 
+    resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+      this.setState({
+        [end_date_prop_name] : null,
+        [end_hours_prop_name] : '',
+        [end_mins_prop_name] : '',
+        [end_am_pm_prop_name] : '',
+      },()=>{
+              toast.info(" Time fell asleep should be less than time woke up ",{
+              className:"dark"
+              })
+      });
+    }
+
+    resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+      var flag = 0;
+      for(var key in this.state){
+        if(end_hours_prop_name == key ){
+            this.resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
+            flag += 1;
+            break;
+        }
+      }
+      if(flag==0){
+        this.refs.child.resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
+      }
+      
+    }
+
+    dateTimeValidation(start_time_date, start_time_hours, start_time_mins, start_time_secs,start_time_am_pm, end_time_date, end_time_hours, end_time_mins, end_time_secs, end_time_am_pm, end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+
+      start_time_hours = Number(start_time_hours);
+      start_time_mins = Number(start_time_mins);
+      start_time_secs = Number(start_time_secs);
+      end_time_hours = Number(end_time_hours);
+      end_time_mins = Number(end_time_mins);
+      end_time_secs = Number(end_time_secs);
+  
+      if(start_time_date && start_time_hours && start_time_mins && start_time_secs && start_time_am_pm && end_time_date && end_time_hours && end_time_mins &&     end_time_secs && end_time_am_pm)
+      {
+        if(end_time_date > start_time_date){
+          //nothing
+        }
+        else if(end_time_date < start_time_date){
+          this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);      
+        }
+        else{
+              if((start_time_am_pm == "am" && end_time_am_pm == "am")||(start_time_am_pm == "pm" && end_time_am_pm == "pm")){
+                if(end_time_hours > start_time_hours){
+                  //nothing
+                }
+                else if(end_time_hours < start_time_hours){
+                  this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
+                }
+                else{
+                  if(end_time_mins > start_time_mins){
+                    //nothing
+                  }
+                  else if(end_time_mins < start_time_mins){
+                    this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
+                  }
+                  else{
+                    if(end_time_secs > start_time_secs)
+                    {
+                      //nothing
+                    }
+                    else{
+                      this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
+                    }
+                  }
+                }
+              }
+              if(start_time_am_pm == "am" && end_time_am_pm == "pm"){
+                //nothing
+              }
+              if((start_time_am_pm == "pm") && (end_time_am_pm == "am")){
+                this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
+              }
+          }
+      }        
+    }
+
     render(){
+      const children = React.Children.map(this.props.children,
+      (child, index) => React.cloneElement(child, {
+        ref : `child${index}`
+      })
+     );
       
        const {fix} = this.props;
         return(

@@ -240,7 +240,7 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		create_notification.state = "processing"
 		create_notification.save()
 		activity_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
+		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
 			user_id,date))
 		heartrate_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
@@ -289,6 +289,18 @@ def update_fitbit_data(user,date,create_notification,data,collection_type):
 			date_of_foods=date).update(foods_data=data,date_of_foods=date.today())
 	return None
 
+def get_activities_data(activities, date):
+	activities_list = []
+	for activity in activities:
+
+		fitbit_date = activity.get("originalStartTime",0)
+		fitbit_date = fitbit_date[:10]
+		fitbit_date_obj = datetime.strptime(fitbit_date, '%Y-%m-%d').date()
+	
+		if fitbit_date_obj == date:
+			activities_list.append(activity)
+	return activities_list
+
 def store_data(fitbit_all_data,user,start_date,create_notification,data_type=None):
 	'''
 	this function takes json data as parameter and store in database
@@ -329,31 +341,32 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "activity_fitbit" == key:
 				date_of_activity = value['pagination']['afterDate']
-				if value["activities"]:
-					fitbit_date = value['activities'][0].get("originalStartTime",0)
-					fitbit_date = fitbit_date[:10]
-					fitbit_date_obj = datetime.strptime(
-						fitbit_date, '%Y-%m-%d').date()
-
-					# print(fitbit_date_obj,"type of the activty")
-				else:
-					fitbit_date_obj = 0
-				if fitbit_date_obj == start_date:
-					try:
-						activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
-						update_fitbit_data(user,date_of_activity,create_notification,value,key)
-						print("Updated Activity-Fitbit successfully")
-						if create_notification != None:
-							create_notification.state = "processed"
-							create_notification.save()
-					except UserFitbitDataActivities.DoesNotExist:
-						UserFitbitDataActivities.objects.create(user=user,
-						date_of_activities=date_of_activity,
-						activities_data=value,created_at=start_date)
-						print("Created Activity-Fitbit successfully")
-						if create_notification != None:
-							create_notification.state = "processed"
-							create_notification.save()
+				activities_list = get_activities_data(value["activities"], start_date)
+				value = dict({'activities':activities_list})
+				
+				# if value["activities"]:
+				# 	fitbit_date = value['activities'][0].get("originalStartTime",0)
+				# 	fitbit_date = fitbit_date[:10]
+				# 	fitbit_date_obj = datetime.strptime(
+				# 		fitbit_date, '%Y-%m-%d').date()
+				# else:
+				# 	fitbit_date_obj = 0
+				# if fitbit_date_obj == start_date:
+				try:
+					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
+					update_fitbit_data(user,date_of_activity,create_notification,value,key)
+					print("Updated Activity-Fitbit successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
+				except UserFitbitDataActivities.DoesNotExist:
+					UserFitbitDataActivities.objects.create(user=user,
+					date_of_activities=date_of_activity,
+					activities_data=value,created_at=start_date)
+					print("Created Activity-Fitbit successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
 
 		except (KeyError, IndexError):
 			logging.exception("message")

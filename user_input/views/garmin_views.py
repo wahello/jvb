@@ -161,7 +161,10 @@ def _get_activities(user,target_date):
 					(single_activity.get("durationInSeconds",0) <= 1200) and 
 					(single_activity.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
 					least_hr = min(single_heartrate)
-					hrr_difference = single_heartrate[0] - least_hr
+					if least_hr and single_heartrate:
+						hrr_difference = single_heartrate[0] - least_hr
+					else:
+						hrr_difference = 0
 					if hrr_difference > 10:
 						single_activity["activityType"] = "HEART_RATE_RECOVERY"
 				else:
@@ -276,7 +279,8 @@ class GarminData(APIView):
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			have_activities = True if activites else False
+			have_activities = quicklook.calculations.garmin_calculation.\
+				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,
