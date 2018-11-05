@@ -332,7 +332,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 		todays_sleep_data = get_fitbit_model_data(
 				UserFitbitDataSleep,user,current_date.date(),current_date.date())
-		print(UserFitbitDataSleep,"111111111111111111111111111111111111111")
 		try:
 			todays_user_input = UserDailyInput.objects.select_related(
 				'strong_input','encouraged_input','optional_input').filter(
