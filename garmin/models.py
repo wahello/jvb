@@ -3,6 +3,7 @@ import base64
 
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 # from django.contrib.postgres.fields import JSONField
 
 class UserGarminDataEpoch(models.Model):
@@ -123,7 +124,8 @@ class GarminConnectToken(models.Model):
 
 class GarminFitFiles(models.Model):
 	user = models.ForeignKey('auth.user', on_delete=models.CASCADE, related_name="garmin_fit_files")
-	created_at = models.DateTimeField(auto_now=True)
+	created_at = models.DateTimeField(default=timezone.now)
+	fit_file_belong_date = models.DateField(default=None,null=True)
 	fit_file = models.BinaryField(blank=True)
 	meta_data_fitfile = models.TextField()
 

@@ -880,7 +880,8 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
 				# etc. In that case empty value will be taken for those keys even
 				# though value exist in original summary provided by garmin 
-				if val or key == 'duplicate' or key == 'deleted' or key == 'comments':
+				if(val or key == 'duplicate' or key == 'deleted' 
+					or key == 'comments' or key == 'activity_weather'):
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
@@ -1654,7 +1655,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 
 		return movement_consistency
 
-def cal_exercise_steps_total_steps(dailies_json,combined_user_activities,age):
+def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,age):
 	'''
 		Calculate exercise steps and total steps
 	'''	
@@ -1702,8 +1703,8 @@ def cal_exercise_steps_total_steps(dailies_json,combined_user_activities,age):
 				else:
 					garmin_non_exec_steps += steps
 
-	if dailies_json:
-		garmin_total_steps = dailies_json[0].get('steps',0)
+	
+	garmin_total_steps = total_daily_steps
 
 	if (garmin_total_steps 
 		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps)):
@@ -2485,7 +2486,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		# if userinput_activities:
 		# 	userinput_activities = json.loads(userinput_activities)
 		userinput_activities = get_daily_activities_in_base_format(
-			user,current_date.date())
+			user,current_date.date(),include_all=True)
 
 		bodycmp = get_garmin_model_data(
 			UserGarminDataBodyComposition,user,
@@ -2751,8 +2752,11 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise step calculation, Non exercise step calculation and
 		# Non-Exercise steps grade calculation
+		daily_total_steps = 0
+		if dailies_json:
+			daily_total_steps = dailies_json[0].get('steps',0)
 		exercise_steps,non_exercise_steps,total_steps = cal_exercise_steps_total_steps(
-			dailies_json,
+			daily_total_steps,
 			combined_user_activities,
 			user.profile.age(),
 		)	

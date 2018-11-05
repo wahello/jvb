@@ -59,6 +59,7 @@ urlpatterns = [
     url(r'^dashboard/', include(dashboardUrls)),
     url(r'^users/',include(userInputUrls)),
     url(r'^fitbit/',include(fitbitUrls)),
+    url(r'^weather/',include(weatherUrls)),
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^service_connect$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
@@ -66,7 +67,6 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^(.*)$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
-    url(r'^weather/',include(weatherUrls)),
 ]
 
 if settings.DEBUG:

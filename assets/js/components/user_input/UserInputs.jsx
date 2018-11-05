@@ -537,7 +537,7 @@ transformActivity(activity){
           travel:have_optional_input?data.data.optional_input.travel:'',
           travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
+          general_comment:(have_optional_input&&canUpdateForm)?data.data.optional_input.general_comment:'',
           
           took_nap:have_optional_input?data.data.optional_input.took_nap:'',
           //nap_start_time_date:nap_start_time_info.calendarDate,
