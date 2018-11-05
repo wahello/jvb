@@ -117,7 +117,7 @@ class UserInputs extends React.Component{
         outdoor_temperature:'',
         temperature_feels_like:'',
         wind:'',
-        dewpoint:'',
+        dewPoint:'',
         humidity:'',
         weather_comment:'',
 
@@ -554,11 +554,23 @@ transformActivity(activity){
           nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
           nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
         },()=>{
-          /******** CALLING WEATHER REPORT API *******/
-          userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+          
+            let humidity = Object.keys(this.state.activities)
+              .map(prop => this.state.activities[prop].humidity);
+            let temperature_feels_like = Object.keys(this.state.activities)
+              .map(prop => this.state.activities[prop].temperature_feels_like);
+            let weather_condition = Object.keys(this.state.activities)
+              .map(prop => this.state.activities[prop].weather_condition);
+            let temperature = Object.keys(this.state.activities)
+              .map(prop => this.state.activities[prop].temperature);
+            let dewpoint = Object.keys(this.state.activities)
+              .map(prop => this.state.activities[prop].dewPoint);
+            let wind = Object.keys(this.state.activities)
+              .map(prop => this.state.activities[prop].wind);
+
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
-              (!this.state.weight || this.state.weight == "i do not weigh myself today")){
+              (!this.state.weight || this.state.weight == "i do not weigh myself today") || (!this.state.activities[0].humidity || !this.state.activities[0].temperature_feels_like || !this.state.activities[0].weather_condition || !this.state.activities[0].temperature || !this.state.activities[0].dewPoint || !this.state.activities[0].wind)){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
               this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
@@ -568,6 +580,13 @@ transformActivity(activity){
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
+            if(!humidity[0] || !temperature_feels_like[0] || !weather_condition[0] || !temperature[0] || ! dewpoint[0] || !wind[0]) {
+              /******** CALLING WEATHER REPORT API *******/
+              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+            }
+            /*else if(!this.state.activities["0"].humidity || !this.state.activities[0].temperature_feels_like || !this.state.activities[0].weather_condition || !this.state.activities[0].temperature || !this.state.activities[0].dewpoint || !this.state.activities[0].wind) {
+              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+            }*/
           }
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
@@ -578,19 +597,24 @@ transformActivity(activity){
     }
     onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
       if (!_.isEmpty(data.data)){
-        const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
+        const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature','wind'];
         let activities = this.state.activities;
         for(let[summaryID,val] of Object.entries(data.data)) {
           if(activities[summaryID] != null && activities[summaryID] != undefined && activities[summaryID] != "") {
               for(let field of WEATHER_FIELDS){
-                activities[summaryID][field] = val[field].value;
+                if(field == "weather_condition"){
+                  activities[summaryID][field] = val[field];
+                }
+                else{
+                 activities[summaryID][field] = val[field].value;
+                }
               }
           }
         }
         this.setState({
           activities:activities
         }, () => {
-          this.props.updateParentActivities(this.state.activites);
+          this.props.updateParentActivities(this.state.activities);
         });
       }
     }
@@ -2873,8 +2897,8 @@ handleScroll() {
                               <div className="input1">
                                   <Input type="select" 
                                      className="custom-select form-control"
-                                     name="dewpoint"                                  
-                                     value={this.state.dewpoint}
+                                     name="dewPoint"                                  
+                                     value={this.state.dewPoint}
                                      onChange={this.handleChange} >
                                      <option key="select" value="">Select</option>                                    
                                      {this.createDropdown(-20,120,true)}
@@ -2884,7 +2908,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.dewpoint}</p>
+                                <p>{this.state.dewPoint}</p>
                               </div>
                             }
                           </FormGroup> 
