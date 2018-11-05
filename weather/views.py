@@ -31,7 +31,6 @@ class ActivityWeatherView(APIView):
         for activity in filtered_activities_list:
             if activity['activity_weather'] == {}:
                 epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
-                print (activity['startingLatitudeInDegree'], activity['startingLongitudeInDegree'], epoch_time)
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
@@ -50,7 +49,6 @@ class ActivityWeatherView(APIView):
                     weather_data[activity['summaryId']] = {**weather_report}
             else:
                 weather_data[activity['summaryId']] = {**activity['activity_weather']}
-        print (weather_data)
         return Response(weather_data)
 
 
