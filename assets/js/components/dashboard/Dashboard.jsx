@@ -135,6 +135,7 @@ class Dashboard extends Component {
 				  		 	  <Link to = '/progressanalyzer_dashboard'>Progress Analyzer Dashboard</Link><br/>
 				  		 	  <Link to='/mcs_dashboard'>Movement Consistency Score (MCS) Dashboard</Link><br />
 				  		 	  <Link to='/weekly_workout_summary'>Weekly Workout Summary Report</Link><br/>
+				  		 	  <Link to='/active_dahsboard'>Time Moving / Active Dashboard</Link><br/>
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
 							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
 							  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
