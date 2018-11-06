@@ -569,12 +569,36 @@ def aa_data(user,start_date):
 			one_activity_file_dict =  ast.literal_eval(activity_files[i])
 			activities_summary_id.append(one_activity_file_dict['summaryId'])
 			if 'averageHeartRateInBeatsPerMinute' in one_activity_file_dict.keys():
-				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or '') and not user_input_strong:
-					hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
-					hrr_not_recorded_list.append(hrr_not_recorded_time)
+				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or ''):
+					if user_input_activities:
+						for index,single_ui_act in enumerate(user_input_activities):
+							ui_id = single_ui_act.get("summaryId")
+							garmin_id = one_activity_file_dict.get('summaryId')
+							ui_hr = single_ui_act.get("averageHeartRateInBeatsPerMinute")
+							garmin_hr = one_activity_file_dict.get("averageHeartRateInBeatsPerMinute")
+							if ui_hr == None or ui_hr == '':
+								ui_hr = 0
+							if garmin_hr == None or garmin_hr == '':
+								garmin_hr = 0
+							if ui_id == garmin_id and garmin_hr == ui_hr:
+								hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+								hrr_not_recorded_list.append(hrr_not_recorded_time)
+					else:
+						hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+						hrr_not_recorded_list.append(hrr_not_recorded_time)
 			else:
-				hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
-				hrr_not_recorded_list.append(hrr_not_recorded_time)
+				if user_input_activities:
+					for index,single_ui_act in enumerate(user_input_activities):
+						ui_id = single_ui_act.get("summaryId")
+						garmin_id = one_activity_file_dict.get('summaryId')
+						ui_hr = single_ui_act.get("averageHeartRateInBeatsPerMinute")
+						garmin_hr = one_activity_file_dict.get("averageHeartRateInBeatsPerMinute")
+						if ui_id == garmin_id and not ui_hr:
+							hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+							hrr_not_recorded_list.append(hrr_not_recorded_time)
+				else:		
+					hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+					hrr_not_recorded_list.append(hrr_not_recorded_time)
 
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
