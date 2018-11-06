@@ -16,11 +16,18 @@ def get_epoch_offset_from_timestamp(timestamp):
 			# Before Python 3.7, if tz offset have colon in it
 			# then strptime cannot parse it and throw error
 			# More - https://bugs.python.org/msg169952
-			# So a simple workaround is to remove the colon 
+			# So a simple workaround is to remove the colon
 			timestamp = timestamp[:-3]+timestamp[-2:]
 
-		dobj = datetime.strptime(timestamp,"%Y-%m-%dT%H:%M:%S.%f%z")
-		offset = int(dobj.utcoffset().total_seconds())
+		try:
+			dobj = datetime.strptime(timestamp,"%Y-%m-%dT%H:%M:%S.%f%z")
+		except ValueError as e:
+			dobj = datetime.strptime(timestamp,"%Y-%m-%dT%H:%M:%S.%fZ")
+
+		offset = 0
+		if dobj.utcoffset():
+			offset = int(dobj.utcoffset().total_seconds())
+
 		time_in_utc_seconds = int(dobj.timestamp())
 		return (time_in_utc_seconds,offset)
 
@@ -169,7 +176,7 @@ def fitbit_to_garmin_activities(active_summary):
 		# garmin_activites['maxPaceInMinutesPerKilometer'] = active_summary.get("")
 		# garmin_activites['maxRunCadenceInStepsPerMinute'] = active_summary.get("")
 		# garmin_activites['maxSpeedInMetersPerSecond'] = active_summary.get("")
-		# garmin_activites['steps'] = active_summary.get('steps',0)
+		garmin_activites['steps'] = active_summary.get('steps',0)
 		# garmin_activites['totalElevationGainInMeters'] = active_summary.get("")
 		# garmin_activites['totalElevationLossInMeters'] = active_summary.get("")
 		# garmin_activites['resting_hr_last_night'] = active_summary.get("")
