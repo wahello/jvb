@@ -22,6 +22,8 @@ import {getInitialStateHrr} from './initialStateHrr';
 import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
 import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync,hrrDate}  from '../../network/quick';
 
+import {renderRawDataExportReportsDataFetchOverlay} from '../dashboard_healpers';
+
 
 import NavbarMenu from '../navbar';
 import { Alert } from 'reactstrap';
@@ -90,6 +92,7 @@ class Quicklook extends Component{
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
 		this.renderModel = this.renderModel.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
+		this.renderRawDataExportReportsDataFetchOverlay = renderRawDataExportReportsDataFetchOverlay.bind(this);
 
 
 
@@ -850,7 +853,7 @@ onLogoutSuccess(response){
 									        </span>
                                  		 <span id="spa">
                                           <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`} onClick={this.renderRawDataExportReportsDataFetchOverlay}>
                                             <div className="btn3">
                                             <Button id="nav-btn" className="btn">Export Reports</Button>
                                             </div>
