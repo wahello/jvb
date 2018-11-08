@@ -23,14 +23,17 @@ class ActivityWeatherView(APIView):
         activities = get_daily_activities_in_base_format(user, date)
         garmin_list, manually_edited_list = _get_activities_data(user, date)
         manually_edited = {dic['summaryId']:dic for dic in manually_edited_list}
+        print ('manually_edited', manually_edited)
+        print ('activities', activities)
 
         filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
                             manually_updated_json=manually_edited,
                             userinput_activities=activities)
         weather_data = {}
+        print ('>>>>>>>>>>>>>', filtered_activities_list)
         for activity in filtered_activities_list:
-            if activity['activity_weather'] == {}:
-                epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
+            epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
+            if activity.get('activity_weather') == {}:
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
@@ -48,7 +51,9 @@ class ActivityWeatherView(APIView):
                                                 user, epoch_time, activity['summaryId'])
                     weather_data[activity['summaryId']] = {**weather_report}
             else:
-                weather_data[activity['summaryId']] = {**activity['activity_weather']}
+                weather_report = get_weather_info_using_garmin_activity(
+                                                user, epoch_time, activity['summaryId'])
+                weather_data[activity['summaryId']] = {**weather_report}
         return Response(weather_data)
 
 
