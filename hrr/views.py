@@ -106,7 +106,6 @@ class UserHrrViewRawData(generics.ListCreateAPIView):
 		  and return the list
 	'''
 	permission_classes = (IsAuthenticated,)
-	serializer_class = HrrSerializer
 
 	def get_queryset(self):
 		user = self.request.user
@@ -124,6 +123,45 @@ class UserHrrViewRawData(generics.ListCreateAPIView):
 
 		return queryset
 
+class UpdateHrr(generics.RetrieveUpdateDestroyAPIView):
+	'''
+		-update the HRR
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def get_queryset(self):
+		date = self.request.query_params.get('start_date',None)
+		if date:
+			qs = Hrr.objects.filter(
+				created_at = date 
+			).order_by('-created_at')
+		else:
+			qs = Hrr.objects.filter(
+			).order_by('-created_at')
+		return qs 
+
+	def get_object(self):
+		qs = self.get_queryset()
+		try:
+			obj = qs.filter(user_hrr = self.request.user)
+			if obj:
+				return obj[0]
+			else:
+				None
+		except Hrr.DoesNotExist:
+			return None
+
+	def put(self, request,format="json"):
+		latest_hrr = self.get_object()
+		if latest_hrr:
+			serializer = HrrSerializer(latest_hrr,data = request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response({})
+		else:
+			return Response({})
 
 class UserAA(generics.ListCreateAPIView):
 	'''

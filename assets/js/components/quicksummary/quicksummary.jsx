@@ -90,10 +90,6 @@ class Quicklook extends Component{
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
 		this.renderModel = this.renderModel.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
-
-
-
-
 		this.toggleDate=this.toggleDate.bind(this);
 	    this.toggleNav = this.toggleNav.bind(this);
 	    this.toggleDropdown = this.toggleDropdown.bind(this);
