@@ -2,7 +2,9 @@ import pytz
 from django.core.mail import send_mail
 from datetime import datetime,time,date,timedelta
 from user_input.models import UserDailyInput
+from quicklook.calculations.calculation_driver import which_device
 from garmin.models import UserLastSynced
+from fitbit.models import UserFitbitLastSynced
 
 
 def send_userinput_update_email(admin_users_email,instance_meta):
@@ -46,22 +48,54 @@ def get_users_having_local_time(email_timing,filter_username=None):
 	'''
 	Get the users infromation like local_time with their offsets 
 	'''
-	distinct_offsets = set(q['offset'] for q 
-		in UserLastSynced.objects.values('offset'))
-	offsets_in_local_time = []
-	for offset in distinct_offsets:
+	garmin_offsets = set(q['offset'] for q in UserLastSynced.objects.values('offset'))
+	fitbit_offsets = set(q['offset'] for q in UserFitbitLastSynced.objects.values('offset'))
+	garmin_offsets_in_local_time = []
+	fitbit_offsets_in_local_time = []
+	for offset in garmin_offsets:
 		offset_localtime = (datetime.utcnow()+timedelta(seconds=offset))
 		for time in email_timing:
 			if offset_localtime.hour == time.hour:
-				offsets_in_local_time.append(offset)
+				garmin_offsets_in_local_time.append(offset)
+	for offset in fitbit_offsets:
+		offset_localtime = (datetime.utcnow()+timedelta(seconds=offset))
+		for time in email_timing:
+			if offset_localtime.hour == time.hour:
+				fitbit_offsets_in_local_time.append(offset)
 	if filter_username:
-		users_with_offset_in_local_time = UserLastSynced.objects.filter(
-			offset__in = offsets_in_local_time,
+		garmin_users = UserLastSynced.objects.filter(
+			offset__in = garmin_offsets_in_local_time,
+			user__username__in = filter_username).select_related('user')
+		fitbit_users = UserFitbitLastSynced.objects.filter(
+			offset__in = fitbit_offsets_in_local_time,
 			user__username__in = filter_username).select_related('user')
 	else:
-		users_with_offset_in_local_time = UserLastSynced.objects.filter(
-			offset__in = offsets_in_local_time).select_related('user')
-
+		garmin_users = UserLastSynced.objects.filter(
+			offset__in = garmin_offsets_in_local_time).select_related('user')
+		fitbit_users = UserFitbitLastSynced.objects.filter(
+			offset__in = fitbit_offsets_in_local_time).select_related('user')
+	g_usernames = [g.user.username for g in garmin_users]
+	f_usernames = [f.user.username for f in fitbit_users]
+	
+	users_with_offset_in_local_time = []
+	if g_usernames:
+		for g_user in garmin_users:
+			if f_usernames and g_user.user.username in f_usernames:
+				for f_user in fitbit_users:
+					if f_user.user.username in g_usernames:
+						if (g_user.user.username == f_user.user.username and 
+						g_user.last_synced < f_user.last_synced_fitbit):
+							users_with_offset_in_local_time.append(f_user)
+						elif (g_user.user.username == f_user.user.username and 
+						g_user.last_synced > f_user.last_synced_fitbit):
+							users_with_offset_in_local_time.append(g_user)
+					else:
+						users_with_offset_in_local_time.append(f_user)		
+			else:
+				users_with_offset_in_local_time.append(g_user)
+	elif f_usernames:
+		users_with_offset_in_local_time.append(fitbit_users)
+	users_with_offset_in_local_time = list(set(users_with_offset_in_local_time))
 	return users_with_offset_in_local_time
 
 # remind selected users to submit UserDailyInput
@@ -150,7 +184,7 @@ def notify_users_to_sync_watch():
 	RECEPIENTS_USERNAME = ["johnb",'pw',"BrookPorter",
 		"Justin","lalancaster","MikeC","atul","jvbhealth","Jvbtest",
 		"missbgymnast","squishyturtle24","Vickykolovou"]
-	# RECEPIENTS_USERNAME = ['atul']
+	# RECEPIENTS_USERNAME = ['venky','pavan','norm','mani','narendra']
 	EMAIL_TIMING = [time(9),time(21)]
 	RECEPIENTS_WITH_OFFSET = get_users_having_local_time(
 		EMAIL_TIMING,RECEPIENTS_USERNAME)
@@ -165,11 +199,24 @@ def notify_users_to_sync_watch():
 			"user_offset":user_lsync.offset
 		}
 		try:
-			last_synced_obj = UserLastSynced.objects.filter(user = user)[0]
-			last_sync_local_dtime = last_synced_obj.last_synced + timedelta(
-				seconds=last_synced_obj.offset) 
+			garmin_last_sync = UserLastSynced.objects.filter(user = user)	
+			fitbit_last_sync = UserFitbitLastSynced.objects.filter(user = user)
+			if garmin_last_sync and fitbit_last_sync and garmin_last_sync[0].last_synced > fitbit_last_sync[0].last_synced_fitbit:
+				last_synced_obj = [garmin_last_sync[0],"garmin"] 
+			elif garmin_last_sync and fitbit_last_sync and garmin_last_sync[0].last_synced < fitbit_last_sync[0].last_synced_fitbit:
+				last_synced_obj = [fitbit_last_sync[0],"fitbit"]
+			elif garmin_last_sync:
+				last_synced_obj = [garmin_last_sync[0],"garmin"]
+			elif fitbit_last_sync:
+				last_synced_obj = [fitbit_last_sync[0],"fitbit"]
+			if last_synced_obj[1] == "garmin":
+				last_sync_local_dtime = last_synced_obj[0].last_synced + timedelta(
+					seconds=last_synced_obj[0].offset) 
+			else:
+				last_sync_local_dtime = last_synced_obj[0].last_synced_fitbit + timedelta(
+					seconds=last_synced_obj[0].offset)
 			last_synced_of_users[user.username]["last_sync"] = last_sync_local_dtime
-		except (IndexError,UserLastSynced.DoesNotExist) as e:
+		except (IndexError,UserLastSynced.DoesNotExist,UserFitbitLastSynced.DoesNotExist) as e:
 			last_synced_of_users[user.username]["last_sync"] = None
 
 	for username,user_meta in last_synced_of_users.items():

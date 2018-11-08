@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class FitbitConnectToken(models.Model):
@@ -78,6 +79,7 @@ class FitbitNotifications(models.Model):
 
 	def __str__(self):
 		return "%s"%(self.user.username)
+		
 class UserFitbitDatabody(models.Model):
 	user = models.ForeignKey('auth.user',on_delete=models.CASCADE,
 	 related_name="fitbit_body_data")
@@ -97,3 +99,14 @@ class UserFitbitDatafoods(models.Model):
 		return "%s"%(self.user.username)
 
 
+class UserFitbitLastSynced(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='last_synced_fitbit'
+    )
+    last_synced_fitbit = models.DateTimeField()
+    offset = models.IntegerField()
+
+    def __str__(self):
+        sync_time_str = self.last_synced_fitbit.strftime("%Y-%m-%d %H:%M:%S")
+        return "{}-{}".format(self.user.username,sync_time_str)

@@ -38,6 +38,8 @@ class ToMovementConsistencyCumulative(object):
 		self.cum_total_active_min = raw_data["cum_total_active_min"]
 		self.cum_sleep_active_min = raw_data["cum_sleep_active_min"]
 		self.cum_exercise_active_min = raw_data["cum_exercise_active_min"]
+		self.cum_sleep_hours = raw_data["cum_sleep_hours"]
+		self.cum_exercise_hours = raw_data["cum_exercise_hours"]
 
 class ToExerciseConsistencyCumulative(object):
 	def __init__(self,raw_data):
@@ -1007,12 +1009,22 @@ class ProgressReport():
 						act_min_without_sleep_currently = (
 							current_data.cum_total_active_min
 							- current_data.cum_sleep_active_min)
+ 
+						avg_sleep_hours = round(_cal_custom_average(
+								todays_data.cum_sleep_hours,
+								current_data.cum_sleep_hours,
+								mc_days
+							))
+
+						total_mins_without_sleep = 1440 - (avg_sleep_hours*60)
 
 						value = round(_cal_custom_average(
 									act_min_without_sleep_today,
 									act_min_without_sleep_currently,
 									mc_days))
-						active_prcnt = round((value/1440)*100)
+
+						active_prcnt = round((
+							value/total_mins_without_sleep)*100)
 						if mc_days:
 							return active_prcnt
 						else:
@@ -1034,11 +1046,31 @@ class ProgressReport():
 							- current_data.cum_sleep_active_min
 							- current_data.cum_exercise_active_min)
 
+						avg_sleep_hours = round(_cal_custom_average(
+								todays_data.cum_sleep_hours,
+								current_data.cum_sleep_hours,
+								mc_days
+							))
+
+						avg_exercise_hours = round(_cal_custom_average(
+								todays_data.cum_exercise_hours,
+								current_data.cum_exercise_hours,
+								mc_days
+							))
+
+						total_mins_without_sleep_exercise = (1440 
+							- avg_sleep_hours*60 
+							- avg_exercise_hours*60)
+
+
 						value = round(_cal_custom_average(
 									act_min_without_sleep_exercise_today,
 									act_min_without_sleep_exercise_currently,
 									mc_days))
-						active_prcnt = round((value/1440)*100)
+						
+						active_prcnt = round(
+							(value/total_mins_without_sleep_exercise)*100)
+
 						if mc_days:
 							return active_prcnt
 						else:
