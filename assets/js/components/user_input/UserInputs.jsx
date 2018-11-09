@@ -285,6 +285,9 @@ class UserInputs extends React.Component{
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
     this.onWeatherReportFetchSuccess = this.onWeatherReportFetchSuccess.bind(this);
     this.onWeatherReportFetchFailure = this.onWeatherReportFetchFailure.bind(this);
+    this.dateTimeValidation = this.dateTimeValidation.bind(this);
+    this.resetEndTime = this.resetEndTime.bind(this);
+    this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
     }
     
     _extractDateTimeInfo(dateObj){
