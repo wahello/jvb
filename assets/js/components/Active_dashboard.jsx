@@ -35,14 +35,12 @@ class ActiveDashboard extends Component{
 		this.errorActiveData = this.errorActiveData.bind(this);
 	}
 	successActiveData(data){
-		alert(data.data);	
 		this.setState({
 			active_data:data.data,
 			fetching_active_data:false
 		});
   	}
   	errorActiveData(error){
-  		alert(1);
 		console.log(error.message);
 		this.setState({
 			fetching_active_data:false,
@@ -55,7 +53,8 @@ class ActiveDashboard extends Component{
 		var tomorrow = moment(today).add(1, 'days');
 		this.setState({
 			selectedDate:tomorrow.toDate(),
-			fetching_active_data:true
+			fetching_active_data:true,
+			active_data:{}
 		
 		},()=>{
 			fetchActiveData(this.successActiveData,this.errorActiveData,this.state.selectedDate);
@@ -68,6 +67,7 @@ class ActiveDashboard extends Component{
 		this.setState({
 			selectedDate:tomorrow.toDate(),
 			fetching_active_data:true,
+			active_data:{}
 			
 	},()=>{
 			fetchActiveData(this.successActiveData,this.errorActiveData,this.state.selectedDate);
@@ -84,6 +84,7 @@ class ActiveDashboard extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_active_data:true,
+			active_data:{}
 			
 		},()=>{
 			fetchActiveData(this.successActiveData,this.errorActiveData,this.state.selectedDate);
@@ -95,77 +96,106 @@ class ActiveDashboard extends Component{
 		});
 		fetchActiveData(this.successActiveData,this.errorActiveData,this.state.selectedDate);
 	}
+	renderTable(active_data){
+		if (!_.isEmpty(active_data)){
+			let td_keys = ["total_active_time", "sleeping_active_time", "excluded_sleep", "exercise_active_time", "excluded_sleep_exercise",
+				"total_hours", "total_sleeping_hours", "excluded_sleep_hours", 
+				"total_exercise_hours", "excluded_sleep_exercise_hours", 
+				"total_active_prcnt", "sleep_hour_prcnt", "excluded_sleep_prcnt", 
+				"exercise_hour_prcnt", "excluded_sleep_exercise_prcnt"];
+			let tr_values = [];
+			let td_values1 = [];
+			let td_values2 = [];
+			let td_values3 = [];
+			
+			td_values1.push(<td>Time Moving / Active (hh:mm)</td>);
+			for(let key=0;key<5;key++){
+				td_values1.push(<td>{active_data[td_keys[key]]}</td>);
+			}
+			
+			td_values2.push(<td>Time in Period (hh:mm)</td>);
+			for(let key=5;key<10;key++){
+				td_values2.push(<td>{active_data[td_keys[key]]}</td>);
+			}
+			
+			td_values3.push(<td>%Active</td>);
+			for(let key=10;key<15;key++){
+				td_values3.push(<td>{active_data[td_keys[key]]}</td>);
+			}
+
+			tr_values.push(<tr>{td_values1}</tr>);
+			tr_values.push(<tr>{td_values2}</tr>);
+			tr_values.push(<tr>{td_values3}</tr>);
+
+			return [tr_values];
+		}
+	return [null];
+	}
+
 	render(){
+		let rendered_data = this.renderTable(this.state.active_data);
+		let rendered_rows = rendered_data[0];
 		return(
-			//<div>Testing</div>
-				<div className = "container-fluid mnh-mobile-view">
-					<NavbarMenu title = {<span style = {{fontSize:"18px"}}>
-					Time Moving / Active Dashboard
-					</span>} />
+			<div className = "container-fluid mnh-mobile-view">
+				<NavbarMenu title = {<span style = {{fontSize:"18px"}}>
+				Time Moving / Active Dashboard
+				</span>} />
 
-					<div className = "cla_center" style = {{fontSize:"12px"}}>
-						<span className = "col-md-4 col-sm-4">
-							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
-								<FontAwesome
-			                        name = "angle-left"
-			                        size = "2x"
-				                />
-							</span> 
-			            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
-			                    <FontAwesome
-			                        name = "calendar"
-			                        size = "2x"
-			                    />
-			                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>
-			                   
-		                	</span>
-		                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
-								<FontAwesome
-			                        name = "angle-right"
-			                        size = "2x"
-				                />
-							</span> 
-			            	<Popover
-					            placement="bottom"
-					            isOpen={this.state.calendarOpen}
-					            target="gd_progress"
-					            toggle={this.toggleCalendar}>
-				                <PopoverBody className="calendar2">
-				                <CalendarWidget  onDaySelect={this.processDate}/>
-				                </PopoverBody>
-			                </Popover>
+				<div className = "cla_center" style = {{fontSize:"12px"}}>
+					<span>
+						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+							<FontAwesome
+		                        name = "angle-left"
+		                        size = "2x"
+			                />
+						</span> 
+		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
+		                    <FontAwesome
+		                        name = "calendar"
+		                        size = "2x"
+		                    />
+		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>
+		                   
 	                	</span>
-	                	<span className="col-md-8 col-sm-8" style = {{fontWeight:"bold"}}>Time Moving / Active (hh:mm)
-	                	</span>
-		        	</div>
+	                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+							<FontAwesome
+		                        name = "angle-right"
+		                        size = "2x"
+			                />
+						</span> 
+		            	<Popover
+				            placement="bottom"
+				            isOpen={this.state.calendarOpen}
+				            target="gd_progress"
+				            toggle={this.toggleCalendar}>
+			                <PopoverBody className="calendar2">
+			                <CalendarWidget  onDaySelect={this.processDate}/>
+			                </PopoverBody>
+		                </Popover>
+                	</span>
+                	
+	        	</div>
 
-					 {/*<div className = "hr_table_padd" style = {{fontSize:"12px"}}>*/}
-					 <div style = {{fontSize:"12px"}}>
-							<div className = "table table-responsive">
-				          	    <table className = "weeklyWorkoutTable table table-striped table-bordered">
-									<tr>
-										<th></th>
-										<th>Entire 24<br />Hour <br />Day</th>
-										<th>Sleep<br />Hours</th>
-										<th>Entire 24<br />Hour Day<br />Excluding<br />Sleep</th>
-										<th>Exercise<br />Hours</th>
-										<th>Entire 24<br />Hour Day<br />Excluding<br />Sleep and<br />Exercise</th>
-									</tr>
-									<tbody>
-										<tr>
-											<td>Time Moving / Active (hh:mm)</td>
-										</tr>
-										<tr>
-											<td>Time in Period (hh:mm)</td>
-										</tr>
-										<tr>
-											<td>%Active</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
+				 <div style = {{fontSize:"12px"}}>
+				 <div className="" style = {{fontWeight:"bold","textAlign":"center"}}>Time Moving / Active (hh:mm)
+                	</div>
+						<div className = "table table-responsive new_style1">
+			          	    <table className = "weeklyWorkoutTable new_style table table-striped table-bordered">
+								<tr>
+									<th></th>
+									<th>Entire 24<br />Hour <br />Day</th>
+									<th>Sleep<br />Hours</th>
+									<th>Entire 24<br />Hour Day<br />Excluding<br />Sleep</th>
+									<th>Exercise<br />Hours</th>
+									<th>Entire 24<br />Hour Day<br />Excluding<br />Sleep and<br />Exercise</th>
+								</tr>
+								<tbody>
+									{rendered_rows}
+								</tbody>
+							</table>
 						</div>
-				</div>
+					</div>
+			</div>
 		);			
 	}
 }
