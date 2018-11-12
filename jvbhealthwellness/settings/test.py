@@ -8,13 +8,14 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
   'default': {
       'ENGINE': 'django.db.backends.postgresql',
-      'NAME': 'jvbhealthapptest',
-      'USER': 'u5cbtl3seu12pf',
-      'PASSWORD': 'jvbhealth',
-      'HOST': 'jvb-health-app.c7lti9kc1dov.ap-south-1.rds.amazonaws.com', # set in docker-compose.yml
+      'NAME': 'jvbhealth',
+      'USER': 'jvbhealth',
+      'PASSWORD': 'Health2112',
+      'HOST': 'jvb-staging.c2iyrd4ofjox.us-east-1.rds.amazonaws.com', # set in docker-compose.yml
       'PORT': 5432 # default postgres port
   }
 }
+
 
 
 STATIC_ROOT = 'staticfiles'

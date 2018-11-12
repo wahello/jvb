@@ -75,6 +75,12 @@ export function handleChangeSleepBedTime(date){
     sleep_bedtime_date:date
     },()=>{
     let duration = this.getTotalSleep();
+    this.dateTimeValidation(this.state.sleep_bedtime_date, this.state.sleep_hours_bed_time,
+      this.state.sleep_mins_bed_time, 1, this.state.sleep_bedtime_am_pm, 
+      this.state.sleep_awake_time_date, this.state.sleep_hours_awake_time, 
+      this.state.sleep_mins_awake_time, 1, this.state.sleep_awake_time_am_pm, 
+      'sleep_awake_time_date', 'sleep_hours_awake_time', 'sleep_mins_awake_time', '', 
+      'sleep_awake_time_am_pm');
      if(duration)
     {  
       let hours = duration.split(":")[0];
@@ -86,16 +92,22 @@ export function handleChangeSleepBedTime(date){
       })
     }
   });
-
 }
 
 export function handleChangeSleepHoursMin(event){
   const value = event.target.value;
   const name = event.target.name;
+  //alert(value);
   this.setState({
   [name]: value
   },()=>{
     let duration = this.getTotalSleep();
+    this.dateTimeValidation(this.state.sleep_bedtime_date, this.state.sleep_hours_bed_time,
+      this.state.sleep_mins_bed_time, 1, this.state.sleep_bedtime_am_pm, 
+      this.state.sleep_awake_time_date, this.state.sleep_hours_awake_time, 
+      this.state.sleep_mins_awake_time, 1, this.state.sleep_awake_time_am_pm,
+      'sleep_awake_time_date', 'sleep_hours_awake_time', 'sleep_mins_awake_time', '', 
+      'sleep_awake_time_am_pm');
      if(duration)
     {  
       let hours = duration.split(":")[0];
@@ -114,6 +126,12 @@ export function handleChangeSleepAwakeTime(date){
       sleep_awake_time_date: date,
     },()=>{
     let duration = this.getTotalSleep();
+    this.dateTimeValidation(this.state.sleep_bedtime_date, this.state.sleep_hours_bed_time,
+      this.state.sleep_mins_bed_time, 1, this.state.sleep_bedtime_am_pm, 
+      this.state.sleep_awake_time_date, this.state.sleep_hours_awake_time, 
+      this.state.sleep_mins_awake_time, 1, this.state.sleep_awake_time_am_pm,
+      'sleep_awake_time_date', 'sleep_hours_awake_time', 'sleep_mins_awake_time', '', 
+      'sleep_awake_time_am_pm');
     if(duration)
     {  
       let hours = duration.split(":")[0];

@@ -7,12 +7,13 @@ import moment from 'moment';
 import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
-
+import { ToastContainer, toast } from 'react-toastify';
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
 "HEART_RATE_RECOVERY":"HEART RATE RECOVERY(HRR)",
 "JVB_STRENGTH_EXERCISES":"JVB STRENGTH EXERCISES",
+'ARC_TRAINER':'ARC TRAINER',
 "BACKCOUNTRY_SKIING_SNOWBOARDING":"BACKCOUNTRY SKIING SNOWBOARDING",
 "BARRE_CLASS":"BARRE CLASS",
 "BASKETBALL":"BASKETBALL",
@@ -133,6 +134,10 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
+this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
+this.handleChange_weather = this.handleChange_weather.bind(this);
+
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -148,7 +153,7 @@ this.state ={
     modal_activity_min:"",
     modal_activity_sec:"",
     modal_exercise_steps:"",
-    modal_exercise_steps_status:"",
+    modal_exercise_steps_status:"exercise",
     modal_duplicate_info_status:false,
     modal_activity_comment:"",
     activity_display_name:"",
@@ -387,25 +392,23 @@ errorActivity(error){
 }
 toggleModal(){
     this.setState({
-        modal_activity_type:"",
-        modal_activity_heart_rate:"",
-        modal_activity_hour:"",
-        modal_activity_min:"",
-        modal_exercise_steps:"",
-        modal_exercise_steps_status:"",
-        modal_duplicate_info_status:false,
-        modal_activity_comment:"",
-        selectedActivityId:"",
-        activity_start_date:"",
-        activity_start_hour:"",
-        activity_start_min:"",
-        activity_start_sec:"",
-        activity_start_am_pm:"",
-        activity_end_date:"",
-        activity_end_hour:"",
-        activity_end_min:"",
-        activity_end_sec:"",
-        activity_end_am_pm:"",
+      modal_activity_type:"",
+      modal_activity_heart_rate:"",
+      modal_activity_hour:"",
+      modal_activity_min:"",
+      modal_exercise_steps:"",
+      modal_exercise_steps_status:"exercise",
+      modal_duplicate_info_status:false,
+      modal_activity_comment:"",
+      selectedActivityId:"",
+      activitystarttime_calender:"",
+      modalstarttime_activity_hour:"",
+      modalstarttime_activity_min:"",
+      modalstarttime_activity_ampm:"",
+      activityendtime_calender:"",
+      modalendtime_activity_hour:"",
+      modalendtime_activity_min:"",
+      modalendtime_activity_ampm:"",
       activityEditModal:!this.state.activityEditModal
     });
   }
@@ -454,7 +457,7 @@ handleChangeModal(event){
     modal_activity_min:mins,
     modal_activity_sec:secs,
     modal_exercise_steps:current_activity?current_activity.steps:"",
-    modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
+    modal_exercise_steps_status:current_activity?current_activity.steps_type:"exercise",
     modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
     modal_activity_comment:current_activity?current_activity.comments:"",
     selectedActivityId:selectedActivityId,
@@ -480,6 +483,25 @@ editToggleHandlerActivityType(event){
     }
 }
 
+<<<<<<< HEAD
+=======
+editToggleHandler_weather(key, event){
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let categoryMode = this.state.activities_edit_mode[selectedActivityId];
+    categoryMode[key] = !categoryMode[key] 
+    if(selectedActivityId){
+        this.setState({
+            ...this.state.activities_edit_mode,
+            [selectedActivityId]:categoryMode
+        },()=>{
+            this.props.updateParentActivities(this.state.activites);
+        });
+    }
+}
+
+
+>>>>>>> 3bdb11fd50dadbd5fa6f5aef9dabd8a25cb4f8a0
 editToggleHandler_heartrate(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -495,12 +517,24 @@ editToggleHandler_heartrate(event){
     }
 }
 
+<<<<<<< HEAD
 editToggleHandlerStartTime(selectedActivityId){
     let activity_start_date = null;
     let activity_start_hour = "";
     let activity_start_min = "";
     let activity_start_sec = "";
     let activity_start_am_pm = "";
+=======
+
+editToggleHandlerStartTime(selectedActivityId,event){
+    let categoryEditMode = this.state.activities_edit_mode[selectedActivityId];
+    let activity_start_end_date = null;
+    let activity_start_end_hour = "";
+    let activity_start_end_min = "";
+    let activity_start_end_sec = "";
+    let activity_start_end_am_pm = "";
+    categoryEditMode['startTimeInSeconds'] = !categoryEditMode['startTimeInSeconds'];
+>>>>>>> 3bdb11fd50dadbd5fa6f5aef9dabd8a25cb4f8a0
 
     if(selectedActivityId){
         let start_time = this.state.activity_start_end_time[selectedActivityId]['start_time'];
@@ -751,19 +785,28 @@ handleChange_heartrate(event){
         }
     });
 }
+handleChange_weather(key, event) {
+    const target = event.target;
+    const value = target.value;
+    const selectedActivityId = target.getAttribute('data-name');
+    let activity_data = this.state.activites[selectedActivityId];
+    activity_data[key] = value;
+    this.setState({
+        activites:{...this.state.activites,
+        [selectedActivityId]:activity_data,
+    }
+    });
+}
 
 valueChange(event){
-const target = event.target;
-  const value = target.value;
-  const selectedActivityId = target.getAttribute('data-name');
-  let activity_data = this.state.activites[selectedActivityId];
-  activity_data['comments'] = value;
-  this.setState({
- 
-  changevalue: activity_data
-
- 
-     });
+    const target = event.target;
+    const value = target.value;
+    const selectedActivityId = target.getAttribute('data-name');
+    let activity_data = this.state.activites[selectedActivityId];
+    activity_data['comments'] = value;
+    this.setState({
+        changevalue: activity_data
+    });
 }
  handleChange_comments(event){
   const target = event.target;
@@ -1162,7 +1205,7 @@ CreateNewActivity(data){
         modal_activity_hour:"",
         modal_activity_min:"",
         modal_exercise_steps:"",
-        modal_exercise_steps_status:"",
+        modal_exercise_steps_status:"exercise",
         modal_duplicate_info_status:false,
         modal_activity_comment:"",
         activity_start_date:"",
@@ -1321,14 +1364,26 @@ handleChangeModelActivityStartTimeDate(date){
     this.setState({
         activity_start_date:date
     },()=>{
-        let duration = this.getTotalActivityDuration();
-        if(duration){  
-            this.setState({
-                modal_activity_hour:duration.split(":")[0],
-                modal_activity_min: duration.split(":")[1],
-                modal_activity_sec:duration.split(":")[2]
-            });
-        }
+            let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
+            if(duration){  
+                this.setState({
+                    modal_activity_hour:duration.split(":")[0],
+                    modal_activity_min: duration.split(":")[1],
+                    modal_activity_sec:duration.split(":")[2]
+                });
+            }
     });
 }
 
@@ -1337,6 +1392,18 @@ handleChangeModelActivityEndTimeDate(date){
         activity_end_date:date
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm,'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1354,6 +1421,18 @@ handleChangeModalActivityTime(event){
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1410,9 +1489,25 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
+
+   resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+      this.setState({
+        [end_date_prop_name] : null,
+        [end_hours_prop_name] : '',
+        [end_mins_prop_name] : '',
+        [end_am_pm_prop_name] : '',
+        [end_secs_prop_name]:''
+      },()=>{
+              toast.info(" Time of your workout started should be less than time of your workout ended ",{
+              className:"dark"
+              })
+      });
+    }
+
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
-        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
+        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","humidity","temperature_feels_like","temperature","dewPoint","wind","weather_condition","comments"];
+        /*const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];*/
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
         let activityData = [];
@@ -1501,16 +1596,15 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm:ss a'):''} 
-                 
-                </td>);
+                {start_time?moment(start_time).format('MMM D, YYYY h:mm:ss a'):''} 
+                      </td>);
             }
 
             else if(key === "endTimeInSeconds"){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            {end_time?end_time.format('MMM D, YYYY h:mm:ss a'):''}  
-                </td>);
+                    {end_time?moment(end_time).format('MMM D, YYYY h:mm:ss a'):''} 
+            </td>);
             }
 
             else if(key === "durationInSeconds"){
@@ -1598,6 +1692,153 @@ renderTable(){
                         duplicateInfoLabel
                     }
                 </td>);
+                /*//<Input
+                          type = "text" 
+                          className="form-control"
+                          style={{height:"37px"}}
+                          name="modal_activity_type"
+                          value={this.state.modal_activity_type}                                 
+                          onChange={this.handleChange}>   
+                        </Input>*/
+            }
+            //const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
+            else if(key === "humidity") {
+                let humidity = this.state.activites[summaryId][key];
+                humidity || humidity == null || humidity == undefined ?humidity:'Not Measured'; 
+                activityData.push(<td name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="text" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={(event) => this.handleChange_weather("humidity",event)}
+                        onBlur={(event) => this.editToggleHandler_weather("humidity",event)}>  
+                        </Input>: humidity}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={(event) => this.editToggleHandler_weather("humidity",event)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "temperature_feels_like") {
+                let temperature_feels_like = this.state.activites[summaryId][key];
+                temperature_feels_like || temperature_feels_like == null || temperature_feels_like == undefined ?temperature_feels_like:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="text" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={(event) => this.handleChange_weather("temperature_feels_like",event)}
+                        onBlur={(event) => this.editToggleHandler_weather("temperature_feels_like",event)}> 
+                        </Input>: temperature_feels_like}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={(event) => this.editToggleHandler_weather("temperature_feels_like",event)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "temperature") {
+                let temperature = this.state.activites[summaryId][key];
+                temperature || temperature == null || temperature == undefined ?temperature:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="text" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={(event) => this.handleChange_weather("temperature",event)}
+                        onBlur={(event) => this.editToggleHandler_weather("temperature",event)}> 
+                        </Input>: temperature}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={(event) => this.editToggleHandler_weather("temperature",event)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "weather_condition") {
+                let weather_condition = this.state.activites[summaryId][key];
+                weather_condition || weather_condition == null || weather_condition == undefined ?weather_condition:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="text" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={(event) => this.handleChange_weather("weather_condition",event)}
+                        onBlur={(event) => this.editToggleHandler_weather("weather_condition",event)}> 
+                        </Input>: weather_condition}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={(event) => this.editToggleHandler_weather("weather_condition",event)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "dewPoint") {
+                let dewPoint = this.state.activites[summaryId][key];
+                dewPoint || dewPoint == null || dewPoint == undefined ?dewPoint:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="text" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={(event) => this.handleChange_weather("dewPoint",event)}
+                        onBlur={(event) => this.editToggleHandler_weather("dewPoint",event)}>
+                        </Input>: dewPoint}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={(event) => this.editToggleHandler_weather("dewPoint",event)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
+            }
+            else if(key === "wind") {
+                let wind = this.state.activites[summaryId][key];
+                wind || wind == null || wind == undefined ?wind:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {this.state.activities_edit_mode[summaryId][key] ?                            
+                        <Input 
+                        data-name = {summaryId}
+                        type="text" 
+                        className="form-control"
+                        style={{height:"37px",width:"80%"}}
+                        value={this.state.activites[summaryId][key]}                               
+                        onChange={(event) => this.handleChange_weather("wind",event)}
+                        onBlur={(event) => this.editToggleHandler_weather("wind",event)}>
+                        </Input>: wind}
+                        {this.props.editable && !isActivityDeleted &&
+                            <span data-name = {summaryId} onClick={(event) => this.editToggleHandler_weather("wind",event)}
+                            className="fa fa-pencil fa-1x progressActivity1"
+                            id = "add_button">
+                            </span>
+                        }
+                    </td>
+               );
             }
             else if(key === "humidity") {
                 let humidity = this.state.activites[summaryId][key];
@@ -1657,7 +1898,6 @@ renderTable(){
 
             else
                 activityData.push(<td id = "add_button">{keyValue}</td>);
-
         }
     activityRows.push(
         <tr name = {summaryId} 
@@ -1986,7 +2226,6 @@ renderEditActivityModal(){
 render(){
 
 return(
-
 <div className = "container_fluid">
 <div className="row justify-content-center">
 <div id = "activity_table">

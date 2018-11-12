@@ -595,7 +595,6 @@ transformActivity(activity){
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
-        
       }
     }
     onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
@@ -620,6 +619,15 @@ transformActivity(activity){
           this.props.updateParentActivities(this.state.activities);
         });
       }
+    }
+
+    onWeatherReportFetchFailure(error){
+      this.setState(
+        {
+        selected_date:this.state.selected_date,
+        gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
     }
 
     onWeatherReportFetchFailure(error){

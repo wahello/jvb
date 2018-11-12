@@ -87,14 +87,14 @@
 /*Weekly workout table*/
 @media (min-width: 375px) and (max-width: 736px){
 	.weeklyWorkoutTable {	
-		font-size:80% !important;
+		font-size:66% !important;
 		width: 40px !important;
 	}
 	.mnh-mobile-view {
 		font-size:80% !important;
 	}
 	.weeklyWorkoutTable>tbody>tr>td:first-child {
-		word-break: break-all !important;
+		font-size:85% !important;
 	}
 	.weeklyWorkoutTable th{
 		min-width: 40px !important;
@@ -154,8 +154,7 @@
 	min-width: 60px;
 }
 .weeklyWorkoutTable>tbody>tr>td:first-child{
-	word-break: break-all;
-	white-space:pre-wrap;
+	font-size: 85%
 }
 .weeklyWorkoutTable>tr>th:first-child{
 	min-width: 80px !important;

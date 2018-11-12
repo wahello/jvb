@@ -35,6 +35,11 @@ class ToMovementConsistencyCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_movement_consistency_gpa = raw_data["cum_movement_consistency_gpa"]
 		self.cum_movement_consistency_score = raw_data["cum_movement_consistency_score"]
+		self.cum_total_active_min = raw_data["cum_total_active_min"]
+		self.cum_sleep_active_min = raw_data["cum_sleep_active_min"]
+		self.cum_exercise_active_min = raw_data["cum_exercise_active_min"]
+		self.cum_sleep_hours = raw_data["cum_sleep_hours"]
+		self.cum_exercise_hours = raw_data["cum_exercise_hours"]
 
 class ToExerciseConsistencyCumulative(object):
 	def __init__(self,raw_data):
@@ -902,7 +907,6 @@ class ProgressReport():
 							todays_meta_data.cum_mc_recorded_days_count - 
 							current_meta_data.cum_mc_recorded_days_count
 						)
-
 						grade =  garmin_calculation.cal_movement_consistency_grade(
 							_cal_custom_average(
 								todays_data.cum_movement_consistency_score,
@@ -915,6 +919,162 @@ class ProgressReport():
 						else:
 							return "Not Reported"
 					return None
+				elif key == "total_active_minutes":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						value = round(_cal_custom_average(
+									todays_data.cum_total_active_min,
+									current_data.cum_total_active_min,
+									mc_days))
+						if mc_days:
+							return value
+						else:
+							return "Not Reported"
+				elif key == "active_minutes_without_sleep":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						act_min_without_sleep_today = (
+							todays_data.cum_total_active_min
+							- todays_data.cum_sleep_active_min)
+
+						act_min_without_sleep_currently = (
+							current_data.cum_total_active_min
+							- current_data.cum_sleep_active_min)
+
+						value = round(_cal_custom_average(
+									act_min_without_sleep_today,
+									act_min_without_sleep_currently,
+									mc_days))
+						if mc_days:
+							return value
+						else:
+							return "Not Reported"
+				elif key == "active_minutes_without_sleep_exercise":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						act_min_without_sleep_exercise_today = (
+							todays_data.cum_total_active_min
+							- todays_data.cum_sleep_active_min
+							- todays_data.cum_exercise_active_min)
+
+						act_min_without_sleep_exercise_currently = (
+							current_data.cum_total_active_min
+							- current_data.cum_sleep_active_min
+							- current_data.cum_exercise_active_min)
+
+						value = round(_cal_custom_average(
+									act_min_without_sleep_exercise_today,
+									act_min_without_sleep_exercise_currently,
+									mc_days))
+						if mc_days:
+							return value
+						else:
+							return "Not Reported"
+							
+				elif key == "total_active_minutes_prcnt":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						value = round(_cal_custom_average(
+									todays_data.cum_total_active_min,
+									current_data.cum_total_active_min,
+									mc_days))
+						active_prcnt = round((value/1440)*100)
+						if mc_days:
+							return active_prcnt
+						else:
+							return "Not Reported"
+
+				elif key == "active_minutes_without_sleep_prcnt":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count 
+							 - current_meta_data.cum_mc_recorded_days_count
+						)
+						act_min_without_sleep_today = (
+							todays_data.cum_total_active_min
+							- todays_data.cum_sleep_active_min)
+
+						act_min_without_sleep_currently = (
+							current_data.cum_total_active_min
+							- current_data.cum_sleep_active_min)
+ 
+						avg_sleep_hours = round(_cal_custom_average(
+								todays_data.cum_sleep_hours,
+								current_data.cum_sleep_hours,
+								mc_days
+							))
+
+						total_mins_without_sleep = 1440 - (avg_sleep_hours*60)
+
+						value = round(_cal_custom_average(
+									act_min_without_sleep_today,
+									act_min_without_sleep_currently,
+									mc_days))
+
+						active_prcnt = round((
+							value/total_mins_without_sleep)*100)
+						if mc_days:
+							return active_prcnt
+						else:
+							return "Not Reported"
+
+				elif key == "active_minutes_without_sleep_exercise_prcnt":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count
+							 - current_meta_data.cum_mc_recorded_days_count
+						)
+						act_min_without_sleep_exercise_today = (
+							todays_data.cum_total_active_min
+							- todays_data.cum_sleep_active_min
+							- todays_data.cum_exercise_active_min)
+
+						act_min_without_sleep_exercise_currently = (
+							current_data.cum_total_active_min
+							- current_data.cum_sleep_active_min
+							- current_data.cum_exercise_active_min)
+
+						avg_sleep_hours = round(_cal_custom_average(
+								todays_data.cum_sleep_hours,
+								current_data.cum_sleep_hours,
+								mc_days
+							))
+
+						avg_exercise_hours = round(_cal_custom_average(
+								todays_data.cum_exercise_hours,
+								current_data.cum_exercise_hours,
+								mc_days
+							))
+
+						total_mins_without_sleep_exercise = (1440 
+							- avg_sleep_hours*60 
+							- avg_exercise_hours*60)
+
+
+						value = round(_cal_custom_average(
+									act_min_without_sleep_exercise_today,
+									act_min_without_sleep_exercise_currently,
+									mc_days))
+						
+						active_prcnt = round(
+							(value/total_mins_without_sleep_exercise)*100)
+
+						if mc_days:
+							return active_prcnt
+						else:
+							return "Not Reported"
 
 			return None
 
@@ -922,6 +1082,12 @@ class ProgressReport():
 			'movement_consistency_score':{d:None for d in self.duration_type},
 			'movement_consistency_grade':{d:None for d in self.duration_type},
 			'movement_consistency_gpa':{d:None for d in self.duration_type},
+			'total_active_minutes':{d:None for d in self.duration_type},
+			'total_active_minutes_prcnt':{d:None for d in self.duration_type},
+			'active_minutes_without_sleep':{d:None for d in self.duration_type},
+			'active_minutes_without_sleep_prcnt':{d:None for d in self.duration_type},
+			'active_minutes_without_sleep_exercise':{d:None for d in self.duration_type},
+			'active_minutes_without_sleep_exercise_prcnt':{d:None for d in self.duration_type}
 		}
 		summary_type = "movement_consistency_cum"
 

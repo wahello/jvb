@@ -9,7 +9,7 @@ DEBUG = False
 SECRET_KEY = config('SECRET_KEY')
 
 DATABASES = {
-    'default': config('DATABASE_URL', cast=db_url),
+	'default': config('DATABASE_URL', cast=db_url),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -50,57 +50,67 @@ CSRF_COOKIE_HTTPONLY = True
 WEBPACK_LOADER['DEFAULT']['CACHE'] = True
 
 # Celery
-CELERY_BROKER_URL = 'redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379'
-CELERY_RESULT_BACKEND = 'redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379'
+CELERY_BROKER_URL = 'redis://ec2-34-239-176-5.compute-1.amazonaws.com:6379'
+CELERY_RESULT_BACKEND = 'redis://ec2-34-239-176-5.compute-1.amazonaws.com:6379'
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BEAT_SCHEDULE = {
-    #execute every day at 1:00 AM EST (America/New_york)
-    'create-cumulative-sum':{
-        'task':'progress_analyzer.generate_cumulative_instances',
-        'schedule':crontab(minute=0, hour=1)
-    },
-    #execute every quarter to hour. Ex 10:45, 9:45 etc.
-    'update-obsolete-progress-analyzer-report':{
-        'task':'progress_analyzer.update_obsolete_pa_reports',
-        'schedule':crontab(minute=45, hour='*/1')
-    },
-    #execute every day at 3:00 AM EST (America/New_york)
-    'retry-failed-ping-notifications':{
-        'task':'garmin.retry_failed_ping_notification',
-        'schedule':crontab(minute=0, hour=3)
-    },
-     #execute every one hour UTC time zone
-    'generate-log-for-incorrect-pa':{
-        'task':'progress_analyzer.generate_log_incorrect_pa',
-        'schedule':crontab(minute=0, hour='*/1')
-    },
-    #execute every day at 4:00 AM EST (America/New_york)
-    "validate-garmin-health-token":{
-        'task':'garmin.validate_garmin_health_token',
-        'schedule':crontab(minute=0, hour=4)
-    },
-    #execute every one hour
-    "remind_selected_users_submit_input":{
-        'task':'userinputs.submit_userinput_reminder',
-        'schedule':crontab(minute=0, hour='*/1')
-    },
-    #execute every hour EST (America/New_york)
-    "remind_users_sync_watch":{
-        'task':'sync_watch.reminder',
-        'schedule':crontab(minute=0, hour='*/1')
-    },
+	#execute every day at 1:00 AM EST (America/New_york)
+	'create-cumulative-sum':{
+		'task':'progress_analyzer.generate_cumulative_instances',
+		'schedule':crontab(minute=0, hour=1)
+	},
+	#execute every quarter to hour. Ex 10:45, 9:45 etc.
+	'update-obsolete-progress-analyzer-report':{
+		'task':'progress_analyzer.update_obsolete_pa_reports',
+		'schedule':crontab(minute=45, hour='*/1')
+	},
+	#execute every day at 3:00 AM EST (America/New_york)
+	'retry-failed-ping-notifications':{
+		'task':'garmin.retry_failed_ping_notification',
+		'schedule':crontab(minute=0, hour=3)
+	},
+	 #execute every one hour UTC time zone
+	'generate-log-for-incorrect-pa':{
+		'task':'progress_analyzer.generate_log_incorrect_pa',
+		'schedule':crontab(minute=0, hour='*/1')
+	},
+	#execute every day at 4:00 AM EST (America/New_york)
+	"validate-garmin-health-token":{
+		'task':'garmin.validate_garmin_health_token',
+		'schedule':crontab(minute=0, hour=4)
+	},
+	#execute every one hour
+	"remind_selected_users_submit_input":{
+		'task':'userinputs.submit_userinput_reminder',
+		'schedule':crontab(minute=0, hour='*/1')
+	},
+	#execute every hour EST (America/New_york)
+	"remind_users_sync_watch":{
+		'task':'sync_watch.reminder',
+		'schedule':crontab(minute=0, hour='*/1')
+	},
+   #executr every one hour
+	'add-date-to-fitfile':{
+		'task':'hrr.add_date_to_fitfile',
+		'schedule':crontab(minute=0, hour='*/1')
+	},
+   #execute every hour at 30 mins (America/New_york)
+	"notify_users_mcs":{
+		'task':'mcsteps.email',
+		'schedule':crontab(minute=30, hour='*/1')
+	},
 }
 
 # Whitenoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MIDDLEWARE.insert(  # insert WhiteNoiseMiddleware right after SecurityMiddleware
-    MIDDLEWARE.index('django.middleware.security.SecurityMiddleware') + 1,
-    'whitenoise.middleware.WhiteNoiseMiddleware')
+	MIDDLEWARE.index('django.middleware.security.SecurityMiddleware') + 1,
+	'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # django-log-request-id
 MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
-    0, 'log_request_id.middleware.RequestIDMiddleware')
+	0, 'log_request_id.middleware.RequestIDMiddleware')
 
 # MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
 #     0, 'django.middleware.cache.UpdateCacheMiddleware')
@@ -123,78 +133,78 @@ LOG_REQUESTS = True
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        },
-        'request_id': {
-            '()': 'log_request_id.filters.RequestIDFilter'
-        },
-    },
-    'formatters': {
-        'standard': {
-            'format': '%(levelname)-8s [%(asctime)s] [%(request_id)s] %(name)s: %(message)s'
-        },
-    },
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_false'],
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'filters': ['request_id'],
-            'formatter': 'standard',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['console'],
-            'level': 'INFO'
-        },
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'log_request_id.middleware': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    }
+	'version': 1,
+	'disable_existing_loggers': False,
+	'filters': {
+		'require_debug_false': {
+			'()': 'django.utils.log.RequireDebugFalse'
+		},
+		'request_id': {
+			'()': 'log_request_id.filters.RequestIDFilter'
+		},
+	},
+	'formatters': {
+		'standard': {
+			'format': '%(levelname)-8s [%(asctime)s] [%(request_id)s] %(name)s: %(message)s'
+		},
+	},
+	'handlers': {
+		'null': {
+			'class': 'logging.NullHandler',
+		},
+		'mail_admins': {
+			'level': 'ERROR',
+			'class': 'django.utils.log.AdminEmailHandler',
+			'filters': ['require_debug_false'],
+		},
+		'console': {
+			'level': 'DEBUG',
+			'class': 'logging.StreamHandler',
+			'filters': ['request_id'],
+			'formatter': 'standard',
+		},
+	},
+	'loggers': {
+		'': {
+			'handlers': ['console'],
+			'level': 'INFO'
+		},
+		'django.security.DisallowedHost': {
+			'handlers': ['null'],
+			'propagate': False,
+		},
+		'django.request': {
+			'handlers': ['mail_admins'],
+			'level': 'ERROR',
+			'propagate': True,
+		},
+		'log_request_id.middleware': {
+			'handlers': ['console'],
+			'level': 'DEBUG',
+			'propagate': False,
+		},
+	}
 }
 
 
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient"
-        },
-        "KEY_PREFIX": "app"
-    }
+	"default": {
+		"BACKEND": "django_redis.cache.RedisCache",
+		"LOCATION": "redis://ec2-34-239-176-5.compute-1.amazonaws.com:6379/1",
+		"OPTIONS": {
+			"CLIENT_CLASS": "django_redis.client.DefaultClient"
+		},
+		"KEY_PREFIX": "app"
+	}
 }
 
 # Elastic APM settings
 INSTALLED_APPS.insert(0,"elasticapm.contrib.django")
 MIDDLEWARE.insert(0,'elasticapm.contrib.django.middleware.TracingMiddleware')
 ELASTIC_APM = {
-    # allowed characters in SERVICE_NAME: a-z, A-Z, 0-9, -, _, and space
-    'SERVICE_NAME': 'JVB-Production',
-    'SECRET_TOKEN': 'health',
-    'SERVER_URL': 'http://13.232.104.156:8200',
-    'DEBUG': True,
+	# allowed characters in SERVICE_NAME: a-z, A-Z, 0-9, -, _, and space
+	'SERVICE_NAME': 'JVB-Production',
+	'SECRET_TOKEN': 'health',
+	'SERVER_URL': 'http://13.232.104.156:8200',
+	'DEBUG': True,
 }

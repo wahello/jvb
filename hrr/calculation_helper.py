@@ -132,12 +132,12 @@ def add_activity_type(workout_dict,workout_type):
 					workout_dict[key][k_str] = {}
 				workout_dict[key][k_str]['value'] = value["distance_meters"]
 				workout_dict[key][k_str]['unit'] = "meters"
-			else:
-				k_str = k.lower()+"_distance"
-				if not value.get(k_str):
-					workout_dict[key][k_str] = {}
-				workout_dict[key][k_str]['value'] = 0
-				workout_dict[key][k_str]['unit'] = "meters"
+			# else:
+			# 	k_str = k.lower()+"_distance"
+			# 	if not value.get(k_str):
+			# 		workout_dict[key][k_str] = {}
+			# 	workout_dict[key][k_str]['value'] = 0
+			# 	workout_dict[key][k_str]['unit'] = "meters"
 	return workout_dict
 
 def change_hrr_key(workout_dict_percent):
