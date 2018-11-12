@@ -1504,7 +1504,7 @@ infoPrint(infoPrintText){
 
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
-        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","humidity","temperature_feels_like","temperature","dewPoint","wind","weather_condition","comments"];
+        "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","indoor_temperature","temperature","dewPoint","humidity","wind","temperature_feels_like","weather_condition","comments"];
         /*const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];*/
     let activityRows = [];
     for (let [key,value] of Object.entries(this.state.activites)){
@@ -1703,7 +1703,7 @@ renderTable(){
            
             else if(key === "humidity") {
                 let humidity = this.state.activites[summaryId][key];
-                humidity || humidity == null || humidity == undefined ?humidity:'Not Measured'; 
+                humidity = humidity || humidity !== null || humidity !== undefined ?humidity:' - '; 
                 activityData.push(<td name = {summaryId}  id = "add_button">
                     {humidity}
                     </td>
@@ -1711,7 +1711,7 @@ renderTable(){
             }
             else if(key === "temperature_feels_like") {
                 let temperature_feels_like = this.state.activites[summaryId][key];
-                temperature_feels_like || temperature_feels_like == null || temperature_feels_like == undefined ?temperature_feels_like:'Not Measured'; 
+                temperature_feels_like = temperature_feels_like || temperature_feels_like !== null || temperature_feels_like !== undefined ?temperature_feels_like:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {temperature_feels_like}
                     </td>
@@ -1719,7 +1719,7 @@ renderTable(){
             }
             else if(key === "temperature") {
                 let temperature = this.state.activites[summaryId][key];
-                temperature || temperature == null || temperature == undefined ?temperature:'Not Measured'; 
+                temperature = temperature || temperature !== null || temperature == !undefined ?temperature:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {temperature}
                     </td>
@@ -1727,7 +1727,7 @@ renderTable(){
             }
             else if(key === "weather_condition") {
                 let weather_condition = this.state.activites[summaryId][key];
-                weather_condition || weather_condition == null || weather_condition == undefined ?weather_condition:'Not Measured'; 
+                weather_condition = weather_condition || weather_condition !== null || weather_condition !== undefined ?weather_condition:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {weather_condition}
                     </td>
@@ -1735,7 +1735,7 @@ renderTable(){
             }
             else if(key === "dewPoint") {
                 let dewPoint = this.state.activites[summaryId][key];
-                dewPoint || dewPoint == null || dewPoint == undefined ?dewPoint:'Not Measured'; 
+                dewPoint = dewPoint || dewPoint !== null || dewPoint !== undefined ?dewPoint:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {dewPoint}
                     </td>
@@ -1743,7 +1743,7 @@ renderTable(){
             }
             else if(key === "wind") {
                 let wind = this.state.activites[summaryId][key];
-                wind || wind == null || wind == undefined ?wind:'Not Measured'; 
+                wind = wind || wind !== null || wind !== undefined ?wind:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {wind}
                     </td>
@@ -2061,6 +2061,118 @@ renderEditActivityModal(){
                               </Label>
                         </div>
                        </FormGroup>
+                       {/*
+                        *********************WEATHER REPORT **********************
+                       */}
+                       <FormGroup>
+                       <Label className="padding1">9. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                       <FormGroup>
+                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
+                        <div className="input">                           
+                              <Label className="btn radio1">
+                                <Input type="radio" 
+                                name="modal_duplicate_info_status" 
+                                value={true}
+                                checked={this.state.modal_duplicate_info_status === true}
+                                onChange={this.handleChange}/> Duplicate
+                              </Label>
+                              <Label className="btn radio1">
+                                <Input type="radio" name="modal_duplicate_info_status" 
+                                value={false}
+                                checked={this.state.modal_duplicate_info_status === false}
+                                onChange={this.handleChange}/> Not Duplicate
+                              </Label>
+                        </div>
+                       </FormGroup>
+                        {/*********************/}
                        <FormGroup>
                       <Label className="padding1">9. Exercise Comments</Label>
                        <div className="input1 ">
@@ -2147,17 +2259,19 @@ return(
         </a>
     </span>
 </td>
-<td id = "add_button" className="add_button_back" >Humidity <br />(%)
-</td>
-<td id = "add_button" className="add_button_back" >Temperature <br />Feels Like <br />(celsius)
+<td id = "add_button" className="add_button_back" >Indoor<br /> Temperature
 </td>
 <td id = "add_button" className="add_button_back" >Temperature <br />(celsius)
 </td>
-<td id = "add_button" className="add_button_back">Dew Point <br />(celsius)
+<td id = "add_button" className="add_button_back" >Dew Point <br />(celsius)
+</td>
+<td id = "add_button" className="add_button_back" >Humidity <br />(%)
 </td>
 <td id = "add_button" className="add_button_back">Wind <br />(meter/second)
 </td>
-<td id = "add_button" className="add_button_back">Weather <br />Condition
+<td id = "add_button" className="add_button_back">Temperature Feels like <br />(celsius)
+</td>
+<td id = "add_button" className="add_button_back">Weather <br />Conditions
 </td>
 <td id = "add_button" className="add_button_back">Comment</td>
  
