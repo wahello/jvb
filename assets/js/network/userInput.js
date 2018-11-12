@@ -423,3 +423,25 @@ export function fetchGarminHrrData(start_date, successCallback=undefined, errorC
 	});
 }
 
+export function userDailyInputWeatherReportFetch(date, successCallback=undefined, errorCallback=undefined,clone){
+	const URL = 'weather/activity_weather_report/';
+	
+    const created_at = moment(date).format('YYYY-MM-DD');
+	const config = {
+		url : URL,
+		params:{
+   			start_date:created_at
+  		},
+		method: 'get',
+		withCredentials: true
+	};
+	axios(config).then(function(response){
+		if(successCallback != undefined){
+			successCallback(response,clone);
+		}
+	}).catch((error) => {
+		if(errorCallback != undefined){
+			errorCallback(error);
+		}
+	});
+}

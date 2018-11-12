@@ -1599,6 +1599,54 @@ renderTable(){
                     }
                 </td>);
             }
+            else if(key === "humidity") {
+                let humidity = this.state.activites[summaryId][key];
+                humidity || humidity == null || humidity == undefined ?humidity:'Not Measured'; 
+                activityData.push(<td name = {summaryId}  id = "add_button">
+                    {humidity}
+                    </td>
+               );
+            }
+            else if(key === "temperature_feels_like") {
+                let temperature_feels_like = this.state.activites[summaryId][key];
+                temperature_feels_like || temperature_feels_like == null || temperature_feels_like == undefined ?temperature_feels_like:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    temperature_feels_like}
+                    </td>
+               );
+            }
+            else if(key === "temperature") {
+                let temperature = this.state.activites[summaryId][key];
+                temperature || temperature == null || temperature == undefined ?temperature:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {temperature}
+                    </td>
+               );
+            }
+            else if(key === "weather_condition") {
+                let weather_condition = this.state.activites[summaryId][key];
+                weather_condition || weather_condition == null || weather_condition == undefined ?weather_condition:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {weather_condition}
+                    </td>
+               );
+            }
+            else if(key === "dewPoint") {
+                let dewPoint = this.state.activites[summaryId][key];
+                dewPoint || dewPoint == null || dewPoint == undefined ?dewPoint:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {dewPoint}
+                    </td>
+               );
+            }
+            else if(key === "wind") {
+                let wind = this.state.activites[summaryId][key];
+                wind || wind == null || wind == undefined ?wind:'Not Measured'; 
+                activityData.push(<td  name = {summaryId}  id = "add_button">
+                    {wind}
+                    </td>
+               );
+            }
             /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
             else if(key === "comments"){
                 let  comments=keyValue;
@@ -1998,6 +2046,18 @@ return(
               />
         </a>
     </span>
+</td>
+<td id = "add_button" className="add_button_back" >Humidity <br />(%)
+</td>
+<td id = "add_button" className="add_button_back" >Temperature <br />Feels Like <br />(celsius)
+</td>
+<td id = "add_button" className="add_button_back" >Temperature <br />(celsius)
+</td>
+<td id = "add_button" className="add_button_back">Dew Point <br />(celsius)
+</td>
+<td id = "add_button" className="add_button_back">Wind <br />(meter/second)
+</td>
+<td id = "add_button" className="add_button_back">Weather <br />Condition
 </td>
 <td id = "add_button" className="add_button_back">Comment</td>
  
