@@ -1114,7 +1114,8 @@ CreateNewActivity(data){
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
         "steps":steps,
-        "steps_type":this.state.modal_exercise_steps_status,
+        "steps_type":this.state.modal_exercise_steps_status?
+            this.state.modal_exercise_steps_status:'exercise',
         "duplicate":this.state.modal_duplicate_info_status,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
