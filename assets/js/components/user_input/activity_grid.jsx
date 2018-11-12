@@ -155,6 +155,13 @@ this.state ={
     modal_exercise_steps:"",
     modal_exercise_steps_status:"exercise",
     modal_duplicate_info_status:false,
+    modal_indoor_temperature:"",
+    modal_temperature:"",
+    modal_dew_point:"",
+    modal_humidity:"",
+    modal_wind:"",
+    modal_temperature_feels_like:"",
+    modal_weather_conditions:"",
     modal_activity_comment:"",
     activity_display_name:"",
     editToggle_heartrate:false,
@@ -392,32 +399,65 @@ errorActivity(error){
 }
 toggleModal(){
     this.setState({
-      modal_activity_type:"",
-      modal_activity_heart_rate:"",
-      modal_activity_hour:"",
-      modal_activity_min:"",
-      modal_exercise_steps:"",
-      modal_exercise_steps_status:"exercise",
-      modal_duplicate_info_status:false,
-      modal_activity_comment:"",
-      selectedActivityId:"",
-      activitystarttime_calender:"",
-      modalstarttime_activity_hour:"",
-      modalstarttime_activity_min:"",
-      modalstarttime_activity_ampm:"",
-      activityendtime_calender:"",
-      modalendtime_activity_hour:"",
-      modalendtime_activity_min:"",
-      modalendtime_activity_ampm:"",
-      activityEditModal:!this.state.activityEditModal
+        modal_activity_type:"",
+        modal_activity_heart_rate:"",
+        modal_activity_hour:"",
+        modal_activity_min:"",
+        modal_exercise_steps:"",
+        modal_exercise_steps_status:"exercise",
+        modal_duplicate_info_status:false,
+        modal_indoor_temperature:"",
+        modal_temperature:"",
+        modal_dew_point:"",
+        modal_humidity:"",
+        modal_wind:"",
+        modal_temperature_feels_like:"",
+        modal_weather_conditions:"",
+        modal_activity_comment:"",
+        selectedActivityId:"",
+        activitystarttime_calender:"",
+        modalstarttime_activity_hour:"",
+        modalstarttime_activity_min:"",
+        modalstarttime_activity_ampm:"",
+        activityendtime_calender:"",
+        modalendtime_activity_hour:"",
+        modalendtime_activity_min:"",
+        modalendtime_activity_ampm:"",
+        activity_start_date:"",
+        activity_start_hour:'',
+        activity_start_min:'',
+        activity_start_sec:'',
+        activity_start_am_pm:'',
+
+        activity_end_date:"",
+        activity_end_hour:'',
+        activity_end_min:'',
+        activity_end_sec:'',
+        activity_end_am_pm:'',
+        activityEditModal:!this.state.activityEditModal
     });
   }
 
 handleChangeModal(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
-    this.editToggleHandlerStartTime(selectedActivityId)
-    this.editToggleHandlerEndTime(selectedActivityId)
+
+    let categoryEditMode = this.state.activities_edit_mode[selectedActivityId];
+    
+    let activity_start_date = null;
+    let activity_start_hour = "";
+    let activity_start_min = "";
+    let activity_start_sec = "";
+    let activity_start_am_pm = "";
+
+    let activity_end_date = null;
+    let activity_end_hour = "";
+    let activity_end_min = "";
+    let activity_end_sec = "";
+    let activity_end_am_pm = "";
+
+    /*this.editToggleHandlerStartTime(selectedActivityId)
+    this.editToggleHandlerEndTime(selectedActivityId)*/
     let date = moment(this.state.selected_date);
     let activityDisplayName = "";
     let current_activity = "";
@@ -426,6 +466,23 @@ handleChangeModal(event){
     let secs = "";
 
     if(selectedActivityId){
+
+        let start_time = this.state.activity_start_end_time[selectedActivityId]['start_time'];
+        let start_time_info = this._extractDateTimeInfo(start_time);
+        activity_start_date = start_time_info.calendarDate;
+        activity_start_hour = start_time_info.hour;
+        activity_start_min = start_time_info.min;
+        activity_start_sec = start_time_info.sec;
+        activity_start_am_pm = start_time_info.meridiem;
+
+        let end_time = this.state.activity_start_end_time[selectedActivityId]['end_time'];
+        let end_time_info = this._extractDateTimeInfo(end_time);
+        activity_end_date = end_time_info.calendarDate;
+        activity_end_hour = end_time_info.hour;
+        activity_end_min = end_time_info.min;
+        activity_end_sec = end_time_info.sec;
+        activity_end_am_pm = end_time_info.meridiem;
+        
         current_activity = this.state.activites[selectedActivityId];
         let activityDuration = current_activity?current_activity.durationInSeconds:"";
         const possible_activities = Object.keys(activites);
@@ -448,21 +505,46 @@ handleChangeModal(event){
             secs = parseInt(activityDuration-(hour * 3600) - (mins * 60));
             secs = ((secs) && (secs < 10)) ? "0" + secs : secs;
         }
+        else{
+            hour = "0";
+            mins = "00";
+            secs = "00";
+        }
     }
     this.setState({
-    activity_display_name:activityDisplayName,
-    modal_activity_type:current_activity?current_activity.activityType:"",
-    modal_activity_heart_rate:current_activity?current_activity.averageHeartRateInBeatsPerMinute:"",
-    modal_activity_hour:hour,
-    modal_activity_min:mins,
-    modal_activity_sec:secs,
-    modal_exercise_steps:current_activity?current_activity.steps:"",
-    modal_exercise_steps_status:current_activity?current_activity.steps_type:"exercise",
-    modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
-    modal_activity_comment:current_activity?current_activity.comments:"",
-    selectedActivityId:selectedActivityId,
-    activityEditModal:true,
-    activity_start_date:date
+        activity_display_name:activityDisplayName,
+        modal_activity_type:current_activity?current_activity.activityType:"",
+        modal_activity_heart_rate:current_activity?current_activity.averageHeartRateInBeatsPerMinute:"",
+        modal_activity_hour:hour,
+        modal_activity_min:mins,
+        modal_activity_sec:secs,
+        modal_exercise_steps:current_activity?current_activity.steps:"",
+        modal_exercise_steps_status:current_activity?current_activity.steps_type:"exercise",
+        modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
+        modal_indoor_temperature:current_activity?(current_activity.indoor_temperature?current_activity.indoor_temperature:""):"",
+        modal_temperature:current_activity?(current_activity.temperature?current_activity.temperature:""):"",
+        modal_dew_point:current_activity?(current_activity.dewPoint?current_activity.dewPoint:""):"",
+        modal_humidity:current_activity?(current_activity.humidity?current_activity.humidity:""):"",
+        modal_wind:current_activity?(current_activity.wind?current_activity.wind:""):"",
+        modal_temperature_feels_like:current_activity?(current_activity.temperature_feels_like?current_activity.temperature_feels_like:""):"",
+        modal_weather_conditions:current_activity?(current_activity.weather_condition?current_activity.weather_condition:""):"",
+        modal_activity_comment:current_activity?current_activity.comments:"",
+        selectedActivityId:selectedActivityId,
+        activityEditModal:true,
+        activity_start_date:date,
+
+        activity_start_date:activity_start_date,
+        activity_start_hour:activity_start_hour,
+        activity_start_min:activity_start_min,
+        activity_start_sec:activity_start_sec,
+        activity_start_am_pm:activity_start_am_pm,
+
+        activity_end_date:activity_end_date,
+        activity_end_hour:activity_end_hour,
+        activity_end_min:activity_end_min,
+        activity_end_sec:activity_end_sec,
+        activity_end_am_pm:activity_end_am_pm,
+
     });
 }
 
@@ -540,10 +622,10 @@ editToggleHandlerStartTime(selectedActivityId,event){
             [selectedActivityId]:categoryEditMode
         },
         activity_start_end_date:activity_start_end_date,
-        activity_start_end_hour:activity_start_end_hour,
-        activity_start_end_min:activity_start_end_min,
-        activity_start_end_sec:activity_start_end_sec,
-        activity_start_end_am_pm:activity_start_end_am_pm,
+        activity_start_hour:activity_start_end_hour,
+        activity_start_min:activity_start_end_min,
+        activity_start_sec:activity_start_end_sec,
+        activity_start_am_pm:activity_start_end_am_pm,
     },()=>{
         this.props.updateParentActivities(this.state.activites);
     });
@@ -574,10 +656,10 @@ editToggleHandlerEndTime(selectedActivityId,event){
             [selectedActivityId]:categoryEditMode
         },
         activity_start_end_date:activity_start_end_date,
-        activity_start_end_hour:activity_start_end_hour,
-        activity_start_end_min:activity_start_end_min,
-        activity_start_end_sec:activity_start_end_sec,
-        activity_start_end_am_pm:activity_start_end_am_pm,
+        activity_end_hour:activity_start_end_hour,
+        activity_end_min:activity_start_end_min,
+        activity_end_sec:activity_start_end_sec,
+        activity_end_am_pm:activity_start_end_am_pm,
     },()=>{
         this.props.updateParentActivities(this.state.activites);
     });
@@ -1172,6 +1254,13 @@ CreateNewActivity(data){
         "steps":steps,
         "steps_type":this.state.modal_exercise_steps_status,
         "duplicate":this.state.modal_duplicate_info_status,
+        "indoor_temperature":this.state.modal_indoor_temperature,
+        "temperature":this.state.modal_temperature,
+        "dewPoint":this.state.modal_dew_point,
+        "humidity":this.state.modal_humidity,
+        "wind":this.state.modal_wind,
+        "temperature_feels_like":this.state.modal_temperature_feels_like,
+        "weather_condition":this.state.modal_weather_conditions,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
         "startTimeOffsetInSeconds":tzOffsetFromUTCInSeconds,
@@ -1206,6 +1295,13 @@ CreateNewActivity(data){
         modal_exercise_steps_status:"exercise",
         modal_duplicate_info_status:false,
         modal_activity_comment:"",
+        modal_indoor_temperature:"",
+        modal_temperature:"",
+        modal_dew_point:"",
+        modal_humidity:"",
+        modal_wind:"",
+        modal_temperature_feels_like:"",
+        modal_weather_conditions:"",
         activity_start_date:"",
         activity_start_hour:"",
         activity_start_min:"",
@@ -1585,7 +1681,7 @@ renderTable(){
             else if(key === "averageHeartRateInBeatsPerMinute"){
                 let averageHeartRateInBeatsPerMinute=keyValue;
                 let hr = this.state.activites[summaryId][key];
-                hr = hr || hr == null || hr == undefined ?hr:'Not Measured'; 
+                hr = hr && hr !== null && hr !== undefined ?hr:'Not Measured'; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {hr}
                 </td>);
@@ -1700,10 +1796,17 @@ renderTable(){
                         </Input>*/
             }
             //const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];
-           
+           else if(key === "indoor_temperature") {
+                let indoor_temperature = this.state.activites[summaryId][key];
+                indoor_temperature = indoor_temperature && indoor_temperature !== null && indoor_temperature !== undefined ?indoor_temperature:' - '; 
+                activityData.push(<td name = {summaryId}  id = "add_button">
+                    {indoor_temperature}
+                    </td>
+               );
+            }
             else if(key === "humidity") {
                 let humidity = this.state.activites[summaryId][key];
-                humidity = humidity || humidity !== null || humidity !== undefined ?humidity:' - '; 
+                humidity = humidity && humidity !== null && humidity !== undefined ?humidity:' - '; 
                 activityData.push(<td name = {summaryId}  id = "add_button">
                     {humidity}
                     </td>
@@ -1711,7 +1814,7 @@ renderTable(){
             }
             else if(key === "temperature_feels_like") {
                 let temperature_feels_like = this.state.activites[summaryId][key];
-                temperature_feels_like = temperature_feels_like || temperature_feels_like !== null || temperature_feels_like !== undefined ?temperature_feels_like:' - '; 
+                temperature_feels_like = temperature_feels_like && temperature_feels_like !== null && temperature_feels_like !== undefined ?temperature_feels_like:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {temperature_feels_like}
                     </td>
@@ -1719,7 +1822,7 @@ renderTable(){
             }
             else if(key === "temperature") {
                 let temperature = this.state.activites[summaryId][key];
-                temperature = temperature || temperature !== null || temperature == !undefined ?temperature:' - '; 
+                temperature = temperature && temperature !== null && temperature !== undefined ?temperature:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {temperature}
                     </td>
@@ -1727,7 +1830,7 @@ renderTable(){
             }
             else if(key === "weather_condition") {
                 let weather_condition = this.state.activites[summaryId][key];
-                weather_condition = weather_condition || weather_condition !== null || weather_condition !== undefined ?weather_condition:' - '; 
+                weather_condition = weather_condition && weather_condition !== null && weather_condition !== undefined ?weather_condition:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {weather_condition}
                     </td>
@@ -1735,7 +1838,7 @@ renderTable(){
             }
             else if(key === "dewPoint") {
                 let dewPoint = this.state.activites[summaryId][key];
-                dewPoint = dewPoint || dewPoint !== null || dewPoint !== undefined ?dewPoint:' - '; 
+                dewPoint = dewPoint && dewPoint !== null && dewPoint !== undefined ?dewPoint:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {dewPoint}
                     </td>
@@ -1743,7 +1846,7 @@ renderTable(){
             }
             else if(key === "wind") {
                 let wind = this.state.activites[summaryId][key];
-                wind = wind || wind !== null || wind !== undefined ?wind:' - '; 
+                wind = wind && wind !== null && wind !== undefined ?wind:' - '; 
                 activityData.push(<td  name = {summaryId}  id = "add_button">
                     {wind}
                     </td>
@@ -2065,111 +2168,70 @@ renderEditActivityModal(){
                         *********************WEATHER REPORT **********************
                        */}
                        <FormGroup>
-                       <Label className="padding1">9. Change Duplicate value to Not Duplicate</Label>
-                        <div className="input">                           
-                              <Label className="btn radio1">
-                                <Input type="radio" 
-                                name="modal_duplicate_info_status" 
-                                value={true}
-                                checked={this.state.modal_duplicate_info_status === true}
-                                onChange={this.handleChange}/> Duplicate
-                              </Label>
-                              <Label className="btn radio1">
-                                <Input type="radio" name="modal_duplicate_info_status" 
-                                value={false}
-                                checked={this.state.modal_duplicate_info_status === false}
-                                onChange={this.handleChange}/> Not Duplicate
-                              </Label>
+                       <Label className="padding1">9. Change Indoor Temperature</Label>
+                        <div className="input">
+                            <Input 
+                                type="text" 
+                                className="form-control"
+                                name="modal_indoor_temperature"
+                                style={{height:"37px",width:"80%"}}
+                                value={this.state.modal_indoor_temperature}                               
+                                onChange={this.handleChange}>
+                        </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
-                        <div className="input">                           
-                              <Label className="btn radio1">
-                                <Input type="radio" 
-                                name="modal_duplicate_info_status" 
-                                value={true}
-                                checked={this.state.modal_duplicate_info_status === true}
-                                onChange={this.handleChange}/> Duplicate
-                              </Label>
-                              <Label className="btn radio1">
-                                <Input type="radio" name="modal_duplicate_info_status" 
-                                value={false}
-                                checked={this.state.modal_duplicate_info_status === false}
-                                onChange={this.handleChange}/> Not Duplicate
-                              </Label>
+                       <Label className="padding1">10. Change Temperature</Label>
+                        <div className="input">
+                            <Input type="text" 
+                                name="modal_temperature" 
+                                value={this.state.modal_temperature}
+                                onChange={this.handleChange}/>
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
-                        <div className="input">                           
-                              <Label className="btn radio1">
-                                <Input type="radio" 
-                                name="modal_duplicate_info_status" 
-                                value={true}
-                                checked={this.state.modal_duplicate_info_status === true}
-                                onChange={this.handleChange}/> Duplicate
-                              </Label>
-                              <Label className="btn radio1">
-                                <Input type="radio" name="modal_duplicate_info_status" 
-                                value={false}
-                                checked={this.state.modal_duplicate_info_status === false}
-                                onChange={this.handleChange}/> Not Duplicate
-                              </Label>
+                       <Label className="padding1">11. Change Dew Point</Label>
+                        <div className="input">
+                            <Input type="text" 
+                                name="modal_dew_point" 
+                                value={this.state.modal_dew_point}
+                                onChange={this.handleChange}/> 
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
-                        <div className="input">                           
-                              <Label className="btn radio1">
-                                <Input type="radio" 
-                                name="modal_duplicate_info_status" 
-                                value={true}
-                                checked={this.state.modal_duplicate_info_status === true}
-                                onChange={this.handleChange}/> Duplicate
-                              </Label>
-                              <Label className="btn radio1">
-                                <Input type="radio" name="modal_duplicate_info_status" 
-                                value={false}
-                                checked={this.state.modal_duplicate_info_status === false}
-                                onChange={this.handleChange}/> Not Duplicate
-                              </Label>
+                       <Label className="padding1">12. Change Humidity</Label>
+                        <div className="input">
+                            <Input type="text" 
+                                name="modal_humidity" 
+                                value={this.state.modal_humidity}
+                                onChange={this.handleChange}/>
+                        </div>
+                        </FormGroup>
+                        <FormGroup>
+                        <Label className="padding1">13. Change wind</Label>
+                        <div className="input">
+                            <Input type="text" 
+                                name="modal_wind" 
+                                value={this.state.modal_wind}
+                                checked={this.handleChange}/> 
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
-                        <div className="input">                           
-                              <Label className="btn radio1">
-                                <Input type="radio" 
-                                name="modal_duplicate_info_status" 
-                                value={true}
-                                checked={this.state.modal_duplicate_info_status === true}
-                                onChange={this.handleChange}/> Duplicate
-                              </Label>
-                              <Label className="btn radio1">
-                                <Input type="radio" name="modal_duplicate_info_status" 
-                                value={false}
-                                checked={this.state.modal_duplicate_info_status === false}
-                                onChange={this.handleChange}/> Not Duplicate
-                              </Label>
+                       <Label className="padding1">14. Change Temperature Feels Like</Label>
+                        <div className="input">
+                            <Input type="text" 
+                                name="modal_temperature_feels_like" 
+                                value={this.state.modal_temperature_feels_like}
+                                onChange={this.handleChange}/> 
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1">8. Change Duplicate value to Not Duplicate</Label>
-                        <div className="input">                           
-                              <Label className="btn radio1">
-                                <Input type="radio" 
-                                name="modal_duplicate_info_status" 
-                                value={true}
-                                checked={this.state.modal_duplicate_info_status === true}
-                                onChange={this.handleChange}/> Duplicate
-                              </Label>
-                              <Label className="btn radio1">
-                                <Input type="radio" name="modal_duplicate_info_status" 
-                                value={false}
-                                checked={this.state.modal_duplicate_info_status === false}
-                                onChange={this.handleChange}/> Not Duplicate
-                              </Label>
+                       <Label className="padding1">15. Change Weather Conditions</Label>
+                        <div className="input">
+                            <Input type="text" 
+                                name="modal_weather_conditions" 
+                                value={this.state.modal_weather_conditions}
+                                onChange={this.handleChange}/> 
                         </div>
                        </FormGroup>
                         {/*********************/}
@@ -2267,7 +2329,7 @@ return(
 </td>
 <td id = "add_button" className="add_button_back" >Humidity <br />(%)
 </td>
-<td id = "add_button" className="add_button_back">Wind <br />(meter/second)
+<td id = "add_button" className="add_button_back">Wind <br />(miles/hour)
 </td>
 <td id = "add_button" className="add_button_back">Temperature Feels like <br />(celsius)
 </td>
