@@ -1423,6 +1423,7 @@ def daily_aa_data(user, start_date):
 	filtered_activities_only = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													user=user,calendar_date=start_date)
+	
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
 	garmin_activity_keys = []
 	for i,single_activity in enumerate(filtered_activities_only):
@@ -1451,6 +1452,7 @@ def daily_aa_data(user, start_date):
 			for single_activity_key in user_created_activity:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
+	
 	for i,single_activity in enumerate(filtered_activities_only):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
 		if avg_hr == '' or avg_hr == 0:
@@ -1497,7 +1499,6 @@ def daily_aa_data(user, start_date):
 					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
 						user_created_activity_list.append(k)
 						remove_in_workout.append(int(k["summaryId"]))
-
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1996,10 +1997,6 @@ def aa_low_high_end_data(user,start_date):
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
 
-	for i,single_activity in enumerate(filtered_activities_only):
-		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
-		if avg_hr == '' or avg_hr == 0:
-			user_created_activity_list.append(single_activity)
 	remove_in_workout = []
 	for i,single_actiivty in enumerate(garmin_list):
 		if (single_actiivty.get("manual",0) == True 
@@ -2042,6 +2039,13 @@ def aa_low_high_end_data(user,start_date):
 					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
 						user_created_activity_list.append(k)
 						remove_in_workout.append(int(k["summaryId"]))
+
+	for i,single_activity in enumerate(filtered_activities_only):
+		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
+		summaryid = int(single_activity.get('summaryId',0))
+		if avg_hr == '' or avg_hr == 0 and summaryid not in remove_in_workout:
+			user_created_activity_list.append(single_activity)
+
 	workout = []
 	hrr = []
 	start = start_date
