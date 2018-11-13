@@ -155,7 +155,7 @@ this.state ={
     modal_exercise_steps:"",
     modal_exercise_steps_status:"exercise",
     modal_duplicate_info_status:false,
-    modal_indoor_temperature:"",
+    modal_indoor_temperature:this.props.indoor_temperature,
     modal_temperature:"",
     modal_dew_point:"",
     modal_humidity:"",
@@ -197,7 +197,7 @@ this.state ={
 }
 }
 
-initializeActivity(activities,selected_date,isEditable,callback){
+initializeActivity(activities,selected_date,isEditable,indoor_temperature,callback){
     this.setState({
       selected_date:selected_date,
       activity_start_date:moment(selected_date),
@@ -205,12 +205,23 @@ initializeActivity(activities,selected_date,isEditable,callback){
       activities_edit_mode:this.createActivityEditModeState(activities),
       activites_hour_min:this.createActivityTime(activities),
       activity_start_end_time:this.createStartAndEndTime(activities),
-      activites:activities
+      activites:activities,
+      modal_indoor_temperature:indoor_temperature
     },()=>{
         if(!isEditable)
             callback();
     });
   }
+
+createDropdown(start_num , end_num, step=1){
+    let elements = [];
+    let i = start_num;
+    while(i<=end_num){
+      elements.push(<option key={i} value={i}>{i}</option>);
+      i=i+step;
+    }
+    return elements;
+}
 
 componentWillReceiveProps(nextProps) {
     if(nextProps.activities !== this.props.activities) {
@@ -218,6 +229,7 @@ componentWillReceiveProps(nextProps) {
             nextProps.activities,
             nextProps.selected_date,
             nextProps.editable,
+            nextProps.indoor_temperature,
             this.setActivitiesEditModeFalse
         );
     }
@@ -406,7 +418,7 @@ toggleModal(){
         modal_exercise_steps:"",
         modal_exercise_steps_status:"exercise",
         modal_duplicate_info_status:false,
-        modal_indoor_temperature:"",
+        modal_indoor_temperature:this.props.indoor_temperature,
         modal_temperature:"",
         modal_dew_point:"",
         modal_humidity:"",
@@ -521,7 +533,7 @@ handleChangeModal(event){
         modal_exercise_steps:current_activity?current_activity.steps:"",
         modal_exercise_steps_status:current_activity?current_activity.steps_type:"exercise",
         modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
-        modal_indoor_temperature:current_activity?(current_activity.indoor_temperature?current_activity.indoor_temperature:""):"",
+        modal_indoor_temperature:current_activity?(current_activity.indoor_temperature?current_activity.indoor_temperature:this.props.indoor_temperature):this.props.indoor_temperature,
         modal_temperature:current_activity?(current_activity.temperature?current_activity.temperature:""):"",
         modal_dew_point:current_activity?(current_activity.dewPoint?current_activity.dewPoint:""):"",
         modal_humidity:current_activity?(current_activity.humidity?current_activity.humidity:""):"",
@@ -1295,7 +1307,7 @@ CreateNewActivity(data){
         modal_exercise_steps_status:"exercise",
         modal_duplicate_info_status:false,
         modal_activity_comment:"",
-        modal_indoor_temperature:"",
+        modal_indoor_temperature:this.props.indoor_temperature,
         modal_temperature:"",
         modal_dew_point:"",
         modal_humidity:"",
@@ -2170,14 +2182,21 @@ renderEditActivityModal(){
                        <FormGroup>
                        <Label className="padding1">9. Change Indoor Temperature</Label>
                         <div className="input">
-                            <Input 
+                            {/*<Input 
                                 type="text" 
                                 className="form-control"
                                 name="modal_indoor_temperature"
                                 style={{height:"37px",width:"80%"}}
                                 value={this.state.modal_indoor_temperature}                               
                                 onChange={this.handleChange}>
-                        </Input>
+                            </Input>*/}
+                            <Input type="select" name="modal_indoor_temperature"
+                                className="form-control custom-select"
+                                value={this.state.modal_indoor_temperature}
+                                onChange={this.handleChange} >
+                                 <option key="hours" value="">Indoor</option>
+                                {this.createDropdown(-20,120)}                        
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
