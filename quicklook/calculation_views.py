@@ -57,5 +57,5 @@ class movementConsistencySummary(generics.ListAPIView):
 		qs = self.get_queryset()
 		for ql in qs:
 			movement_consistency.append(self._create_mc_object(ql))
-
+			movement_consistency.append({'non_exercise_steps':ql.non_exercise_steps})
 		return Response(movement_consistency, status=status.HTTP_200_OK)
