@@ -106,6 +106,7 @@ class UserHrrViewRawData(generics.ListCreateAPIView):
 		  and return the list
 	'''
 	permission_classes = (IsAuthenticated,)
+	serializer_class = HrrSerializer
 
 	def get_queryset(self):
 		user = self.request.user
