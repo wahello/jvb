@@ -223,6 +223,22 @@ createDropdown(start_num , end_num, step=1){
     return elements;
 }
 
+createWindDropdown(start_num , end_num, step=1){
+    let elements = [];
+    let i = start_num;
+    while(i<=end_num){
+      if(i < 1)
+        elements.push(
+          <option key={0} value={0}>CALM</option>
+          );
+      else
+        elements.push(
+          <option key={i} value={i}>{i}</option>);
+      i=i+step;
+    }
+    return elements;
+}
+
 componentWillReceiveProps(nextProps) {
     if(nextProps.activities !== this.props.activities) {
         this.initializeActivity(
@@ -1194,6 +1210,17 @@ handleChange(event){
         });
     }
 }
+
+valueToFixedDecimal(event){
+    const target = event.target;
+    const value = parseFloat(target.value);
+    const name = target.name;
+    this.setState({
+        [name]:(value.toFixed(2))
+    })
+}
+
+
     createSleepDropdown(start_num , end_num, mins=false, step=1){
     let elements = [];
     let i = start_num;
@@ -2205,7 +2232,16 @@ renderEditActivityModal(){
                             <Input type="text" 
                                 name="modal_temperature" 
                                 value={this.state.modal_temperature}
-                                onChange={this.handleChange}/>
+                                onChange={this.handleChange}
+                                onBlur={this.valueToFixedDecimal.bind(this)}/>
+                            {/*<Input type="select" 
+                                className="custom-select form-control"
+                                name="modal_temperature"                                  
+                                value={this.state.modal_temperature}
+                                onChange={this.handleChange} >
+                                <option key="select" value="">Select</option>                                    
+                                {this.createDropdown(-20,120)}
+                            </Input>*/}
                         </div>
                        </FormGroup>
                        <FormGroup>
@@ -2214,16 +2250,33 @@ renderEditActivityModal(){
                             <Input type="text" 
                                 name="modal_dew_point" 
                                 value={this.state.modal_dew_point}
-                                onChange={this.handleChange}/> 
+                                onChange={this.handleChange}
+                                onBlur={this.valueToFixedDecimal.bind(this)} />
+                            {/*<Input type="select" 
+                                className="custom-select form-control"
+                                name="modal_dew_point"                                  
+                                value={this.state.modal_dew_point}
+                                onChange={this.handleChange} >
+                                <option key="select" value="">Select</option>                                    
+                                {this.createDropdown(-20,120,true)}
+                            </Input>*/}
                         </div>
                        </FormGroup>
                        <FormGroup>
                        <Label className="padding1">12. Change Humidity</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_humidity" 
                                 value={this.state.modal_humidity}
-                                onChange={this.handleChange}/>
+                                onChange={this.handleChange}/>*/}
+                            <Input type="select" 
+                                className="custom-select form-control"
+                                name="modal_humidity"                                  
+                                value={this.state.modal_humidity}
+                                onChange={this.handleChange} >
+                                <option key="select" value="">Select</option>                                    
+                                {this.createDropdown(1,100)}
+                            </Input>
                         </div>
                         </FormGroup>
                         <FormGroup>
@@ -2232,7 +2285,16 @@ renderEditActivityModal(){
                             <Input type="text" 
                                 name="modal_wind" 
                                 value={this.state.modal_wind}
-                                checked={this.handleChange}/> 
+                                onChange={this.handleChange}
+                                onBlur={this.valueToFixedDecimal.bind(this)} /> 
+                                {/*<Input type="select" 
+                                    className="custom-select form-control"
+                                    name="modal_wind"                                  
+                                    value={this.state.modal_wind}
+                                    onChange={this.handleChange} >
+                                    <option key="select" value="">Select</option>                                    
+                                    {this.createWindDropdown(0,350)}
+                                </Input>*/}
                         </div>
                        </FormGroup>
                        <FormGroup>
@@ -2241,7 +2303,16 @@ renderEditActivityModal(){
                             <Input type="text" 
                                 name="modal_temperature_feels_like" 
                                 value={this.state.modal_temperature_feels_like}
-                                onChange={this.handleChange}/> 
+                                onChange={this.handleChange}
+                                onBlur={this.valueToFixedDecimal.bind(this)} /> 
+                            {/*<Input type="select" 
+                                className="custom-select form-control"
+                                name="modal_temperature_feels_like"
+                                value={this.state.modal_temperature_feels_like}
+                                onChange={this.handleChange} >
+                                <option key="select" value="">Select</option>                                    
+                                {this.createDropdown(-20,120)}
+                            </Input>*/}
                         </div>
                        </FormGroup>
                        <FormGroup>
