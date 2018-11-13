@@ -1435,14 +1435,14 @@ handleScroll() {
           this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);     
         }
         else{
-              if((start_time_am_pm == "am" && end_time_am_pm == "am")||(start_time_am_pm == "pm" && end_time_am_pm == "pm")){
+              if((start_time_am_pm == "am" && end_time_am_pm == "am" || start_time_am_pm == "pm" && end_time_am_pm == "pm") && start_time_hours){
                 if(end_time_hours > start_time_hours){
                   //nothing
                 }
-                else if(end_time_hours < start_time_hours){
+                else if((end_time_hours < start_time_hours) && (start_time_hours !== 12)){
                   this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
                 }
-                else{
+                else if(end_time_hours == start_time_hours){
                   if(end_time_mins > start_time_mins){
                     //nothing
                   }
