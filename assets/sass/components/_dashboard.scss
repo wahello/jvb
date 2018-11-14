@@ -84,7 +84,7 @@
  	}
 }
 
-/*Weekly workout table*/
+/*Weekly workout table and Active table*/
 @media (min-width: 375px) and (max-width: 736px){
 	.weeklyWorkoutTable {	
 		font-size:66% !important;
@@ -171,3 +171,31 @@
 .weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr:nth-child(2) td:nth-child(2){
 	background-color: #A9A9A9 !important;
 }
+//new styels for Active table
+.new_style{
+	font-size:12px;
+}
+.new_style th{
+	min-width: 100px;
+}
+.new_style tbody td{
+	height:50px;
+}
+@media (max-width: 667px) and (orientation:landscape) {
+	.new_style1{
+		width:42.5%;
+		margin:auto;
+	}
+	.new_style td{
+		height:40px;
+	}
+}
+@media (min-width: 375px) and (orientation:portrait){
+	.new_style1{
+		width:76%;
+		margin:auto;
+	}
+	.new_style td{
+		height:40px;
+	}
+} 

@@ -40,6 +40,8 @@ import MCS_Dashboard from '../components/mcs_dashboard'
 import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
+import ActiveDashboard from '../components/Active_dashboard';
+
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -94,6 +96,7 @@ function initializeLocalState(){
 					<Route path='/mcs_dashboard' component={MCS_Dashboard}/>
 					<Route path='/overall_hrr_rank' component={OverallRank}/>
 					<Route path='/progressanalyzer_dashboard' component={ProgressDashboard}/>
+					<Route path='/active_dahsboard' component={ActiveDashboard}/>
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 
