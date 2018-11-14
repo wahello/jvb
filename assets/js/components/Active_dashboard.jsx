@@ -33,6 +33,7 @@ class ActiveDashboard extends Component{
 		this.processDate = this.processDate.bind(this);
 		this.successActiveData = this.successActiveData.bind(this);
 		this.errorActiveData = this.errorActiveData.bind(this);
+		this.renderTable = this.renderTable.bind(this);
 	}
 	successActiveData(data){
 		this.setState({
@@ -97,7 +98,7 @@ class ActiveDashboard extends Component{
 		fetchActiveData(this.successActiveData,this.errorActiveData,this.state.selectedDate);
 	}
 	renderTable(active_data){
-		if (!_.isEmpty(active_data)){
+		//if (!_.isEmpty(active_data)){
 			let td_keys = ["total_active_time", "sleeping_active_time", "excluded_sleep", "exercise_active_time", "excluded_sleep_exercise",
 				"total_hours", "total_sleeping_hours", "excluded_sleep_hours", 
 				"total_exercise_hours", "excluded_sleep_exercise_hours", 
@@ -110,17 +111,26 @@ class ActiveDashboard extends Component{
 			
 			td_values1.push(<td>Time Moving / Active (hh:mm)</td>);
 			for(let key=0;key<5;key++){
-				td_values1.push(<td>{active_data[td_keys[key]]}</td>);
+				if(active_data[td_keys[key]] != null && active_data[td_keys[key]] != undefined)
+					td_values1.push(<td>{active_data[td_keys[key]]}</td>);
+				else
+					td_values1.push(<td>{" - "}</td>);
 			}
 			
 			td_values2.push(<td>Time in Period (hh:mm)</td>);
 			for(let key=5;key<10;key++){
-				td_values2.push(<td>{active_data[td_keys[key]]}</td>);
+				if(active_data[td_keys[key]] != null && active_data[td_keys[key]] != undefined)
+					td_values2.push(<td>{active_data[td_keys[key]]}</td>);
+				else
+					td_values2.push(<td>{" - "}</td>);
 			}
 			
 			td_values3.push(<td>%Active</td>);
 			for(let key=10;key<15;key++){
-				td_values3.push(<td>{active_data[td_keys[key]]}</td>);
+				if(active_data[td_keys[key]] != null && active_data[td_keys[key]] != undefined)
+					td_values3.push(<td>{active_data[td_keys[key]]}</td>);
+				else
+					td_values3.push(<td>{" - "}</td>);
 			}
 
 			tr_values.push(<tr>{td_values1}</tr>);
@@ -128,7 +138,7 @@ class ActiveDashboard extends Component{
 			tr_values.push(<tr>{td_values3}</tr>);
 
 			return [tr_values];
-		}
+		//}
 	return [null];
 	}
 
