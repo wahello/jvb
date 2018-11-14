@@ -136,7 +136,14 @@ renderScoreHeader1(otherScoreObject){
               values.push(null);
             }
             else{
-              let value = value1[cat].value;
+              //let value = value1[cat].value;
+              let value;
+              if(c_name == "Active Minute Per Day (24 hours)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+                  value = this.props.MinToHours(value1[cat].value);
+              }
+              else{
+                value = value1[cat].value;
+              }
               if(value != undefined){
                 value += '';
                 var x = value.split('.');
@@ -175,6 +182,12 @@ renderScoreHeader1(otherScoreObject){
                           }
                         }
                         //if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
+                          /*if(c_name == "Active Minute Per Day (24 hours)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)")
+                          {
+                            values.push(<td className = "myranking_all">{this.props.MinToHours(value1[cat])}</td>);
+                          }else{
+                            values.push(<td className = "myranking_all">{value1[cat]}</td>);
+                          }*/
                           values[key3]["scores"].push(<td className = "myranking_all">{o_score.value}</td>);
                         
                       }

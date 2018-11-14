@@ -1071,7 +1071,7 @@ class ProgressDashboard extends Component{
 
 MinToHours(score){
   let time;// undefined
-      if(score != null && score != undefined && score != ""){
+      if(score != null && score != undefined && score != "" && score != "N/A"){
         if (score == -1){
           time = "Never"
         }
@@ -2667,6 +2667,7 @@ getGarminStressColors(stressValue){
 					}
 					{this.state.btnView && 
 			            <AllRank_Data1 data={this.state.active_category}
+                  MinToHours = {this.MinToHours}
 			            active_username = {this.state.active_username}
 			            active_category_name = {this.state.active_category_name}
 			            all_verbose_name = {this.state.all_verbose_name}/>
