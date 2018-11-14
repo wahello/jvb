@@ -228,10 +228,9 @@ class ActiveTimeDashboardView(APIView):
         user = self.request.user
         target_date = request.query_params.get('date',None)
         current_date = str_to_datetime(target_date)
-        moment_obj = None
         moment_obj = Steps.objects.filter(user_ql__user = user,user_ql__created_at = current_date).values(
             'movement_consistency')
-        if moment_obj[0].get('movement_consistency'):
+        if moment_obj and  moment_obj[0].get('movement_consistency'):
             moment_obj = ast.literal_eval(moment_obj[0].get('movement_consistency'))
             sleeping_active_minutes = 0
             exercise_active_minutes = 0
