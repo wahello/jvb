@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 from users import views as userViews
 from user_input import urls as userInputUrls
 from garmin import urls as garminUrls
+from common import urls as commonUrls
 from garmin import views as garmin_views
 from quicklook import urls as quicklookUrls
 from progress_analyzer import urls as progressUrls
@@ -51,6 +52,7 @@ urlpatterns = [
     url(r'^fitbit/fetching_data_fitbit$',fitbitViews.fetching_data_fitbit,name='fetching_data_fitbit'),
     
     url(r'^garmin/',include(garminUrls)),
+    url(r'^common/',include(commonUrls)),
     url(r'^quicklook/',include(quicklookUrls)),
     url(r'^progress/',include(progressUrls)),
     url(r'^leaderboard/', include(leaderboardUrls)),
