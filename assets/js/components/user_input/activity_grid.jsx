@@ -135,8 +135,6 @@ this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this)
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
 
-this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
-
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -1300,56 +1298,68 @@ getTotalActivityDuration(){
         return '';
 }
 
+ActivityTimeInvalidErrorPopup(){
+  toast.info("Workout start time should be less than activity end time",{
+    className:"dark"
+  })
+}
+
 handleChangeModelActivityStartTimeDate(date){
+    let oldValue = this.state.activitystarttime_calender;
     this.setState({
         activitystarttime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
-            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
                 this.state.modalstarttime_activity_hour,
                 this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_sec,
                 this.state.modalstarttime_activity_ampm,
                 this.state.activityendtime_calender,
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_sec,
-                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
-                'modalendtime_activity_hour', 'modalendtime_activity_min', 
-                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
-            if(duration){  
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    activitystarttime_calender:oldValue
+                })
             }
     });
 }
 
 handleChangeModelActivityEndTimeDate(date){
+    let oldValue = this.state.activityendtime_calender;
     this.setState({
         activityendtime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
-            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
                 this.state.modalstarttime_activity_hour,
                 this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_sec,
                 this.state.modalstarttime_activity_ampm,
                 this.state.activityendtime_calender,
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_sec,
-                this.state.modalendtime_activity_ampm,'activityendtime_calender', 
-                'modalendtime_activity_hour', 'modalendtime_activity_min', 
-                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
-            if(duration){  
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    activityendtime_calender:oldValue
+                })
             }
     });
 }
@@ -1357,28 +1367,31 @@ handleChangeModelActivityEndTimeDate(date){
 handleChangeModalActivityTime(event){
     const value = event.target.value;
     const name = event.target.name;
+    let oldValue = this.state[name];
     this.setState({
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
-            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
                 this.state.modalstarttime_activity_hour,
                 this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_sec,
                 this.state.modalstarttime_activity_ampm,
                 this.state.activityendtime_calender,
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_sec,
-                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
-                'modalendtime_activity_hour', 'modalendtime_activity_min', 
-                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
-            if(duration){  
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    [name]:oldValue
+                })
             }
     });
 }
@@ -1429,20 +1442,6 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
-
-   resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
-      this.setState({
-        [end_date_prop_name] : null,
-        [end_hours_prop_name] : '',
-        [end_mins_prop_name] : '',
-        [end_am_pm_prop_name] : '',
-        [end_secs_prop_name]:''
-      },()=>{
-              toast.info(" Time of your workout started should be less than time of your workout ended ",{
-              className:"dark"
-              })
-      });
-    }
 
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
