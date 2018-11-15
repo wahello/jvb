@@ -11,6 +11,9 @@ def determine_user_steps():
 	selected_users = ['jvbhealth','dileep','atul']
 	# selected_users = ['venky','norm','pavan','dileep']
 	RECEPIENT_USERS = User.objects.filter(username__in=selected_users)
+	notify_time = []
+	for times in range(7,23):
+		notify_time.append(time(times,30).strftime('%I:%M %p'))
 	for user in RECEPIENT_USERS:
 		user_firstname = user.first_name
 		user_email = user.email
@@ -40,7 +43,7 @@ def determine_user_steps():
 					and value['steps']<=300): 
 						activity_hour = time(noon_hour).strftime('%I:%M %p')
 						activity_steps = value['steps']
-			if activity_hour:
+			if activity_hour and (present_time in notify_time):
 				notify_user_movement_consistency_steps(user_email,user_firstname,activity_steps,\
 					activity_hour,present_time)	
 				
