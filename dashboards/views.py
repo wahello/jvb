@@ -1,5 +1,5 @@
 import json
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,time
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +11,10 @@ from garmin.models import UserLastSynced
 from hrr.models import Hrr
 from user_input.models import UserDailyInput
 from leaderboard.helpers.leaderboard_helper_classes import calculate_t99_points
+
+from quicklook.calculations.garmin_calculation import str_to_datetime
+from quicklook.models import Steps
+import ast
 
 def sec_to_min_sec(secs):
     if secs or secs is not None:
@@ -217,3 +221,82 @@ class GradesDashboardView(APIView):
                 grades_data["mcs_score"] = None
                 
         return Response(grades_data,status.HTTP_200_OK)
+
+class ActiveTimeDashboardView(APIView):
+
+    def get(self, request):
+        user = self.request.user
+        target_date = request.query_params.get('date',None)
+        current_date = str_to_datetime(target_date)
+        moment_obj = Steps.objects.filter(user_ql__user = user,user_ql__created_at = current_date).values(
+            'movement_consistency')
+        if moment_obj and  moment_obj[0].get('movement_consistency'):
+            moment_obj = ast.literal_eval(moment_obj[0].get('movement_consistency'))
+            sleeping_active_minutes = 0
+            exercise_active_minutes = 0
+            sleep_hours = 0
+            exercise_hours = 0
+            for key,value in moment_obj.items():
+                try:
+                    if value['status'] == 'sleeping':
+                        sleeping_active_minutes += value['active_duration']['duration']
+                        sleep_hours += 1
+                    elif value['status'] == 'exercise':
+                        exercise_active_minutes += value['active_duration']['duration']
+                        exercise_hours += 1
+                except TypeError as e:
+                    pass
+            sleep_hour_prcnt = round((sleeping_active_minutes / (sleep_hours*60)) * 100)
+            exercise_hour_prcnt = round((exercise_active_minutes / (exercise_hours*60)) * 100)
+            excluded_sleep = moment_obj['total_active_minutes'] - sleeping_active_minutes
+            excluded_sleep_exercise = excluded_sleep - exercise_active_minutes
+            sleeping_active_time = [sleeping_active_minutes//60,sleeping_active_minutes%60]
+            exercise_active_time = [exercise_active_minutes//60,exercise_active_minutes%60]
+            excluded_sleep_time = [excluded_sleep//60,excluded_sleep%60]
+            excluded_sleep_exercise_time = [excluded_sleep_exercise//60,excluded_sleep_exercise%60]
+            active_time = {}
+            total_hours = 24
+            excluded_sleep_hours = total_hours-sleep_hours
+            excluded_sleep_prcnt = round((excluded_sleep / (excluded_sleep_hours*60)) * 100)
+            excluded_sleep_exercise_hours = excluded_sleep_hours - exercise_hours
+            excluded_sleep_exercise_prcnt = round((excluded_sleep_exercise / (excluded_sleep_exercise_hours*60)) * 100)
+            active_time['total_active_time']=time(moment_obj['total_active_minutes']//60,\
+                moment_obj['total_active_minutes']%60).strftime('%I:%M')
+
+            active_time['total_hours'] = '{}:{}'.format(total_hours,'00')
+
+            active_time['sleeping_active_time'] = '{}:{}'.format(sleeping_active_time[0],\
+                "%02d" % sleeping_active_time[1])
+
+            active_time['total_sleeping_hours'] = '{}:{}'.format(sleep_hours,'00')
+
+            active_time['sleep_hour_prcnt'] = '{}%'.format(sleep_hour_prcnt)
+
+            active_time['exercise_active_time'] = '{}:{}'.format(exercise_active_time[0],\
+               "%02d" % exercise_active_time[1])
+
+            active_time['total_exercise_hours'] = '{}:{}'.format(exercise_hours,'00')
+
+            active_time['exercise_hour_prcnt'] = '{}%'.format(exercise_hour_prcnt)
+
+            active_time['excluded_sleep']= '{}:{}'.format(excluded_sleep_time[0],\
+               "%02d" % excluded_sleep_time[1])
+
+            active_time['excluded_sleep_hours'] = '{}:{}'.format(total_hours-sleep_hours,'00')
+
+            active_time['excluded_sleep_prcnt'] = '{}%'.format(excluded_sleep_prcnt)
+
+            active_time['excluded_sleep_exercise']= '{}:{}'.format(excluded_sleep_exercise_time[0],\
+               "%02d" % excluded_sleep_exercise_time[1])
+
+            active_time['excluded_sleep_exercise_hours'] = '{}:{}'.format(total_hours-sleep_hours-exercise_hours,'00')
+
+            active_time['excluded_sleep_exercise_prcnt'] = '{}%'.format(excluded_sleep_exercise_prcnt)
+
+            active_time['total_active_prcnt']='{}%'.format(moment_obj['total_active_prcnt'])
+            return Response(active_time,status.HTTP_200_OK)
+
+        else:
+            active_time = {}
+            return Response(active_time,status.HTTP_200_OK)
+
