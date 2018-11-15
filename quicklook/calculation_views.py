@@ -32,7 +32,8 @@ class movementConsistencySummary(generics.ListAPIView):
 		mc = ql.movement_consistency
 		obj = {
 			"created_at":ql.user_ql.created_at.strftime("%Y-%m-%d"),
-			"movement_consistency":ast.literal_eval(mc) if (mc != ''and mc != None) else {} 
+			"movement_consistency":ast.literal_eval(mc) if (mc != ''and mc != None) else {}, 
+			"non_exercise_steps":ql.non_exercise_steps
 		}
 		return obj
 
@@ -57,5 +58,5 @@ class movementConsistencySummary(generics.ListAPIView):
 		qs = self.get_queryset()
 		for ql in qs:
 			movement_consistency.append(self._create_mc_object(ql))
-			movement_consistency.append({'non_exercise_steps':ql.non_exercise_steps})
+			
 		return Response(movement_consistency, status=status.HTTP_200_OK)
