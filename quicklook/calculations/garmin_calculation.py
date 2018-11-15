@@ -1007,16 +1007,25 @@ def get_activity_stats(combined_user_activities,user_age):
 	if len(combined_user_activities):
 		avg_run_speed_mps = 0
 		total_duration = 0
+		workout_wise_total_duration = {}
 
 		for obj in combined_user_activities:
-			if(obj.get('activityType') not in IGNORE_ACTIVITY):
-				total_duration += obj.get('durationInSeconds',0)
+			activity_type = obj.get('activityType')
+			activity_duration = obj.get('durationInSeconds',0)
+			if(activity_type not in IGNORE_ACTIVITY):
+				total_duration += activity_duration
+			if not workout_wise_total_duration.get(activity_type):
+				workout_wise_total_duration[activity_type] = 0
+			workout_wise_total_duration[activity_type] += activity_duration
 		
 		for obj in combined_user_activities:
 
 			act_duration = obj.get('durationInSeconds',0)
 			obj_act = obj.get('activityType')
 			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
+			print(workout_wise_total_duration)
+			print(obj_act)
+			workout_type_total_duration = workout_wise_total_duration.get(obj_act)
 			if not obj_avg_hr:
 				obj_avg_hr = 0
 
@@ -1029,7 +1038,7 @@ def get_activity_stats(combined_user_activities,user_age):
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = 0
 			# weighted average
-			activities_hr[obj_act] += round((act_duration/total_duration)*obj_avg_hr)
+			activities_hr[obj_act] += round((act_duration/workout_type_total_duration)*obj_avg_hr)
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -1052,7 +1061,7 @@ def get_activity_stats(combined_user_activities,user_age):
 				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
 				act_avg_speed = obj.get("averageSpeedInMetersPerSecond",0)
 				# Weighted average
-				avg_run_speed_mps += ((act_duration/total_duration)*act_avg_speed)
+				avg_run_speed_mps += ((act_duration/workout_type_total_duration)*act_avg_speed)
 
 			elif 'swimming' in obj.get('activityType','').lower():
 				activity_stats['distance_swim_yards'] += obj.get('distanceInMeters',0)
