@@ -40,7 +40,11 @@ class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 				last_synced_obj = queryset.get(user=self.request.user)
 				if last_synced_obj:
 					serializer = UserFitbitLastSyncedSerializer(last_synced_obj)
-					return Response(serializer.data,status=status.HTTP_200_OK)
+					new_data = {}
+					new_data["last_synced"] = serializer.data["last_synced_fitbit"]
+					new_data.update(serializer.data)
+					new_data.pop("last_synced_fitbit")
+					return Response(new_data,status=status.HTTP_200_OK)
 				else:
 					return Response({})
 			except UserFitbitLastSynced.DoesNotExist as e:
