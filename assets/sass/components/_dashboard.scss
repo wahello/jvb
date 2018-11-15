@@ -185,10 +185,21 @@
 	.new_style1{
 		width:42.5%;
 		margin:auto;
-	}
+		table {
+  height:100%;
+  width:100%;
+  background: red;}
+}
+	
 	.new_style td{
 		height:40px;
 	}
+	html, body {
+ height: 100%;
+ padding:0;
+ margin: 0;
+}
+
 }
 @media (min-width: 375px) and (orientation:portrait){
 	.new_style1{
@@ -199,3 +210,56 @@
 		height:40px;
 	}
 } 
+
+.activeTimeTable{
+	vertical-align: middle;
+	min-width: 60px;
+	padding: 0rem;
+	width: 100%;
+}
+.activeTimeTable tr{
+	border: none;
+}
+.activeTimeTable td{
+	padding: 0rem 0.4rem !important;
+	vertical-align: middle;
+}
+.activeTimeTable tbody td{
+	padding: 3px 6px;
+	min-width: 60px;
+}
+.activeTimeTable th{
+	vertical-align: middle;
+	min-width: 60px;
+	padding: 0rem;
+}
+
+.activeTimeTable th tr td, .activeTimeTable th tr{
+	border:none;
+}
+
+.activeTimeTableParentDiv{
+	margin:0% 6%;
+}
+
+
+
+/*Weekly workout table and Active table*/
+@media (min-width: 375px) and (max-width: 736px){
+	.activeTimeTable {	
+		font-size:80% !important;
+	}
+	.activeTimeTable th{
+		min-width: 40px !important;
+		padding: 0rem 0.2rem;
+	}
+	.activeTimeTable td{
+    	height: auto !important;
+		padding: 10px 12px !important;
+		min-width: 40px !important;
+	}
+	.activeTimeTable tbody .activeTimeTable tr td{
+		padding: 0rem 0.5rem !important;
+		min-width: 60px !important;
+	}
+}

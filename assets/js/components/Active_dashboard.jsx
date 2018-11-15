@@ -188,16 +188,17 @@ class ActiveDashboard extends Component{
 
 				 <div style = {{fontSize:"12px"}}>
 				 <div className="" style = {{fontWeight:"bold","textAlign":"center"}}>Time Moving / Active (hh:mm)
+
                 	</div>
-						<div className = "table table-responsive new_style1">
-			          	    <table className = "weeklyWorkoutTable new_style table table-striped table-bordered">
+						<div className = "activeTimeTableParentDiv">
+			          	    <table className = "activeTimeTable table table-striped table-bordered">
 								<tr>
 									<th></th>
-									<th>Entire 24<br />Hour <br />Day</th>
-									<th>Sleep<br />Hours</th>
-									<th>Entire 24<br />Hour Day<br />Excluding<br />Sleep</th>
-									<th>Exercise<br />Hours</th>
-									<th>Entire 24<br />Hour Day<br />Excluding<br />Sleep and<br />Exercise</th>
+									<th>Entire 24 Hour Day</th>
+									<th>Sleep Hours</th>
+									<th>Entire 24 Hour Day Excluding Sleep</th>
+									<th>Exercise Hours</th>
+									<th>Entire 24 Hour Day Excluding Sleep and Exercise</th>
 								</tr>
 								<tbody>
 									{rendered_rows}
