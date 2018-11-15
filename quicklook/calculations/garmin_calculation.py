@@ -1023,8 +1023,6 @@ def get_activity_stats(combined_user_activities,user_age):
 			act_duration = obj.get('durationInSeconds',0)
 			obj_act = obj.get('activityType')
 			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
-			print(workout_wise_total_duration)
-			print(obj_act)
 			workout_type_total_duration = workout_wise_total_duration.get(obj_act)
 			if not obj_avg_hr:
 				obj_avg_hr = 0
