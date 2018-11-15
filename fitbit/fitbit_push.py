@@ -8,8 +8,8 @@ from datetime import datetime, timedelta , date, timezone
 import ast
 import logging
 import time
+import pytz
 from pytz import timezone
-
 from django.db.models import Q
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -29,13 +29,19 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataSteps,\
 					FitbitNotifications,\
 					UserFitbitDatabody,\
-					UserFitbitDatafoods
+					UserFitbitDatafoods,\
+					UserFitbitLastSynced
+
 from quicklook.tasks import generate_quicklook
 from garmin.garmin_push import _get_data_start_end_time
 from progress_analyzer.tasks import (
 	generate_cumulative_instances_custom_range,
 	set_pa_report_update_date
 )
+from . import views
+
+from quicklook.calculations.converter.fitbit_to_garmin_converter import get_epoch_offset_from_timestamp
+
 def refresh_token_for_notification(user):
 	'''
 	This function updates the expired tokens in database
@@ -87,14 +93,10 @@ def call_push_api(data):
 		This function take the latest created_at from FitbitNotifications and get the data 
 	'''
 	print("Startes for checking notifications in database")
-
-	# create_data = FitbitNotifications.objects.create(data_notification=data)
-	# print(FitbitNotifications._meta.get_fields(),"fields")
-	# updated_data = create_data.data_notification
-	# updated_data = FitbitNotifications.objects.latest('created_at')
 	if data:
 		for i,k in enumerate(data):
 			# k = ast.literal_eval(k)
+			
 			notification = k
 			date = k['date']
 			user_id = k['ownerId']
@@ -104,16 +106,20 @@ def call_push_api(data):
 			except FitbitConnectToken.DoesNotExist as e:
 				user = None
 			if user:
-				create_notification = FitbitNotifications.objects.create(user=user,collection_type=data_type,
+				create_notification = FitbitNotifications.objects.create(
+					user=user,collection_type=data_type,
 					notification_date=date,state="unprocessed",notification= notification)
 			service = session_fitbit()
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
 			'''
-		The updated_at will check the time when the access_token is (created or updated)
-		As the access_token expires at every 8Hours. When celery job runs first we will check
-		the access_token is not expries. If it expries we will update the access_token first then
-		run the push notification job.
+				--The updated_at will check the time when the access_token is 
+				(created or updated)
+				--As the access_token expires at every 8Hours. When celery job runs first 
+				we will check
+				--the access_token is not expries. If it expries we will update 
+				the access_token first then
+				--run the push notification job.
 			'''
 			token_updated_time = tokens.updated_at
 			present_time = datetime.utcnow()
@@ -121,11 +127,46 @@ def call_push_api(data):
 			check_token_expire = (datetime_obj_utc - token_updated_time).total_seconds()
 			session = service.get_session(access_token)
 			if check_token_expire < 28800:
-				call_api(date,user_id,data_type,user,session,create_notification)
+				call_api_data = call_api(date,user_id,data_type,user,session,create_notification)
 			else:
 				session = get_session_and_access_token(user)
-				call_api(date,user_id,data_type,user,session,create_notification)
-	return None
+				call_api_data =call_api(date,user_id,data_type,user,session,create_notification)
+			if call_api_data:
+				activities_data = call_api_data['activities']
+			else:
+				activities_data = None
+			if activities_data:
+				activity_fitbit = activities_data['activity_summary']
+			else:
+				activity_fitbit = None
+			if (user and data_type == 'activities'
+				and activity_fitbit
+				and activity_fitbit['activities']):
+				activity_data = activity_fitbit['activities'][0] 
+				start_time = activity_data['originalStartTime']
+				offset_conversion = get_epoch_offset_from_timestamp(start_time)
+				return fitbit_create_update_sync_time(
+					user, present_time, offset_conversion[1])
+			else:
+				return fitbit_create_update_sync_time(user, present_time, 0)
+
+def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
+	try:
+	# If last sync info is already present, update it
+		last_sync_obj = UserFitbitLastSynced.objects.get(user=user)
+		last_sync_timestamp = last_sync_obj.last_synced_fitbit
+		fitbit_sync_time = pytz.utc.localize(fitbit_sync_time)
+		if last_sync_timestamp < fitbit_sync_time:
+			last_sync_obj.last_synced_fitbit = pytz.utc.localize(
+				datetime.utcfromtimestamp(fitbit_sync_time.timestamp()))
+			last_sync_obj.offset = offset if offset!=last_sync_obj.offset and offset!=0 else last_sync_obj.offset
+
+			last_sync_obj.save()
+	except UserFitbitLastSynced.DoesNotExist as e:
+		UserFitbitLastSynced.objects.create(
+			user = user,
+			last_synced_fitbit = fitbit_sync_time,
+			offset = offset if offset else 0)
 
 def get_session_and_access_token(user):
 	refresh_token,access_token = refresh_token_for_notification(user)
@@ -146,13 +187,15 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		  session(created sesssion)
 	Return: returns nothing
 	'''
-	
+	fitbit_pull_data = {}
 	if data_type == 'body':
 		body_fat_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/log/fat/date/{}.json".format(
 			user_id,data_type,date))
 		body_fat_fitbit = body_fat_fitbit.json()
 		store_data(body_fat_fitbit,user,date,create_notification,data_type='body_fat_fitbit')
+		fitbit_pull_data['body_fat'] = body_fat_fitbit
+		return fitbit_pull_data
 		#print(body_fat_fitbit, "testttttttttttt1")
 		# body_weight_fitbit = session.get(
 		# 	"https://api.fitbit.com/1/user/{}/body/log/weight/date/{}.json ".format(
@@ -170,6 +213,10 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 			user_id,data_type,date))
 		foods_goal_logs = foods_goal_logs.json()
 		store_data(foods_goal_logs,user,date,create_notification,data_type='foods_goal_logs')
+		fitbit_pull_data['foods'] = {}
+		fitbit_pull_data['foods']['goals'] = foods_goal_logs
+
+		return fitbit_pull_data
 		# foods_goal_logs = foods_goal_logs.json()
 		# print(foods_goal_logs, "foodssssssssssssss")
 		# foods_water_logs = session.get(
@@ -187,11 +234,13 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 			user_id,data_type,date))
 		sleep_fitbit = sleep_fitbit.json()
 		store_data(sleep_fitbit,user,date,create_notification,data_type='sleep_fitbit')
+		fitbit_pull_data['sleep'] = sleep_fitbit
+		return fitbit_pull_data
 	elif data_type == 'activities':
 		create_notification.state = "processing"
 		create_notification.save()
 		activity_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
+		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
 			user_id,date))
 		heartrate_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
@@ -202,16 +251,19 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
 			store_data(activity_fitbit,user,date,create_notification,data_type="activity_fitbit")
+			fitbit_pull_data['activities'] = {}
+			fitbit_pull_data['activities']['activity_summary'] = activity_fitbit
 		if heartrate_fitbit:
 			heartrate_fitbit = heartrate_fitbit.json()
 			store_data(heartrate_fitbit,user,date,create_notification,data_type="heartrate_fitbit")
+			fitbit_pull_data['activities']['heartrate'] = heartrate_fitbit
 		if steps_fitbit:
 			steps_fitbit = steps_fitbit.json()
 			store_data(steps_fitbit,user,date,create_notification,data_type="steps_fitbit")
-			# FitbitNotifications.objects.filter(user=user,
-			# 	collection_type='Activities').update(state="processed") 
+			fitbit_pull_data['activities']['steps'] = steps_fitbit
+		return fitbit_pull_data
 		
-	return None
+	return fitbit_pull_data
 
 def update_fitbit_data(user,date,create_notification,data,collection_type):
 	'''
@@ -236,6 +288,18 @@ def update_fitbit_data(user,date,create_notification,data,collection_type):
 		UserFitbitDatafoods.objects.filter(user=user,
 			date_of_foods=date).update(foods_data=data,date_of_foods=date.today())
 	return None
+
+def get_activities_data(activities, date):
+	activities_list = []
+	for activity in activities:
+
+		fitbit_date = activity.get("originalStartTime",0)
+		fitbit_date = fitbit_date[:10]
+		fitbit_date_obj = datetime.strptime(fitbit_date, '%Y-%m-%d').date()
+	
+		if fitbit_date_obj == date:
+			activities_list.append(activity)
+	return activities_list
 
 def store_data(fitbit_all_data,user,start_date,create_notification,data_type=None):
 	'''
@@ -277,31 +341,32 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "activity_fitbit" == key:
 				date_of_activity = value['pagination']['afterDate']
-				if value["activities"]:
-					fitbit_date = value['activities'][0].get("originalStartTime",0)
-					fitbit_date = fitbit_date[:10]
-					fitbit_date_obj = datetime.strptime(
-						fitbit_date, '%Y-%m-%d').date()
-
-					# print(fitbit_date_obj,"type of the activty")
-				else:
-					fitbit_date_obj = 0
-				if fitbit_date_obj == start_date:
-					try:
-						activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
-						update_fitbit_data(user,date_of_activity,create_notification,value,key)
-						print("Updated Activity-Fitbit successfully")
-						if create_notification != None:
-							create_notification.state = "processed"
-							create_notification.save()
-					except UserFitbitDataActivities.DoesNotExist:
-						UserFitbitDataActivities.objects.create(user=user,
-						date_of_activities=date_of_activity,
-						activities_data=value,created_at=start_date)
-						print("Created Activity-Fitbit successfully")
-						if create_notification != None:
-							create_notification.state = "processed"
-							create_notification.save()
+				activities_list = get_activities_data(value["activities"], start_date)
+				value = dict({'activities':activities_list})
+				
+				# if value["activities"]:
+				# 	fitbit_date = value['activities'][0].get("originalStartTime",0)
+				# 	fitbit_date = fitbit_date[:10]
+				# 	fitbit_date_obj = datetime.strptime(
+				# 		fitbit_date, '%Y-%m-%d').date()
+				# else:
+				# 	fitbit_date_obj = 0
+				# if fitbit_date_obj == start_date:
+				try:
+					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
+					update_fitbit_data(user,date_of_activity,create_notification,value,key)
+					print("Updated Activity-Fitbit successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
+				except UserFitbitDataActivities.DoesNotExist:
+					UserFitbitDataActivities.objects.create(user=user,
+					date_of_activities=date_of_activity,
+					activities_data=value,created_at=start_date)
+					print("Created Activity-Fitbit successfully")
+					if create_notification != None:
+						create_notification.state = "processed"
+						create_notification.save()
 
 		except (KeyError, IndexError):
 			logging.exception("message")
@@ -426,3 +491,4 @@ def job_to_update_fitbit_raw_data(user, start_date, end_date):
 		)
 	else:
 		generate_quicklook.delay(user.id,str_start_date,str_end_date)
+

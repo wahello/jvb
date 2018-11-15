@@ -520,8 +520,11 @@ editToggleHandlerDuration(event){
 handleChange_activity(event){
   const target = event.target;
   const value = target.value;
+  
   const selectedActivityId = target.getAttribute('data-name');
+  
   let activity_data = this.state.activites[selectedActivityId];
+  
   activity_data['activityType'] = value;
 
   this.setState({

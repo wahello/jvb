@@ -35,6 +35,7 @@ import { StyleSheet, css } from 'aphrodite';
           {name: 'Deep Sleep (hh:mm)'},
           {name: 'Light Sleep (hh:mm)'},
           {name: 'Awake Time (hh:mm)'},
+          {name: 'Restless Sleep (hh:mm)'},
           {name: 'REM Sleep (hh:mm)'},
           {name: 'Garmin Stress Level'}                     
       ],
@@ -119,10 +120,11 @@ renderTableColumns(dateWiseData,category,classes=""){
 			let all_data = [];
 			for(let [key,value] of Object.entries(data[category])){
 				if(key !== 'id' && key !== 'user_ql'){
-					if(value !== '-' && value !== undefined && value !== "" &&
+					if(value !== '-' && value !== undefined && value !== "" &&    
 						(key == 'deep_sleep' ||
 						key == 'light_sleep' ||
 						key == 'awake_time' ||
+						key == 'restless_sleep' ||
 						key == 'rem_sleep' ||
 						key == 'sleep_per_wearable')){
 						let hm = value.split(':');

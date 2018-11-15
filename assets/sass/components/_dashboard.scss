@@ -85,16 +85,16 @@
 }
 
 /*Weekly workout table*/
-@media (min-width: 375px) and (max-width: 736px){
+@media (min-width: 375px) and (max-width: 812px){
 	.weeklyWorkoutTable {	
-		font-size:80% !important;
+		font-size:65% !important;
 		width: 40px !important;
 	}
 	.mnh-mobile-view {
 		font-size:80% !important;
 	}
 	.weeklyWorkoutTable>tbody>tr>td:first-child {
-		font-size:85% !important;
+		font-size:82% !important;
 	}
 	.weeklyWorkoutTable th{
 		min-width: 40px !important;
@@ -107,7 +107,7 @@
 	}
 	.weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr td{
 		padding: 0rem 0.5rem !important;
-		min-width: 60px !important;
+		min-width: 80px !important;
 	}
 }
 

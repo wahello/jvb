@@ -7,13 +7,13 @@ import moment from 'moment';
 import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
-
+import { ToastContainer, toast } from 'react-toastify';
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
 "HEART_RATE_RECOVERY":"HEART RATE RECOVERY(HRR)",
 "JVB_STRENGTH_EXERCISES":"JVB STRENGTH EXERCISES",
-'ARC_TRAINER':'ARC TRAINER',
+"ARC_TRAINER":"ARC TRAINER",
 "BACKCOUNTRY_SKIING_SNOWBOARDING":"BACKCOUNTRY SKIING SNOWBOARDING",
 "BARRE_CLASS":"BARRE CLASS",
 "BASKETBALL":"BASKETBALL",
@@ -134,6 +134,9 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+
+this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
+
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -849,26 +852,7 @@ handleChange_steps_type(event){
     let count = 0;
     let activitiesLen = 0;
     if(steps_type == "exercise"){
-        for(let activityId of Object.keys(activitiesObj)) {
-            if(activitiesObj[activityId]["deleted"] !== true && activitiesObj[activityId]["duplicate"] !== true){
-                if(activitiesObj[activityId]["activityType"] !== "HEART_RATE_RECOVERY")
-                    activitiesLen ++;
-                for(let key of Object.keys(activitiesObj[activityId])){
-
-                    if((key === "activityType" && activitiesObj[activityId][key] !== "HEART_RATE_RECOVERY" && activitiesObj[activityId]["steps_type"] === "non_exercise")) {
-                        count ++;
-                    }
-                }
-            }
-                
-        }
-        if((activity_data["activityType"] !== "HEART_RATE_RECOVERY") && ((count === 0 && activitiesLen === 1) || (count === (activitiesLen -1)))) {
-
-            this.activityStepsTypeModalToggle();
-            steps_type = "exercise";
-        } else {
-            steps_type = "non_exercise";
-        }
+        steps_type = "non_exercise";
     }
     else {
         steps_type = "exercise";
@@ -879,6 +863,7 @@ handleChange_steps_type(event){
             [selectedActivityId]: activity_data
         });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 
 /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
@@ -898,6 +883,7 @@ handleChange_duplicate_info(event) {
         [selectedActivityId]: activity_data
       });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
@@ -1318,6 +1304,18 @@ handleChangeModelActivityStartTimeDate(date){
         activitystarttime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1333,6 +1331,18 @@ handleChangeModelActivityEndTimeDate(date){
         activityendtime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm,'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1350,6 +1360,18 @@ handleChangeModalActivityTime(event){
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
+            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_sec,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_sec,
+                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
+                'modalendtime_activity_hour', 'modalendtime_activity_min', 
+                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
             if(duration){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1406,6 +1428,21 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
+
+   resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+      this.setState({
+        [end_date_prop_name] : null,
+        [end_hours_prop_name] : '',
+        [end_mins_prop_name] : '',
+        [end_am_pm_prop_name] : '',
+        [end_secs_prop_name]:''
+      },()=>{
+              toast.info(" Time of your workout started should be less than time of your workout ended ",{
+              className:"dark"
+              })
+      });
+    }
+
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
@@ -1481,7 +1518,7 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm:ss a'):''} 
+                {start_time?moment(start_time).format('MMM D, YYYY h:mm:ss a'):''} 
                  {this.props.editable && !isActivityDeleted &&                           
                         <span 
                             data-name = {summaryId}  
@@ -1492,7 +1529,7 @@ renderTable(){
                     }
                         <Modal 
                         isOpen={this.state.activities_edit_mode[summaryId]["startTimeInSeconds"]}
-                        toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} 
+                        toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} class="modal"
                         >
                           <ModalHeader
                               toggle={this.editToggleHandlerStartTime.bind(this,summaryId)}>
@@ -1596,7 +1633,7 @@ renderTable(){
             else if(key === "endTimeInSeconds"){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            {end_time?end_time.format('MMM D, YYYY h:mm:ss a'):''}  
+                            {end_time?moment(end_time).format('MMM D, YYYY h:mm:ss a'):''}  
                           {this.props.editable && !isActivityDeleted &&                
                         <span 
                             data-name = {summaryId} 
@@ -2247,7 +2284,6 @@ renderEditActivityModal(){
 render(){
 
 return(
-
 <div className = "container_fluid">
 <div className="row justify-content-center">
 <div id = "activity_table">
