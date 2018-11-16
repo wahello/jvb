@@ -280,7 +280,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					todays_activity.save()
 				else:
 					activities_model_objects.append(act_obj)
-			print ('#############', activities_model_objects)
+			# print ('#############', activities_model_objects)
 			DailyActivity.objects.bulk_create(activities_model_objects)
 
 
