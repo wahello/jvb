@@ -3274,7 +3274,7 @@ def export_users_xls(request):
 				rounded_percent = int(Decimal(value['percent_days_no_activity']).quantize(0,ROUND_HALF_UP))
 				weekly_workout_sheet.write(
 				new_row,new_column2,"{}{}".format(rounded_percent,"%"),innercell_format)
-				new_row = new_row + 3
+				new_row = new_row + 2
 
 
 		current_date2, week_end_date2 = week_date(week_end_date-timedelta(days=6))
