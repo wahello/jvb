@@ -141,7 +141,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_reported_alcohol_days_count":None,
 			"cum_hrr_pure_1_minute_beat_lowered_days_count":None,
 			"cum_hrr_pure_time_to_99_days_count":None,
-			"cum_hrr_activity_end_hr_days_count":None
+			"cum_hrr_activity_end_hr_days_count":None,
+			"cum_sleep_reported_days_count":None
 		}
 		return fields
 
@@ -1133,6 +1134,12 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 			)
 		)
 
+		sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_user_input",None)
+		if not sleep_dur:
+			sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_wearable",None)
+		sleep_dur = 1 if sleep_dur else 0
+		meta_cum_data['cum_sleep_reported_days_count'] = sleep_dur \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_sleep_reported_days_count",0)
 
 
 	elif today_ql_data:
@@ -1212,6 +1219,12 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 		)
 		hrr_activity_end_hr = 1 if hrr_activity_end_hr else 0
 		meta_cum_data['cum_hrr_activity_end_hr_days_count'] = hrr_activity_end_hr
+
+		sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_user_input",None)
+		if not sleep_dur:
+			sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_wearable",None)
+		sleep_dur = 1 if sleep_dur else 0
+		meta_cum_data['cum_sleep_reported_days_count'] = sleep_dur
 		
 	return meta_cum_data
 
