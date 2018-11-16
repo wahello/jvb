@@ -246,8 +246,15 @@ class ActiveTimeDashboardView(APIView):
                         exercise_hours += 1
                 except TypeError as e:
                     pass
-            sleep_hour_prcnt = round((sleeping_active_minutes / (sleep_hours*60)) * 100)
-            exercise_hour_prcnt = round((exercise_active_minutes / (exercise_hours*60)) * 100)
+            try:
+                sleep_hour_prcnt = round((sleeping_active_minutes / (sleep_hours*60)) * 100)
+            except ZeroDivisionError as e:
+                sleep_hour_prcnt = 0
+            try:
+                exercise_hour_prcnt = round((exercise_active_minutes / (exercise_hours*60)) * 100)
+            except ZeroDivisionError as e:
+                exercise_hour_prcnt = 0
+
             excluded_sleep = moment_obj['total_active_minutes'] - sleeping_active_minutes
             excluded_sleep_exercise = excluded_sleep - exercise_active_minutes
             sleeping_active_time = [sleeping_active_minutes//60,sleeping_active_minutes%60]
@@ -260,8 +267,9 @@ class ActiveTimeDashboardView(APIView):
             excluded_sleep_prcnt = round((excluded_sleep / (excluded_sleep_hours*60)) * 100)
             excluded_sleep_exercise_hours = excluded_sleep_hours - exercise_hours
             excluded_sleep_exercise_prcnt = round((excluded_sleep_exercise / (excluded_sleep_exercise_hours*60)) * 100)
-            active_time['total_active_time']=time(moment_obj['total_active_minutes']//60,\
-                moment_obj['total_active_minutes']%60).strftime('%I:%M')
+            active_time['total_active_time']= '{}:{}'.format(
+                moment_obj['total_active_minutes']//60,
+                "%02d"%(moment_obj['total_active_minutes']%60))
 
             active_time['total_hours'] = '{}:{}'.format(total_hours,'00')
 
