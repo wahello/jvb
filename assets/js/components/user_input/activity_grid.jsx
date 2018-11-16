@@ -2413,15 +2413,15 @@ return(
 </td>
 <td id = "add_button" className="add_button_back" >Indoor<br /> Temperature
 </td>
-<td id = "add_button" className="add_button_back" >Temperature <br />(celsius)
+<td id = "add_button" className="add_button_back" >Temperature <br />(fahrenheit)
 </td>
-<td id = "add_button" className="add_button_back" >Dew Point <br />(celsius)
+<td id = "add_button" className="add_button_back" >Dew Point <br />(fahrenheit)
 </td>
 <td id = "add_button" className="add_button_back" >Humidity <br />(%)
 </td>
 <td id = "add_button" className="add_button_back">Wind <br />(miles/hour)
 </td>
-<td id = "add_button" className="add_button_back">Temperature Feels like <br />(celsius)
+<td id = "add_button" className="add_button_back">Temperature Feels like <br />(fahrenheit)
 </td>
 <td id = "add_button" className="add_button_back">Weather <br />Conditions
 </td>
