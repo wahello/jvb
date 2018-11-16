@@ -496,6 +496,8 @@ class DailyActivity(models.Model):
     start_time_in_seconds = models.IntegerField()
     activity_data = models.TextField()
     activity_weather = models.TextField(blank=True)
+    squash = models.TextField(blank=True)
+    conditioning_class = models.TextField(blank=True)
     can_update_steps_type = models.BooleanField(default=True)
     
     steps_type = models.CharField(
