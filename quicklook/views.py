@@ -3168,13 +3168,13 @@ def export_users_xls(request):
 
 
 
-	week_start_date, week_end_date = week_date(to_date)
+	week_start_date, week_end_date = week_date(to_date+timedelta(days=7))
 
 
 	current_date = week_start_date
 
 
-	to_date = to_date
+	to_date = to_date+timedelta(days=7)
 	
 
 
@@ -3230,7 +3230,7 @@ def export_users_xls(request):
 		# print(week_end_date,"week_end_date")
 		# print(week_end_date-timedelta(days=6),"week_end_date-timedelta(days=7)")
 		data = weekly_workout_helper(request.user,to_date)
-
+		
 
 
 		
@@ -3254,8 +3254,11 @@ def export_users_xls(request):
 					if value1 in total_activities:
 						k_distance = value1.lower()+"_distance"
 						avg_dis = avg_dis +	round((value[k_distance]['value']*0.000621371),2)
-		weekly_workout_sheet.write(new_row_distance+2,12,avg_dis)
-		new_row_distance = new_row_distance + 6
+		if data:
+			weekly_workout_sheet.write(new_row_distance+2,12,avg_dis)
+			new_row_distance = new_row_distance + 6
+		else:
+			new_row_distance = new_row_distance + 2
 		for key,value in data.items():
 			if key == 'Totals':
 				weekly_workout_sheet.write(new_row,new_column2,key)
@@ -3274,7 +3277,7 @@ def export_users_xls(request):
 				rounded_percent = int(Decimal(value['percent_days_no_activity']).quantize(0,ROUND_HALF_UP))
 				weekly_workout_sheet.write(
 				new_row,new_column2,"{}{}".format(rounded_percent,"%"),innercell_format)
-				new_row = new_row + 3
+				new_row = new_row + 2
 
 
 		current_date2, week_end_date2 = week_date(week_end_date-timedelta(days=6))
