@@ -49,15 +49,15 @@ class Profile(models.Model):
 
     gender = models.CharField(default=MALE, max_length=1, choices=GENDER_CHOICE)
 
-    height = models.CharField(max_length=6)
+    height = models.CharField(max_length=25,null=True, blank=True)
 
-    weight = models.CharField(max_length=3)
+    weight = models.CharField(max_length=34,null=True, blank=True)
 
     date_of_birth = models.DateField()
 
-    sleep_goals = models.CharField(max_length=10)
+    #sleep_goals = models.CharField(max_length=10)
 
-    goals = models.CharField(max_length=250, null=True, blank=True)
+    #goals = models.CharField(max_length=250, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
