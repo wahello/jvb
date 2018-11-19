@@ -436,10 +436,10 @@ toggleModal(){
         modal_duplicate_info_status:false,
         modal_indoor_temperature:this.props.indoor_temperature,
         modal_temperature:"",
-        modal_dew_point:"",
+        modal_dew_point:this.props.dewPoint,
         modal_humidity:"",
-        modal_wind:"",
-        modal_temperature_feels_like:"",
+        modal_wind:this.props.wind,
+        modal_temperature_feels_like:this.props.temperature_feels_like,
         modal_weather_conditions:"",
         modal_activity_comment:"",
         selectedActivityId:"",
@@ -2229,37 +2229,37 @@ renderEditActivityModal(){
                        <FormGroup>
                        <Label className="padding1">10. Change Temperature</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_temperature" 
                                 value={this.state.modal_temperature}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)}/>
-                            {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)}/>*/}
+                            <Input type="select" 
                                 className="custom-select form-control"
                                 name="modal_temperature"                                  
                                 value={this.state.modal_temperature}
                                 onChange={this.handleChange} >
                                 <option key="select" value="">Select</option>                                    
                                 {this.createDropdown(-20,120)}
-                            </Input>*/}
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
                        <Label className="padding1">11. Change Dew Point</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_dew_point" 
                                 value={this.state.modal_dew_point}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)} />
-                            {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)} />*/}
+                            <Input type="select" 
                                 className="custom-select form-control"
                                 name="modal_dew_point"                                  
                                 value={this.state.modal_dew_point}
                                 onChange={this.handleChange} >
                                 <option key="select" value="">Select</option>                                    
                                 {this.createDropdown(-20,120,true)}
-                            </Input>*/}
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
@@ -2282,37 +2282,37 @@ renderEditActivityModal(){
                         <FormGroup>
                         <Label className="padding1">13. Change wind</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_wind" 
                                 value={this.state.modal_wind}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)} /> 
-                                {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)} /> */}
+                                <Input type="select" 
                                     className="custom-select form-control"
                                     name="modal_wind"                                  
                                     value={this.state.modal_wind}
                                     onChange={this.handleChange} >
                                     <option key="select" value="">Select</option>                                    
                                     {this.createWindDropdown(0,350)}
-                                </Input>*/}
+                                </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
                        <Label className="padding1">14. Change Temperature Feels Like</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_temperature_feels_like" 
                                 value={this.state.modal_temperature_feels_like}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)} /> 
-                            {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)} /> */}
+                            <Input type="select" 
                                 className="custom-select form-control"
                                 name="modal_temperature_feels_like"
                                 value={this.state.modal_temperature_feels_like}
                                 onChange={this.handleChange} >
                                 <option key="select" value="">Select</option>                                    
                                 {this.createDropdown(-20,120)}
-                            </Input>*/}
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
