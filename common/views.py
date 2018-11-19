@@ -57,6 +57,7 @@ class HaveTokens(APIView):
 	permission_classes = (IsAuthenticated,)
 	def get(self,request,format="json"):
 		have_tokens = {
+			"linked_devices":False,
 			"have_garmin_health_token":False,
 			"have_garmin_connect_token":False,
 			"have_fitbit_token":False
@@ -64,12 +65,12 @@ class HaveTokens(APIView):
 
 		if GarminToken.objects.filter(user=request.user).exists():
 			have_tokens['have_garmin_health_token'] = True
+			have_tokens['linked_devices'] = True
 		if GarminConnectToken.objects.filter(user=request.user).exists():
 			have_tokens['have_garmin_connect_token'] = True
+			have_tokens['linked_devices'] = True
 		if FitbitConnectToken.objects.filter(user=request.user).exists():
 			have_tokens['have_fitbit_token'] = True
+			have_tokens['linked_devices'] = True
 
-		if have_tokens['have_garmin_health_token'] or \
-						have_tokens['have_garmin_connect_token'] or \
-						have_tokens['have_fitbit_token']:
-			return Response(have_tokens,status=status.HTTP_200_OK)
+		return Response(have_tokens,status=status.HTTP_200_OK)
