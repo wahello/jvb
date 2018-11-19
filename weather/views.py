@@ -75,20 +75,20 @@ def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
 def get_weather_response_as_required(latitude, longitude, epoch_time):
     weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
 
-    # dewPoint_value = round((weather_info['currently']['dewPoint'] * 9/5)+ 32, 2)
-    # temperature_value = round((weather_info['currently']['temperature'] * 9/5)+ 32, 2)
-    # temperature_feels_like_value = round((weather_info['currently']['apparentTemperature'] * 9/5)+ 32, 2)
+    dewPoint_value = round((weather_info['currently']['dewPoint'] * 9/5)+ 32, 2)
+    temperature_value = round((weather_info['currently']['temperature'] * 9/5)+ 32, 2)
+    temperature_feels_like_value = round((weather_info['currently']['apparentTemperature'] * 9/5)+ 32, 2)
     humidity_value = weather_info['currently']['humidity']*100
     wind_value = round(weather_info['currently']['windSpeed']*2.237, 2)
                     
-    activity_weather = {'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
-                                            # 'value': dewPoint_value, 'units': 'fahrenheit'},
+    activity_weather = {'dewPoint': {#'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
+                                            'value': dewPoint_value, 'units': 'fahrenheit'},
                 'humidity': {'value': humidity_value, 'units': 'percentage'},
-                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
-                                # 'value': temperature_value, 'units': 'fahrenheit'},
+                'temperature':{#'value': weather_info['currently']['temperature'], 'units': 'celsius'},
+                                'value': temperature_value, 'units': 'fahrenheit'},
                 'wind': {'value': wind_value, 'units': 'miles/hour'},
-                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
-                                    # 'value': temperature_feels_like_value, 'units': 'fahrenheit'},
+                'temperature_feels_like':{#'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
+                                    'value': temperature_feels_like_value, 'units': 'fahrenheit'},
                 'weather_condition': weather_info['currently']['icon']}
     return activity_weather
 
