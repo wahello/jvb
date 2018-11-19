@@ -11,5 +11,5 @@ urlpatterns = [
 	url(r'users/data/manually_updated$',views.UserGarminDataManuallyUpdatedView.as_view(),
 	    name="manually_updated_data"),
 	url(r'users/last_synced$', views.UserLastSyncedItemview.as_view(),name="last_synced"),
-	url(r'users/have_tokens', views.HaveGarminTokens.as_view(), name="have_tokens"),
+	# url(r'users/have_tokens', views.HaveGarminTokens.as_view(), name="have_tokens"),
 ]
