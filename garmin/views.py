@@ -134,25 +134,6 @@ class GarminPing(APIView):
 	def get(self, request, format="json"):
 		return Response(status = status.HTTP_200_OK)
 
-# class HaveGarminTokens(APIView):
-# 	'''
-# 	Check availability of garmin connect and garmin health token
-# 	for current user
-# 	'''
-# 	permission_classes = (IsAuthenticated,)
-# 	def get(self,request,format="json"):
-# 		have_tokens = {
-# 			"have_garmin_health_token":False,
-# 			"have_garmin_connect_token":False
-# 		}
-
-# 		if GarminToken.objects.filter(user=request.user).exists():
-# 			have_tokens['have_garmin_health_token'] = True
-# 		if GarminConnectToken.objects.filter(user=request.user).exists():
-# 			have_tokens['have_garmin_connect_token'] = True
-
-# 		return Response(have_tokens,status=status.HTTP_200_OK)
-
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
 	serializer_class = UserLastSyncedSerializer
