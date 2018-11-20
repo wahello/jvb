@@ -14,9 +14,6 @@ class WizardPersonalPage extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			'feet_err':' ',
-			'inches_error':' ',
-            'weight_error':' ' ,
             'monthError':' ',
             'dateError':' ',
             'yearError':' ',
@@ -24,9 +21,6 @@ class WizardPersonalPage extends Component{
 			backdrop:'static',
 			nestedModal: false,
 		}
-		this.FeetError = this.FeetError.bind(this);
-		this.InchesError = this.InchesError.bind(this);
-		this.WeightError = this.WeightError.bind(this);
 		this.monthError = this.monthError.bind(this);
 		this.dateError = this.dateError.bind(this);
 		this.yearError = this.yearError.bind(this);
@@ -48,22 +42,6 @@ class WizardPersonalPage extends Component{
 	}
 	onDisagreeTerms(){
 			this.props.history.push("/");
-	}
-	FeetError(err_msg){
-		this.setState({
-			feet_err:err_msg !== undefined ? err_msg : ' '
-		});
-	}
-
-	InchesError(err_msg){
-		this.setState({
-			inches_error:err_msg !== undefined ? err_msg : ' '
-		});
-	}
-	WeightError(err_msg){
-		this.setState({
-			weight_error:err_msg !== undefined ? err_msg : ' '
-		});
 	}
 	monthError(err_msg){
 		this.setState({
@@ -140,45 +118,6 @@ class WizardPersonalPage extends Component{
 							</div>
 
 						</FormGroup>
-
-						{/*<FormGroup>
-							<Label>Height</Label>
-							<InputGroup>
-								<Field
-									name = "feet"
-									type = "select"
-									component = {renderSelectFeet}
-									err_callback = {this.FeetError}	
-								/>
-								&nbsp;&nbsp;
-								<Field
-									name = "inches"
-									type = "select"
-									component = {renderSelectInches}	
-									err_callback = {this.InchesError}	
-								/>
-							</InputGroup>
-							<div style={{color:"red"}}>
-								{this.state.feet_err+" "+this.state.inches_error}
-							</div>
-
-						</FormGroup>
-						<FormGroup>
-						<label>Weight&nbsp;&nbsp;(in pounds)</label>
-                           <Field
-									name = "weight"
-									type = "select"
-									component = {renderSelectPounds}	
-									err_callback = {this.WeightError}	
-								/>
- 
-                            <div style={{color:"red"}}>
-								{this.state.weight_error}
-							</div>
-                        </FormGroup> */}
-                           
-						
-
 						 <FormGroup>
 					          <Label className="custom-control custom-radio">
 					            	<Field 
@@ -208,12 +147,9 @@ class WizardPersonalPage extends Component{
 							<Button outline color="primary" onClick={previousPage}>
 								Previous
 							</Button>
-							<Button outline  color="primary" id="submit3" onClick={this.toggle}  style={{float:'right'}}>
+							<Button outline  color="primary" id="submit2" onClick={this.toggle} style={{float:'right'}} disabled={!this.props.valid}>
 								Submit
 							</Button>
-							{/*<Button id= "submit2" type="submit" outline color="primary" style={{float:'right'}}>
-								Next
-							</Button>*/}
 						</div>
 					</Col>
 				</Row>

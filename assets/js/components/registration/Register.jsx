@@ -10,7 +10,6 @@ import RegisterNetwork from '../../network/register';
 import NavbarMenu from '../navbar';
 import WizardAccountPage from './WizardAccountPage';
 import WizardPersonalPage from './WizardPersonalPage';
-/*import WizardGoalsPage from './WizardGoalsPage';*/
 import { Collapse,Navbar,NavbarToggler,NavbarBrand,Nav,NavItem,NavLink,UncontrolledDropdown,
 	     DropdownToggle,DropdownMenu,DropdownItem } from 'reactstrap';
 
@@ -74,7 +73,6 @@ toggle() {
 		const { page } = this.state;
 		const class_account = `f-cp-icon ${page === 1 ? 'active':''}`;
 		const class_personal = `f-cp-icon ${page === 2 ? 'active':''}`;
-		//const class_goals = `f-cp-icon ${page === 3 ? 'active':''}`;
 
 		return(
 			<div >
@@ -123,13 +121,7 @@ toggle() {
 												<i className="fa fa-user" aria-hidden="true"></i>
 											</div>
 											<p>Personal</p>
-										</div>{/*
-										<div className="f-cp">
-											<div className={class_goals}>
-												<i className="fa fa-check-circle" aria-hidden="true"></i>
-											</div>
-											<p>Goals</p>
-										</div>*/}
+										</div>
 									</div>
 								</CardHeader>
 								<CardBody>
@@ -139,11 +131,6 @@ toggle() {
 											onSubmit = {this.onSubmit}
 											previousPage = {this.previousPage}
 									 />}
-									 {/*{page === 3 &&
-									 <WizardGoalsPage 
-											onSubmit = {this.onSubmit}
-											previousPage = {this.previousPage}
-									 />}*/}
 								</CardBody>
 							</Card>
 						</Col>

@@ -37,7 +37,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	def create(self,validated_data):
 		user_data = validated_data.pop('user')
 		user = User.objects.create_user(**user_data)
-		#validated_data['goals'] = Profile.GOALS_CHOICE[0][1]
 		profile = Profile.objects.create(user=user,**validated_data)
 		if validated_data['terms_conditions']:
 			terms = TermsConditionsText.objects.get(version='1.0')
@@ -55,8 +54,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.height = validated_data.get('height', instance.height)
 		instance.weight = validated_data.get('weight', instance.weight)
 		instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
-		instance.sleep_goals = validated_data.get('sleep_goals',instance.sleep_goals)
-		instance.goals = validated_data.get('goals',instance.goals)
 		instance.save()
 		return instance
 		
