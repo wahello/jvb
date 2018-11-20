@@ -44,17 +44,17 @@ export function personal_validate(values){
 		errors.dob_year = "year  required";
 	}
 
-	if(!values.feet || values.feet === 'Feet'){
-		errors.feet = "Feet is required";
-	}
+	// if(!values.feet || values.feet === 'Feet'){
+	// 	errors.feet = "Feet is required";
+	// }
 
-	if(values.inches == null || values.inches == undefined || values.inches === 'Inches'){
-		errors.inches = "Inches is required";
-	}
+	// if(values.inches == null || values.inches == undefined || values.inches === 'Inches'){
+	// 	errors.inches = "Inches is required";
+	// }
 
-	if(!values.weight || values.weight === 'Weight'){
-		errors.weight = "weight is required";
-	}
+	// if(!values.weight || values.weight === 'Weight'){
+	// 	errors.weight = "weight is required";
+	// }
 
 	
 
@@ -65,26 +65,26 @@ export function personal_validate(values){
 	return errors;
 }
 
-export function goals_validate(values){
-	const errors = {};
+// export function goals_validate(values){
+// 	const errors = {};
 
-	if(!values.terms_conditions){
-		errors.terms_conditions = "Please accept terms and conditions";
-	}
+// 	if(!values.terms_conditions){
+// 		errors.terms_conditions = "Please accept terms and conditions";
+// 	}
 
-	if(!values.sleep_goal){
-		errors.sleep_goal = "Sleep goal is required";
-	}
+// 	if(!values.sleep_goal){
+// 		errors.sleep_goal = "Sleep goal is required";
+// 	}
 
-	if(!values.sleep_hours || values.sleep_hours === 'Hours'){
-		errors.sleep_hours = "Hours is required";
-	}
+// 	if(!values.sleep_hours || values.sleep_hours === 'Hours'){
+// 		errors.sleep_hours = "Hours is required";
+// 	}
 
-	if(!values.sleep_minutes || values.sleep_minutes === 'Minutes'){
-		errors.sleep_minutes = "Minutes is required";
-	}
+// 	if(!values.sleep_minutes || values.sleep_minutes === 'Minutes'){
+// 		errors.sleep_minutes = "Minutes is required";
+// 	}
 
 	
 
-	return errors;
-}
+// 	return errors;
+// }
