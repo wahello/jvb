@@ -47,13 +47,14 @@ class Dashboard extends Component {
 						  className={this.props.className}>
 				          <ModalHeader>Link wearable device(s)</ModalHeader>
 				          <ModalBody>
+				          	<p>
 				            	We noticed that you have not linked any wearable device yet.
 				            	Click the links below to link devices supported by us
 				            	so we can provide you with lots of cool reporting, grades from your
 				            	data and analysis from your workouts!
-				          </ModalBody>
-				          <ModalFooter>
-				          	    <a href='/users/request_token' 
+				            </p>
+				            <div style={{display:'flex',justifyContent:'space-between'}}>
+					            <a href='/users/request_token' 
 				          	    	className = "garminlink">
 				          	    	<Button color="primary" style = {{fontSize:"13px"}}>Garmin Health<br/></Button>
 				          	    </a>
@@ -65,6 +66,9 @@ class Dashboard extends Component {
 									className = "garminlink">
 									<Button color="primary" style = {{fontSize:"13px"}}>Fitbit<br/></Button>
 								</a>
+							</div>
+				          </ModalBody>
+				          <ModalFooter>
 				            	<Button color="primary" onClick={this.toggle} style = {{fontSize:"13px"}}>OK</Button>
 				          </ModalFooter>
 			        </Modal>
