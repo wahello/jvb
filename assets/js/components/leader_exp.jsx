@@ -206,6 +206,8 @@ class LeaderBoard1 extends Component{
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.renderTableHeader = this.renderTableHeader.bind(this);
 		this.renderOverallHrrTable = this.renderOverallHrrTable.bind(this);
+		this.MinToHours = this.MinToHours.bind(this);
+
 	}
 	successLeaderBoard(data){
 		this.setState({
@@ -305,6 +307,40 @@ class LeaderBoard1 extends Component{
 		});
 		fetchLeaderBoard(this.successLeaderBoard,this.errorLeaderBoard,this.state.selectedDate,true);
 	}
+
+	MinToHours(score){
+		let time;// undefined
+	  	if(score != null && score != undefined && score != "" && score != "N/A"){
+		    if (score == -1){
+		      time = "Never"
+	    }
+	    else{
+	      let hours = parseInt(score/60);//3
+	      let minutes = (score % 60);//9
+	      if(hours < 10){// 3<10 
+	        hours = "0" + hours;  //time = 03
+	      }
+	      else{
+	        hours = hours; // time = 03 
+	      }
+	      if(minutes < 10){// 9<10 
+	        time = hours + ":0" + minutes; // time = 03:09
+	      }
+	      else{
+	        time = hours + ":" + minutes;// time = 3:9
+	      }
+	    }
+	  }
+	  else{
+	    time = "N/A"
+	  }
+	  if (score == null || score == 0){
+	    time = "N/A"
+	  }
+	  return time;
+	}// time = 03:09
+
+
 	toggle() {
 	    this.setState({
 	      isOpen: !this.state.isOpen,
@@ -503,7 +539,15 @@ class LeaderBoard1 extends Component{
 				  		 		}
 			  		 	    }
 			  		 		usernames = c_rankData.username;
-			  		 		scores.push(c_rankData.score.value);
+			  		 		let score_val = null;
+		  		 			if(category == "Active Minute Per Day (24 hours)" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+					                score_val = this.MinToHours(c_rankData.score.value);
+					            }
+					        else{
+					        	score_val = c_rankData.score.value;
+					        }
+
+			  		 		scores.push(score_val);
 			  		 
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
@@ -535,7 +579,15 @@ class LeaderBoard1 extends Component{
 			  		 	    }
 			  		 	    
 			  		 		usernames = rankData.username;
-			  		 		scores.push(rankData.score.value);
+			  		 		let score_val = null;
+		  		 			if(category == "Active Minute Per Day (24 hours)" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || category == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+					                score_val = this.MinToHours(rankData.score.value);
+					            }
+					        else{
+					        	score_val = rankData.score.value;
+					        }
+
+			  		 		scores.push(score_val);
 			  	
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
@@ -1143,7 +1195,7 @@ class LeaderBoard1 extends Component{
 			{this.state.active_view &&
 		        <div className = "row justify-content-center lb_table_style">
 			        <div className = "table table-responsive">
-			        	{this.renderTablesTd(this.state.ranking_data.active_min_total,this.state.duration_date)}
+			        	{this.renderTablesTd(this.state.ranking_data.active_min_total,this.state.duration_date) == null?"Not Reported":this.renderTablesTd(this.state.ranking_data.active_min_total,this.state.duration_date)}
 			        </div>
 		        </div>
 		    }
@@ -1165,6 +1217,7 @@ class LeaderBoard1 extends Component{
 			{/****************************/}
 	      	{this.state.btnView && 
 		        <AllRank_Data1 data={this.state.active_category} 
+		        MinToHours = {this.MinToHours}
 		        active_username = {this.state.active_username} 
 		        active_category_name = {this.state.active_category_name}
 		        all_verbose_name = {this.state.all_verbose_name}/>
