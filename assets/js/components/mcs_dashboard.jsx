@@ -38,6 +38,7 @@ class MCS_Dashboard extends Component{
 	    this.errorMCFetch = this.errorMCFetch.bind(this);
 		this.successMCFetch = this.successMCFetch.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
+		this.renderSteps = this.renderSteps.bind(this);
 		this.successLastSync = this.successLastSync.bind(this);
 		this.errorquick = this.errorquick.bind(this);
 		this.stepsValueComma = this.stepsValueComma.bind(this);
@@ -75,10 +76,19 @@ class MCS_Dashboard extends Component{
           let sync="";
         if(value != null){
           time = moment(value).format("MMM DD, YYYY @ hh:mm a")
-          sync = <div className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
+          sync = <span className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</span>;
        }
         return sync;
+   }
        
+   renderSteps(value){
+   		  let non_exercise_steps;
+   		  let steps = "";
+   		if (value!=null){
+   		  non_exercise_steps = moment(value)
+   		  steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> NES {non_exercise_steps} </span>
+   		}
+   		return steps;
    }
     renderAddDate(){
     	/*added the angle-right to the calender to getting the next day data */
@@ -102,6 +112,7 @@ class MCS_Dashboard extends Component{
 	}
 
     successMCFetch(data){
+		  console.log(data.data)
 		this.setState({
 		  mc_data:data.data
 	   });
@@ -237,6 +248,9 @@ class MCS_Dashboard extends Component{
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
 		         	}
+		         	if (key2 == "non_exercise_steps"){
+		         		console.log(values2)
+		         	}
 		        }
 	         	
 	  		}
@@ -353,32 +367,34 @@ class MCS_Dashboard extends Component{
                     </span>} />
                
                     <div className="cla_center">
-						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
-							<FontAwesome
-							className="arrow"
-		                        name = "angle-left"
-		                        size = "2x"
-			                />
-						 </span> 
-                
-			            <span id="navlink"  onClick={this.toggleCalendar} id="gd_progress">
-                            <FontAwesome
-                            className="arrow"
-			                  name = "calendar"
-			                  size = "2x"
-			                />
-			                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+                    	<span className="col-md-3">
+							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+								<FontAwesome
+								className="arrow"
+			                        name = "angle-left"
+			                        size = "2x"
+				                />
+							 </span> 
+	                
+				            <span id="navlink"  onClick={this.toggleCalendar} id="gd_progress">
+	                            <FontAwesome
+	                            className="arrow"
+				                  name = "calendar"
+				                  size = "2x"
+				                />
+				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
-		                </span>
-		                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
-						    <FontAwesome
-						    className="arrow"
-		                        name = "angle-right"
-		                        size = "2x"
-			                />
+			                </span>
+			                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+							    <FontAwesome
+							    className="arrow"
+			                        name = "angle-right"
+			                        size = "2x"
+				                />
+							</span>
 						</span>
 
-						 <span  className="last_sync" style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
+						<span  className="last_sync col-md-6">{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -389,8 +405,9 @@ class MCS_Dashboard extends Component{
 				         
 				                </PopoverBody>
 			                </Popover>
+			            <span> className="steps_count col-md-3">{this.renderSteps(this.state.steps_counted)}</span>
 			         </div>
-			           
+			           <br / ><br/>
 			       <div className = "row justify-content-center mcs_dashboard">
 			          <div className="col-sm-9 table_process">
 			           
@@ -470,6 +487,7 @@ class MCS_Dashboard extends Component{
 					</div>
 					<div className = "row justify-content-center mcs-dashboard">
 		          	<div className = "col-sm-9">
+			                <p className="mcs_content" style={{marginLeft:"15px"}}>NES = Non Exercise Steps</p>
 	         				<p className="mcs_content" style={{marginLeft:"15px"}}>Data in each cell = Steps in that particular hour ( percentage of active minutes in that hour )</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>
