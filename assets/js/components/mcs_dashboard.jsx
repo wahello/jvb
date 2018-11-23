@@ -30,6 +30,7 @@ class MCS_Dashboard extends Component{
 			isOpen:false,
 			last_synced:null,
 			mc_data:{},
+			non_exercise_steps:""
 		};
 
 		this.toggleCalendar = this.toggleCalendar.bind(this);
@@ -249,6 +250,9 @@ class MCS_Dashboard extends Component{
 		         		}
 		         	}
 		         	if (key2 == "non_exercise_steps"){
+		         		this.setState({
+		         			non_exercise_steps:values2
+		         		})
 		         		console.log(values2)
 		         	}
 		        }
@@ -405,7 +409,7 @@ class MCS_Dashboard extends Component{
 				         
 				                </PopoverBody>
 			                </Popover>
-			            <span> className="steps_count col-md-3">{this.renderSteps(this.state.steps_counted)}</span>
+			            <span className="steps_count col-md-3">{this.renderSteps(this.state.non_exercise_steps)}</span>
 			         </div>
 			           <br / ><br/>
 			       <div className = "row justify-content-center mcs_dashboard">
