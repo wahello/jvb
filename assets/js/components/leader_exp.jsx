@@ -1217,7 +1217,6 @@ class LeaderBoard1 extends Component{
 			{/****************************/}
 	      	{this.state.btnView && 
 		        <AllRank_Data1 data={this.state.active_category} 
-		        MinToHours = {this.MinToHours}
 		        active_username = {this.state.active_username} 
 		        active_category_name = {this.state.active_category_name}
 		        all_verbose_name = {this.state.all_verbose_name}/>
