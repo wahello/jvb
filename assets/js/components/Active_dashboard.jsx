@@ -263,7 +263,7 @@ class ActiveDashboard extends Component{
 		}
 		tableRows.push(<tbody><tr >{activePercentTableData}</tr></tbody>);
 
-		return  <table className = "activeTimeTable table table-striped table-bordered">{tableRows}</table>;
+		return  <table className = "activeTimeTable table  table-bordered">{tableRows}</table>;
 	}
 	render(){
 		return(
