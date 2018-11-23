@@ -247,7 +247,7 @@
 /*Weekly workout table and Active table*/
 @media (min-width: 375px) and (max-width: 736px){
 	.activeTimeTable {	
-		font-size:80% !important;
+		font-size:70% !important;
 	}
 	.activeTimeTable th{
 		min-width: 40px !important;
@@ -255,7 +255,7 @@
 	}
 	.activeTimeTable td{
     	height: auto !important;
-		padding: 10px 12px !important;
+		padding: 10px 8px !important;
 		min-width: 40px !important;
 	}
 	.activeTimeTable tbody .activeTimeTable tr td{
