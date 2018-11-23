@@ -1,6 +1,3 @@
-from django.contrib.auth.models import User
-from django.core import serializers
-
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,9 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from garmin.serializers import UserLastSyncedSerializer
 from fitbit.serializers import UserFitbitLastSyncedSerializer
 
-from garmin.models import UserLastSynced
-from fitbit.models import UserFitbitLastSynced
-
+from garmin.models import UserLastSynced,GarminConnectToken
+from fitbit.models import UserFitbitLastSynced,FitbitConnectToken
 from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
 
@@ -52,3 +48,29 @@ class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 
 		else:
 			return Response({})
+
+class HaveTokens(APIView):
+	'''
+	Check availability of garmin connect, garmin health token
+	and fitbit tokens for current user
+	'''
+	permission_classes = (IsAuthenticated,)
+	def get(self,request,format="json"):
+		have_tokens = {
+			"linked_devices":False,
+			"have_garmin_health_token":False,
+			"have_garmin_connect_token":False,
+			"have_fitbit_token":False
+		}
+
+		if GarminToken.objects.filter(user=request.user).exists():
+			have_tokens['have_garmin_health_token'] = True
+			have_tokens['linked_devices'] = True
+		if GarminConnectToken.objects.filter(user=request.user).exists():
+			have_tokens['have_garmin_connect_token'] = True
+			have_tokens['linked_devices'] = True
+		if FitbitConnectToken.objects.filter(user=request.user).exists():
+			have_tokens['have_fitbit_token'] = True
+			have_tokens['linked_devices'] = True
+
+		return Response(have_tokens,status=status.HTTP_200_OK)
