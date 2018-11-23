@@ -19,7 +19,10 @@ urlpatterns = [
 									name="Weekly workout summary"),
 	url(r'^hrr_calculations$',views.UserHrrView.as_view(),
 								  name="hrr_api"),
-
+	#url(r'^update/hrr_calculations/(?P<id>[0-9]+)/$',views.UpdateHrr.as_view(),
+	#							  name="hrr_update"),
+	url(r'^update/hrr_calculations$',views.UpdateHrr.as_view(),
+								  name="hrr_update"),
 	url(r'^raw_data/hrr_calculations$',views.UserHrrViewRawData.as_view(),
 								  name="hrr_api_raw_data"),
 	url(r'^aa_calculations$',views.UserAA.as_view(),

@@ -212,9 +212,11 @@ class LeaderboardCategories(object):
 			'pure_time_99':'Pure Time To 99 ',
 			'beat_lowered':'Heart Beat Lowered In 1st Minute',
 			'pure_beat_lowered':'Pure Heart Beat Lowered In 1st Minute',
-			'active_min_total':'Active Minutes (24 hours)',
-			'active_min_exclude_sleep':'Active Minutes (when not sleeping)',
-			'active_min_exclude_sleep_exercise':'Active Minutes (when not sleeping and exercising)'
+			'active_min_total':'Time Moving / Active (hh:mm) (24 hours)',
+			'active_min_exclude_sleep':'Time Moving / Active '\
+				+'(when not sleeping) (hh:mm)',
+			'active_min_exclude_sleep_exercise':'Time Moving / Active '\
+				+'(when not sleeping and exercising)'
 		}
 		self.category_score_priority = self.__get_catg_score_priority()
 
@@ -916,7 +918,7 @@ class LeaderboardOverview(object):
 						other_scores = {
 							'prcnt_active_min':{
 								"value":data['mc']['active_minutes_without_sleep_prcnt'][dtype],
-								"verbose_name":"% Active Minutes (when not sleeping)"
+								"verbose_name":"% of Time Moving / Active (when not sleeping)"
 							},
 							'sleep_duration':{
 								"value":data['sleep']['total_sleep_in_hours_min'][dtype],
@@ -931,7 +933,7 @@ class LeaderboardOverview(object):
 						other_scores = {
 							'prcnt_active_min':{
 								"value":data['mc']['active_minutes_without_sleep_exercise_prcnt'][dtype],
-								"verbose_name":"% Active Minutes (when not sleeping and exercising)"
+								"verbose_name":"% of Time Moving / Active (when not sleeping and exercising)"
 							},
 							'sleep_duration':{
 								"value":data['sleep']['total_sleep_in_hours_min'][dtype],
@@ -1047,7 +1049,7 @@ class LeaderboardOverview(object):
 							other_scores = {
 								'prcnt_active_min':{
 									"value":data['mc']['active_minutes_without_sleep_prcnt']['custom_range'][str_range]['data'],
-									"verbose_name":"% Active Minutes (when not sleeping)"
+									"verbose_name":"% of Time Moving / Active (when not sleeping)"
 								},
 								'sleep_duration':{
 									"value":data['sleep']['total_sleep_in_hours_min']['custom_range'][str_range]['data'],
@@ -1062,7 +1064,7 @@ class LeaderboardOverview(object):
 							other_scores = {
 								'prcnt_active_min':{
 									"value":data['mc']['active_minutes_without_sleep_exercise_prcnt']['custom_range'][str_range]['data'],
-									"verbose_name":"% Active Minutes (when not sleeping and exercising)"
+									"verbose_name":"% of Time Moving / Active (when not sleeping and exercising)"
 								},
 								'sleep_duration':{
 									"value":data['sleep']['total_sleep_in_hours_min']['custom_range'][str_range]['data'],

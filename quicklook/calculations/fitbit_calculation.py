@@ -131,11 +131,11 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		"light_sleep": '',
 		"awake_time": '',
 		"rem_sleep":'',
-		"restless":'',
+		"restless_sleep":'',
 		"sleep_bed_time": '',
 		"sleep_awake_time": '',
 		"sleep_per_wearable":'',
-		"sleep_per_userinput":''
+		"sleep_per_userinput":'',
 	}
 	have_userinput_sleep = False
 	trans_sleep_data = None
@@ -209,10 +209,10 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		sleep_stats["rem_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			trans_sleep_data['remSleepInSeconds'],include_sec = False
 		)
-		# sleep_stats["restless"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
-		# 	trans_sleep_data['restlessDurationInSeconds'],
-		# 	include_sec = False
-		# )
+		sleep_stats["restless_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
+			trans_sleep_data['restlessDurationInSeconds'],
+		 	include_sec = False
+		 )
 		sleep_stats["sleep_per_wearable"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			(trans_sleep_data['durationInSeconds'] 
 			- trans_sleep_data['awakeDurationInSeconds']
@@ -619,7 +619,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			if ui_sleep_duration else "")
 		sleeps_calculated_data['sleep_comments'] = ui_sleep_comment
 		sleeps_calculated_data['sleep_aid'] = ui_sleep_aid
-		#sleeps_calculated_data['restless'] = sleep_stats['restless']
+		sleeps_calculated_data['restless_sleep'] = sleep_stats['restless_sleep']
 
 		# Sleep grade point calculation
 		sleep_grade_point = get_avg_sleep_grade(

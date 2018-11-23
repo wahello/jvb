@@ -9,7 +9,7 @@ def notify_user_movement_consistency_steps(user_email,user_firstname,activity_st
 Hi {},
 
 You have only {} steps from {} to {}. Get up and move! We encourage you to get 300 steps an hour, which only takes between 3 and 5 minutes of walking around.  
-Make it happen!  Those  that move 300 steps an hour or more feel much less stiff, have more energy, improve bloodwork results, reduce injury risk, and live longer (to name a few things)!
+Make it happen! Those that move 300 steps an hour or more feel much less stiff, have more energy, improve bloodwork results, reduce injury risk, and live longer (to name a few things)!
 
 Move, Move, Move!!!
 
