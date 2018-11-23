@@ -77,7 +77,7 @@ class MCS_Dashboard extends Component{
           let sync="";
         if(value != null){
           time = moment(value).format("MMM DD, YYYY @ hh:mm a")
-          sync = <span className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</span>;
+          sync = <div className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}> Wearable Device Last Synced on {time}</div>;
        }
         return sync;
    }
@@ -86,8 +86,8 @@ class MCS_Dashboard extends Component{
    		  let non_exercise_steps;
    		  let steps = "";
    		if (value!=null){
-   		  non_exercise_steps = moment(value)
-   		  steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> NES {non_exercise_steps} </span>
+   		  non_exercise_steps = value
+   		  steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> NES: {non_exercise_steps} </span>
    		}
    		return steps;
    }
@@ -113,9 +113,20 @@ class MCS_Dashboard extends Component{
 	}
 
     successMCFetch(data){
-		  console.log(data.data)
+	  console.log(data.data)
+		let non_exercise_steps = "";
+		if(!_.isEmpty(data.data)){
+        for(let[keys1,values1] of Object.entries(data.data)){
+         	for(let[key2,values2] of Object.entries(values1)){
+	         	if (key2 == "non_exercise_steps"){
+	         		non_exercise_steps = values2;
+		         	}
+		        }	         	
+	  		}
+  		}	
 		this.setState({
-		  mc_data:data.data
+		  mc_data:data.data,
+  		  non_exercise_steps:non_exercise_steps
 	   });
    }
     toggleCalendar(){
@@ -232,6 +243,7 @@ class MCS_Dashboard extends Component{
   		var td_rows = [];
   		let keys = ["12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM","05:00 AM to 05:59 AM"];
   		if(!_.isEmpty(mc_data)){
+  			let non_exercise_steps = "";
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
 	         		if(key2 == "movement_consistency"){
@@ -248,12 +260,6 @@ class MCS_Dashboard extends Component{
 			         		}	
 		         			td_rows.push(<tr>{td_values}</tr>);
 		         		}
-		         	}
-		         	if (key2 == "non_exercise_steps"){
-		         		this.setState({
-		         			non_exercise_steps:values2
-		         		})
-		         		console.log(values2)
 		         	}
 		        }
 	         	
@@ -370,8 +376,8 @@ class MCS_Dashboard extends Component{
 			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard
                     </span>} />
                
-                    <div className="cla_center">
-                    	<span className="col-md-3">
+                    <div className=" row cla_center">
+                    	<span className = "col-md-3">
 							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
 								<FontAwesome
 								className="arrow"
@@ -388,17 +394,17 @@ class MCS_Dashboard extends Component{
 				                />
 				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
-			                </span>
+			                	</span>
 			                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
 							    <FontAwesome
 							    className="arrow"
 			                        name = "angle-right"
 			                        size = "2x"
 				                />
+								</span>
 							</span>
-						</span>
 
-						<span  className="last_sync col-md-6">{this.renderLastSync(this.state.last_synced)}</span> 
+						<span  className="last_sync col-md-6 offset-md-1">{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -409,12 +415,12 @@ class MCS_Dashboard extends Component{
 				         
 				                </PopoverBody>
 			                </Popover>
-			            <span className="steps_count col-md-3">{this.renderSteps(this.state.non_exercise_steps)}</span>
+			            
+			            <span className="steps_count col-md-2">{this.renderSteps(this.state.non_exercise_steps)}</span>
 			         </div>
-			           <br / ><br/>
+		    
 			       <div className = "row justify-content-center mcs_dashboard">
-			          <div className="col-sm-9 table_process">
-			           
+			          <div className="col-sm-9 table_process">          	
 	          	    	  <table className = "table table-striped table-bordered tableContent ">
 		          	    	<tr className="table_content">
 			          	    	<th className="table_size">12:00 - 12:59 AM</th>
@@ -463,9 +469,8 @@ class MCS_Dashboard extends Component{
 		          	    		{this.renderTablecolumndata(this.state.mc_data)}
 		          	    </tbody>
 		          	</table>
-		         
+	          	</div>
 		     </div>
-		  </div>
 
 		          <div className = "row justify-content-center table_size1">
 		          	<div className = "col-sm-9">
