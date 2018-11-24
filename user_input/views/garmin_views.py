@@ -13,7 +13,8 @@ import quicklook.calculations.calculation_driver
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
-	UserGarminDataManuallyUpdated)
+	UserGarminDataManuallyUpdated,
+	UserGarminDataEpoch)
 
 from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 
@@ -92,17 +93,12 @@ def _create_activity_stat(user,activity_obj,current_date):
 
 def _get_activities(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
-	# hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
-	# if hrr_data:
-	# 	measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
 	act_data = _get_activities_data(user,target_date)
 	activity_data = act_data[0]
 	manually_updated_act_data = act_data[1]
 
 	final_act_data = {}
-	comments = {}
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
-	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=3)
 	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
@@ -123,8 +119,6 @@ def _get_activities(user,target_date):
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
 	
-	# heart_rate = [x for x in all_activities_heartrate if x != []]
-	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []
 	for single_timestamp in all_activities_timestamp:
 		if single_timestamp:
@@ -145,10 +139,18 @@ def _get_activities(user,target_date):
 		else:
 			final_heart_rate.append([])
 
+
+	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+	epoch_summaries = quicklook.calculations.garmin_calculation\
+		.get_garmin_model_data(UserGarminDataEpoch,user,
+			current_date_epoch,current_date_epoch+86400,
+			order_by = '-id')
+	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
 		activity_data, manually_updated_act_data,
-		include_duplicate=True,include_deleted=True
+		include_duplicate=True,include_deleted=True,
+		epoch_summaries = epoch_summaries
 	)
 	for single_activity in combined_activities:
 		if fitfiles:

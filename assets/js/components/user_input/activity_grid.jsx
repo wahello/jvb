@@ -20,6 +20,7 @@ const activites = { "":"Select",
 "BIKETORUNTRANSITION":"BIKE TO RUN TRANSITION",
 "BOATING":"BOATING",
 "CASUAL_WALKING":"CASUAL WALKING",
+"CONDITIONING_CLASS":"CONDITIONING CLASS",
 "CROSS_COUNTRY_SKIING":"CROSS COUNTRY SKIING",
 "CYCLING":"CYCLING",
 "CYCLOCROSS":"CYCLOCROSS",
@@ -64,6 +65,7 @@ const activites = { "":"Select",
 "SNOW_SHOE":"SNOW SHOE",
 "SOCCER":"SOCCER",
 "SPEED_WALKING":"SPEED WALKING",
+"SQUASH":"SQUASH",
 "STAIR_CLIMBING":"STAIR CLIMBING",
 "STAND_UP_PADDLEBOARDING":"STAND UP PADDLE BOARDING",
 "STREET_RUNNING":"STREET RUNNING",
@@ -134,9 +136,12 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+<<<<<<< HEAD
+=======
 this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
+>>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
 
 this.state ={
     selected_date:selected_date,
@@ -436,10 +441,10 @@ toggleModal(){
         modal_duplicate_info_status:false,
         modal_indoor_temperature:this.props.indoor_temperature,
         modal_temperature:"",
-        modal_dew_point:"",
+        modal_dew_point:this.props.dewPoint,
         modal_humidity:"",
-        modal_wind:"",
-        modal_temperature_feels_like:"",
+        modal_wind:this.props.wind,
+        modal_temperature_feels_like:this.props.temperature_feels_like,
         modal_weather_conditions:"",
         modal_activity_comment:"",
         selectedActivityId:"",
@@ -1291,7 +1296,8 @@ CreateNewActivity(data){
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
         "steps":steps,
-        "steps_type":this.state.modal_exercise_steps_status,
+        "steps_type":this.state.modal_exercise_steps_status?
+            this.state.modal_exercise_steps_status:'exercise',
         "duplicate":this.state.modal_duplicate_info_status,
         "indoor_temperature":this.state.modal_indoor_temperature,
         "temperature":this.state.modal_temperature,
@@ -1493,56 +1499,68 @@ getTotalActivityDuration(){
         return '';
 }
 
+ActivityTimeInvalidErrorPopup(){
+  toast.info("Workout start time should be less than activity end time",{
+    className:"dark"
+  })
+}
+
 handleChangeModelActivityStartTimeDate(date){
+    let oldValue = this.state.activitystarttime_calender;
     this.setState({
         activity_start_date:date
     },()=>{
             let duration = this.getTotalActivityDuration();
-            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
                 this.state.modalstarttime_activity_hour,
                 this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_sec,
                 this.state.modalstarttime_activity_ampm,
                 this.state.activityendtime_calender,
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_sec,
-                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
-                'modalendtime_activity_hour', 'modalendtime_activity_min', 
-                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
-            if(duration){  
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    activitystarttime_calender:oldValue
+                })
             }
     });
 }
 
 handleChangeModelActivityEndTimeDate(date){
+    let oldValue = this.state.activityendtime_calender;
     this.setState({
         activity_end_date:date
     },()=>{
             let duration = this.getTotalActivityDuration();
-            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
                 this.state.modalstarttime_activity_hour,
                 this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_sec,
                 this.state.modalstarttime_activity_ampm,
                 this.state.activityendtime_calender,
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_sec,
-                this.state.modalendtime_activity_ampm,'activityendtime_calender', 
-                'modalendtime_activity_hour', 'modalendtime_activity_min', 
-                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
-            if(duration){  
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    activityendtime_calender:oldValue
+                })
             }
     });
 }
@@ -1550,28 +1568,31 @@ handleChangeModelActivityEndTimeDate(date){
 handleChangeModalActivityTime(event){
     const value = event.target.value;
     const name = event.target.name;
+    let oldValue = this.state[name];
     this.setState({
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
-            this.props.dateTimeValidation(this.state.activitystarttime_calender,
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
                 this.state.modalstarttime_activity_hour,
                 this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_sec,
                 this.state.modalstarttime_activity_ampm,
                 this.state.activityendtime_calender,
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_sec,
-                this.state.modalendtime_activity_ampm, 'activityendtime_calender', 
-                'modalendtime_activity_hour', 'modalendtime_activity_min', 
-                'modalendtime_activity_sec', 'modalendtime_activity_ampm');
-            if(duration){  
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    [name]:oldValue
+                })
             }
     });
 }
@@ -1622,20 +1643,6 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
-
-   resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
-      this.setState({
-        [end_date_prop_name] : null,
-        [end_hours_prop_name] : '',
-        [end_mins_prop_name] : '',
-        [end_am_pm_prop_name] : '',
-        [end_secs_prop_name]:''
-      },()=>{
-              toast.info(" Time of your workout started should be less than time of your workout ended ",{
-              className:"dark"
-              })
-      });
-    }
 
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
@@ -2229,37 +2236,37 @@ renderEditActivityModal(){
                        <FormGroup>
                        <Label className="padding1">10. Change Temperature</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_temperature" 
                                 value={this.state.modal_temperature}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)}/>
-                            {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)}/>*/}
+                            <Input type="select" 
                                 className="custom-select form-control"
                                 name="modal_temperature"                                  
                                 value={this.state.modal_temperature}
                                 onChange={this.handleChange} >
                                 <option key="select" value="">Select</option>                                    
                                 {this.createDropdown(-20,120)}
-                            </Input>*/}
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
                        <Label className="padding1">11. Change Dew Point</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_dew_point" 
                                 value={this.state.modal_dew_point}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)} />
-                            {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)} />*/}
+                            <Input type="select" 
                                 className="custom-select form-control"
                                 name="modal_dew_point"                                  
                                 value={this.state.modal_dew_point}
                                 onChange={this.handleChange} >
                                 <option key="select" value="">Select</option>                                    
                                 {this.createDropdown(-20,120,true)}
-                            </Input>*/}
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
@@ -2282,37 +2289,37 @@ renderEditActivityModal(){
                         <FormGroup>
                         <Label className="padding1">13. Change wind</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_wind" 
                                 value={this.state.modal_wind}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)} /> 
-                                {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)} /> */}
+                                <Input type="select" 
                                     className="custom-select form-control"
                                     name="modal_wind"                                  
                                     value={this.state.modal_wind}
                                     onChange={this.handleChange} >
                                     <option key="select" value="">Select</option>                                    
                                     {this.createWindDropdown(0,350)}
-                                </Input>*/}
+                                </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>
                        <Label className="padding1">14. Change Temperature Feels Like</Label>
                         <div className="input">
-                            <Input type="text" 
+                            {/*<Input type="text" 
                                 name="modal_temperature_feels_like" 
                                 value={this.state.modal_temperature_feels_like}
                                 onChange={this.handleChange}
-                                onBlur={this.valueToFixedDecimal.bind(this)} /> 
-                            {/*<Input type="select" 
+                                onBlur={this.valueToFixedDecimal.bind(this)} /> */}
+                            <Input type="select" 
                                 className="custom-select form-control"
                                 name="modal_temperature_feels_like"
                                 value={this.state.modal_temperature_feels_like}
                                 onChange={this.handleChange} >
                                 <option key="select" value="">Select</option>                                    
                                 {this.createDropdown(-20,120)}
-                            </Input>*/}
+                            </Input>
                         </div>
                        </FormGroup>
                        <FormGroup>

@@ -131,6 +131,7 @@ class MetaCumulative(models.Model):
 		blank=True,null=True)
 	cum_hrr_activity_end_hr_days_count = models.IntegerField(
 		blank=True,null=True)
+	cum_sleep_reported_days_count = models.IntegerField(blank=True, null=True)
 
 
 class ProgressReportUpdateMeta(models.Model):

@@ -839,6 +839,32 @@ def is_duplicate_activity(activity, all_activities):
 
 	return is_duplicate
 
+def activity_step_from_epoch(act_start, act_end, epochs):
+	'''
+	Try to guess the number of steps for given activity start
+	and end time. Especially for those activities which have
+	0 steps for example, Indoor Rowing, Yoga, Swimming etc.
+
+	Args:
+		act_start(datetime): Start time of the activity
+		act_end(datetime): End time of the activity
+		epoch(list): List of epoch summaries
+
+	Returns:
+		Int: Number of steps
+	'''
+	steps = 0
+	for epoch in epochs:
+		epoch_steps = epoch.get('steps',0)
+		epoch_start = datetime.utcfromtimestamp(
+			epoch.get('startTimeInSeconds')
+			+ epoch.get('startTimeOffsetInSeconds'))
+		epoch_end = (epoch_start + timedelta(
+			seconds=epoch.get('durationInSeconds')))
+		if(epoch_start >= act_start and epoch_end <= act_end):
+			steps += epoch_steps
+	return steps
+
 
 def get_filtered_activity_stats(activities_json,manually_updated_json,
 		userinput_activities = None,include_duplicate = False,
@@ -865,6 +891,7 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 	activities_json = copy.deepcopy(activities_json)
 	userinput_activities = copy.deepcopy(userinput_activities)
 	manually_updated_json = copy.deepcopy(manually_updated_json)
+	epoch_summaries = kwargs.get('epoch_summaries')
 
 	# If same id exist in user submited activities, give it more preference
 	# than manually edited activities
@@ -891,15 +918,25 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 	filtered_activities = []
 	if activities_json:
 		for obj in activities_json:
-			non_edited_steps = obj.get('steps',None)
+			non_edited_steps = obj.get('steps',0)
 			obj = manually_edited(obj)
 			manually_edited_steps = obj.get('steps',None)
-			if (not non_edited_steps is None) and not manually_edited_steps:
+			if (non_edited_steps and not manually_edited_steps):
 				# Manually edited summaries drop steps data, so if steps
 				# data in manually edited summary is not present but
 				# it was present in normal unedited version of summary, in
 				# that case add the previous step data to the current summary
 				obj['steps'] = non_edited_steps
+			elif epoch_summaries and not non_edited_steps:
+				# Try to guess the activity steps from epoch summaries
+				# if epoch summaries are present(in Garmin, it is present)
+				act_start_end_time = _get_activities_start_end_time([obj])[0]
+				steps = activity_step_from_epoch(
+					act_start_end_time.start,
+					act_start_end_time.end,
+					epoch_summaries
+				)
+				obj['steps'] = steps
 
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
@@ -1007,11 +1044,25 @@ def get_activity_stats(combined_user_activities,user_age):
 	max_duration = 0
 
 	if len(combined_user_activities):
-		runs_count = 0
 		avg_run_speed_mps = 0
+		total_duration = 0
+		workout_wise_total_duration = {}
+
+		for obj in combined_user_activities:
+			activity_type = obj.get('activityType')
+			activity_duration = obj.get('durationInSeconds',0)
+			if(activity_type not in IGNORE_ACTIVITY):
+				total_duration += activity_duration
+			if not workout_wise_total_duration.get(activity_type):
+				workout_wise_total_duration[activity_type] = 0
+			workout_wise_total_duration[activity_type] += activity_duration
+		
 		for obj in combined_user_activities:
 
+			act_duration = obj.get('durationInSeconds',0)
+			obj_act = obj.get('activityType')
 			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
+			workout_type_total_duration = workout_wise_total_duration.get(obj_act)
 			if not obj_avg_hr:
 				obj_avg_hr = 0
 
@@ -1019,19 +1070,12 @@ def get_activity_stats(combined_user_activities,user_age):
 				activity_stats['have_activity'] = (
 					do_user_has_exercise_activity(
 						combined_user_activities,user_age))
-			obj_act = obj.get('activityType')
 
 			activities_duration[obj['activityType']] = obj.get('durationInSeconds',0)
 			if not activities_hr.get(obj_act, None):
-				activities_hr[obj_act] = {}
-				activities_hr[obj_act]['hr'] = 0
-				activities_hr[obj_act]['count'] = 0
-
-			activities_hr[obj_act]['hr'] += obj_avg_hr
-			activities_hr[obj_act]['count'] += 1
-
-			if(obj.get('activityType') not in IGNORE_ACTIVITY):
-				activity_stats['total_duration'] += obj.get('durationInSeconds',0)
+				activities_hr[obj_act] = 0
+			# weighted average
+			activities_hr[obj_act] += round((act_duration/workout_type_total_duration)*obj_avg_hr)
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -1052,8 +1096,9 @@ def get_activity_stats(combined_user_activities,user_age):
 
 			if 'running' in obj.get('activityType','').lower():
 				activity_stats['distance_run_miles'] += obj.get('distanceInMeters',0)
-				avg_run_speed_mps += obj.get("averageSpeedInMetersPerSecond",0)
-				runs_count += 1
+				act_avg_speed = obj.get("averageSpeedInMetersPerSecond",0)
+				# Weighted average
+				avg_run_speed_mps += ((act_duration/workout_type_total_duration)*act_avg_speed)
 
 			elif 'swimming' in obj.get('activityType','').lower():
 				activity_stats['distance_swim_yards'] += obj.get('distanceInMeters',0)
@@ -1063,13 +1108,9 @@ def get_activity_stats(combined_user_activities,user_age):
 
 			elif 'other' in obj.get('activityType','').lower():
 				activity_stats['distance_other_miles'] += obj.get('distanceInMeters',0)
-
-		for key,val in activities_hr.items():
-			if val['count']:
-				activities_hr[key] = round(val['hr']/val['count'])
-			else:
-				activities_hr[key] = val['hr']			
+	
 		activity_stats['avg_heartrate'] = json.dumps(activities_hr)
+		activity_stats['total_duration'] = total_duration
 		
 		# Conversion into respective units
 		to_miles = lambda x: round(x * 0.000621371, 2)
@@ -1078,8 +1119,7 @@ def get_activity_stats(combined_user_activities,user_age):
 		activity_stats['distance_bike_miles'] = to_miles(activity_stats['distance_bike_miles'])
 		activity_stats['distance_other_miles'] = to_miles(activity_stats['distance_other_miles'])
 		activity_stats['distance_swim_yards'] = to_yards(activity_stats['distance_swim_yards'])
-		if runs_count:
-			activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps/runs_count) 
+		activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps) 
 
 		activity_stats['activities_duration'] = json.dumps(activities_duration)
 	#print('filtered:',filtered_activities,'\n','user:',userinput_activities)
@@ -2601,7 +2641,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		# but not necessarily 
 		combined_user_activities = get_filtered_activity_stats(
 			todays_activities_json,todays_manually_updated_json,
-			userinput_activities,user = user, calendar_date = current_date)
+			userinput_activities,user = user, calendar_date = current_date,
+			epoch_summaries = epochs_json)
 		activity_stats = get_activity_stats(combined_user_activities,user_age)
 		weather_data = get_weather_data(todays_daily_strong,start_epoch,activity_stats)
 
@@ -2622,9 +2663,9 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
 
 		# Meters to foot and rounding half up
-		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(todays_activities_json,
+		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(combined_user_activities,
 													'totalElevationGainInMeters')*3.28084,1))
-		exercise_calculated_data['elevation_loss'] = int(round(safe_sum(todays_activities_json,
+		exercise_calculated_data['elevation_loss'] = int(round(safe_sum(combined_user_activities,
 													'totalElevationLossInMeters')*3.28084,1))
 		exercise_calculated_data['effort_level'] = safe_get(todays_daily_strong,
 													"workout_effort_level", 0)

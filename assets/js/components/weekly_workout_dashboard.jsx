@@ -602,8 +602,7 @@ renderTable(weekly_data){
 				td_valuesExtra.push(<td>{extra}</td>)
 			}
 			tr_values.push(<tr>{td_valuesExtra}</tr>);
-
-			return [activity_distance_keys,tr_values];
+			return [activity_distance_keys,tr_values];		
 		}
 		return [null,null];
 	}
