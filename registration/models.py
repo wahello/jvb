@@ -55,10 +55,6 @@ class Profile(models.Model):
 
     date_of_birth = models.DateField()
 
-    sleep_goals = models.CharField(max_length=10)
-
-    goals = models.CharField(max_length=250, null=True, blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
