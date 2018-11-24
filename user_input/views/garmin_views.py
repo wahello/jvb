@@ -21,7 +21,6 @@ from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 from garmin.models import GarminFitFiles
 from hrr.calculation_helper import fitfile_parse
 
-from user_input.models import DailyUserInputStrong
 
 def _get_activities_data(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
