@@ -136,12 +136,8 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
-<<<<<<< HEAD
-=======
-this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
->>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
 
 this.state ={
     selected_date:selected_date,

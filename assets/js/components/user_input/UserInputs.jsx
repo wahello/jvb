@@ -286,14 +286,8 @@ class UserInputs extends React.Component{
     this.onWeatherReportFetchSuccess = this.onWeatherReportFetchSuccess.bind(this);
     this.onWeatherReportFetchFailure = this.onWeatherReportFetchFailure.bind(this);
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
-<<<<<<< HEAD
- }   
-=======
-    this.resetEndTime = this.resetEndTime.bind(this);
-    this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
     }
     
->>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
@@ -1491,25 +1485,11 @@ handleScroll() {
       window.scrollTo(0, scrollHeight-80);
     }
 
-<<<<<<< HEAD
     sleepInvalidErrorPopup(){
       toast.info("Time fell asleep should be less than time woke up",{
         className:"dark"
       })
-=======
 
-    resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
-      this.setState({
-        [end_date_prop_name] : null,
-        [end_hours_prop_name] : '',
-        [end_mins_prop_name] : '',
-        [end_am_pm_prop_name] : '',
-      },()=>{
-              toast.info(" Time fell asleep should be less than time woke up ",{
-              className:"dark"
-              })
-      });
->>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
     }
 
     dateTimeValidation(start_time_date, start_time_hours,
@@ -1523,7 +1503,6 @@ handleScroll() {
             start_time_mins,start_time_am_pm)
         }
 
-<<<<<<< HEAD
         let sleep_awake_time_dt = null;
         if (end_time_date && end_time_hours
            && end_time_mins && end_time_am_pm){
@@ -1534,24 +1513,7 @@ handleScroll() {
         if(sleep_bedtime_dt && sleep_awake_time_dt){
           // check if sleep bedtime is before the awake time
           return sleep_awake_time_dt.isAfter(sleep_bedtime_dt);
-=======
-      start_time_hours = Number(start_time_hours);
-      start_time_mins = Number(start_time_mins);
-      start_time_secs = Number(start_time_secs);
-      end_time_hours = Number(end_time_hours);
-      end_time_mins = Number(end_time_mins);
-      end_time_secs = Number(end_time_secs);
-      start_time_date.startOf('day');
-      end_time_date.startOf('day');
-  
-      if(start_time_date && start_time_hours && start_time_mins && start_time_secs && start_time_am_pm && end_time_date && end_time_hours && end_time_mins &&     end_time_secs && end_time_am_pm)
-      {
-        if(end_time_date > start_time_date){
-          //nothing
-        }
-        else if(end_time_date < start_time_date){
-          this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);     
->>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
+
         }
         return true;
     }

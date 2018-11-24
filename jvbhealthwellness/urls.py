@@ -16,11 +16,8 @@ from fitbit import views as fitbitViews
 from hrr import urls as hrrUrls
 from fitbit import urls as fitbitUrls
 from dashboards import urls as dashboardUrls
-<<<<<<< HEAD
 from common import urls as commonUrls
-=======
 from weather import urls as weatherUrls
->>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -65,11 +62,8 @@ urlpatterns = [
     url(r'^dashboard/', include(dashboardUrls)),
     url(r'^users/',include(userInputUrls)),
     url(r'^fitbit/',include(fitbitUrls)),
-<<<<<<< HEAD
-     url(r'^common/',include(commonUrls)),
-=======
+    url(r'^common/',include(commonUrls)),
     url(r'^weather/',include(weatherUrls)),
->>>>>>> 7e607902a51986dfd83f13a3d4db6a2a8937038e
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^service_connect$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
