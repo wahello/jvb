@@ -115,6 +115,7 @@ class MCS_Dashboard extends Component{
     successMCFetch(data){
 	  console.log(data.data)
 		let non_exercise_steps = "";
+  		let non_exercise_steps_value = "";
 		if(!_.isEmpty(data.data)){
         for(let[keys1,values1] of Object.entries(data.data)){
          	for(let[key2,values2] of Object.entries(values1)){
@@ -123,10 +124,11 @@ class MCS_Dashboard extends Component{
 		         	}
 		        }	         	
 	  		}
-  		}	
+  		}
+  		non_exercise_steps_value = this.stepsValueComma(non_exercise_steps)
 		this.setState({
 		  mc_data:data.data,
-  		  non_exercise_steps:non_exercise_steps
+  		  non_exercise_steps:non_exercise_steps_value
 	   });
    }
     toggleCalendar(){
@@ -243,7 +245,6 @@ class MCS_Dashboard extends Component{
   		var td_rows = [];
   		let keys = ["12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM","05:00 AM to 05:59 AM"];
   		if(!_.isEmpty(mc_data)){
-  			let non_exercise_steps = "";
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
 	         		if(key2 == "movement_consistency"){
