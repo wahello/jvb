@@ -87,7 +87,7 @@ class MCS_Dashboard extends Component{
    		  let steps = "";
    		if (value!=null){
    		  non_exercise_steps = value
-   		  steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> NES: {non_exercise_steps} </span>
+   		  steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> Today's Non Exercise Steps: {non_exercise_steps} </span>
    		}
    		return steps;
    }
@@ -404,7 +404,7 @@ class MCS_Dashboard extends Component{
 								</span>
 							</span>
 
-						<span  className="last_sync col-md-6 offset-md-1">{this.renderLastSync(this.state.last_synced)}</span> 
+						<span  className="last_sync col-md-5 offset-md-1">{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -416,7 +416,7 @@ class MCS_Dashboard extends Component{
 				                </PopoverBody>
 			                </Popover>
 			            
-			            <span className="steps_count col-md-2">{this.renderSteps(this.state.non_exercise_steps)}</span>
+			            <span className="steps_count col-md-3">{this.renderSteps(this.state.non_exercise_steps)}</span>
 			         </div>
 		    
 			       <div className = "row justify-content-center mcs_dashboard">
@@ -496,7 +496,6 @@ class MCS_Dashboard extends Component{
 					</div>
 					<div className = "row justify-content-center mcs-dashboard">
 		          	<div className = "col-sm-9">
-			                <p className="mcs_content" style={{marginLeft:"15px"}}>NES = Non Exercise Steps</p>
 	         				<p className="mcs_content" style={{marginLeft:"15px"}}>Data in each cell = Steps in that particular hour ( percentage of active minutes in that hour )</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>
