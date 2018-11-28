@@ -387,7 +387,7 @@ class No_Hrr_Data extends Component{
 	  return sleep_bedtime_dt;
 }
 	successHeart(data){
-		toast.info("Updated HRR successfully",{
+		toast.info("Your HRR stats have been updated successfully",{
 	          className:"dark"
 	    });
 	  	this.setState({

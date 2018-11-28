@@ -190,7 +190,7 @@ class Heartrate_Data extends Component{
   		}
 
   		successHeart(data){
-			toast.info("Updated HRR successfully",{
+			toast.info("Your HRR stats have been updated successfully",{
 	          className:"dark"
 	        });
 	  		this.setState({
