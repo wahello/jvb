@@ -80,9 +80,9 @@ def week_date(start_date):
 	Returns:Week start date and End date
 	'''
 	week_start_date = start_date - timedelta(
-		days = start_date.weekday()+7)
+		days = start_date.weekday())
 	week_end_date = start_date - timedelta(
-		days = start_date.weekday()+1)
+		days = start_date.weekday()-6)
 	return(week_start_date,week_end_date)
 
 def get_weekly_workouts(user,start_date,end_date):
