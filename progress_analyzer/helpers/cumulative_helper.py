@@ -752,44 +752,51 @@ def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 	else:
 		hrr_api_data = None
 
-	hrr_time_to_99 = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0
-	)
-	if hrr_time_to_99 and type(hrr_time_to_99) == str and hrr_time_to_99 != ":":
-		hrr_time_to_99 = round(
-			_str_to_hours_min_sec(hrr_time_to_99,'minute',"mm:ss"),3
-		)
-	elif(hrr_api_data):
-		hrr_time_to_99 = hrr_api_data.get("hrr_time_to_99")
-	else:
-		hrr_time_to_99 = 0
+	# hrr_time_to_99 = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0
+	# )
+	# if hrr_time_to_99 and type(hrr_time_to_99) == str and hrr_time_to_99 != ":":
+	# 	hrr_time_to_99 = round(
+	# 		_str_to_hours_min_sec(hrr_time_to_99,'minute',"mm:ss"),3
+	# 	)
+	# elif(hrr_api_data):
+	# 	hrr_time_to_99 = hrr_api_data.get("hrr_time_to_99")
+	# else:
+	# 	hrr_time_to_99 = 0
 
-	data['hrr_time_to_99'] = hrr_time_to_99
+	# data['hrr_time_to_99'] = hrr_time_to_99
 
-	hrr_starting_point = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"hrr_starting_point",0
-	)
-	if not hrr_starting_point and hrr_api_data:
-		hrr_starting_point = hrr_api_data.get("hrr_starting_point")
-	data['hrr_starting_point'] = hrr_starting_point
+	# hrr_starting_point = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"hrr_starting_point",0
+	# )
+	# if not hrr_starting_point and hrr_api_data:
+	# 	hrr_starting_point = hrr_api_data.get("hrr_starting_point")
+	# data['hrr_starting_point'] = hrr_starting_point
 
-	lowest_hr_during_hrr = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0
-	)
-	if not lowest_hr_during_hrr and hrr_api_data:
-		lowest_hr_during_hrr = hrr_api_data.get("lowest_hr_during_hrr")
-	data['lowest_hr_during_hrr'] = lowest_hr_during_hrr
+	# lowest_hr_during_hrr = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0
+	# )
+	# if not lowest_hr_during_hrr and hrr_api_data:
+	# 	lowest_hr_during_hrr = hrr_api_data.get("lowest_hr_during_hrr")
+	# data['lowest_hr_during_hrr'] = lowest_hr_during_hrr
 
-	hrr_beats_lowered_first_minute = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0
-	)
-	if not hrr_beats_lowered_first_minute and hrr_api_data:
-		hrr_beats_lowered_first_minute = hrr_api_data.get(
-			"hrr_beats_lowered_first_minute"
-		)
-	data['hrr_beats_lowered_first_minute'] = hrr_beats_lowered_first_minute
+	# hrr_beats_lowered_first_minute = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0
+	# )
+	# if not hrr_beats_lowered_first_minute and hrr_api_data:
+	# 	hrr_beats_lowered_first_minute = hrr_api_data.get(
+	# 		"hrr_beats_lowered_first_minute"
+	# 	)
+	# data['hrr_beats_lowered_first_minute'] = hrr_beats_lowered_first_minute
 
 	if hrr_api_data:
+		data["hrr_time_to_99"] = hrr_api_data.get("hrr_time_to_99")
+		data["hrr_starting_point"] = hrr_api_data.get("hrr_starting_point")
+		data["lowest_hr_during_hrr"] = hrr_api_data.get("lowest_hr_during_hrr")
+		data["hrr_beats_lowered_first_minute"] = hrr_api_data.get(
+			"hrr_beats_lowered_first_minute"
+		)
+
 		data["hrr_pure_1_min_beats_lowered"] = hrr_api_data.get(
 			"hrr_pure_1_min_beats_lowered"
 		)
