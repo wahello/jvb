@@ -227,11 +227,9 @@ class Other_Hrr_Data extends Component{
 	  return sleep_bedtime_dt;
 }
 	successHeart(data){
-		console.log("DATA received: ", data);
-		{this.renderHrrSelectedDateFetchOverlay()}
-		/*toast.info("Updated Other Heart-rate Data!",{
+		toast.info("Updated HRR successfully",{
 	          className:"dark"
-	    });*/
+	    });
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
@@ -260,7 +258,6 @@ class Other_Hrr_Data extends Component{
 					created_at:data.data.created_at
 	  	});
 	  	this.props.HRR_measured(data.data.Did_you_measure_HRR);
-	  	console.log("From child other hrr");
 	}
 	errorHeart(error){
 		console.log(error.message); 

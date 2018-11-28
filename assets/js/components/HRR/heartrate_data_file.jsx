@@ -190,11 +190,9 @@ class Heartrate_Data extends Component{
   		}
 
   		successHeart(data){
-			console.log("DATA received: ", data);
-			{this.renderHrrSelectedDateFetchOverlay()}
-				/*toast.info("Updated Heart-rate Data!",{
-		          className:"dark"
-		        });*/
+			toast.info("Updated HRR successfully",{
+	          className:"dark"
+	        });
 	  		this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
@@ -223,7 +221,6 @@ class Heartrate_Data extends Component{
 					created_at:data.data.created_at
 		  	});
 		  	this.props.HRR_measured(data.data.Did_you_measure_HRR);
-		  	console.log("From child hrr");
 		}
 		errorHeart(error){
 			console.log(error.message); 
