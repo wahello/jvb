@@ -32,6 +32,7 @@ from garmin.models import GarminFitFiles,\
 						UserGarminDataActivity,\
 						UserGarminDataManuallyUpdated
 from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
 from hrr.models import Hrr,\
@@ -688,7 +689,9 @@ def aa_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
-	
+
+	activities_dic = get_usernput_activities(
+		user,start_date)
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
@@ -696,7 +699,7 @@ def aa_data(user,start_date):
 	# print(filtered_activities_files,"filtered activities")
 	filtered_activities_only = filtered_activities_files.copy()
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
-	if user_input_strong:
+	if activities_dic:
 		for i,k in enumerate(filtered_activities_files):
 			user_input_keys.append(filtered_activities_files[i]['summaryId'])
 			user_input_summary_id = list(set(user_input_keys))
@@ -773,8 +776,7 @@ def aa_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end)
-	if user_input_strong:
-		
+	if activities_dic:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
@@ -956,11 +958,9 @@ def store_aa_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the AA calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("AA calculations got started",user.username)
@@ -1028,27 +1028,32 @@ def get_usernput_activities(user,start_date):
 	'''
 		Get activities from user input models
 	'''
-	try:
-		user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
-		activities=[]
-		activities_dic={}
-		if user_input_strong:
-			user_input_activities =[act.activities for act in user_input_strong]
-			user_input_activities = json.loads(user_input_activities[0])
-			for i,k in user_input_activities.items():
-				summaryId = []
-				for keys in user_input_activities.keys():
-					summaryId.append(keys)
-				for i in range(len(summaryId)):
-					activities.append(user_input_activities[summaryId[i]])
-					activities_dic[summaryId[i]]=user_input_activities[summaryId[i]]
-	except (ValueError, SyntaxError):
-		activities =[]
-		activities_dic = {}
-		user_input_strong = ''
-	return activities,activities_dic,user_input_strong
+	# try:
+	# 	user_input_strong = DailyUserInputStrong.objects.filter(
+	# 	user_input__created_at=(start_date),
+	# 	user_input__user = user).order_by('-user_input__created_at')
+	# 	activities=[]
+	# 	activities_dic={}
+	# 	if user_input_strong:
+	# 		user_input_activities =[act.activities for act in user_input_strong]
+	# 		user_input_activities = json.loads(user_input_activities[0])
+	# 		for i,k in user_input_activities.items():
+	# 			summaryId = []
+	# 			for keys in user_input_activities.keys():
+	# 				summaryId.append(keys)
+	# 			for i in range(len(summaryId)):
+	# 				activities.append(user_input_activities[summaryId[i]])
+	# 				activities_dic[summaryId[i]]=user_input_activities[summaryId[i]]
+	# except (ValueError, SyntaxError):
+	# 	activities =[]
+	# 	activities_dic = {}
+	# 	user_input_strong = ''
+	# return activities,activities_dic,user_input_strong
+	activities_dic = get_daily_activities_in_base_format(user,start_date)
+	if activities_dic:
+		return activities_dic
+	else:
+		return {}
 
 def remove_hrr_file(filtered_activities_files):
 	for i,single_actiivty in enumerate(filtered_activities_files):
@@ -1073,26 +1078,40 @@ def aa_workout_data(user,start_date):
 			summaryId = ui_data_single['summaryId']
 			only_hrr_summary_id.append(summaryId)
 			ui_data_keys.remove(summaryId)
-	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(user,start_date)
+	
+	activities_dic = get_usernput_activities(user,start_date)
+
 	count = 0
 	id_act = 0
 	activities = []
 	ui_hrr_keys = []
-	if user_input_strong:
-		for single_ui_object in user_input_strong:
-			single_activity = single_ui_object.activities
-			if single_activity:
-				single_activity_json = json.loads(single_activity)
-				single_activity_values = single_activity_json.values()
-				single_activity_values = list(single_activity_values)
-				for i,k in enumerate(single_activity_values):
-					if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
-						id_act = int(single_activity_values[i]['summaryId'])
-						count = count + 1
-						ui_hrr_keys.append(single_activity_values[i]['summaryId'])
-						activities.append(single_activity_values[i])
-					else:
-						activities.append(single_activity_values[i])
+	# if user_input_strong:
+	# 	for single_ui_object in user_input_strong:
+	# 		single_activity = single_ui_object.activities
+	# 		if single_activity:
+	# 			single_activity_json = json.loads(single_activity)
+	# 			single_activity_values = single_activity_json.values()
+	# 			single_activity_values = list(single_activity_values)
+	# 			for i,k in enumerate(single_activity_values):
+	# 				if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
+	# 					id_act = int(single_activity_values[i]['summaryId'])
+	# 					count = count + 1
+	# 					ui_hrr_keys.append(single_activity_values[i]['summaryId'])
+	# 					activities.append(single_activity_values[i])
+	# 				else:
+	# 					activities.append(single_activity_values[i])
+
+	if activities_dic:
+		single_activity_values = activities_dic.values()
+		single_activity_values = list(single_activity_values)
+		for i,k in enumerate(single_activity_values):
+			if single_activity_values[i]['activityType'] == 'HEART_RATE_RECOVERY':
+				id_act = int(single_activity_values[i]['summaryId'])
+				count = count + 1
+				ui_hrr_keys.append(single_activity_values[i]['summaryId'])
+				activities.append(single_activity_values[i])
+			else:
+				activities.append(single_activity_values[i])					
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
 
@@ -1253,11 +1272,9 @@ def store_aa_workout_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the Daily A/A
 	workout calculations then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("HRR A/A Workout started")
@@ -1396,9 +1413,6 @@ def daily_aa_data(user, start_date):
 			garmin_workout.append(one_activity_file)
 	else:
 		activity_files = []
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
 
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
@@ -1413,7 +1427,7 @@ def daily_aa_data(user, start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
-	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+	activities_dic = get_usernput_activities(
 		user,start_date)
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
@@ -1528,7 +1542,7 @@ def daily_aa_data(user, start_date):
 	fitfiles_obj = get_fitfiles(user,start_date,start,end)
 
 	try:
-		if activities:
+		if activities_dic:
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -1791,11 +1805,9 @@ def store_daily_aa_calculations(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the Daily A/A calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("A/A dailies got started")
@@ -1941,11 +1953,6 @@ def aa_low_high_end_data(user,start_date):
 	else:
 		activity_files = ''
 		offset = 0
-
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
-
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	ui_data_hrr = []
@@ -1963,7 +1970,7 @@ def aa_low_high_end_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
-	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+	activities_dic = get_usernput_activities(
 		user,start_date)
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
@@ -2052,7 +2059,7 @@ def aa_low_high_end_data(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end)
-	if activities and fitfiles_obj:
+	if activities_dic and fitfiles_obj:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
@@ -2223,11 +2230,9 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 	This function takes user start date and end date, calculate the low_high_end 
 	HR calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
@@ -2276,9 +2281,6 @@ def hrr_data(user,start_date):
 	end_date_timestamp = start_date_timestamp + 86400
 
 	start_date_str = start_date.strftime('%Y-%m-%d')
-	user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
 	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	activity_files = [pr.data for pr in activity_files_qs]
 	
@@ -2302,7 +2304,7 @@ def hrr_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
-	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+	activities_dic = get_usernput_activities(
 		user,start_date)
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
@@ -2340,7 +2342,7 @@ def hrr_data(user,start_date):
 		the HRR fit file
 	'''
 	try:
-		if activities:
+		if activities_dic:
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -2720,11 +2722,9 @@ def store_hhr(user,from_date,to_date):
 	'''
 	This function takes user start date and end date, calculate the HRR calculations 
 	then stores in Data base
-
 	Args:user(user object)
 		:from_date(start date)
 		:to_date(end date)
-
 	Return:None
 	'''
 	print("HRR calculations got started",user.username)

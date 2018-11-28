@@ -313,26 +313,30 @@ export function renderSubmitOverlay(){
 export function renderActivityGrid(){
 	const updateParentActivities = function(activities){
 		let workout = this.state.workout;
-		if(!_.isEmpty(activities)){
-			let have_exercise_activity = false;
-			for(let [key,act] of Object.entries(activities)){
-				if(!act.deleted && !act.duplicate && act.steps_type === 'exercise'){
-					have_exercise_activity = true;
-					break;
-				}
-			}
-			workout = have_exercise_activity?'yes':'no';
-		}
+        if(!_.isEmpty(activities)){
+            let have_exercise_activity = false;
+            for(let [key,act] of Object.entries(activities)){
+                if(!act.deleted && !act.duplicate && act.steps_type === 'exercise'){
+                    have_exercise_activity = true;
+                    break;
+                }
+            }
+            workout = have_exercise_activity?'yes':'no';
+        }
 
-		this.setState({
-			workout:workout,
-			activities:activities
-		});
-	}.bind(this);
+        this.setState({
+            workout:workout,
+            activities:activities
+        });
+    }.bind(this);
 	return(
 		<ActivityGrid
 			updateParentActivities = {updateParentActivities}
 			activities = {this.state.activities}
+			indoor_temperature = {this.state.indoor_temperature}
+			dewPoint = {this.state.dewPoint}
+			wind = {this.state.wind}
+			temperature_feels_like = {this.state.temperature_feels_like}
 			selected_date = {this.state.selected_date}
 			editable = {this.state.editable}
 			dateTimeValidation = {this.dateTimeValidation}

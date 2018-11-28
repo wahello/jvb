@@ -1,4 +1,3 @@
-# from datetime import datetime
 import re
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator,BaseValidator
@@ -494,6 +493,7 @@ class DailyActivity(models.Model):
     user = models.ForeignKey(User, related_name='daily_activities')
     activity_id = models.CharField(max_length=100)
     created_at = models.DateField()
+    start_time_in_seconds = models.IntegerField()
     activity_data = models.TextField()
     activity_weather = models.TextField(blank=True)
     can_update_steps_type = models.BooleanField(default=True)
