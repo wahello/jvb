@@ -1107,7 +1107,7 @@ def aa_workout_data(user,start_date):
 	
 	filtered_activities_files_copy = filtered_activities_files.copy()
 	filtered_activities_files_copy = remove_hrr_file(filtered_activities_files_copy)
-	# print(filtered_activities_files,"filtered_activities_files")
+	
 	act_id = []
 	workout = []
 	hrr = []
@@ -1115,19 +1115,19 @@ def aa_workout_data(user,start_date):
 	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	if activities:
-		if filtered_activities_files:
-			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in only_hrr_summary_id:
-					hrr.append(filtered_activities_files[i])
+		if filtered_activities_files_copy:
+			for i,k in enumerate(filtered_activities_files_copy):
+				if filtered_activities_files_copy[i].get("summaryId") in only_hrr_summary_id:
+					hrr.append(filtered_activities_files_copy[i])
 				else:
-					workout.append(filtered_activities_files[i])
+					workout.append(filtered_activities_files_copy[i])
 	else:
-		if filtered_activities_files:
-			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in ui_data_keys:
-					workout.append(filtered_activities_files[i])
+		if filtered_activities_files_copy:
+			for i,k in enumerate(filtered_activities_files_copy):
+				if filtered_activities_files_copy[i].get("summaryId") in ui_data_keys:
+					workout.append(filtered_activities_files_copy[i])
 				else:
-					hrr.append(filtered_activities_files[i])
+					hrr.append(filtered_activities_files_copy[i])
 	data={"date":"",
 		  "workout_type":"",
 		  "duration":"",
@@ -2309,12 +2309,12 @@ def hrr_data(user,start_date):
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
 	count = 0
-	id_act = 0
+	id_act = []
 	activities = []
 	workout_id = []
 	for i,k in enumerate(filtered_activities_files):
 		if filtered_activities_files[i]['activityType'] == 'HEART_RATE_RECOVERY':
-			id_act = int(filtered_activities_files[i]['summaryId'])
+			id_act.append(int(filtered_activities_files[i]['summaryId']))
 			count = count + 1
 			activities.append(filtered_activities_files[i])
 		else:
@@ -2334,7 +2334,6 @@ def hrr_data(user,start_date):
 	fitfiles_obj = get_fitfiles(user,start_date,start,end)
 	workout = []
 	hrr = []
-	
 	'''
 		Below try block do, first capture data from user input form and identify file as  
 		hrr file if it fails then else block will do assumtion calculation for idetifying
@@ -2346,7 +2345,7 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = int(meta['activityIds'][0])
-				if id_act == data_id:
+				if data_id in id_act:
 					hrr.append(tmp)
 				elif data_id in workout_id:
 					workout.append(tmp)
