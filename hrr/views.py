@@ -1479,41 +1479,39 @@ def daily_aa_data(user, start_date):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
-			if user_input_strong:
-				for i,k in enumerate(filtered_activities_files):
-					garmin_id = single_actiivty.get("summaryId")
-					ui_id = filtered_activities_files[i].get('summaryId')
-					garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
-					ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
-					garmin_duration = single_actiivty.get("durationInSeconds",0)
-					ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
-					if ui_hr == None or ui_hr == '':
-						ui_hr = 0
-					if garmin_hr == None or garmin_hr == '':
-						garmin_hr = 0
-					if garmin_duration == None or garmin_duration == '':
-						garmin_duration = 0
-					if ui_duration == None or ui_duration == '':
-						ui_duration = 0
-					if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
-						user_created_activity_list.append(k)
-						remove_in_workout.append(int(k["summaryId"]))
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				garmin_duration = single_actiivty.get("durationInSeconds",0)
+				ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if garmin_duration == None or garmin_duration == '':
+					garmin_duration = 0
+				if ui_duration == None or ui_duration == '':
+					ui_duration = 0
+				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
 		elif (single_actiivty.get("manual",0) != True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
-			if user_input_strong:
-				for i,k in enumerate(filtered_activities_files):
-					garmin_id = single_actiivty.get("summaryId")
-					ui_id = filtered_activities_files[i].get('summaryId')
-					garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
-					ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
-					if ui_hr == None or ui_hr == '':
-						ui_hr = 0
-					if garmin_hr == None or garmin_hr == '':
-						garmin_hr = 0
-					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
-						user_created_activity_list.append(k)
-						remove_in_workout.append(int(k["summaryId"]))
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -2012,41 +2010,39 @@ def aa_low_high_end_data(user,start_date):
 			and activities_dic.get(single_actiivty["summaryId"])):
 			user_created_activity_list.append(
 				activities_dic.get(single_actiivty["summaryId"]))
-			if user_input_strong:
-				for i,k in enumerate(filtered_activities_files):
-					garmin_id = single_actiivty.get("summaryId")
-					ui_id = filtered_activities_files[i].get('summaryId')
-					garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
-					ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
-					garmin_duration = single_actiivty.get("durationInSeconds",0)
-					ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
-					if ui_hr == None or ui_hr == '':
-						ui_hr = 0
-					if garmin_hr == None or garmin_hr == '':
-						garmin_hr = 0
-					if garmin_duration == None or garmin_duration == '':
-						garmin_duration = 0
-					if ui_duration == None or ui_duration == '':
-						ui_duration = 0
-					if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
-						user_created_activity_list.append(k)
-						remove_in_workout.append(int(k["summaryId"]))
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				garmin_duration = single_actiivty.get("durationInSeconds",0)
+				ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if garmin_duration == None or garmin_duration == '':
+					garmin_duration = 0
+				if ui_duration == None or ui_duration == '':
+					ui_duration = 0
+				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
 		elif (single_actiivty.get("manual",0) != True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
-			if user_input_strong:
-				for i,k in enumerate(filtered_activities_files):
-					garmin_id = single_actiivty.get("summaryId")
-					ui_id = filtered_activities_files[i].get('summaryId')
-					garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
-					ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
-					if ui_hr == None or ui_hr == '':
-						ui_hr = 0
-					if garmin_hr == None or garmin_hr == '':
-						garmin_hr = 0
-					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
-						user_created_activity_list.append(k)
-						remove_in_workout.append(int(k["summaryId"]))
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
 
 	for i,single_activity in enumerate(filtered_activities_only):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
