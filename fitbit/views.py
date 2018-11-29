@@ -16,6 +16,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .tasks import store_fitbit_data
@@ -29,6 +30,7 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
 					FitbitNotifications
+
 from .fitbit_push import store_data,session_fitbit
 
 
@@ -116,7 +118,7 @@ def api_fitbit(session,date_fitbit):
 	'''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
 	activity_fitbit = session.get(
-	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=1&offset=0".format(
+	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
 	date_fitbit))
 	heartrate_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
 	steps_fitbit = session.get("https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
@@ -317,18 +319,3 @@ def fetching_data_fitbit(request):
 # 			steps_fitbit = steps_fitbit.json()
 # 			store_data(steps_fitbit,user,date,data_type="steps_fitbit")
 # 	return None
-
-class HaveFitbitTokens(APIView):
-	'''
-	Check availability of fitbit tokens for current user
-	'''
-	permission_classes = (IsAuthenticated,)
-	def get(self,request,format="json"):
-		have_tokens = {
-			"have_fitbit_tokens":False
-		}
-
-		if FitbitConnectToken.objects.filter(user=request.user).exists():
-			have_tokens['have_fitbit_tokens'] = True
-
-		return Response(have_tokens,status=status.HTTP_200_OK)

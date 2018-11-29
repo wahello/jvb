@@ -84,8 +84,8 @@
  	}
 }
 
-/*Weekly workout table*/
-@media (min-width: 375px) and (max-width: 812px){
+/*Weekly workout table and Active table*/
+@media (min-width: 375px) and (max-width: 736px){
 	.weeklyWorkoutTable {	
 		font-size:65% !important;
 		width: 40px !important;
@@ -170,4 +170,96 @@
 }
 .weeklyWorkoutTable tbody .weeklyWorkoutTDMatrix tr:nth-child(2) td:nth-child(2){
 	background-color: #A9A9A9 !important;
+}
+//new styels for Active table
+.new_style{
+	font-size:12px;
+}
+.new_style th{
+	min-width: 100px;
+}
+.new_style tbody td{
+	height:50px;
+}
+@media (max-width: 667px) and (orientation:landscape) {
+	.new_style1{
+		width:42.5%;
+		margin:auto;
+		table {
+  height:100%;
+  width:100%;
+  background: red;}
+}
+	
+	.new_style td{
+		height:40px;
+	}
+	html, body {
+ height: 100%;
+ padding:0;
+ margin: 0;
+}
+
+}
+@media (min-width: 375px) and (orientation:portrait){
+	.new_style1{
+		width:76%;
+		margin:auto;
+	}
+	.new_style td{
+		height:40px;
+	}
+} 
+
+.activeTimeTable{
+	vertical-align: middle;
+	min-width: 60px;
+	padding: 0rem;
+	width: 100%;
+}
+.activeTimeTable tr{
+	border: none;
+}
+.activeTimeTable td{
+	padding: 0rem 0.4rem !important;
+	vertical-align: middle;
+}
+.activeTimeTable tbody td{
+	padding: 3px 6px;
+	min-width: 60px;
+}
+.activeTimeTable th{
+	vertical-align: middle;
+	min-width: 60px;
+	padding: 0rem;
+}
+
+.activeTimeTable th tr td, .activeTimeTable th tr{
+	border:none;
+}
+
+.activeTimeTableParentDiv{
+	margin:0% 6%;
+}
+
+
+
+/*Weekly workout table and Active table*/
+@media (min-width: 375px) and (max-width: 736px){
+	.activeTimeTable {	
+		font-size:70% !important;
+	}
+	.activeTimeTable th{
+		min-width: 40px !important;
+		padding: 0rem 0.2rem;
+	}
+	.activeTimeTable td{
+    	height: auto !important;
+		padding: 10px 8px !important;
+		min-width: 40px !important;
+	}
+	.activeTimeTable tbody .activeTimeTable tr td{
+		padding: 0rem 0.5rem !important;
+		min-width: 60px !important;
+	}
 }

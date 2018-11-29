@@ -283,8 +283,9 @@ class UserInputs extends React.Component{
     this.extraTab = this.extraTab.bind(this);
     this.renderAddDate = this.renderAddDate.bind(this);
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
-    }
-    
+
+    this.dateTimeValidation = this.dateTimeValidation.bind(this);
+ }   
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
@@ -1136,6 +1137,7 @@ getTotalSleep(){
       getUserProfile(this.onProfileSuccessFetch);
       
       window.addEventListener('scroll', this.handleScroll);
+
     }
 
 createDropdown(start_num , end_num, step=1){
@@ -1383,7 +1385,43 @@ handleScroll() {
       window.scrollTo(0, scrollHeight-80);
     }
 
+    sleepInvalidErrorPopup(){
+      toast.info("Time fell asleep should be less than time woke up",{
+        className:"dark"
+      })
+    }
+
+    dateTimeValidation(start_time_date, start_time_hours,
+      start_time_mins,start_time_am_pm,end_time_date,
+      end_time_hours,end_time_mins,end_time_am_pm){
+        let sleep_bedtime_dt = null;
+        if (start_time_date && start_time_hours
+           && start_time_mins && start_time_am_pm){
+          console.log("Sleep bedtime date:",sleep_bedtime_dt);
+          sleep_bedtime_dt = this.getDTMomentObj(start_time_date,start_time_hours,
+            start_time_mins,start_time_am_pm)
+        }
+
+        let sleep_awake_time_dt = null;
+        if (end_time_date && end_time_hours
+           && end_time_mins && end_time_am_pm){
+          sleep_awake_time_dt = this.getDTMomentObj(end_time_date,end_time_hours,
+            end_time_mins,end_time_am_pm)
+        }
+
+        if(sleep_bedtime_dt && sleep_awake_time_dt){
+          // check if sleep bedtime is before the awake time
+          return sleep_awake_time_dt.isAfter(sleep_bedtime_dt);
+        }
+        return true;
+    }
+
     render(){
+      const children = React.Children.map(this.props.children,
+      (child, index) => React.cloneElement(child, {
+        ref : `child${index}`
+      })
+     );
       
        const {fix} = this.props;
         return(

@@ -13,7 +13,8 @@ import quicklook.calculations.calculation_driver
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
-	UserGarminDataManuallyUpdated)
+	UserGarminDataManuallyUpdated,
+	UserGarminDataEpoch)
 
 from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 
@@ -77,7 +78,8 @@ def _create_activity_stat(user,activity_obj,current_date):
 		for k, v in activity_obj.items():
 			if k in activity_keys.keys():
 				activity_keys[k] = v
-				avg_hr = int(activity_keys.get("averageHeartRateInBeatsPerMinute",0))
+				avg_hr = activity_keys.get("averageHeartRateInBeatsPerMinute",0)
+				avg_hr = int(avg_hr) if avg_hr else 0
 				# If there is no average HR information, then consider
 				# steps as "exercise steps"
 				if ((avg_hr and avg_hr < below_aerobic_value) or
@@ -85,24 +87,19 @@ def _create_activity_stat(user,activity_obj,current_date):
 					activity_keys["steps_type"] = "non_exercise"
 				else:
 					activity_keys["steps_type"] = "exercise"
-				if int(activity_keys.get("averageHeartRateInBeatsPerMinute",0)) > anaerobic_value:
+				if avg_hr > anaerobic_value:
 					activity_keys["can_update_steps_type"] = False
 
 		return {activity_obj['summaryId']:activity_keys}
 
 def _get_activities(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
-	# hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
-	# if hrr_data:
-	# 	measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
 	act_data = _get_activities_data(user,target_date)
 	activity_data = act_data[0]
 	manually_updated_act_data = act_data[1]
 
 	final_act_data = {}
-	comments = {}
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
-	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=3)
 	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
@@ -123,8 +120,6 @@ def _get_activities(user,target_date):
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
 	
-	# heart_rate = [x for x in all_activities_heartrate if x != []]
-	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []
 	for single_timestamp in all_activities_timestamp:
 		if single_timestamp:
@@ -145,10 +140,18 @@ def _get_activities(user,target_date):
 		else:
 			final_heart_rate.append([])
 
+
+	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+	epoch_summaries = quicklook.calculations.garmin_calculation\
+		.get_garmin_model_data(UserGarminDataEpoch,user,
+			current_date_epoch,current_date_epoch+86400,
+			order_by = '-id')
+	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
 		activity_data, manually_updated_act_data,
-		include_duplicate=True,include_deleted=True
+		include_duplicate=True,include_deleted=True,
+		epoch_summaries = epoch_summaries
 	)
 	for single_activity in combined_activities:
 		if fitfiles:
@@ -160,7 +163,10 @@ def _get_activities(user,target_date):
 					(single_activity.get("durationInSeconds",0) <= 1200) and 
 					(single_activity.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
 					least_hr = min(single_heartrate)
-					hrr_difference = single_heartrate[0] - least_hr
+					if least_hr and single_heartrate:
+						hrr_difference = single_heartrate[0] - least_hr
+					else:
+						hrr_difference = 0
 					if hrr_difference > 10:
 						single_activity["activityType"] = "HEART_RATE_RECOVERY"
 				else:
@@ -275,7 +281,8 @@ class GarminData(APIView):
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			have_activities = True if activites else False
+			have_activities = quicklook.calculations.garmin_calculation.\
+				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,

@@ -7,19 +7,20 @@ import moment from 'moment';
 import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
-
+import { ToastContainer, toast } from 'react-toastify';
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
 "HEART_RATE_RECOVERY":"HEART RATE RECOVERY(HRR)",
 "JVB_STRENGTH_EXERCISES":"JVB STRENGTH EXERCISES",
-'ARC_TRAINER':'ARC TRAINER',
+"ARC_TRAINER":"ARC TRAINER",
 "BACKCOUNTRY_SKIING_SNOWBOARDING":"BACKCOUNTRY SKIING SNOWBOARDING",
 "BARRE_CLASS":"BARRE CLASS",
 "BASKETBALL":"BASKETBALL",
 "BIKETORUNTRANSITION":"BIKE TO RUN TRANSITION",
 "BOATING":"BOATING",
 "CASUAL_WALKING":"CASUAL WALKING",
+"CONDITIONING_CLASS":"CONDITIONING CLASS",
 "CROSS_COUNTRY_SKIING":"CROSS COUNTRY SKIING",
 "CYCLING":"CYCLING",
 "CYCLOCROSS":"CYCLOCROSS",
@@ -64,6 +65,7 @@ const activites = { "":"Select",
 "SNOW_SHOE":"SNOW SHOE",
 "SOCCER":"SOCCER",
 "SPEED_WALKING":"SPEED WALKING",
+"SQUASH":"SQUASH",
 "STAIR_CLIMBING":"STAIR CLIMBING",
 "STAND_UP_PADDLEBOARDING":"STAND UP PADDLE BOARDING",
 "STREET_RUNNING":"STREET RUNNING",
@@ -134,6 +136,7 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+
 this.state ={
     selected_date:selected_date,
     activityEditModal:false,
@@ -849,26 +852,7 @@ handleChange_steps_type(event){
     let count = 0;
     let activitiesLen = 0;
     if(steps_type == "exercise"){
-        for(let activityId of Object.keys(activitiesObj)) {
-            if(activitiesObj[activityId]["deleted"] !== true && activitiesObj[activityId]["duplicate"] !== true){
-                if(activitiesObj[activityId]["activityType"] !== "HEART_RATE_RECOVERY")
-                    activitiesLen ++;
-                for(let key of Object.keys(activitiesObj[activityId])){
-
-                    if((key === "activityType" && activitiesObj[activityId][key] !== "HEART_RATE_RECOVERY" && activitiesObj[activityId]["steps_type"] === "non_exercise")) {
-                        count ++;
-                    }
-                }
-            }
-                
-        }
-        if((activity_data["activityType"] !== "HEART_RATE_RECOVERY") && ((count === 0 && activitiesLen === 1) || (count === (activitiesLen -1)))) {
-
-            this.activityStepsTypeModalToggle();
-            steps_type = "exercise";
-        } else {
-            steps_type = "non_exercise";
-        }
+        steps_type = "non_exercise";
     }
     else {
         steps_type = "exercise";
@@ -879,6 +863,7 @@ handleChange_steps_type(event){
             [selectedActivityId]: activity_data
         });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 
 /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
@@ -898,6 +883,7 @@ handleChange_duplicate_info(event) {
         [selectedActivityId]: activity_data
       });
     }
+    this.props.updateParentActivities(this.state.activites);
 }
 /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
@@ -1128,7 +1114,8 @@ CreateNewActivity(data){
         "averageHeartRateInBeatsPerMinute": this.state.modal_activity_heart_rate,
         "durationInSeconds":durationSeconds,
         "steps":steps,
-        "steps_type":this.state.modal_exercise_steps_status,
+        "steps_type":this.state.modal_exercise_steps_status?
+            this.state.modal_exercise_steps_status:'exercise',
         "duplicate":this.state.modal_duplicate_info_status,
         "comments":this.state.modal_activity_comment,
         "startTimeInSeconds":activityStartTimeMObject.unix(),
@@ -1313,32 +1300,68 @@ getTotalActivityDuration(){
         return '';
 }
 
+ActivityTimeInvalidErrorPopup(){
+  toast.info("Workout start time should be less than activity end time",{
+    className:"dark"
+  })
+}
+
 handleChangeModelActivityStartTimeDate(date){
+    let oldValue = this.state.activitystarttime_calender;
     this.setState({
         activitystarttime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
-            if(duration){  
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    activitystarttime_calender:oldValue
+                })
             }
     });
 }
 
 handleChangeModelActivityEndTimeDate(date){
+    let oldValue = this.state.activityendtime_calender;
     this.setState({
         activityendtime_calender:date
     },()=>{
             let duration = this.getTotalActivityDuration();
-            if(duration){  
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    activityendtime_calender:oldValue
+                })
             }
     });
 }
@@ -1346,16 +1369,31 @@ handleChangeModelActivityEndTimeDate(date){
 handleChangeModalActivityTime(event){
     const value = event.target.value;
     const name = event.target.name;
+    let oldValue = this.state[name];
     this.setState({
         [name]: value
     },()=>{
             let duration = this.getTotalActivityDuration();
-            if(duration){  
+            let isActivityTimeValid = this.props.dateTimeValidation(
+                this.state.activitystarttime_calender,
+                this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_ampm,
+                this.state.activityendtime_calender,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_ampm);
+            if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
                     modal_activity_min: duration.split(":")[1],
                     modal_activity_sec:duration.split(":")[2]
                 });
+            }else if(!isActivityTimeValid){
+                this.ActivityTimeInvalidErrorPopup();
+                this.setState({
+                    [name]:oldValue
+                })
             }
     });
 }
@@ -1406,6 +1444,7 @@ infoPrint(infoPrintText){
     mywindow.print();
     mywindow.close();
    }
+
 renderTable(){
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","comments"];
@@ -1481,7 +1520,7 @@ renderTable(){
             else if(key === "startTimeInSeconds"){
                 let start_time = this.state.activity_start_end_time[summaryId]['start_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                {start_time?start_time.format('MMM D, YYYY h:mm:ss a'):''} 
+                {start_time?moment(start_time).format('MMM D, YYYY h:mm:ss a'):''} 
                  {this.props.editable && !isActivityDeleted &&                           
                         <span 
                             data-name = {summaryId}  
@@ -1492,7 +1531,7 @@ renderTable(){
                     }
                         <Modal 
                         isOpen={this.state.activities_edit_mode[summaryId]["startTimeInSeconds"]}
-                        toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} 
+                        toggle={this.editToggleHandlerStartTime.bind(this,summaryId)} class="modal"
                         >
                           <ModalHeader
                               toggle={this.editToggleHandlerStartTime.bind(this,summaryId)}>
@@ -1596,7 +1635,7 @@ renderTable(){
             else if(key === "endTimeInSeconds"){
                 let end_time = this.state.activity_start_end_time[summaryId]['end_time'];
                 activityData.push(<td  name = {summaryId}  id = "add_button">
-                            {end_time?end_time.format('MMM D, YYYY h:mm:ss a'):''}  
+                            {end_time?moment(end_time).format('MMM D, YYYY h:mm:ss a'):''}  
                           {this.props.editable && !isActivityDeleted &&                
                         <span 
                             data-name = {summaryId} 
@@ -2247,7 +2286,6 @@ renderEditActivityModal(){
 render(){
 
 return(
-
 <div className = "container_fluid">
 <div className="row justify-content-center">
 <div id = "activity_table">

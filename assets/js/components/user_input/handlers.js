@@ -71,38 +71,59 @@ export function handleChangeSleepLast(event){
 }
 
 export function handleChangeSleepBedTime(date){
+  let oldValue = this.state['sleep_bedtime_date'];
   this.setState({
     sleep_bedtime_date:date
     },()=>{
-    let duration = this.getTotalSleep();
-     if(duration)
-    {  
-      let hours = duration.split(":")[0];
-      let mins = duration.split(":")[1];
+      let duration = this.getTotalSleep();
+      let isSleepTimeValid = this.dateTimeValidation(
+        this.state.sleep_bedtime_date, this.state.sleep_hours_bed_time,
+        this.state.sleep_mins_bed_time,this.state.sleep_bedtime_am_pm, 
+        this.state.sleep_awake_time_date, this.state.sleep_hours_awake_time, 
+        this.state.sleep_mins_awake_time,this.state.sleep_awake_time_am_pm);
+      if(duration && isSleepTimeValid){  
+        let hours = duration.split(":")[0];
+        let mins = duration.split(":")[1];
 
-      this.setState({
-        sleep_hours_last_night:hours,
-        sleep_mins_last_night:mins
-      })
-    }
+        this.setState({
+          sleep_hours_last_night:hours,
+          sleep_mins_last_night:mins
+        })
+      }
+      else if(!isSleepTimeValid){
+        this.sleepInvalidErrorPopup();
+        this.setState({
+          sleep_bedtime_date:oldValue
+        })
+      }
   });
-
 }
 
 export function handleChangeSleepHoursMin(event){
   const value = event.target.value;
   const name = event.target.name;
+  //alert(value);
+  let oldValue = this.state[name];
   this.setState({
   [name]: value
   },()=>{
     let duration = this.getTotalSleep();
-     if(duration)
-    {  
+    let isSleepTimeValid = this.dateTimeValidation(
+      this.state.sleep_bedtime_date, this.state.sleep_hours_bed_time,
+      this.state.sleep_mins_bed_time,this.state.sleep_bedtime_am_pm, 
+      this.state.sleep_awake_time_date, this.state.sleep_hours_awake_time, 
+      this.state.sleep_mins_awake_time, this.state.sleep_awake_time_am_pm);
+    if(duration && isSleepTimeValid){  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
       this.setState({
         sleep_hours_last_night:hours,
         sleep_mins_last_night:mins
+      })
+    }else if(!isSleepTimeValid){
+      this.sleepInvalidErrorPopup();
+      this.setState({
+        [name]:oldValue
       })
     }
   });
@@ -110,17 +131,27 @@ export function handleChangeSleepHoursMin(event){
 
 export function handleChangeSleepAwakeTime(date){
   const name = event.target.name;
+  let oldValue = this.state['sleep_awake_time_date'];
   this.setState({
       sleep_awake_time_date: date,
     },()=>{
     let duration = this.getTotalSleep();
-    if(duration)
-    {  
+    let isSleepTimeValid = this.dateTimeValidation(
+      this.state.sleep_bedtime_date, this.state.sleep_hours_bed_time,
+      this.state.sleep_mins_bed_time,this.state.sleep_bedtime_am_pm, 
+      this.state.sleep_awake_time_date, this.state.sleep_hours_awake_time, 
+      this.state.sleep_mins_awake_time, this.state.sleep_awake_time_am_pm);
+    if(duration && isSleepTimeValid){  
       let hours = duration.split(":")[0];
       let mins = duration.split(":")[1];
       this.setState({
         sleep_hours_last_night:hours, 
         sleep_mins_last_night:mins
+      })
+    }else if(!isSleepTimeValid){
+      this.sleepInvalidErrorPopup();
+      this.setState({
+        sleep_awake_time_date:oldValue
       })
     } 
   });

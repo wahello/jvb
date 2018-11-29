@@ -46,6 +46,8 @@ class MovementConsistencyCumulative(models.Model):
 	cum_total_active_min = models.FloatField(blank=True,null=True)
 	cum_sleep_active_min = models.FloatField(blank=True,null=True)
 	cum_exercise_active_min = models.FloatField(blank=True,null=True)
+	cum_sleep_hours = models.FloatField(blank=True, null=True)
+	cum_exercise_hours = models.FloatField(blank=True, null=True)
 	
 class ExerciseConsistencyCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="exercise_consistency_cum")
@@ -129,6 +131,7 @@ class MetaCumulative(models.Model):
 		blank=True,null=True)
 	cum_hrr_activity_end_hr_days_count = models.IntegerField(
 		blank=True,null=True)
+	cum_sleep_reported_days_count = models.IntegerField(blank=True, null=True)
 
 
 class ProgressReportUpdateMeta(models.Model):

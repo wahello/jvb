@@ -21,3 +21,21 @@ export default function fetchMovemetData(successMovementData,errorMovementData,s
     errorMovementData(error);
   });
 }
+
+export function fetchActiveData(successActiveData,errorActiveData,selectedDate){   
+  selectedDate = moment(selectedDate);
+  const URL=`/dashboard/api/activetime`;
+  const config={
+   method:"get",
+   params:{
+   date: selectedDate.format('YYYY-MM-DD')
+ },
+   url:URL,
+   withCredentials: true
+  };
+  axios(config).then((response)=>{
+   successActiveData(response);
+  }).catch(function(error){
+    errorActiveData(error);
+  });
+}
