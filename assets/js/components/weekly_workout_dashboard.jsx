@@ -120,6 +120,17 @@ class WorkoutDashboard extends Component{
 		return td_header;
 	}
 
+	/************** IT CHECKS WHETHER SELECTED DATE IS SUNDAY, IF IT IS SUNDAY 
+ 	THEN GETS, LAST TO LAST WEEKS DATES BY SUBTRACTING ONE DAY FROM SELECTED DATE. ****************/
+	getDateFromSelectedDay(selectedDate,day_num) {
+
+	 	let tempSelectedDate = moment(selectedDate).format("dddd");
+	 	if(tempSelectedDate !== "Sunday") {
+	 		return(moment(selectedDate).weekday(day_num).format('MMM DD'));
+	 	} else {
+	 		return(moment(moment(selectedDate).subtract(1,"days")).weekday(day_num).format('MMM DD'));
+	 	}
+	}
 	/*renderTableActivityHeaderDescription(header_data){
 		let th_header_desc = [];
 		let th_row = [];
@@ -339,16 +350,22 @@ renderTable(weekly_data){
 		let td_extra = [];	
 		
 		let td_keys = ["workout_type","no_activity_in_week","duration","workout_duration_percent","duration_in_aerobic_range", "percent_aerobic", "duration_in_anaerobic_range", "percent_anaerobic", "duration_below_aerobic_range", "percent_below_aerobic", "duration_hrr_not_recorded", "percent_hrr_not_recorded","days_with_activity"];
+		let tempSelectedDate = moment(this.state.selectedDate).format("dddd");
+ 			let tempDateSelected = null;
 
- 			let mon = moment(this.state.selectedDate).startOf('week').add(1, 'days').format('DD-MMM-YY');
- 			let tue = moment(this.state.selectedDate).startOf('week').add(2, 'days').format('DD-MMM-YY');
- 			let wed = moment(this.state.selectedDate).startOf('week').add(3, 'days').format('DD-MMM-YY');
- 			let thu = moment(this.state.selectedDate).startOf('week').add(4, 'days').format('DD-MMM-YY');
- 			let fri = moment(this.state.selectedDate).startOf('week').add(5, 'days').format('DD-MMM-YY');
- 			let sat = moment(this.state.selectedDate).startOf('week').add(6, 'days').format('DD-MMM-YY');
- 			let sun = moment(this.state.selectedDate).startOf('week').add(7, 'days').format('DD-MMM-YY');
-
- 			td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
+ 			if(tempSelectedDate !== "Sunday") {
+ 				tempDateSelected = this.state.selectedDate;
+ 			} else {
+ 				tempDateSelected = moment(this.state.selectedDate).subtract(1,"days");
+ 			}
+ 			
+ 			let mon = moment(tempDateSelected).weekday(1).format('DD-MMM-YY');
+ 			let tue = moment(tempDateSelected).weekday(2).format('DD-MMM-YY');
+ 			let wed = moment(tempDateSelected).weekday(3).format('DD-MMM-YY');
+ 			let thu = moment(tempDateSelected).weekday(4).format('DD-MMM-YY');
+ 			let fri = moment(tempDateSelected).weekday(5).format('DD-MMM-YY');
+ 			let sat = moment(tempDateSelected).weekday(6).format('DD-MMM-YY');
+ 			let sun = moment(tempDateSelected).weekday(7).format('DD-MMM-YY');
 
 		td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
 
@@ -585,7 +602,8 @@ renderTable(weekly_data){
 				td_valuesExtra.push(<td>{extra}</td>)
 			}
 			tr_values.push(<tr>{td_valuesExtra}</tr>);
-			return [activity_distance_keys,tr_values];		
+
+			return [activity_distance_keys,tr_values];
 		}
 		return [null,null];
 	}
@@ -664,13 +682,26 @@ renderTable(weekly_data){
 											</tr>
 										</th>
 										<th># of Days With <br /> Activity</th>
- 										<th>Mon {moment(this.state.selectedDate).startOf('week').add(1, 'days').format('MMM DD')}</th>
- 										<th>Tue {moment(this.state.selectedDate).startOf('week').add(2, 'days').format('MMM DD')}</th>
- 										<th>Wed {moment(this.state.selectedDate).startOf('week').add(3, 'days').format('MMM DD')}</th>
- 										<th>Thu {moment(this.state.selectedDate).startOf('week').add(4, 'days').format('MMM DD')}</th>
- 										<th>Fri {moment(this.state.selectedDate).startOf('week').add(5, 'days').format('MMM DD')}</th>
- 										<th>Sat {moment(this.state.selectedDate).startOf('week').add(6, 'days').format('MMM DD')}</th>
- 										<th>Sun {moment(this.state.selectedDate).startOf('week').add(7, 'days').format('MMM DD')}</th>
+ 										<th>Mon {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(1))}</th>
+ 										<th>Tue {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(2))
+ 										}</th>
+ 										<th>Wed {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(3))
+ 										}</th>
+ 										<th>Thu {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(4))
+ 										}</th>
+ 										<th>Fri  {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(5))
+ 										}</th>
+ 										<th>Sat {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(6))
+ 										}</th>
+ 										<th>Sun {
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(7))
+ 										}</th>
 										{this.renderTableActivityHeader(activities_keys)}
 									</tr>
 									<tbody>
