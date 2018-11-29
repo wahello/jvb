@@ -387,11 +387,9 @@ class No_Hrr_Data extends Component{
 	  return sleep_bedtime_dt;
 }
 	successHeart(data){
-		console.log("DATA received: ", data);
-		{this.renderHrrSelectedDateFetchOverlay()}
-		/*toast.info("Updated No Heart-rate Data!",{
+		toast.info("Your HRR stats have been updated successfully",{
 	          className:"dark"
-	    });*/
+	    });
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
@@ -420,7 +418,6 @@ class No_Hrr_Data extends Component{
 					created_at:data.data.created_at
 	  	});
 	  	this.props.HRR_measured(data.data.Did_you_measure_HRR);
-	  	console.log("From child No hrr");
 	}
 	errorHeart(error){
 		console.log(error.message); 
@@ -466,7 +463,6 @@ class No_Hrr_Data extends Component{
 				"lowest_hrr_no_fitfile": parseInt(this.state.lowest_hrr_no_fitfile),
 				"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
 			}
-			console.log("DATA: " +data);
 			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
 			//this.props.renderHrrData(data);
 		});
