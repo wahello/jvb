@@ -23,12 +23,16 @@ def get_daily_activities_in_base_format(user,date,include_all=False):
 
     Args:
         user(`obj`:User): Django User object
-        date(date): Date for which activities are requested
+        date(datetime.date,string): Date for which activities are requested.
+            Could be datetime.date object or string in 'YYYY-MM-DD'
+            format. 
         include_all(bool): If Ture, return all the activities
             which are submitted on requested date. If False,
             ignore activities which were submitted on requested
             date but activity start time is different date
     '''
+    if(type(date) is str):
+        date = datetime.strptime(date,'%Y-%m-%d').date()
     current_day_dt = datetime.combine(date,time(0))
     current_day_start_epoch = int(current_day_dt.replace(
         tzinfo=timezone.utc).timestamp())
