@@ -129,7 +129,7 @@ def _get_activities(user,target_date):
 		sum_timestamp.append(total_time)
 	final_heart_rate=[]
 	index = ''
-
+	# print(all_activities_heartrate,"all_activities_heartrate")
 	for single_heartrate,single_time in zip(all_activities_heartrate,sum_timestamp):
 		if single_time:
 			for i,value in enumerate(single_time):
@@ -155,6 +155,7 @@ def _get_activities(user,target_date):
 	)
 	for single_activity in combined_activities:
 		if fitfiles:
+			# print(final_heart_rate,"final_heart_rate")
 			for single_fitfiles,single_heartrate in zip(fitfiles,final_heart_rate):
 				meta = single_fitfiles.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -162,6 +163,7 @@ def _get_activities(user,target_date):
 				if (((single_activity.get("summaryId",None) == str(data_id)) and 
 					(single_activity.get("durationInSeconds",0) <= 1200) and 
 					(single_activity.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
+					# print(single_heartrate,"single activity")
 					least_hr = min(single_heartrate)
 					if least_hr and single_heartrate:
 						hrr_difference = single_heartrate[0] - least_hr
