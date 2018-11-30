@@ -3168,15 +3168,15 @@ def export_users_xls(request):
 
 
 
-	week_start_date, week_end_date = week_date(to_date+timedelta(days=7))
-
+	week_start_date, week_end_date = week_date(to_date)
+	print(week_start_date,"sssssssssssssssssssssssssssssssss")
+	print(week_end_date,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 
 	current_date = week_start_date
 
 
-	to_date = to_date+timedelta(days=7)
-	
-
+	to_date = to_date
+	print(to_date)
 
 	new_row = 2
 	new_column = 0
@@ -3202,7 +3202,6 @@ def export_users_xls(request):
 				weekly_workout_sheet.write(new_row,new_column,'Anaerobic',cell_format)
 
 			elif single_header2 == "Avg % Below Aerobic":
-			
 				new_row = new_row +1
 				weekly_workout_sheet.write(new_row,new_column-1,'   Below'+'\n'+' Aerobic',cell_format)
 			elif single_header2 == "Avg HR Not Recorded Duration (hh:mm)":
@@ -3230,10 +3229,8 @@ def export_users_xls(request):
 		# print(week_end_date,"week_end_date")
 		# print(week_end_date-timedelta(days=6),"week_end_date-timedelta(days=7)")
 		data = weekly_workout_helper(request.user,to_date)
-		
+		print(data)
 
-
-		
 		new_column2 = 0
 		total_activities = []
 		for key,value in data.items():
@@ -3280,12 +3277,12 @@ def export_users_xls(request):
 				new_row = new_row + 2
 
 
-		current_date2, week_end_date2 = week_date(week_end_date-timedelta(days=6))
+		current_date2, week_end_date2 = week_date(week_end_date-timedelta(days=7))
 		# print(current_date2, 'and', week_end_date2 , "week_data after update aaaaaaaaaaaaa")
 		current_date = current_date2
 		week_end_date = week_end_date2
 		
-		to_date = week_end_date+timedelta(days=6)
+		to_date = week_end_date
 
 		#weekly_workout_sheet.write(new_row,new_column2,'Weekly Workout Summary Report For The Week Ended : '+ str(week_end_date),head_bold)
 		
