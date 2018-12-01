@@ -2819,7 +2819,6 @@ def export_users_xls(request):
 		rounded_percent = int(Decimal(percent_value).quantize(0,ROUND_HALF_UP))
 		return rounded_percent
 	
-	#def show_values(value,new_row,new_column2,workout_type,to_date,total_activities=None):
 	def show_values(value,new_row,new_column2,workout_type,to_date,total_activities=None):
 
 		'''
@@ -2834,94 +2833,7 @@ def export_users_xls(request):
 		"duration_below_aerobic_range","percent_below_aerobic",
 		"duration_hrr_not_recorded","percent_hrr_not_recorded","dates"]
 
-		# for key,values in enumerate(workout_keys):
-		# 	if values == 'duration':
-		# 		col_num1 = col_num1 + 1
-		# 		duration = value[values]
-		# 		hours,minutes = convert_sec_to_hhmm(duration)
-		# 		workout_duration_percent = value['workout_duration_percent']
-		# 		workout_duration_percent_value = str(int(workout_duration_percent))
-		# 		weekly_workout_sheet.write(row_num,col_num1,str(hours)+':'+str(minutes)+'('+workout_duration_percent_value+'%'+')',innercell_format)
-		# 	elif values == 'duration_in_aerobic_range':
-		# 		col_num1 = col_num1 + 1
-		# 		aerobic = "Aerobic"
-		# 		if value.get("duration_in_aerobic_range") and value.get('percent_aerobic') !=0:
-		# 			aerobic_range_duration = value['duration_in_aerobic_range']
-		# 		# print(duration_in_aerobic_range)
-		# 			hours,minutes = convert_sec_to_hhmm(aerobic_range_duration)
-		# 			percent_aerobic = value['percent_aerobic']
-		# 			aerobic_value = str(int(percent_aerobic))
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,col_num1,aerobic+'\n'+str(hours)+':'+str(minutes)+'('+aerobic_value+'%'+')',innercell_format)
-		# 		else:
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,col_num1,aerobic+'\n'+'00'+':'+'00'+'('+'0' + '%'+')',innercell_format)
-
-		# 	elif values == 'duration_in_anaerobic_range':
-		# 		col_num1 = col_num1 + 1
-		# 		if value.get("duration_in_anaerobic_range") and value.get('percent_anaerobic') !=0:
-		# 			seconds = value[values]
-		# 			hours,minutes = convert_sec_to_hhmm(seconds)
-		# 			anaerobic_percentage = value['percent_anaerobic']
-		# 			anaerobic_percentage_value = str(int(anaerobic_percentage))
-		# 			anaerobic = "Anaerobic"
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,col_num1,anaerobic+'\n'+str(hours)+':'+str(minutes)+'('+anaerobic_percentage_value+'%'+')',innercell_format)
-		# 		else:
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,col_num1,'Anaerobic'+'\n'+'00'+':'+'00'+'('+'0' + '%'+')',innercell_format)
-
-		# 	elif values == 'days_with_activity':
-		# 		row_num = row_num
-		# 		if value.get("days_with_activity"):
-		# 			x = value['days_with_activity']
-		# 			y = str(int(x))
-		# 			weekly_workout_sheet.write_rich_string(row_num,4,y,innercell_format)
-		# 		else:
-		# 			weekly_workout_sheet.write_rich_string(row_num,4,'0',innercell_format)
-		# 	elif values == 'dates':                               
-				
-		# 		dates = value[values]
-		# 		current_date = week_start_date
-		# 		for keys , values in dates.items():
-		# 			dates = values['workout_date']
-		# 			date_convertion  = datetime.strptime(dates, "%d-%b-%y").date()
-		# 			diff_of_dates = date_convertion-current_date
-		# 			repeated = values['repeated']
-		# 			duration = values['duration']
-		# 			hours,minutes = convert_sec_to_hhmm(duration)
-		# 			x = str(hours)+':'+str(minutes)
-		# 			y = "(" + str(int(repeated)) + ")"
-		# 			col_num1 = 5+ diff_of_dates.days
-		# 			weekly_workout_sheet.write_rich_string(row_num-1,col_num1,x + y,innercell_format)
-		# 	elif values == "duration_below_aerobic_range":
-		# 		row_num = row_num +1
-		# 		if value.get("duration_below_aerobic_range") and value.get('percent_below_aerobic') !=0:
-		# 			below_aerobic_range = value['duration_below_aerobic_range']
-		# 			hours,minutes = convert_sec_to_hhmm(below_aerobic_range)
-		# 			percent_below_aerobic = value['percent_below_aerobic']
-		# 			Workout_type = str(int(percent_below_aerobic))
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,2,'Below'+'\n'+'Aerobic'+'\n'+str(hours)+':'+str(minutes)+'('+Workout_type + '%'+')',innercell_format)
-		# 		else:
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,2,'Below'+'\n'+'Aerobic'+'\n'+'00'+':'+'00'+'('+'0' + '%'+')',innercell_format)
-		# 	elif values == "duration_hrr_not_recorded":
-		# 		col_num1 = col_num1 + 1
-		# 		if value.get("duration_hrr_not_recorded") and value.get('percent_hrr_not_recorded') !=0:
-		# 			below_aerobic_range = value['duration_hrr_not_recorded']
-		# 			hours,minutes = convert_sec_to_hhmm(below_aerobic_range)
-		# 			percent_below_aerobic = value['percent_hrr_not_recorded']
-		# 			Workout_type = str(int(percent_below_aerobic))
-					
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,3,'Not'+'\n'+'Recorded'+'\n'+str(hours)+':'+str(minutes)+'('+Workout_type + '%'+')',innercell_format)
-		# 		else:
-		# 			weekly_workout_sheet.write_rich_string(
-		# 			row_num,3,'Not'+'\n'+'Recorded'+'\n'+'00'+':'+'00'+'('+'0'+ '%'+')',innercell_format)
-				#avg_heart = round_percentage(value[values])
-				#weekly_workout_sheet.write(row_num,col_num1,avg_heart,innercell_format)
-
+		
 
 		for key,values in enumerate(workout_keys):
 			if values == 'duration':
@@ -2937,7 +2849,6 @@ def export_users_xls(request):
 				aerobic = "Aerobic"
 				if value.get("duration_in_aerobic_range") and value.get('percent_aerobic') !=0:
 					aerobic_range_duration = value['duration_in_aerobic_range']
-				# print(duration_in_aerobic_range)
 					hours,minutes = convert_sec_to_hhmm(aerobic_range_duration)
 					percent_aerobic = value['percent_aerobic']
 					aerobic_value = str(int(percent_aerobic))
@@ -3022,40 +2933,23 @@ def export_users_xls(request):
 		'''
 		col_num1 = 10
 		avg_dis = 0
-		# row_num = 4
-		# print(total_activities,"eeeeeeeeeeeeeeeeeeeeeeee")
-		# print(value,"ccccccccccccccccccc")
 		for i,k in enumerate(total_activities):
 			k_distance = k.lower()+"_distance"
-		# 	# if 'swimming' in k_distance:
-		# 	# 	weekly_workout_sheet.write(
-		# 	# 	row_num,12,round((value[k_distance]['value']*1.09361),2))
-		# 	# 	col_num1 = col_num1 + 1
-		# 	# else
 			if value.get(k_distance):
 				weekly_workout_sheet.write(
 				new_row,12,round((value[k_distance]['value']*0.000621371),2))
-				# row_num = row_num + 2
-				# if value[k_distance]['value']:
 				avg_dis = avg_dis +	round((value[k_distance]['value']*0.000621371),2)
-				# print(new_row,"new_row")
-				# print(avg_dis,"avg distance")
-				# print(new_row+2,"row num of avg")
 				weekly_workout_sheet.write(new_row+2,12,avg_dis)
-		# pass
+
 
 	# Weekly Workout Summary
 	weekly_workout_sheet.set_row(2,50)
 	weekly_workout_sheet.set_row(3,40)
 	weekly_workout_sheet.set_row(1,20)
-	#weekly_workout_sheet.freeze_panes(3,1)
-	#weekly_workout_sheet.freeze_panes(4,1)
-	#weekly_workout_sheet.set_row(row_num,40)
 	weekly_workout_sheet.set_default_row(40)
 	weekly_workout_sheet.set_zoom(77)
 
 	cell_format_bg_color = book.add_format({'bold': True, 'bg_color': '#D3D3D3'})
-	#weekly_workout_sheet.set_row(5, 6, cell_format_bg_color)
 
 
 	cell_format = book.add_format({'bold': True})
@@ -3070,123 +2964,22 @@ def export_users_xls(request):
 	col_num = 0
 	row_num1 = 2
 	weekly_workout_sheet.set_column('A:A', 17)
-	#week_start_date, week_end_date = week_date(to_date)
-	#week_start_date1, week_end_date2 = week_date(week_start_date)
-	
 	format_week = book.add_format({'bold': True})
 	format_week.set_align('center')
 	format_week.set_text_wrap()
 	format_week.set_shrink()
 	head_bold = book.add_format({'bold': True})
 	
-	# current_date = week_start_date
-	# row = 4
-	# if week_start_date and  week_end_date:
-	# 	while (current_date <= week_end_date):
-	# 		row = row + 1
-	# 		weekday1 = calendar.day_name[current_date.weekday()]
-	# 		x= current_date.strftime('%m-%d-%y')
-	# 		current_date_split= x.split("-")
-	# 		current_date_string = str(int(current_date_split[0]))+'-'+str(int(current_date_split[1]))+'-'+str(current_date_split[2])
-	# 		current_date_string = str(current_date_string)
-	# 		weekly_workout_sheet.write_rich_string(2,row,weekday1,'\n',current_date_string,format_week)
-	# 		current_date += timedelta(days=1)
-			
-	# for single_header in headers:
-		
-	# 	if single_header =="Workout Type":
-	# 		weekly_workout_sheet.write(row_num1,col_num ,single_header+'\n'+'(# Workouts)',cell_format)
-	# 	elif single_header == "% of Total Duration":
-	# 		duration_header = 'Total' 
-	# 		duration= 'Duration'
-	# 		weekly_workout_sheet.write(row_num1,col_num+1 ,duration_header+'\n'+duration+'\n'+'  (%)',cell_format)
-	# 	elif single_header == "Avg % Aerobic":
-	# 		weekly_workout_sheet.write(row_num1,col_num+2 ,'  Aerobic',cell_format)
-	# 	elif single_header =="Avg % Anaerobic":
-	# 		weekly_workout_sheet.write(row_num1,col_num+3 ,'Anaerobic',cell_format)
-	# 	elif single_header == "Avg # Of Days With Activity" :
-	# 		weekly_workout_sheet.write(row_num1,col_num+4,single_header,cell_format)
-	# 	elif single_header == "Avg % Below Aerobic":
-	# 		weekly_workout_sheet.write(row_num1+1,col_num+2 ,'   Below'+'\n'+' Aerobic',cell_format)
-	# 	elif single_header == "Avg HR Not Recorded Duration (hh:mm)":
-
-	# 		weekly_workout_sheet.write(row_num1+1,col_num+3 ,'  Not'+'\n'+'Recorded',cell_format)
-
-	# data = weekly_workout_helper(request.user,to_date)
-	
-	# col_num1 = 0
-	# row_num = 4
-	# total_activities = []
-	# for key,value in data.items():
-	# 	if key != 'Totals' and key != 'extra' and key!= 'heartrate_ranges':
-	# 		total_activities.append(key)
-	# 		# if 'SWIMMING' in key:
-	# 		# 	weekly_workout_sheet.write(
-	# 		# 	row_num1,12,"Avg {} Distance (In Yards)".format(key),cell_format)
-	# 		# 	col_num = col_num + 1
-	# 		#else:
-	# 		x = value['no_activity_in_week']
-	# 		y = key +"(" + str(int(x)) + ")"
-	# 		Workout_type= ''.join((y))			
-	# 		weekly_workout_sheet.write(
-	# 		row_num1,12,"*Distance",cell_format)
-	# 		col_num = col_num + 1
-	# 		weekly_workout_sheet.write(row_num,col_num1,Workout_type,)
-	# 		#weekly_workout_sheet.set_row(row_num, col_num1, cell_format_bg_color)
-	# 		show_values(value,col_num1,row_num,key,to_date,total_activities)
-	# 		row_num = row_num + 2
-	
-	# for key,value in data.items():
-	# 	if key == 'Totals':
-	# 		col_num1 = 0
-	# 		weekly_workout_sheet.write(row_num,col_num1,key)
-	# 		show_values(value,col_num1,row_num,key,to_date)
-	# 		workout_totals_miles(value,col_num1,row_num,total_activities)
-	# 		row_num = row_num + 2
-	# for key,value in data.items():
-	# 	if key == 'extra':
-	# 		# weekly_workout_sheet.write(row_num,col_num1,"No Activity")
-	# 		# col_num1 = col_num1 + 1
-	# 		number_of_days = value['days_no_activity']
-	# 		activity_number_of_days = "(" + str(int(number_of_days)) + ")"
-	# 		weekly_workout_sheet.write(row_num,col_num1,"No Activity"+activity_number_of_days,innercell_format)
-	# 		col_num1 = col_num1 + 1
-	# 		rounded_percent = int(Decimal(value['percent_days_no_activity']).quantize(0,ROUND_HALF_UP))
-	# 		weekly_workout_sheet.write(
-	# 		row_num,col_num1,"{}{}".format(rounded_percent,"%"),innercell_format)
-	# 		row_num = row_num + 2
-
-
-
-
-
-
-
-
-
-
-
-
-
 	week_start_date, week_end_date = week_date(to_date)
-	print(week_start_date,"sssssssssssssssssssssssssssssssss")
-	print(week_end_date,"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-
 	current_date = week_start_date
-
-
 	to_date = to_date
-	print(to_date)
-
 	new_row = 2
 	new_column = 0
 	new_row_distance = 2
 	while current_date >from_date:
 		headline_row = new_row -1 
 		weekly_workout_sheet.write(headline_row, new_column,'Weekly Workout Summary Report For The Week Ended : '+ str(week_end_date),head_bold)
-		
 		for single_header2 in headers:
-			
 			if single_header2 =="Workout Type":
 				weekly_workout_sheet.write(new_row,new_column,single_header2+'\n'+'(# Workouts)',cell_format)
 			elif single_header2 == "% of Total Duration":
@@ -3200,20 +2993,16 @@ def export_users_xls(request):
 			elif single_header2 =="Avg % Anaerobic":
 				new_column = new_column +1
 				weekly_workout_sheet.write(new_row,new_column,'Anaerobic',cell_format)
-
 			elif single_header2 == "Avg % Below Aerobic":
 				new_row = new_row +1
 				weekly_workout_sheet.write(new_row,new_column-1,'   Below'+'\n'+' Aerobic',cell_format)
 			elif single_header2 == "Avg HR Not Recorded Duration (hh:mm)":
 				new_column = new_column +1
-			
 				weekly_workout_sheet.write(new_row,new_column-1 ,'  Not'+'\n'+'Recorded',cell_format)
 			elif single_header2 == "Avg # Of Days With Activity" :
 				new_column = new_column +1
 				weekly_workout_sheet.write(new_row,4,single_header2,cell_format)
 		new_row = new_row +1
-
-
 		while (current_date <= week_end_date):
 			new_column = new_column+1
 			weekday1 = calendar.day_name[current_date.weekday()]
@@ -3223,14 +3012,9 @@ def export_users_xls(request):
 			current_date_string = str(current_date_string)
 			weekly_workout_sheet.write_rich_string(new_row-2,new_column,weekday1,'\n',current_date_string,format_week)
 			current_date += timedelta(days=1)
-
 		weekly_workout_sheet.write(
 				new_row-2,new_column+1,"*Distance",cell_format)
-		# print(week_end_date,"week_end_date")
-		# print(week_end_date-timedelta(days=6),"week_end_date-timedelta(days=7)")
 		data = weekly_workout_helper(request.user,to_date)
-		print(data)
-
 		new_column2 = 0
 		total_activities = []
 		for key,value in data.items():
@@ -3260,13 +3044,9 @@ def export_users_xls(request):
 			if key == 'Totals':
 				weekly_workout_sheet.write(new_row,new_column2,key)
 				show_values(value,new_row,new_column2,key,to_date)
-				# workout_totals_miles(value,new_row,new_column2,total_activities)
 				new_row = new_row + 2
-		
 		for key,value in data.items():
 			if key == 'extra':
-			# weekly_workout_sheet.write(row_num,col_num1,"No Activity")
-			# col_num1 = col_num1 + 1
 				number_of_days = value['days_no_activity']
 				activity_number_of_days = "(" + str(int(number_of_days)) + ")"
 				weekly_workout_sheet.write(new_row,new_column2,'No Activity'+activity_number_of_days,innercell_format)
@@ -3275,24 +3055,13 @@ def export_users_xls(request):
 				weekly_workout_sheet.write(
 				new_row,new_column2,"{}{}".format(rounded_percent,"%"),innercell_format)
 				new_row = new_row + 2
-
-
 		current_date2, week_end_date2 = week_date(week_end_date-timedelta(days=7))
-		# print(current_date2, 'and', week_end_date2 , "week_data after update aaaaaaaaaaaaa")
 		current_date = current_date2
 		week_end_date = week_end_date2
-		
 		to_date = week_end_date
-
-		#weekly_workout_sheet.write(new_row,new_column2,'Weekly Workout Summary Report For The Week Ended : '+ str(week_end_date),head_bold)
-		
 		new_column = 0
 		if current_date == from_date:
 			break
-
-
-
-
 	
 
 	#movement consistenct
