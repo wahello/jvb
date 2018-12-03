@@ -1167,6 +1167,18 @@ def _get_activities_start_end_time(combined_user_activities):
 			)
 	return activities_start_end_time  
 
+def in_interval(act_start,act_end,int_start,int_end):
+	if(act_start >= int_start and act_end <= int_end):
+		return True
+	elif(act_start >= int_start and act_start <= int_end):
+		return True
+	elif(act_end >= int_start and act_end <= int_end):
+		return True
+	elif(act_start <= int_end and act_end >= int_end):
+		return True
+	else:
+		return False
+
 def _is_epoch_falls_in_activity_duration(activites_time_list,epoch_start):
 	for activity_time in activites_time_list:
 		start = datetime.combine(activity_time.start.date(),time(activity_time.start.hour))
@@ -1445,37 +1457,41 @@ def cal_quarter_status(quarter_start, quarter_end,
 	ui_strength_end_time = None, nap_start_time = None,
 	nap_end_time = None, activities_start_end_time = None,
 	timezone_change_interval = None):
-
-	def in_tz_interval(hour_start):
-		for interval in timezone_change_interval:
-			interval_start = datetime.combine(
+	
+	def in_act_interval(act_start_end_time_list,int_start, int_end):
+		for interval in act_start_end_time_list:
+			act_interval_start = datetime.combine(
 				interval.start.date(),
 				time(interval.start.hour))
-			interval_end = datetime.combine(
+			act_interval_end = datetime.combine(
 				interval.end.date(),
 				time(interval.end.hour,59))
-			if hour_start >= interval_start and hour_start <= interval_end:
+			if in_interval(act_interval_start,
+				act_interval_end,int_start,int_end):
 				return True
 		return False
+
 	status = ''
 	if (yesterday_bedtime and today_awake_time 
-		and quarter_start >= yesterday_bedtime
-		and quarter_start <= today_awake_time):
+		and in_interval(yesterday_bedtime,today_awake_time,
+		quarter_start,quarter_end)):
 		status = "sleeping"
-	elif today_bedtime and quarter_start >= today_bedtime:
+	elif (today_bedtime 
+		  and (quarter_start >= today_bedtime
+		  or today_bedtime >= quarter_start 
+		  and today_bedtime <= quarter_end)):
 		status = "sleeping"
 	elif(ui_strength_start_time and ui_strength_end_time
-		and quarter_start >= ui_strength_start_time
-		and quarter_start <= ui_strength_end_time):
+		and in_interval(ui_strength_start_time,ui_strength_end_time,
+		quarter_start,quarter_end)):
 		status = "strength"
-	elif(_is_epoch_falls_in_activity_duration(
-		activities_start_end_time,quarter_start)):
+	elif(in_act_interval(activities_start_end_time,quarter_start,quarter_end)):
 		status = "exercise"
-	elif in_tz_interval(quarter_start):
+	elif in_act_interval(timezone_change_interval,quarter_start,quarter_end):
 		status = "time zone change"
 	elif(nap_start_time and nap_start_time
-		and quarter_start >= nap_start_time 
-		and quarter_start <= nap_end_time):
+		and in_interval(nap_start_time,nap_start_time,
+		quarter_start,quarter_end)):
 			status = "nap"
 	elif(not steps 
 		and user_current_local_time.date() == quarter_start.date()
