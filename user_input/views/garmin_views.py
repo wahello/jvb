@@ -98,7 +98,7 @@ def _get_activities(user,target_date):
 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 
 	start_epoch = current_date_epoch
-	end_epoch = current_date_epoch + 86400
+	end_epoch = current_date_epoch + 86399
 	act_data = _get_activities_data(user,target_date)
 	activity_data = act_data[0]
 	manually_updated_act_data = act_data[1]
