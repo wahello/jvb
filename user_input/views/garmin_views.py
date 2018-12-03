@@ -95,6 +95,10 @@ def _create_activity_stat(user,activity_obj,current_date):
 
 def _get_activities(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+
+	start_epoch = current_date_epoch
+	end_epoch = current_date_epoch + 86400
 	act_data = _get_activities_data(user,target_date)
 	activity_data = act_data[0]
 	manually_updated_act_data = act_data[1]
@@ -103,11 +107,8 @@ def _get_activities(user,target_date):
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
 	start = current_date
 	end = current_date + timedelta(days=3)
-	start_date_timestamp = current_date.date()
-	start_date_timestamp = start_date_timestamp.timetuple()
-	start_date_timestamp = time.mktime(start_date_timestamp)
-	end_date_timestamp = start_date_timestamp + 86400
-	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_epoch,end_epoch])
 	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())	
 	if not fitfiles or len(activity_files_qs) != len(fitfiles):
 		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
