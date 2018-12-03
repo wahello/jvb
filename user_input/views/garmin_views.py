@@ -1,6 +1,7 @@
 from datetime import timezone,timedelta
 import ast
 import json
+import time
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -102,10 +103,14 @@ def _get_activities(user,target_date):
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
 	start = current_date
 	end = current_date + timedelta(days=3)
-	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
-	if not fitfiles:
+	start_date_timestamp = current_date.date()
+	start_date_timestamp = start_date_timestamp.timetuple()
+	start_date_timestamp = time.mktime(start_date_timestamp)
+	end_date_timestamp = start_date_timestamp + 86400
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())	
+	if not fitfiles or len(activity_files_qs) != len(fitfiles):
 		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
-
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
