@@ -1216,6 +1216,8 @@ def _update_status_to_sleep_hours(mc_data,last_sleeping_hour,calendar_date):
 
 			if last_sleeping_hour and hour_start <= last_sleeping_hour:
 				mc_data[interval]['status'] = 'sleeping'
+				for quarter in mc_data[interval]["quarterly"]:
+					mc_data[interval]["quarterly"][quarter]['status'] = 'sleeping'
 
 			if mc_data[interval]['status'] == 'active': 
 				active_hours += 1 
@@ -1417,7 +1419,7 @@ def get_epoch_active_time(activites_time_list,epoch,intensity_level):
 		epoch.get('startTimeInSeconds')+ epoch.get('startTimeOffsetInSeconds'))
 	epoch_end = epoch_start + timedelta(seconds=epoch.get('durationInSeconds'))
 
-	overlapping_duration_in_sec = 0
+	overlapping_duration_in_sec = 0 
 	for activity_time in activites_time_list:
 		if (activity_time.start >= epoch_start 
 			and activity_time.end <= epoch_end):
@@ -1460,19 +1462,15 @@ def cal_quarter_status(quarter_start, quarter_end,
 	
 	def in_act_interval(act_start_end_time_list,int_start, int_end):
 		for interval in act_start_end_time_list:
-			act_interval_start = datetime.combine(
-				interval.start.date(),
-				time(interval.start.hour))
-			act_interval_end = datetime.combine(
-				interval.end.date(),
-				time(interval.end.hour,59))
-			if in_interval(act_interval_start,
-				act_interval_end,int_start,int_end):
+			if in_interval(interval.start,
+				interval.end,int_start,int_end):
 				return True
 		return False
 
 	status = ''
-	if (yesterday_bedtime and today_awake_time 
+	if 	in_act_interval(timezone_change_interval,quarter_start,quarter_end):
+		status = "time zone change"
+	elif (yesterday_bedtime and today_awake_time 
 		and in_interval(yesterday_bedtime,today_awake_time,
 		quarter_start,quarter_end)):
 		status = "sleeping"
@@ -1487,10 +1485,8 @@ def cal_quarter_status(quarter_start, quarter_end,
 		status = "strength"
 	elif(in_act_interval(activities_start_end_time,quarter_start,quarter_end)):
 		status = "exercise"
-	elif in_act_interval(timezone_change_interval,quarter_start,quarter_end):
-		status = "time zone change"
-	elif(nap_start_time and nap_start_time
-		and in_interval(nap_start_time,nap_start_time,
+	elif(nap_start_time and nap_end_time
+		and in_interval(nap_start_time,nap_end_time,
 		quarter_start,quarter_end)):
 			status = "nap"
 	elif(not steps 
@@ -1508,6 +1504,7 @@ def populate_quarterly_active_secs_status(mcs_data,calendar_date,
 	ui_strength_start_time = None, ui_strength_end_time = None,
 	nap_start_time = None, nap_end_time = None,
 	activities_start_end_time = None,timezone_change_interval = None):
+	
 	mcs_data = copy.deepcopy(mcs_data)
 	for interval,values in list(mcs_data.items()):
 		non_interval_keys = ['active_hours','inactive_hours','sleeping_hours',
@@ -1527,7 +1524,7 @@ def populate_quarterly_active_secs_status(mcs_data,calendar_date,
 			for quarter in range(4):
 				steps = values['quarterly'][str(quarter)]['steps']
 				if quarter:
-					current_quarter_start = current_quarter_start + timedelta(seconds = 899)
+					current_quarter_start = current_quarter_start + timedelta(seconds = 900)
 				current_quarter_end = current_quarter_start + timedelta(seconds = 899)
 				status = cal_quarter_status(
 					current_quarter_start,current_quarter_end,
@@ -1686,8 +1683,6 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			nap_start_time, nap_end_time, activities_start_end_time,
 			timezone_change_interval)
 		
-		print(dict(movement_consistency))
-
 		total_active_minutes = 0
 		active_hours = 0
 		inactive_hours = 0
@@ -1829,7 +1824,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 				last_sleeping_hour,
 				calendar_date
 			)
-
+			
 		return movement_consistency
 
 def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,age):
