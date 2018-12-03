@@ -1,6 +1,7 @@
 from datetime import timezone,timedelta
 import ast
 import json
+import time
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -94,6 +95,10 @@ def _create_activity_stat(user,activity_obj,current_date):
 
 def _get_activities(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+
+	start_epoch = current_date_epoch
+	end_epoch = current_date_epoch + 86399
 	act_data = _get_activities_data(user,target_date)
 	activity_data = act_data[0]
 	manually_updated_act_data = act_data[1]
@@ -102,10 +107,11 @@ def _get_activities(user,target_date):
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
 	start = current_date
 	end = current_date + timedelta(days=3)
-	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
-	if not fitfiles:
-		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_epoch,end_epoch])
+	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())	
+	if not fitfiles or len(activity_files_qs) != len(fitfiles):
+		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -129,7 +135,7 @@ def _get_activities(user,target_date):
 		sum_timestamp.append(total_time)
 	final_heart_rate=[]
 	index = ''
-
+	# print(all_activities_heartrate,"all_activities_heartrate")
 	for single_heartrate,single_time in zip(all_activities_heartrate,sum_timestamp):
 		if single_time:
 			for i,value in enumerate(single_time):
@@ -155,6 +161,7 @@ def _get_activities(user,target_date):
 	)
 	for single_activity in combined_activities:
 		if fitfiles:
+			# print(final_heart_rate,"final_heart_rate")
 			for single_fitfiles,single_heartrate in zip(fitfiles,final_heart_rate):
 				meta = single_fitfiles.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -162,6 +169,7 @@ def _get_activities(user,target_date):
 				if (((single_activity.get("summaryId",None) == str(data_id)) and 
 					(single_activity.get("durationInSeconds",0) <= 1200) and 
 					(single_activity.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
+					# print(single_heartrate,"single activity")
 					least_hr = min(single_heartrate)
 					if least_hr and single_heartrate:
 						hrr_difference = single_heartrate[0] - least_hr

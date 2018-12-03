@@ -359,13 +359,13 @@ renderTable(weekly_data){
  				tempDateSelected = moment(this.state.selectedDate).subtract(1,"days");
  			}
  			
- 			let mon = moment(tempDateSelected).weekday(-6).format('DD-MMM-YY');
- 			let tue = moment(tempDateSelected).weekday(-5).format('DD-MMM-YY');
- 			let wed = moment(tempDateSelected).weekday(-4).format('DD-MMM-YY');
- 			let thu = moment(tempDateSelected).weekday(-3).format('DD-MMM-YY');
- 			let fri = moment(tempDateSelected).weekday(-2).format('DD-MMM-YY');
- 			let sat = moment(tempDateSelected).weekday(-1).format('DD-MMM-YY');
- 			let sun = moment(tempDateSelected).weekday(0).format('DD-MMM-YY');
+ 			let mon = moment(tempDateSelected).weekday(1).format('DD-MMM-YY');
+ 			let tue = moment(tempDateSelected).weekday(2).format('DD-MMM-YY');
+ 			let wed = moment(tempDateSelected).weekday(3).format('DD-MMM-YY');
+ 			let thu = moment(tempDateSelected).weekday(4).format('DD-MMM-YY');
+ 			let fri = moment(tempDateSelected).weekday(5).format('DD-MMM-YY');
+ 			let sat = moment(tempDateSelected).weekday(6).format('DD-MMM-YY');
+ 			let sun = moment(tempDateSelected).weekday(7).format('DD-MMM-YY');
 
 		td_keys = td_keys.concat(mon, tue, wed, thu, fri, sat, sun);
 
@@ -602,7 +602,8 @@ renderTable(weekly_data){
 				td_valuesExtra.push(<td>{extra}</td>)
 			}
 			tr_values.push(<tr>{td_valuesExtra}</tr>);
-			return [activity_distance_keys,tr_values];		
+
+			return [activity_distance_keys,tr_values];
 		}
 		return [null,null];
 	}
@@ -682,24 +683,24 @@ renderTable(weekly_data){
 										</th>
 										<th># of Days With <br /> Activity</th>
  										<th>Mon {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(-6))}</th>
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(1))}</th>
  										<th>Tue {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(-5))
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(2))
  										}</th>
  										<th>Wed {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(-4))
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(3))
  										}</th>
  										<th>Thu {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(-3))
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(4))
  										}</th>
  										<th>Fri  {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(-2))
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(5))
  										}</th>
  										<th>Sat {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(-1))
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(6))
  										}</th>
  										<th>Sun {
- 											this.getDateFromSelectedDay(this.state.selectedDate,(0))
+ 											this.getDateFromSelectedDay(this.state.selectedDate,(7))
  										}</th>
 										{this.renderTableActivityHeader(activities_keys)}
 									</tr>

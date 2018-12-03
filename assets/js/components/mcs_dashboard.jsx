@@ -28,9 +28,11 @@ class MCS_Dashboard extends Component{
 		    selectedDate:new Date(),
 			calendarOpen:false,
 			isOpen:false,
-			last_synced:null,
+			last_synced:"",
 			mc_data:{},
-			non_exercise_steps:""
+			exercise_steps:"",
+			non_exercise_steps:"",
+			total_steps:""
 		};
 
 		this.toggleCalendar = this.toggleCalendar.bind(this);
@@ -82,12 +84,16 @@ class MCS_Dashboard extends Component{
         return sync;
    }
        
-   renderSteps(value){
+   renderSteps(es,nes,ts){
+   		  let exercise_steps;
    		  let non_exercise_steps;
+   		  let total_steps;
    		  let steps = "";
-   		if (value!=null){
-   		  non_exercise_steps = value
-   		  steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> NES: {non_exercise_steps} </span>
+   		if (es != null && nes != null && ts != null){
+   			exercise_steps = es;
+			non_exercise_steps = nes;
+			total_steps = ts;
+			steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> Today’s: Exercise Steps: {exercise_steps} | Non Exercise Steps: {non_exercise_steps} | Total Steps: {ts} </span>
    		}
    		return steps;
    }
@@ -113,20 +119,36 @@ class MCS_Dashboard extends Component{
 	}
 
     successMCFetch(data){
-	  console.log(data.data)
+	  //console.log(data.data)
+	  	let exercise_steps = "";
+	  	let exercise_steps_value = "";
 		let non_exercise_steps = "";
+  		let non_exercise_steps_value = "";
+  		let total_steps = "";
+  		let total_steps_value = "";
 		if(!_.isEmpty(data.data)){
         for(let[keys1,values1] of Object.entries(data.data)){
          	for(let[key2,values2] of Object.entries(values1)){
 	         	if (key2 == "non_exercise_steps"){
 	         		non_exercise_steps = values2;
 		         	}
+		         else if(key2 == "exercise_steps"){
+		         	exercise_steps = values2;
+		         }
+		         else if(key2 == "total_steps"){
+		         	total_steps = values2;
+		         }
 		        }	         	
 	  		}
-  		}	
+  		}
+  		exercise_steps_value = this.stepsValueComma(exercise_steps);
+  		non_exercise_steps_value = this.stepsValueComma(non_exercise_steps);
+  		total_steps_value = this.stepsValueComma(total_steps);
 		this.setState({
 		  mc_data:data.data,
-  		  non_exercise_steps:non_exercise_steps
+		  exercise_steps:exercise_steps_value,
+  		  non_exercise_steps:non_exercise_steps_value,
+  		  total_steps:total_steps_value,
 	   });
    }
     toggleCalendar(){
@@ -243,7 +265,6 @@ class MCS_Dashboard extends Component{
   		var td_rows = [];
   		let keys = ["12:00 AM to 12:59 AM","01:00 AM to 01:59 AM","02:00 AM to 02:59 AM","03:00 AM to 03:59 AM","04:00 AM to 04:59 AM","05:00 AM to 05:59 AM"];
   		if(!_.isEmpty(mc_data)){
-  			let non_exercise_steps = "";
 	        for(let[keys1,values1] of Object.entries(mc_data)){
 	         	for(let[key2,values2] of Object.entries(values1)){
 	         		if(key2 == "movement_consistency"){
@@ -404,7 +425,7 @@ class MCS_Dashboard extends Component{
 								</span>
 							</span>
 
-						<span  className="last_sync col-md-6 offset-md-1">{this.renderLastSync(this.state.last_synced)}</span> 
+						<span  className="last_sync col-md-5 offset-md-1">{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -416,11 +437,14 @@ class MCS_Dashboard extends Component{
 				                </PopoverBody>
 			                </Popover>
 			            
-			            <span className="steps_count col-md-2">{this.renderSteps(this.state.non_exercise_steps)}</span>
+			            {/*<span className="steps_count col-md-3">{this.renderSteps(this.state.non_exercise_steps)}</span>*/}
 			         </div>
+			        
+			        
 		    
 			       <div className = "row justify-content-center mcs_dashboard">
-			          <div className="col-sm-9 table_process">          	
+			          <div className="col-sm-9 table_process">
+			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
 	          	    	  <table className = "table table-striped table-bordered tableContent ">
 		          	    	<tr className="table_content">
 			          	    	<th className="table_size">12:00 - 12:59 AM</th>
@@ -496,7 +520,9 @@ class MCS_Dashboard extends Component{
 					</div>
 					<div className = "row justify-content-center mcs-dashboard">
 		          	<div className = "col-sm-9">
-			                <p className="mcs_content" style={{marginLeft:"15px"}}>NES = Non Exercise Steps</p>
+		          			<p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Steps = Steps achieved during exercise</p>
+							<p className="mcs_content" style={{marginLeft:"15px"}}>Non Exercise Steps = Steps achieved when not exercising</p>
+							<p className="mcs_content" style={{marginLeft:"15px"}}>Total Steps = Exercise steps + Non exercise steps</p>
 	         				<p className="mcs_content" style={{marginLeft:"15px"}}>Data in each cell = Steps in that particular hour ( percentage of active minutes in that hour )</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>

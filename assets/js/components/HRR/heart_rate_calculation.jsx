@@ -77,7 +77,6 @@ class HeartRateCal extends Component{
   	}
   	
 	successHeart(data){
-		console.log("DATA received: ", data);
 		{this.renderHrrSelectedDateFetchOverlay()}
 	  	this.setState({
 	  	    		fetching_hrr:false,
