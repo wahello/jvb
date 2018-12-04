@@ -41,7 +41,7 @@ def fitfile_parse(obj,offset,start_date_str):
 		timeheart_str = timeheart.strftime("%Y-%m-%d %H:%M:%S")
 		timeheart_utc = int(time.mktime(datetime.strptime(timeheart_str, "%Y-%m-%d %H:%M:%S").timetuple()))+offset
 		timeheart_utc = datetime.utcfromtimestamp(timeheart_utc)
-		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj:
+		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj and heart:
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
 

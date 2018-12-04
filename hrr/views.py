@@ -394,7 +394,7 @@ def fitfile_parse(obj,offset,start_date_str):
 		timeheart_str = timeheart.strftime("%Y-%m-%d %H:%M:%S")
 		timeheart_utc = int(time.mktime(datetime.strptime(timeheart_str, "%Y-%m-%d %H:%M:%S").timetuple()))+offset
 		timeheart_utc = datetime.utcfromtimestamp(timeheart_utc)
-		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj:
+		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj and heart:
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
 	# print(timestamp_selected_date,"timestamp_selected_date")
@@ -423,12 +423,14 @@ def fitfile_parse(obj,offset,start_date_str):
 	# print(to_timestamp,"to_timestamp") 
 	return (final_heartrate,final_timestamp,to_timestamp)
 
-def get_fitfiles(user,start_date,start,end):
+def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_timestamp=None):
 	'''
 		get the today fitfiles or 3 days fitfiles
 	'''
+	activity_files_qs=UserGarminDataActivity.objects.filter(
+		user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
-	if not fitfiles_obj:
+	if not fitfiles_obj or len(activity_files_qs) != len(fitfiles_obj):
 		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	return fitfiles_obj
 
@@ -775,7 +777,7 @@ def aa_data(user,start_date):
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	if activities_dic:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
@@ -1537,7 +1539,7 @@ def daily_aa_data(user, start_date):
 	data_summaryid = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 
 	try:
 		if activities_dic:
@@ -2054,7 +2056,7 @@ def aa_low_high_end_data(user,start_date):
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	if activities_dic and fitfiles_obj:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
@@ -2329,7 +2331,7 @@ def hrr_data(user,start_date):
 
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	workout = []
 	hrr = []
 	'''
