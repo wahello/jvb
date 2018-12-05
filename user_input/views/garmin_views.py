@@ -289,8 +289,9 @@ class GarminData(APIView):
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			have_activities = quicklook.calculations.garmin_calculation.\
-				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
+			# have_activities = quicklook.calculations.garmin_calculation.\
+			# 	do_user_has_exercise_activity(activites.values(),request.user.profile.age())
+			have_activities = True if activites else False
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,
