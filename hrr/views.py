@@ -2511,6 +2511,11 @@ def hrr_data(user,start_date):
 			# -1 represents the pure time to 99 did not reach never
 			pure_time_99 = -1
 			pure_1min_heart_beats = None
+		if end_heartrate_activity < 99:
+			# -1 represents the HRR activty started before 99
+			time_99 = -1
+			pure_time_99 = -1
+			pure_1min_heart_beats = None
 
 	else:
 		Did_you_measure_HRR = 'no'
