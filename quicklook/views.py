@@ -3173,7 +3173,7 @@ def export_users_xls(request):
 	current_date = week_start_date
 
 
-	to_date = to_date
+	to_date_wss = to_date
 
 	new_row = 2
 	new_column = 0
@@ -3225,8 +3225,7 @@ def export_users_xls(request):
 				new_row-2,new_column+1,"*Distance",cell_format)
 		# print(week_end_date,"week_end_date")
 		# print(week_end_date-timedelta(days=6),"week_end_date-timedelta(days=7)")
-		data = weekly_workout_helper(request.user,to_date)
-		print(data)
+		data = weekly_workout_helper(request.user,to_date_wss)
 
 		new_column2 = 0
 		total_activities = []
@@ -3237,7 +3236,7 @@ def export_users_xls(request):
 				y = key +"(" + str(int(x)) + ")"
 				Workout_type= ''.join((y))			
 				weekly_workout_sheet.write(new_row,new_column2,Workout_type,)
-				show_values(value,new_row,new_column2,to_date,total_activities)
+				show_values(value,new_row,new_column2,to_date_wss,total_activities)
 				new_row = new_row + 2
 		avg_dis = 0
 		for key,value in data.items():
@@ -3256,7 +3255,7 @@ def export_users_xls(request):
 		for key,value in data.items():
 			if key == 'Totals':
 				weekly_workout_sheet.write(new_row,new_column2,key)
-				show_values(value,new_row,new_column2,key,to_date)
+				show_values(value,new_row,new_column2,key,to_date_wss)
 				# workout_totals_miles(value,new_row,new_column2,total_activities)
 				new_row = new_row + 2
 		
@@ -3279,7 +3278,7 @@ def export_users_xls(request):
 		current_date = current_date2
 		week_end_date = week_end_date2
 		
-		to_date = week_end_date
+		to_date_wss = week_end_date
 
 		#weekly_workout_sheet.write(new_row,new_column2,'Weekly Workout Summary Report For The Week Ended : '+ str(week_end_date),head_bold)
 		
