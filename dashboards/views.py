@@ -230,22 +230,32 @@ class ActiveTimeDashboardView(APIView):
         current_date = str_to_datetime(target_date)
         moment_obj = Steps.objects.filter(user_ql__user = user,user_ql__created_at = current_date).values(
             'movement_consistency')
+        NON_INTERVAL_KEYS = ['total_active_minutes','total_active_prcnt',
+            'active_hours','inactive_hours','sleeping_hours','strength_hours',
+            'exercise_hours','nap_hours','no_data_hours','timezone_change_hours',
+            'total_steps']
         if moment_obj and  moment_obj[0].get('movement_consistency'):
             moment_obj = ast.literal_eval(moment_obj[0].get('movement_consistency'))
-            sleeping_active_minutes = 0
-            exercise_active_minutes = 0
-            sleep_hours = 0
-            exercise_hours = 0
+            sleep_active_sec = 0
+            exercise_active_sec = 0
+            sleep_mins = 0
+            exercise_min = 0
             for key,value in moment_obj.items():
-                try:
-                    if value['status'] == 'sleeping':
-                        sleeping_active_minutes += value['active_duration']['duration']
-                        sleep_hours += 1
-                    elif value['status'] == 'exercise':
-                        exercise_active_minutes += value['active_duration']['duration']
-                        exercise_hours += 1
-                except TypeError as e:
-                    pass
+                if (key not in NON_INTERVAL_KEYS):
+                    quarterly_data = value['quarterly']
+                    for quarter in quarterly_data.values():
+                        if(quarter['status'] == 'sleeping' or quarter['status'] == 'nap'):
+                            sleep_mins += 15
+                            sleep_active_sec += quarter['active_sec']
+                        elif(quarter['status'] == 'exercise'):
+                            exercise_min += 15
+                            exercise_active_sec += quarter['active_sec']
+            
+            sleeping_active_minutes = round(sleep_active_sec/60)
+            exercise_active_minutes = round(exercise_active_sec/60)
+            sleep_hours = round(sleep_mins/60)
+            exercise_hours = round(exercise_min/60)
+
             try:
                 sleep_hour_prcnt = round((sleeping_active_minutes / (sleep_hours*60)) * 100)
             except ZeroDivisionError as e:
