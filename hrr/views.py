@@ -2483,7 +2483,7 @@ def hrr_data(user,start_date):
 			pure_1min_heart_beats = 0
 		pure_time_99 = time_99 + diff_actity_hrr
 		
-		if Did_heartrate_reach_99 == 'no':
+		if Did_heartrate_reach_99 == 'no' and garmin_data_daily:
 			if daily_starttime:
 				daily_start_time = end_time_activity - daily_starttime
 				make_to_daily_key = (daily_start_time) % 15
@@ -2509,6 +2509,11 @@ def hrr_data(user,start_date):
 				
 		if diff_actity_hrr > 120:
 			# -1 represents the pure time to 99 did not reach never
+			pure_time_99 = -1
+			pure_1min_heart_beats = None
+		if end_heartrate_activity < 99:
+			# -1 represents the HRR activty started before 99
+			time_99 = -1
 			pure_time_99 = -1
 			pure_1min_heart_beats = None
 

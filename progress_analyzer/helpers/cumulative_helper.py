@@ -696,7 +696,7 @@ def _get_hrr_api_data(user,date):
 				time_99 = _safe_get_mobj(data,"time_99",0)
 			else:
 				time_99 = _safe_get_mobj(data,"no_fitfile_hrr_time_reach_99",0)
-			if time_99:
+			if time_99 and time_99 != -1:
 				time_in_mins = time_99 / 60
 				time_in_mins = round(time_in_mins,3)
 				formated_data['hrr_time_to_99'] = time_in_mins
