@@ -1061,13 +1061,13 @@ class ProgressReport():
 							current_data.cum_total_active_min
 							- current_data.cum_sleep_active_min)
  
-						avg_sleep_hours = round(_cal_custom_average(
+						avg_sleep_mins = round(_cal_custom_average(
 								todays_data.cum_sleep_hours,
 								current_data.cum_sleep_hours,
 								mc_days
 							))
 
-						total_mins_without_sleep = 1440 - (avg_sleep_hours*60)
+						total_mins_without_sleep = 1440 - (avg_sleep_mins)
 
 						value = round(_cal_custom_average(
 									act_min_without_sleep_today,
@@ -1097,21 +1097,21 @@ class ProgressReport():
 							- current_data.cum_sleep_active_min
 							- current_data.cum_exercise_active_min)
 
-						avg_sleep_hours = round(_cal_custom_average(
+						avg_sleep_mins = round(_cal_custom_average(
 								todays_data.cum_sleep_hours,
 								current_data.cum_sleep_hours,
 								mc_days
 							))
 
-						avg_exercise_hours = round(_cal_custom_average(
+						avg_exercise_mins = round(_cal_custom_average(
 								todays_data.cum_exercise_hours,
 								current_data.cum_exercise_hours,
 								mc_days
 							))
 
 						total_mins_without_sleep_exercise = (1440 
-							- avg_sleep_hours*60 
-							- avg_exercise_hours*60)
+							- avg_sleep_mins
+							- avg_exercise_mins)
 
 
 						value = round(_cal_custom_average(
