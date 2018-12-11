@@ -110,3 +110,14 @@ class UserFitbitLastSynced(models.Model):
     def __str__(self):
         sync_time_str = self.last_synced_fitbit.strftime("%Y-%m-%d %H:%M:%S")
         return "{}-{}".format(self.user.username,sync_time_str)
+
+class UserAppTokens(models.Model):
+	user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='User_app_tokens'
+    )
+	user_client_id = models.CharField(max_length=250)
+	user_client_secret = models.CharField(max_length=250)
+
+	def __str__(self):
+		return "%s"%(self.user.username)

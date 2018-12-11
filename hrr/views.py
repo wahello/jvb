@@ -180,14 +180,20 @@ class UserAA(generics.ListCreateAPIView):
 		else:
 			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 			final_query = aa_data(user_get,start_date)
-			if final_query.get('total_time'):
-				try:
-					user_aa = AA.objects.get(
-					user=user_get, created_at=start_date)
-					aa_update_instance(user_aa, final_query)
-				except AA.DoesNotExist:
-					aa_create_instance(user_get, final_query, start_date)
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				if final_query.get('total_time'):
+					try:
+						user_aa = AA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_update_instance(user_aa, final_query)
+					except AA.DoesNotExist:
+						aa_create_instance(user_get, final_query, start_date)
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_hr_difference = fitbit.views.fitbit_aa_chart_one_new(user_get,start_date)
+				return fitbit_hr_difference
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -222,19 +228,26 @@ class UserAA_workout(generics.ListCreateAPIView):
 		if aa_data_set:
 			final_query = aa_data_set[0]
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = aa_workout_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = AaWorkoutCalculations.objects.get(
-					user_aa_workout=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except AaWorkoutCalculations.DoesNotExist:
-					create_workout_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = aa_workout_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = AaWorkoutCalculations.objects.get(
+						user_aa_workout=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except AaWorkoutCalculations.DoesNotExist:
+						create_workout_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa2_workout = fitbit.views.calculate_AA2_workout(user_get,start_date)
+				return fitbit_aa2_workout
+
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -272,19 +285,25 @@ class UserAA_daily(generics.ListCreateAPIView):
 		if aa_data_set:
 			final_query = aa_data_set[0]
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = daily_aa_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = AaCalculations.objects.get(
-					user_aa=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except AaCalculations.DoesNotExist:
-					create_aa_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = daily_aa_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = AaCalculations.objects.get(
+						user_aa=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except AaCalculations.DoesNotExist:
+						create_aa_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa2_daily = fitbit.views.calculate_AA2_daily(user_get,start_date)
+				return fitbit_aa2_daily
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
