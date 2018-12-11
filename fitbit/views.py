@@ -3,7 +3,8 @@ import base64
 import requests
 import webbrowser
 import pprint
-from datetime import datetime, timedelta , date
+from datetime import datetime, timedelta , date, time
+from decimal import Decimal, ROUND_HALF_UP
 import ast
 import logging
 
@@ -31,6 +32,7 @@ from .models import FitbitConnectToken,\
 
 from .fitbit_push import store_data,session_fitbit
 import quicklook.calculations.converter
+from quicklook.calculations.converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
 
 # Create your views here.
 
@@ -682,118 +684,119 @@ def calculate_AA2_workout(user,start_date):
 	return ({})
 
 def calculate_AA2_daily(user,start_date):
-	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
-	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(user_get,start_date)
+	pass
+	# hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
+	# # all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(user_get,start_date)
 
-	all_activities_heartrate = []
-	all_activities_timestamp = []
-	activies_timestamp = []
-	daily_aa_data={}
-	make_dict_to_list = []
-	if hr_time_diff:
-		for single_activity in hr_time_diff:
-			make_dict_to_list.append(single_activity)
-			all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(single_activity)
-			make_dict_to_list.pop(0)
-			all_activities_heartrate.append(all_activities_heartrate_list)
-			all_activities_timestamp.append(all_activities_timestamp_list)
+	# all_activities_heartrate = []
+	# all_activities_timestamp = []
+	# activies_timestamp = []
+	# daily_aa_data={}
+	# make_dict_to_list = []
+	# if hr_time_diff:
+	# 	for single_activity in hr_time_diff:
+	# 		make_dict_to_list.append(single_activity)
+	# 		all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(single_activity)
+	# 		make_dict_to_list.pop(0)
+	# 		all_activities_heartrate.append(all_activities_heartrate_list)
+	# 		all_activities_timestamp.append(all_activities_timestamp_list)
 		
-		all_activities_heartrate = [single_list for single_list in all_activities_heartrate if single_list]
-		all_activities_timestamp = [single_list for single_list in all_activities_timestamp if single_list]
+	# 	all_activities_heartrate = [single_list for single_list in all_activities_heartrate if single_list]
+	# 	all_activities_timestamp = [single_list for single_list in all_activities_timestamp if single_list]
 		
-		below_aerobic_value = 180-user_age-30
-		anaerobic_value = 180-user_age+5
-		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-		anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		below_aerobic_range = 'below {}'.format(below_aerobic_value)
+	# 	below_aerobic_value = 180-user_age-30
+	# 	anaerobic_value = 180-user_age+5
+	# 	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
+	# 	anaerobic_range = '{} or above'.format(anaerobic_value+1)
+	# 	below_aerobic_range = 'below {}'.format(below_aerobic_value)
 		
-		def individual_activity(heart,time):
-			anaerobic_range_list = []
-			below_aerobic_list = []
-			aerobic_list = []
-			for hrt,tm in zip(heart,time):
-				if hrt > anaerobic_value:
-					anaerobic_range_list.append(tm)
-				elif hrt < below_aerobic_value:
-					below_aerobic_list.append(tm)
-				else:
-					aerobic_list.append(tm)
-			return aerobic_list,below_aerobic_list,anaerobic_range_list
-		aerobic_duration = []
-		anaerobic_duration = []
-		below_aerobic_duration = []
-		total_duration = []
-		for i in range(len(all_activities_heartrate)):
-			single_activity_file = individual_activity(all_activities_heartrate[i],all_activities_timestamp[i])
-			single_activity_list =list(single_activity_file)
-			time_in_aerobic = sum(single_activity_list[0])
-			aerobic_duration.append(time_in_aerobic)
-			time_in_below_aerobic = sum(single_activity_list[1])
-			below_aerobic_duration.append(time_in_below_aerobic)
-			time_in_anaerobic = sum(single_activity_list[2])
-			anaerobic_duration.append(time_in_anaerobic)
-			total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
-			total_duration.append(total_time)
+	# 	def individual_activity(heart,time):
+	# 		anaerobic_range_list = []
+	# 		below_aerobic_list = []
+	# 		aerobic_list = []
+	# 		for hrt,tm in zip(heart,time):
+	# 			if hrt > anaerobic_value:
+	# 				anaerobic_range_list.append(tm)
+	# 			elif hrt < below_aerobic_value:
+	# 				below_aerobic_list.append(tm)
+	# 			else:
+	# 				aerobic_list.append(tm)
+	# 		return aerobic_list,below_aerobic_list,anaerobic_range_list
+	# 	aerobic_duration = []
+	# 	anaerobic_duration = []
+	# 	below_aerobic_duration = []
+	# 	total_duration = []
+	# 	for i in range(len(all_activities_heartrate)):
+	# 		single_activity_file = individual_activity(all_activities_heartrate[i],all_activities_timestamp[i])
+	# 		single_activity_list =list(single_activity_file)
+	# 		time_in_aerobic = sum(single_activity_list[0])
+	# 		aerobic_duration.append(time_in_aerobic)
+	# 		time_in_below_aerobic = sum(single_activity_list[1])
+	# 		below_aerobic_duration.append(time_in_below_aerobic)
+	# 		time_in_anaerobic = sum(single_activity_list[2])
+	# 		anaerobic_duration.append(time_in_anaerobic)
+	# 		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
+	# 		total_duration.append(total_time)
 			
-			try:
-				percent_anaerobic = (time_in_anaerobic/total_time)*100
-				percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+	# 		try:
+	# 			percent_anaerobic = (time_in_anaerobic/total_time)*100
+	# 			percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 			
-				percent_below_aerobic = (time_in_below_aerobic/total_time)*100
-				percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+	# 			percent_below_aerobic = (time_in_below_aerobic/total_time)*100
+	# 			percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 				
-				percent_aerobic = (time_in_aerobic/total_time)*100
-				percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+	# 			percent_aerobic = (time_in_aerobic/total_time)*100
+	# 			percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 			
-				total_percent = 100
-			except (ZeroDivisionError):
-				percent_anaerobic=''
-				percent_below_aerobic=''
-				percent_aerobic=''
-				total_percent=''
-			single_data = {"avg_heart_rate":None#avg_hrr_list[i],
-					"max_heart_rate":None#max_hrr_list[i],
-					"total_duration":total_time,
-					"duration_in_aerobic_range":time_in_aerobic,
-					"percent_aerobic":percent_aerobic,
-					"duration_in_anaerobic_range":time_in_anaerobic,
-					"percent_anaerobic":percent_anaerobic,
-					"duration_below_aerobic_range":time_in_below_aerobic,
-					"percent_below_aerobic":percent_below_aerobic,
-					"duration_hrr_not_recorded":hrr_not_recorded_list[i],
-					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
-					}
-			# print(single_data,"single_data")
-			daily_aa_data[str(data_summaryid[i])] = single_data
-			# print(daily_aa_data,"daily_aa_data")
-		try:
-			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
-			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
-			total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
-			total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
-			total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
-		except (ZeroDivisionError,IndexError):
-			total_prcnt_anaerobic = ''
-			total_prcnt_below_aerobic = ''
-			total_prcnt_aerobic = ''
+	# 			total_percent = 100
+	# 		except (ZeroDivisionError):
+	# 			percent_anaerobic=''
+	# 			percent_below_aerobic=''
+	# 			percent_aerobic=''
+	# 			total_percent=''
+	# 		single_data = {"avg_heart_rate":avg_hrr_list[i],
+	# 				"max_heart_rate":max_hrr_list[i],
+	# 				"total_duration":total_time,
+	# 				"duration_in_aerobic_range":time_in_aerobic,
+	# 				"percent_aerobic":percent_aerobic,
+	# 				"duration_in_anaerobic_range":time_in_anaerobic,
+	# 				"percent_anaerobic":percent_anaerobic,
+	# 				"duration_below_aerobic_range":time_in_below_aerobic,
+	# 				"percent_below_aerobic":percent_below_aerobic,
+	# 				"duration_hrr_not_recorded":hrr_not_recorded_list[i],
+	# 				"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
+	# 				}
+	# 		# print(single_data,"single_data")
+	# 		daily_aa_data[str(data_summaryid[i])] = single_data
+	# 		# print(daily_aa_data,"daily_aa_data")
+	# 	try:
+	# 		total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
+	# 		total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
+	# 		total_prcnt_below_aerobic = (sum(below_aerobic_duration)/sum(total_duration)*100)
+	# 		total_prcnt_below_aerobic = int(Decimal(total_prcnt_below_aerobic).quantize(0,ROUND_HALF_UP))
+	# 		total_prcnt_aerobic = (sum(aerobic_duration)/sum(total_duration)*100)
+	# 		total_prcnt_aerobic = int(Decimal(total_prcnt_aerobic).quantize(0,ROUND_HALF_UP))
+	# 	except (ZeroDivisionError,IndexError):
+	# 		total_prcnt_anaerobic = ''
+	# 		total_prcnt_below_aerobic = ''
+	# 		total_prcnt_aerobic = ''
 
-		total =  {"avg_heart_rate":None#avg_hrr,
-				  "max_heart_rate":None#max_hrr,
-				  "total_duration":sum(total_duration),
-				  "duration_in_aerobic_range":sum(aerobic_duration),
-				  "duration_in_anaerobic_range":sum(anaerobic_duration),
-				  "duration_below_aerobic_range":sum(below_aerobic_duration),
-				  "percent_aerobic":total_prcnt_aerobic,
-				  "percent_below_aerobic":total_prcnt_below_aerobic,
-				  "percent_anaerobic":total_prcnt_anaerobic,
-				  "duration_hrr_not_recorded":sum(hrr_not_recorded_list),
-				  "percent_hrr_not_recorded":sum(prcnt_hrr_not_recorded_list)
-					}
-		if total:
-			daily_aa_data['Totals'] = total
-		else:
-			daily_aa_data['Totals'] = {}
-		return daily_aa_data
-	else:
-		return {}
+	# 	total =  {"avg_heart_rate":avg_hrr,
+	# 			  "max_heart_rate":max_hrr,
+	# 			  "total_duration":sum(total_duration),
+	# 			  "duration_in_aerobic_range":sum(aerobic_duration),
+	# 			  "duration_in_anaerobic_range":sum(anaerobic_duration),
+	# 			  "duration_below_aerobic_range":sum(below_aerobic_duration),
+	# 			  "percent_aerobic":total_prcnt_aerobic,
+	# 			  "percent_below_aerobic":total_prcnt_below_aerobic,
+	# 			  "percent_anaerobic":total_prcnt_anaerobic,
+	# 			  "duration_hrr_not_recorded":sum(hrr_not_recorded_list),
+	# 			  "percent_hrr_not_recorded":sum(prcnt_hrr_not_recorded_list)
+	# 				}
+	# 	if total:
+	# 		daily_aa_data['Totals'] = total
+	# 	else:
+	# 		daily_aa_data['Totals'] = {}
+	# 	return daily_aa_data
+	# else:
+	# 	return {}

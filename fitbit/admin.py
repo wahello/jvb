@@ -9,7 +9,8 @@ from .models import FitbitConnectToken,\
                     FitbitNotifications,\
                     UserFitbitDatabody,\
                     UserFitbitDatafoods,\
-                    UserFitbitLastSynced
+                    UserFitbitLastSynced,\
+                    UserAppTokens
 # Register your models here.
 
 class FitbitConnectTokenAdmin(admin.ModelAdmin):
@@ -61,6 +62,10 @@ class UserFitbitLastSyncedAdmin(admin.ModelAdmin):
     search_fields = ('user__username','user__email','user__first_name',
         'user__last_name')
 
+class UserAppTokensAdmin(admin.ModelAdmin):
+    list_display = ['user']
+    search_fields = ('user__username','user__email','user__first_name',
+        'user__last_name')
 
 admin.site.register(FitbitConnectToken,FitbitConnectTokenAdmin)
 admin.site.register(FitbitNotifications,FitbitNotificationsAdmin)
@@ -71,3 +76,4 @@ admin.site.register(UserFitbitDataSteps,UserFitbitDataStepsAdmin)
 admin.site.register(UserFitbitDatabody,UserFitbitDatabodyAdmin)
 admin.site.register(UserFitbitDatafoods,UserFitbitDatafoodsAdmin)
 admin.site.register(UserFitbitLastSynced,UserFitbitLastSyncedAdmin)
+admin.site.register(UserAppTokens,UserAppTokensAdmin)

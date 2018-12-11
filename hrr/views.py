@@ -34,6 +34,8 @@ from garmin.models import GarminFitFiles,\
 from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
 from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
+import fitbit
+import quicklook
 from hrr.models import Hrr,\
 						AaCalculations,\
 						TimeHeartZones,\
