@@ -470,11 +470,9 @@ def _get_mc_active_min_sleep_exercise_hours(ql_data):
 
 	sleep_active_min = round(sleep_active_sec/60)
 	exercise_active_min = round(exercise_active_sec/60)
-	sleep_hours = round(sleep_min/60)
-	exercise_hours = round(exercise_min/60)
 
 	return (total_active_min,sleep_active_min,
-			exercise_active_min,sleep_hours,exercise_hours)
+			exercise_active_min,sleep_min,exercise_min)
 
 def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 	mc_cum_data = _get_blank_pa_model_fields("mc")
@@ -493,8 +491,8 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		total_active_min = active_min_sleep_exercise_hours[0]
 		sleep_active_min = active_min_sleep_exercise_hours[1]
 		exercise_active_min = active_min_sleep_exercise_hours[2]
-		sleep_hours = active_min_sleep_exercise_hours[3]
-		exercise_hours = active_min_sleep_exercise_hours[4]
+		sleep_mins = active_min_sleep_exercise_hours[3]
+		exercise_mins = active_min_sleep_exercise_hours[4]
 
 		mc_cum_data['cum_movement_consistency_gpa'] = (GRADE_POINT[
 			_safe_get_mobj(
@@ -519,11 +517,11 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_exercise_active_min",0))
 
-		mc_cum_data['cum_sleep_hours'] = (sleep_hours
+		mc_cum_data['cum_sleep_hours'] = (sleep_mins
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_sleep_hours",0))
 
-		mc_cum_data['cum_exercise_hours'] = (exercise_hours
+		mc_cum_data['cum_exercise_hours'] = (exercise_mins
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_exercise_hours",0))
 
@@ -533,8 +531,8 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		total_active_min = active_min_sleep_exercise_hours[0]
 		sleep_active_min = active_min_sleep_exercise_hours[1]
 		exercise_active_min = active_min_sleep_exercise_hours[2]
-		sleep_hours = active_min_sleep_exercise_hours[3]
-		exercise_hours = active_min_sleep_exercise_hours[4]
+		sleep_mins = active_min_sleep_exercise_hours[3]
+		exercise_mins = active_min_sleep_exercise_hours[4]
 		
 		mc_cum_data['cum_movement_consistency_gpa'] = GRADE_POINT[
 			_safe_get_mobj(
@@ -546,8 +544,8 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		mc_cum_data['cum_total_active_min'] = total_active_min
 		mc_cum_data['cum_sleep_active_min'] = sleep_active_min
 		mc_cum_data['cum_exercise_active_min'] = exercise_active_min
-		mc_cum_data['cum_sleep_hours'] = sleep_hours
-		mc_cum_data['cum_exercise_hours'] = exercise_hours
+		mc_cum_data['cum_sleep_hours'] = sleep_mins
+		mc_cum_data['cum_exercise_hours'] = exercise_mins
 		
 	return mc_cum_data
 
