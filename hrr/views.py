@@ -1262,7 +1262,7 @@ def store_aa_workout_calculations(user,from_date,to_date):
 
 	Return:None
 	'''
-	print("HRR A/A Workout started")
+	print("A/A Workout started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -1270,16 +1270,17 @@ def store_aa_workout_calculations(user,from_date,to_date):
 		data = aa_workout_data(user,current_date)
 		# data = json.dumps(data)
 		if data:
-			print("HRR A/A workout")
+			print("A/A workout")
 			try:
 				user_obj = AaWorkoutCalculations.objects.get(
 					user_aa_workout=user, created_at=current_date)
 				user_obj.data = data
 				user_obj.save()
+				# update_workout_instance(user,start_date,data)
 			except AaWorkoutCalculations.DoesNotExist:
 				create_workout_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
-	print("HRR A/A workout finished")
+	print("A/A workout finished")
 	return None
 
 def total_percent(modified_data_total):
@@ -1823,8 +1824,8 @@ def low_high_hr(low_end_heart,high_end_heart,heart_beat):
 	'''
 		Making ranges for A/A third chart
 	'''
-	low_hr = sorted(i for i in low_end_heart if i <= heart_beat)
-	high_hr = sorted(i for i in high_end_heart if i >= heart_beat)
+	low_hr = sorted(i for i in low_end_heart if i <= int(heart_beat))
+	high_hr = sorted(i for i in high_end_heart if i >= int(heart_beat))
 	return low_hr[-1],high_hr[1]
 
 def add_hr_nor_recorded_heartbeat(
