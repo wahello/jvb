@@ -969,9 +969,10 @@ def store_aa_calculations(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA1 = AA.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_data(user,current_date)
-		if data.get('total_time'):
+		if data.get('total_time') or (AA1 and not data.get('total_time')):
 			print("AA calculations creating")
 			try:
 				user_aa = AA.objects.get(user=user, created_at=current_date)
@@ -1266,10 +1267,11 @@ def store_aa_workout_calculations(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA2 = AaWorkoutCalculations.objects.filter(user_aa_workout=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_workout_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA2 and not data):
 			print("A/A workout")
 			try:
 				user_obj = AaWorkoutCalculations.objects.get(
@@ -1531,7 +1533,7 @@ def daily_aa_data(user, start_date):
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 
 	try:
-		if activities:
+		if workout_data:
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -1642,7 +1644,7 @@ def daily_aa_data(user, start_date):
 	all_activities_timestamp = []
 	activies_timestamp = []
 	daily_aa_data={}
-	if workout:
+	if workout and workout_data:
 		for tmp in workout:
 			workout_activities = fitfile_parse([tmp],offset,start_date_str)
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
@@ -1805,10 +1807,11 @@ def store_daily_aa_calculations(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA3 = AaCalculations.objects.filter(user_aa=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA3 and not data):
 			print("A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
@@ -2236,10 +2239,11 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA4 = TimeHeartZones.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_low_high_end_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA4 and not data):
 			try:
 				time_hr_zone_obj = TimeHeartZones.objects.get(
 					user=user, created_at=current_date)
