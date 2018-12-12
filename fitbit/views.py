@@ -692,24 +692,29 @@ def calculate_AA2_workout(user,start_date):
 		return ({})
 	return ({})
 
+def list_single_activity_hr(data):
+	single_activity_id = list(data.keys())
+	time_diff = data[single_activity_id[0]]['time_diff']
+	hr_values = data[single_activity_id[0]]['hr_values']
+	return time_diff,hr_values
+
 def calculate_AA2_daily(user,start_date):
-	pass
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
 	# all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(user_get,start_date)
-
 	all_activities_heartrate = []
 	all_activities_timestamp = []
 	activies_timestamp = []
 	daily_aa_data={}
-	make_dict_to_list = []
+	log_ids = []
+	user_age = user.profile.age()
 	if hr_time_diff:
 		for single_activity in hr_time_diff:
-			make_dict_to_list.append(single_activity)
-			all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(single_activity)
-			make_dict_to_list.pop(0)
+			log_ids.extend(list(single_activity.keys()))
+			all_activities_heartrate_list,all_activities_timestamp_list = list_single_activity_hr(single_activity)
 			all_activities_heartrate.append(all_activities_heartrate_list)
 			all_activities_timestamp.append(all_activities_timestamp_list)
-		
+		print(all_activities_heartrate_list,"all_activities_heartrate_list")
+		print(all_activities_timestamp_list,"all_activities_timestamp_list")
 		all_activities_heartrate = [single_list for single_list in all_activities_heartrate if single_list]
 		all_activities_timestamp = [single_list for single_list in all_activities_timestamp if single_list]
 		
@@ -763,8 +768,8 @@ def calculate_AA2_daily(user,start_date):
 				percent_below_aerobic=''
 				percent_aerobic=''
 				total_percent=''
-			single_data = {"avg_heart_rate":avg_hrr_list[i],
-					"max_heart_rate":max_hrr_list[i],
+			single_data = {"avg_heart_rate":None,
+					"max_heart_rate":None,
 					"total_duration":total_time,
 					"duration_in_aerobic_range":time_in_aerobic,
 					"percent_aerobic":percent_aerobic,
@@ -772,11 +777,12 @@ def calculate_AA2_daily(user,start_date):
 					"percent_anaerobic":percent_anaerobic,
 					"duration_below_aerobic_range":time_in_below_aerobic,
 					"percent_below_aerobic":percent_below_aerobic,
-					"duration_hrr_not_recorded":hrr_not_recorded_list[i],
-					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
+					"duration_hrr_not_recorded":None,
+					"percent_hrr_not_recorded":None
 					}
 			# print(single_data,"single_data")
-			daily_aa_data[str(data_summaryid[i])] = single_data
+			log_id = log_ids[i]
+			daily_aa_data[log_id] = single_data
 			# print(daily_aa_data,"daily_aa_data")
 		try:
 			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
@@ -790,8 +796,8 @@ def calculate_AA2_daily(user,start_date):
 			total_prcnt_below_aerobic = ''
 			total_prcnt_aerobic = ''
 
-		total =  {"avg_heart_rate":avg_hrr,
-				  "max_heart_rate":max_hrr,
+		total =  {"avg_heart_rate":None,
+				  "max_heart_rate":None,
 				  "total_duration":sum(total_duration),
 				  "duration_in_aerobic_range":sum(aerobic_duration),
 				  "duration_in_anaerobic_range":sum(anaerobic_duration),
@@ -799,8 +805,8 @@ def calculate_AA2_daily(user,start_date):
 				  "percent_aerobic":total_prcnt_aerobic,
 				  "percent_below_aerobic":total_prcnt_below_aerobic,
 				  "percent_anaerobic":total_prcnt_anaerobic,
-				  "duration_hrr_not_recorded":sum(hrr_not_recorded_list),
-				  "percent_hrr_not_recorded":sum(prcnt_hrr_not_recorded_list)
+				  "duration_hrr_not_recorded":None,
+				  "percent_hrr_not_recorded":None,
 					}
 		if total:
 			daily_aa_data['Totals'] = total
