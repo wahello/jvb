@@ -15,7 +15,6 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
-
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -42,6 +41,7 @@ from hrr.models import Hrr,\
 						AaWorkoutCalculations,\
 						AA
 import pprint
+from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
 									get_weekly_workouts,\
 									get_weekly_aa,\
@@ -195,7 +195,7 @@ class UserAA(generics.ListCreateAPIView):
 				return final_query
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-				fitbit_hr_difference = fitbit.views.fitbit_aa_chart_one_new(user_get,start_date)
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_one_new(user_get,start_date)
 				return fitbit_hr_difference
 
 	def get(self,request,format="json"):
@@ -249,7 +249,7 @@ class UserAA_workout(generics.ListCreateAPIView):
 				return final_query
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-				fitbit_aa2_workout = fitbit.views.calculate_AA2_workout(user_get,start_date)
+				fitbit_aa2_workout = fitbit_aa.calculate_AA2_workout(user_get,start_date)
 				return fitbit_aa2_workout
 
 
@@ -307,7 +307,7 @@ class UserAA_daily(generics.ListCreateAPIView):
 				return final_query
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-				fitbit_aa2_daily = fitbit.views.calculate_AA2_daily(user_get,start_date)
+				fitbit_aa2_daily = fitbit_aa.calculate_AA2_daily(user_get,start_date)
 				if fitbit_aa2_daily:
 					try:
 						user_obj = AaCalculations.objects.get(
@@ -1010,7 +1010,7 @@ def store_garmin_aa1(user,from_date,to_date):
 
 def store_fitbit_aa1(user,from_date,to_date):
 	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
-	data = fitbit.views.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
+	data = fitbit_aa.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
 	if data.get('total_time'):
 		print("Fitbit AA1 calculations creating")
 		try:
@@ -1870,7 +1870,7 @@ def store_garmin_aa_daily(user,from_date,to_date):
 
 def store_fitbit_aa_daily(user,from_date,to_date):
 	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
-	data = fitbit.views.calculate_AA2_daily(user,from_date,user_input_activities=activities_dict)
+	data = fitbit_aa.calculate_AA2_daily(user,from_date,user_input_activities=activities_dict)
 	if data:
 			try:
 				user_aa = AaCalculations.objects.get(
