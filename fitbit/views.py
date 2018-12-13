@@ -28,7 +28,8 @@ from .models import FitbitConnectToken,\
 					UserFitbitDataHeartRate,\
 					UserFitbitDataActivities,\
 					UserFitbitDataSteps,\
-					FitbitNotifications
+					FitbitNotifications,\
+					UserAppTokens
 
 from hrr.models import (AaCalculations,
 					TimeHeartZones,
@@ -38,8 +39,24 @@ from hrr.models import (AaCalculations,
 from .fitbit_push import store_data,session_fitbit
 import quicklook.calculations.converter
 from quicklook.calculations.converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
+from django.conf import settings
 
 # Create your views here.
+redirect_uri = settings.FITBIT_REDIRECT_URL
+
+def get_client_id_secret(user):
+	'''
+		This function get the client id and client secret from databse for respective use
+		if not then provide jvb app client id,secret
+	'''
+	try:
+		user_app_tokens = UserAppTokens.objects.get(user=user)
+		client_id = user_app_tokens.user_client_id
+		client_secret = user_app_tokens.user_client_secret
+	except:
+		client_id = settings.FITBIT_CONSUMER_ID
+		client_secret = settings.FITBIT_CONSUMER_SECRET
+	return client_id,client_secret
 
 class FitbitPush(APIView):
 	'''
@@ -65,8 +82,9 @@ def refresh_token(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id,client_secret = get_client_id_secret(request.user)
+	# client_id='22CN2D'
+	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -96,7 +114,7 @@ def refresh_token(user):
 
 
 def fitbit_user_subscriptions(user):
-	service = session_fitbit()
+	service = session_fitbit(user)
 	tokens = FitbitConnectToken.objects.get(user = user)
 	fibtbit_user_id = tokens.user_id_fitbit
 	access_token = tokens.access_token
@@ -141,15 +159,16 @@ def api_fitbit(session,date_fitbit):
 	return(sleep_fitbit,activity_fitbit,heartrate_fitbit,steps_fitbit)
 
 def request_token_fitbit(request):
+	client_id,client_secret = get_client_id_secret(request.user)
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id=client_id,
+					 client_secret=client_secret,
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')  
 
 	params = {
-		'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+		'redirect_uri':redirect_uri,
 		'response_type':'code',
 		'scope':' '.join(['activity','nutrition','heartrate','location',
 						 'profile','settings','sleep','social','weight'])
@@ -161,8 +180,9 @@ def request_token_fitbit(request):
 
 
 def receive_token_fitbit(request):
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id,client_secret = get_client_id_secret(request.user)
+	# client_id='22CN2D'
+	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	authorize_url='https://www.fitbit.com/oauth2/authorize'
 	base_url='https://fitbit.com/api'
@@ -177,7 +197,7 @@ def receive_token_fitbit(request):
 		data = {
 			'clientId':client_id,
 			'grant_type':'authorization_code',
-			'redirect_uri':'https://app.jvbwellness.com/callbacks/fitbit',
+			'redirect_uri':redirect_uri,
 			'code':authorization_code
 		}
 		r = requests.post(access_token_url,headers=headers,data=data)
@@ -204,7 +224,7 @@ def fetching_data_fitbit(request):
 	start_date_str = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
 	
-	service = session_fitbit()
+	service = session_fitbit(request.user)
 	tokens = FitbitConnectToken.objects.get(user = request.user)
 	access_token = tokens.access_token
 	session = service.get_session(access_token)
@@ -494,11 +514,7 @@ def all_activities_hr_and_time_diff(hr_time_diff):
 		all_activities_heartrate_list.extend(single_activity[single_activity_id[0]]["hr_values"])
 	return all_activities_heartrate_list,all_activities_timestamp_list
 
-def fitbit_aa_chart_one_new(user_get,start_date):
-
-	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
-	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
-
+def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp_list):
 	user_age = user_get.profile.age()
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
@@ -602,6 +618,45 @@ def fitbit_aa_chart_one_new(user_get,start_date):
 	# 	print(final_data , "fffffffffffffffffffffffffffffffffffffffffffffffffffffff")
 	# print(data)
 	return data
+
+def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
+
+	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
+	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+	data = cal_aa1_data(
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+	AA_data = AA.objects.filter(user=user_get,created_at=start_date)
+	cal_aa1_data(
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+	if not user_input_activities and not AA_data:
+		data = cal_aa1_data(
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+		return data
+	elif  not user_input_activities and AA_data:
+		data = cal_aa1_data(
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+		return data
+	elif ((user_input_activities and not AA_data) or
+			(user_input_activities and AA_data)):
+		ui_act_ids = list(user_input_activities.keys())
+		fibit_act = fitbit_aa_chart_one(user_get,start_date)
+		if len(ui_act_ids) == len(fibit_act):
+			data = cal_aa1_data(
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+			return data
+		else:
+			activity_hr_time = get_user_created_activity(user_get,start_date,user_input_activities,fibit_act)
+			# user_added_data = get_aa2_daily_data(user,activity_hr_time)
+			# data = get_aa2_daily_data(user,hr_time_diff)
+			act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
+			all_activities_heartrate_list.extend(act_hr_list)
+			all_activities_timestamp_list.extend(act_time_list)
+			final_data = cal_aa1_data(
+				user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+			return final_data
+
+	else:
+		return {}
 
 def calculate_AA2_workout(user,start_date):
 	fibit_activities_qs = UserFitbitDataActivities.objects.filter(
@@ -941,7 +996,8 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 	elif  not user_input_activities and AA_data:
 		data = get_aa2_daily_data(user,hr_time_diff)
 		return data
-	elif user_input_activities and not AA_data:
+	elif ((user_input_activities and not AA_data) or
+			(user_input_activities and AA_data)):
 		ui_act_ids = list(user_input_activities.keys())
 		fibit_act = fitbit_aa_chart_one(user,start_date)
 		if len(ui_act_ids) == len(fibit_act):
@@ -949,10 +1005,10 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 			return data
 		else:
 			activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
-			# print(activity_hr_time,"activity_hr_time")
 			user_added_data = get_aa2_daily_data(user,activity_hr_time)
 			data = get_aa2_daily_data(user,hr_time_diff)
 			final_data = generate_totals(user_added_data,data)
 			return final_data
+
 	else:
 		return {}
