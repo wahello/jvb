@@ -144,7 +144,8 @@ def include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit):
 		if heartrate_fitbit:
 			heartrate_fitbit_json = heartrate_fitbit.json()
 		if heartrate_fitbit_intraday_json and heartrate_fitbit_json:
-			heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
+			if heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate"):
+				heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
 			return heartrate_fitbit_intraday_json
 		elif heartrate_fitbit_json:
 			return heartrate_fitbit_json
