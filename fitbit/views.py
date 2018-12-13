@@ -135,20 +135,42 @@ def fitbit_user_subscriptions(user):
 		fibtbit_user_id))
 	return None
 
+def include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit):
+	try:
+		heartrate_fitbit_intraday_json = ''
+		heartrate_fitbit_json = ''
+		if heartrate_fitbit_intraday:
+			heartrate_fitbit_intraday_json = heartrate_fitbit_intraday.json()
+		if heartrate_fitbit:
+			heartrate_fitbit_json = heartrate_fitbit.json()
+		if heartrate_fitbit_intraday_json and heartrate_fitbit_json:
+			heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
+			return heartrate_fitbit_intraday_json
+		elif heartrate_fitbit_json:
+			return heartrate_fitbit_json
+		else:
+			return {}
+	except:
+		return {}
+
 def api_fitbit(session,date_fitbit):
 	'''
 	Takes session and start date then call the fitbit api,return the fitbit api
 	'''
+	heartrate_fitbit_intraday = ''
+	heartrate_fitbit = ''
 	sleep_fitbit = session.get("https://api.fitbit.com/1.2/user/-/sleep/date/{}.json".format(date_fitbit))
 	activity_fitbit = session.get(
 	"https://api.fitbit.com/1/user/-/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
 	date_fitbit))
 	try:
-		heartrate_fitbit = session.get(
+		heartrate_fitbit_intraday = session.get(
 		"https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d/1sec/time/00:00/23:59.json".format(date_fitbit))
 	except:
-		heartrate_fitbit = session.get(
+		pass
+	heartrate_fitbit_normal = session.get(
 		"https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
+	heartrate_fitbit = include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
 	try:
 		steps_fitbit = session.get(
 		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d/15min/time/00:00/23:59.json".format(date_fitbit))
@@ -237,7 +259,7 @@ def fetching_data_fitbit(request):
 	#converting str to dict
 	sleep_fitbit = sleep_fitbit.json()
 	activity_fitbit = activity_fitbit.json()
-	heartrate_fitbit = heartrate_fitbit.json()
+	heartrate_fitbit = heartrate_fitbit
 	steps_fitbit = steps_fitbit.json()
 	if statuscode == 401: # if status 401 means fitbit tokens are expired below does generate tokens
 		if sleep_fitbit['errors'][0]['errorType'] == 'expired_token': 
