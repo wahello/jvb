@@ -47,8 +47,9 @@ def refresh_token_for_notification(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id,client_secret = views.get_client_id_secret(request.user)
+	# client_id='22CN2D'
+	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -75,13 +76,14 @@ def refresh_token_for_notification(user):
 	if token_object:
 		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
-def session_fitbit():
+def session_fitbit(user):
 	'''
 	return the session 
 	'''
+	client_id,client_secret = views.get_client_id_secret(user)
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id=client_id,
+					 client_secret=client_secret,
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
@@ -109,7 +111,7 @@ def call_push_api(data):
 				create_notification = FitbitNotifications.objects.create(
 					user=user,collection_type=data_type,
 					notification_date=date,state="unprocessed",notification= notification)
-			service = session_fitbit()
+			service = session_fitbit(user)
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
 			'''
@@ -170,7 +172,7 @@ def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
 
 def get_session_and_access_token(user):
 	refresh_token,access_token = refresh_token_for_notification(user)
-	service = session_fitbit()
+	service = session_fitbit(user)
 	access_token = access_token
 	session = service.get_session(access_token)	
 	return session
