@@ -19,6 +19,8 @@ from garmin.models import UserGarminDataEpoch,\
           UserGarminDataMoveIQ,\
           UserLastSynced
 
+from fitbit.models import UserFitbitLastSynced
+
 from user_input.models import UserDailyInput,\
 					DailyUserInputStrong,\
 					DailyUserInputEncouraged,\
@@ -1261,12 +1263,22 @@ def _get_user_current_local_time(user,tz_offset=None):
 		Datetime: Return a naive datetime object   
 	'''
 	utc_time_now = datetime.utcnow()
+	# First check garmin last sync
 	if not tz_offset:
 		try:
 			last_synced_obj = UserLastSynced.objects.get(user=user)
 			tz_offset = last_synced_obj.offset
 		except UserLastSynced.DoesNotExist as e:
 			tz_offset = 0
+
+	# Still no offset, look if user have fitbit last sync time
+	if not tz_offset:
+		try:
+			last_synced_obj = UserFitbitLastSynced.objects.get(user=user)
+			tz_offset = last_synced_obj.offset
+		except UserFitbitLastSynced.DoesNotExist as e:
+			tz_offset = 0
+
 	if tz_offset:
 		td = timedelta(seconds = tz_offset)
 		local_time = utc_time_now + td
