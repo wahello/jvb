@@ -151,7 +151,7 @@ def fitbit_aa_chart_one(user_get,start_date):
 					activities_start_end_time.append(act_start_end_dict)
 			
 		# print(activities_start_end_time,"activities_start_end_time")
-		return activities_start_end_time
+	return activities_start_end_time
 		
 def get_fitbit_hr_data(user_get,start_date):
 	hr_dataset = []
@@ -466,8 +466,14 @@ def get_aa2_daily_data(user,hr_time_diff):
 			single_activity_id = list(single_activity.keys())
 			time_diff = single_activity[single_activity_id[0]]['time_diff']
 			hr_values = single_activity[single_activity_id[0]]['hr_values']
-			avg_hr.append(sum(hr_values)/len(hr_values))
-			max_hr.append(max(hr_values))
+			try:
+				avg_hr.append(sum(hr_values)/len(hr_values))
+			except:
+				pass
+			try:
+				max_hr.append(max(hr_values))
+			except:
+				pass
 			all_activities_hr.append(hr_values)
 			all_activities_time.append(time_diff)
 		# print(all_activities_heartrate_list,"activities_heartrate_list")
@@ -552,9 +558,16 @@ def get_aa2_daily_data(user,hr_time_diff):
 			total_prcnt_anaerobic = ''
 			total_prcnt_below_aerobic = ''
 			total_prcnt_aerobic = ''
-
-		total =  {"avg_heart_rate":sum(avg_hr)/len(avg_hr),
-				  "max_heart_rate":max(max_hr),
+		try:
+			total_avg = sum(avg_hr)/len(avg_hr)
+		except:
+			total_avg = ''
+		try:
+			total_max = max(max_hr)
+		except:
+			total_max = ''
+		total =  {"avg_heart_rate":total_avg,
+				  "max_heart_rate":total_max,
 				  "total_duration":sum(total_duration),
 				  "duration_in_aerobic_range":sum(aerobic_duration),
 				  "duration_in_anaerobic_range":sum(anaerobic_duration),
