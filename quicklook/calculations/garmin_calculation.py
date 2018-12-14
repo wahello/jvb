@@ -19,6 +19,8 @@ from garmin.models import UserGarminDataEpoch,\
           UserGarminDataMoveIQ,\
           UserLastSynced
 
+from fitbit.models import UserFitbitLastSynced
+
 from user_input.models import UserDailyInput,\
 					DailyUserInputStrong,\
 					DailyUserInputEncouraged,\
@@ -1261,12 +1263,22 @@ def _get_user_current_local_time(user,tz_offset=None):
 		Datetime: Return a naive datetime object   
 	'''
 	utc_time_now = datetime.utcnow()
+	# First check garmin last sync
 	if not tz_offset:
 		try:
 			last_synced_obj = UserLastSynced.objects.get(user=user)
 			tz_offset = last_synced_obj.offset
 		except UserLastSynced.DoesNotExist as e:
 			tz_offset = 0
+
+	# Still no offset, look if user have fitbit last sync time
+	if not tz_offset:
+		try:
+			last_synced_obj = UserFitbitLastSynced.objects.get(user=user)
+			tz_offset = last_synced_obj.offset
+		except UserFitbitLastSynced.DoesNotExist as e:
+			tz_offset = 0
+
 	if tz_offset:
 		td = timedelta(seconds = tz_offset)
 		local_time = utc_time_now + td
@@ -1556,10 +1568,9 @@ def which_quarter(dt):
 	elif minute >= 45 and minute <= 59:
 		return 3
 
-def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
-		sleeps_today_json,user_input_todays_bedtime,combined_user_activities,
-		user_input_bedtime = None,user_input_awake_time = None,
-		user_input_timezone = None,user_input_strength_start_time = None,
+def cal_movement_consistency_summary(user,calendar_date,epochs_json,
+		yesterday_bedtime,today_awake_time,combined_user_activities,
+		today_bedtime=None, user_input_strength_start_time = None,
 		user_input_strength_end_time = None,yesterday_epoch_data = None,
 		tomorrow_epoch_data = None, nap_start_time = None, nap_end_time = None):
 	
@@ -1574,28 +1585,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,sleeps_json,
 			return datetime.combine(dt.date(),time(dt.hour,59))
 		else:
 			return dt
-
-	sleep_stats = get_sleep_stats(calendar_date,sleeps_json,sleeps_today_json, 
-		user_input_bedtime = user_input_bedtime,
-		user_input_awake_time = user_input_awake_time,
-		user_input_timezone = user_input_timezone ,str_dt=False)
 	
 	activities_start_end_time =_get_activities_start_end_time(
 		combined_user_activities)
-
-	today_bedtime = None
-	if (user_input_todays_bedtime 
-		and user_input_todays_bedtime[0] 
-		and user_input_todays_bedtime[1]):
-		target_tz = pytz.timezone(user_input_todays_bedtime[1])
-		today_bedtime = user_input_todays_bedtime[0].astimezone(target_tz).replace(tzinfo=None)
-	else:
-		sleeps_today_stats = get_sleep_stats(calendar_date,None,sleeps_today_json[::-1],
-			user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
-		today_bedtime = sleeps_today_stats['sleep_bed_time']
-
-	yesterday_bedtime = sleep_stats['sleep_bed_time']
-	today_awake_time = sleep_stats['sleep_awake_time']
 
 	# If user slept after midnight and again went to bed after next midnight
 	# In that case we have same yesterday_bedtime and today_bedtime 
@@ -2836,7 +2828,20 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		sleep_stats = get_sleep_stats(current_date,sleeps_json,sleeps_today_json,
 									  user_input_bedtime = user_input_bedtime,
 									  user_input_awake_time = user_input_awake_time,
-									  user_input_timezone = user_input_timezone)
+									  user_input_timezone = user_input_timezone,
+									  str_dt=False)
+
+		sleep_bed_time = sleep_stats['sleep_bed_time']
+		sleep_awake_time = sleep_stats['sleep_awake_time']
+		if sleep_bed_time:
+			sleep_bed_time = sleep_bed_time.strftime("%I:%M %p")
+		else:
+			sleep_bed_time = ''
+
+		if sleep_awake_time:
+			sleep_awake_time = sleep_awake_time.strftime("%I:%M %p")
+		else:
+			sleep_awake_time = ''
 		
 		sleeps_calculated_data['sleep_aid'] = safe_get(todays_daily_strong,
 					 "prescription_or_non_prescription_sleep_aids_last_night", "")
@@ -2844,8 +2849,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		sleeps_calculated_data['light_sleep'] = sleep_stats['light_sleep']
 		sleeps_calculated_data['rem_sleep'] = sleep_stats['rem_sleep']
 		sleeps_calculated_data['awake_time'] = sleep_stats['awake_time']
-		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
-		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
+		sleeps_calculated_data['sleep_bed_time'] = sleep_bed_time
+		sleeps_calculated_data['sleep_awake_time'] = sleep_awake_time
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
 		sleeps_calculated_data['sleep_per_user_input'] = (user_input_sleep_duration 
 			if user_input_sleep_duration else "")
@@ -2944,16 +2949,26 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		if nap_start_time and nap_end_time:
 			nap_start_time = _str_duration_to_dt(current_date,nap_start_time)
 			nap_end_time = _str_duration_to_dt(current_date,nap_end_time)
+
+		yesterday_bedtime = sleep_stats['sleep_bed_time']
+		today_awake_time = sleep_stats['sleep_awake_time']
+		today_bedtime = None
+		if (todays_bedtime and tomorrows_user_input_tz):
+			target_tz = pytz.timezone(tomorrows_user_input_tz)
+			today_bedtime = todays_bedtime.astimezone(target_tz).replace(tzinfo=None)
+		else:
+			sleeps_today_stats = get_sleep_stats(current_date,None,sleeps_today_json[::-1],
+				user_input_timezone = user_input_timezone,str_dt=False,bed_time_today=True)
+			today_bedtime = sleeps_today_stats['sleep_bed_time']
+
 		movement_consistency_summary = cal_movement_consistency_summary(
 			user,
 			current_date,
-			epochs_json,sleeps_json,
-			sleeps_today_json,
-			user_input_todays_bedtime = (todays_bedtime,tomorrows_user_input_tz),
-			user_input_bedtime = user_input_bedtime,
+			epochs_json,
+			yesterday_bedtime = yesterday_bedtime,
+			today_awake_time = today_awake_time,
 			combined_user_activities = combined_user_activities,
-		  	user_input_awake_time = user_input_awake_time,
-		  	user_input_timezone = user_input_timezone,
+			today_bedtime = today_bedtime,
 		  	user_input_strength_start_time = user_input_strength_start_time,
 		  	user_input_strength_end_time = user_input_strength_end_time,
 		  	yesterday_epoch_data = yesterday_epoch,

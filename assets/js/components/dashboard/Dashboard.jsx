@@ -153,9 +153,9 @@ class Dashboard extends Component {
 							  <a href='/fitbit/request_token_fitbit'>Connect to Fitbit</a><br/>
 							  </div>
 							}
-							  <h3 id="link_style">Other</h3>
+							  {/*<h3 id="link_style">Other</h3>
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
-							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>
+							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>*/}
 						  </div>
 						</div>
 					</div>
