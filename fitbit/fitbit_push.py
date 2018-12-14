@@ -243,20 +243,34 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		create_notification.save()
 		activity_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
-			user_id,date))
-		heartrate_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
-			user_id,date))
-		steps_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
-			user_id,date))
+			user_id,date)) 
+		# heartrate_fitbit = session.get(
+		# "https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
+		# 	user_id,date))
+		# steps_fitbit = session.get(
+		# "https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
+		# 	user_id,date))
+		try:
+			heartrate_fitbit_intraday = session.get(
+		"https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d/1sec/time/00:00/23:59.json".format(date_fitbit))
+		except:
+			pass
+		heartrate_fitbit_normal = session.get(
+			"https://api.fitbit.com/1/user/-/activities/heart/date/{}/1d.json".format(date_fitbit))
+		heartrate_fitbit = views.include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
+		try:
+			steps_fitbit = session.get(
+			"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d/15min/time/00:00/23:59.json".format(date_fitbit))
+		except:
+			steps_fitbit = session.get(
+			"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
 			store_data(activity_fitbit,user,date,create_notification,data_type="activity_fitbit")
 			fitbit_pull_data['activities'] = {}
 			fitbit_pull_data['activities']['activity_summary'] = activity_fitbit
 		if heartrate_fitbit:
-			heartrate_fitbit = heartrate_fitbit.json()
+			# heartrate_fitbit = heartrate_fitbit.json()
 			store_data(heartrate_fitbit,user,date,create_notification,data_type="heartrate_fitbit")
 			fitbit_pull_data['activities']['heartrate'] = heartrate_fitbit
 		if steps_fitbit:
