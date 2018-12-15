@@ -53,7 +53,7 @@ def get_time_from_timestamp(time_stamp):
 
 def convert_timestr_time(start_date):
 	hour,minute,sec = start_date.split(':')
-	time_obj = time(int(hour),int(minute),int(sec))	
+	time_obj = time(int(hour),int(minute),int(sec))
 	return time_obj
 
 def get_diff_time(start,end):
@@ -90,6 +90,7 @@ def get_hr_timediff(hr_dataset,start_date,end_date,log_id):
 				dateset_time_obj = convert_timestr_time(time_near_start)
 				diff_start_date = get_diff_time(start_date_time_obj,dateset_time_obj)
 				if diff_start_date.seconds == 0 or diff_start_date.days == -1:
+					# print(dateset_time_obj,"Start date")
 					start_activty_time = 0
 		if diff_index and diff_index >= index:
 			diff_index_end_act = index
@@ -105,8 +106,11 @@ def get_hr_timediff(hr_dataset,start_date,end_date,log_id):
 				hr.append(act_interval_hr)
 				diff_times_end_act = get_diff_time(end_date_time_obj,act_interval_time_obj)
 				if diff_times_end_act.seconds == 0 or diff_times_end_act.days == -1:
+					# print(act_interval_time_obj,"End date")
 					end_activty_time = 0
 					diff_index = 0
+					hr_time_diff = hr_time_diff[1:-4]
+					hr = hr[1:-4]
 
 	single_activity_dic = {}
 	single_activity_dic[log_id] = {}
@@ -150,7 +154,7 @@ def fitbit_aa_chart_one(user_get,start_date):
 					act_start_end_dict[act_id]["log_id"] = act_id
 					activities_start_end_time.append(act_start_end_dict)
 			
-		# print(activities_start_end_time,"activities_start_end_time")
+	# print(activities_start_end_time,"activities_start_end_time")
 	return activities_start_end_time
 		
 def get_fitbit_hr_data(user_get,start_date):
@@ -305,6 +309,7 @@ def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp
 def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
 	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
 	data = cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
 	AA_data = AA.objects.filter(user=user_get,created_at=start_date)
@@ -464,6 +469,7 @@ def get_aa2_daily_data(user,hr_time_diff):
 			# print(all_activities_heartrate_list,"all_activities_heartrate_list")
 			# print(type(all_activities_heartrate_list))
 			single_activity_id = list(single_activity.keys())
+			# print(single_activity[single_activity_id[0]]['time_diff'],"single_activity[single_activity_id[0]]['time_diff']")
 			time_diff = single_activity[single_activity_id[0]]['time_diff']
 			hr_values = single_activity[single_activity_id[0]]['hr_values']
 			try:

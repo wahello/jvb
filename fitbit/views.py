@@ -71,7 +71,9 @@ class FitbitPush(APIView):
 	def get(self, request, format="json"):
 		verify_codes = ['116ac5efa95d30cb8f4d4118a3a6845e4b16220c8b3839bac4002db982804c3a',
 						'4d48c7d06f18f34bb9479af97d4dd82732885d3adbeda22c1ce79c559189900c',
-						'5ab5902e4e30d983e32f0927b2e087824b923759f482798a5cb242b59c122afa']
+						'5ab5902e4e30d983e32f0927b2e087824b923759f482798a5cb242b59c122afa',
+						'c48e07b496216e1016bf5029a6e6089e238d1dcf135a5296607c3a8377308a53',
+						'fde3ef2d376adfaa762560aa942fa9e07a96a1a1e5e8e3c711eb1b26df4dc919']
 		verification_code = request.query_params
 		verify_code = verification_code.get('verify','')
 		if verify_code in verify_codes:
@@ -85,7 +87,7 @@ def refresh_token(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id,client_secret = get_client_id_secret(request.user)
+	client_id,client_secret = get_client_id_secret(user)
 	# client_id='22CN2D'
 	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
