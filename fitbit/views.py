@@ -73,7 +73,8 @@ class FitbitPush(APIView):
 						'4d48c7d06f18f34bb9479af97d4dd82732885d3adbeda22c1ce79c559189900c',
 						'5ab5902e4e30d983e32f0927b2e087824b923759f482798a5cb242b59c122afa',
 						'c48e07b496216e1016bf5029a6e6089e238d1dcf135a5296607c3a8377308a53',
-						'fde3ef2d376adfaa762560aa942fa9e07a96a1a1e5e8e3c711eb1b26df4dc919']
+						'fde3ef2d376adfaa762560aa942fa9e07a96a1a1e5e8e3c711eb1b26df4dc919',
+						'6c1d1f97ebe6fd810652d2d655bd8b0cc56f66b64473cab2f2597f03293a8a4e']
 		verification_code = request.query_params
 		verify_code = verification_code.get('verify','')
 		if verify_code in verify_codes:
