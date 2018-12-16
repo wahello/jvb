@@ -47,7 +47,7 @@ def refresh_token_for_notification(user):
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id,client_secret = views.get_client_id_secret(request.user)
+	client_id,client_secret = views.get_client_id_secret(user)
 	# client_id='22CN2D'
 	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
