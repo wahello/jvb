@@ -447,49 +447,49 @@ class MCS_Dashboard extends Component{
 			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
 	          	    	  <table className = "table table-striped table-bordered tableContent ">
 		          	    	<tr className="table_content">
-			          	    	<th className="table_size">12:00 - 12:59 AM</th>
-			          	    	<th className="table_size">01:00 - 01:59 AM</th> 
-			          	    	<th className="table_size">02:00 - 02:59 AM</th>
-			          	    	<th className="table_size">03:00 - 03:59 AM</th>
-			          	    	<th className="table_size">04:00 - 04:59 AM</th>
-			          	    	<th className="table_size">05:00 - 05:59 AM</th>
+			          	    	<th className="table_size">12 - 12:59 AM</th>
+			          	    	<th className="table_size">01 - 01:59 AM</th> 
+			          	    	<th className="table_size">02 - 02:59 AM</th>
+			          	    	<th className="table_size">03 - 03:59 AM</th>
+			          	    	<th className="table_size">04 - 04:59 AM</th>
+			          	    	<th className="table_size">05 - 05:59 AM</th>
 			          	 
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody border_bottom">
 		          	    		{this.renderTable(this.state.mc_data)}
 
 		          	    </tbody>
 		          	    	<tr className="table_content">
-		          	    		<th className="table_size">06:00 - 06:59 AM</th>
-			          	    	<th className="table_size">07:00 - 07:59 AM</th>
-			          	    	<th className="table_size">08:00 - 08:59 AM</th>
-			          	    	<th className="table_size">09:00 - 09:59 AM</th>
-			          	    	<th className="table_size">10:00 - 10:59 AM</th>
-			          	    	<th className="table_size">11:00 - 11:59 AM</th>
+		          	    		<th className="table_size">06 - 06:59 AM</th>
+			          	    	<th className="table_size">07 - 07:59 AM</th>
+			          	    	<th className="table_size">08 - 08:59 AM</th>
+			          	    	<th className="table_size">09 - 09:59 AM</th>
+			          	    	<th className="table_size">10 - 10:59 AM</th>
+			          	    	<th className="table_size">11 - 11:59 AM</th>
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody border_bottom">
 		          	    		{this.renderTablecolumn(this.state.mc_data)}
 		          	    </tbody>
 		          	    	<tr className="table_content">
-			          	    	<th className="table_size">12:00 - 12:59 PM</th>
-			          	    	<th className="table_size">01:00 - 01:59 PM</th>
-			          	    	<th className="table_size">02:00 - 02:59 PM</th>
-			          	    	<th className="table_size">03:00 - 03:59 PM</th>
-			          	    	<th className="table_size">04:00 - 04:59 PM</th>
-			          	    	<th className="table_size">05:00 - 05:59 PM</th>
+			          	    	<th className="table_size">12 - 12:59 PM</th>
+			          	    	<th className="table_size">01 - 01:59 PM</th>
+			          	    	<th className="table_size">02 - 02:59 PM</th>
+			          	    	<th className="table_size">03 - 03:59 PM</th>
+			          	    	<th className="table_size">04 - 04:59 PM</th>
+			          	    	<th className="table_size">05 - 05:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody border_bottom">
 		          	    		{this.renderTabledata(this.state.mc_data)}
 		          	    </tbody>
 		          	    	 <tr className="table_content">
-		          	    		<th className="table_size">06:00 - 06:59 PM</th>
-			          	    	<th className="table_size">07:00 - 07:59 PM</th>
-			          	    	<th className="table_size">08:00 - 08:59 PM</th>
-			          	    	<th className="table_size">09:00 - 09:59 PM</th>
-			          	    	<th className="table_size">10:00 - 10:59 PM</th>
-			          	    	<th className="table_size">11:00 - 11:59 PM</th>
+		          	    		<th className="table_size">06 - 06:59 PM</th>
+			          	    	<th className="table_size">07 - 07:59 PM</th>
+			          	    	<th className="table_size">08 - 08:59 PM</th>
+			          	    	<th className="table_size">09 - 09:59 PM</th>
+			          	    	<th className="table_size">10 - 10:59 PM</th>
+			          	    	<th className="table_size">11 - 11:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody">
 		          	    		{this.renderTablecolumndata(this.state.mc_data)}
 		          	    </tbody>
 		          	</table>
