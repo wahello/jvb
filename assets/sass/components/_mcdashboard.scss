@@ -18,8 +18,8 @@
     font-size: 13px;
   }
 	.row .mc_calendar{
-		margin-top: 10px;
-   padding-bottom: 8px;
+		margin-top: 2px;
+   padding-bottom: 2px;
 	}
    .mcs_dashboard  {
     font-size: 9px;
@@ -29,7 +29,7 @@
     min-width: 40px;
     text-align: center;
     font-size: 9px; 
-    padding:3px;
+    padding:0 3px 0 3px;
 }
 .table .mcs-dashboard {
 
@@ -126,6 +126,15 @@
   }
 }
 
-.border_bottom {
-  border-bottom: 3px solid #808080;
+.mcs_dashboard_border_bottom {
+   border-bottom: 2px solid #505050;
+  }
+
+
+// .tbody {
+//   border-bottom: 2px solid #505050;
+// }
+
+.mcs_dashboard_table_border {
+  border: 2px solid #505050;
 }

@@ -413,7 +413,7 @@ class MCS_Dashboard extends Component{
 				                  name = "calendar"
 				                  size = "2x"
 				                />
-				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"2px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
 			                	</span>
 			                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
@@ -445,7 +445,7 @@ class MCS_Dashboard extends Component{
 			       <div className = "row justify-content-center mcs_dashboard">
 			          <div className="col-sm-9 table_process">
 			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
-	          	    	  <table className = "table table-striped table-bordered tableContent ">
+	          	    	  <table className = "table table-striped table-bordered tableContent mcs_dashboard_table_border ">
 		          	    	<tr className="table_content">
 			          	    	<th className="table_size">12 - 12:59 AM</th>
 			          	    	<th className="table_size">01 - 01:59 AM</th> 
@@ -455,7 +455,7 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">05 - 05:59 AM</th>
 			          	 
 		          	    	</tr>
-		          	    	<tbody className="tbody border_bottom">
+		          	    	<tbody className="tbody mcs_dashboard_border_bottom">
 		          	    		{this.renderTable(this.state.mc_data)}
 
 		          	    </tbody>
@@ -467,7 +467,7 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">10 - 10:59 AM</th>
 			          	    	<th className="table_size">11 - 11:59 AM</th>
 		          	    	</tr>
-		          	    	<tbody className="tbody border_bottom">
+		          	    	<tbody className="tbody mcs_dashboard_border_bottom">
 		          	    		{this.renderTablecolumn(this.state.mc_data)}
 		          	    </tbody>
 		          	    	<tr className="table_content">
@@ -478,7 +478,7 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">04 - 04:59 PM</th>
 			          	    	<th className="table_size">05 - 05:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody className="tbody border_bottom">
+		          	    	<tbody className="tbody mcs_dashboard_border_bottom">
 		          	    		{this.renderTabledata(this.state.mc_data)}
 		          	    </tbody>
 		          	    	 <tr className="table_content">
@@ -489,7 +489,7 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">10 - 10:59 PM</th>
 			          	    	<th className="table_size">11 - 11:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody className="tbody">
+		          	    	<tbody className="tbody mcs_dashboard_border_bottom">
 		          	    		{this.renderTablecolumndata(this.state.mc_data)}
 		          	    </tbody>
 		          	</table>
@@ -499,7 +499,7 @@ class MCS_Dashboard extends Component{
 		          <div className = "row justify-content-center table_size1">
 		          	<div className = "col-sm-9">
 		          	<div className="table_pro">
-		          	    <table className="table table-striped table-bordered">
+		          	    <table className="table table-striped table-bordered mcs_dashboard_table_border">
 		          	    	<tr>
 		          	    		<th className="mcs-dashboard" style={{background:'rgb(0,176,240)',color:'black'}}>Sleeping Hours</th>
 			          	    	<th className="mcs-dashboard" style={{background:' #107dac',color:'white'}}>Nap Hours</th>
