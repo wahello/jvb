@@ -163,7 +163,14 @@ def get_fitbit_hr_data(user_get,start_date):
 									user=user_get).values_list(
 									'heartrate_data',flat=True)
 	for i,qs in enumerate(hr_qs):
-		heartrate_data = ast.literal_eval(qs)
+		try:
+			heartrate_data = ast.literal_eval(qs)
+		except:
+			# print(type(qs),"vvvv")
+			qs = ast.literal_eval(qs.replace(
+				"'heartrate_fitbit': {...}","'heartrate_fitbit': {}"))
+			heartrate_data = qs
+		# print(heartrate_data,"heartrate_data")
 		hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
 	return hr_dataset
 
@@ -364,7 +371,7 @@ def calculate_AA2_workout(user,start_date):
 	data1={}
 	steps = []
 	hrr_not_recorded_list = []
-	if trans_activity_data[0]:
+	if trans_activity_data and trans_activity_data[0]:
 		start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
 		start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
@@ -712,3 +719,119 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 
 	else:
 		return {}
+
+def get_aa3_data(user,hr_list,timediff_list):
+
+	user_age = user.profile.age()
+	data = {"heart_rate_zone_low_end":"",
+				"heart_rate_zone_high_end":"",
+				"classification":"",
+				"time_in_zone":"",
+				"prcnt_total_duration_in_zone":"",
+				}
+
+	below_aerobic_value = 180-user_age-30
+	anaerobic_value = 180-user_age+5
+	data2 = {}
+	classification_dic = {}
+	low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
+						29,34,39,44,49,54,59]
+	high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-11,0,5,10,13,18,23,28,
+						33,38,43,48,53,58,63]
+
+	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
+	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
+
+	for a,b in zip(low_end_heart,high_end_heart):					
+		if a and b > anaerobic_value:
+			classification_dic[a] = 'anaerobic_zone'
+		elif a and b < below_aerobic_value:
+			classification_dic[a] = 'below_aerobic_zone'
+		else:
+			classification_dic[a] = 'aerobic_zone'
+
+		data={"heart_rate_zone_low_end":a,
+			  "heart_rate_zone_high_end":b,
+			  "classificaton":classification_dic[a],
+			  "time_in_zone":0,
+			  "prcnt_total_duration_in_zone":0,
+			 }
+
+		data2[str(a)]=data
+	total = {"total_duration":0,
+				"total_percent":0}
+	data2['total'] = total
+
+	if hr_list and timediff_list:
+		low_end_dict = dict.fromkeys(low_end_heart,0)
+		# high_end_dict = dict.fromkeys(high_end_heart,0)
+		for a,b in zip(low_end_heart,high_end_heart):
+			for c,d in zip(hr_list,timediff_list):
+				if c>=a and c<=b:
+					low_end_dict[a] = low_end_dict[a] + d
+		# print(low_end_dict,"low_end_dict")
+		total_time_duration = sum(low_end_dict.values())		
+		for a,b in zip(low_end_heart,high_end_heart):					
+			if a and b > anaerobic_value:
+				classification_dic[a] = 'anaerobic_zone'
+			elif a and b < below_aerobic_value:
+				classification_dic[a] = 'below_aerobic_zone'
+			else:
+				classification_dic[a] = 'aerobic_zone'
+			try:
+				prcnt_in_zone = (low_end_dict[a]/total_time_duration)*100
+			except ZeroDivisionError:
+				prcnt_in_zone = 0
+			prcnt_in_zone = int(Decimal(prcnt_in_zone).quantize(0,ROUND_HALF_UP))
+			data={"heart_rate_zone_low_end":a,
+			  "heart_rate_zone_high_end":b,
+			  "classificaton":classification_dic[a],
+			  "time_in_zone":low_end_dict[a],
+			  "prcnt_total_duration_in_zone":prcnt_in_zone,
+			 }
+			data2[str(a)]=data
+
+		total = {"total_duration":total_time_duration,
+				"total_percent":"100%"}
+		if total:
+			data2['total'] = total
+		else:
+			data2['total'] = ""
+	if data2:
+		data2["heartrate_not_recorded"] = {}
+		data2["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = 0
+		data2["heartrate_not_recorded"]["time_in_zone"] = 0
+		data2["heartrate_not_recorded"]["classificaton"] = "heart_rate_not_recorded"
+
+	return data2
+
+def calculate_AA3(user,start_date,user_input_activities):
+	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
+	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+	AA_data = TimeHeartZones.objects.filter(user=user,created_at=start_date)
+	if not user_input_activities and not AA_data:
+		data = get_aa3_data(
+		user,all_activities_heartrate_list,all_activities_timestamp_list)
+		return data
+	elif  not user_input_activities and AA_data:
+		data = get_aa3_data(
+		user,all_activities_heartrate_list,all_activities_timestamp_list)
+		return data
+	elif ((user_input_activities and not AA_data) or
+			(user_input_activities and AA_data)):
+		ui_act_ids = list(user_input_activities.keys())
+		fibit_act = fitbit_aa_chart_one(user,start_date)
+		if len(ui_act_ids) == len(fibit_act):
+			data = get_aa3_data(
+		user,all_activities_heartrate_list,all_activities_timestamp_list)
+			return data
+		else:
+			activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
+			act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
+			all_activities_heartrate_list.extend(act_hr_list)
+			all_activities_timestamp_list.extend(act_time_list)
+			final_data = get_aa3_data(
+				user,all_activities_heartrate_list,all_activities_timestamp_list)
+			return final_data
+	return {}
+	
