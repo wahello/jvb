@@ -371,7 +371,7 @@ def calculate_AA2_workout(user,start_date):
 	data1={}
 	steps = []
 	hrr_not_recorded_list = []
-	if trans_activity_data[0]:
+	if trans_activity_data and trans_activity_data[0]:
 		start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
 		start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
