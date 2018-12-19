@@ -57,8 +57,6 @@ def _create_activity_stat(user,activity_obj,current_date):
 		which are to be shown in activity grid
 	'''
 	user_age = user.profile.age()
-	
-	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
 
 	if activity_obj:
@@ -81,19 +79,15 @@ def _create_activity_stat(user,activity_obj,current_date):
 				activity_keys[k] = v
 				avg_hr = activity_keys.get("averageHeartRateInBeatsPerMinute",0)
 				avg_hr = int(avg_hr) if avg_hr else 0
-				# If there is no average HR information, then consider
-				# steps as "exercise steps"
-				if ((avg_hr and avg_hr < below_aerobic_value) or
-					activity_keys.get("activityType","") == "HEART_RATE_RECOVERY"):
-					activity_keys["steps_type"] = "non_exercise"
-				else:
-					activity_keys["steps_type"] = "exercise"
-				if avg_hr > anaerobic_value:
-					activity_keys["can_update_steps_type"] = False
-
+				if avg_hr >= anaerobic_value:
+					if activity_keys.get("activityType","") == "HEART_RATE_RECOVERY":
+						activity_keys["can_update_steps_type"] = True
+					else:
+						activity_keys["can_update_steps_type"] = False
 		return {activity_obj['summaryId']:activity_keys}
 
 def _get_activities(user,target_date):
+	user_age = user.profile.age()
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 
@@ -155,10 +149,11 @@ def _get_activities(user,target_date):
 	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
-		activity_data, manually_updated_act_data,
+		activity_data,user_age,manually_updated_act_data,
 		include_duplicate=True,include_deleted=True,
-		epoch_summaries = epoch_summaries
+		include_non_exercise = True,epoch_summaries = epoch_summaries
 	)
+
 	for single_activity in combined_activities:
 		if fitfiles:
 			# print(final_heart_rate,"final_heart_rate")
