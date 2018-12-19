@@ -10,7 +10,8 @@ from .models import FitbitConnectToken,\
                     UserFitbitDatabody,\
                     UserFitbitDatafoods,\
                     UserFitbitLastSynced,\
-                    UserAppTokens
+                    UserAppTokens,\
+                    UserAppSubscriptionToken
 # Register your models here.
 
 class FitbitConnectTokenAdmin(admin.ModelAdmin):
@@ -67,6 +68,10 @@ class UserAppTokensAdmin(admin.ModelAdmin):
     search_fields = ('user__username','user__email','user__first_name',
         'user__last_name')
 
+class UserAppSubscriptionTokenAdmin(admin.ModelAdmin):
+    list_display = ['user']
+    search_fields = ('user__username',)
+
 admin.site.register(FitbitConnectToken,FitbitConnectTokenAdmin)
 admin.site.register(FitbitNotifications,FitbitNotificationsAdmin)
 admin.site.register(UserFitbitDataSleep,UserFitbitSleepAdmin)
@@ -77,3 +82,4 @@ admin.site.register(UserFitbitDatabody,UserFitbitDatabodyAdmin)
 admin.site.register(UserFitbitDatafoods,UserFitbitDatafoodsAdmin)
 admin.site.register(UserFitbitLastSynced,UserFitbitLastSyncedAdmin)
 admin.site.register(UserAppTokens,UserAppTokensAdmin)
+admin.site.register(UserAppSubscriptionToken,UserAppSubscriptionTokenAdmin)
