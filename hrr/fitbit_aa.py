@@ -313,10 +313,19 @@ def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp
 	# print(data)
 	return data
 
+def delete_activity(user_input_activities):
+	user_input_activities_copy = user_input_activities.copy()
+	for key,single_activity in user_input_activities_copy.items():
+		if single_activity.get("duplicate") or single_activity.get("deleted"):
+			user_input_activities.pop(key,None)
+	return user_input_activities
+
 def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
 	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
 	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
+	if user_input_activities:
+		user_input_activities = delete_activity(user_input_activities)
 	data = cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
 	AA_data = AA.objects.filter(user=user_get,created_at=start_date)
@@ -697,6 +706,8 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
 	# all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(user_get,start_date)
 	AA_data = AaCalculations.objects.filter(user_aa=user,created_at=start_date)
+	if user_input_activities:
+		user_input_activities = delete_activity(user_input_activities)
 	if not user_input_activities and not AA_data:
 		data = get_aa2_daily_data(user,hr_time_diff)
 		return data
@@ -809,6 +820,8 @@ def calculate_AA3(user,start_date,user_input_activities):
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
 	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
 	AA_data = TimeHeartZones.objects.filter(user=user,created_at=start_date)
+	if user_input_activities:
+		user_input_activities = delete_activity(user_input_activities)
 	if not user_input_activities and not AA_data:
 		data = get_aa3_data(
 		user,all_activities_heartrate_list,all_activities_timestamp_list)

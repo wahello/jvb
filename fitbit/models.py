@@ -121,3 +121,10 @@ class UserAppTokens(models.Model):
 
 	def __str__(self):
 		return "%s"%(self.user.username)
+
+class UserAppSubscriptionToken(models.Model):
+	user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='User_subscription_token'
+    )
+	user_subscription_token = models.TextField(null=True)
