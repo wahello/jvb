@@ -15,7 +15,6 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
-
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -35,12 +34,15 @@ from quicklook.calculations.garmin_calculation import get_filtered_activity_stat
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
+import fitbit
+import quicklook
 from hrr.models import Hrr,\
 						AaCalculations,\
 						TimeHeartZones,\
 						AaWorkoutCalculations,\
 						AA
 import pprint
+from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
 									get_weekly_workouts,\
 									get_weekly_aa,\
@@ -178,17 +180,24 @@ class UserAA(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
 			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 			final_query = aa_data(user_get,start_date)
-			if final_query.get('total_time'):
-				try:
-					user_aa = AA.objects.get(
-					user=user_get, created_at=start_date)
-					aa_update_instance(user_aa, final_query)
-				except AA.DoesNotExist:
-					aa_create_instance(user_get, final_query, start_date)
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				if final_query.get('total_time'):
+					try:
+						user_aa = AA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_update_instance(user_aa, final_query)
+					except AA.DoesNotExist:
+						aa_create_instance(user_get, final_query, start_date)
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_one_new(user_get,start_date)
+				return fitbit_hr_difference
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -222,20 +231,28 @@ class UserAA_workout(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = aa_workout_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = AaWorkoutCalculations.objects.get(
-					user_aa_workout=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except AaWorkoutCalculations.DoesNotExist:
-					create_workout_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = aa_workout_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = AaWorkoutCalculations.objects.get(
+						user_aa_workout=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except AaWorkoutCalculations.DoesNotExist:
+						create_workout_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa2_workout = fitbit_aa.calculate_AA2_workout(user_get,start_date)
+				return fitbit_aa2_workout
+
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -272,20 +289,37 @@ class UserAA_daily(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = daily_aa_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = AaCalculations.objects.get(
-					user_aa=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except AaCalculations.DoesNotExist:
-					create_aa_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = daily_aa_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = AaCalculations.objects.get(
+						user_aa=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except AaCalculations.DoesNotExist:
+						create_aa_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa2_daily = fitbit_aa.calculate_AA2_daily(user_get,start_date)
+				if fitbit_aa2_daily:
+					try:
+						user_obj = AaCalculations.objects.get(
+						user_aa=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa2_daily
+						user_obj.save()
+					except AaCalculations.DoesNotExist:
+						create_aa_instance(user_get, fitbit_aa2_daily, start_date)
+				else:
+					fitbit_aa2_daily = {}
+				return fitbit_aa2_daily
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -322,20 +356,27 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = aa_low_high_end_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = TimeHeartZones.objects.get(
-					user=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except TimeHeartZones.DoesNotExist:
-					create_heartzone_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = aa_low_high_end_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = TimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except TimeHeartZones.DoesNotExist:
+						create_heartzone_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa3 = fitbit_aa.calculate_AA3(user_get,start_date,user_input_activities=None)
+				return fitbit_aa3
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -956,22 +997,15 @@ def aa_calculations(request):
 			aa_create_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_aa_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the AA calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
-	'''
+def store_garmin_aa1(user,from_date,to_date):
 	print("AA calculations got started",user.username)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA1 = AA.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_data(user,current_date)
-		if data.get('total_time'):
+		if data.get('total_time') or (AA1 and not data.get('total_time')):
 			print("AA calculations creating")
 			try:
 				user_aa = AA.objects.get(user=user, created_at=current_date)
@@ -982,6 +1016,38 @@ def store_aa_calculations(user,from_date,to_date):
 			print("NO AA")
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
+
+def store_fitbit_aa1(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
+	if data.get('total_time'):
+		print("Fitbit AA1 calculations creating")
+		try:
+			user_aa = AA.objects.get(user=user, created_at=from_date)
+			aa_update_instance(user_aa, data)
+		except AA.DoesNotExist:
+			aa_create_instance(user, data, from_date)
+	else:
+		print("NO Fitbit AA1")
+
+def store_aa_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the AA calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa1(user,from_date,to_date)
+	elif device_type == "fitbit":
+		print("Fitbit AA chat1 data calculation got started")
+		store_fitbit_aa1(user,from_date,to_date)
+		print("Fitbit AA chat1 data calculation finished")
 	return None
 
 def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
@@ -1279,24 +1345,26 @@ def store_aa_workout_calculations(user,from_date,to_date):
 		:to_date(end date)
 	Return:None
 	'''
-	print("HRR A/A Workout started")
+	print("A/A Workout started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA2 = AaWorkoutCalculations.objects.filter(user_aa_workout=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_workout_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
-			print("HRR A/A workout")
+		if data or (AA2 and not data):
+			print("A/A workout")
 			try:
 				user_obj = AaWorkoutCalculations.objects.get(
 					user_aa_workout=user, created_at=current_date)
 				user_obj.data = data
 				user_obj.save()
+				# update_workout_instance(user,start_date,data)
 			except AaWorkoutCalculations.DoesNotExist:
 				create_workout_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
-	print("HRR A/A workout finished")
+	print("A/A workout finished")
 	return None
 
 def total_percent(modified_data_total):
@@ -1653,7 +1721,7 @@ def daily_aa_data(user, start_date):
 	all_activities_timestamp = []
 	activies_timestamp = []
 	daily_aa_data={}
-	if workout:
+	if workout and workout_data:
 		for tmp in workout:
 			workout_activities = fitfile_parse([tmp],offset,start_date_str)
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
@@ -1801,23 +1869,16 @@ def daily_aa_calculations(request):
 			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_daily_aa_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the Daily A/A calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
-	'''
+def store_garmin_aa_daily(user,from_date,to_date):
 	print("A/A dailies got started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA3 = AaCalculations.objects.filter(user_aa=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA3 and not data):
 			print("A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
@@ -1827,14 +1888,44 @@ def store_daily_aa_calculations(user,from_date,to_date):
 				create_aa_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
 	print("A/A dailes finished")
+
+def store_fitbit_aa_daily(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.calculate_AA2_daily(user,from_date,user_input_activities=activities_dict)
+	if data:
+			try:
+				user_aa = AaCalculations.objects.get(
+					user_aa=user, created_at=from_date)
+				update_aa_instance(user,from_date,data)
+			except AaCalculations.DoesNotExist:
+				create_aa_instance(user, data, from_date)
+
+def store_daily_aa_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the Daily A/A calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa_daily(user,from_date,to_date)
+	elif device_type == "fitbit":
+		print("Fitbit AA chat daily data calculation got started")
+		store_fitbit_aa_daily(user,from_date,to_date)
+		print("Fitbit AA chat daily data calculation finished")
 	return None
 
 def low_high_hr(low_end_heart,high_end_heart,heart_beat):
 	'''
 		Making ranges for A/A third chart
 	'''
-	low_hr = sorted(i for i in low_end_heart if i <= heart_beat)
-	high_hr = sorted(i for i in high_end_heart if i >= heart_beat)
+	low_hr = sorted(i for i in low_end_heart if i <= int(heart_beat))
+	high_hr = sorted(i for i in high_end_heart if i >= int(heart_beat))
 	return low_hr[-1],high_hr[1]
 
 def add_hr_nor_recorded_heartbeat(
@@ -2223,23 +2314,15 @@ def aa_low_high_end_calculations(request):
 			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_aa_low_high_end_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the low_high_end 
-	HR calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
-	'''
+def store_garmin_aa3(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA4 = TimeHeartZones.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_low_high_end_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA4 and not data):
 			try:
 				time_hr_zone_obj = TimeHeartZones.objects.get(
 					user=user, created_at=current_date)
@@ -2249,7 +2332,38 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 				create_heartzone_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
 	return None
-	
+
+def store_fitbit_aa3(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.calculate_AA3(user,from_date,user_input_activities=activities_dict)
+	if data:
+		try:
+			time_hr_zone_obj = TimeHeartZones.objects.get(
+				user=user, created_at=from_date)
+			if time_hr_zone_obj:
+				update_heartzone_instance(user, from_date,data)
+		except TimeHeartZones.DoesNotExist:
+			create_heartzone_instance(user, data, from_date)
+			
+def store_aa_low_high_end_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the low_high_end 
+	HR calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa3(user,from_date,to_date)
+	elif device_type == 'fitbit':
+		print("Fitbit AA chat3 data calculation got started")
+		store_fitbit_aa3(user,from_date,to_date)
+		print("Fitbit AA chat3 data calculation finished")
 
 def hrr_data(user,start_date):
 	Did_heartrate_reach_99 = ''
@@ -2481,7 +2595,7 @@ def hrr_data(user,start_date):
 			pure_1min_heart_beats = 0
 		pure_time_99 = time_99 + diff_actity_hrr
 		
-		if Did_heartrate_reach_99 == 'no':
+		if Did_heartrate_reach_99 == 'no' and garmin_data_daily:
 			if daily_starttime:
 				daily_start_time = end_time_activity - daily_starttime
 				make_to_daily_key = (daily_start_time) % 15
@@ -2507,6 +2621,11 @@ def hrr_data(user,start_date):
 				
 		if diff_actity_hrr > 120:
 			# -1 represents the pure time to 99 did not reach never
+			pure_time_99 = -1
+			pure_1min_heart_beats = None
+		if end_heartrate_activity < 99:
+			# -1 represents the HRR activty started before 99
+			time_99 = -1
 			pure_time_99 = -1
 			pure_1min_heart_beats = None
 

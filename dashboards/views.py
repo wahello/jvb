@@ -22,7 +22,7 @@ def sec_to_min_sec(secs):
         mins = round(mins)
         secs = round(secs)
         if secs < 10:
-            mins = "{:02d}".format(secs) 
+            secs = "{:02d}".format(secs) 
         return "{}:{}".format(mins,secs)
     return None 
 
@@ -230,77 +230,63 @@ class ActiveTimeDashboardView(APIView):
         current_date = str_to_datetime(target_date)
         moment_obj = Steps.objects.filter(user_ql__user = user,user_ql__created_at = current_date).values(
             'movement_consistency')
+        NON_INTERVAL_KEYS = ['total_active_minutes','total_active_prcnt',
+            'active_hours','inactive_hours','sleeping_hours','strength_hours',
+            'exercise_hours','nap_hours','no_data_hours','timezone_change_hours',
+            'total_steps']
         if moment_obj and  moment_obj[0].get('movement_consistency'):
             moment_obj = ast.literal_eval(moment_obj[0].get('movement_consistency'))
-            sleeping_active_minutes = 0
-            exercise_active_minutes = 0
-            sleep_hours = 0
-            exercise_hours = 0
+            sleep_active_sec = 0
+            exercise_active_sec = 0
+            sleep_mins = 0
+            exercise_mins = 0
             for key,value in moment_obj.items():
-                try:
-                    if value['status'] == 'sleeping':
-                        sleeping_active_minutes += value['active_duration']['duration']
-                        sleep_hours += 1
-                    elif value['status'] == 'exercise':
-                        exercise_active_minutes += value['active_duration']['duration']
-                        exercise_hours += 1
-                except TypeError as e:
-                    pass
+                if (key not in NON_INTERVAL_KEYS):
+                    quarterly_data = value['quarterly']
+                    for quarter in quarterly_data.values():
+                        if(quarter['status'] == 'sleeping' or quarter['status'] == 'nap'):
+                            sleep_mins += 15
+                            sleep_active_sec += quarter['active_sec']
+                        elif(quarter['status'] == 'exercise'):
+                            exercise_mins += 15
+                            exercise_active_sec += quarter['active_sec']
+            
+            sleeping_active_minutes = round(sleep_active_sec/60)
+            exercise_active_minutes = round(exercise_active_sec/60)
+
             try:
-                sleep_hour_prcnt = round((sleeping_active_minutes / (sleep_hours*60)) * 100)
+                sleep_hour_prcnt = round((sleeping_active_minutes / sleep_mins) * 100)
             except ZeroDivisionError as e:
                 sleep_hour_prcnt = 0
             try:
-                exercise_hour_prcnt = round((exercise_active_minutes / (exercise_hours*60)) * 100)
+                exercise_hour_prcnt = round((exercise_active_minutes / (exercise_mins)) * 100)
             except ZeroDivisionError as e:
                 exercise_hour_prcnt = 0
 
-            excluded_sleep = moment_obj['total_active_minutes'] - sleeping_active_minutes
-            excluded_sleep_exercise = excluded_sleep - exercise_active_minutes
-            sleeping_active_time = [sleeping_active_minutes//60,sleeping_active_minutes%60]
-            exercise_active_time = [exercise_active_minutes//60,exercise_active_minutes%60]
-            excluded_sleep_time = [excluded_sleep//60,excluded_sleep%60]
-            excluded_sleep_exercise_time = [excluded_sleep_exercise//60,excluded_sleep_exercise%60]
             active_time = {}
-            total_hours = 24
-            excluded_sleep_hours = total_hours-sleep_hours
-            excluded_sleep_prcnt = round((excluded_sleep / (excluded_sleep_hours*60)) * 100)
-            excluded_sleep_exercise_hours = excluded_sleep_hours - exercise_hours
-            excluded_sleep_exercise_prcnt = round((excluded_sleep_exercise / (excluded_sleep_exercise_hours*60)) * 100)
-            active_time['total_active_time']= '{}:{}'.format(
-                moment_obj['total_active_minutes']//60,
-                "%02d"%(moment_obj['total_active_minutes']%60))
+            total_mins = 1440
+            excluded_sleep_active_min = moment_obj['total_active_minutes'] - sleeping_active_minutes
+            excluded_sleep_exercise_active_min = excluded_sleep_active_min - exercise_active_minutes
+            excluded_sleep_mins = total_mins-sleep_mins
+            excluded_sleep_prcnt = round((excluded_sleep_active_min / (excluded_sleep_mins)) * 100)
+            excluded_sleep_exercise_mins = excluded_sleep_mins - exercise_mins
+            excluded_sleep_exercise_prcnt = round(
+                (excluded_sleep_exercise_active_min / (excluded_sleep_exercise_mins)) * 100)
 
-            active_time['total_hours'] = '{}:{}'.format(total_hours,'00')
-
-            active_time['sleeping_active_time'] = '{}:{}'.format(sleeping_active_time[0],\
-                "%02d" % sleeping_active_time[1])
-
-            active_time['total_sleeping_hours'] = '{}:{}'.format(sleep_hours,'00')
-
+            active_time['total_active_time']= sec_to_min_sec(moment_obj['total_active_minutes'])
+            active_time['total_hours'] = sec_to_min_sec(total_mins)
+            active_time['sleeping_active_time'] = sec_to_min_sec(sleeping_active_minutes)
+            active_time['total_sleeping_hours'] = sec_to_min_sec(sleep_mins)
             active_time['sleep_hour_prcnt'] = '{}%'.format(sleep_hour_prcnt)
-
-            active_time['exercise_active_time'] = '{}:{}'.format(exercise_active_time[0],\
-               "%02d" % exercise_active_time[1])
-
-            active_time['total_exercise_hours'] = '{}:{}'.format(exercise_hours,'00')
-
+            active_time['exercise_active_time'] = sec_to_min_sec(exercise_active_minutes)
+            active_time['total_exercise_hours'] = sec_to_min_sec(exercise_mins)
             active_time['exercise_hour_prcnt'] = '{}%'.format(exercise_hour_prcnt)
-
-            active_time['excluded_sleep']= '{}:{}'.format(excluded_sleep_time[0],\
-               "%02d" % excluded_sleep_time[1])
-
-            active_time['excluded_sleep_hours'] = '{}:{}'.format(total_hours-sleep_hours,'00')
-
+            active_time['excluded_sleep']= sec_to_min_sec(excluded_sleep_active_min)
+            active_time['excluded_sleep_hours'] = sec_to_min_sec(excluded_sleep_mins)
             active_time['excluded_sleep_prcnt'] = '{}%'.format(excluded_sleep_prcnt)
-
-            active_time['excluded_sleep_exercise']= '{}:{}'.format(excluded_sleep_exercise_time[0],\
-               "%02d" % excluded_sleep_exercise_time[1])
-
-            active_time['excluded_sleep_exercise_hours'] = '{}:{}'.format(total_hours-sleep_hours-exercise_hours,'00')
-
+            active_time['excluded_sleep_exercise'] = sec_to_min_sec(excluded_sleep_exercise_active_min)
+            active_time['excluded_sleep_exercise_hours'] = sec_to_min_sec(excluded_sleep_exercise_mins)
             active_time['excluded_sleep_exercise_prcnt'] = '{}%'.format(excluded_sleep_exercise_prcnt)
-
             active_time['total_active_prcnt']='{}%'.format(moment_obj['total_active_prcnt'])
             return Response(active_time,status.HTTP_200_OK)
 
