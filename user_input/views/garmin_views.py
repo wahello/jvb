@@ -22,8 +22,6 @@ from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 from garmin.models import GarminFitFiles
 from hrr.calculation_helper import fitfile_parse
 
-from user_input.models import DailyUserInputStrong
-
 def _get_activities_data(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -197,9 +195,15 @@ def _get_fitbit_activities_data(user,target_date):
 				fitbit_to_garmin_converter.fitbit_to_garmin_activities(act)
 			for act in activity_data]
 
+		combined_user_activities = quicklook.calculations.garmin_calculation.\
+				get_filtered_activity_stats(
+					activity_data,user.profile.age(),
+					include_duplicate = True,include_deleted=True,
+					include_non_exercise = True)
+
 		activity_data = [
 			_create_activity_stat(user,act,current_date)[act['summaryId']]
-			for act in activity_data
+			for act in combined_user_activities
 		]
 
 	activity_data = {act.get('summaryId'):act for act in activity_data}
@@ -284,9 +288,9 @@ class GarminData(APIView):
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			# have_activities = quicklook.calculations.garmin_calculation.\
-			# 	do_user_has_exercise_activity(activites.values(),request.user.profile.age())
-			have_activities = True if activites else False
+			have_activities = quicklook.calculations.garmin_calculation.\
+				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
+			# have_activities = True if activites else False
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,

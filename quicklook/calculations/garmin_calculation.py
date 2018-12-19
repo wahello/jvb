@@ -2884,7 +2884,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 			daily_encouraged,"lowest_hr_first_minute",0)
 				
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
-		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
+		exercise_calculated_data['running_cadence'] = safe_sum(combined_user_exercise_activities,
 											'averageRunCadenceInStepsPerMinute')
 		exercise_calculated_data['water_consumed_workout'] = safe_get(daily_encouraged,
 												"water_consumed_during_workout",0)
