@@ -365,7 +365,7 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 			if "sleep_fitbit" == key:
 				date_of_sleep = value['sleep'][0]['dateOfSleep']
 				try:
-					sleep_obj = UserFitbitDataSleep.objects.get(user=user,
+					sleep_obj = UserFitbitDataSleep.objects.filter(user=user,
 					created_at=start_date)
 					update_fitbit_data(user,date_of_sleep,create_notification,value,key)
 					print("Updated sleep-Fitbit successfully")
@@ -401,7 +401,7 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 				# 	fitbit_date_obj = 0
 				# if fitbit_date_obj == start_date:
 				try:
-					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
+					activity_obj = UserFitbitDataActivities.objects.filter(user=user,created_at=start_date)
 					update_fitbit_data(user,date_of_activity,create_notification,value,key)
 					print("Updated Activity-Fitbit successfully")
 					if create_notification != None:
@@ -426,7 +426,7 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 			if "heartrate_fitbit" == key:
 				date_of_heartrate = value['activities-heart'][0]['dateTime']
 				try:
-					heartrate_obj = UserFitbitDataHeartRate.objects.get(user=user,
+					heartrate_obj = UserFitbitDataHeartRate.objects.filter(user=user,
 					created_at=start_date)
 					update_fitbit_data(user,date_of_heartrate,create_notification,value,key)
 					print("Updated Heartrate-Fitbit successfully")
@@ -443,7 +443,7 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 			if "steps_fitbit" == key:
 				date_of_steps = value['activities-steps'][0]['dateTime']
 				try:
-					steps_obj = UserFitbitDataSteps.objects.get(user=user,
+					steps_obj = UserFitbitDataSteps.objects.filter(user=user,
 					created_at=start_date)
 					update_fitbit_data(user,date_of_steps,create_notification,value,key)
 					print("Updated steps-Fitbit successfully")
@@ -459,7 +459,7 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 			if "body_fat_fitbit" == key:
 				date_of_body = value['fat'][0]['date']
 				try:
-					body_obj = UserFitbitDatabody.objects.get(user=user,
+					body_obj = UserFitbitDatabody.objects.filter(user=user,
 					created_at=date_of_body)
 					update_fitbit_data(user,date_of_body,create_notification,value,key)
 					if create_notification != None:
@@ -484,7 +484,7 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 			if "foods_goal_logs" == key:
 				# date_of_foods = value['activities-steps'][0]['dateTime']
 				try:
-					foods_obj = UserFitbitDatafoods.objects.get(user=user,
+					foods_obj = UserFitbitDatafoods.objects.filter(user=user,
 					created_at=datetime.now())
 					update_fitbit_data(user,date.today(),create_notification,value,key)
 					print("Updated foods_goal_logs successfully")
