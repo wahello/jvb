@@ -252,8 +252,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					activity_stats['can_update_steps_type'],
 					activity_stats['duplicate'],
 					activity_stats['deleted'],
-					activity_stats['weather_stats'])
-
+					)
+				# activity_stats['weather_stats']
 				act_obj = DailyActivity(
 					user = user,
 					activity_id = activity['summaryId'],
@@ -270,7 +270,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				)
 				todays_activity = todays_activities.get(activity['summaryId'],None)
 				if todays_activity:
-					todays_activity.update(
+					todays_activity.__dict__.update(
 						activity_data = activity_stats,
 						activity_weather = weather_stats, 
 						start_time_in_seconds  = start_time,
@@ -280,6 +280,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 						comments = activity.get('comments'),
 						duplicate = activity.get('duplicate',False),
 						deleted = activity.get('deleted',False))
+					todays_activity.save()
 				else:
 					activities_model_objects.append(act_obj)
 			DailyActivity.objects.bulk_create(activities_model_objects)
