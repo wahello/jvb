@@ -1,0 +1,119 @@
+.list_margine{
+	margin-top: 40px;
+	font-size: 14px;
+}
+.list_margine,.row{
+	margin-top: 24px;
+	font-size: 14px;
+}
+.list_margine,p{
+	margin-top: 28px;
+	font-size: 14px;
+}
+.check,label{
+	margin-left: 12px;
+	font-size: 14px;
+}
+.text_padding{
+	text-align: left;
+	padding-top: 5px;
+}
+
+
+.save_button{
+	display:flex;
+	justify-content:center;
+} 
+
+
+
+.leftcolumn{
+	display:inline-block;
+	height: 100%;
+	margin-left: 3%;
+	width: 35%;
+	flex: 2;
+
+}
+
+.contentwrapper{
+	display:inline-block;
+    width: 65%;
+	height: 100%;
+	margin-right: 3%;
+	flex: 2;
+}
+
+
+.leftcolumn_a{
+	display:inline-block;
+	height: 100%;
+	margin-left: 2%;
+	width: 58%;
+	flex: 3;
+
+}
+
+.contentwrapper_a{
+	display:inline-block;
+    width: 40%;
+	height: 100%;
+	margin-right: 2%;
+	flex: 2;
+}
+
+.leftcolumn_b{
+	display:inline-block;
+	height: 100%;
+	margin-left: 3%;
+	width: 45%;
+	flex: 2;
+
+}
+
+.contentwrapper_b{
+	display:inline-block;
+    width: 55%;
+	height: 100%;
+	margin-right: 3%;
+	flex: 2;
+}
+
+.main{
+	padding-left: 3%;
+}
+
+.main_a{
+	padding-left: 2%;
+}
+
+
+@media only screen and (min-width: 1300px) {
+	#datepicker{
+		width:auto;
+	}
+}
+@media only screen and (min-width: 1350px) {
+	#datepicker{
+		width:auto;
+	}
+}
+@media only screen and (min-width: 1024px) and (max-width:1299px){
+	#datepicker{
+		width:auto;
+	}
+}
+
+
+.column2{
+    float: right;
+    width: 33.33%;
+	padding: 5px;
+	margin-right: 13% ;
+	margin-bottom: 25px;
+  }
+
+
+
+
+g
