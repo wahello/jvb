@@ -47,3 +47,29 @@ export function renderQlCreateOverlay(){
 		);
 	}
 }
+
+export function renderRawDataExportReportsDataFetchOverlay(){
+	if(this.state.fetchingExportReports_ql){
+		let startDate = moment(this.state.start_date);
+		let endDate = moment(this.state.end_date);
+		console.log("Inside renderRawDataExportReportsDataFetchOverlay, startDate: ",startDate.format('MMMM D, YYYY'));
+		//alert("Inside renderRawDataExportReportsDataFetchOverlay, startDate: ",startDate.format('MMMM D, YYYY'));
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>
+					Preparing Report For {startDate.format('MMMM D, YYYY')} -{endDate.format('MMMM D, YYYY')}...  </p>
+				</div>
+			</div>
+		);
+	}
+}

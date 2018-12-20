@@ -205,25 +205,3 @@ export function renderHrrSummaryDashboardDataFetchOverlay(){
 		);
 	}
 }
-
-export function renderRawDataExportReportsDataFetchOverlay(){
-		let startDate = moment(this.state.start_date);
-		let endDate = moment(this.state.end_date);
-
-		return(
-			<div className="overlay d-flex justify-content-center align-items-center">
-				<div className="overlay-content">
-					<div className="d-flex">
-						<FontAwesome 
-							name='spinner' 
-							size='3x'
-							pulse spin
-							className="mx-auto"   
-						/>
-					</div>
-					<br/>
-					<p>Fetching Export Reports Data For {startDate.format('MMMM D, YYYY')} -{endDate.format('MMMM D, YYYY')}  </p>
-				</div>
-			</div>
-		);
-}
