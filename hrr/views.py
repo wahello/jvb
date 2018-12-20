@@ -731,11 +731,12 @@ def aa_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
-	
+	user_age = user.profile.age()
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
-													user=user,calendar_date=start_date)
+													user=user,calendar_date=start_date,)
 	# print(filtered_activities_files,"filtered activities")
 	filtered_activities_only = filtered_activities_files.copy()
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
@@ -840,7 +841,6 @@ def aa_data(user,start_date):
 	# for tmp_profile in profile:
 	# 	user_dob = tmp_profile.date_of_birth
 	# user_age = (date.today() - user_dob) // timedelta(days=365.2425)
-	user_age = user.profile.age()
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
 	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
@@ -1165,8 +1165,9 @@ def aa_workout_data(user,start_date):
 
 	garmin_list,garmin_dic = get_garmin_activities(
 		user,start_date_timestamp,end_date_timestamp)
-
+	user_age = user.profile.age()
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
 													user=user,calendar_date=start_date)
@@ -1483,13 +1484,15 @@ def daily_aa_data(user, start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
 		user,start_date)
-
+	user_age = user.profile.age()
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
 													user=user,calendar_date=start_date)
 	# print(filtered_activities_files,"filtered_activities_files")
 	filtered_activities_only = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													user=user,calendar_date=start_date)
 	
@@ -2055,12 +2058,15 @@ def aa_low_high_end_data(user,start_date):
 	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
 		user,start_date)
 
+	user_age = user.profile.age()
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
 													user=user,calendar_date=start_date)
 
 	filtered_activities_only = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													user=user,calendar_date=start_date)
 	activities = []
@@ -2414,8 +2420,9 @@ def hrr_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
 		user,start_date)
-
+	user_age = user.profile.age()
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
+													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
 	count = 0
