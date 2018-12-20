@@ -65,7 +65,7 @@ export function renderRawDataExportReportsDataFetchOverlay(){
 					</div>
 					<br/>
 					<p>
-					Preparing Report For {startDate.format('MMMM D, YYYY')}-{endDate.format('MMMM D, YYYY')}...  </p>
+					Preparing report for {startDate.format('MMMM D, YYYY')}-{endDate.format('MMMM D, YYYY')}. It will be downloaded automatically in a moment</p>
 				</div>
 			</div>
 		);
