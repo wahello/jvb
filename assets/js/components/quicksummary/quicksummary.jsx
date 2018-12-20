@@ -19,8 +19,10 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 import {getInitialState} from './initialState';
 import {getInitialStateUserInput} from './initialStateUser';  
 import {getInitialStateHrr} from './initialStateHrr';
-import {renderQlFetchOverlay,renderQlCreateOverlay} from './helpers';
+import {renderQlFetchOverlay,renderQlCreateOverlay,renderRawDataExportReportsDataFetchOverlay} from './helpers';
 import {quicksummaryDate,userInputDate,createQuicklook,fetchLastSync,hrrDate}  from '../../network/quick';
+
+//import {renderRawDataExportReportsDataFetchOverlay} from '../dashboard_healpers';
 
 
 import NavbarMenu from '../navbar';
@@ -90,6 +92,7 @@ class Quicklook extends Component{
 		this.renderQlCreateOverlay = renderQlCreateOverlay.bind(this);
 		this.renderModel = this.renderModel.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
+		this.renderRawDataExportReportsDataFetchOverlay = renderRawDataExportReportsDataFetchOverlay.bind(this);
 		this.toggleDate=this.toggleDate.bind(this);
 	    this.toggleNav = this.toggleNav.bind(this);
 	    this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -112,6 +115,7 @@ class Quicklook extends Component{
 			activeTab : 'grade',
 			fetching_ql:false,
 			creating_ql:false,
+			fetchingExportReports_ql:false,
 			dateRange:false,
 			dropdownOpen: false,
 			model:true,
@@ -735,6 +739,14 @@ onLogoutSuccess(response){
     this.props.history.push("/#logout");
   }
 
+rawDataExportReportOverlay(){
+	this.setState({
+		fetchingExportReports_ql:true
+	},() => {
+		setTimeout(() => this.setState({ fetchingExportReports_ql: false }), 3000);
+	});
+}
+
 
 	render(){
 		const {fix} = this.props;
@@ -847,7 +859,7 @@ onLogoutSuccess(response){
 									        </span>
                                  		 <span id="spa">
                                           <abbr  id="abbri">
-                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`}>
+                                           <a href={`/quicklook/print/excel?from_date=${moment(this.state.start_date).format('MM-DD-YYYY')}&to_date=${moment(this.state.end_date).format('MM-DD-YYYY')}`} onClick={this.rawDataExportReportOverlay.bind(this)}>
                                             <div className="btn3">
                                             <Button id="nav-btn" className="btn">Export Reports</Button>
                                             </div>
@@ -1100,6 +1112,7 @@ onLogoutSuccess(response){
 					{this.renderQlFetchOverlay()}
 					{this.renderQlCreateOverlay()}
 					{this.renderModel()}
+					{this.renderRawDataExportReportsDataFetchOverlay()}
 				</div>
 
 
