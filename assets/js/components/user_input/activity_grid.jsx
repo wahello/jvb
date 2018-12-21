@@ -2372,7 +2372,7 @@ return(
     </span>
 </td>
 <td id = "add_button" className="add_button_back">
-    Steps Type 
+          Exercise or Non-Exercise? / Exercise or Non-Exercise Steps
     <span id="stepsTypeInfoModalWindow" onClick={this.toggleInfo_stepsType}>
         <a  className="infoBtn"> 
             <FontAwesome style={{fontSize:"16px"}}
@@ -2526,7 +2526,7 @@ return(
        <span>
         <a href="#" onClick={() => this.infoPrint("steps_type_info_modal_body")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
             &nbsp;
-            Steps Type
+            Exercise or Non-Exercise? / Exercise or Non-Exercise Steps
         </span>
         </ModalHeader>
           <ModalBody className="modalcontent" id="steps_type_info_modal_body">
@@ -2552,7 +2552,7 @@ return(
                             <td>
                                 Exercise/Non-Exercise Steps Characterization
                             </td>
-                            <td colSpan="3">
+                            <td colSpan="4">
                                 If the average heart rate of an activity file is
                             </td>
                         </tr>
@@ -2569,6 +2569,9 @@ return(
                             <td>
                                 Anaerobic zone
                             </td>
+                            <td>
+                                 Not Recorded
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -2580,12 +2583,18 @@ return(
                             </td>
                             <td>
                                 Default: Non-Exercise steps
-                                <br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                             <td>
                                 Default: Non-Exercise steps
                                 <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
+                            <td>
+                                Default: Non-Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+
+
                         </tr>
                         <tr>
                             <td>
@@ -2603,9 +2612,54 @@ return(
                                 Default: Exercise steps
                                 <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  No
                             </td>
+
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                 Activity (Exercise) File:  Walk/Walking Activity Type
+                            </td>
+                            <td>
+                                Default: Non Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  No
+                            </td>
+
+                            <td>
+                                Default: Non Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
                         </tr>
                         <tr>
-                            <td colSpan="4">
+                            <td colSpan="5">
+                            We differentiate between Exercise and Not Exercise (Movement).  Both are important.  In general, we define exercise as (1) when one elevates his/her average heart rate to an aerobic or anaerobic zone over the course of the workout; and (2) during strength training or other activities that are clearly exercise but may or may not elevate one's average heart rate over the course of the workout to an aerobic or anaerobic zone
+
+                            We define "Exercise Steps" ("Activity Steps") as those steps accumulated during exercise, generally when a person's heart rate is elevated consistently to the aerobic or anaerobic zone; conversely, we define non exercise steps generally as those steps accumulated when moving around throughout the day (MOVEMENT!) when not exercising, and therefore one's heart rate is lower and therefore we consider it to be movement, not exercise
+
+                            We receive and/or have written proprietary algorithms to arrive at 'Exercise Steps"/“Activity Steps” from various wearable devices and use the logic to characterize steps as “exercise” or “non exercise” steps (and this characterization also determines the “Non Exercise Steps” grade on our site as well as other stats we provide). We give you the ability to recharacterize your steps as “exercise” or “non exercise” steps in certain scenarios, as you may create an activity file on your wearable device (we encourage this) that you may characterize differently than the logic we use below. To recharacterize your steps between exercise and non exercise steps, select the toggle button in the “Steps Type” column.  
+
+                            NOTE 1:  IF ONE CHARACTERIZES STEPS AS "NON EXERCISE STEPS", THEN THE "Exercise or Not Exercise (Movement)" CLASSIFICATION MUST BE "NOT EXERCISE (MOVEMENT)" (AND VICE VERSA).   THIS ENSURES THAT USERS WILL NOT DOUBLE DIP BY GETTING CREDIT FOR BOTH EXERCISE WHILE AT THE SAME TIME ACCUMULATING NON EXERCISE STEPS
+
+                            NOTE 2: USERS CAN NOT CHANGE EXERCISE STEPS TO NON EXERCISE STEPS IF THE ACTIVITY FILE HAS AN AVERAGE HEART RATE IN THE ANAEROBIC ZONE, AS IN ALL CASES WE CONSIDER THIS EXERCISE (AND NOT MOVEMENT)
+
+                            If you’d like to recharacterize AN EXERCISE ACTIVITY AS EXERCISE OR NOT EXERCISE (MOVEMENT) and are unable to do so on the site, email us at info@jvbwellness.com to request what you would like to do and explain why
+                            
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colSpan="5">
                                  *If multiple activities, a user must characterize one activity as “exercise steps”
                             </td>
                         </tr>
