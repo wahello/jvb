@@ -760,6 +760,7 @@ def aa_data(user,start_date):
 					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
 						user_created_activity_list.append(k)
 						remove_in_workout.append(int(k["summaryId"]))
+
 	for single_activity in created_activity_dict.values():
 		if single_activity.get('averageHeartRateInBeatsPerMinute',0) == 0 or single_activity.get('averageHeartRateInBeatsPerMinute',0) == '':
 			if activities_dic:
@@ -776,14 +777,13 @@ def aa_data(user,start_date):
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	if user_input_strong:
-		
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = int(meta['activityIds'][0])
 			if id_act == data_id:
 				hrr.append(tmp)
-			elif user_input_workout_keys and data_id not in remove_in_workout:
+			elif (str(data_id) in user_input_workout_keys) and data_id not in remove_in_workout:
 				workout.append(tmp)
 	else:
 		
@@ -795,10 +795,6 @@ def aa_data(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)
-	# profile = Profile.objects.filter(user=user)
-	# for tmp_profile in profile:
-	# 	user_dob = tmp_profile.date_of_birth
-	# user_age = (date.today() - user_dob) // timedelta(days=365.2425)
 	user_age = user.profile.age()
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
@@ -1464,8 +1460,18 @@ def daily_aa_data(user, start_date):
 		if avg_hr == '' or avg_hr == 0:
 			user_created_activity_list.append(single_activity)
 	remove_in_workout = []
-	# print(garmin_list,"garmin_list")
-	# print(filtered_activities_files,"filtered_activities_files")
+	act_from_ui = []
+	if activities_hrr:
+		act_from_ui.extend(activities_hrr)
+	if activities_workout:
+		act_from_ui.extend(activities_workout)
+	if garmin_workout_keys and act_from_ui:
+		deleted_act = list(set(garmin_workout_keys)-set(act_from_ui))
+	else:
+		deleted_act = []
+	if deleted_act:
+		for i,sigle_act_id in enumerate(deleted_act):
+			garmin_workout_keys.remove(sigle_act_id)
 	for i,single_actiivty in enumerate(garmin_list):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
@@ -1531,7 +1537,6 @@ def daily_aa_data(user, start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
-
 	try:
 		if workout_data:
 			for tmp in fitfiles_obj:
@@ -1540,7 +1545,7 @@ def daily_aa_data(user, start_date):
 				data_id = int(meta['activityIds'][0])
 				if id_act == data_id:
 					hrr.append(tmp)
-				elif str(data_id) in garmin_workout_keys and data_id not in remove_in_workout:
+				elif str(data_id) in garmin_workout_keys:
 					workout.append(tmp)
 					data_summaryid.append(data_id)
 				if filtered_activities_files:
@@ -1603,13 +1608,14 @@ def daily_aa_data(user, start_date):
 	data_summaryid = [str(summaryid) for summaryid in data_summaryid]
 	no_hrr_actvities = list(set(ui_data_keys) - set(data_summaryid))
 	no_hrr_actvities = list(set(no_hrr_actvities) - set(activities_hrr))
+	
 	if garmin_workout and no_hrr_actvities:
 		for single_activity in garmin_workout:
 			for single_activity_key in no_hrr_actvities:
-				if single_activity_key == single_activity['summaryId']:
+				single_activity_key == single_activity['summaryId']
+				if single_activity_key and single_activity_key not in deleted_act:
 					user_created_activity_list.append(single_activity)
 	profile = Profile.objects.filter(user=user)
-	
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
 			try:
@@ -1704,8 +1710,16 @@ def daily_aa_data(user, start_date):
 				percent_below_aerobic=''
 				percent_aerobic=''
 				total_percent=''
-			single_data = {"avg_heart_rate":avg_hrr_list[i],
-					"max_heart_rate":max_hrr_list[i],
+			try:
+				avg_hr_single_data = avg_hrr_list[i]
+			except:
+				avg_hr_single_data = ''
+			try:
+				max_hr_single_data = max_hrr_list[i]
+			except:
+				max_hr_single_data = ''
+			single_data = {"avg_heart_rate":avg_hr_single_data,
+					"max_heart_rate":max_hr_single_data,
 					"total_duration":total_time,
 					"duration_in_aerobic_range":time_in_aerobic,
 					"percent_aerobic":percent_aerobic,
