@@ -524,6 +524,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_controlled_substance_penalty = ""
 		ui_smoking_penalty = ""
 		ui_did_workout = ""
+		ui_prcnt_breath_through_nose = 0
 
 		# calling the resting hearate from fitbit models
 		resting_heartrate = fitbit_heartrate_data(user,current_date)
@@ -565,6 +566,9 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			ui_controlled_substance_penalty = todays_user_input.strong_input.controlled_uncontrolled_substance
 			ui_smoking_penalty = todays_user_input.strong_input.smoke_any_substances_whatsoever
 			ui_did_workout = todays_user_input.strong_input.workout
+			prcnt_breath_through_nose = todays_user_input.encouraged_input.workout_that_user_breathed_through_nose
+			if prcnt_breath_through_nose:
+				ui_prcnt_breath_through_nose = int(prcnt_breath_through_nose)
 			
 		
 			'''user inputs of activites for displaying exercise reporting'''
@@ -581,6 +585,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			exercise_calculated_data['smoke_substance'] = ui_smoke_substance
 			exercise_calculated_data['workout_comment'] = ui_workout_comment
 			exercise_calculated_data['effort_level'] = ui_workout_effort_level
+			exercise_calculated_data['nose_breath_prcnt_workout'] = ui_prcnt_breath_through_nose
 
 		#Food 
 		food_calculated_data['prcnt_non_processed_food'] = ui_prcnt_unprocessed_food_consumed_yesterday
@@ -713,11 +718,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['exercise_consistency_score'] = \
 			exe_consistency_grade[1]
 
-		# overal grades gpa and grade
-		overall_grade_pt = get_overall_grades(grades_calculated_data)
-		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
-		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
-
 		# Movement consistency and movement consistency grade calculation
 		# Time user go to bed last night
 		yesterday_bedtime = sleep_stats['sleep_bed_time']
@@ -780,6 +780,11 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			grade = quicklook.calculations.garmin_calculation\
 				.cal_movement_consistency_grade(inactive_hours)
 			grades_calculated_data['movement_consistency_grade'] = grade
+
+		# overal grades gpa and grade
+		overall_grade_pt = get_overall_grades(grades_calculated_data)
+		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
+		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
 
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 

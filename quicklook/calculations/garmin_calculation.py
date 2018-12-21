@@ -2812,6 +2812,9 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 													 			"fitnessAge", 0)
 		exercise_calculated_data['heartrate_variability_stress'] = safe_get_dict(dailies_json,
 														'averageStressLevel',-1)
+		exercise_calculated_data['nose_breath_prcnt_workout'] = safe_get(
+			daily_encouraged,
+			"workout_that_user_breathed_through_nose",0)
 		
 		# Steps
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
