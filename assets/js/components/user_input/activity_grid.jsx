@@ -8,6 +8,7 @@ import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 import { ToastContainer, toast } from 'react-toastify';
+import {getUserProfile} from '../../network/auth';
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
@@ -84,7 +85,11 @@ const activites = { "":"Select",
 "WALKING":"WALKING",
 "WHITEWATER_RAFTING_KAYAKING":"WHITE WATER RAFTING KAYAKING",
 "WIND_KITE_SURFING":"WIND KITE SURFING",
-"YOGA":"YOGA"
+"YOGA":"YOGA" ,
+
+"date_of_birth":"",
+
+selectedDate:new Date(),
 };
 
 export default class ActivityGrid extends Component{
@@ -138,6 +143,9 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+this.successProfile=this.successProfile.bind(this);
+this.renderAge=this.renderAge.bind(this);
+this.calculateZone = this.calculateZone.bind(this);
 
 this.state ={
     selected_date:selected_date,
@@ -191,7 +199,10 @@ this.state ={
     infoButton_activitySteps:'',
     infoButton_duplicate:false,
     infoButton_delete:false,
-    isActivityStepsTypeOpen:false
+    isActivityStepsTypeOpen:false ,
+
+    date_of_birth:"",
+    selectedDate:new Date(),
 }
 }
 
@@ -225,6 +236,8 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
+
+
 addingCommaToSteps(value){
     value += '';
     var x = value.split('.');
@@ -236,6 +249,33 @@ addingCommaToSteps(value){
     }
     return x1 + x2;
 }
+successProfile(data){
+    this.setState({
+        date_of_birth:data.data.date_of_birth,
+    },() => {
+        console.log("*************",this.state.date_of_birth);
+    })
+}
+renderAge(){
+    let today_date = new Date();
+    let date_of_birth = moment(this.state.date_of_birth);
+    let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
+    let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
+    
+    
+      return age;
+}
+
+calculateZone(){
+
+    let age = this.renderAge();
+
+    let aerobic_zone = 180-age-29;
+    return aerobic_zone;
+}
+
+
+
 setActivitiesEditModeFalse(){
     //it will do set the state true to false of activity.
     //it will do hide the fields when you click on the
@@ -759,11 +799,23 @@ handleChange_heartrate(event){
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
+    let aerobic_zone = this.calculateZone();
+        
+    if(value<aerobic_zone){
+        let steps_type = "non_exercise";
+        activity_data['steps_type'] = steps_type;
+    } else {
+        //Exercise
+        let steps_type = "exercise";
+        activity_data['steps_type'] = steps_type;
+    }
     this.setState({
         activites:{
             ...this.state.activites,
             [selectedActivityId]:activity_data
         }
+    },() =>{
+        this.props.updateParentActivities(this.state.activites);
     });
 }
 
@@ -2285,6 +2337,14 @@ renderEditActivityModal(){
           
           }
     }
+
+
+    
+componentDidMount(){
+    getUserProfile(this.successProfile);
+}
+
+
 render(){
 
 return(
