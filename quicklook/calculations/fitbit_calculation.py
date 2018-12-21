@@ -379,7 +379,6 @@ def get_overall_grades(grades_calculated_data):
 		Args: All grades
 		Return: tuple of Overall grade Overall GPA
 	'''
-	print(grades_calculated_data)
 	overall_grade_pt = quicklook.calculations.garmin_calculation.get_overall_grade(
 		grades_calculated_data)
 	return overall_grade_pt
