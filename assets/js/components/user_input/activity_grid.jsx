@@ -85,11 +85,7 @@ const activites = { "":"Select",
 "WALKING":"WALKING",
 "WHITEWATER_RAFTING_KAYAKING":"WHITE WATER RAFTING KAYAKING",
 "WIND_KITE_SURFING":"WIND KITE SURFING",
-"YOGA":"YOGA" ,
-
-"date_of_birth":"",
-
-selectedDate:new Date(),
+"YOGA":"YOGA"
 };
 
 export default class ActivityGrid extends Component{
@@ -144,7 +140,6 @@ this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this)
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
 this.successProfile=this.successProfile.bind(this);
-this.renderAge=this.renderAge.bind(this);
 this.calculateZone = this.calculateZone.bind(this);
 
 this.state ={
@@ -200,9 +195,8 @@ this.state ={
     infoButton_duplicate:false,
     infoButton_delete:false,
     isActivityStepsTypeOpen:false ,
-
-    date_of_birth:"",
-    selectedDate:new Date(),
+    age:"",
+    selectedDate:new Date()
 }
 }
 
@@ -250,26 +244,17 @@ addingCommaToSteps(value){
     return x1 + x2;
 }
 successProfile(data){
-    this.setState({
-        date_of_birth:data.data.date_of_birth,
-    },() => {
-        console.log("*************",this.state.date_of_birth);
-    })
-}
-renderAge(){
     let today_date = new Date();
-    let date_of_birth = moment(this.state.date_of_birth);
+    let date_of_birth = moment(data.data.date_of_birth);
     let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
     let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
-    
-    
-      return age;
+    this.setState({
+        age:age
+    })
 }
 
 calculateZone(){
-
-    let age = this.renderAge();
-
+    let age = this.state.age;
     let aerobic_zone = 180-age-29;
     return aerobic_zone;
 }
@@ -814,8 +799,6 @@ handleChange_heartrate(event){
             ...this.state.activites,
             [selectedActivityId]:activity_data
         }
-    },() =>{
-        this.props.updateParentActivities(this.state.activites);
     });
 }
 
