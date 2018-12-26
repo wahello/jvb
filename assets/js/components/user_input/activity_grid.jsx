@@ -196,7 +196,8 @@ this.state ={
     infoButton_delete:false,
     isActivityStepsTypeOpen:false ,
     age:"",
-    selectedDate:new Date()
+    selectedDate:new Date() ,
+    avg_hr: ''
 }
 }
 
@@ -256,7 +257,11 @@ successProfile(data){
 calculateZone(){
     let age = this.state.age;
     let aerobic_zone = 180-age-29;
-    return aerobic_zone;
+    let anaerobic_zone = 180-age+5;
+
+    return {
+        aerobic_zone: aerobic_zone ,
+        anaerobic_zone: anaerobic_zone  };
 }
 
 
@@ -721,13 +726,43 @@ handleChange_activity(event){
   const value = target.value;
   const selectedActivityId = target.getAttribute('data-name');
   let activity_data = this.state.activites[selectedActivityId];
-  activity_data['activityType'] = value;
 
-  this.setState({
-  activites:{...this.state.activites,
-  [selectedActivityId]:activity_data
-  }
-     });
+  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+  
+   activity_data['activityType'] = value;
+   let calZone = this.calculateZone();
+   let aerobic_zone = calZone.aerobic_zone;
+   let anaerobic_zone = calZone.anaerobic_zone;
+   let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
+
+
+ if(value == "HEART_RATE_RECOVERY" ){
+     let steps_type = "non_exercise";
+     activity_data['steps_type'] = steps_type;
+ }
+
+else if(value == "WALKING"){
+     if( avg_hr >= aerobic_zone && avg_hr <= anaerobic_zone ){
+         let steps_type = "exercise";
+        activity_data['steps_type'] = steps_type;
+    }else{
+        let steps_type = "non_exercise";
+         activity_data['steps_type'] = steps_type;
+     }
+}else{
+    let steps_type = "exercise";
+    activity_data['steps_type'] = steps_type;
+ }
+
+
+this.setState({
+    activites:{
+        ...this.state.activites,
+        [selectedActivityId]:activity_data
+    }
+});
+
+ /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
  
   $('#comments_id').css('display','none');
    if(value == "OTHER"){
@@ -747,7 +782,7 @@ handleChange_activity(event){
   this.setState({
 [selectedActivityId]: value
   });
-  }
+  } 
 }
 
 handleChange_time(event){
@@ -779,27 +814,52 @@ handleChange_time(event){
   }
  
 handleChange_heartrate(event){
+
     const target = event.target;
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
-    activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
-    let aerobic_zone = this.calculateZone();
-        
-    if(value<aerobic_zone){
+    
+
+    /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+     let calZone = this.calculateZone();
+     let aerobic_zone = calZone.aerobic_zone;
+     let anaerobic_zone = calZone.anaerobic_zone;
+     activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
+
+     let act_type = activity_data['activityType'];
+
+     if(value  && act_type == "HEART_RATE_RECOVERY"){
         let steps_type = "non_exercise";
         activity_data['steps_type'] = steps_type;
-    } else {
-        //Exercise
-        let steps_type = "exercise";
-        activity_data['steps_type'] = steps_type;
     }
+     else if( act_type == "WALKING"){
+        if( value >= aerobic_zone && value <= anaerobic_zone ){
+            let steps_type = "exercise";
+           activity_data['steps_type'] = steps_type;
+       }else{
+           let steps_type = "non_exercise";
+            activity_data['steps_type'] = steps_type;
+        }
+   }else{
+       let steps_type = "exercise";
+       activity_data['steps_type'] = steps_type;
+    }
+
+     
     this.setState({
+
         activites:{
             ...this.state.activites,
             [selectedActivityId]:activity_data
-        }
+        } ,
+        avg_hr : value 
+
     });
+
+     /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
+
+    
 }
 
 valueChange(event){
@@ -1056,39 +1116,88 @@ EndTimeInSecondsSaveCalender(event){
   })
 }
 
+
+
 handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-    if(value== "OTHER"){
-        this.setState({
-            [name]: value,
+
+ /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+let calZone = this.calculateZone();
+let aerobic_zone = calZone.aerobic_zone;
+let anaerobic_zone = calZone.anaerobic_zone;
+let modal_activity_heart_rate= this.state.modal_activity_heart_rate; 
+let modal_act_id;
+
+if(  modal_activity_heart_rate && value == "HEART_RATE_RECOVERY"){
+     modal_act_id  = "non_exercise";
+    
+    
+}
+ else if( value == "WALKING"){
+    if(  modal_activity_heart_rate >= aerobic_zone &&  modal_activity_heart_rate <= anaerobic_zone ){
+         modal_act_id = "exercise";
+    
+
+   }else{
+        modal_act_id = "non_exercise";
+        
+
+    }
+}else{
+    modal_act_id = "exercise";
+}
+
+
+/************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
+
+
+
+     if(value== "OTHER"){
+         this.setState({
+             [name]: value,
             "modal_activity_type":""
         });
     }
-    else if(name == "activity_display_name"){
+     else if(name == "activity_display_name"){
         this.setState({
             [name]: value,
+            modal_exercise_steps_status : modal_act_id ,
             "modal_activity_type":value
-        });
-    }
-    else if (name == "modal_activity_heart_rate"
-        || name == "modal_exercise_steps"){
+         },() => {
+             console.log("modal_exercise_steps_status: ",this.state.modal_exercise_steps_status);
+         });
+     }
+     else if (name == "modal_activity_heart_rate"
+         || name == "modal_exercise_steps"){
         this.setState({
-            [name]: parseInt(value)
-        });
-    }
-    else if (name == "modal_duplicate_info_status"){
-        this.setState({
-            [name]: (value == "true")
-        });
-    }
-    else{
-        this.setState({
-            [name]: value
-        });
-    }
+            [name]: parseInt(value) 
+
+         });
+     }
+     else if (name == "modal_duplicate_info_status"){
+         this.setState({
+             [name]: (value == "true")
+         });
+     }
+     else{
+         this.setState({
+             [name]: value
+         });
+     }
 }
+
+
+
+
+
+
+
+
+
+
+
     createSleepDropdown(start_num , end_num, mins=false, step=1){
     let elements = [];
     let i = start_num;
@@ -2584,12 +2693,12 @@ return(
                                 Activity (Exercise) File
                             </td>
                             <td>
-                                Default: Non Exercise steps
+                                Default: Exercise steps
                                 <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
                             </td>
                             <td>
                                 Default: Exercise steps
-                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes*
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                             <td>
                                 Default: Exercise steps
@@ -2626,7 +2735,7 @@ return(
                         </tr>
                         <tr>
                             <td colSpan="5">
-                                 *If multiple activities, a user must characterize one activity as “exercise steps”
+                                 If multiple activities, a user must characterize one activity as “exercise steps”
                             </td>
                         </tr>
                         </tbody>
