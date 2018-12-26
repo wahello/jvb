@@ -254,18 +254,6 @@ successProfile(data){
     })
 }
 
-calculateZone(){
-    let age = this.state.age;
-    let aerobic_zone = 180-age-29;
-    let anaerobic_zone = 180-age+5;
-
-    return {
-        aerobic_zone: aerobic_zone ,
-        anaerobic_zone: anaerobic_zone  };
-}
-
-
-
 setActivitiesEditModeFalse(){
     //it will do set the state true to false of activity.
     //it will do hide the fields when you click on the
@@ -719,70 +707,78 @@ editToggleHandlerDuration(event){
             this.props.updateParentActivities(this.state.activites);
         });
     }
+}
+
+calculateZone(){
+    let age = this.state.age;
+    let aerobic_zone = 180-age-29;
+    let anaerobic_zone = 180-age+5;
+
+    return {
+        aerobic_zone: aerobic_zone ,
+        anaerobic_zone: anaerobic_zone
+    };
 }   
 
+getActivityCategory = (activityType,heartrate) => {
+    const EXERCISE = 'exercise';
+    if(activityType){
+        let hrzone = this.calculateZone();
+        const NON_EXERCISE = 'non_exercise';
+        const HEART_RATE_RECOVERY = 'heart_rate_recovery'
+        const WALK = "walk";
+
+        if(activityType.toLowerCase() == HEART_RATE_RECOVERY){
+            return NON_EXERCISE;
+        }
+        else if(activityType.toLowerCase().includes(WALK)){
+            if(!heartrate || heartrate < hrzone['aerobic_zone'])
+                return NON_EXERCISE;
+            return EXERCISE;
+        }
+        else{
+            return EXERCISE;
+        }
+    }
+    return EXERCISE;
+}
+
 handleChange_activity(event){
-  const target = event.target;
-  const value = target.value;
-  const selectedActivityId = target.getAttribute('data-name');
-  let activity_data = this.state.activites[selectedActivityId];
+    const target = event.target;
+    const value = target.value;
+    const selectedActivityId = target.getAttribute('data-name');
+    let activity_data = this.state.activites[selectedActivityId];
+    activity_data['activityType'] = value;
 
-  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
-  
-   activity_data['activityType'] = value;
-   let calZone = this.calculateZone();
-   let aerobic_zone = calZone.aerobic_zone;
-   let anaerobic_zone = calZone.anaerobic_zone;
-   let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
-
-
- if(value == "HEART_RATE_RECOVERY" ){
-     let steps_type = "non_exercise";
-     activity_data['steps_type'] = steps_type;
- }
-
-else if(value == "WALKING"){
-     if( avg_hr >= aerobic_zone && avg_hr <= anaerobic_zone ){
-         let steps_type = "exercise";
-        activity_data['steps_type'] = steps_type;
-    }else{
-        let steps_type = "non_exercise";
-         activity_data['steps_type'] = steps_type;
-     }
-}else{
-    let steps_type = "exercise";
+    /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+    let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
+    let steps_type = this.getActivityCategory(value,avg_hr);
     activity_data['steps_type'] = steps_type;
- }
-
-
-this.setState({
+    /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
+    this.setState({
     activites:{
         ...this.state.activites,
         [selectedActivityId]:activity_data
     }
-});
-
- /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
- 
-  $('#comments_id').css('display','none');
-   if(value == "OTHER"){
-  this.setState({
-[selectedActivityId]: value,
-"modal_activity_type":""
-  });
-  }
-  else if(name == "activity_display_name"){
-  this.setState({
-[selectedActivityId]: value,
-"modal_activity_type":value
-  });
-
-  }
-  else{
-  this.setState({
-[selectedActivityId]: value
-  });
-  } 
+    });
+    $('#comments_id').css('display','none');
+    if(value == "OTHER"){
+        this.setState({
+        [selectedActivityId]: value,
+        "modal_activity_type":""
+        });
+    }
+    else if(name == "activity_display_name"){
+        this.setState({
+        [selectedActivityId]: value,
+        "modal_activity_type":value
+        });
+    }
+    else{
+        this.setState({
+        [selectedActivityId]: value
+        });
+    } 
 }
 
 handleChange_time(event){
@@ -814,51 +810,23 @@ handleChange_time(event){
   }
  
 handleChange_heartrate(event){
-
     const target = event.target;
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
-    
-
+    activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
     /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
-     let calZone = this.calculateZone();
-     let aerobic_zone = calZone.aerobic_zone;
-     let anaerobic_zone = calZone.anaerobic_zone;
-     activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
-
-     let act_type = activity_data['activityType'];
-
-     if(value  && act_type == "HEART_RATE_RECOVERY"){
-        let steps_type = "non_exercise";
-        activity_data['steps_type'] = steps_type;
-    }
-     else if( act_type == "WALKING"){
-        if( value >= aerobic_zone && value <= anaerobic_zone ){
-            let steps_type = "exercise";
-           activity_data['steps_type'] = steps_type;
-       }else{
-           let steps_type = "non_exercise";
-            activity_data['steps_type'] = steps_type;
-        }
-   }else{
-       let steps_type = "exercise";
-       activity_data['steps_type'] = steps_type;
-    }
-
-     
+    let act_type = activity_data['activityType'];
+    let steps_type = this.getActivityCategory(act_type,parseInt(value));
+    activity_data['steps_type'] = steps_type;
+    /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
     this.setState({
-
         activites:{
             ...this.state.activites,
             [selectedActivityId]:activity_data
         } ,
         avg_hr : value 
-
     });
-
-     /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
-
     
 }
 
@@ -1124,80 +1092,56 @@ handleChange(event){
     const name = target.name;//modal_duplicate_info_status
 
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
-let calZone = this.calculateZone();
-let aerobic_zone = calZone.aerobic_zone;
-let anaerobic_zone = calZone.anaerobic_zone;
-let modal_activity_heart_rate= this.state.modal_activity_heart_rate; 
-let modal_act_id;
-
-if(  modal_activity_heart_rate && value == "HEART_RATE_RECOVERY"){
-     modal_act_id  = "non_exercise";
-    
-    
-}
- else if( value == "WALKING"){
-    if(  modal_activity_heart_rate >= aerobic_zone &&  modal_activity_heart_rate <= anaerobic_zone ){
-         modal_act_id = "exercise";
-    
-
-   }else{
-        modal_act_id = "non_exercise";
-        
-
-    }
-}else{
-    modal_act_id = "exercise";
-}
-
-
+    let actType = this.state.modal_activity_type;
+    let actAvgHeartRate = this.state.modal_activity_heart_rate;
+    let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
 /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
 
-
-
-     if(value== "OTHER"){
-         this.setState({
-             [name]: value,
-            "modal_activity_type":""
-        });
-    }
-     else if(name == "activity_display_name"){
+    if(value == "OTHER"){
+        let actType = value;
+        let actAvgHeartRate = this.state.modal_activity_heart_rate;
+        let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
         this.setState({
             [name]: value,
-            modal_exercise_steps_status : modal_act_id ,
-            "modal_activity_type":value
-         },() => {
-             console.log("modal_exercise_steps_status: ",this.state.modal_exercise_steps_status);
-         });
-     }
-     else if (name == "modal_activity_heart_rate"
-         || name == "modal_exercise_steps"){
+            modal_activity_type:"",
+            modal_exercise_steps_status:steps_type
+        });
+    }
+    else if(name == "activity_display_name"){
+        let actType = value;
+        let actAvgHeartRate = this.state.modal_activity_heart_rate;
+        let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
+        this.setState({
+            [name]: value,
+            modal_activity_type:value,
+            modal_exercise_steps_status:steps_type
+        });
+    }
+    else if(name == "modal_activity_heart_rate"){
+        let actType = this.state.modal_activity_type;
+        let actAvgHeartRate = this.state.modal_activity_heart_rate;
+        let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
+        this.setState({
+            [name]: parseInt(value),
+             modal_exercise_steps_status:steps_type
+        });
+    }
+    else if (name == "modal_exercise_steps"){
         this.setState({
             [name]: parseInt(value) 
-
-         });
-     }
-     else if (name == "modal_duplicate_info_status"){
-         this.setState({
-             [name]: (value == "true")
-         });
-     }
-     else{
-         this.setState({
-             [name]: value
-         });
-     }
+        });
+    }
+    else if (name == "modal_duplicate_info_status"){
+        this.setState({
+            [name]: (value == "true")
+        });
+    }
+    else{
+        this.setState({
+            [name]: value
+        });
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
     createSleepDropdown(start_num , end_num, mins=false, step=1){
     let elements = [];
     let i = start_num;
