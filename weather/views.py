@@ -30,7 +30,7 @@ class ActivityWeatherView(APIView):
         weather_data = {}
         for activity in filtered_activities_list:
             epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
-            if activity.get('activity_weather') == {}:
+            if has_weather_data(activity):
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
@@ -40,13 +40,22 @@ class ActivityWeatherView(APIView):
 
                     weather_data[activity['summaryId']] = {**activity_weather}
                 else:
-                    weather_report = get_weather_info_using_garmin_activity(
-                                                user, epoch_time, activity['summaryId'])
+                    weather_report = {'dewPoint': {'value': None, 'units': None},
+                                'humidity': {'value': None, 'units': None},
+                                'temperature':{'value': None, 'units': None},
+                                'wind': {'value': None, 'units': None},
+                                'temperature_feels_like':{'value': None, 'units': None},
+                                'weather_condition': None}
                     weather_data[activity['summaryId']] = {**weather_report}
             else:
-                weather_report = get_weather_info_using_garmin_activity(
-                                                user, epoch_time, activity['summaryId'])
-                weather_data[activity['summaryId']] = {**weather_report}
+                # weather_report = get_weather_info_using_garmin_activity(
+                #                                 user, epoch_time, activity['summaryId'])
+                # weather_data[activity['summaryId']] = {**weather_report}
+                weather_keys = ("dewPoint", "humidity", "temperature", "wind", "temperature_feels_like")
+                weather_report = {}
+                for key in weather_keys:
+                    weather_report[key] = activity[key]
+                # weather_report["weather_condition"] = activity["weather_condition"]
         return Response(weather_data)
 
 
@@ -66,15 +75,14 @@ def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
 
             activity_weather = get_weather_response_as_required(
                                     latitude, longitude, epoch_time)
+            print("............:::", activity_weather)
             weather_report.update({**activity_weather})
         return weather_report
     except UserGarminDataActivity.DoesNotExist:
         return weather_report
 
-
 def get_weather_response_as_required(latitude, longitude, epoch_time):
     weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
-
     dewPoint_value = round((weather_info['currently']['dewPoint'] * 9/5)+ 32)
     temperature_value = round((weather_info['currently']['temperature'] * 9/5)+ 32)
     temperature_feels_like_value = round((weather_info['currently']['apparentTemperature'] * 9/5)+ 32)
@@ -119,3 +127,10 @@ def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='s
         return weather_report.json()
     except:
         return ()
+
+def has_weather_data(activity):
+    ''' Returns Boolean type. Returns True if there is all weather column values are none in the database else returns False'''
+    dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
+    weather_keys = ("dewPoint", "humidity","temperature","wind","temperature_feels_like","weather_condition")
+    weather_keys_values = dictfilt(activity, weather_keys)
+    return True if all(value == None for value in weather_keys_values.values()) else False

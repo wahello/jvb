@@ -13,12 +13,12 @@ def get_activity_base_format(activity):
     del (activity['activity_data'], activity['user_id'], \
         activity['id'], (activity['created_at']),  \
             activity["activity_weather"], activity['activity_id'])
-    weather_keys = ('temperature_feels_like', 'weather_condition', 'humidity', 'dewPoint', 'wind', 'temperature')
+    weather_keys = ('temperature_feels_like', 'humidity', 'dewPoint', 'wind', 'temperature')
     activity_weathers = {}
     for k  in weather_keys:
         if activity_weather_dict and activity_weather_dict[k]:
-            # if activity_weather_dict[k]:
             activity_weathers[k] = activity_weather_dict[k]['value']
+    activity_weathers['weather_condition'] = activity_weather_dict['weather_condition']
     return {**activity_data_dict, **activity, **activity_weathers}
 
 def get_daily_activities_in_base_format(user,date,include_all=False):
