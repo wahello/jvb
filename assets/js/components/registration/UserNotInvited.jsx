@@ -14,9 +14,8 @@ const userNotInvited = (props) => {
 						/>
 					</div>
 					<div>
-						We're sorry, but you are not invited to register on the JVB Health & Wellness.
 						Please contact <span style={{fontWeight:"bold"}}>info@jvbwellness.com</span> to
-						get invited.
+						request an invitation and then try again after getting approved
 					</div>
 					<CardLink href="/"> Go to Home</CardLink>
 				</div>
