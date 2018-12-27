@@ -33,4 +33,6 @@ urlpatterns = [
 								  name="daily_aa"),
 	url(r'^aa_low_high_calculations$',views.UserAA_low_high_values.as_view(),
 									name="aa_classification chart"),
+	url(r'^aa_whole_day_calculations$',views.UserAA_whole_day.as_view(),
+								  name="aa_whole_day_database"),
 ]

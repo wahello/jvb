@@ -39,7 +39,8 @@ from hrr.models import Hrr,\
 						AaCalculations,\
 						TimeHeartZones,\
 						AaWorkoutCalculations,\
-						AA
+						AA, \
+						AAWholeDay
 import pprint
 from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
@@ -56,6 +57,7 @@ from hrr.calculation_helper import week_date,\
 
 from .serializers import AaSerializer,HeartzoneSerializer
 from .serializers import HrrSerializer
+from fitbit.models import UserFitbitDataHeartRate
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -397,6 +399,54 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 							  user=user).values()
 		else:
 			queryset = TimeHeartZones.objects.all()
+		return queryset
+
+class UserAA_whole_day(generics.ListCreateAPIView):
+	'''
+		- Create the AAWholeDay instance
+		- List all the AAWholeDay instance
+		- If query parameters "from" is provided
+		  then filter the AAWholeDay data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+			return final_query
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_four_new(user_get,start_date)
+				if fitbit_hr_difference.get('total_time'):
+					try:
+						user_aa = AAWholeDay.objects.get(
+						user=user_get, created_at=start_date)
+						aa_whole_day_update_instance(user_aa, fitbit_hr_difference)
+					except AAWholeDay.DoesNotExist:
+						aa_whole_day_create_instance(user_get, fitbit_hr_difference, start_date)
+				return fitbit_hr_difference
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
+		return Response(aa_data, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+
+		start_dt = self.request.query_params.get('start_date', None)
+
+		if start_dt:
+			queryset = AAWholeDay.objects.filter(created_at=start_dt,
+							  user=user).values()
+		else:
+			queryset = AAWholeDay.objects.all()
 		return queryset
 
 # Parse the fit files and return the heart beat and timstamp
@@ -977,6 +1027,18 @@ def aa_update_instance(instance, data):
 def aa_create_instance(user, data, start_date):
 	created_at = start_date
 	AA.objects.create(user = user,created_at = created_at,**data)
+
+# update AAWholeDay table
+
+def aa_whole_day_update_instance(instance, data):
+	aa_update_helper(instance, data)
+
+
+#creating AAWholeDay table
+
+def aa_whole_day_create_instance(user, data, start_date):
+	created_at = start_date
+	AAWholeDay.objects.create(user = user,created_at = created_at,**data)
 
 
 def aa_calculations(request):
