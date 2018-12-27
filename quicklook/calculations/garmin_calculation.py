@@ -995,10 +995,6 @@ def get_filtered_activity_stats(activities_json,user_age,
 
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
-
-			act_category = get_activity_exercise_non_exercise_category(obj,
-				user_age)
-			obj['steps_type'] = act_category
 			filtered_activities.append(obj)
 
 	# merge user created manual activities which are not provided by garmin
@@ -1016,13 +1012,12 @@ def get_filtered_activity_stats(activities_json,user_age,
 			calendar_date = kwargs.get('calendar_date'),
 			activities = filtered_activities
 		)
-
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
-			act_category = get_activity_exercise_non_exercise_category(act,
+		act_category = get_activity_exercise_non_exercise_category(act,
 				user_age)
-			act['steps_type'] = act_category
+		act['steps_type'] = act_category
 
 	deleted_activities = []
 	duplicate_activities = []
