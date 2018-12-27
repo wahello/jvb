@@ -826,8 +826,7 @@ handleChange_heartrate(event){
         activites:{
             ...this.state.activites,
             [selectedActivityId]:activity_data
-        } ,
-        avg_hr : value 
+        }
     });
     
 }
