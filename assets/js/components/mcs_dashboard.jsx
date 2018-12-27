@@ -251,7 +251,14 @@ class MCS_Dashboard extends Component{
 	        color = 'white';
 	      }
 	    return (
-	    	<td style = {{background:background,color:color}}>
+	    	<td style = {{background:background, color:color ,  borderColor: "#505050" ,
+			borderStyle: "solid" ,
+			borderWidth: "0 2px 2px 2px" ,
+			margin: "0 1px 1px 1px" ,
+			marginTop: "0 !important " ,
+			paddingTop: "0 !important ",
+			borderSpacing: "0 inherit inherit inherit !important " 
+		    }}>
 	    	<div>
 		    	{this.stepsValueComma(score)}
 		    </div> 
@@ -381,7 +388,14 @@ class MCS_Dashboard extends Component{
          	     		if(!_.isEmpty(values2)){
 	                     	let td_values = [];
 	                     	for(let key3 of keys) 
-			         		 	td_values.push(<td className="mcs-dashboard">{values2[key3]}</td>);
+			         		 	td_values.push(<td className="mcs-dashboard"  style ={{ borderColor: "#505050" ,
+									borderStyle: "solid" ,
+									borderWidth: "0 2px 2px 2px" ,
+									margin: "0 1px 1px 1px" ,
+									marginTop: "0 !important " ,
+									paddingTop: "0 !important ",
+									borderSpacing: "0 inherit inherit inherit !important " 
+								   }}>{values2[key3]}</td>);
 		          			td_rows.push(<tr className="mcs-dashboard">{td_values}</tr>);
 		         		}
 		         	}
@@ -413,7 +427,7 @@ class MCS_Dashboard extends Component{
 				                  name = "calendar"
 				                  size = "2x"
 				                />
-				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"2px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
 			                	</span>
 			                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
@@ -445,51 +459,51 @@ class MCS_Dashboard extends Component{
 			       <div className = "row justify-content-center mcs_dashboard">
 			          <div className="col-sm-9 table_process">
 			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
-	          	    	  <table className = "table table-striped table-bordered tableContent ">
+	          	    	  <table className = "table table-striped  tableContent  border_spacing">
 		          	    	<tr className="table_content">
-			          	    	<th className="table_size">12:00 - 12:59 AM</th>
-			          	    	<th className="table_size">01:00 - 01:59 AM</th> 
-			          	    	<th className="table_size">02:00 - 02:59 AM</th>
-			          	    	<th className="table_size">03:00 - 03:59 AM</th>
-			          	    	<th className="table_size">04:00 - 04:59 AM</th>
-			          	    	<th className="table_size">05:00 - 05:59 AM</th>
+			          	    	<th className="table_size">12 - 12:59 AM</th>
+			          	    	<th className="table_size">1 - 1:59 AM</th> 
+			          	    	<th className="table_size">2 - 2:59 AM</th>
+			          	    	<th className="table_size">3 - 3:59 AM</th>
+			          	    	<th className="table_size">4 - 4:59 AM</th>
+			          	    	<th className="table_size">5 - 5:59 AM</th>
 			          	 
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody">
 		          	    		{this.renderTable(this.state.mc_data)}
 
 		          	    </tbody>
 		          	    	<tr className="table_content">
-		          	    		<th className="table_size">06:00 - 06:59 AM</th>
-			          	    	<th className="table_size">07:00 - 07:59 AM</th>
-			          	    	<th className="table_size">08:00 - 08:59 AM</th>
-			          	    	<th className="table_size">09:00 - 09:59 AM</th>
-			          	    	<th className="table_size">10:00 - 10:59 AM</th>
-			          	    	<th className="table_size">11:00 - 11:59 AM</th>
+		          	    		<th className="table_size">6 - 6:59 AM</th>
+			          	    	<th className="table_size">7 - 7:59 AM</th>
+			          	    	<th className="table_size">8 - 8:59 AM</th>
+			          	    	<th className="table_size">9 - 9:59 AM</th>
+			          	    	<th className="table_size">10 - 10:59 AM</th>
+			          	    	<th className="table_size">11 - 11:59 AM</th>
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody">
 		          	    		{this.renderTablecolumn(this.state.mc_data)}
 		          	    </tbody>
 		          	    	<tr className="table_content">
-			          	    	<th className="table_size">12:00 - 12:59 PM</th>
-			          	    	<th className="table_size">01:00 - 01:59 PM</th>
-			          	    	<th className="table_size">02:00 - 02:59 PM</th>
-			          	    	<th className="table_size">03:00 - 03:59 PM</th>
-			          	    	<th className="table_size">04:00 - 04:59 PM</th>
-			          	    	<th className="table_size">05:00 - 05:59 PM</th>
+			          	    	<th className="table_size">12 - 12:59 PM</th>
+			          	    	<th className="table_size">1 - 1:59 PM</th>
+			          	    	<th className="table_size">2 - 2:59 PM</th>
+			          	    	<th className="table_size">3 - 3:59 PM</th>
+			          	    	<th className="table_size">4 - 4:59 PM</th>
+			          	    	<th className="table_size">5 - 5:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody">
 		          	    		{this.renderTabledata(this.state.mc_data)}
 		          	    </tbody>
 		          	    	 <tr className="table_content">
-		          	    		<th className="table_size">06:00 - 06:59 PM</th>
-			          	    	<th className="table_size">07:00 - 07:59 PM</th>
-			          	    	<th className="table_size">08:00 - 08:59 PM</th>
-			          	    	<th className="table_size">09:00 - 09:59 PM</th>
-			          	    	<th className="table_size">10:00 - 10:59 PM</th>
-			          	    	<th className="table_size">11:00 - 11:59 PM</th>
+		          	    		<th className="table_size">6 - 6:59 PM</th>
+			          	    	<th className="table_size">7 - 7:59 PM</th>
+			          	    	<th className="table_size">8 - 8:59 PM</th>
+			          	    	<th className="table_size">9 - 9:59 PM</th>
+			          	    	<th className="table_size">10 - 10:59 PM</th>
+			          	    	<th className="table_size">11 - 11:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody>
+		          	    	<tbody className="tbody">
 		          	    		{this.renderTablecolumndata(this.state.mc_data)}
 		          	    </tbody>
 		          	</table>
@@ -499,16 +513,24 @@ class MCS_Dashboard extends Component{
 		          <div className = "row justify-content-center table_size1">
 		          	<div className = "col-sm-9">
 		          	<div className="table_pro">
-		          	    <table className="table table-striped table-bordered">
+		          	    <table className="table table-striped  border_spacing">
 		          	    	<tr>
-		          	    		<th className="mcs-dashboard" style={{background:'rgb(0,176,240)',color:'black'}}>Sleeping Hours</th>
-			          	    	<th className="mcs-dashboard" style={{background:' #107dac',color:'white'}}>Nap Hours</th>
-			          	    	<th className="mcs-dashboard" style={{background:'green',color:'white'}}>Active Hours</th>
-			          	    	<th className="mcs-dashboard" style={{background:'red',color:'white'}}>Inactive Hours</th>
-			          	    	<th className="mcs-dashboard" style={{background:'rgb(255,0,255)',color:'white'}}>Strength Hours</th>
-								<th className="mcs-dashboard" style={{background:'#FD9A44',color:'black'}}>Exercise Hours</th>
-								<th className="mcs-dashboard" style={{background:'#A5A7A5',color:'black'}}>No Data Yet</th>
-								<th className="mcs-dashboard" style={{background:'#fdeab7',color:'black'}}>Time Zone Change</th>
+		          	    		<th className="mcs-dashboard mcs_th" style={{background:'rgb(0,176,240)',color:'black' , borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important ' }}>Sleeping Hours</th>
+			          	    	<th className="mcs-dashboard mcs_th" style={{background:' #107dac',color:'white' ,  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>Nap Hours</th>
+			          	    	<th className="mcs-dashboard mcs_th" style={{background:'green',color:'white' ,  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>Active Hours</th>
+			          	    	<th className="mcs-dashboard mcs_th" style={{background:'red',color:'white' ,  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>Inactive Hours</th>
+			          	    	<th className="mcs-dashboard mcs_th" style={{background:'rgb(255,0,255)',color:'white' ,  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>Strength Hours</th>
+								<th className="mcs-dashboard mcs_th" style={{background:'#FD9A44',color:'black',  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>Exercise Hours</th>
+								<th className="mcs-dashboard mcs_th" style={{background:'#A5A7A5',color:'black' ,  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>No Data Yet</th>
+								<th className="mcs-dashboard mcs_th" style={{background:'#fdeab7',color:'black' ,  borderColor: '#505050',
+                                           borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important '}}>Time Zone Change</th>
 								
 		          	    	</tr>
 		          	    	<tbody>
